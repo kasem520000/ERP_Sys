@@ -161,16 +161,19 @@ describe("receipt-58 / receipt-80 (POS roll prints, §1)", () => {
 });
 
 describe("template registry + fonts (§1–§2)", () => {
-  it("PRINT_TEMPLATE_VERSIONS freezes the four base templates at version 1", () => {
+  it("PRINT_TEMPLATE_VERSIONS freezes the four base templates (v2 for the QR-image templates)", () => {
     expect(Object.keys(PRINT_TEMPLATE_VERSIONS).sort()).toEqual([
       "a4-document",
       "a4-report",
       "receipt-58",
       "receipt-80",
     ]);
-    for (const version of Object.values(PRINT_TEMPLATE_VERSIONS)) {
-      expect(version).toBe(1);
-    }
+    // PHASE-037 (H-02): the three invoice-bearing templates gained the
+    // pre-rendered QR image block → v2; a4-report is untouched → v1.
+    expect(PRINT_TEMPLATE_VERSIONS["a4-document"]).toBe(2);
+    expect(PRINT_TEMPLATE_VERSIONS["receipt-80"]).toBe(2);
+    expect(PRINT_TEMPLATE_VERSIONS["receipt-58"]).toBe(2);
+    expect(PRINT_TEMPLATE_VERSIONS["a4-report"]).toBe(1);
   });
 
   it("the print stylesheet embeds the woff2 fonts as data URIs (no network fetch)", () => {

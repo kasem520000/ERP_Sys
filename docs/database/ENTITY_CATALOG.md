@@ -1,6 +1,6 @@
 # Entity Catalog
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-10 (PHASE-037 — zatca_devices, 203 → 204 domain rows)
 
 All planned entities grouped by owning module, with the phase that introduces them and
 key relationships. This is the catalog-level map; column-level specifications for core
@@ -131,7 +131,8 @@ Legend: **Phase** = first implementation phase · **OC** = offline-creatable
 | `sales_order_lines` | Order lines + the optional soft-reservation reference | tenant_id, order_id, item_id, qty, unit_price, discount, tax_code_id, net/tax amounts, reservation_id | 012 | no |
 | `delivery_notes` | Goods-out docs | tenant_id, order_id, warehouse_id, status, lines | 012 | no |
 | `delivery_note_lines` | DN lines (issue-cost snapshot — the W-3 provenance) | tenant_id, delivery_id, order_line_id, item_id, qty, unit_price, net_amount, batch_id, serial_ids, issue_unit_cost, issue_value | 012 | no |
-| `sales_invoices` | Billing docs | tenant_id, customer_id, branch_id, invoice_no, invoice_date, due_date, kind (CASH/CREDIT), currency, exchange_rate, totals, tax_summary, posted_journal_ids, status, offline_receipt_no?, einvoice_status, channel (STANDARD/POS), pos_terminal_id?, order_type? (DINE_IN/TAKEAWAY/DELIVERY/COUNTER), pos_table_id?, tenders jsonb (the cash/card split — G-02), job_card_id?/vehicle_id? (017 provenance — the card→invoice chain + per-vehicle history), owner_device_id? (020 — the OWNER_DEVICE_WINS drafts stamp, reassigned by the admin route), claim_ref? (031 — external insurer claim reference, captured only when a template policy activates it; null = self-pay) | 012 → 016 (POS channel columns) → 017 (job-card/vehicle provenance) → 020 (owner-device drafts) → 031 (healthcare claim_ref) | POS yes |
+| `sales_invoices` | Billing docs | tenant_id, customer_id, branch_id, invoice_no, invoice_date, due_date, kind (CASH/CREDIT), currency, exchange_rate, totals, tax_summary, posted_journal_ids, status, offline_receipt_no?, einvoice_status, channel (STANDARD/POS), pos_terminal_id?, order_type? (DINE_IN/TAKEAWAY/DELIVERY/COUNTER), pos_table_id?, tenders jsonb (the cash/card split — G-02), job_card_id?/vehicle_id? (017 provenance — the card→invoice chain + per-vehicle history), owner_device_id? (020 — the OWNER_DEVICE_WINS drafts stamp, reassigned by the admin route), claim_ref? (031 — external insurer claim reference, captured only when a template policy activates it; null = self-pay) | 012 → 016 (POS channel columns) → 017 (job-card/vehicle provenance) → 020 (owner-device drafts) → 031 (healthcare claim_ref) → 037 (ZATCA Phase-1 chain stamps) | POS yes |
+| `sales_invoices` — **PHASE-037 addenda** (migration `0050_zatca_phase1.sql`) | ZATCA chain stamps on the billing doc | zatca_device_id? (composite FK → zatca_devices — the chain anchor), icv? (1..N per device, strictly monotonic — INV-027), previous_invoice_hash? (PIH = the predecessor's stored invoice_hash; genesis = base64(SHA-256(ASCII "0"))), invoice_hash? (base64 digest), invoice_hash_version? (`invoice-hash-v1`; PHASE-054 re-derives), qr_payload? (base64 TLV — rendered to an image at print time only, OA-06), classification? (STANDARD/SIMPLIFIED — the B2C path); all six stamp columns all-or-nothing (`ck_sales_invoices_zatca_stamp_shape`), partial UNIQUE (tenant, device, icv) + chain-walk index; NULL = unstamped until post or the backfill fills history (never rewritten) | 037 | POS yes |
 | `sales_invoice_lines` | Lines | invoice_id, item_id, qty, uom_id, unit_price, discount, tax_code_id, tax_snapshot, net_amount, tax_amount, batch_id, serial_id, foc_reason_code? (017 BR-008 — zero-price FOC lines carry their reason; net ≥ 0 exactly when reason-coded) | 012 → 017 (FOC reason) | POS yes |
 | `credit_notes` | AR corrections/returns | tenant_id, customer_id, ref_invoice_id, lines, totals, tax_summary, return_stock, job_card_id? (017 warranty-note provenance) | 012 → 017 (job-card link) | no |
 | `credit_note_lines` | Note lines (mandatory invoice_line_id; re-entry cost snapshot) | tenant_id, note_id, invoice_line_id, item_id, qty, unit_price, tax_code_id, tax_snapshot, return_to_stock, batch_id, serial_ids, reentry_unit_cost, reentry_value | 012 | no |
@@ -396,6 +397,18 @@ additively with zero migrations.
 | `custom_picklists` | Tenant-managed value lists (FD-20) | key, name, name_ar, status ACTIVE/ARCHIVED | 036 | no |
 | `custom_picklist_options` | Picklist options | picklist_id, label, label_ar, sort_order, status ACTIVE/ARCHIVED (archived rejected for new values, labels preserved for history) | 036 | no |
 | `form_layouts` | Per-entity designer layouts + role overrides (FD-19) | entity_type, role_key (NULL = default; two partial uniques), name, sections jsonb, status | 036 | no |
+
+## zatca devices (PHASE-037 — DELIVERED by migration `0050_zatca_phase1.sql`, schema_version 50)
+
+The ZATCA Phase-1 generation substrate (INV-027 —
+[../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md)): the
+per-tenant EIAS device registry (the chain anchor) + the additive NULLABLE sales_invoices
+stamp columns recorded as the addenda row in the sales section above. +1 table — the
+catalog count moves 203 → 204 (the RLS-suite parity gate checks the number).
+
+| Entity | Purpose | Key fields | Phase | OC |
+|--------|---------|-----------|-------|----|
+| `zatca_devices` | Per-tenant ZATCA EIAS device registry — the INV-027 chain anchor (device UUID/serial are placeholders until PHASE-054 CSID onboarding; solution-provider fields stored verbatim, never guessed) | tenant_id, name/name_ar (UNIQUE per tenant), device_uuid? (36-hex shape, UNIQUE per tenant where set), device_serial?, solution_provider_name?, solution_provider_vat? (15-digit shape), registration_status (NOT_REGISTERED/PENDING/REGISTERED/REVOKED — the app writes NOT_REGISTERED only in Phase-1, BR-061), icv_counter (≥0 — the next minted ICV is counter+1, incremented transactionally inside the invoice post), branch_id? (composite FK RESTRICT), note; grants SELECT/INSERT/UPDATE — **NO DELETE** (a device with issued invoices is archive-disabled by the service; the purge-path policies cover offboarding) | 037 | no |
 
 ## Diagrams
 

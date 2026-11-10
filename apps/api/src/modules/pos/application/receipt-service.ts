@@ -1,6 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { renderReceipt58, renderReceipt80, type ReceiptPayload } from "@erp/ui/print";
 
+import { ZatcaQrPayloadRequiredError } from "../../tax/domain/zatca/zatca-errors";
+import { findTaxRegistrationByCountry } from "../../tax/infrastructure/tax.store";
+import { listZatcaDevices } from "../../tax/infrastructure/zatca.store";
+import { qrDataUri } from "../../tax/application/zatca/qr-renderer";
 import * as posStore from "../infrastructure/pos.store";
 import * as salesStore from "../../sales/infrastructure/sales.store";
 import { PosTerminalNotFoundError } from "../domain/pos-errors";
@@ -88,6 +92,34 @@ export class PosReceiptService {
             )
             .join(" + ");
 
+    // PHASE-037 (BR-060, fail-closed): for an ENROLLED tenant (an EIAS
+    // device exists — the settings-screen registry is the enrollment
+    // act), a KSA-VAT tenant cannot PRINT a SIMPLIFIED invoice without a
+    // QR payload. POS receipts are the simplified path by definition
+    // (classification SIMPLIFIED; legacy rows before 0050 carry NULL
+    // classification + channel POS). Unenrolled tenants keep printing
+    // their legacy receipts unchanged. The guard runs BEFORE any
+    // rendering side effect — zero residue.
+    const saRegistration = await findTaxRegistrationByCountry("SA");
+    const sellerVatRegistered =
+      saRegistration?.status === "REGISTERED" && saRegistration.registrationNumber !== null;
+    const enrolled = (await listZatcaDevices({ limit: 1 })).length > 0;
+    const simplified =
+      invoice.classification === "SIMPLIFIED" ||
+      (invoice.classification === null && invoice.channel === "POS");
+    if (simplified && enrolled && sellerVatRegistered && invoice.qrPayload === null) {
+      throw new ZatcaQrPayloadRequiredError({
+        invoiceId: invoice.id,
+        surface: "print",
+        classification: "SIMPLIFIED",
+      });
+    }
+    // H-02: the pre-rendered QR image over the STORED payload (never the
+    // client's guess; render-at-print only — OA-06). Unstamped receipts
+    // (no payload) print without an image — the guard above decides
+    // whether that is legal (non-KSA-VAT tenants: yes).
+    const qrImageUri = invoice.qrPayload !== null ? await qrDataUri(invoice.qrPayload) : undefined;
+
     const payload: ReceiptPayload = {
       template,
       locale,
@@ -96,6 +128,7 @@ export class PosReceiptService {
       items,
       totals,
       paymentMethod,
+      ...(qrImageUri === undefined ? {} : { qrImageUri }),
       ...(terminal === undefined ? {} : { terminal: terminal.code }),
       legalLine:
         locale === "ar"

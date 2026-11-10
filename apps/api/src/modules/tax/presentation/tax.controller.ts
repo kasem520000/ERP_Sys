@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Post, Query, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Patch, Post, Query, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { z } from "zod";
 
@@ -14,6 +14,7 @@ import { PackService } from "../application/pack-service";
 import { EInvoicingService } from "../application/einvoicing-service";
 import { TaxReconciliationService } from "../application/tax-reconciliation-service";
 import { SubmissionRegistryService } from "../submissions/registry-service";
+import { ZatcaPhase1Service } from "../application/zatca/zatca-phase1-service";
 import * as certs from "../certs/certificate-service";
 import * as rollout from "../rollout/adapter-settings";
 import { FilesService } from "../../files/application/files.service";
@@ -125,6 +126,35 @@ const adapterSettingSchema = z.object({
   enabled: z.boolean(),
 });
 
+// PHASE-037: the ZATCA EIAS device registry schemas (matrix §3.7 —
+// tax.einvoicing.devices.manage). registrationStatus is READ-ONLY on the
+// wire (BR-061: Phase-1 never registers; the Phase-2 lifecycle is 054's).
+const zatcaDeviceCreateSchema = z.object({
+  name: z.string().min(1).max(160),
+  nameAr: z.string().min(1).max(200).nullish(),
+  deviceUuid: z.string().min(8).max(64).nullish(),
+  deviceSerial: z.string().min(1).max(64).nullish(),
+  solutionProviderName: z.string().min(1).max(160).nullish(),
+  solutionProviderVat: z.string().regex(/^\d{15}$/).nullish(),
+  branchId: UUID.nullish(),
+  note: z.string().min(1).max(2000).nullish(),
+});
+
+const zatcaDeviceUpdateSchema = z.object({
+  name: z.string().min(1).max(160).nullish(),
+  nameAr: z.string().min(1).max(200).nullish(),
+  deviceUuid: z.string().min(8).max(64).nullish(),
+  deviceSerial: z.string().min(1).max(64).nullish(),
+  solutionProviderName: z.string().min(1).max(160).nullish(),
+  solutionProviderVat: z.string().regex(/^\d{15}$/).nullish(),
+  branchId: UUID.nullish(),
+  note: z.string().min(1).max(2000).nullish(),
+});
+
+const zatcaBackfillSchema = z.object({
+  limit: z.number().int().min(1).max(1000).optional(),
+});
+
 @Controller("api/v1/tax")
 export class TaxController {
   constructor(
@@ -137,6 +167,7 @@ export class TaxController {
     @Inject(TaxReconciliationService) private readonly reconciliation: TaxReconciliationService,
     @Inject(SubmissionRegistryService) private readonly submissionRegistry: SubmissionRegistryService,
     @Inject(FilesService) private readonly files: FilesService,
+    @Inject(ZatcaPhase1Service) private readonly zatca: ZatcaPhase1Service,
   ) {}
 
   // -- reference data (read-only packs + treatments) ------------------------------
@@ -493,6 +524,126 @@ export class TaxController {
         adapterId,
         countryCode: input.countryCode.toUpperCase(),
         enabled: input.enabled,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  // -- PHASE-037: the ZATCA EIAS device registry + chain + backfill -------
+  // (matrix §3.7 — tax.einvoicing.devices.manage; BR-061: the registration
+  // status is the NOT_REGISTERED placeholder, never writable here).
+
+  /** List the tenant's devices (chain status included). */
+  @Get("zatca/devices")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async listZatcaDevices(@Query("status") status?: string): Promise<unknown> {
+    return envelope({ devices: await this.zatca.listDevices({ registrationStatus: status }) });
+  }
+
+  /** Create a device (the registration placeholder — status NOT_REGISTERED). */
+  @Post("zatca/devices")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async createZatcaDevice(@Req() request: Request, @Body() body: unknown): Promise<unknown> {
+    const identity = requireIdentity(request);
+    const input = zatcaDeviceCreateSchema.parse(body);
+    return envelope(
+      await this.zatca.createDevice({
+        name: input.name,
+        nameAr: input.nameAr ?? null,
+        deviceUuid: input.deviceUuid ?? null,
+        deviceSerial: input.deviceSerial ?? null,
+        solutionProviderName: input.solutionProviderName ?? null,
+        solutionProviderVat: input.solutionProviderVat ?? null,
+        branchId: input.branchId ?? null,
+        note: input.note ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  /** One device. */
+  @Get("zatca/devices/:id")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async findZatcaDevice(@Param("id") id: string): Promise<unknown> {
+    return envelope(await this.zatca.findDevice(id));
+  }
+
+  /** Update the descriptive/placeholder fields (never the status). */
+  @Patch("zatca/devices/:id")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async updateZatcaDevice(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ): Promise<unknown> {
+    const identity = requireIdentity(request);
+    const input = zatcaDeviceUpdateSchema.parse(body);
+    return envelope(
+      await this.zatca.updateDevice({
+        id,
+        name: input.name ?? null,
+        nameAr: input.nameAr === undefined ? undefined : input.nameAr,
+        deviceUuid: input.deviceUuid === undefined ? undefined : input.deviceUuid,
+        deviceSerial: input.deviceSerial === undefined ? undefined : input.deviceSerial,
+        solutionProviderName:
+          input.solutionProviderName === undefined ? undefined : input.solutionProviderName,
+        solutionProviderVat:
+          input.solutionProviderVat === undefined ? undefined : input.solutionProviderVat,
+        branchId: input.branchId === undefined ? undefined : input.branchId,
+        note: input.note === undefined ? undefined : input.note,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  /** The device's chain view (ICV order — the settings screen's chain status). */
+  @Get("zatca/devices/:id/chain")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async zatcaChain(@Param("id") id: string): Promise<unknown> {
+    return envelope({
+      chain: await this.zatca.deviceChain(id),
+      verification: await this.zatca.verifyDeviceChain(id),
+    });
+  }
+
+  /** INV-027 verification (fails closed — typed ZATCA_CHAIN_BROKEN). */
+  @Post("zatca/devices/:id/verify")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  @HttpCode(HttpStatus.OK)
+  async verifyZatcaChain(@Param("id") id: string): Promise<unknown> {
+    return envelope(await this.zatca.verifyDeviceChain(id));
+  }
+
+  /** The backfill DRY-RUN report (the job's step 1 — zero writes). */
+  @Get("zatca/devices/:id/backfill/plan")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async zatcaBackfillPlan(
+    @Param("id") id: string,
+    @Query("limit") limit?: string,
+  ): Promise<unknown> {
+    const bound = Math.min(Math.max(Number(limit ?? 200) || 200, 1), 1000);
+    return envelope(await this.zatca.backfillPlan(id, bound));
+  }
+
+  /** The backfill RUN (idempotent, resumable, issuance-ordered). */
+  @Post("zatca/devices/:id/backfill")
+  @RequirePermissions("tax.einvoicing.devices.manage")
+  async zatcaBackfillRun(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ): Promise<unknown> {
+    const identity = requireIdentity(request);
+    const input = zatcaBackfillSchema.parse(body ?? {});
+    const tenantName = await (async () => {
+      const { ownTenantName } = await import("../../../infra/settings/setting-reader");
+      return ownTenantName();
+    })();
+    return envelope(
+      await this.zatca.backfillRun({
+        deviceId: id,
+        limit: input.limit ?? 200,
+        sellerName: tenantName.nameAr?.trim() || tenantName.name,
         actorId: identity.userId,
       }),
     );

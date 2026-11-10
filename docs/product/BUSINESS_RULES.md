@@ -1,6 +1,6 @@
 # Business Rules
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-036)
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-037 — BR-060/061)
 
 The numbered, normative rule catalog for tenant-configurable business behavior. Rules are
 referenced as `BR-xxx` across the blueprint (phases, tests, workflows). Each rule fixes a
@@ -227,6 +227,23 @@ is `platform.custom_fields`.
 | BR-057 | Custom-field type integrity: a value row exists only for a definition of matching `data_type`, and exactly ONE typed column is non-null per row (the `num_nonnulls` DB law); archiving a definition hides its field but PRESERVES its values (history renders forever); archived picklist options are rejected for NEW values while their labels keep rendering for history | The typed store is the queryable, indexable, type-safe substrate (ADR-0019); values are business history — a definition retiring may never destroy recorded facts | `configuration` value guard (validate before entity insert — zero partial writes; full-replace semantics) · `configuration.custom_fields.manage` (writes ride the OWNING entity's permission) | (**fixed**) | INV-022 |
 | BR-058 | Key namespace discipline: tenant keys are lowercase snake_case ≤ 64 chars (leading letter), never a reserved platform stem (`id`, `tenant_id`, `created_at`, `updated_at`, `version`, `created_by`, `status`, `custom_fields`/`customFields`, …), and never a native column of the target entity (the code-owned registry's native-field blocklist); future native columns are checked against the registry at design time | A custom key that shadows a platform stem or a native column silently forks the entity's own vocabulary and breaks every future native migration | `configuration` definition service at create (key guard) · `configuration.custom_fields.manage` | (**fixed**) | — |
 | BR-059 | Form-layout native protection: every mandatory native field appears exactly ONCE in any saved layout and the mandatory fields keep their canonical registry order; role overrides layer on the default layout, never replace it | A layout that drops or reorders a mandatory field renders a form that cannot save — the designer composes presentation, never the entry contract | `configuration` form-layout service at upsert (guarded against the registry's mandatory list) · `configuration.form_layouts.manage` | (**fixed**) | — |
+
+## Blueprint v3.0 — compliance rules (BR-060 … BR-061)
+
+The two rules below are fixed by [../planning/COMPLETENESS_REGISTER.md](../planning/COMPLETENESS_REGISTER.md)
+CR-07 and delivered by PHASE-037 (migration `0050_zatca_phase1.sql`) — the ZATCA
+Phase-1 generation core (the TLV QR, the ICV/PIH chain, the fail-closed B2C guard).
+Numbering continues from BR-059, the last shipped rule; boundary rules 1–2 above apply
+unchanged (BR-060 guards INV-027's chain — [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md);
+no rule here invents legal content — the SA pack
+([../localization/compliance-matrix/sa.md](../localization/compliance-matrix/sa.md)) stays
+the legal source). The per-group table format applies; each rule's delivering phase is 037
+and the entitlement is the existing `tax.einvoicing_zatca` feature key (no new flag).
+
+| ID | Statement | Rationale | Enforcement point (module · permission) | Tenant policy (default) | Invariants |
+|----|-----------|-----------|------------------------------------------|--------------------------|------------|
+| BR-060 | ZATCA QR mandatory, fail-closed (PHASE-037): a KSA-VAT tenant (country SA + SA tax registration REGISTERED) cannot ISSUE (post) or PRINT a SIMPLIFIED invoice without a stored QR payload — typed ZATCA_QR_PAYLOAD_REQUIRED rejection at both surfaces, zero residue. STANDARD invoices carry the QR as well when a device is configured. | An unstamped SIMPLIFIED (B2C) invoice is legally non-issueable in KSA — compliance surfaces fail closed, never best-effort: a posted fact or a printed artifact without its QR must be impossible, and the rejection must leave zero partial residue (INV-027's all-or-nothing stamp rides the same transaction) | `sales` post guard (stamped INSIDE the post transaction after the numbering bind, using the STORED `posted_at` — typed `ZatcaQrPayloadRequiredError`) + `pos` `PosReceiptService` print guard (the QR image injected + re-checked at print) · rides the owning document permissions (`sales.invoices.post`, the POS shift flow) — no new key | (**fixed**) | INV-027 |
+| BR-061 | Honest generation vocabulary (PHASE-037): the ZATCA adapter produces GENERATED/FAILED only; no clearance/reporting/acceptance claim exists before PHASE-054; the Phase-2 surface (submit, CSID lifecycle, UBL 2.1, XAdES) is a typed NOT_IMPLEMENTED placeholder; device registration_status stays NOT_REGISTERED in Phase-1. | RISK-005 no-fabrication: a status that says ACCEPTED before an authority said it is a fabricated compliance claim — Phase-1 is pure computation with zero external calls (the audit's verdict), so the only honest outcomes are computed (GENERATED) or not (FAILED); every submission refusal carries the unmet GATE-1..4 pack ([GATE-DISCIPLINE-ZATCA.md](../decisions/compliance/GATE-DISCIPLINE-ZATCA.md)) | `tax` adapter contract (`zatca-stub.ts` → `ZatcaGenerationAdapter`): `ZATCA_GENERATION_STATUS_VOCABULARY` (grep-pinned by the contract tests), `submit()` typed `ZATCA_PHASE2_NOT_IMPLEMENTED` with `ZATCA_UNMET_GATE_ITEMS` · `zatca_devices.registration_status` CHECK admits the Phase-2 lifecycle states but the Phase-1 surface writes `NOT_REGISTERED` only · `tax.einvoicing.devices.manage` (device CRUD, online-only) | (**fixed**) | INV-022 |
 
 ## 8. Enforcement & test matrix
 

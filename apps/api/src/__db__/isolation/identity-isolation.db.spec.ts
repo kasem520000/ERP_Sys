@@ -2209,10 +2209,17 @@ async function seedFixtures(superuser: {
   );
 
   // PHASE-036 (Blueprint v3.0 · CR-06): the custom-fields cluster — one
-  // picklist + option + TEXT definition + typed value (on the partner
+  // picklist + option + TEXT definition + typed value (on the ITEM
   // fixture) + default form layout per tenant. The value row's FK follows
   // the owning tenant's definition; the layout seeds the entity DEFAULT
   // (role_key NULL — the partial unique allows one per tenant).
+  // ENTITY = 'purchase_orders' — the collision-free choice (PHASE-037
+  // gate repair, recorded): the custom-fields functional spec seeds its
+  // own (TENANT_A, 'partners') DEFAULT layout and its "no layout"
+  // probe reads resolveLayout('items', 'sales') expecting NULL, so the
+  // isolation fixtures may claim NEITHER entity — the registered entity
+  // no other spec writes a layout for. The value row's (entity_type,
+  // entity_id) is polymorphic by design (no DB FK — ADR-0019).
   await superuser.query(
     `INSERT INTO custom_picklists (id, tenant_id, key, name, name_ar)
      VALUES
@@ -2232,17 +2239,17 @@ async function seedFixtures(superuser: {
   await superuser.query(
     `INSERT INTO custom_field_definitions (id, tenant_id, entity_type, key, label, label_ar, data_type)
      VALUES
-       ('a3603636-0000-4000-8000-000000000001', $1, 'partners', 'iso_field', 'Isolation field', 'حقل العزل', 'TEXT'),
-       ('a3603636-0000-4000-8000-000000000002', $2, 'partners', 'iso_field', 'Isolation field', 'حقل العزل', 'TEXT')
+       ('a3603636-0000-4000-8000-000000000001', $1, 'purchase_orders', 'iso_field', 'Isolation field', 'حقل العزل', 'TEXT'),
+       ('a3603636-0000-4000-8000-000000000002', $2, 'purchase_orders', 'iso_field', 'Isolation field', 'حقل العزل', 'TEXT')
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
   await superuser.query(
     `INSERT INTO custom_field_values (id, tenant_id, entity_type, entity_id, field_id, value_text)
      VALUES
-       ('d3603636-0000-4000-8000-000000000001', $1, 'partners', 'b5b5b5b5-0000-4000-8000-000000000001',
+       ('d3603636-0000-4000-8000-000000000001', $1, 'purchase_orders', '63703700-0000-4000-8000-000000000001',
         'a3603636-0000-4000-8000-000000000001', 'iso'),
-       ('d3603636-0000-4000-8000-000000000002', $2, 'partners', 'b5b5b5b5-0000-4000-8000-000000000002',
+       ('d3603636-0000-4000-8000-000000000002', $2, 'purchase_orders', '63703700-0000-4000-8000-000000000002',
         'a3603636-0000-4000-8000-000000000002', 'iso')
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
@@ -2250,8 +2257,20 @@ async function seedFixtures(superuser: {
   await superuser.query(
     `INSERT INTO form_layouts (id, tenant_id, entity_type, role_key, name, sections)
      VALUES
-       ('e3603636-0000-4000-8000-000000000001', $1, 'partners', NULL, 'Isolation layout', '[]'::jsonb),
-       ('e3603636-0000-4000-8000-000000000002', $2, 'partners', NULL, 'Isolation layout', '[]'::jsonb)
+       ('e3603636-0000-4000-8000-000000000001', $1, 'purchase_orders', NULL, 'Isolation layout', '[]'::jsonb),
+       ('e3603636-0000-4000-8000-000000000002', $2, 'purchase_orders', NULL, 'Isolation layout', '[]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
+  // PHASE-037 (Blueprint v3.0 · CR-07): one ZATCA EIAS device per tenant —
+  // the chain anchor (icv_counter) seeds at 0; the registration status is
+  // the honest NOT_REGISTERED placeholder (BR-061).
+  await superuser.query(
+    `INSERT INTO zatca_devices (id, tenant_id, name, name_ar, registration_status, icv_counter)
+     VALUES
+       ('a0370370-0000-4000-8000-000000000001', $1, 'Isolation EIAS', 'جهاز العزل', 'NOT_REGISTERED', 0),
+       ('a0370370-0000-4000-8000-000000000002', $2, 'Isolation EIAS', 'جهاز العزل', 'NOT_REGISTERED', 0)
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
@@ -2701,6 +2720,9 @@ const OWN_ROW: Record<string, [string, string]> = {
   custom_field_definitions: ["a3603636-0000-4000-8000-000000000001", "a3603636-0000-4000-8000-000000000002"],
   custom_field_values: ["d3603636-0000-4000-8000-000000000001", "d3603636-0000-4000-8000-000000000002"],
   form_layouts: ["e3603636-0000-4000-8000-000000000001", "e3603636-0000-4000-8000-000000000002"],
+  // PHASE-037 (0050): the ZATCA device registry — the B row doubles as
+  // the A4/A7 foreign probe target (the consolidation/036 pattern).
+  zatca_devices: ["a0370370-0000-4000-8000-000000000001", "a0370370-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3347,12 +3369,17 @@ const MISMATCHED_INSERT: Record<string, string> = {
      VALUES ('c3603636-3000-4000-8000-000000000003', $1, 'b3603636-0000-4000-8000-000000000002',
        'Attack option', 'خيار الهجوم', 2)`,
   custom_field_definitions: `INSERT INTO custom_field_definitions (id, tenant_id, entity_type, key, label, label_ar, data_type)
-     VALUES ('a3603636-3000-4000-8000-000000000003', $1, 'partners', 'atk_field', 'Attack field', 'حقل الهجوم', 'TEXT')`,
+     VALUES ('a3603636-3000-4000-8000-000000000003', $1, 'purchase_orders', 'atk_field', 'Attack field', 'حقل الهجوم', 'TEXT')`,
   custom_field_values: `INSERT INTO custom_field_values (id, tenant_id, entity_type, entity_id, field_id, value_text)
-     VALUES ('d3603636-3000-4000-8000-000000000003', $1, 'partners', 'b5b5b5b5-0000-4000-8000-000000000002',
+     VALUES ('d3603636-3000-4000-8000-000000000003', $1, 'purchase_orders', '63703700-0000-4000-8000-000000000002',
        'a3603636-0000-4000-8000-000000000002', 'atk')`,
   form_layouts: `INSERT INTO form_layouts (id, tenant_id, entity_type, role_key, name, sections)
-     VALUES ('e3603636-3000-4000-8000-000000000003', $1, 'partners', 'sales', 'Attack layout', '[]'::jsonb)`,
+     VALUES ('e3603636-3000-4000-8000-000000000003', $1, 'purchase_orders', 'sales', 'Attack layout', '[]'::jsonb)`,
+  // PHASE-037 (0050): the ZATCA device attack — tenant B's name is taken
+  // by its own seeded row, so the mismatched INSERT reuses the name under
+  // tenant A's GUC and the RLS WITH CHECK is the isolated rejection.
+  zatca_devices: `INSERT INTO zatca_devices (id, tenant_id, name, name_ar, registration_status, icv_counter)
+     VALUES ('a0370370-3000-4000-8000-000000000003', $1, 'Isolation EIAS', 'جهاز العزل', 'NOT_REGISTERED', 0)`,
 };
 
 beforeAll(async () => {

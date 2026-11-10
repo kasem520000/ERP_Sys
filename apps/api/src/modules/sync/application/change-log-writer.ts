@@ -253,12 +253,19 @@ async function projectSource(
     // — DRAFT+POSTED read cache. Lines are NOT pulled in 020: desktop
     // doc-detail is online (MASTER-PLAN §1.5 scope honesty). Money rides
     // the row's numeric totals (total_gross = the document amount).
+    // PHASE-037 (CR-36 g): the ZATCA Phase-1 columns ride ADDITIVELY —
+    // icv / invoiceHash / qrPayload / classification so offline clients
+    // render the QR + chain state read-only (device management itself is
+    // online-only, N/A-recorded). Stamp columns are NULL until the post
+    // (or the backfill) stamps them — additive, no reshape.
     case "sales_invoices": {
       const rows = await tx.execute(sql`
         SELECT v.id, v.updated_at AS "changedAt", v.version, v.invoice_no AS "invoiceNo",
                v.status, v.kind, v.channel, v.customer_id AS "customerId",
                v.invoice_date AS "orderDate", v.total_gross AS "totalAmount",
                v.currency_code AS "currency", v.owner_device_id AS "ownerDeviceId",
+               v.icv, v.invoice_hash AS "invoiceHash", v.qr_payload AS "qrPayload",
+               v.classification,
                (SELECT COALESCE(jsonb_object_agg(d.key,
                         CASE d.data_type
                           WHEN 'NUMBER' THEN to_jsonb(cf.value_number)

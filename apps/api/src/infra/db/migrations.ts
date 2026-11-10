@@ -232,6 +232,17 @@ export const MIGRATIONS: readonly string[] = [
   // (business + enterprise — the tier-4 precedent; starter excluded).
   // NOT ledger documents — zero journal rules by construction.
   "0049_custom_fields",
+  // PHASE-037 (Blueprint v3.0 · CR-07): 0050_zatca_phase1 — the ZATCA
+  // Phase-1 GENERATION substrate (H-01 Phase-1 / H-02): additive NULLABLE
+  // sales_invoices columns (zatca_device_id / icv / previous_invoice_hash /
+  // invoice_hash / invoice_hash_version / qr_payload / classification +
+  // the partial unique (tenant, device, icv) INV-027 floor + the
+  // EXPLAIN-verified chain-walk index), and the RLS'd zatca_devices
+  // registry (NOT_REGISTERED-only in Phase-1 — BR-061; icv_counter is the
+  // chain anchor). One permission seed (tax.einvoicing.devices.manage —
+  // drift 248 → 249). NOT ledger documents — the stamp rides the
+  // invoice's own post transaction; zero journal rules.
+  "0050_zatca_phase1",
 ];
 
 /**

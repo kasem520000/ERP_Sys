@@ -152,10 +152,12 @@ describe("seeds (acceptance 9)", () => {
     // doc-sync action key for the return money event; role grants in 0005).
     // + 3 PHASE-036 keys (0049 seed §7: configuration.custom_fields.read/
     // .manage + configuration.form_layouts.manage — the extensibility core).
+    // + 1 PHASE-037 key (0050 seed §5: tax.einvoicing.devices.manage —
+    // the ZATCA Phase-1 EIAS device registry manager, matrix §3.7).
     // (233 after 0025 + 8 = 241; 241 + 2 = 243 after 0027; 243 + 1 = 244
     // after 0035; 244 + 1 = 245 after 0038-phase; 245 + 3 = 248 after 0049;
-    // the drift CLI agrees: matrix 248 = seed 248.)
-    expect(result.rows[0]?.n).toBe(248);
+    // 248 + 1 = 249 after 0050; the drift CLI agrees: matrix 249 = seed 249.)
+    expect(result.rows[0]?.n).toBe(249);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

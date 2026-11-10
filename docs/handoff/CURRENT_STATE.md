@@ -1,10 +1,37 @@
 # Current State
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-036 — extensibility core delivered)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-037 — ZATCA Phase-1 & QR compliance delivered)
 
 What actually exists in this repository right now. Paired with
 [../planning/IMPLEMENTATION_STATUS.md](../planning/IMPLEMENTATION_STATUS.md) (phase
 table) and [NEXT_ACTION.md](NEXT_ACTION.md).
+
+> **PHASE-037 (2026-11-10) — ZATCA Phase-1 & QR Compliance — COMPLETE** (Blueprint
+> v3.0 wave 1 / CR-07 — the audit's H-01 verdict resolved: Phase-1 is pure
+> mathematical encoding, zero external APIs): migration `0050` — the seven additive
+> NULLABLE sales_invoices chain columns (zatca_device_id / icv /
+> previous_invoice_hash / invoice_hash / invoice_hash_version / qr_payload /
+> classification) with the stamp-shape all-or-nothing CHECK + the partial UNIQUE
+> (tenant, device, icv) INV-027 floor, and the RLS'd `zatca_devices` registry (the
+> NOT_REGISTERED Phase-2 placeholder — BR-061 — and the icv_counter chain anchor);
+> the pure-computation core (TLV encoder with byte-pinned vectors, the
+> `invoice-hash-v1` chain with the genesis PIH, the QR PNG/SVG renderer); the
+> post-transaction stamping (ICV mint under a row lock, PIH = predecessor hash)
+> + the verification walk (re-derive + fail-closed typed pack) + the backfill
+> (issuance order, dry-run first, idempotent, the negative ledger proof) + the
+> daily pg-boss sweep; BR-060 fail-closed (enrollment = the device registry; an
+> enrolled KSA-VAT tenant cannot issue/print a simplified invoice without a QR
+> payload); the adapter evolved to the honest `ZatcaGenerationAdapter`
+> (GENERATED/FAILED only; submit = typed PHASE-2 NOT_IMPLEMENTED, GATE-1..4
+> preserved); H-02 closed — the print templates v2 render the QR as a real
+> scannable image (Chromium-decoded to the exact stored payload); the
+> `tax.e-invoicing-log` report v2 (ICV/PIH/QR columns + the device filter); the
+> sync projection rides the chain fields additively (CR-36 g); the
+> `/settings/tax/zatca-devices` screen; permissions 248 → 249; i18n
+> 4,536=4,536 (+89); ENTITY_CATALOG 203 → 204; the GCC readiness matrix started
+> (DF-54) + the GATE-1..4 discipline record; four recorded gate repairs + one
+> environmental item (crm task-sweep mail race). Next: PHASE-038 — evidence:
+> [../implementation/phases/reports/PHASE-037-COMPLETION.md](../implementation/phases/reports/PHASE-037-COMPLETION.md).
 
 > **PHASE-036 (2026-11-10) — Extensibility Core — Custom Fields — COMPLETE** (Blueprint
 > v3.0 wave 1 / CR-06 — the audit's single most important functional gap, FD-18/FD-19/

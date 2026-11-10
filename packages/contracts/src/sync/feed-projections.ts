@@ -187,3 +187,18 @@ export interface NotificationLite {
   readonly actionUrl: string | null;
   readonly readAt: string | null;
 }
+
+/**
+ * `sales_invoices` — the header projection (desktop group; `customerId`
+ * is the personal-scope key). PHASE-037 (CR-36 g) rides ADDITIVE fields:
+ *
+ *   icv            number | null  — the ZATCA invoice counter (1..N per
+ *                                   device; null until the post stamps)
+ *   invoiceHash    string | null  — base64 digest (render read-only)
+ *   qrPayload      string | null  — base64 TLV; offline clients render
+ *                                   the QR LOCALLY from this (read-only)
+ *   classification string | null  — 'STANDARD' | 'SIMPLIFIED'
+ *
+ * Device MANAGEMENT is online-only (N/A-recorded in the phase sync
+ * surface) — these fields are display data, never actionable offline.
+ */

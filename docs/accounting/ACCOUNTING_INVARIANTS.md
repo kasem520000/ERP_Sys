@@ -1,6 +1,6 @@
 # Accounting Invariants
 
-> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-10 (PHASE-037 — INV-027)
 
 The testable, normative invariants of the financial core. Each invariant has an ID
 referenced by module code comments, test names (`INV-xxx`), and phase acceptance
@@ -73,6 +73,12 @@ entitlement may violate any invariant (directive §1.15). Test plan:
 | INV-024 | Note custody equals its journal effects: a COLLECTED/DISCOUNTED/RETURNED note carries zero `NOTES_RECEIVABLE` balance; a DISHONORED note restores the AR open item exactly (amount + references). | Notes custody machine (`custody-machine.ts` legal transitions) + dishonor/return services (the repoint-restore algebra over `treasury_allocations.note_id`; G-24…G-27, BR-045…047) · INV-024 property suite ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_TESTS.md) §2) + RC-11 notes reconciliation (kind `NOTES`, [RECONCILIATION.md](RECONCILIATION.md) §1 row 11) |
 | INV-025 | Payroll run totals equal Σ lines (gross, deductions, net) and net = gross − deductions exactly; posted runs are immutable (reversal-only). | Payroll run service (same-transaction totals, BR-052/053) + posted-row guards · INV-025 suite |
 | INV-026 | Consolidation runs never write member books; consolidated statement = Σ member statements (group currency, dated FX) − eliminations; every elimination is a balanced journal in the consolidation books. | Consolidation run service (read-only cross-tenant access, [../architecture/ADR/ADR-0018-multi-entity-consolidation.md](../architecture/ADR/ADR-0018-multi-entity-consolidation.md); BR-056) + engine · INV-026 suite |
+
+## Compliance-chain integrity (Blueprint v3.0 — PHASE-037)
+
+| ID | Invariant | Enforced by / tested at |
+|----|-----------|------------------------|
+| INV-027 | ZATCA chain integrity (PHASE-037): per-device ICV strictly monotonic 1..N, zero gaps (partial UNIQUE (tenant, device, icv) as the DB floor); every PIH equals the predecessor's stored invoice_hash (genesis = base64(SHA-256(ASCII "0"))); the verification service re-derives every digest and FAILS CLOSED on any tamper with a typed failure pack. The stamp rides the invoice post transaction — never a partial chain. Digest carries a code-level version marker (invoice-hash-v1); PHASE-054's UBL 2.1 digest re-derives the full walk (PIH links survive). | `ZatcaPhase1Service` `stampForPost` (ICV minted via SELECT FOR UPDATE inside the post transaction — zero-journal, the negative ledger proof) + `verifyDeviceChain` (re-derives digests; typed `ZatcaChainBrokenError` failure pack) · DB floor `uq_sales_invoices_tenant_device_icv` + `ck_sales_invoices_zatca_stamp_shape` (all-stamp-or-all-null, migration `0050_zatca_phase1.sql`) · BR-060/BR-061 ([../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md)) · INV-027 suite (`zatca-phase1.spec.ts` — chain 1..N + genesis PIH, tamper fail-closed) |
 
 Definitions are canonical in [../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) §G (ED-13);
 the INV-022 principle extends to them unchanged — no configuration, template, or entitlement

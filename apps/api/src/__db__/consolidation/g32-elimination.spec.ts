@@ -124,9 +124,19 @@ describe("G-32 · the intercompany elimination golden", () => {
     expect(row.status).toBe("POSTED");
     expect(row.source_type).toBe("consolidation_elimination");
     expect(row.operation).toBe("post");
-    expect(row.lines).toEqual([
-      { direction: "DEBIT", amount: "500.0000", purpose: "AP_CONTROL" },
+    // PHASE-037 gate repair (recorded): the engine's two-line entry has NO
+    // documented order (the heap emits debit/credit in load-dependent
+    // order under full-suite CPU pressure) — the G-32 shape is the SET
+    // {DR AP_CONTROL, CR AR_CONTROL}, so the assertion compares sorted
+    // lines (direction, amount, purpose) and stays order-insensitive.
+    const sortedLines = [...row.lines].sort((a, b) =>
+      `${a.direction}|${a.amount}|${a.purpose}`.localeCompare(
+        `${b.direction}|${b.amount}|${b.purpose}`,
+      ),
+    );
+    expect(sortedLines).toEqual([
       { direction: "CREDIT", amount: "500.0000", purpose: "AR_CONTROL" },
+      { direction: "DEBIT", amount: "500.0000", purpose: "AP_CONTROL" },
     ]);
 
     // ZERO rows in ANY member tenant's ledger with a consolidation source.

@@ -1,6 +1,7 @@
 # PHASE-037 — ZATCA Phase-1 & QR Compliance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 1 / Stage 12 · **Register:** [CR-07](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE — IMPLEMENTED (2026-11-10) · **Wave:** 1 / Stage 12 · **Register:** [CR-07](../../planning/COMPLETENESS_REGISTER.md) · completion evidence:
+> [reports/PHASE-037-COMPLETION.md](reports/PHASE-037-COMPLETION.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-01 Phase-1 · H-02) · X-08 (P1) · DF-54 · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1
 
 ## 1. Phase Overview

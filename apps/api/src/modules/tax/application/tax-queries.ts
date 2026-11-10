@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 
 import * as store from "../infrastructure/tax.store";
 import * as submissionsStore from "../submissions/store";
+import { listInvoiceStamps } from "../infrastructure/zatca.store";
 
 /**
  * PHASE-013 · tax report queries (REPORT_CATALOG §6): the VAT return v2
@@ -31,7 +32,10 @@ export interface VatBothSides {
 
 /** One e-invoicing submission-log row (PHASE-035 T-06 — the flattened
  * register view the report renders; status/attempts/timestamps only, no
- * secrets: payload digests and file ids stay in the operational funnel). */
+ * secrets: payload digests and file ids stay in the operational funnel).
+ * PHASE-037 T-10: the Phase-1 chain columns join additively — the
+ * device name, the ICV, the PIH, and the QR presence for rows whose
+ * source is a stamped sales invoice (batched read — never N+1). */
 export interface EInvoicingLogRow {
   readonly id: string;
   readonly countryCode: string;
@@ -46,6 +50,12 @@ export interface EInvoicingLogRow {
   readonly respondedAt: string | null;
   readonly reportedAt: string | null;
   readonly createdAt: string;
+  // PHASE-037: the ZATCA Phase-1 stamp columns (null when the source
+  // document is not a stamped sales invoice).
+  readonly zatcaDeviceName: string | null;
+  readonly icv: number | null;
+  readonly previousInvoiceHash: string | null;
+  readonly qrPresent: boolean | null;
 }
 
 @Injectable()
@@ -98,13 +108,17 @@ export class TaxQueriesService {
 
   /** PHASE-035 T-06 · the e-invoicing submission log for a window: the
    * registry's operational read surface (status/adapter/country filters,
-   * created_at window, newest first) — REPORT_CATALOG §6 tax.e-invoicing-log. */
+   * created_at window, newest first) — REPORT_CATALOG §6 tax.e-invoicing-log.
+   * PHASE-037 T-10: `deviceId` filters to submissions whose source sales
+   * invoice carries THAT device's chain stamp (null = no filter); every
+   * row gains the ICV/PIH/QR columns via ONE batched stamp read. */
   async submissionLog(input: {
     dateFrom?: string;
     dateTo?: string;
     status?: string;
     adapterId?: string;
     countryCode?: string;
+    deviceId?: string;
   }): Promise<readonly EInvoicingLogRow[]> {
     const rows = await submissionsStore.listSubmissions({
       createdFrom: input.dateFrom,
@@ -114,20 +128,41 @@ export class TaxQueriesService {
       countryCode: input.countryCode,
       limit: 500,
     });
-    return rows.map((row) => ({
-      id: row.id,
-      countryCode: row.countryCode,
-      adapterId: row.adapterId,
-      sourceType: row.sourceType,
-      sourceId: row.sourceId,
-      status: row.status,
-      attempts: row.attempts,
-      authorityReference: row.authorityReference,
-      lastErrorCode: row.lastErrorCode,
-      submittedAt: row.submittedAt,
-      respondedAt: row.respondedAt,
-      reportedAt: row.reportedAt,
-      createdAt: row.createdAt,
-    }));
+    // The batched stamp read (PHASE-037): one query for all sales-invoice
+    // sources — the report never walks rows with per-row queries.
+    const invoiceSourceIds = rows
+      .filter((row) => row.sourceType === "sales_invoice")
+      .map((row) => row.sourceId);
+    const stamps = await listInvoiceStamps(invoiceSourceIds);
+    const enriched = rows.map((row) => {
+      const stamp = row.sourceType === "sales_invoice" ? stamps.get(row.sourceId) : undefined;
+      return {
+        id: row.id,
+        countryCode: row.countryCode,
+        adapterId: row.adapterId,
+        sourceType: row.sourceType,
+        sourceId: row.sourceId,
+        status: row.status,
+        attempts: row.attempts,
+        authorityReference: row.authorityReference,
+        lastErrorCode: row.lastErrorCode,
+        submittedAt: row.submittedAt,
+        respondedAt: row.respondedAt,
+        reportedAt: row.reportedAt,
+        createdAt: row.createdAt,
+        zatcaDeviceName: stamp?.deviceName ?? null,
+        icv: stamp?.icv ?? null,
+        previousInvoiceHash: stamp?.previousInvoiceHash ?? null,
+        qrPresent: stamp?.qrPresent ?? null,
+      };
+    });
+    return input.deviceId === undefined
+      ? enriched
+      : // The device filter: an equality on the SOURCE INVOICE's stamp
+        // device — unmatched rows never leak (no existence-test drift).
+        enriched.filter((row) => {
+          const stamp = stamps.get(row.sourceId);
+          return stamp !== undefined && stamp.deviceId === input.deviceId;
+        });
   }
 }

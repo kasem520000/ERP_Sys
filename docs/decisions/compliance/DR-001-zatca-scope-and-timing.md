@@ -81,3 +81,21 @@ non-blocking fast-follow. Two non-negotiables regardless of option:
 - On acceptance: update [../../ASSUMPTIONS_AND_OPEN_QUESTIONS.md](../../ASSUMPTIONS_AND_OPEN_QUESTIONS.md)
   (OQ-004 → decided), `sa.md` compliance matrix, PHASE-023/025 phase documents if scope
   moved, and `CHANGELOG.md` per the decision process.
+
+## Status update — PHASE-037 (2026-11-10)
+
+Phase-1 generation is delivered: the TLV-base64 QR payload, the per-device ICV counter +
+previous-invoice-hash chain (INV-027), the scannable QR in the print templates, and the
+fail-closed B2C guard (BR-060) — migration `0050_zatca_phase1.sql` — with **zero external
+calls** ([PHASE-037](../../implementation/phases/PHASE-037.md)). The audit's framing that
+Phase-1's absence was "a decision, not a necessity" is thereby resolved **for the QR
+leg**: it was decided, and the decision is now shipped as pure computation.
+
+What this record still governs: the **submission** claim. The Phase-2 surface (clearance/
+reporting, CSID lifecycle, UBL 2.1, XAdES) remains a typed `ZATCA_PHASE2_NOT_IMPLEMENTED`
+refusal carrying the unmet GATE-1..4 pack — all four gates NOT_VERIFIED
+([GATE-DISCIPLINE-ZATCA.md](GATE-DISCIPLINE-ZATCA.md)); BR-061 pins the honest
+GENERATED/FAILED vocabulary. **DR-001 stays OPEN** for the Phase-2 integration decision —
+which taxpayer segments may be served once submission exists — until PHASE-054 clears the
+gates and this record is accepted with its evidence pack (option C's fast-follow slot is
+the working shape).

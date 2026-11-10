@@ -160,6 +160,7 @@ permissions cannot be granted to `viewer`-derived templates).
 | `tax.returns.view` / `.prepare` | VAT return data and drafts / بيانات الإقرار الضريبي | accountant, owner | tenant | no |
 | `tax.returns.mark_filed` | Mark return as filed by the human accountant / تعليم الإقرار كمُقدَّم | owner | tenant | **yes** (audited; platform never files) |
 | `tax.einvoicing.manage` | Enroll devices/certificates, monitor submissions / إدارة الفوترة الإلكترونية | owner | tenant | **yes** (certificate handling per [SECRETS_MANAGEMENT.md](SECRETS_MANAGEMENT.md) §6) |
+| `tax.einvoicing.devices.manage` | Manage ZATCA EIAS devices and view their chain status (PHASE-037 — registration stays the NOT_REGISTERED placeholder until PHASE-054) / إدارة أجهزة الفوترة الإلكترونية وعرض حالة السلسلة | accountant, owner | tenant | no (audited; registration writes are Phase-2) |
 
 ### 3.8 `reporting`, `files`, `audit`, `configuration`, `industry`, `sync`, `crm`, `manufacturing`, `distribution`, `pos` (PHASE-016; distribution in PHASE-017; manufacturing keys completed in PHASE-018)
 

@@ -1255,6 +1255,51 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/tax/einvoicing/settings/:adapterId",
     permission: "tax.einvoicing.manage",
   },
+  // -- PHASE-037 (Blueprint v3.0 · CR-07; matrix §3.7): the ZATCA Phase-1
+  // EIAS device registry + chain verification + the backfill dry-run/run.
+  // One new key (tax.einvoicing.devices.manage — 248 → 249 zero-drift;
+  // migration 0050 §5). BR-061: the routes never expose a registration
+  // write — the status stays the NOT_REGISTERED Phase-2 placeholder.
+  {
+    method: "GET",
+    path: "/api/v1/tax/zatca/devices",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/tax/zatca/devices",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/tax/zatca/devices/:id",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/tax/zatca/devices/:id",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/tax/zatca/devices/:id/chain",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/tax/zatca/devices/:id/verify",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/tax/zatca/devices/:id/backfill/plan",
+    permission: "tax.einvoicing.devices.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/tax/zatca/devices/:id/backfill",
+    permission: "tax.einvoicing.devices.manage",
+  },
   // -- PHASE-023 T8: commerce channels (sales.commerce.manage) ----------------
   {
     method: "GET",

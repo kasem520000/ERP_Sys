@@ -47,3 +47,19 @@ export async function ownTenantBaseCurrency(): Promise<string> {
   }
   return row.base_currency;
 }
+
+/**
+ * Own tenant's display name pair (PHASE-037: the ZATCA QR seller name —
+ * Arabic-first per the house convention; the EN name is the fallback).
+ */
+export async function ownTenantName(): Promise<{ name: string; nameAr: string | null }> {
+  const tx = tenantTx();
+  const result = await tx.execute(
+    sql`SELECT name, name_ar AS "nameAr" FROM tenants WHERE id = erp.current_tenant_id()`,
+  );
+  const row = (result.rows as unknown as { name: string; nameAr: string | null }[])[0];
+  if (row === undefined) {
+    throw new Error("own tenant row not visible under the current scope");
+  }
+  return { name: row.name, nameAr: row.nameAr };
+}

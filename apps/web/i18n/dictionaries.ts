@@ -1186,6 +1186,98 @@ export interface Dictionary {
   einvoicingFunnelDeadLetter: string;
   einvoicingFunnelRejectRate: string;
   einvoicingFunnelNoData: string;
+  // -- WEB-037 (PHASE-037): ZATCA Phase-1 device registry ----------------------
+  // the /settings/tax/zatca-devices manager (devices + chain verification +
+  // backfill) over the tax/zatca/devices routes (tax.einvoicing.devices.manage)
+  zatcaNavLabel: string;
+  zatcaDevicesTitle: string;
+  zatcaDevicesSubtitle: string;
+  zatcaDevicesDevicesTab: string;
+  zatcaDevicesChainTab: string;
+  zatcaDevicesBackfillTab: string;
+  zatcaDevicesPhase2Note: string;
+  zatcaDevicesDeviceName: string;
+  zatcaDevicesDeviceNameAr: string;
+  zatcaDevicesDeviceUuid: string;
+  zatcaDevicesDeviceUuidHint: string;
+  zatcaDevicesDeviceSerial: string;
+  zatcaDevicesProviderName: string;
+  zatcaDevicesProviderVat: string;
+  zatcaDevicesProviderVatHint: string;
+  zatcaDevicesProviderVatInvalid: string;
+  zatcaDevicesBranch: string;
+  zatcaDevicesBranchAny: string;
+  zatcaDevicesNote: string;
+  zatcaDevicesOptional: string;
+  zatcaDevicesNameRequired: string;
+  zatcaDevicesCreateDevice: string;
+  zatcaDevicesEditDevice: string;
+  zatcaDevicesSaveDevice: string;
+  zatcaDevicesCancelEdit: string;
+  zatcaDevicesDeleteDisabled: string;
+  zatcaDevicesEmpty: string;
+  zatcaDevicesColName: string;
+  zatcaDevicesColStatus: string;
+  zatcaDevicesColCounter: string;
+  zatcaDevicesColDeviceUuid: string;
+  zatcaDevicesColSerial: string;
+  zatcaDevicesColBranch: string;
+  zatcaDevicesColCreatedAt: string;
+  zatcaDevicesStatusPlaceholder: string;
+  zatcaDevicesIcvCounter: string;
+  zatcaDevicesChainHead: string;
+  zatcaDevicesPickDevice: string;
+  zatcaDevicesPickDeviceFirst: string;
+  zatcaDevicesChainTitle: string;
+  zatcaDevicesChainEmpty: string;
+  zatcaDevicesChainColInvoice: string;
+  zatcaDevicesChainColIcv: string;
+  zatcaDevicesChainColPih: string;
+  zatcaDevicesChainColHash: string;
+  zatcaDevicesChainColHashVersion: string;
+  zatcaDevicesChainColQr: string;
+  zatcaDevicesChainColClassification: string;
+  zatcaDevicesChainColPosted: string;
+  zatcaDevicesChainColAmount: string;
+  zatcaDevicesClassificationStandard: string;
+  zatcaDevicesClassificationSimplified: string;
+  zatcaDevicesClassificationNone: string;
+  zatcaDevicesQrPresent: string;
+  zatcaDevicesQrMissing: string;
+  zatcaDevicesGenesisPih: string;
+  zatcaDevicesHashTruncated: string;
+  zatcaDevicesVerificationTitle: string;
+  zatcaDevicesVerificationOk: string;
+  zatcaDevicesVerificationChecked: string;
+  zatcaDevicesVerificationFailed: string;
+  zatcaDevicesVerificationFailureIcv: string;
+  zatcaDevicesVerificationFailureReason: string;
+  zatcaDevicesVerifyNow: string;
+  zatcaDevicesVerifyDone: string;
+  zatcaDevicesBackfillTitle: string;
+  zatcaDevicesBackfillPlan: string;
+  zatcaDevicesBackfillPlanNote: string;
+  zatcaDevicesBackfillDryRunNote: string;
+  zatcaDevicesBackfillLimit: string;
+  zatcaDevicesBackfillCandidates: string;
+  zatcaDevicesBackfillColInvoice: string;
+  zatcaDevicesBackfillColPosted: string;
+  zatcaDevicesBackfillColGross: string;
+  zatcaDevicesBackfillStampable: string;
+  zatcaDevicesBackfillRun: string;
+  zatcaDevicesConfirmBackfill: string;
+  zatcaDevicesBackfillStamped: string;
+  zatcaDevicesBackfillSkipped: string;
+  zatcaDevicesBackfillEmpty: string;
+  zatcaDevicesBackfillResults: string;
+  zatcaDevicesBackfillColIcv: string;
+  zatcaDevicesIssuanceOrder: string;
+  zatcaDevicesIdempotentNote: string;
+  zatcaDevicesBackfillRequiresVat: string;
+  zatcaDevicesCreateSuccess: string;
+  zatcaDevicesUpdateSuccess: string;
+  zatcaDevicesBackfillSuccess: string;
+  zatcaDevicesErrorsGeneric: string;
   // jurisdiction packs (registry + version viewer + staged apply)
   taxPacksTitle: string;
   taxPacksEmpty: string;
@@ -5974,6 +6066,100 @@ const ar: Dictionary = {
   einvoicingFunnelDeadLetter: "رسائل ميتة",
   einvoicingFunnelRejectRate: "نسبة الرفض (15 دقيقة)",
   einvoicingFunnelNoData: "لا بيانات بعد.",
+  // WEB-037 (PHASE-037) — ZATCA Phase-1 device registry (Arabic-first).
+  zatcaNavLabel: "أجهزة ZATCA",
+  zatcaDevicesTitle: "أجهزة الفاتورة الإلكترونية (ZATCA)",
+  zatcaDevicesSubtitle:
+    "سجل أجهزة EIAS — توليد رمز QR (المرحلة الأولى) مع سلسلة هاش وعدّاد ICV لكل جهاز.",
+  zatcaDevicesDevicesTab: "الأجهزة",
+  zatcaDevicesChainTab: "السلسلة والتحقق",
+  zatcaDevicesBackfillTab: "الإضافة الرجعية",
+  zatcaDevicesPhase2Note:
+    "المرحلة الأولى (توليد QR) فقط — الترحيل/الإبلاغ وتسجيل CSID لدى ZATCA مرحلة لاحقة (PHASE-054) وغير مُنفَّذة هنا عمدًا.",
+  zatcaDevicesDeviceName: "اسم الجهاز",
+  zatcaDevicesDeviceNameAr: "الاسم بالعربية",
+  zatcaDevicesDeviceUuid: "معرّف الجهاز (UUID)",
+  zatcaDevicesDeviceUuidHint: "المعرّف الفريد للجهاز لدى هيئة الزكاة والضريبة والجمارك — اختياري في المرحلة الأولى.",
+  zatcaDevicesDeviceSerial: "الرقم التسلسلي",
+  zatcaDevicesProviderName: "مزوّد الحل",
+  zatcaDevicesProviderVat: "الرقم الضريبي للمزوّد",
+  zatcaDevicesProviderVatHint: "15 رقمًا — الرقم الضريبي لجهة حل الفاتورة الإلكترونية.",
+  zatcaDevicesProviderVatInvalid: "الرقم الضريبي للمزوّد يجب أن يكون 15 رقمًا بالضبط.",
+  zatcaDevicesBranch: "الفرع",
+  zatcaDevicesBranchAny: "بدون فرع",
+  zatcaDevicesNote: "ملاحظة",
+  zatcaDevicesOptional: "اختياري",
+  zatcaDevicesNameRequired: "اسم الجهاز مطلوب.",
+  zatcaDevicesCreateDevice: "جهاز جديد",
+  zatcaDevicesEditDevice: "تعديل الجهاز",
+  zatcaDevicesSaveDevice: "حفظ الجهاز",
+  zatcaDevicesCancelEdit: "إلغاء التعديل",
+  zatcaDevicesDeleteDisabled: "لا حذف للأجهزة — كل جهاز مرساة لسلسلة أختام ICV وحذفه يكسر التتبع.",
+  zatcaDevicesEmpty: "لا أجهزة بعد — أنشئ جهاز EIAS لبدء ختم الفواتير برمز QR.",
+  zatcaDevicesColName: "الجهاز",
+  zatcaDevicesColStatus: "التسجيل",
+  zatcaDevicesColCounter: "عدّاد ICV",
+  zatcaDevicesColDeviceUuid: "UUID",
+  zatcaDevicesColSerial: "التسلسلي",
+  zatcaDevicesColBranch: "الفرع",
+  zatcaDevicesColCreatedAt: "أُنشئ",
+  zatcaDevicesStatusPlaceholder: "غير مسجَّل — تسجيل المرحلة الثانية (CSID) لاحقًا",
+  zatcaDevicesIcvCounter: "عدّاد ICV",
+  zatcaDevicesChainHead: "رأس السلسلة (أعلى ICV)",
+  zatcaDevicesPickDevice: "اختر جهازًا",
+  zatcaDevicesPickDeviceFirst: "اختر جهازًا لعرض سلسلته.",
+  zatcaDevicesChainTitle: "سلسلة الفواتير المختومة",
+  zatcaDevicesChainEmpty: "لا فواتير مختومة على هذا الجهاز بعد.",
+  zatcaDevicesChainColInvoice: "الفاتورة",
+  zatcaDevicesChainColIcv: "ICV",
+  zatcaDevicesChainColPih: "PIH (هاش السابق)",
+  zatcaDevicesChainColHash: "هاش الفاتورة",
+  zatcaDevicesChainColHashVersion: "إصدار الهاش",
+  zatcaDevicesChainColQr: "QR",
+  zatcaDevicesChainColClassification: "التصنيف",
+  zatcaDevicesChainColPosted: "وقت الترحيل",
+  zatcaDevicesChainColAmount: "الإجمالي",
+  zatcaDevicesClassificationStandard: "قياسية",
+  zatcaDevicesClassificationSimplified: "مبسَّطة",
+  zatcaDevicesClassificationNone: "غير مصنَّفة",
+  zatcaDevicesQrPresent: "موجود",
+  zatcaDevicesQrMissing: "غير موجود",
+  zatcaDevicesGenesisPih: "أول فاتورة تحمل PIH التكويني (genesis) — لا سلف لها.",
+  zatcaDevicesHashTruncated: "قيمة مجتزأة للعرض — القيمة الكاملة محفوظة في السجل.",
+  zatcaDevicesVerificationTitle: "التحقق من السلسلة",
+  zatcaDevicesVerificationOk: "سلسلة سليمة",
+  zatcaDevicesVerificationChecked: "عدد الفواتير المفحوصة: {checked}",
+  zatcaDevicesVerificationFailed: "التحقق فشل — السلسلة مكسورة",
+  zatcaDevicesVerificationFailureIcv: "عند ICV",
+  zatcaDevicesVerificationFailureReason: "السبب",
+  zatcaDevicesVerifyNow: "إعادة التحقق",
+  zatcaDevicesVerifyDone: "اكتمل التحقق — السلسلة سليمة.",
+  zatcaDevicesBackfillTitle: "الإضافة الرجعية للأختام",
+  zatcaDevicesBackfillPlan: "تقرير جاف",
+  zatcaDevicesBackfillPlanNote: "الفواتير المرحّلة غير المختومة التي ستُختم على هذا الجهاز.",
+  zatcaDevicesBackfillDryRunNote: "التقرير الجاف أولاً — لا كتابة قبل التأكيد",
+  zatcaDevicesBackfillLimit: "الحد الأقصى",
+  zatcaDevicesBackfillCandidates: "الفواتير المرشحة",
+  zatcaDevicesBackfillColInvoice: "الفاتورة",
+  zatcaDevicesBackfillColPosted: "وقت الترحيل",
+  zatcaDevicesBackfillColGross: "الإجمالي",
+  zatcaDevicesBackfillStampable: "قابلة للختم: {count}",
+  zatcaDevicesBackfillRun: "تشغيل الختم",
+  zatcaDevicesConfirmBackfill:
+    "سيُختم حتى {count} فاتورة على هذا الجهاز ويُمدَّد عدّاد ICV — هل تريد المتابعة؟",
+  zatcaDevicesBackfillStamped: "ما خُتم: {stamped}",
+  zatcaDevicesBackfillSkipped: "ما تم تجاوزه: {skipped}",
+  zatcaDevicesBackfillEmpty: "لا فواتير مرحّلة غير مختومة — لا شيء للإضافة الرجعية.",
+  zatcaDevicesBackfillResults: "نتائج التشغيل",
+  zatcaDevicesBackfillColIcv: "ICV الممنوح",
+  zatcaDevicesIssuanceOrder: "بترتيب الإصدار (posted_at ثم created_at ثم id).",
+  zatcaDevicesIdempotentNote: "العملية آمنة للتكرار وقابلة للاستئناف — المختوم سابقًا يُتجاوَز تلقائيًا.",
+  zatcaDevicesBackfillRequiresVat:
+    "تعذّر الختم: تتطلب أختام ZATCA تسجيل ضريبة قيمة مضافة ساريًا في السعودية (رقم البائع داخل QR).",
+  zatcaDevicesCreateSuccess: "أُنشئ الجهاز — الحالة: غير مسجَّل (المرحلة الأولى).",
+  zatcaDevicesUpdateSuccess: "حُفظت تعديلات الجهاز.",
+  zatcaDevicesBackfillSuccess: "اكتملت الإضافة الرجعية.",
+  zatcaDevicesErrorsGeneric: "تعذّر إكمال إجراء ZATCA — أعد المحاولة.",
   taxPacksTitle: "حزم الولايات القضائية",
   taxPacksEmpty: "لا توجد حزم مزروعة.",
   taxPacksCountry: "الدولة",
@@ -10783,6 +10969,100 @@ const en: Dictionary = {
   einvoicingFunnelDeadLetter: "Dead letters",
   einvoicingFunnelRejectRate: "Rejection rate (15 min)",
   einvoicingFunnelNoData: "No data yet.",
+  // WEB-037 (PHASE-037) — ZATCA Phase-1 device registry (EN mirror).
+  zatcaNavLabel: "ZATCA devices",
+  zatcaDevicesTitle: "ZATCA e-invoicing devices",
+  zatcaDevicesSubtitle:
+    "The EIAS device registry — Phase-1 QR generation with a per-device hash chain and ICV counter.",
+  zatcaDevicesDevicesTab: "Devices",
+  zatcaDevicesChainTab: "Chain & verification",
+  zatcaDevicesBackfillTab: "Backfill",
+  zatcaDevicesPhase2Note:
+    "Phase-1 (QR generation) only — clearance/reporting and CSID registration with ZATCA are a later phase (PHASE-054) and deliberately not implemented here.",
+  zatcaDevicesDeviceName: "Device name",
+  zatcaDevicesDeviceNameAr: "Arabic name",
+  zatcaDevicesDeviceUuid: "Device UUID",
+  zatcaDevicesDeviceUuidHint: "The device's unique ID at ZATCA — optional in Phase-1.",
+  zatcaDevicesDeviceSerial: "Device serial",
+  zatcaDevicesProviderName: "Solution provider",
+  zatcaDevicesProviderVat: "Solution provider VAT",
+  zatcaDevicesProviderVatHint: "15 digits — the VAT number of the e-invoicing solution provider.",
+  zatcaDevicesProviderVatInvalid: "The solution-provider VAT must be exactly 15 digits.",
+  zatcaDevicesBranch: "Branch",
+  zatcaDevicesBranchAny: "No branch",
+  zatcaDevicesNote: "Note",
+  zatcaDevicesOptional: "optional",
+  zatcaDevicesNameRequired: "Device name is required.",
+  zatcaDevicesCreateDevice: "New device",
+  zatcaDevicesEditDevice: "Edit device",
+  zatcaDevicesSaveDevice: "Save device",
+  zatcaDevicesCancelEdit: "Cancel edit",
+  zatcaDevicesDeleteDisabled: "Devices cannot be deleted — each device anchors an ICV stamp chain and deleting it would break the audit trail.",
+  zatcaDevicesEmpty: "No devices yet — create an EIAS device to start stamping invoices with QR.",
+  zatcaDevicesColName: "Device",
+  zatcaDevicesColStatus: "Registration",
+  zatcaDevicesColCounter: "ICV counter",
+  zatcaDevicesColDeviceUuid: "UUID",
+  zatcaDevicesColSerial: "Serial",
+  zatcaDevicesColBranch: "Branch",
+  zatcaDevicesColCreatedAt: "Created",
+  zatcaDevicesStatusPlaceholder: "Not registered yet — Phase-2 CSID registration comes later",
+  zatcaDevicesIcvCounter: "ICV counter",
+  zatcaDevicesChainHead: "Chain head (highest ICV)",
+  zatcaDevicesPickDevice: "Pick a device",
+  zatcaDevicesPickDeviceFirst: "Pick a device to view its chain.",
+  zatcaDevicesChainTitle: "Stamped invoice chain",
+  zatcaDevicesChainEmpty: "No stamped invoices on this device yet.",
+  zatcaDevicesChainColInvoice: "Invoice",
+  zatcaDevicesChainColIcv: "ICV",
+  zatcaDevicesChainColPih: "PIH (previous hash)",
+  zatcaDevicesChainColHash: "Invoice hash",
+  zatcaDevicesChainColHashVersion: "Hash version",
+  zatcaDevicesChainColQr: "QR",
+  zatcaDevicesChainColClassification: "Classification",
+  zatcaDevicesChainColPosted: "Posted",
+  zatcaDevicesChainColAmount: "Total",
+  zatcaDevicesClassificationStandard: "Standard",
+  zatcaDevicesClassificationSimplified: "Simplified",
+  zatcaDevicesClassificationNone: "Unclassified",
+  zatcaDevicesQrPresent: "Present",
+  zatcaDevicesQrMissing: "Missing",
+  zatcaDevicesGenesisPih: "The first invoice carries the genesis PIH — it has no predecessor.",
+  zatcaDevicesHashTruncated: "Truncated for display — the full value is stored in the record.",
+  zatcaDevicesVerificationTitle: "Chain verification",
+  zatcaDevicesVerificationOk: "Chain verified",
+  zatcaDevicesVerificationChecked: "Invoices checked: {checked}",
+  zatcaDevicesVerificationFailed: "Verification FAILED — the chain is broken",
+  zatcaDevicesVerificationFailureIcv: "At ICV",
+  zatcaDevicesVerificationFailureReason: "Reason",
+  zatcaDevicesVerifyNow: "Verify again",
+  zatcaDevicesVerifyDone: "Verification complete — the chain holds.",
+  zatcaDevicesBackfillTitle: "Stamp backfill",
+  zatcaDevicesBackfillPlan: "Dry-run plan",
+  zatcaDevicesBackfillPlanNote: "Posted invoices not yet stamped that would attach to this device.",
+  zatcaDevicesBackfillDryRunNote: "Dry-run first — nothing is written before you confirm",
+  zatcaDevicesBackfillLimit: "Limit",
+  zatcaDevicesBackfillCandidates: "Candidates",
+  zatcaDevicesBackfillColInvoice: "Invoice",
+  zatcaDevicesBackfillColPosted: "Posted",
+  zatcaDevicesBackfillColGross: "Total gross",
+  zatcaDevicesBackfillStampable: "Stampable: {count}",
+  zatcaDevicesBackfillRun: "Run stamping",
+  zatcaDevicesConfirmBackfill:
+    "Up to {count} invoices will be stamped onto this device and its ICV counter advanced — continue?",
+  zatcaDevicesBackfillStamped: "Stamped: {stamped}",
+  zatcaDevicesBackfillSkipped: "Skipped: {skipped}",
+  zatcaDevicesBackfillEmpty: "No unstamped posted invoices — nothing to backfill.",
+  zatcaDevicesBackfillResults: "Run results",
+  zatcaDevicesBackfillColIcv: "ICV minted",
+  zatcaDevicesIssuanceOrder: "In issuance order (posted_at, then created_at, then id).",
+  zatcaDevicesIdempotentNote: "The run is idempotent and resumable — already-stamped rows are skipped automatically.",
+  zatcaDevicesBackfillRequiresVat:
+    "Stamping failed: ZATCA stamps require an active Saudi VAT registration (the seller number inside the QR).",
+  zatcaDevicesCreateSuccess: "Device created — status: not registered (Phase-1).",
+  zatcaDevicesUpdateSuccess: "Device changes saved.",
+  zatcaDevicesBackfillSuccess: "Backfill complete.",
+  zatcaDevicesErrorsGeneric: "The ZATCA action could not be completed — try again.",
   taxPacksTitle: "Jurisdiction packs",
   taxPacksEmpty: "No seeded packs.",
   taxPacksCountry: "Country",

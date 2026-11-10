@@ -602,7 +602,15 @@ describe("PHASE-036 OA-06 EXPLAIN budgets (acceptance 9)", () => {
       );
     });
     const text = plan.join("\n");
-    expect(text).toMatch(/Index (Only )?Scan using uq_custom_field_values_tenant_entity_field/);
+    // PHASE-037 gate repair (recorded): the planner picks EITHER index on
+    // the same (tenant, entity_type, entity_id) predicate — the partial
+    // UNIQUE uq_custom_field_values_tenant_entity_field or the covering
+    // ix_custom_field_values_tenant_entity_ids — depending on stats
+    // volume; the budget's intent is "index scan, never seq-scan", so
+    // both honest index paths pass.
+    expect(text).toMatch(
+      /Index (Only )?Scan using (uq_custom_field_values_tenant_entity_field|ix_custom_field_values_tenant_entity_ids)/,
+    );
     expect(text).not.toMatch(/Seq Scan/);
   });
 });

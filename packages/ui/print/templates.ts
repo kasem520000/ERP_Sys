@@ -46,6 +46,10 @@ export interface A4DocumentPayload {
   /** Pre-computed tafqit (amountToWords) — templates never compute. */
   readonly amountInWords?: string;
   readonly legalFooter?: LegalFooter;
+  /** PHASE-037 (H-02): the PRE-RENDERED QR image (a data URI over the
+   * stored TLV payload) — templates never compute a QR; the caller
+   * renders at print time (OA-06). Printed invoices become scannable. */
+  readonly qrImageUri?: string;
 }
 
 export interface A4ReportPayload {
@@ -79,6 +83,12 @@ export interface ReceiptPayload {
   readonly items: readonly { readonly name: string; readonly qty: string; readonly price: string; readonly total: string }[];
   readonly totals: readonly { readonly label: string; readonly amount: string }[];
   readonly paymentMethod: string;
+  /** PHASE-037 (H-02): the PRE-RENDERED QR image (data URI) replacing the
+   * old `[QR]` text placeholder — the printed receipt is scannable by the
+   * ZATCA reader. `qrPayload` (raw text) remains for offline receipts
+   * that carry no image yet (PENDING_SYNC — the payload exists only
+   * server-side after the post stamps it). */
+  readonly qrImageUri?: string;
   readonly qrPayload?: string;
   readonly offlineNo?: string;
   readonly legalLine?: string;
@@ -86,11 +96,30 @@ export interface ReceiptPayload {
 }
 
 export const PRINT_TEMPLATE_VERSIONS: Readonly<Record<string, number>> = Object.freeze({
-  "a4-document": 1,
+  // PHASE-037 (H-02): a4-document + the two receipts gain the QR image
+  // block (the pre-rendered data-URI <img>) — v1 → v2 for the three
+  // invoice-bearing templates; a4-report is untouched (v1).
+  "a4-document": 2,
   "a4-report": 1,
-  "receipt-80": 1,
-  "receipt-58": 1,
+  "receipt-80": 2,
+  "receipt-58": 2,
 });
+
+/**
+ * PHASE-037 (H-02): the QR image block — a real scannable <img> over the
+ * pre-rendered data URI. Physical block (the RTL rules: QR never
+ * mirrors); the sizing budget keeps it ≈25mm on A4 / 80mm rolls.
+ */
+function qrImageBlock(qrImageUri: string | undefined, locale: "ar" | "en"): string {
+  if (qrImageUri === undefined) return "";
+  const caption = locale === "ar"
+    ? "امسح رمز الاستجابة السريعة وفق نظام الفوترة الإلكترونية"
+    : "Scan the ZATCA e-invoicing QR";
+  return `<div style="text-align: center; margin-block: 2mm;" dir="ltr">` +
+    `<img src="${qrImageUri}" alt="${esc(caption)}" width="96" height="96" ` +
+    `style="inline-size: 25mm; max-inline-size: 30mm; block-size: auto; image-rendering: pixelated;">` +
+    `</div>`;
+}
 
 function esc(value: string): string {
   return value
@@ -164,6 +193,7 @@ ${payload.legalFooter.vatRegNo ? `<div>الرقم الضريبي / VAT No.: <spa
 ${payload.legalFooter.notices.map((notice) => `<div>${esc(notice)}</div>`).join("")}
 </div>`
     : "";
+  const qr = qrImageBlock(payload.qrImageUri, locale);
   const bodyHtml = `
 <div class="doc-header">
   ${payload.branding.logoDataUri ? `<img src="${payload.branding.logoDataUri}" alt="" style="max-inline-size: 40mm;">` : ""}
@@ -179,6 +209,7 @@ ${payload.legalFooter.notices.map((notice) => `<div>${esc(notice)}</div>`).join(
   <table>${totals}</table>
   ${payload.amountInWords ? `<div style="margin-block-start: 6pt;">${esc(payload.amountInWords)}</div>` : ""}
 </div>
+${qr}
 ${legal}`;
   return htmlDocument(
     locale,
@@ -268,9 +299,14 @@ export function renderReceipt(payload: ReceiptPayload): string {
   const totals = payload.totals
     .map((total) => `<div class="row"><span>${esc(total.label)}</span><span class="num">${esc(total.amount)}</span></div>`)
     .join("");
-  const qr = payload.qrPayload
-    ? `<div style="text-align: center; margin-block: 2mm; font-size: 8pt;">[QR] ${esc(payload.qrPayload)}</div>`
-    : "";
+  const qr = payload.qrImageUri !== undefined
+    ? qrImageBlock(payload.qrImageUri, locale)
+    : payload.qrPayload
+      ? // Offline receipts (PENDING_SYNC): the payload exists only after
+        // the server post stamps it — until then the raw text renders so
+        // the operator sees the pending state (never a fake image).
+        `<div style="text-align: center; margin-block: 2mm; font-size: 8pt; word-break: break-all;">${esc(payload.qrPayload)}</div>`
+      : "";
   const offline =
     payload.offlineNo !== undefined
       ? `<div style="text-align: center;">OFF-<span class="num">${esc(payload.offlineNo)}</span> — بانتظار المزامنة / pending sync</div>`

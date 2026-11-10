@@ -17,7 +17,7 @@ import {
   type SubmissionStatus,
 } from "../../modules/tax/submissions/state-machine";
 import * as store from "../../modules/tax/submissions/store";
-import { ZatcaUnverifiedStubAdapter, ZATCA_UNMET_GATE_ITEMS } from "../../modules/tax/adapters/zatca/zatca-stub";
+import { ZatcaUnverifiedStubAdapter, ZATCA_GENERATION_STATUS_VOCABULARY, ZATCA_UNMET_GATE_ITEMS } from "../../modules/tax/adapters/zatca/zatca-stub";
 import { sealArtifact, openArtifact } from "../../modules/tax/submissions/secret-artifact";
 import { generateUuidV7 } from "@erp/domain-core";
 import { setupPackTenant, X_ACTOR, type PackTenant } from "./fixtures";
@@ -226,7 +226,7 @@ describe("ZATCA stub — refuses every regulated action (T4, RISK-005)", () => {
     expect(stub.supportedCountries).toEqual(["SA"]);
   });
 
-  it("submit returns the explicit UNVERIFIED refusal naming the gate items", async () => {
+  it("submit returns the honest Phase-2 NOT_IMPLEMENTED refusal naming the gate items (PHASE-037 BR-061)", async () => {
     const outcome = await stub.submit({
       countryCode: "SA",
       sourceType: "sales_invoice",
@@ -234,11 +234,26 @@ describe("ZATCA stub — refuses every regulated action (T4, RISK-005)", () => {
       document: {},
     });
     expect(outcome.status).toBe("FAILED");
-    expect(outcome.error?.code).toBe("UNVERIFIED_REGIME");
-    const error = outcome.error as { unmetGateItems: string[]; decisionRecord: string };
+    // PHASE-037: the refusal reason is now the HONEST one — Phase-2 is
+    // NOT IMPLEMENTED (staged 054), not merely unverified specs.
+    expect(outcome.error?.code).toBe("ZATCA_PHASE2_NOT_IMPLEMENTED");
+    const error = outcome.error as { unmetGateItems: string[]; decisionRecord: string; phase: string };
     expect(error.unmetGateItems).toHaveLength(ZATCA_UNMET_GATE_ITEMS.length);
     expect(error.unmetGateItems[0]).toContain("GATE-1");
     expect(error.decisionRecord).toContain("DR-001");
+    expect(error.phase).toBe("054");
+  });
+
+  it("the adapter vocabulary is GENERATED/FAILED only (BR-061 — no clearance/reporting claims)", () => {
+    expect(ZATCA_GENERATION_STATUS_VOCABULARY).toEqual(["GENERATED", "FAILED"]);
+    // The generation path computes a real digest over the payload.
+    const generated = stub.generate({ qrPayload: "AQ9Nb3RoZXIncyBNYXJrZXQ=" });
+    expect(generated.status).toBe("GENERATED");
+    if (generated.status === "GENERATED") {
+      expect(generated.payloadDigest.length).toBeGreaterThan(0);
+    }
+    const failed = stub.generate({});
+    expect(failed.status).toBe("FAILED");
   });
 
   it("the registry service refuses BEFORE the adapter call and marks FAILED", async () => {

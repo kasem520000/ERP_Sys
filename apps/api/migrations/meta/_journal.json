@@ -343,6 +343,13 @@
       "when": 1794568000000,
       "tag": "0049_custom_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1794654400000,
+      "tag": "0050_zatca_phase1",
+      "breakpoints": true
     }
   ],
   "version": "7"

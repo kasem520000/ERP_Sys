@@ -1,4 +1,4 @@
-import { Module, type OnModuleInit } from "@nestjs/common";
+import { Inject, Module, type OnModuleInit } from "@nestjs/common";
 
 import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
@@ -10,8 +10,11 @@ import { VatReturnService } from "./application/vat-return-service";
 import { PackService } from "./application/pack-service";
 import { EInvoicingService } from "./application/einvoicing-service";
 import { TaxReconciliationService } from "./application/tax-reconciliation-service";
+import { ZatcaPhase1Service } from "./application/zatca/zatca-phase1-service";
 import { SubmissionRegistryService } from "./submissions/registry-service";
 import { registerSubmissionJobs } from "./submissions/jobs";
+import { registerZatcaBackfillJob } from "./infrastructure/zatca-backfill.job";
+import { getBoss } from "../../infra/jobs/boss";
 import { TaxController } from "./presentation/tax.controller";
 
 /**
@@ -29,6 +32,12 @@ import { TaxController } from "./presentation/tax.controller";
  * (rollout/adapter-settings, default OFF), and the ZATCA UNVERIFIED
  * refusing stub (adapters/zatca — the RISK-005 discipline: no adapter
  * ships against unverified official specs; DR-001 OPEN).
+ *
+ * PHASE-037 additions: the ZATCA Phase-1 GENERATION service
+ * (application/zatca — the TLV QR payload, the ICV/PIH chain, the
+ * verification walk, the backfill) — ZERO external calls; the adapter
+ * file evolves to the honest GENERATION mode (BR-061) while the
+ * Phase-2 submission surface stays a typed NOT_IMPLEMENTED (054).
  *
  * Dependencies (DEPENDENCY_RULES §2; the phase §4): accounting (posting
  * engine, purposes — tax posts only via the engine, ADR-0007) + audit +
@@ -50,6 +59,10 @@ import { TaxController } from "./presentation/tax.controller";
     EInvoicingService,
     TaxReconciliationService,
     SubmissionRegistryService,
+    // PHASE-037: the ZATCA Phase-1 GENERATION service (devices + chain
+    // stamping + verification + backfill) — exported for the sales module
+    // (the invoice post stamps through it) and the controller routes.
+    ZatcaPhase1Service,
   ],
   exports: [
     TaxResolverService,
@@ -60,6 +73,7 @@ import { TaxController } from "./presentation/tax.controller";
     EInvoicingService,
     TaxReconciliationService,
     SubmissionRegistryService,
+    ZatcaPhase1Service,
   ],
 })
 export class TaxModule implements OnModuleInit {
@@ -72,5 +86,13 @@ export class TaxModule implements OnModuleInit {
     await registerSubmissionJobs().catch((error) => {
       void error;
     });
+    // PHASE-037 T-08: the daily chain backfill sweep (3:15 UTC) — the
+    // same degraded-boot discipline (registration failure never takes
+    // the module down; schedules are idempotent replaces).
+    await registerZatcaBackfillJob(getBoss(), this.zatca).catch((error) => {
+      void error;
+    });
   }
+
+  constructor(@Inject(ZatcaPhase1Service) private readonly zatca: ZatcaPhase1Service) {}
 }

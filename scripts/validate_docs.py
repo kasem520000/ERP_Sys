@@ -260,8 +260,12 @@ def completeness_check() -> None:
         for s in range(1, 9):
             if f"## {s}. " not in t:
                 bad_ph.append(f"PHASE-{n:03d}: no '## {s}. ' heading")
-        if "NOT_STARTED" not in t:
-            bad_ph.append(f"PHASE-{n:03d}: no NOT_STARTED status marker")
+        # PHASE-037 (recorded): a phase is born with the NOT_STARTED marker
+        # and its header FLIPS to COMPLETE on delivery (the PHASE-034
+        # baseline precedent) — accept either state, require one of them,
+        # so the marker can never silently vanish.
+        if "NOT_STARTED" not in t and "COMPLETE" not in t:
+            bad_ph.append(f"PHASE-{n:03d}: no NOT_STARTED/COMPLETE status marker")
     check("8b. PHASE-035..065 present with 8 canonical headings + planned status",
           not bad_ph, "; ".join(bad_ph[:5]))
 

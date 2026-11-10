@@ -3364,6 +3364,20 @@ export const salesInvoices = pgTable(
     // creating device; update_draft rejects non-owners + stale versions;
     // the admin reassign route re-stamps.
     ownerDeviceId: uuid("owner_device_id"),
+    // PHASE-037 (migration 0050): the ZATCA Phase-1 chain stamp — the
+    // issuing EIAS device, the per-device ICV, the PIH link, this
+    // invoice's hash digest (+ its code-level version marker), and the
+    // base64 TLV QR payload. All NULLABLE (additive; history backfilled
+    // in issuance order, never rewritten). Stamped atomically at post.
+    zatcaDeviceId: uuid("zatca_device_id"),
+    icv: integer("icv"),
+    previousInvoiceHash: text("previous_invoice_hash"),
+    invoiceHash: text("invoice_hash"),
+    qrPayload: text("qr_payload"),
+    invoiceHashVersion: text("invoice_hash_version"),
+    // PHASE-037: invoice classification — STANDARD (B2B) | SIMPLIFIED
+    // (B2C); BR-060 fail-closed guards post+print for KSA-VAT tenants.
+    classification: text("classification"),
     note: text("note"),
     noteAr: text("note_ar"),
     submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
@@ -3403,6 +3417,60 @@ export const salesInvoices = pgTable(
     index("ix_sales_invoices_owner_device")
       .on(table.ownerDeviceId)
       .where(sql`${table.ownerDeviceId} IS NOT NULL`),
+    // PHASE-037 (0050): the INV-027 DB floor — one invoice per
+    // (tenant, device, icv), even under minting races — and the
+    // chain-verification walk index (OA-06 EXPLAIN path) + the
+    // classification filter.
+    uniqueIndex("uq_sales_invoices_tenant_device_icv")
+      .on(table.tenantId, table.zatcaDeviceId, table.icv)
+      .where(sql`${table.zatcaDeviceId} IS NOT NULL AND ${table.icv} IS NOT NULL`),
+    index("ix_sales_invoices_tenant_device_icv")
+      .on(table.tenantId, table.zatcaDeviceId, table.icv)
+      .where(sql`${table.zatcaDeviceId} IS NOT NULL`),
+    index("ix_sales_invoices_tenant_classification")
+      .on(table.tenantId, table.classification)
+      .where(sql`${table.classification} IS NOT NULL`),
+  ],
+);
+
+/**
+ * PHASE-037 (migration 0050): the per-tenant ZATCA EIAS device registry —
+ * device UUID/serial + solution-provider placeholders (Phase-2 CSID
+ * onboarding completes them in 054), registration_status (NOT_REGISTERED
+ * is the only value the Phase-1 surface writes — BR-061 honesty), and
+ * icv_counter — the chain anchor minted transactionally per invoice post
+ * (INV-027). NO deletes (archive-not-delete; the chain anchor is
+ * immutable history).
+ */
+export const zatcaDevices = pgTable(
+  "zatca_devices",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    deviceUuid: text("device_uuid"),
+    deviceSerial: text("device_serial"),
+    solutionProviderName: text("solution_provider_name"),
+    solutionProviderVat: text("solution_provider_vat"),
+    registrationStatus: text("registration_status").notNull().default("NOT_REGISTERED"),
+    icvCounter: integer("icv_counter").notNull().default(0),
+    branchId: uuid("branch_id"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_zatca_devices_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_zatca_devices_tenant_name").on(table.tenantId, table.name),
+    uniqueIndex("uq_zatca_devices_tenant_device_uuid")
+      .on(table.tenantId, table.deviceUuid)
+      .where(sql`${table.deviceUuid} IS NOT NULL`),
+    index("ix_zatca_devices_tenant_status").on(table.tenantId, table.registrationStatus),
   ],
 );
 

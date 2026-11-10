@@ -105,7 +105,11 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // definitions registry + the typed value store + the picklist pair +
     // form layouts; the three §3.8 permission seeds move the drift count
     // 245 → 248; the platform.custom_fields plan grant rides the tail).
-    expect(files.at(-1)?.tag).toBe("0049_custom_fields");
+    // PHASE-037 (Blueprint v3.0 · CR-07): 0050_zatca_phase1 — the ZATCA
+    // Phase-1 GENERATION substrate: the additive NULLABLE invoice chain
+    // columns + the RLS'd zatca_devices registry (one permission seed,
+    // drift 248 → 249; NOT ledger documents — zero journal rules).
+    expect(files.at(-1)?.tag).toBe("0050_zatca_phase1");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-10 (PHASE-035 — catalog↔registry reconciliation: 86/86; the 7 unlisted rows added, the sales.commissions_due duplicate removed, tax.e-invoicing-log delivered with its permission reconciled)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-10 (PHASE-037 — tax.e-invoicing-log v2: the ZATCA device/ICV/PIH/QR-presence columns + the deviceId filter; registry unchanged at 86)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -134,7 +134,7 @@ Cash reports assert INV-019 (account balance = Σ movements) per account in scop
 |------------|------------------|-----------------|----------------|------|---------|-------|
 | `tax.vat-return` | VAT Return / الإقرار الضريبي | tax · `returnQueries.vatReturn` · document tax summaries + GL tax accounts (INV-012 tie) | jurisdiction, period, registration, output/input breakdown by treatment | `reports.tax.vat-return.read` | PDF · XLSX · CSV | PHASE-009 |
 | `tax.summary-by-treatment` | Sales/Purchases by Tax Treatment / الملخص حسب المعاملة الضريبية | tax · `taxQueries.byTreatment` + sales/purchasing analytics | period, branches, direction (sales/purchases) | `reports.tax.summary.read` | XLSX · CSV | PHASE-009 |
-| `tax.e-invoicing-log` | E-Invoicing Submission Log / سجل الفوترة الإلكترونية | tax · `taxQueries.submissionLog` · e_invoicing_submissions | period, status (PENDING/GENERATED/SIGNED/SUBMITTED/ACCEPTED/REJECTED/REPORTED/FAILED), adapter, jurisdiction | `tax.einvoicing.manage` | XLSX · CSV | PHASE-035 (delivered; documented since 023) |
+| `tax.e-invoicing-log` | E-Invoicing Submission Log / سجل الفوترة الإلكترونية | tax · `taxQueries.submissionLog` · e_invoicing_submissions (+ the PHASE-037 batched stamp read over sales_invoices) | period, status (PENDING/GENERATED/SIGNED/SUBMITTED/ACCEPTED/REJECTED/REPORTED/FAILED), adapter, jurisdiction, deviceId (PHASE-037 per-device filter) — **v2 columns: zatcaDeviceName, icv, previousInvoiceHash, qrPresent** | `tax.einvoicing.manage` | XLSX · CSV | PHASE-035 (delivered; documented since 023) · **v2 PHASE-037** |
 
 The VAT return renders both sides (document summaries vs GL movements) side-by-side; a
 mismatch marks the draft "unfileable" ([../accounting/RECONCILIATION.md](../accounting/RECONCILIATION.md)
@@ -146,6 +146,19 @@ seed. The delivered contract (T-06, audit EVAL-F-6) registers over the PHASE-013
 engine and rides the tax module's existing `tax.einvoicing.manage` per the §12
 module-register convention (the `platform.report-runs` precedent) — permission drift
 stays zero (245 = 245).
+
+v2 extension (PHASE-037, T-10): the contract bumps to **version 2** — four columns
+(`zatcaDeviceName`, `icv`, `previousInvoiceHash`, `qrPresent`) read additively from the
+sales_invoices ZATCA stamp (a batched read keyed by the submissions' source ids — no N+1)
+and the `deviceId` parameter filters to one EIAS device's log
+([ENTITY_CATALOG.md](../database/ENTITY_CATALOG.md) `zatca_devices`). The column set
+reports QR **presence**, never the raw payload — `qr_payload` is not a report column
+(the stamp columns carry the evidence; the payload itself is a document artifact, not a
+report datum). Same permission (`tax.einvoicing.manage`), same export formats, no new
+registry key (registry stays 86). The `einvoicing-log-qr-presence-faithful` assertion
+pins the report's qrPresent to the stored stamp shape
+([REPORT_RECONCILIATION.md](REPORT_RECONCILIATION.md) §1). Saved views referencing the
+contract re-validate on open (governance §17.3).
 
 ## 7. Platform administration (المنصة)
 
@@ -372,6 +385,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-029 | payroll reports (register, cost summary, EOS provision) |
 | PHASE-034 | consolidation reports (consolidated TB/IS/BS, eliminations log) — **delivered 2026-11-09, registry 80** |
 | PHASE-035 | tax.e-invoicing-log delivered — registry 85 → 86; catalog reconciled 79 → 86 rows (7 unlisted added, 1 duplicate removed) |
+| PHASE-037 | tax.e-invoicing-log **v2** — the ZATCA device/ICV/PIH/QR-presence columns + the deviceId filter (§6); registry unchanged at 86 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 

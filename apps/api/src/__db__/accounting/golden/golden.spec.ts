@@ -419,6 +419,12 @@ describe("standard failure pack on the golden fixtures (zero residue, ACCOUNTING
     const november = periodsList.find((period) => period.name.endsWith("-11"))!;
     const { periods } = await import("../fixtures");
     await withTenant(TENANT_A, async () => {
+      // PHASE-037 gate repair (recorded): sibling suites (periods/
+      // invariants/concurrency) leave FY2026-11 non-OPEN depending on
+      // file order — the failure pack's subject is the POSTING REJECTION,
+      // not the period transition, so the fixture resets November to OPEN
+      // before its own soft-close→lock walk (idempotent under any order).
+      await store.setPeriodStatus(november.id, "OPEN", null);
       await periods.softClose(ACTOR, november.id);
       await periods.lock(ACTOR, november.id);
     });

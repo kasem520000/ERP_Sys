@@ -4786,3 +4786,83 @@ export interface ConsolidationSnapshot {
     brokenLines: string[];
   };
 }
+
+// ---------------------------------------------------------------------------
+// WEB-037 (PHASE-037) — ZATCA Phase-1 (QR) device registry rows. Mirrors the
+// zatca.store selects (apps/api tax/infrastructure/zatca.store.ts); money
+// stays canonical decimal strings (ADR-0009), hashes are lowercase hex, ids
+// are UUIDv7 strings. registrationStatus is the honest NOT_REGISTERED
+// placeholder in Phase-1 (BR-061 — the CSID lifecycle is PHASE-054's).
+// ---------------------------------------------------------------------------
+
+/** GET/POST tax/zatca/devices → one EIAS device row (never deleted — chain anchor). */
+export interface ZatcaDeviceRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+  name: string;
+  nameAr: string | null;
+  deviceUuid: string | null;
+  deviceSerial: string | null;
+  solutionProviderName: string | null;
+  solutionProviderVat: string | null;
+  registrationStatus: string;
+  icvCounter: number;
+  branchId: string | null;
+  note: string | null;
+}
+
+/** One stamped invoice of a device's chain (GET tax/zatca/devices/:id/chain, ICV order). */
+export interface ZatcaChainRow {
+  id: string;
+  invoiceNo: string | null;
+  invoiceDate: string;
+  postedAt: string | null;
+  status: string;
+  currencyCode: string;
+  totalNet: string;
+  totalTax: string;
+  totalGross: string;
+  classification: "STANDARD" | "SIMPLIFIED" | null;
+  zatcaDeviceId: string | null;
+  icv: number | null;
+  previousInvoiceHash: string | null;
+  invoiceHash: string | null;
+  invoiceHashVersion: string | null;
+  qrPayload: string | null;
+}
+
+/** One INV-027 verification failure (the tamper-evidence pack row). */
+export interface ZatcaChainFailure {
+  icv: number | null;
+  invoiceId: string;
+  reason: string;
+}
+
+/** The INV-027 chain-walk verdict (ok ⇒ failures empty; broken ⇒ 422 details). */
+export interface ZatcaChainVerification {
+  ok: boolean;
+  checked: number;
+  failures: readonly ZatcaChainFailure[];
+}
+
+/** GET tax/zatca/devices/:id/backfill/plan → the DRY-RUN report (zero writes). */
+export interface ZatcaBackfillPlan {
+  deviceId: string;
+  deviceName: string;
+  candidates: readonly {
+    invoiceId: string;
+    invoiceNo: string | null;
+    postedAt: string | null;
+    totalGross: string;
+  }[];
+  stampableCount: number;
+}
+
+/** POST tax/zatca/devices/:id/backfill → the run outcome (idempotent, resumable). */
+export interface ZatcaBackfillResult {
+  stamped: number;
+  skipped: number;
+  results: readonly { invoiceId: string; icv: number }[];
+}

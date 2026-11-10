@@ -1,6 +1,6 @@
 # Data Dictionary — Shared Column Semantics
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-10 (PHASE-036)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-10 (PHASE-037 — the ZATCA Phase-1 chain columns + `zatca_devices`)
 
 The semantic dictionary for **recurring columns and value sets** across all tables. It
 sits between [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) (mechanical rules:
@@ -194,6 +194,8 @@ are pre-registered at blueprint level per [../EXPANSION_REGISTER.md](../EXPANSIO
 | `consolidation_run_status` | QUEUED, RUNNING, COMPLETED, FAILED | consolidation_runs | 034 |
 | `custom_field_data_type` | TEXT, NUMBER, DATE, BOOLEAN, SELECT, MULTISELECT, REFERENCE | custom_field_definitions | 036 |
 | `custom_field_status` | ACTIVE, ARCHIVED | custom_field_definitions, custom_picklists, custom_picklist_options, form_layouts | 036 |
+| `invoice_classification` | STANDARD, SIMPLIFIED — **the column admits NULL = unclassified** (classification is captured at create — POS defaults to SIMPLIFIED, everything else to STANDARD; the explicit input is validated) | sales_invoices | 037 |
+| `zatca_registration_status` | NOT_REGISTERED, PENDING, REGISTERED, REVOKED — **NOT_REGISTERED is the only value the Phase-1 surface writes** (BR-061 honesty: the CHECK admits the Phase-2 lifecycle so 054 evolves vocabulary, never reshape) | zatca_devices | 037 |
 
 ## 10. `memo` vs `description`
 
@@ -311,3 +313,48 @@ native + custom field refs with `role_key` overrides, BR-059) and the ADR-0019 v
 (full-replace writes; values ride the owning entity's permission) are documented in
 [ADR-0019](../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md) and
 [BUSINESS_RULES.md](../product/BUSINESS_RULES.md) (BR-057…BR-059).
+
+## 16. ZATCA Phase-1 chain columns (PHASE-037 · INV-027)
+
+Migration `0050_zatca_phase1.sql` (schema_version 50) adds the Saudi e-invoicing
+Phase-1 GENERATION substrate: seven additive NULLABLE columns on `sales_invoices` (zero
+reshape of existing rows — the backfill fills history, never rewrites it) and the RLS'd
+`zatca_devices` table (the chain anchor). Same rules as every dictionary term — no table
+may redefine them.
+
+**The `sales_invoices` addenda** (all NULL = unstamped/unclassified):
+
+| Column | Type | Rule | Meaning |
+|--------|------|------|---------|
+| `zatca_device_id` | `uuid` | NULL = unstamped; composite tenant FK `(zatca_device_id, tenant_id) → zatca_devices (id, tenant_id)` ON DELETE RESTRICT (the house convention — both sides' tenant_id must agree) | The issuing ZATCA EIAS device — the INV-027 chain anchor; a device with issued invoices is archive-disabled (no DELETE grant on the registry) |
+| `icv` | `integer` | NULL = unstamped; DB floor `uq_sales_invoices_tenant_device_icv` — partial UNIQUE `(tenant_id, zatca_device_id, icv)` WHERE stamped (a device can never mint the same counter twice, even under a minting race); chain-walk index `ix_sales_invoices_tenant_device_icv` | Invoice counter value — strictly monotonic 1..N per device, zero gaps (INV-027); minted inside the post transaction from the device's `icv_counter` (SELECT FOR UPDATE) |
+| `previous_invoice_hash` | `text` | NULL = unstamped; base64 | PIH — the predecessor's stored `invoice_hash` on the same device chain; the first invoice carries the documented genesis `base64(SHA-256(ASCII "0"))` (`GENESIS_PIH`); never computed forward, always the stored fact |
+| `invoice_hash` | `text` | NULL = unstamped; base64 | This invoice's hash digest over the canonical serialization (`invoiceHash` in `hash-chain.ts`) — the value the NEXT invoice's PIH must equal |
+| `invoice_hash_version` | `text` | NULL = unstamped; carries the code-level version marker `invoice-hash-v1` | Digest-implementation marker — PHASE-054's UBL 2.1 digest re-derives the full walk under a new marker (PIH links survive; no chain rewrite) |
+| `qr_payload` | `text` | NULL = unstamped; base64 TLV of the five mandated fields (tags 1..5; `PAYLOAD_SPEC_VERSION` `phase1-tlv-v1`) | The stored QR payload — **rendered to an image at print time only** (the image is NEVER stored, OA-06); the report layer surfaces presence (`qrPresent`), not the payload |
+| `classification` | `text` | `ck_sales_invoices_classification`: NULL or STANDARD/SIMPLIFIED — deliberately OUTSIDE the stamp-shape CHECK (a DRAFT may be classified before it is stamped) | Invoice classification — STANDARD (B2B) / SIMPLIFIED (B2C); POS creates default SIMPLIFIED, everything else STANDARD; BR-060 fail-closes post+print for KSA-VAT tenants |
+
+The stamp coherence law: `ck_sales_invoices_zatca_stamp_shape` — the six stamp columns
+(`zatca_device_id`, `icv`, `previous_invoice_hash`, `invoice_hash`, `qr_payload`,
+`invoice_hash_version`) are **all NULL or all NOT NULL** (the stamp lands atomically in
+the post transaction or the backfill; no partial stamp can exist). BR-060's post/print
+guards are APPLICATION guards above this floor — a DB-level "SIMPLIFIED ⇒ stamped"
+equality would break the DRAFT lifecycle.
+
+**The `zatca_devices` columns** (RLS'd tenant table; grants SELECT/INSERT/UPDATE —
+**NO DELETE**; purge-path policies for offboarding):
+
+| Column | Type | Nullability / default | Meaning |
+|--------|------|----------------------|---------|
+| `id` | `uuid` | NOT NULL, PK | Device row id; `(id, tenant_id)` UNIQUE — the composite-FK target convention |
+| `tenant_id` | `uuid` | NOT NULL (FK RESTRICT) | Owner tenant |
+| `name` / `name_ar` | `text` | name NOT NULL (1..160, UNIQUE per tenant) · name_ar NULL | Bilingual device display name (the tenant's own EIAS device label) |
+| `device_uuid` | `text` | NULL; `ck_zatca_devices_device_uuid_shape` `^[0-9a-fA-F-]{36}$`; UNIQUE per tenant where set | The ZATCA-assigned device UUID — placeholder until the Phase-2 onboarding issues it; shape-validated when set, never guessed |
+| `device_serial` | `text` | NULL | The ZATCA-assigned device serial (placeholder, same discipline) |
+| `solution_provider_name` | `text` | NULL | The solution-provider vendor name — stored verbatim (PHASE-054 completes onboarding) |
+| `solution_provider_vat` | `text` | NULL; `ck_zatca_devices_vat_shape` `^\d{15}$` | The solution-provider VAT number — 15 digits when set |
+| `registration_status` | `text` | NOT NULL DEFAULT `'NOT_REGISTERED'`; CHECK IN (NOT_REGISTERED, PENDING, REGISTERED, REVOKED) | The registration lifecycle — **the Phase-1 surface writes NOT_REGISTERED only** (BR-061: no registry claims before PHASE-054); the CHECK admits the future states so 054 evolves vocabulary, never reshape |
+| `icv_counter` | `integer` | NOT NULL DEFAULT 0; CHECK ≥ 0 | The chain anchor: the next ICV this device mints is `icv_counter + 1`; incremented transactionally inside the invoice post (SELECT FOR UPDATE) and re-synced by the backfill |
+| `branch_id` | `uuid` | NULL; composite tenant FK RESTRICT | Optional branch binding (a device may serve one branch's terminals) |
+| `note` | `text` | NULL | Free text — user-entered, never machine-parsed (§10 discipline) |
+| `created_at` / `updated_at` / `version` / `created_by` | — | house standard | [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) standard columns |

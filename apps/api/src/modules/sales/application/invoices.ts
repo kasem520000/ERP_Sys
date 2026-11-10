@@ -7,6 +7,8 @@ import { PostingService } from "../../accounting/application/posting-service";
 import { SelfApprovalBlockedError } from "../../accounting/domain/accounting-errors";
 import type { JournalLineSpec, JournalSpec } from "../../accounting/domain/posting-engine/journal-spec";
 import { TaxResolverService } from "../../tax/application/tax-resolver-service";
+import { ZatcaPhase1Service, type InvoiceClassification } from "../../tax/application/zatca/zatca-phase1-service";
+import { findTaxRegistrationByCountry } from "../../tax/infrastructure/tax.store";
 import { recordDocumentTaxSummary } from "../../tax/application/posting-adapter";
 import {
   planIssue,
@@ -15,7 +17,7 @@ import {
   stagePendingOverlay,
   type IssuePlan,
 } from "../../inventory/application/movement-core";
-import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
+import { ownTenantBaseCurrency, ownTenantName } from "../../../infra/settings/setting-reader";
 import * as store from "../infrastructure/sales.store";
 import {
   DeliveryAlreadyInvoicedError,
@@ -122,7 +124,37 @@ export class SalesInvoiceService {
     @Inject(PostingService) private readonly posting: PostingService,
     @Inject(NumberingService) private readonly numbering: NumberingService,
     @Inject(TaxResolverService) private readonly resolver: TaxResolverService,
+    // PHASE-037: the ZATCA Phase-1 stamping service — OPTIONAL so the
+    // specs constructing this service manually keep their constructor
+    // shape (the zatcaService() fallback covers unwired instances;
+    // stamping is opt-in per device anyway).
+    @Inject(ZatcaPhase1Service) private readonly zatca?: ZatcaPhase1Service,
   ) {}
+
+  /** PHASE-037: the ZATCA surface, tolerant of unwired DI. */
+  private zatcaService(): ZatcaPhase1Service {
+    return this.zatca ?? new ZatcaPhase1Service(this.audit);
+  }
+
+  /**
+   * PHASE-037: the classification capture rule — an explicit input wins
+   * (validated vocabulary), POS-channel invoices default SIMPLIFIED (the
+   * B2C counter document), everything else STANDARD (B2B).
+   */
+  private resolveClassification(input: {
+    classification?: InvoiceClassification;
+    pos?: { terminalId: string } ;
+  }): InvoiceClassification {
+    if (input.classification !== undefined) {
+      if (input.classification !== "STANDARD" && input.classification !== "SIMPLIFIED") {
+        throw new InvoiceLineInvalidError(
+          `classification "${String(input.classification)}" is not STANDARD|SIMPLIFIED (ZATCA Phase-1)`,
+        );
+      }
+      return input.classification;
+    }
+    return input.pos !== undefined ? "SIMPLIFIED" : "STANDARD";
+  }
 
   async list(filter: {
     status?: string;
@@ -191,6 +223,11 @@ export class SalesInvoiceService {
      *  ONLY, never posting; INV-022). */
     insured?: boolean;
     claimRef?: string | null;
+    /** PHASE-037: the invoice classification (STANDARD B2B / SIMPLIFIED
+     * B2C) — defaults to SIMPLIFIED for POS-channel invoices and
+     * STANDARD otherwise (the ZATCA document types). BR-060 fail-closed
+     * applies at post/print for KSA-VAT tenants. */
+    classification?: InvoiceClassification;
     note: string | null;
     noteAr: string | null;
     actorId: string | null;
@@ -497,6 +534,9 @@ export class SalesInvoiceService {
       serviceOrderId: input.serviceOrderId ?? null,
       projectId: input.projectId ?? null,
       claimRef,
+      // PHASE-037: classification captured at create (POS → SIMPLIFIED;
+      // explicit input wins, validated against the two-value vocabulary).
+      classification: this.resolveClassification(input),
       note: input.note,
       noteAr: input.noteAr,
       actorId: input.actorId,
@@ -1191,12 +1231,71 @@ export class SalesInvoiceService {
     if (invoice.contractId !== null && this.contractBillingPort !== null) {
       await this.contractBillingPort.onContractInvoicePosted(invoice.contractId, id, actorId);
     }
+    // (8) PHASE-037: the ZATCA Phase-1 stamp — mint the device's ICV, link
+    // PIH, compute the digest + TLV QR payload, write the stamp. Same UoW
+    // (a stamp failure rolls the post back — never a partial chain,
+    // INV-027). Runs AFTER the numbering bind so the digest carries the
+    // official number, and AFTER the status flip so the QR timestamp is
+    // the STORED posted_at instant (the verification walk re-derives the
+    // digest from the stored row — any clock drift here would break the
+    // chain). BR-060: a KSA-VAT tenant posting a SIMPLIFIED invoice with
+    // no stampable device fails closed HERE (typed, zero residue — the
+    // transaction aborts).
+    const stamped = invoice.classification ?? (isPos ? "SIMPLIFIED" : "STANDARD");
+    const zatca = this.zatcaService();
+    const tenantName = await ownTenantName();
+    const sellerName = tenantName.nameAr?.trim() || tenantName.name;
+    const saRegistration = await findTaxRegistrationByCountry("SA");
+    const sellerVat =
+      saRegistration?.status === "REGISTERED" ? saRegistration.registrationNumber : null;
+    const stampedRow = await this.find(id);
+    const stamp = await zatca.stampForPost({
+      invoice: {
+        invoiceId: id,
+        invoiceNo: acquired.number,
+        invoiceDate: stampedRow.invoiceDate,
+        postedAt: stampedRow.postedAt,
+        status: stampedRow.status,
+        currencyCode: stampedRow.currencyCode,
+        totalNet: stampedRow.totalNet,
+        totalTax: stampedRow.totalTax,
+        totalGross: stampedRow.totalGross,
+        branchId: stampedRow.branchId,
+        classification: stamped as InvoiceClassification,
+      },
+      sellerName,
+      sellerVatRegistrationNumber: sellerVat,
+    });
+    await this.audit.record({
+      action: "sales.invoice_posted",
+      entityType: "sales_invoice",
+      entityId: id,
+      actorId: actorId ?? undefined,
+      after: {
+        invoiceNo: acquired.number,
+        journalEntryId: result.journalEntryId,
+        cogsJournalEntryId: cogsJournalId,
+        totalGross: invoice.totalGross,
+        kind: invoice.kind,
+        ...(stamp === null
+          ? {}
+          : {
+              zatca: {
+                deviceId: stamp.deviceId,
+                icv: stamp.icv,
+                invoiceHashVersion: stamp.invoiceHashVersion,
+                classification: stamp.classification,
+              },
+            }),
+      },
+    });
     return {
       invoice: await this.find(id),
       journalEntryId: result.journalEntryId,
       cogsJournalEntryId: cogsJournalId,
       invoiceNo: acquired.number,
       idempotentReplay: false,
+      ...(stamp === null ? {} : { zatcaStamp: { icv: stamp.icv, deviceId: stamp.deviceId } }),
     };
   }
 

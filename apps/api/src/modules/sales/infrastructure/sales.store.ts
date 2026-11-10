@@ -701,6 +701,17 @@ export interface SalesInvoiceRow {
   // billed to the patient. Metadata only: never a document number
   // (ADR-0006) and never a journal-line rider (INV-022).
   claimRef: string | null;
+  // PHASE-037 (0050): the ZATCA Phase-1 chain stamp + classification.
+  // All stamp columns arrive together at post (ck_sales_invoices_zatca_stamp_shape);
+  // classification is captured at create (POS → SIMPLIFIED default).
+  postedAt: string | null;
+  zatcaDeviceId: string | null;
+  icv: number | null;
+  previousInvoiceHash: string | null;
+  invoiceHash: string | null;
+  invoiceHashVersion: string | null;
+  qrPayload: string | null;
+  classification: string | null;
 }
 
 /** PHASE-016: a POS tender split line (jsonb on sales_invoices). */
@@ -723,7 +734,12 @@ const INVOICE_COLUMNS = sql`id, branch_id AS "branchId", customer_id AS "custome
   pos_table_id AS "posTableId", offline_receipt_no AS "offlineReceiptNo", tenders,
   job_card_id AS "jobCardId", vehicle_id AS "vehicleId",
   contract_id AS "contractId", service_order_id AS "serviceOrderId", project_id AS "projectId",
-  claim_ref AS "claimRef"`;
+  claim_ref AS "claimRef",
+  posted_at AS "postedAt",
+  zatca_device_id AS "zatcaDeviceId", icv,
+  previous_invoice_hash AS "previousInvoiceHash", invoice_hash AS "invoiceHash",
+  invoice_hash_version AS "invoiceHashVersion", qr_payload AS "qrPayload",
+  classification`;
 
 export async function insertSalesInvoice(input: {
   /** PHASE-016: the offline-sync client id (ADR-0006) — same id across
@@ -770,6 +786,10 @@ export async function insertSalesInvoice(input: {
    * a claim (insured) invoice, null = self-pay (validated + normalized at
    * the application layer before this write; metadata only, INV-022). */
   claimRef?: string | null;
+  /** PHASE-037: the invoice classification (STANDARD B2B / SIMPLIFIED
+   * B2C) — POS-channel invoices default SIMPLIFIED at the application
+   * layer; validated before this write. */
+  classification?: string | null;
   lines: readonly {
     itemId: string | null;
     accountId: string | null;
@@ -799,7 +819,8 @@ export async function insertSalesInvoice(input: {
                                 tax_summary, credit_check, note, note_ar, created_by,
                                 channel, pos_terminal_id, order_type, pos_table_id,
                                 offline_receipt_no, tenders, job_card_id, vehicle_id,
-                                contract_id, service_order_id, project_id, claim_ref)
+                                contract_id, service_order_id, project_id, claim_ref,
+                                classification)
     VALUES (${id}, erp.current_tenant_id(), ${input.branchId}, ${input.customerId}, ${input.salesRepId},
             ${input.kind}, ${input.invoiceDate}, ${input.dueDate}, ${input.currencyCode}, ${input.exchangeRate},
             ${input.orderId}, ${input.deliveryId}, ${input.warehouseId}, ${input.cashAccountId},
@@ -811,7 +832,7 @@ export async function insertSalesInvoice(input: {
             ${input.tenders === undefined || input.tenders === null ? null : JSON.stringify(input.tenders)}::jsonb,
             ${input.jobCardId ?? null}, ${input.vehicleId ?? null},
             ${input.contractId ?? null}, ${input.serviceOrderId ?? null}, ${input.projectId ?? null},
-            ${input.claimRef ?? null})
+            ${input.claimRef ?? null}, ${input.classification ?? null})
   `);
   let lineNo = 0;
   for (const line of input.lines) {

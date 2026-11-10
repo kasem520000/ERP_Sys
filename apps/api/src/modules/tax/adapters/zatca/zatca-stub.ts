@@ -1,31 +1,34 @@
+import { createHash } from "node:crypto";
+
 import type { EInvoicingAdapter, SubmissionOutcome, SubmissionPayload } from "../../domain/adapter-port";
+import { ZatcaPhase2NotImplementedError } from "../../domain/zatca/zatca-errors";
 
 /**
- * PHASE-023 T4 — the ZATCA (KSA) adapter as the UNVERIFIED refuse-to-submit
- * stub (E_INVOICING §3 verification gate + DR-001 OPEN; phase §2.3
- * gated-shipping rule): the verification checklist has UNPASSED items, so
- * NO adapter capability ships. This is NOT a "best-effort" implementation
- * — it is the RISK-005 discipline made executable:
+ * PHASE-037 T-06 · the ZATCA (KSA) adapter in its honest PHASE-1
+ * GENERATION mode (BR-061). PHASE-023 shipped this file as the
+ * UNVERIFIED refuse-to-submit stub (RISK-005); the refusal discipline
+ * for SUBMISSION is preserved verbatim — what changes is that Phase-1
+ * generation is no longer hidden behind it:
  *
- * Unmet verification-gate items (the completion report's INCOMPLETE list —
- * every item requires artifacts this environment cannot produce; see the
- * verification log, T3):
+ *   GENERATION (this phase, real): the TLV-base64 QR payload, the ICV /
+ *   PIH chain stamp, and the scannable QR image — all pure computation,
+ *   zero external calls. The adapter exposes `generate()` and the ONLY
+ *   outcomes it can ever produce are GENERATED / FAILED (BR-061's
+ *   honest vocabulary — no SUBMITTED/ACCEPTED/REPORTED claim exists in
+ *   this file, and the repo grep in the spec pins that).
  *
- *   GATE-1  Official ZATCA specifications/SDK version pinned  — NOT_VERIFIED
- *           (no SDK artifact retrieved from an official source)
- *   GATE-2  Sandbox environment exercised                     — NOT_VERIFIED
- *           (no sandbox credentials/access)
- *   GATE-3  Sample invoices validated against official rules  — NOT_VERIFIED
- *   GATE-4  Legal review of invoice-content requirements      — NOT_VERIFIED
+ *   SUBMISSION (PHASE-054): `submit()` remains a hard refusal, now with
+ *   the HONEST reason — not "unverified specs" but a typed
+ *   NOT_IMPLEMENTED (ZatcaPhase2NotImplementedError): clearance /
+ *   reporting, the CSID lifecycle, UBL 2.1, and XAdES signing are
+ *   explicitly out of Phase-1. The GATE-1..4 verification checklist
+ *   below is preserved and documented for 054's entry evidence.
  *
- * DR-001 (ZATCA scope & timing) remains OPEN — option C (generation
- * features at launch, integration adapter as certified fast-follow) is the
- * recommendation; until the record is approved AND the gate passes, this
- * stub refuses EVERY regulated action (integrations README §4 rule 2:
- * "never a guessed wire format").
+ * E_INVOICING_ARCHITECTURE seam unchanged: the registry service still
+ * enforces the gate before any adapter call (defense in depth).
  */
 
-/** The unmet gate items this stub names in every refusal (T3 evidence). */
+/** The unmet gate items Phase-2 submission names in every refusal (T3). */
 export const ZATCA_UNMET_GATE_ITEMS: readonly { item: string; status: "NOT_VERIFIED" }[] = [
   { item: "GATE-1 official ZATCA specifications/SDK version pinned", status: "NOT_VERIFIED" },
   { item: "GATE-2 ZATCA sandbox environment exercised", status: "NOT_VERIFIED" },
@@ -33,35 +36,92 @@ export const ZATCA_UNMET_GATE_ITEMS: readonly { item: string; status: "NOT_VERIF
   { item: "GATE-4 legal review of invoice-content requirements", status: "NOT_VERIFIED" },
 ];
 
-/** The explicit refusal outcome — the ONLY outcome this stub produces. */
-export function zatcaRefusal(payload?: Partial<SubmissionPayload>): SubmissionOutcome {
+/**
+ * BR-061: the COMPLETE status vocabulary this adapter can produce.
+ * GENERATED = the Phase-1 artifact was computed locally; FAILED = the
+ * generation input was invalid (or the Phase-2 surface was reached).
+ * The vocabulary test greps this file: any clearance/reporting state
+ * (SUBMITTED/ACCEPTED/REJECTED/REPORTED/SIGNED/PENDING) appearing as a
+ * produced outcome is a spec failure.
+ */
+export const ZATCA_GENERATION_STATUS_VOCABULARY = ["GENERATED", "FAILED"] as const;
+
+export type ZatcaGenerationOutcome =
+  | {
+      readonly status: "GENERATED";
+      readonly payloadDigest: string;
+      readonly generatedAt: string;
+    }
+  | {
+      readonly status: "FAILED";
+      readonly reason: string;
+      readonly generatedAt: string;
+    };
+
+/** The Phase-2 refusal outcome — the ONLY result submit() ever returns. */
+export function zatcaPhase2Refusal(payload?: Partial<SubmissionPayload>): SubmissionOutcome {
+  const notImplemented = new ZatcaPhase2NotImplementedError("adapter.submit (clearance/reporting)");
   return {
     status: "FAILED",
     authorityReference: null,
     payloadDigest: null,
     error: {
-      code: "UNVERIFIED_REGIME",
+      code: notImplemented.code,
       adapterId: "zatca",
-      note: "the ZATCA adapter is an UNVERIFIED stub and refuses real submissions — no wire format is guessed (RISK-005; E_INVOICING §3 verification gate; DR-001 OPEN)",
+      note: notImplemented.message,
+      phase: "054",
+      // The preserved GATE-1..4 discipline: the checklist stays attached
+      // to every submission refusal (054's entry evidence base).
       unmetGateItems: ZATCA_UNMET_GATE_ITEMS.map((gate) => gate.item),
-      decisionRecord: "docs/decisions/compliance/DR-001-zatca-scope-and-timing.md (OPEN)",
+      decisionRecord: "docs/decisions/compliance/DR-001-zatca-scope-and-timing.md",
       countryCode: payload?.countryCode ?? null,
     },
   };
 }
 
 /**
- * The stub. `regimeVerified` is FALSE and the submit call returns the
- * explicit refusal — the registry service ALSO enforces the gate before
- * the call (defense in depth: the stub refusing + the service gate = the
- * asserted no-submission guarantee).
+ * The ZATCA adapter, Phase-1 GENERATION mode. `regimeVerified` stays
+ * FALSE — the RISK-005 gate still blocks SUBMISSION paths; generation
+ * does not claim any regime contact.
  */
-export class ZatcaUnverifiedStubAdapter implements EInvoicingAdapter {
+export class ZatcaGenerationAdapter implements EInvoicingAdapter {
   readonly id = "zatca";
   readonly supportedCountries: readonly string[] = ["SA"];
   readonly regimeVerified = false;
 
+  /**
+   * PHASE-1 generation: compute the QR payload digest over the document
+   * snapshot the caller assembled (the chain stamp itself lives in the
+   * invoice post transaction — this adapter surface exists so the
+   * submission-registry pipeline can record the generation step without
+   * ever implying transmission). Fails typed on missing fields.
+   */
+  generate(document: Readonly<Record<string, unknown>>): ZatcaGenerationOutcome {
+    const generatedAt = new Date().toISOString();
+    const required = ["qrPayload"] as const;
+    for (const key of required) {
+      if (typeof document[key] !== "string" || (document[key] as string).length === 0) {
+        return { status: "FAILED", reason: `missing ${key}`, generatedAt };
+      }
+    }
+    const digest = createHash("sha256")
+      .update(String(document.qrPayload), "utf8")
+      .digest("base64");
+    return { status: "GENERATED", payloadDigest: digest, generatedAt };
+  }
+
+  /**
+   * The Phase-2 surface: ALWAYS the typed refusal. Never a wire call,
+   * never a guessed format, never a clearance/reporting claim.
+   */
   async submit(payload: SubmissionPayload): Promise<SubmissionOutcome> {
-    return zatcaRefusal(payload);
+    return zatcaPhase2Refusal(payload);
   }
 }
+
+/**
+ * Back-compat alias (the PHASE-023 registry registers the class under
+ * its old name — the export shape stays stable for the registry and the
+ * existing spec imports).
+ */
+export const ZatcaUnverifiedStubAdapter = ZatcaGenerationAdapter;

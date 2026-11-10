@@ -1,6 +1,6 @@
 # Compliance Decision Records
 
-> **Status:** STABLE · **Owner:** Product Owner & Compliance Review · **Updated:** 2026-11-06
+> **Status:** STABLE · **Owner:** Product Owner & Compliance Review · **Updated:** 2026-11-10 (PHASE-037 — the GATE-DISCIPLINE-ZATCA record added)
 
 Jurisdiction scope and timing decisions: which regulatory regimes the platform targets,
 for which taxpayer segments, and by when. Process and format: [../README.md](../README.md).
@@ -26,6 +26,7 @@ not even a product-owner signature.
 | [DR-002-yemen-scope.md](DR-002-yemen-scope.md) | Yemen scope at GA (no-VAT pack only vs. sales-tax reporting) | OPEN | Before PHASE-023 evaluation window |
 | [DR-003-egypt-eta-scope.md](DR-003-egypt-eta-scope.md) | Egypt ETA scope at GA (e-invoice vs e-receipt vs both; taxpayer segments; timeline) | OPEN — draft (PHASE-023 T9), DEFERRED recommendation | Before the Egypt launch segment planning |
 | [DR-P25-04-eta-uae-followup.md](DR-P25-04-eta-uae-followup.md) | Egypt ETA & UAE e-invoicing adapter follow-ups (post-GA slot) | **PROPOSED** (post-GA slot) | ETA evaluation-pack external access (RISK-007) / official UAE spec publication / segment demand |
+| [GATE-DISCIPLINE-ZATCA.md](GATE-DISCIPLINE-ZATCA.md) | ZATCA submission gate discipline (GATE-1..4 — the no-fabrication gate made operational; established PHASE-023) | ACTIVE — all four gates **NOT_VERIFIED**; attached to every `ZATCA_PHASE2_NOT_IMPLEMENTED` refusal | Clears (with recorded evidence) or blocks — at PHASE-054, the submission phase |
 
 The `DR-P25-NN` row is a **post-GA pointer stub** (PHASE-025 T14): the filed owning
 slot for the GA release's "ETA/UAE adapter follow-ups" pointer — DR-003 remains the

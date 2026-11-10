@@ -116,6 +116,10 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   // registry row `settings.custom_fields` (contracts NAV_ITEMS) drives the
   // sidebar; this fallback covers nav-fetch failure (crumbs only).
   "settings/custom-fields": { group: "navSettings", label: "customFieldsTitle" },
+  // -- WEB-037 (PHASE-037): the ZATCA Phase-1 device registry. The sidebar
+  // stays registry-driven; this fallback covers nav-fetch failure (crumbs
+  // only — the support-sessions rule).
+  "settings/tax/zatca-devices": { group: "navSettings", label: "zatcaNavLabel" },
   // -- PHASE-016 T10: the POS surfaces (registry-driven when the navigation
   // payload grows the pos group; fallback covers the in-between state).
   pos: { group: "posNavSection", label: "posNavCounter" },

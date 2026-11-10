@@ -344,6 +344,12 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "custom_picklists" },
   { table: "custom_picklist_options" },
   { table: "form_layouts", deleteGranted: true },
+  // PHASE-037 (Blueprint v3.0 · CR-07, migration 0050): the ZATCA EIAS
+  // device registry — the chain anchor (icv_counter) is immutable
+  // history, so NO delete grant (SELECT/INSERT/UPDATE only; the purge
+  // path covers offboarding). One table — the auto-generated A-suite
+  // extends by +6.
+  { table: "zatca_devices" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

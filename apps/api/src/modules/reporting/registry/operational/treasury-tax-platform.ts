@@ -680,18 +680,23 @@ const EINVOICING_STATUSES = [
 
 export const taxEInvoicingLogContract = defineReport({
   id: "tax.e-invoicing-log",
-  version: 1,
+  // PHASE-037 T-10: v2 — the ICV/PIH/QR columns + the per-device filter
+  // (REPORT_CATALOG §6 row updated in the same phase; no new registry key).
+  version: 2,
   title: bilingual("سجل الفوترة الإلكترونية", "E-Invoicing Submission Log"),
   category: "tax",
   description: bilingual(
-    "سجل عمليات الإرسال للفوترة الإلكترونية: الحالة والمحاولات ومراجع الجهة والطوابع الزمنية",
-    "E-invoicing submission attempts: status, attempts, authority references, and timestamps",
+    "سجل عمليات الإرسال للفوترة الإلكترونية: الحالة والمحاولات ومراجع الجهة والطوابع الزمنية وأعمدة سلسلة ZATCA (العدّاد والهاه السابق ورمز QR) مع فلتر الجهاز",
+    "E-invoicing submission attempts: status, attempts, authority references, timestamps, and the ZATCA Phase-1 chain columns (ICV/PIH/QR presence) with the per-device filter",
   ),
   parameters: z.object({
     ...WINDOW_PARAMS,
     status: z.enum(EINVOICING_STATUSES).optional(),
     adapterId: z.string().optional(),
     jurisdiction: z.string().length(2).optional(),
+    // PHASE-037: the per-device filter (an equality on the source
+    // invoice's chain-stamp device).
+    deviceId: z.string().uuid().optional(),
   }),
   requiredPermission: "tax.einvoicing.manage",
   dataSources: [
@@ -722,6 +727,7 @@ export const taxEInvoicingLogContract = defineReport({
       status: typeof params.status === "string" ? params.status : undefined,
       adapterId: typeof params.adapterId === "string" ? params.adapterId : undefined,
       countryCode: typeof params.jurisdiction === "string" ? params.jurisdiction : undefined,
+      deviceId: typeof params.deviceId === "string" ? params.deviceId : undefined,
     });
     const inVocabulary = rows.filter((row) =>
       (EINVOICING_STATUSES as readonly string[]).includes(row.status),
@@ -736,6 +742,11 @@ export const taxEInvoicingLogContract = defineReport({
         col("attempts", "المحاولات", "Attempts", "text", true),
         col("authorityReference", "مرجع الجهة", "Authority ref"),
         col("lastErrorCode", "رمز الخطأ", "Error code"),
+        // PHASE-037 T-10: the Phase-1 chain columns (additive).
+        col("zatcaDeviceName", "جهاز ZATCA", "ZATCA device"),
+        col("icv", "عدّاد الفاتورة", "ICV", "text", true),
+        col("previousInvoiceHash", "هاش الفاتورة السابقة", "PIH"),
+        col("qrPresent", "رمز QR", "QR present", "status"),
         col("submittedAt", "أُرسل", "Submitted", "date"),
         col("respondedAt", "الرد", "Responded", "date"),
         col("reportedAt", "أُبلغ", "Reported", "date"),
@@ -753,6 +764,11 @@ export const taxEInvoicingLogContract = defineReport({
           attempts: row.attempts,
           authorityReference: row.authorityReference ?? "—",
           lastErrorCode: row.lastErrorCode ?? "—",
+          zatcaDeviceName: row.zatcaDeviceName ?? "—",
+          icv: row.icv === null ? "—" : String(row.icv),
+          previousInvoiceHash:
+            row.previousInvoiceHash === null ? "—" : `${row.previousInvoiceHash.slice(0, 12)}…`,
+          qrPresent: row.qrPresent === null ? "—" : row.qrPresent ? "YES" : "NO",
           submittedAt: row.submittedAt ?? "—",
           respondedAt: row.respondedAt ?? "—",
           reportedAt: row.reportedAt ?? "—",
@@ -762,6 +778,18 @@ export const taxEInvoicingLogContract = defineReport({
       totals: [],
       assertionResults: [
         assertExact("einvoicing-log-status-vocabulary", String(inVocabulary), String(rows.length)),
+        // PHASE-037: the QR column is faithful — every row renders
+        // exactly one of YES/NO/—, so the three rendered buckets sum to
+        // the row count (a dropped or double-rendered QR state fails).
+        assertExact(
+          "einvoicing-log-qr-presence-faithful",
+          String(
+            rows.filter((row) => row.qrPresent === true).length +
+              rows.filter((row) => row.qrPresent === false).length +
+              rows.filter((row) => row.qrPresent === null).length,
+          ),
+          String(rows.length),
+        ),
       ],
     };
   },
