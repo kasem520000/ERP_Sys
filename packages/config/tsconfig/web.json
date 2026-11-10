@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "ERP web (apps/web)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "noEmit": true
+  }
+}

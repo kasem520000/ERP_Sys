@@ -1,0 +1,297 @@
+{
+  "id": "industry.professional_services",
+  "name": "Professional Services",
+  "name_ar": "المكاتب المهنية",
+  "version": "1.0.0",
+  "required_feature_keys": [
+    "industry.template_engine",
+    "items.item_master",
+    "crm.service_contracts",
+    "crm.recurring_billing",
+    "accounting.projects",
+    "sales.invoices",
+    "partners.statements"
+  ],
+  "default_modules_enabled": [
+    "accounting",
+    "partners",
+    "items",
+    "sales",
+    "treasury",
+    "tax",
+    "reporting",
+    "crm",
+    "configuration"
+  ],
+  "terminology_overrides": {
+    "svc.case": {
+      "en": "Case / Matter",
+      "ar": "القضية / الملف"
+    },
+    "svc.time_entry": {
+      "en": "Time entry",
+      "ar": "تسجيل الوقت"
+    },
+    "svc.timesheet": {
+      "en": "Timesheet",
+      "ar": "كشف الساعات"
+    },
+    "svc.billable": {
+      "en": "Billable",
+      "ar": "قابل للفوترة"
+    },
+    "fee.fixed_fee": {
+      "en": "Fixed fee",
+      "ar": "أتعاب مقطوعة"
+    },
+    "fee.hourly": {
+      "en": "Hourly fee",
+      "ar": "أتعاب بالساعة"
+    },
+    "fee.retainer": {
+      "en": "Retainer",
+      "ar": "أتعاب دورية"
+    },
+    "billing.milestone": {
+      "en": "Milestone",
+      "ar": "دفعة مرحلية"
+    },
+    "doc.contract": {
+      "en": "Service contract",
+      "ar": "عقد الخدمات"
+    },
+    "acc.project": {
+      "en": "Project",
+      "ar": "المشروع"
+    }
+  },
+  "navigation_manifest": {
+    "groups": [
+      {
+        "id": "practice",
+        "label": {
+          "en": "Practice",
+          "ar": "المكتب"
+        },
+        "order": 1,
+        "items": [
+          {
+            "id": "cases",
+            "label": {
+              "en": "Cases / Projects",
+              "ar": "القضايا / المشاريع"
+            },
+            "target": "accounting.projects"
+          },
+          {
+            "id": "timesheets",
+            "label": {
+              "en": "Time & timesheets",
+              "ar": "الوقت وكشوف الساعات"
+            },
+            "target": "crm.time"
+          },
+          {
+            "id": "contracts",
+            "label": {
+              "en": "Service contracts",
+              "ar": "عقود الخدمات"
+            },
+            "target": "crm.contracts"
+          }
+        ]
+      },
+      {
+        "id": "billing",
+        "label": {
+          "en": "Billing",
+          "ar": "الفوترة"
+        },
+        "order": 2,
+        "items": [
+          {
+            "id": "recurring",
+            "label": {
+              "en": "Recurring invoices",
+              "ar": "الفواتير الدورية"
+            },
+            "target": "crm.recurring_billing"
+          },
+          {
+            "id": "invoices",
+            "label": {
+              "en": "Invoices",
+              "ar": "الفواتير"
+            },
+            "target": "sales.invoices"
+          },
+          {
+            "id": "statements",
+            "label": {
+              "en": "Client statements",
+              "ar": "كشوف حسابات العملاء"
+            },
+            "target": "partners.statements"
+          }
+        ]
+      }
+    ]
+  },
+  "workflow_policies": {
+    "contract_billing_mode": "retainer_or_milestones",
+    "time_entries_require_case": true,
+    "unbilled_time_review_before_invoice": true,
+    "invoice_approval_required": true,
+    "invoice_numbering_per_series": false,
+    "narrative_required_on_time_billing": true
+  },
+  "document_numbering_defaults": {
+    "contract_invoice": {
+      "prefix": "INV",
+      "format": "INV-{yyyy}-{seq:6}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    },
+    "sales_invoice": {
+      "prefix": "INV",
+      "format": "INV-{yyyy}-{seq:6}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    },
+    "receipt": {
+      "prefix": "RCP",
+      "format": "RCP-{yyyy}-{seq:6}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    },
+    "credit_note": {
+      "prefix": "CN",
+      "format": "CN-{yyyy}-{seq:5}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    }
+  },
+  "inventory_policy_defaults": {
+    "costing_method": "WAC",
+    "default_track_batch": false,
+    "default_track_expiry": false,
+    "default_track_serial": false,
+    "default_imei_tracking": false,
+    "fefo_picking": false,
+    "allow_negative_stock": false
+  },
+  "report_defaults": [
+    {
+      "report_key": "services.contract_revenue_schedule",
+      "pinned": true,
+      "dashboard": true,
+      "default_period": "this_month"
+    },
+    {
+      "report_key": "services.time_billing_summary",
+      "pinned": true,
+      "dashboard": true,
+      "default_period": "this_month"
+    },
+    {
+      "report_key": "ar.aging",
+      "pinned": true,
+      "dashboard": false,
+      "default_period": "this_month"
+    },
+    {
+      "report_key": "sales.commissions_due",
+      "pinned": true,
+      "dashboard": false,
+      "default_period": "this_month"
+    }
+  ],
+  "onboarding_steps": [
+    {
+      "id": "coa_confirm",
+      "title": {
+        "en": "Confirm chart of accounts (fee revenue natures)",
+        "ar": "تأكيد دليل الحسابات (طبيعة إيرادات الأتعاب)"
+      },
+      "required": true
+    },
+    {
+      "id": "clients",
+      "title": {
+        "en": "Clients & engagement contacts",
+        "ar": "العملاء وجهات التعامل"
+      },
+      "required": true
+    },
+    {
+      "id": "fee_items",
+      "title": {
+        "en": "Fee items (hourly, fixed, disbursements)",
+        "ar": "بنود الأتعاب (بالساعة، مقطوعة، مصروفات نائبة)"
+      },
+      "required": true
+    },
+    {
+      "id": "first_contract",
+      "title": {
+        "en": "First service contract",
+        "ar": "أول عقد خدمات"
+      },
+      "required": true
+    },
+    {
+      "id": "billing_run",
+      "title": {
+        "en": "Run first recurring billing cycle",
+        "ar": "تشغيل أول دورة فوترة دورية"
+      },
+      "required": false
+    },
+    {
+      "id": "projects",
+      "title": {
+        "en": "Open projects/cases",
+        "ar": "فتح المشاريع/القضايا"
+      },
+      "required": false
+    }
+  ],
+  "capability_prerequisites": {
+    "service_contracts": {
+      "level": "REQUIRED",
+      "feature_keys": [
+        "crm.service_contracts"
+      ],
+      "available_from_phase": "PHASE-019"
+    },
+    "recurring_billing": {
+      "level": "REQUIRED",
+      "feature_keys": [
+        "crm.recurring_billing"
+      ],
+      "available_from_phase": "PHASE-019"
+    },
+    "deposits_late_fees": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "crm.contract_deposits",
+        "crm.late_fees"
+      ],
+      "available_from_phase": "PHASE-019"
+    },
+    "commissions": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "sales.commissions"
+      ],
+      "available_from_phase": "PHASE-017"
+    },
+    "job_cards": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "sales.job_cards"
+      ],
+      "available_from_phase": "PHASE-017"
+    }
+  }
+}

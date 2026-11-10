@@ -1,0 +1,291 @@
+{
+  "id": "industry.retail",
+  "name": "Retail Stores",
+  "name_ar": "متاجر التجزئة",
+  "version": "1.0.0",
+  "required_feature_keys": [
+    "industry.template_engine",
+    "items.barcodes",
+    "items.price_lists",
+    "inventory.multi_warehouse",
+    "inventory.stock_transfers",
+    "inventory.serial_tracking",
+    "pos.terminals",
+    "pos.sales",
+    "pos.offline_queue",
+    "pos.receipts",
+    "treasury.cashier_shifts"
+  ],
+  "default_modules_enabled": [
+    "accounting",
+    "partners",
+    "items",
+    "inventory",
+    "sales",
+    "purchasing",
+    "treasury",
+    "tax",
+    "reporting",
+    "pos",
+    "configuration"
+  ],
+  "terminology_overrides": {
+    "pos.terminal": {
+      "en": "Terminal",
+      "ar": "الطرفية"
+    },
+    "doc.sales_invoice_pos": {
+      "en": "POS sale",
+      "ar": "بيع نقطة البيع"
+    },
+    "item.exchange": {
+      "en": "Exchange",
+      "ar": "الاستبدال"
+    },
+    "item.variant": {
+      "en": "Variant (size/color)",
+      "ar": "المقاس / اللون"
+    },
+    "item.tag_price": {
+      "en": "Tag price",
+      "ar": "السعر المعلن"
+    },
+    "promo.season_sale": {
+      "en": "Season sale",
+      "ar": "تخفيضات الموسم"
+    }
+  },
+  "navigation_manifest": {
+    "groups": [
+      {
+        "id": "selling",
+        "label": {
+          "en": "Selling",
+          "ar": "البيع"
+        },
+        "order": 1,
+        "items": [
+          {
+            "id": "pos",
+            "label": {
+              "en": "Point of sale",
+              "ar": "نقطة البيع"
+            },
+            "target": "pos.counter",
+            "feature_key": "pos.sales"
+          },
+          {
+            "id": "returns",
+            "label": {
+              "en": "Returns & exchanges",
+              "ar": "المرتجعات والاستبدال"
+            },
+            "target": "sales.credit_notes"
+          },
+          {
+            "id": "receipts",
+            "label": {
+              "en": "Receipts",
+              "ar": "سندات القبض"
+            },
+            "target": "treasury.receipts"
+          }
+        ]
+      },
+      {
+        "id": "stock",
+        "label": {
+          "en": "Stock",
+          "ar": "المخزون"
+        },
+        "order": 2,
+        "items": [
+          {
+            "id": "transfers",
+            "label": {
+              "en": "Branch transfers",
+              "ar": "تحويلات الفروع"
+            },
+            "target": "inventory.transfers"
+          },
+          {
+            "id": "imei",
+            "label": {
+              "en": "IMEI register",
+              "ar": "سجل الأجهزة"
+            },
+            "target": "inventory.imei",
+            "feature_key": "inventory.serial_tracking"
+          }
+        ]
+      }
+    ]
+  },
+  "workflow_policies": {
+    "cash_sales_autopost": true,
+    "pos.return_requires_original_invoice": true,
+    "exchange_same_value_only": false,
+    "shift_variance_approval_required": true,
+    "stock_transfer_in_transit_visible": true
+  },
+  "document_numbering_defaults": {
+    "sales_invoice": {
+      "prefix": "INV",
+      "format": "INV-{yyyy}-{seq:6}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    },
+    "pos_sale": {
+      "prefix": "POS",
+      "format": "POS-{branch}-{yy}{MM}-{seq:5}",
+      "per_branch": true,
+      "reserve_on_approval": false
+    },
+    "credit_note": {
+      "prefix": "CN",
+      "format": "CN-{yyyy}-{seq:5}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    },
+    "stock_transfer": {
+      "prefix": "TRF",
+      "format": "TRF-{yyyy}-{seq:5}",
+      "per_branch": false,
+      "reserve_on_approval": false
+    }
+  },
+  "inventory_policy_defaults": {
+    "costing_method": "WAC",
+    "default_track_batch": false,
+    "default_track_expiry": false,
+    "default_track_serial": false,
+    "default_imei_tracking": false,
+    "fefo_picking": false,
+    "allow_negative_stock": false
+  },
+  "report_defaults": [
+    {
+      "report_key": "pos.sales_by_terminal",
+      "pinned": true,
+      "dashboard": true,
+      "default_period": "today"
+    },
+    {
+      "report_key": "pos.sales_by_hour",
+      "pinned": true,
+      "dashboard": true,
+      "default_period": "this_week"
+    },
+    {
+      "report_key": "retail.imei_register",
+      "pinned": true,
+      "dashboard": false,
+      "default_period": "this_month"
+    },
+    {
+      "report_key": "inventory.stock_valuation",
+      "pinned": true,
+      "dashboard": false,
+      "default_period": "custom"
+    }
+  ],
+  "onboarding_steps": [
+    {
+      "id": "branch_warehouse",
+      "title": {
+        "en": "Create branch and stockroom",
+        "ar": "إنشاء الفرع والمستودع"
+      },
+      "required": true
+    },
+    {
+      "id": "coa_confirm",
+      "title": {
+        "en": "Confirm chart of accounts",
+        "ar": "تأكيد دليل الحسابات"
+      },
+      "required": true
+    },
+    {
+      "id": "categories",
+      "title": {
+        "en": "Item categories & tracking flags",
+        "ar": "تصنيفات الأصناف وخيارات التتبع"
+      },
+      "required": true
+    },
+    {
+      "id": "suppliers",
+      "title": {
+        "en": "Suppliers & opening stock",
+        "ar": "الموردون ورصيد المخزون الافتتاحي"
+      },
+      "required": true
+    },
+    {
+      "id": "terminals",
+      "title": {
+        "en": "Set up POS terminals",
+        "ar": "تهيئة أجهزة نقطة البيع"
+      },
+      "required": true,
+      "feature_key": "pos.terminals"
+    },
+    {
+      "id": "first_shift",
+      "title": {
+        "en": "Open first shift and make a sale",
+        "ar": "افتتاح أول وردية وإجراء أول عملية بيع"
+      },
+      "required": false,
+      "feature_key": "pos.sales"
+    }
+  ],
+  "capability_prerequisites": {
+    "barcode_pos": {
+      "level": "REQUIRED",
+      "feature_keys": [
+        "pos.terminals",
+        "pos.sales",
+        "pos.offline_queue",
+        "pos.receipts"
+      ],
+      "available_from_phase": "PHASE-016"
+    },
+    "cashier_shifts": {
+      "level": "REQUIRED",
+      "feature_keys": [
+        "treasury.cashier_shifts"
+      ],
+      "available_from_phase": "PHASE-016"
+    },
+    "imei_tracking": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "inventory.serial_tracking"
+      ],
+      "available_from_phase": "PHASE-010"
+    },
+    "composite_kits": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "items.composite_products"
+      ],
+      "available_from_phase": "PHASE-016"
+    },
+    "free_goods_promo": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "distribution.free_goods"
+      ],
+      "available_from_phase": "PHASE-017"
+    },
+    "landed_costs": {
+      "level": "OPTIONAL",
+      "feature_keys": [
+        "purchasing.landed_costs"
+      ],
+      "available_from_phase": "PHASE-011"
+    }
+  }
+}

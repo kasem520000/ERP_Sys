@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "pub_date": "2026-11-04T12:00:00Z",
+  "platforms": {
+    "windows-x86_64": {
+      "signature": "untrusted comment: signature from @erp/desktop minisign key\nRWSc7cf4uyPXJ7GqS1biW4QQ47CvEGtFkDEx5awO+5iyeUCm3S/g6odNshizsUphAVTATIUAFzOmLIB8w8t85y0x+0F65DDH+ws=\n",
+      "url": "https://updates.erp.example/stable/1.0.0/ERP-Desktop_1.0.0_x64-setup.exe"
+    }
+  },
+  "rollout": {
+    "stagePercent": 10,
+    "cohortSeed": "staging"
+  },
+  "notes": "إصدار تجريبي 1.0.0 — قناة مستقرة، طرح مرحلي 10٪ | Release 1.0.0 — stable channel, staged rollout at 10%."
+}

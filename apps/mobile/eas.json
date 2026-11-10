@@ -1,0 +1,32 @@
+{
+  "//": "PHASE-022 (DR-P22-10, T-P22-4-a) EAS build profiles — read by EAS CI (.github/workflows/mobile-release.yml) from THIS directory (the EAS project root: app.config.ts + eas.json + metro.config.js). Source-only in the sandbox (no EAS CLI / Android SDK — the k6 precedent): `pnpm check:mobile-shell` validates the profile keys structurally and apps/mobile/__tests__/mobile-release-ci.test.ts asserts them. @expo/json-file tolerates these \"//\" comment keys.",
+  "cli": {
+    "version": ">= 12.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "preview": {
+      "//": "internal QA distribution (APK, no store signing) — device-test profile for the chaos/UX drills that need real hardware (the honest-deferral surface; the on-device C-06/C-07/C-13 legs ride it)",
+      "developmentClient": false,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "//": "Play Store AAB; autoIncrement bumps versionCode per build (the runbook records the mapping). env notes: no secrets ever live here — the Android keystore + FCM credentials are CI-injected (SECRETS_MANAGEMENT S-15 family: mobile-release.yml materializes native/credentials.json + google-services.json from GitHub secrets, warn-and-continue when unset); EXPO_NO_TELEMETRY keeps builds hermetic",
+      "autoIncrement": true,
+      "android": {
+        "buildType": "app-bundle"
+      },
+      "env": {
+        "EXPO_NO_TELEMETRY": "1"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "//": "Play Store production track — documented placeholder: submitting needs a real service-account key (S-15 family) plus the staged-rollout decision (10/50/100 at ≥99.5%/≥200 then ≥99.7%/≥500; halt <98.5% → publish minVersion=last-known-good). T-P22-4-a ships the build pipeline + the rollout config/manifest artifacts; the submit leg runs from a runner with the S-15 secrets — never silently skipped"
+    }
+  }
+}

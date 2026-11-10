@@ -1,0 +1,31 @@
+{
+  "name": "@erp/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Single source of API truth (ADR-0002): zod schema registry v0, error-code enum seed, feature keys, wire-format schemas.",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "vitest": "^3.2.4"
+  },
+  "turbo": {
+    "build": {
+      "outputs": []
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
+}

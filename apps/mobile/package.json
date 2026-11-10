@@ -1,0 +1,40 @@
+{
+  "name": "@erp/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PHASE-022 mobile runtime (ADR-0014): the TypeScript Android application logic — theme/i18n runtime, auth/session, SQLite store, sync host, field-sales flow state machines — hosted by the thin Expo native shell (native/, compiled by EAS CI; DR-P22-01).",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@erp/contracts": "workspace:*",
+    "@erp/domain-core": "workspace:*",
+    "@erp/sync-core": "workspace:*",
+    "react": "18.3.1",
+    "react-native": "^0.76.5"
+  },
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "@testing-library/react-native": "^12.5.6",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/react": "^18.3.12",
+    "better-sqlite3": "^12.11.1",
+    "react-test-renderer": "18.3.1",
+    "vitest": "^3.2.4"
+  },
+  "turbo": {
+    "build": {
+      "outputs": []
+    }
+  },
+  "main": "./native/App.tsx",
+  "types": "./src/index.ts"
+}

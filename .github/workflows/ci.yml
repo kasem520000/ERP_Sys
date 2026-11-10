@@ -1,0 +1,193 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Deterministic dependency install (docs/operations/CI_CD.md §2).
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+  typecheck:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # ESLint incl. module-boundary rules + dependency-cruiser graph rules
+      # (DEPENDENCY_RULES.md §4 — PHASE-001 deliverables).
+      - run: pnpm lint
+      - run: pnpm lint:depcruise
+      # PHASE-005 design-system gates: i18n parity, catalog coverage,
+      # negative proofs for the erp-ui lint rules and the parity checker.
+      - run: pnpm check:i18n-parity
+      - run: pnpm check:ui-catalog
+      - run: pnpm boundary:negative-ui-test
+      - run: pnpm boundary:negative-i18n-test
+      - run: pnpm check:token-contrast
+
+  unit:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Domain unit + property suites (money, UUIDv7, contracts, API health).
+      - run: pnpm test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [typecheck, lint, unit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+  # E2E stub (PHASE_ACCEPTANCE_CRITERIA row 001): proves the job exists and is
+  # green; real E2E + Testcontainers DB integration arrive in PHASE-002.
+  e2e-stub:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: e2e-placeholder
+        run: echo "E2E stub — real E2E activates in PHASE-002 (Testcontainers, integration DB tests)."
+
+  docs-validation:
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/validate_docs.py
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # PHASE-024 T7 dependency triage: recursive workspace audit of PRODUCTION
+  # dependencies, gate at high (the §1 blocking rule — no known-critical in
+  # prod deps — is the floor; high findings fail this job until remediated
+  # or waiver-recorded per SECURITY_TEST_PLAN §13). Findings + triage:
+  # docs/operations/dependency-triage-2026-11.md.
+  deps-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --prod --audit-level high
+
+  # PHASE-024 T7 SBOM review substrate: server (workspace npm graph) + web
+  # CycloneDX SBOMs on every push, uploaded as artifacts for the §6
+  # SBOM-diff review (DEPLOYMENT_ARCHITECTURE release process). Invocation
+  # mirrors desktop-release.yml's SBOM step, plus the two documented pnpm-9
+  # fixes (env -u npm_execpath, --ignore-npm-errors) recorded in
+  # docs/operations/dependency-triage-2026-11.md §4.
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: SBOM — server (workspace npm dependency graph, CycloneDX JSON)
+        run: |
+          mkdir -p sbom-artifacts
+          env -u npm_execpath pnpm dlx @cyclonedx/cyclonedx-npm --ignore-npm-errors --output-format JSON --output-file sbom-artifacts/sbom-server.json
+      - name: SBOM — web app (apps/web dependency graph, CycloneDX JSON)
+        run: |
+          cd apps/web
+          env -u npm_execpath pnpm dlx @cyclonedx/cyclonedx-npm --ignore-npm-errors --output-format JSON --output-file ../../sbom-artifacts/sbom-web.json
+      - name: Upload SBOM artifacts (server + web)
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-sbom-${{ github.sha }}
+          path: sbom-artifacts/*
+          if-no-files-found: error
+
+  # Negative meta-test: the deliberate boundary violation MUST fail lint.
+  negative-boundary-test:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm boundary:negative-test

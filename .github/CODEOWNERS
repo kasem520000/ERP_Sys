@@ -1,0 +1,9 @@
+# CI-enforced code owners (PHASE-001 stub — team aliases are wired at first push).
+*                                   @erp-platform/architecture
+/apps/api/                          @erp-platform/backend
+/packages/domain-core/              @erp-platform/backend
+/packages/contracts/                @erp-platform/backend
+/docs/database/                     @erp-platform/backend
+/docs/accounting/                   @erp-platform/accounting
+/.github/                           @erp-platform/devops
+/scripts/                            @erp-platform/devops

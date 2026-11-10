@@ -1,0 +1,182 @@
+/**
+ * @erp/ui — canonical design tokens (docs/ui/DESIGN_TOKENS.md, byte-verbatim).
+ * The ONLY place raw values exist (DESIGN_SYSTEM §2); components reference
+ * these custom properties or the semantic aliases — never hex/px literals
+ * (lint: erp/no-raw-design-values). Tailwind v4 mapping lives in theme.css.
+ */
+:root {
+  /* §1 Brand primary — teal */
+  --erp-color-primary-50: #F0FDFA;
+  --erp-color-primary-100: #CCFBF1;
+  --erp-color-primary-200: #99F6E4;
+  --erp-color-primary-300: #5EEAD4;
+  --erp-color-primary-400: #2DD4BF;
+  --erp-color-primary-500: #14B8A6;
+  --erp-color-primary-600: #0F766E;
+  --erp-color-primary-700: #115E59;
+  --erp-color-primary-800: #134E4A;
+  --erp-color-primary-900: #042F2E;
+  --erp-color-primary-950: #032726;
+
+  /* §2 Neutrals — gray scale */
+  --erp-color-gray-50: #F9FAFB;
+  --erp-color-gray-100: #F3F4F6;
+  --erp-color-gray-200: #E5E7EB;
+  --erp-color-gray-300: #D1D5DB;
+  --erp-color-gray-400: #9CA3AF;
+  --erp-color-gray-500: #6B7280;
+  --erp-color-gray-600: #4B5563;
+  --erp-color-gray-700: #374151;
+  --erp-color-gray-800: #1F2937;
+  --erp-color-gray-900: #111827;
+  --erp-color-gray-950: #030712;
+
+  /* §3 Semantic states — solid anchors + badge tint pairs */
+  --erp-color-success-700: #15803D;
+  --erp-color-success-tint-bg: #DCFCE7;
+  --erp-color-success-tint-text: #166534;
+  --erp-color-success-tint-border: #BBF7D0;
+
+  /* Success-info (cyan) — APPROVED (awaiting posting), distinct from POSTED */
+  --erp-color-success-info-700: #0E7490;
+  --erp-color-success-info-tint-bg: #CFFAFE;
+  --erp-color-success-info-tint-text: #155E75;
+  --erp-color-success-info-tint-border: #A5F3FC;
+
+  --erp-color-warning-700: #B45309;
+  --erp-color-warning-tint-bg: #FEF3C7;
+  --erp-color-warning-tint-text: #92400E;
+  --erp-color-warning-tint-border: #FDE68A;
+
+  --erp-color-danger-700: #B91C1C;
+  --erp-color-danger-tint-bg: #FEE2E2;
+  --erp-color-danger-tint-text: #991B1B;
+  --erp-color-danger-tint-border: #FECACA;
+
+  --erp-color-info-700: #1D4ED8;
+  --erp-color-info-tint-bg: #DBEAFE;
+  --erp-color-info-tint-text: #1E40AF;
+  --erp-color-info-tint-border: #BFDBFE;
+
+  /* §4 Financial sign semantics (binding) — red = negative BY SIGN,
+     never debit/credit side; zero renders gray-600, never red or green. */
+  --erp-color-finance-positive: #15803D;
+  --erp-color-finance-negative: #B91C1C;
+  --erp-color-finance-neutral: inherit;
+
+  /* §5 Surfaces, borders, elevation */
+  --erp-surface-page: #F9FAFB;
+  --erp-surface-card: #FFFFFF;
+  --erp-surface-sunken: #F3F4F6;
+  --erp-surface-overlay: rgba(3, 7, 18, 0.45);
+  --erp-surface-pos: #032726;
+  --erp-surface-pos-raised: #042F2E;
+  --erp-border-subtle: #E5E7EB;
+  --erp-border-default: #D1D5DB;
+  --erp-border-strong: #9CA3AF;
+  --erp-shadow-e1: 0 1px 2px rgba(3, 7, 18, 0.06);
+  --erp-shadow-e2: 0 2px 4px rgba(3, 7, 18, 0.07);
+  --erp-shadow-e3: 0 4px 12px rgba(3, 7, 18, 0.10);
+  --erp-shadow-e4: 0 8px 24px rgba(3, 7, 18, 0.14);
+
+  /* §6 Typography — families, scale, weights, line heights, numerals */
+  --erp-font-ar: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
+  --erp-font-latin: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --erp-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --erp-text-xs: 0.75rem;   /* 12px */
+  --erp-text-sm: 0.8125rem; /* 13px */
+  --erp-text-base: 0.875rem; /* 14px */
+  --erp-text-md: 0.9375rem; /* 15px */
+  --erp-text-lg: 1.125rem;  /* 18px */
+  --erp-text-xl: 1.375rem;  /* 22px */
+  --erp-text-2xl: 1.75rem;  /* 28px */
+  --erp-leading-tight: 1.2;
+  --erp-leading-normal: 1.45;
+  --erp-leading-relaxed: 1.7;
+  --erp-numerals: latin; /* user-level preference may set 'arabic-indic'; reports always Western */
+
+  /* §7 Spacing — 4px base grid, allowed stops only */
+  --erp-space-0: 0px;
+  --erp-space-1: 4px;
+  --erp-space-2: 8px;
+  --erp-space-3: 12px;
+  --erp-space-4: 16px;
+  --erp-space-5: 20px;
+  --erp-space-6: 24px;
+  --erp-space-8: 32px;
+  --erp-space-12: 48px;
+  --erp-space-16: 64px;
+
+  /* §8 Radii */
+  --erp-radius-sm: 4px;
+  --erp-radius-md: 6px;
+  --erp-radius-lg: 8px;
+  --erp-radius-full: 9999px;
+
+  /* §10 Z-index layers */
+  --erp-z-base: 0;
+  --erp-z-raised: 10;
+  --erp-z-banner: 150;
+  --erp-z-dropdown: 1000;
+  --erp-z-drawer: 1100;
+  --erp-z-overlay: 1200;
+  --erp-z-dialog: 1300;
+  --erp-z-popover: 1400;
+  --erp-z-tooltip: 1500;
+  --erp-z-toast: 1600;
+
+  /* §11 Focus ring — color by context; geometry 2px/2px fixed */
+  --erp-focus-ring: #0F766E;
+  --erp-focus-ring-brand: #99F6E4;
+  --erp-focus-ring-pos: #5EEAD4;
+  --erp-focus-ring-danger: #B91C1C;
+
+  /* §12 Breakpoints (reference values — media queries live in theme.css) */
+  --erp-breakpoint-sm: 640px;
+  --erp-breakpoint-md: 768px;
+  --erp-breakpoint-lg: 1024px;
+  --erp-breakpoint-xl: 1280px;
+  --erp-breakpoint-2xl: 1536px;
+
+  /* §6.3 Layout width — the JournalEntryGrid pattern's horizontal scroll
+     floor (8 columns + row affordances; COMPONENT_CATALOG §6.3). */
+  --erp-width-journal-grid: 960px;
+
+  /* §13 Motion — durations & easings (MOTION_GUIDELINES) */
+  --erp-duration-instant: 0ms;
+  --erp-duration-fast: 120ms;
+  --erp-duration-base: 150ms;
+  --erp-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --erp-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --erp-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* §11 Focus ring (binding, verbatim geometry) */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--erp-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--erp-radius-md);
+}
+
+/* §13 + MOTION_GUIDELINES: reduced motion collapses ALL durations to 0ms,
+   layout preserved — implemented once here, components need no media
+   queries (docs/ui/MOTION_GUIDELINES.md). */
+@supports (prefers-reduced-motion: reduce) {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* §6 Numerals (binding): every money/quantity/rate/document-number element
+   gets tabular-nums via the .tabular utility in theme.css; font-variant
+   default here keeps badge/mono contexts aligned too. */
+:root {
+  font-variant-numeric: lining-nums normal;
+}

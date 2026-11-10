@@ -1,0 +1,34 @@
+name: ci-db
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# PHASE-002 database pipeline (PHASE-002 §2.9, MIGRATION_STRATEGY §7):
+# fresh postgres:16 per run (Testcontainers) → full migration chain →
+# dev credentials → DB suite (RLS attack tests A1–A5/A10, append-only guard
+# proofs, pg-boss dedupe, signed URLs, readiness) → RLS/catalog checker.
+# Regression-apply against the previous released schema snapshot begins with
+# the first tagged phase release; today's regression shape is the idempotent
+# re-apply asserted inside the suite.
+jobs:
+  migration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Boots postgres:16 via Testcontainers, applies migrations, runs the DB
+      # suite + the RLS/catalog checker (scripts/ci/migration-tests.ts).
+      - run: pnpm migration-tests

@@ -1,0 +1,27 @@
+{
+  "extends": "@erp/config/tsconfig/base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "react",
+      "react-dom"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".storybook/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "dist-storybook",
+    "src/__ui-violations__"
+  ]
+}

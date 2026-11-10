@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  # PHASE-022 (DR-P22-01): the Expo native glue dir is NOT a pnpm workspace
+  # member — the src-tauri precedent. Its package.json only declares the expo
+  # toolchain for EAS CI (apps/mobile/native is installed there, never by the
+  # root install). `apps/*` cannot match nested dirs anyway; the explicit
+  # negation documents the boundary and guards against glob broadening.
+  - "!apps/mobile/native"

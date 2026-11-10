@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://erp.example/schemas/desktop.routes.json",
+  "title": "apps/web/desktop.routes.json — the desktop shell export manifest (DR-P21-07)",
+  "description": "Declares which [locale] routes the Tauri shell's static export keeps. Consumed by scripts/desktop-export-prebuild.mjs (the stash/restore build wrapper) and validated by /scripts/check-desktop-shell.ts at the repo root. The 'include' routes must exist as app/[locale]/<route>/page.tsx at build time (the prebuild fails loud listing every missing one).",
+  "type": "object",
+  "required": ["include"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "include": {
+      "type": "array",
+      "description": "The [locale] route segments the export keeps (route dirs under app/[locale]/). Each entry becomes app/[locale]/<entry>/ in the reduced build and <locale>/<entry>(.html|/index.html) in out-desktop/.",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$",
+        "description": "Single-segment or nested route path, lowercase kebab-case segments; no leading/trailing slash, no dot segments."
+      }
+    },
+    "exclude": {
+      "type": "array",
+      "description": "Non-route server surfaces the prebuild always removes for the export build (reserved names — a route may not shadow them).",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }
+    },
+    "notes": { "type": "string" }
+  }
+}

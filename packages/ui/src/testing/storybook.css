@@ -1,0 +1,14 @@
+/* Storybook canvas styles: the Tailwind token theme (same chain as the app). */
+@import "tailwindcss";
+@import "../tokens/tokens.css";
+@import "../tokens/density.css";
+@import "../theme.css";
+@source "../";
+
+html, body {
+  background: var(--erp-surface-page);
+}
+[data-visual-mode="true"] input,
+[data-visual-mode="true"] textarea {
+  caret-color: transparent;
+}

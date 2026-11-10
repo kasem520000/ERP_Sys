@@ -1,0 +1,55 @@
+name: visual-a11y-security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  visual-a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium --with-deps
+      # deterministic fonts are self-hosted (@fontsource); baselines are
+      # committed PNGs regenerated only from green runs (VISUAL_TESTING §5)
+      - name: design-token contrast gate (DESIGN_TOKENS §16)
+        run: pnpm check:token-contrast
+      - name: build Storybook (--test)
+        run: pnpm --filter @erp/ui build:storybook
+      - name: visual + axe + geometry + coverage (≤5 min budget)
+        run: pnpm --filter @erp/ui test:visual
+      - name: DataTable 10k-row 60fps gate (isolated)
+        run: pnpm --filter @erp/ui test:perf
+      - name: ensure baseline changes ship with a changeset (§5)
+        run: |
+          changed=$(git diff --name-only origin/${{ github.base_ref }}... -- 'packages/ui/__image_snapshots__' || true)
+          if [ -n "$changed" ] && [ -z "$(ls .changeset/*.md 2>/dev/null)" ]; then
+            echo "::error::baseline changes require a changeset naming the cause (VISUAL_TESTING §5)"; exit 1
+          fi
+
+  headers-csp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium --with-deps
+      - name: secure headers/CSP probe against the built app (§8)
+        run: pnpm test:web-security

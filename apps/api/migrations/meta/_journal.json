@@ -1,0 +1,335 @@
+{
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1793157000000,
+      "tag": "0001_core_infra",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793157000001,
+      "tag": "0002_rls_macro",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793157000002,
+      "tag": "0003_identity_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793157000003,
+      "tag": "0004_permissions_seed",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793157000004,
+      "tag": "0005_system_role_templates_seed",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793157000005,
+      "tag": "0006_tenancy_provisioning",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793157000006,
+      "tag": "0007_accounts_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793157000007,
+      "tag": "0008_platform_seeds",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793157000008,
+      "tag": "0009_partners_items",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793157000009,
+      "tag": "0010_accounting_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793157000010,
+      "tag": "0011_journal_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793157000011,
+      "tag": "0012_treasury",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793157000012,
+      "tag": "0013_tax",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793157000013,
+      "tag": "0014_inventory_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1793157000014,
+      "tag": "0015_inventory_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1793157000015,
+      "tag": "0016_purchasing_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793157000016,
+      "tag": "0017_purchasing_ap",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793157000017,
+      "tag": "0018_sales_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793157000018,
+      "tag": "0019_sales_ar",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793157000020,
+      "tag": "0020_reporting_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793528802433,
+      "tag": "0021_subscriptions_billing",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793528823433,
+      "tag": "0022_industry_configuration",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793528824433,
+      "tag": "0023_notifications_categories",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793528825433,
+      "tag": "0024_pos_core",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793528825433,
+      "tag": "0025_automotive_distribution",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793528826433,
+      "tag": "0026_manufacturing",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1793528827433,
+      "tag": "0027_crm_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1793528828433,
+      "tag": "0028_crm_service_order_holder",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1793528829433,
+      "tag": "0029_sync_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1793528830433,
+      "tag": "0030_sync_change_log_sequence_grant",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1793528830434,
+      "tag": "0031_sync_draft_line_replace",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1793528830534,
+      "tag": "0032_device_enrollment_one_time",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1793614849000,
+      "tag": "0033_mobile_feeds",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1793615000000,
+      "tag": "0034_device_push_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1793700000000,
+      "tag": "0035_external_integrations",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793900000000,
+      "tag": "0036_security_hardening",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1793950000000,
+      "tag": "0037_fixed_assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1794050000000,
+      "tag": "0038_notes_installments",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1794100000000,
+      "tag": "0039_education_template",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1794150000000,
+      "tag": "0040_agriculture_template",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1794200000000,
+      "tag": "0041_consolidation",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1794150000000,
+      "tag": "0042_budgeting",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1794236400000,
+      "tag": "0043_payroll",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1794320000000,
+      "tag": "0044_industry_wholesale_electronics",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1794400000000,
+      "tag": "0045_healthcare_claim_ref",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1794480000000,
+      "tag": "0046_industry_healthcare",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1794480800000,
+      "tag": "0047_industry_rental_logistics",
+      "breakpoints": true
+    }
+  ],
+  "version": "7"
+}

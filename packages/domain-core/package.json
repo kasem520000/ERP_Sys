@@ -1,0 +1,31 @@
+{
+  "name": "@erp/domain-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared kernel: UUIDv7, Money/Quantity/Rate value objects (ADR-0009), Result, domain errors, CalendarDate.",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "decimal.js": "^10.6.0"
+  },
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "fast-check": "^3.23.2",
+    "vitest": "^3.2.4"
+  },
+  "turbo": {
+    "build": {
+      "outputs": []
+    }
+  },
+  "main": "./src/index.ts"
+}

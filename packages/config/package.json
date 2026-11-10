@@ -1,0 +1,11 @@
+{
+  "name": "@erp/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig/*.json": "./tsconfig/*.json",
+    "./eslint/*": "./eslint/*",
+    "./prettier/*": "./prettier/*"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "extends": "@erp/config/tsconfig/web.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "strict": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/__boundary-violations__/**",
+    "**/__ui-violations__/**"
+  ]
+}

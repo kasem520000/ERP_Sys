@@ -1,0 +1,264 @@
+name: mobile-release
+
+# PHASE-022 T12 (T-P22-4-a) — the Android release pipeline (MASTER-PLAN §10,
+# DR-P22-10) — the desktop-release.yml mirror applied to Expo/EAS.
+# Pipeline order is structurally asserted by
+# apps/mobile/__tests__/mobile-release-ci.test.ts (install → gates →
+# check:mobile-shell → tokens/i18n → native install → EAS build → SBOM →
+# upload → staged-rollout config → release manifest).
+#
+# Honest scope notes (the sandbox ships this as code; the EAS leg executes
+# on real runners only — the k6 precedent):
+# - The dev sandbox has NO Android SDK / EAS CLI / expo toolchain; the pnpm
+#   workspace NEVER installs the expo toolchain (apps/mobile/native is the
+#   src-tauri-style glue dir the workspace excludes). This workflow installs
+#   it standalone in apps/mobile/native, then builds.
+# - ubuntu-latest ships the Android SDK + JDK that `eas build --local`
+#   needs; the EAS project root is apps/mobile (eas.json + app.config.ts +
+#   metro.config.js live there; the app ENTRY is native/App.tsx via the
+#   package.json "main" field — the T-P22-4-a wiring).
+# - metro's monorepo wiring (watchFolders/nodeModulesPaths over the pnpm
+#   layout — see apps/mobile/metro.config.js) is verified on the first real
+#   EAS run; this file is validated STRUCTURALLY in the sandbox (the spec
+#   test above), never executed there.
+# - Android SIGNING + FCM follow the desktop signtool precedent: every seam
+#   is a GitHub secret (SECRETS_MANAGEMENT S-15 family — raw keys never live
+#   in the repo) and each one WARNS AND CONTINUES when unset: an unsigned
+#   internal build is fine for QA, never for Play Store GA.
+# - The on-device chaos legs (C-06/C-07/C-13) + D-02 cipher inspection need
+#   an Android runner with an emulator matrix — wired as the workflow_dispatch
+#   device-farm job at the bottom (the PHASE-021 Windows-CI precedent of
+#   structural honesty: documented, never silently skipped).
+on:
+  push:
+    tags: ["v*"]
+  # the manual device-farm leg (see the device-farm job below)
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12
+          cache: pnpm
+
+      - name: Release version from the tag (CalVer v1.YY.MM.patch — the release policy compares it)
+        run: echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+
+      # The workspace install — frozen. apps/mobile/native is NEVER installed
+      # here (pnpm-workspace.yaml excludes it; the EAS leg below owns it).
+      - name: Install dependencies (frozen lockfile — the workspace root)
+        run: pnpm install --frozen-lockfile
+
+      # Quality gates on the TS runtime (@erp/mobile) BEFORE any native work.
+      - name: Mobile quality gates (typecheck + lint + test)
+        run: |
+          pnpm --filter @erp/mobile typecheck
+          pnpm --filter @erp/mobile lint
+          pnpm --filter @erp/mobile test
+
+      # Structural gate: the native toolchain declaration + entry wiring +
+      # app.config/eas keys + the screen registry + screen imports + the
+      # workspace boundary (the check-desktop-shell precedent).
+      - name: Shell structural gate (check:mobile-shell)
+        run: pnpm check:mobile-shell
+
+      # Token byte-parity vs packages/ui + AR/EN dictionary parity.
+      - name: Token + i18n parity gates
+        run: |
+          pnpm check:mobile-tokens
+          pnpm check:mobile-i18n
+
+      # The EAS leg: install the expo toolchain standalone in apps/mobile/native
+      # (the packageManager field pins pnpm; --no-frozen-lockfile because no
+      # lockfile is committed for a package the workspace never installs).
+      - name: Install the native Expo deps (EAS leg)
+        working-directory: apps/mobile/native
+        run: pnpm install --no-frozen-lockfile
+
+      # S-15 family (SECRETS_MANAGEMENT): the raw keystore, its passwords, and
+      # the FCM app config NEVER live in the repo — CI materializes them from
+      # GitHub secrets. Every seam WARN-AND-CONTINUES when unset (the desktop
+      # signtool precedent).
+      - name: Provision Android signing + FCM config (S-15 — warn and continue)
+        working-directory: apps/mobile/native
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          FCM_PROJECT_ID: ${{ secrets.FCM_PROJECT_ID }}
+          FCM_APP_ID: ${{ secrets.FCM_APP_ID }}
+          FCM_API_KEY: ${{ secrets.FCM_API_KEY }}
+        run: |
+          # Android signing: EAS --local reads native/credentials.json
+          # (keystorePath relative to this dir). Without the secrets the build
+          # falls back to the EAS credential server / debug keystore.
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_ALIAS" ] && \
+             [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > release.jks
+            cat > credentials.json <<EOF
+          {
+            "android": {
+              "keystore": {
+                "keystorePath": "release.jks",
+                "keystoreAlias": "$ANDROID_KEYSTORE_ALIAS",
+                "keystorePassword": "$ANDROID_KEYSTORE_PASSWORD",
+                "keyPassword": "$ANDROID_KEY_PASSWORD"
+              }
+            }
+          }
+          EOF
+            echo "Android signing provisioned (release.jks + credentials.json from the S-15 secrets)"
+          else
+            echo "::warning::Android signing skipped (ANDROID_KEYSTORE_* not configured) — the build falls back to the EAS credential server / debug keystore: internal channel only, never Play Store GA"
+          fi
+          # FCM: prebuild injects google-services.json when it is present at
+          # the project root. Without the secrets the push channel builds
+          # disabled (opt-in, default OFF — the DR-P22-07 skeleton).
+          if [ -n "$FCM_PROJECT_ID" ] && [ -n "$FCM_APP_ID" ] && [ -n "$FCM_API_KEY" ]; then
+            cat > google-services.json <<EOF
+          {
+            "project_info": { "project_number": "000000000000", "project_id": "$FCM_PROJECT_ID" },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "$FCM_APP_ID",
+                  "android_client_info": { "package_name": "com.erp.field" }
+                },
+                "oauth_client": [],
+                "api_key": [ { "current_key": "$FCM_API_KEY" } ],
+                "services": { "appinvite_service": { "status": 1 } }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+            echo "FCM config provisioned (google-services.json from the FCM_* secrets)"
+          else
+            echo "::warning::FCM config skipped (FCM_* not configured) — the push channel builds disabled (opt-in, default OFF)"
+          fi
+
+      # The build itself. EXPO_TOKEN authenticates remote EAS credentials; a
+      # fully local credentials.json (provisioned above) builds without it.
+      # Warn-and-continue when NEITHER exists (structural until S-15 lands).
+      - name: EAS build (android, profile production — local build on the runner)
+        working-directory: apps/mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ ! -f native/credentials.json ] && [ -z "$EXPO_TOKEN" ]; then
+            echo "::warning::EAS build skipped (no EXPO_TOKEN and no local credentials.json) — the pipeline runs for real once the S-15 secrets are provisioned (SECRETS_MANAGEMENT); the desktop signtool warn-and-continue precedent"
+            exit 0
+          fi
+          npx eas-cli build --platform android --profile production --local --non-interactive
+
+      # Software Bill of Materials for the npm dependency graph (the desktop
+      # precedent; the expo toolchain graph rides the same npm inventory).
+      - name: SBOM (CycloneDX, npm dependency graph)
+        run: |
+          mkdir -p mobile-release-artifacts
+          pnpm dlx @cyclonedx/cyclonedx-npm --output-format JSON --output-file mobile-release-artifacts/sbom-npm.json
+
+      # The EAS --local Gradle outputs (standard android/app/build/outputs
+      # paths). `|| true` keeps the step green when the EAS leg was skipped —
+      # the upload below reports it honestly (if-no-files-found: warn).
+      - name: Collect release artifacts (apk/aab from the Gradle outputs)
+        run: |
+          mkdir -p mobile-release-artifacts
+          cp apps/mobile/native/android/app/build/outputs/apk/release/*.apk mobile-release-artifacts/ 2>/dev/null || true
+          cp apps/mobile/native/android/app/build/outputs/bundle/release/*.aab mobile-release-artifacts/ 2>/dev/null || true
+          ls -la mobile-release-artifacts/
+
+      - name: Upload release artifacts (apk/aab + SBOM)
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-mobile-${{ env.RELEASE_VERSION }}
+          path: mobile-release-artifacts/*
+          # warn (not error): empty is the honest outcome when the EAS leg
+          # was skipped above — the ::warning:: lines make it non-silent.
+          if-no-files-found: warn
+
+      # The staged-rollout config artifact: the 10/50/100 ladder + the
+      # binding crash gates, serialized exactly as src/release/rollout.ts
+      # consumes them (trailing 24 h window).
+      - name: Assemble the staged-rollout config (10/50/100 + crash gates)
+        run: |
+          mkdir -p mobile-rollout
+          cat > mobile-rollout/rollout-config.json <<EOF
+          {
+            "version": "${RELEASE_VERSION}",
+            "stages": [10, 50, 100],
+            "stagePercent": 10,
+            "cohortSeed": "erp-field-${RELEASE_VERSION}",
+            "windowHours": 24,
+            "gates": {
+              "to50": { "crashFree": 0.995, "sessions": 200 },
+              "to100": { "crashFree": 0.997, "sessions": 500 },
+              "halt": { "crashFree": 0.985, "remedy": "publish minVersion = last-known-good (force-update)" }
+            }
+          }
+          EOF
+          cat mobile-rollout/rollout-config.json
+
+      # The release manifest (the desktop updater-manifest shape + minVersion):
+      # the client-side policy (src/release/release-policy.ts) compares the
+      # running appVersion against minVersion and force-updates below it.
+      # minVersion starts at THIS release; the runbook bumps it to
+      # last-known-good on a halt (RELEASE_STRATEGY §Rollout).
+      - name: Assemble the release manifest (minVersion — the force-update input)
+        run: |
+          mkdir -p mobile-manifest
+          cat > mobile-manifest/manifest.json <<EOF
+          {
+            "version": "${RELEASE_VERSION}",
+            "pub_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "minVersion": "${RELEASE_VERSION}",
+            "platforms": {
+              "android": { "url": "https://updates.erp.example/mobile/stable/${RELEASE_VERSION}/" }
+            },
+            "rollout": { "stagePercent": 10, "cohortSeed": "erp-field-${RELEASE_VERSION}" },
+            "notes": "ERP Field ${RELEASE_VERSION} — staged rollout 10% (staged channel). Gates: 10→50 at ≥99.5% over ≥200 sessions, 50→100 at ≥99.7% over ≥500, halt <98.5% ⇒ publish minVersion=last-known-good."
+          }
+          EOF
+          cat mobile-manifest/manifest.json
+
+      - name: Upload the staged-rollout + release-manifest artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-mobile-rollout-${{ env.RELEASE_VERSION }}
+          path: |
+            mobile-rollout/*
+            mobile-manifest/*
+          # error (not warn): these are assembled unconditionally above —
+          # their absence means the pipeline itself broke.
+          if-no-files-found: error
+
+  # HONEST PLACEHOLDER (the PHASE-021 Windows-CI precedent): the on-device
+  # legs — chaos C-06 (kill during sync), C-07 (airplane-mode toggling),
+  # C-13 (Doze/background-fetch) + D-02 on-device SQLCipher cipher inspection
+  # — need an Android runner with an emulator matrix. The sandbox has none
+  # and a GitHub-hosted runner is not a farm; this job is wired as the
+  # workflow_dispatch MANUAL leg and documents the matrix it will run. Never
+  # a silent skip: dispatching it prints the plan and points at the runner
+  # requirement.
+  device-farm:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Documented placeholder — the on-device matrix (C-06/C-07/C-13 + D-02)
+        run: |
+          echo "::notice::device-farm leg is a documented placeholder (PHASE-022 T-P22-4-a): requires an Android runner with an emulator matrix. Planned legs: C-06 kill-during-sync, C-07 connectivity toggling, C-13 Doze/background-fetch, D-02 on-device cipher inspection — the preview EAS profile (internal APK) feeds them. Wire the matrix here when the farm exists."

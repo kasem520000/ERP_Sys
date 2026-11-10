@@ -1,0 +1,41 @@
+/*
+ * PHASE-005 — the design system layer replaces the PHASE-003 provisional
+ * stylesheet entirely: tokens, fonts, density, and the Tailwind v4 theme
+ * come from @erp/ui (DESIGN_SYSTEM §2). Apps consume the exported CSS
+ * surface; screens compose catalog components — never provisional styles.
+ */
+@import "tailwindcss";
+@import "@erp/ui/fonts.css";
+@import "@erp/ui/tokens.css";
+@import "@erp/ui/density.css";
+@import "@erp/ui/theme.css";
+
+/* Class-source registration: the workspace design system is a symlinked
+   package — Tailwind's automatic detection skips node_modules, so the
+   component sources are registered explicitly (Tailwind v4 monorepo rule). */
+@source "../../packages/ui/src";
+
+/* App-level base (tokens only — no raw values) */
+html {
+  background-color: var(--erp-surface-page);
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--erp-color-gray-900);
+  font-family: var(--erp-font-ar);
+}
+[lang="en"] {
+  font-family: var(--erp-font-latin);
+}
+main {
+  flex: 1;
+}
+
+/* caret/selection hidden for visual determinism (VISUAL_TESTING §3) */
+[data-visual-mode="true"] input,
+[data-visual-mode="true"] textarea {
+  caret-color: transparent;
+}

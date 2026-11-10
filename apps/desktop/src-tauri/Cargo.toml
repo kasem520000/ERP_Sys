@@ -1,0 +1,99 @@
+# PHASE-021 T1/T12 · the ERP Desktop Tauri v2 shell (ADR-0013).
+#
+# SOURCE-ONLY in this repository: there is no Rust toolchain in the dev
+# sandbox — this crate is compiled (and signed) exclusively by the Windows CI
+# workflow (.github/workflows/desktop-release.yml); scripts/check-desktop-shell.ts
+# validates the structural invariants (bridge-command parity, config shape)
+# instead of compiling. This is the k6 precedent: real sources, honest deferral.
+#
+# Architecture (ADR-0013 / MASTER-PLAN §1 item 1): ALL application logic is
+# TypeScript in apps/desktop/src (the @erp/desktop package, fully unit-tested
+# on Node). This crate is the thin shell: window + plugin glue + the
+# DesktopBridge command surface (apps/desktop/src/bridge/contract.ts) that the
+# web bundle consumes via the injected `window.__erpDesktop` bootstrap.
+#
+# Dependency decisions (crates.io verified 2026-11-04):
+# - tauri 2 (2.12.x line), tauri-build 2, tauri-plugin-updater 2 (stable 2.14.x
+#   — NOT the 3.0.0-alpha), tauri-plugin-http 2 (2.8.x stable): official v2
+#   plugin crates. tauri-plugin-http is registered so the shell's http_request
+#   bridge command uses its reqwest client (consistent TLS stack); the plugin's
+#   own JS commands are not granted to the webview (capabilities/default.json).
+# - keyring 4 (mature "All-in-One Rust Keyring"; Windows Credential Manager
+#   via the windows crate): the keychain glue implements keychain_get/set/delete
+#   directly on this crate. The community "tauri-plugin-keyring" crate exists
+#   on crates.io but is a single 0.1.0 release (2024-12, no repository) — not
+#   a production dependency; recorded in agent-ctx/T-P21-2c.md.
+# - rusqlite 0.41 with the sqlcipher cargo feature (below): the sql glue
+#   (plugins/sql) opens the local store. DEVIATION from the plan's
+#   "tauri-plugin-sql with sqlcipher feature": tauri-plugin-sql 2.6.0 publishes
+#   only mysql/postgres/sqlite features (no sqlcipher — verified on crates.io);
+#   its sqlx backend cannot carry a SQLCipher key. rusqlite's
+#   bundled-sqlcipher-vendored-openssl builds SQLCipher (with OpenSSL) from
+#   source — the real DR-P21-02 "cipher profile" build flag.
+[package]
+name = "erp-desktop"
+version = "1.0.0"
+description = "ERP Desktop — Tauri v2 shell around the exported web ERP build (ADR-0013)"
+authors = ["ERP Platform"]
+license = "Proprietary"
+repository = ""
+edition = "2021"
+rust-version = "1.77"
+
+# The lib is the tauri v2 entry (main.rs calls erp_desktop::run()); the
+# staticlib/cdylib crate types are the standard tauri mobile-ready scaffold.
+[lib]
+name = "erp_desktop"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-updater = "2"
+tauri-plugin-http = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["time"] }
+
+# Local store (plugins/sql). Default = standard SQLite profile (bundled,
+# DR-P21-02 fallback); the `sqlcipher` feature flips the same commands onto a
+# SQLCipher build (PRAGMA key support + cipher_version probe) — the Windows CI
+# release build passes --features sqlcipher.
+rusqlite = { version = "0.41", features = ["bundled"] }
+
+# OS keychain (plugins/keychain) — Windows Credential Manager.
+keyring = "4"
+
+# WebView2 runtime probe (system_webview2_version) — EdgeUpdate registry key.
+winreg = "0.56"
+
+# OS info (system_os_info) — small, dependency-light crate.
+os_info = "3"
+
+[target.'cfg(windows)'.dependencies]
+# Raw ESC-POS printing via the spooler + HTML print via the shell "print"
+# verb (plugins/print/windows_impl.rs). printpdf is deliberately NOT a
+# dependency: ESC-POS bytes are rendered in TypeScript (apps/desktop/src/
+# print/escpos.ts per ADR-0013 "Rust stays confined to plugins") — the shell
+# only transports ready bytes to the spooler. windows 0.62 is the crate the
+# ecosystem (keyring, tauri) already builds on.
+windows = { version = "0.62", features = [
+  "Win32_Graphics_Printing",
+  "Win32_UI_Shell",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_Foundation",
+] }
+
+[features]
+default = []
+# DR-P21-02 cipher profile: builds SQLCipher (with a vendored OpenSSL) into
+# rusqlite instead of stock SQLite. Requires a C toolchain + perl on the build
+# host (windows-latest runners ship both) — documented in the CI workflow.
+sqlcipher = ["rusqlite/bundled-sqlcipher-vendored-openssl"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

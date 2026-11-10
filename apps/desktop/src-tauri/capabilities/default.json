@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "PHASE-021 T1 · the single capability the ERP Desktop shell grants its main window. App commands (keychain_*, sql_*, http_request, updater_*, system_*, print_*, connectivity_is_online — the DesktopBridge surface) are crate-local invoke_handler commands and are callable from the app's own webview by construction; this capability grants the core permissions the injected bridge additionally needs: the event system (connectivity.onChange listens to the erp:connectivity event) and the core defaults. The http/updater plugins are registered for their Rust-side APIs (the reqwest client / the updater runtime) — their JS command surfaces are deliberately NOT granted to the webview.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:window:default",
+    "core:webview:default",
+    "core:event:default",
+    "core:app:default"
+  ]
+}

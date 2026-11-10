@@ -1,0 +1,15 @@
+{
+  "extends": "@erp/config/tsconfig/node.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "noEmit": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

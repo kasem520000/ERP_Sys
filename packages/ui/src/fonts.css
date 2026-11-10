@@ -1,0 +1,18 @@
+/**
+ * Self-hosted typography (DESIGN_TOKENS §6): IBM Plex Sans Arabic (AR default),
+ * Inter (Latin), IBM Plex Mono (document numbers/amounts) — woff2 served from
+ * our own origin via @fontsource (no third-party font CDN; CSP §8 keeps
+ * font-src 'self'). font-display: swap per the tokens doc. Weights limited to
+ * the documented set: 400 body · 500 emphasis/labels · 600 headings/buttons ·
+ * 700 totals & 2xl only.
+ */
+@import "@fontsource/ibm-plex-sans-arabic/400.css";
+@import "@fontsource/ibm-plex-sans-arabic/500.css";
+@import "@fontsource/ibm-plex-sans-arabic/600.css";
+@import "@fontsource/ibm-plex-sans-arabic/700.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";

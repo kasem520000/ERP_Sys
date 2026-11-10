@@ -1,0 +1,6 @@
+{
+  "$schema": "./scripts/desktop.routes.schema.json",
+  "include": ["offline", "unlock"],
+  "exclude": ["api", "middleware"],
+  "notes": "PHASE-021 DR-P21-07 — the desktop shell subset of the web app: 'include' lists the [locale] routes the static export keeps (the Offline Console + the unlock screen — client-hydrated, no server dependencies); everything else under app/[locale] plus app/api (the BFF catch-all + session routes) and middleware.ts are stashed away by scripts/desktop-export-prebuild.mjs for the ERP_TARGET=desktop build. Online use loads the deployed web app (ADR-0013 reuse) — the shell serves only these offline screens from disk. 'exclude' names the non-route server surfaces the prebuild always removes (listed explicitly so a route named 'api' can never silently shadow the BFF). Schema: scripts/desktop.routes.schema.json; validated by scripts/check-desktop-shell.ts."
+}

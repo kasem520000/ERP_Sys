@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# build outputs
+dist/
+.next/
+out/
+# PHASE-021 DR-P21-07 — the desktop shell static export (pnpm --filter @erp/web build:desktop)
+apps/web/out-desktop/
+coverage/
+
+# tooling caches
+.turbo/
+*.tsbuildinfo
+
+# local environment — never commit real secrets
+.env
+.env.local
+
+# misc
+.DS_Store
+
+# workspace-local (agent sandbox)
+upload/
+download/
+skills/
+agent-ctx/local/
+
+# tool-output artifacts (session-local)
+tool-results/
+# PHASE-024 T7 — locally generated SBOMs (CI `sbom` job uploads the
+# authoritative artifacts; local runs are recorded in
+# docs/operations/dependency-triage-2026-11.md, never committed)
+sbom*.json
+# PHASE-021 desktop export prebuild stash (defense-in-depth — the prebuild's
+# finally-restore removes it; ignored so a crashed run never dirties status)
+.desktop-stash/

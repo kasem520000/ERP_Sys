@@ -1,0 +1,33 @@
+{
+  "name": "@erp/sync-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PHASE-016 offline sync core: the POS-scoped local store, outbox, cursors, and sync client (SYNC_PROTOCOL §11 — the narrow first consumer; PHASE-020 generalizes without changing the contracts).",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@erp/contracts": "workspace:*",
+    "@erp/domain-core": "workspace:^",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "vitest": "^3.2.4"
+  },
+  "turbo": {
+    "build": {
+      "outputs": []
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
+}

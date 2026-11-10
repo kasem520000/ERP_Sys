@@ -1,0 +1,34 @@
+{
+  "name": "@erp/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PHASE-021 desktop runtime (ADR-0013): the TypeScript desktop application logic — SQLite store (dual-profile SQLCipher), enrollment/keychain auth, sync host, minisign updater, WebView2 probe, telemetry, ESC-POS print — hosted by the thin Tauri v2 Rust shell (src-tauri, compiled by Windows CI).",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@erp/contracts": "workspace:*",
+    "@erp/sync-core": "workspace:*",
+    "better-sqlite3": "^12.11.1"
+  },
+  "devDependencies": {
+    "@erp/config": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
+    "vitest": "^3.2.4"
+  },
+  "turbo": {
+    "build": {
+      "outputs": []
+    }
+  },
+  "main": "./src/index.ts",
+  "types": "./src/index.ts"
+}

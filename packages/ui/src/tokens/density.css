@@ -1,0 +1,31 @@
+/**
+ * §9 Density modes — first-class measurement maps. Applied via
+ * `data-density="compact|comfortable"` on the shell root (DensityProvider);
+ * components consume the custom properties, never hard-coded 32/40px.
+ */
+:root,
+[data-density="compact"] {
+  --erp-density-row-height: 32px;
+  --erp-density-control-height: 32px;
+  --erp-density-cell-padding-y: 6px;
+  --erp-density-cell-padding-x: 12px;
+  --erp-density-cell-font: var(--erp-text-sm); /* 13px */
+  --erp-density-form-label: inline-start; /* row layout */
+  --erp-density-touch-target: 32px;
+}
+
+[data-density="comfortable"] {
+  --erp-density-row-height: 40px;
+  --erp-density-control-height: 40px;
+  --erp-density-cell-padding-y: 10px;
+  --erp-density-cell-padding-x: 16px;
+  --erp-density-cell-font: var(--erp-text-base); /* 14px */
+  --erp-density-form-label: stacked;
+  --erp-density-touch-target: 40px;
+}
+
+/* ACCESSIBILITY.md §8: touch contexts require ≥44px targets. The provider
+   flags touch surfaces with data-touch="true" — POS forces comfortable. */
+[data-touch="true"] {
+  --erp-density-touch-target: 44px;
+}
