@@ -73,6 +73,7 @@ import {
   treasuryFxDifferencesContract,
   taxVatReturnContract,
   taxSummaryByTreatmentContract,
+  taxEInvoicingLogContract,
   platformAuditTrailContract,
   platformUserActivityContract,
   platformReportRunsContract,
@@ -177,6 +178,9 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §6 tax
   taxVatReturnContract,
   taxSummaryByTreatmentContract,
+  // §6 tax — PHASE-035 T-06 (audit EVAL-F-6): the documented-but-missing
+  // 86th contract, registry 85 → 86.
+  taxEInvoicingLogContract,
   // §7 platform
   platformAuditTrailContract,
   platformUserActivityContract,

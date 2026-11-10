@@ -164,7 +164,9 @@ export function ConsolidationGroupDetail({
 
   async function updateMember(
     member: GroupMemberRow,
-    patch: { percent?: string; status?: string; note?: string },
+    // (PHASE-035 gate repair: the call site sends null to clear the note —
+    // the API's PUT accepts note: null; the patch type missed it.)
+    patch: { percent?: string; status?: string; note?: string | null },
   ): Promise<void> {
     setError(null);
     if (patch.percent !== undefined && !PERCENT_RE.test(patch.percent)) {

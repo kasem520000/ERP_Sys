@@ -146,6 +146,9 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "reports.treasury.fx.read",
   "reports.tax.vat-return.read",
   "reports.tax.summary.read",
+  // PHASE-035 T-06: the tax.e-invoicing-log contract's permission (the
+  // module-register convention — the seeded key every e-invoicing route uses).
+  "tax.einvoicing.manage",
   "platform.audit.read",
   "platform.users.read",
   "platform.reporting.read",

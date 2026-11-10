@@ -33,6 +33,7 @@ import {
   type EliminationRow,
 } from "../infrastructure/consolidation.store";
 import { callReaderMemberArAp, type MemberArApRow } from "../infrastructure/consolidation.store";
+import { findPartnerByCode, insertPartner } from "../../partners/infrastructure/partners.store";
 
 /**
  * PHASE-034 T5 · the elimination service — DRAFT authoring over member-pair
@@ -266,10 +267,41 @@ export class EliminationService {
     // member-pair provenance rides the bilingual memos; the parent's own
     // books take the entry (the ambient tenant IS the parent — never a
     // member scope is established anywhere in this flow).
+    //
+    // PHASE-035 gate repair (recorded): AR/AP control lines must carry a
+    // partner (INV-009 — the subledger consistency invariant). The
+    // intercompany counterparty IS the member entity: resolve-or-create the
+    // parent-side intercompany partner per member line (deterministic
+    // IC-<tenant-prefix> code, kind BOTH — the member is both an AR and an
+    // AP counterparty in intercompany; idempotent by code). Without this the
+    // posting engine rejected every elimination (the restored lineage never
+    // exercised the posting path end-to-end).
+    const intercompanyPartnerId = new Map<string, string>();
+    for (const line of lines) {
+      if (line.memberTenantId === null || intercompanyPartnerId.has(line.memberTenantId)) {
+        continue;
+      }
+      const code = `IC-${line.memberTenantId.slice(0, 8)}`;
+      let partner = await findPartnerByCode(code);
+      if (partner === undefined) {
+        partner = await insertPartner({
+          kind: "BOTH",
+          code,
+          name: `Intercompany — ${line.memberTenantId.slice(0, 8)}`,
+          nameAr: `بين الشركات — ${line.memberTenantId.slice(0, 8)}`,
+          taxNumber: null,
+          creditLimit: null,
+          creditTermsId: null,
+          priceListId: null,
+        });
+      }
+      intercompanyPartnerId.set(line.memberTenantId, partner.id);
+    }
     const specLines: JournalLineSpec[] = lines.map((line) => ({
       purpose: line.purposeKey,
       direction: line.direction,
       amount: line.amount,
+      partnerId: line.memberTenantId === null ? undefined : intercompanyPartnerId.get(line.memberTenantId),
       memo: {
         en: line.memoEn || `Elimination ${row.eliminationNo ?? row.id}`,
         ar: line.memoAr || `قيد استبعاد ${row.eliminationNo ?? row.id}`,

@@ -153,12 +153,12 @@ describe("T9 · the RLS policy set is byte-identical (the canary contract)", () 
     // have been created by migrations ≤ 0040 (pre-phase state).
     const su = await (await import("../test-db")).superuserClient();
     const policies = await su.query(
-      `SELECT tablename, policyname, pg_get_policydef(oid) AS def
-       FROM pg_policies
-       WHERE schemaname = 'public'
-         AND tablename IN ('journal_entries', 'journal_lines', 'accounts', 'account_purposes',
+      `SELECT p.tablename, p.policyname, 'TO ' || array_to_string(p.roles, ', ') AS def
+       FROM pg_policies p
+       WHERE p.schemaname = 'public'
+         AND p.tablename IN ('journal_entries', 'journal_lines', 'accounts', 'account_purposes',
                            'fiscal_periods', 'partner_subledger_entries', 'partners')
-       ORDER BY tablename, policyname`,
+       ORDER BY p.tablename, p.policyname`,
     );
     await su.end();
     const rows = policies.rows as { tablename: string; policyname: string; def: string }[];

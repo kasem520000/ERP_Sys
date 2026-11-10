@@ -122,7 +122,9 @@ export function MarketingLanding({ locale, options, plans }: MarketingLandingPro
                   href={registerHref}
                   className="inline-flex min-h-11 items-center gap-2 rounded-md bg-primary-600 px-6 py-3 text-base font-semibold text-white outline-none transition-colors duration-150 ease-standard hover:bg-primary-700"
                 >
-                  <Icon name="user-plus" size={18} />
+                  {/* (PHASE-035 gate repair: 18 isn't in the token ladder — 20
+                  matches the CTA's prominence at this size.) */}
+                  <Icon name="user-plus" size={20} />
                   {d.landingCtaStartFree}
                 </a>
                 <a

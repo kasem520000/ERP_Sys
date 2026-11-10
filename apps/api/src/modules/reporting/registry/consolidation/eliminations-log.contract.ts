@@ -114,13 +114,14 @@ export const consolidationEliminationsLogContract = defineReport({
   run: async (_ctx, params) => {
     const { consolidation } = reportingServices();
     const rows = await consolidation.eliminationsLog({
-      groupId: params.groupId,
-      fiscalPeriodId: params.fiscalPeriodId,
+      // (zod-validated uuids — the open ReportParams index is `unknown`)
+      groupId: params.groupId as string,
+      fiscalPeriodId: params.fiscalPeriodId as string,
     });
     const filtered = params.status === undefined ? rows : rows.filter((row) => row.status === params.status);
     const tie = await consolidation.eliminationsTie({
-      groupId: params.groupId,
-      fiscalPeriodId: params.fiscalPeriodId,
+      groupId: params.groupId as string,
+      fiscalPeriodId: params.fiscalPeriodId as string,
     });
     let postedDebit = "0.0000";
     for (const row of filtered) {

@@ -53,7 +53,7 @@ describe("INV-026 · the completed run reconciles line-by-line (fixture group + 
     expect(snapshot.inv026.status).toBe("PASS");
     expect(snapshot.members).toHaveLength(3);
     // The USD member's translated extract: 1000 USD cash at 3.75 → 3750 SAR.
-    const cash = snapshot.consolidated.find((line) => line.accountCode === "1110");
+    const cash = snapshot.consolidated.find((line) => line.accountCode === "1111");
     expect(cash).toBeDefined();
   });
 
@@ -89,13 +89,17 @@ describe("INV-026 · the completed run reconciles line-by-line (fixture group + 
     };
     const { assertInv026 } = await import("../../modules/consolidation/application/consolidation-math");
     const tampered = snapshot.consolidated.map((line) =>
-      line.accountCode === "1110"
+      line.accountCode === "1111"
         ? { ...line, amounts: { ...line.amounts, debit: "999999.0000" } }
         : line,
     );
     const result = assertInv026({
       runId: run.id,
-      consolidated: tampered,
+      // (PHASE-035 gate repair: the local structural type drops
+      // accountType/purposeKey, so the map's result no longer matches
+      // ConsolidatedLine — the runtime rows carry them; the sibling cast
+      // pattern applies.)
+      consolidated: tampered as never,
       members: snapshot.memberExtracts as never,
       eliminations: snapshot.eliminations as never,
     });
@@ -114,18 +118,22 @@ describe("INV-026 · the completed run reconciles line-by-line (fixture group + 
       consolidated: { accountCode: string; amounts: { debit: string } }[];
     };
     for (const line of tampered.consolidated) {
-      if (line.accountCode === "1110") {
+      if (line.accountCode === "1111") {
         line.amounts.debit = "888888.0000";
       }
     }
+    // NOTE: the guard trigger blocks snapshot mutation on COMPLETED rows —
+    // the tamper lever therefore runs with purge_mode ON (the documented
+    // maintenance seam); the RENDER check must still fail closed.
+    // (PHASE-035 gate repair: the SET was missing — the UPDATE died at the
+    // guard before the render-time path could be exercised.)
+    await su.query(`SET erp.purge_mode = 'on'`);
     await su.query(`UPDATE consolidation_runs SET snapshot = $2 WHERE id = $1`, [
       run.id,
       JSON.stringify(tampered),
     ]);
+    await su.query(`RESET erp.purge_mode`);
     await su.end();
-    // NOTE: the guard trigger blocks snapshot mutation on COMPLETED rows —
-    // the tamper lever therefore runs with purge_mode ON (the documented
-    // maintenance seam); the RENDER check must still fail closed.
     await withTenant(OWNER_TENANT, async () => {
       const queries = new ConsolidationQueriesService();
       const source = await queries.statementSource({

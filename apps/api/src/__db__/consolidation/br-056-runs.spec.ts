@@ -30,6 +30,14 @@ beforeAll(async () => {
   group = await ensureFixtureGroup();
   const period = await ownerNovemberPeriod();
   periodId = period.id;
+  // PHASE-035 gate repair: close every member's November period up front (the
+  // spec's test 2 assumed closed periods only test 3's loop established —
+  // intra-file order dependence; test 1 re-opens USD's for its rejection
+  // scenario and test 2 re-closes it, both explicitly).
+  for (const member of [OWNER_TENANT, MEMBER_USD, MEMBER_SAR]) {
+    const memberPeriod = await memberNovemberPeriod(member);
+    await setPeriodStatus(memberPeriod.id, "SOFT_CLOSED");
+  }
 });
 
 describe("BR-056 · the run pre-check (typed rejection, never a warning)", () => {

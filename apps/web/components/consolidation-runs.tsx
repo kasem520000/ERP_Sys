@@ -22,7 +22,6 @@ import type {
   ConsolidationGroupRow,
   ConsolidationRunRow,
   ConsolidationRunSnapshotView,
-  ConsolidationSnapshot,
   FiscalPeriodRow,
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";

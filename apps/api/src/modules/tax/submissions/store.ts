@@ -70,6 +70,10 @@ export interface RegistryFilter {
   readonly status?: string;
   readonly sourceType?: string;
   readonly sourceId?: string;
+  /** PHASE-035 T-06: optional created_at window (the tax.e-invoicing-log
+   * report's period filter) — additive, unset = unbounded as before. */
+  readonly createdFrom?: string;
+  readonly createdTo?: string;
   readonly limit?: number;
 }
 
@@ -82,6 +86,8 @@ export async function listSubmissions(filter: RegistryFilter): Promise<Submissio
       AND (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
       AND (${filter.sourceType ?? null}::text IS NULL OR source_type = ${filter.sourceType ?? null})
       AND (${filter.sourceId ?? null}::uuid IS NULL OR source_id = ${filter.sourceId ?? null}::uuid)
+      AND (${filter.createdFrom ?? null}::timestamptz IS NULL OR created_at >= ${filter.createdFrom ?? null}::timestamptz)
+      AND (${filter.createdTo ?? null}::timestamptz IS NULL OR created_at < (${filter.createdTo ?? null}::timestamptz + interval '1 day'))
     ORDER BY created_at DESC
     LIMIT ${filter.limit ?? 200}
   `);

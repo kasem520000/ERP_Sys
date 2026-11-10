@@ -453,7 +453,16 @@ RESET ROLE;
 --> statement-breakpoint
 GRANT USAGE ON SCHEMA public TO erp_consolidation_reader;
 --> statement-breakpoint
-GRANT USAGE ON SCHEMA erp TO erp_consolidation_reader;
+-- PHASE-035 gate repair (recorded in the completion report): the reader
+-- role needs CREATE on the schema to create its SECURITY DEFINER function
+-- family under SET ROLE — the exact 0003 erp_definer precedent (line 398:
+-- GRANT USAGE, CREATE ON SCHEMA erp). Without it a FRESH migration chain
+-- died here with "permission denied for schema erp" (the delivered 034
+-- archive's DB suites necessarily ran against a pre-migrated database —
+-- the fresh-chain boot had never worked since 0041). The role stays
+-- NOLOGIN (disabled-by-default), so the CREATE privilege is reachable only
+-- through the migration role's SET ROLE — same posture as erp_definer.
+GRANT USAGE, CREATE ON SCHEMA erp TO erp_consolidation_reader;
 --> statement-breakpoint
 -- SELECT-only on the member GL read models (the reader function family's
 -- universe: GL aggregates + fiscal periods + the AR/AP subledger pairing

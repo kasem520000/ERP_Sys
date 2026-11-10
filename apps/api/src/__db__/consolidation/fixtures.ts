@@ -35,6 +35,19 @@ export const PERIOD_MONTH = "2026-11";
 export async function setupConsolidationFixture(): Promise<void> {
   await setupAccountingFixture();
   const su = await superuserClient();
+  // PHASE-035 gate repair (recorded): the USD member tenant references a 'US'
+  // country the 0006 seed never carries (the ten MENA pack rows only; USD
+  // the currency IS seeded) — on a fresh chain the fixture died on
+  // fk_tenants_country unless another spec happened to create the row first
+  // (order dependence). The fixture is now self-sufficient: a minimal
+  // inactive US row, idempotent, fixture-owned (no compliance claim — the
+  // platform is MENA/GCC-scoped; out-of-region tenants are consolidation
+  // fixtures only).
+  await su.query(
+    `INSERT INTO countries (code, name, name_ar, default_locale, currency_code, time_zone, is_active)
+     VALUES ('US', 'United States', 'الولايات المتحدة', 'en', 'USD', 'UTC', false)
+     ON CONFLICT (code) DO NOTHING`,
+  );
   await su.query(
     `INSERT INTO tenants (id, name, name_ar, base_currency, country_code, timezone) VALUES
        ($1, 'Group Member A (USD)', 'الشركة العضو أ', 'USD', 'US', 'UTC'),
@@ -91,6 +104,50 @@ export async function setupConsolidationFixture(): Promise<void> {
       if (!years.some((year) => year.name === "FY2026")) {
         await periods.createYear(MEMBER_ACTOR, { name: "FY2026", startDate: "2026-01-01", endDate: "2026-12-31" });
       }
+    });
+    // PHASE-035 gate repair (recorded): the run/translation specs assert over
+    // the members' POSTED November books (the fx-translation golden compares
+    // the snapshot lines against them; the br-056 FAILED-run lever needs a
+    // foreign-currency row to translate) — but the fixture never seeded any
+    // member GL rows, so those suites were unsatisfiable on a fresh chain.
+    // One balanced two-line journal per member in November (fixed docIds →
+    // INV-013 replays are no-ops; the idempotency probe runs before the
+    // period check, so re-entry after the specs close the period is safe).
+    await withTenant(member, async () => {
+      const { PostingService } = await import(
+        "../../modules/accounting/application/posting-service"
+      );
+      const { PartnerSubledgerService } = await import(
+        "../../modules/partners/application/subledger-service"
+      );
+      const { AuditService } = await import("../../modules/audit/api/audit");
+      const { DrizzleAuditStore } = await import(
+        "../../modules/audit/infrastructure/drizzle-audit.store"
+      );
+      const { findAccountByCode } = await import(
+        "../../modules/accounting/infrastructure/accounting.store"
+      );
+      const { manualSpec } = await import("../accounting/fixtures");
+      const audit = new AuditService(new DrizzleAuditStore());
+      const posting = new PostingService(audit, new PartnerSubledgerService());
+      const cash = await findAccountByCode("1111");
+      const sales = await findAccountByCode("4100");
+      if (cash === undefined || sales === undefined) {
+        throw new Error("member fixture accounts 1111/4100 missing");
+      }
+      const isUsdMember = member === MEMBER_USD;
+      await posting.post(
+        manualSpec({
+          docId: isUsdMember
+            ? "52525252-0000-4000-8000-0000000000a1"
+            : "52525252-0000-4000-8000-0000000000a2",
+          debitAccountId: cash.id,
+          creditAccountId: sales.id,
+          amount: isUsdMember ? "1000.0000" : "2000.0000",
+          entryDate: "2026-11-15",
+          currency: isUsdMember ? "USD" : "SAR",
+        }),
+      );
     });
   }
 }

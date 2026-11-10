@@ -448,6 +448,11 @@ export interface Dictionary {
   navItemsNew: string;
   navPriceLists: string;
   navImport: string;
+  // PHASE-035: the tracking surfaces' breadcrumb fallbacks (registry-driven
+  // when navigation resolves; these cover nav-fetch failure).
+  navBatches: string;
+  navSerials: string;
+  navAdjustments: string;
 
   // -- PHASE-007: accounting navigation + screens --------------------------------
   navAccountingCoa: string;
@@ -1316,6 +1321,73 @@ export interface Dictionary {
   movesReasonCountGain: string;
   movesReasonCustomerReturn: string;
   movesReasonOther: string;
+  // PHASE-035 (T-02): the batch & expiry registry
+  batchesTitle: string;
+  batchesEmpty: string;
+  batchesSearchLabel: string;
+  batchesFilterExpired: string;
+  batchesExpiredOnly: string;
+  batchesExpiredBadge: string;
+  batchesColNo: string;
+  batchesColExpiry: string;
+  batchesColSource: string;
+  batchesStatusActive: string;
+  batchesStatusWrittenOff: string;
+  batchesNewTitle: string;
+  batchesItemLabel: string;
+  batchesNoLabel: string;
+  batchesExpiryLabel: string;
+  batchesSourceLabel: string;
+  batchesCreate: string;
+  batchesCreatedToast: string;
+  batchesWriteOff: string;
+  batchesWriteOffTitle: string;
+  batchesWriteOffHint: string;
+  batchesWriteOffDate: string;
+  batchesWriteOffConfirm: string;
+  batchesWriteOffCancel: string;
+  batchesWrittenOffToast: string;
+  // PHASE-035 (T-03): the serial/IMEI registry
+  serialsTitle: string;
+  serialsEmpty: string;
+  serialsSearchLabel: string;
+  serialsFilterStatus: string;
+  serialsColNo: string;
+  serialsColImei: string;
+  serialsColSoldAt: string;
+  serialsColReturnedAt: string;
+  serialsStatusInStock: string;
+  serialsStatusSold: string;
+  serialsStatusReturned: string;
+  serialsSaleView: string;
+  serialsNewTitle: string;
+  serialsItemLabel: string;
+  serialsNoLabel: string;
+  serialsImeiLabel: string;
+  serialsImeiHint: string;
+  serialsCreate: string;
+  serialsCreatedToast: string;
+  serialsSaleTitle: string;
+  serialsSaleClose: string;
+  serialsSaleLoading: string;
+  serialsSaleNone: string;
+  serialsSaleUnitCost: string;
+  serialsSaleMovedAt: string;
+  serialsSaleWarehouse: string;
+  // PHASE-035 (T-04): the stock-adjustments read register
+  adjustmentsTitle: string;
+  adjustmentsEmpty: string;
+  adjustmentsSearchLabel: string;
+  adjustmentsFilterStatus: string;
+  adjustmentsColNo: string;
+  adjustmentsColItem: string;
+  adjustmentsColDelta: string;
+  adjustmentsColPostingDate: string;
+  adjustmentsColNote: string;
+  adjustmentsStatusDraft: string;
+  adjustmentsStatusPosted: string;
+  adjustmentsStatusCancelled: string;
+  adjustmentsReadNote: string;
   // warehouse-to-warehouse transfers
   transfersTitle: string;
   transfersEmpty: string;
@@ -5006,6 +5078,10 @@ const ar: Dictionary = {
   navItemsNew: "صنف جديد",
   navPriceLists: "قوائم الأسعار",
   navImport: "استيراد وتصدير",
+  // PHASE-035: fallbacks لشاشات التتبع (الدفعات/التسلسلات/التسويات)
+  navBatches: "الدفعات والصلاحية",
+  navSerials: "الأرقام التسلسلية",
+  navAdjustments: "تسويات المخزون",
 
   // -- PHASE-007: accounting -----------------------------------------------------
   navAccountingCoa: "دليل الحسابات",
@@ -5867,6 +5943,73 @@ const ar: Dictionary = {
   movesReasonCountGain: "زيادة جرد",
   movesReasonCustomerReturn: "مرتجع عميل",
   movesReasonOther: "أخرى",
+  // PHASE-035 (T-02): سجل الدفعات والصلاحية
+  batchesTitle: "الدفعات والصلاحية",
+  batchesEmpty: "لا توجد دفعات مسجلة",
+  batchesSearchLabel: "بحث (رمز الصنف / رقم الدفعة / المرجع)",
+  batchesFilterExpired: "الصلاحية",
+  batchesExpiredOnly: "المنتهية فقط",
+  batchesExpiredBadge: "منتهية",
+  batchesColNo: "رقم الدفعة",
+  batchesColExpiry: "تاريخ الصلاحية",
+  batchesColSource: "المرجع",
+  batchesStatusActive: "نشطة",
+  batchesStatusWrittenOff: "مشطوبة",
+  batchesNewTitle: "تسجيل دفعة",
+  batchesItemLabel: "الصنف",
+  batchesNoLabel: "رقم الدفعة",
+  batchesExpiryLabel: "تاريخ الصلاحية",
+  batchesSourceLabel: "المرجع (اختياري)",
+  batchesCreate: "تسجيل",
+  batchesCreatedToast: "تم تسجيل الدفعة",
+  batchesWriteOff: "شطب منتهي الصلاحية",
+  batchesWriteOffTitle: "شطب دفعة",
+  batchesWriteOffHint: "يشطب رصيد الدفعة بالكامل بقيد مصروف منتهي الصلاحية واحد",
+  batchesWriteOffDate: "تاريخ القيد",
+  batchesWriteOffConfirm: "تأكيد الشطب",
+  batchesWriteOffCancel: "إلغاء",
+  batchesWrittenOffToast: "تم شطب الدفعة وترحيل قيدها",
+  // PHASE-035 (T-03): سجل الأرقام التسلسلية
+  serialsTitle: "الأرقام التسلسلية",
+  serialsEmpty: "لا توجد أرقام تسلسلية مسجلة",
+  serialsSearchLabel: "بحث (رمز الصنف / الرقم التسلسلي / IMEI)",
+  serialsFilterStatus: "الحالة",
+  serialsColNo: "الرقم التسلسلي",
+  serialsColImei: "IMEI",
+  serialsColSoldAt: "تاريخ البيع",
+  serialsColReturnedAt: "تاريخ الإرجاع",
+  serialsStatusInStock: "متوفر",
+  serialsStatusSold: "مبيع",
+  serialsStatusReturned: "مُرْجَع",
+  serialsSaleView: "عرض حركة البيع",
+  serialsNewTitle: "تسجيل رقم تسلسلي",
+  serialsItemLabel: "الصنف",
+  serialsNoLabel: "الرقم التسلسلي",
+  serialsImeiLabel: "IMEI (اختياري)",
+  serialsImeiHint: "من ١٥ إلى ١٧ رقمًا",
+  serialsCreate: "تسجيل",
+  serialsCreatedToast: "تم تسجيل الرقم التسلسلي",
+  serialsSaleTitle: "حركة البيع الأصلية",
+  serialsSaleClose: "إغلاق",
+  serialsSaleLoading: "جارٍ التحميل…",
+  serialsSaleNone: "لم يُبَع هذا الرقم التسلسلي بعد",
+  serialsSaleUnitCost: "تكلفة الوحدة",
+  serialsSaleMovedAt: "تاريخ الحركة",
+  serialsSaleWarehouse: "المستودع",
+  // PHASE-035 (T-04): سجل تسويات المخزون (عرض فقط)
+  adjustmentsTitle: "تسويات المخزون",
+  adjustmentsEmpty: "لا توجد تسويات",
+  adjustmentsSearchLabel: "بحث (رمز الصنف / رقم التسوية / الملاحظة)",
+  adjustmentsFilterStatus: "الحالة",
+  adjustmentsColNo: "رقم التسوية",
+  adjustmentsColItem: "الصنف",
+  adjustmentsColDelta: "فرق الكمية",
+  adjustmentsColPostingDate: "تاريخ الترحيل",
+  adjustmentsColNote: "ملاحظة",
+  adjustmentsStatusDraft: "مسودة",
+  adjustmentsStatusPosted: "مرحّلة",
+  adjustmentsStatusCancelled: "ملغاة",
+  adjustmentsReadNote: "هذه شاشة عرض فقط — تُنشأ التسويات وتُرحّل من خلال جلسات جرد المخزون (نية تصميمية موثقة).",
   transfersTitle: "تحويلات المخزون",
   transfersEmpty: "لا توجد تحويلات بعد.",
   transfersColNo: "رقم التحويل",
@@ -9579,6 +9722,10 @@ const en: Dictionary = {
   navItemsNew: "New item",
   navPriceLists: "Price lists",
   navImport: "Import & export",
+  // PHASE-035: tracking surfaces breadcrumb fallbacks
+  navBatches: "Batches & expiry",
+  navSerials: "Serial numbers",
+  navAdjustments: "Stock adjustments",
 
   // -- PHASE-007: accounting -----------------------------------------------------
   navAccountingCoa: "Chart of accounts",
@@ -10442,6 +10589,73 @@ const en: Dictionary = {
   movesReasonCountGain: "Count gain",
   movesReasonCustomerReturn: "Customer return",
   movesReasonOther: "Other",
+  // PHASE-035 (T-02): the batch & expiry registry
+  batchesTitle: "Batches & expiry",
+  batchesEmpty: "No batches registered",
+  batchesSearchLabel: "Search (SKU / batch no / ref)",
+  batchesFilterExpired: "Expiry",
+  batchesExpiredOnly: "Expired only",
+  batchesExpiredBadge: "expired",
+  batchesColNo: "Batch no",
+  batchesColExpiry: "Expiry date",
+  batchesColSource: "Source ref",
+  batchesStatusActive: "Active",
+  batchesStatusWrittenOff: "Written off",
+  batchesNewTitle: "Register batch",
+  batchesItemLabel: "Item",
+  batchesNoLabel: "Batch no",
+  batchesExpiryLabel: "Expiry date",
+  batchesSourceLabel: "Source ref (optional)",
+  batchesCreate: "Register",
+  batchesCreatedToast: "Batch registered",
+  batchesWriteOff: "Write off expiry",
+  batchesWriteOffTitle: "Write off batch",
+  batchesWriteOffHint: "Writes the batch's full on-hand off with one EXPIRED expense journal",
+  batchesWriteOffDate: "Value date",
+  batchesWriteOffConfirm: "Confirm write-off",
+  batchesWriteOffCancel: "Cancel",
+  batchesWrittenOffToast: "Batch written off and journal posted",
+  // PHASE-035 (T-03): the serial/IMEI registry
+  serialsTitle: "Serial numbers",
+  serialsEmpty: "No serials registered",
+  serialsSearchLabel: "Search (SKU / serial / IMEI)",
+  serialsFilterStatus: "Status",
+  serialsColNo: "Serial no",
+  serialsColImei: "IMEI",
+  serialsColSoldAt: "Sold at",
+  serialsColReturnedAt: "Returned at",
+  serialsStatusInStock: "In stock",
+  serialsStatusSold: "Sold",
+  serialsStatusReturned: "Returned",
+  serialsSaleView: "View sale",
+  serialsNewTitle: "Register serial",
+  serialsItemLabel: "Item",
+  serialsNoLabel: "Serial no",
+  serialsImeiLabel: "IMEI (optional)",
+  serialsImeiHint: "15–17 digits",
+  serialsCreate: "Register",
+  serialsCreatedToast: "Serial registered",
+  serialsSaleTitle: "Original sale move",
+  serialsSaleClose: "Close",
+  serialsSaleLoading: "Loading…",
+  serialsSaleNone: "This serial has not been sold yet",
+  serialsSaleUnitCost: "Unit cost",
+  serialsSaleMovedAt: "Moved at",
+  serialsSaleWarehouse: "Warehouse",
+  // PHASE-035 (T-04): the stock-adjustments read register
+  adjustmentsTitle: "Stock adjustments",
+  adjustmentsEmpty: "No adjustments",
+  adjustmentsSearchLabel: "Search (SKU / adjustment no / note)",
+  adjustmentsFilterStatus: "Status",
+  adjustmentsColNo: "Adjustment no",
+  adjustmentsColItem: "Item",
+  adjustmentsColDelta: "Qty delta",
+  adjustmentsColPostingDate: "Posting date",
+  adjustmentsColNote: "Note",
+  adjustmentsStatusDraft: "Draft",
+  adjustmentsStatusPosted: "Posted",
+  adjustmentsStatusCancelled: "Cancelled",
+  adjustmentsReadNote: "Read-only surface — adjustments are created and posted through stock-count sessions (recorded design intent).",
   transfersTitle: "Stock transfers",
   transfersEmpty: "No transfers yet.",
   transfersColNo: "Transfer no.",

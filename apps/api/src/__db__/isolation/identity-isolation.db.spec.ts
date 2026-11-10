@@ -2166,6 +2166,48 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+
+  // PHASE-035 gate repair (recorded): the 0041 consolidation cluster — one
+  // group + membership + elimination draft + queued run per tenant (the
+  // member_tenant_id points at the owning tenant itself; the run stays
+  // QUEUED so the snapshot-shape CHECK needs no snapshot).
+  await superuser.query(
+    `INSERT INTO consolidation_groups (id, tenant_id, name, name_ar, base_currency)
+     VALUES
+       ('a0410411-0000-4000-8000-000000000001', $1, 'Isolation group', 'مجموعة العزل', 'SAR'),
+       ('a0410411-0000-4000-8000-000000000002', $2, 'Isolation group', 'مجموعة العزل', 'SAR')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO group_entities (id, tenant_id, group_id, member_tenant_id, ownership_percent)
+     VALUES
+       ('b0410411-0000-4000-8000-000000000001', $1, 'a0410411-0000-4000-8000-000000000001', $1, 100),
+       ('b0410411-0000-4000-8000-000000000002', $2, 'a0410411-0000-4000-8000-000000000002', $2, 100)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO elimination_entries (id, tenant_id, group_id, fiscal_period_id, kind, description)
+     VALUES
+       ('c0410411-0000-4000-8000-000000000001', $1, 'a0410411-0000-4000-8000-000000000001',
+        'c2c2c2c2-0000-4000-8000-000000000001', 'INTERCOMPANY', 'Isolation elimination'),
+       ('c0410411-0000-4000-8000-000000000002', $2, 'a0410411-0000-4000-8000-000000000002',
+        'c2c2c2c2-0000-4000-8000-000000000002', 'INTERCOMPANY', 'Isolation elimination')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO consolidation_runs (id, tenant_id, group_id, fiscal_period_id, status)
+     VALUES
+       ('d0410411-0000-4000-8000-000000000001', $1, 'a0410411-0000-4000-8000-000000000001',
+        'c2c2c2c2-0000-4000-8000-000000000001', 'QUEUED'),
+       ('d0410411-0000-4000-8000-000000000002', $2, 'a0410411-0000-4000-8000-000000000002',
+        'c2c2c2c2-0000-4000-8000-000000000002', 'QUEUED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -2599,6 +2641,13 @@ const OWN_ROW: Record<string, [string, string]> = {
   payroll_run_lines: ["e0290291-0000-4000-8000-000000000001", "e0290291-0000-4000-8000-000000000002"],
   employee_loans: ["f0290291-0000-4000-8000-000000000001", "f0290291-0000-4000-8000-000000000002"],
   employee_loan_lines: ["0a290291-0000-4000-8000-000000000001", "0a290291-0000-4000-8000-000000000002"],
+  // PHASE-035 gate repair (recorded): the 0041 consolidation cluster — the B
+  // rows double as the A4/A7 foreign probe targets (registered late; the
+  // fresh-chain A-suite had never run to catch the omission).
+  consolidation_groups: ["a0410411-0000-4000-8000-000000000001", "a0410411-0000-4000-8000-000000000002"],
+  group_entities: ["b0410411-0000-4000-8000-000000000001", "b0410411-0000-4000-8000-000000000002"],
+  elimination_entries: ["c0410411-0000-4000-8000-000000000001", "c0410411-0000-4000-8000-000000000002"],
+  consolidation_runs: ["d0410411-0000-4000-8000-000000000001", "d0410411-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3219,6 +3268,21 @@ const MISMATCHED_INSERT: Record<string, string> = {
   employee_loan_lines: `INSERT INTO employee_loan_lines (id, tenant_id, loan_id, fiscal_period_id, amount, status)
      VALUES ('0a290291-3000-4000-8000-000000000003', $1, 'f0290291-0000-4000-8000-000000000002',
        'c2c2c2c2-0000-4000-8000-000000000002', 100, 'PENDING')`,
+  // PHASE-035 (0041): the consolidation cluster — FKs reference tenant B's
+  // own fixtures (group a0410411…2, period c2c2c2c2…2) so the composite
+  // tenant FKs stay satisfied and the RLS WITH CHECK is the isolated
+  // rejection.
+  consolidation_groups: `INSERT INTO consolidation_groups (id, tenant_id, name, name_ar, base_currency)
+     VALUES ('a0410411-3000-4000-8000-000000000003', $1, 'Attack group', 'مجموعة هجوم', 'SAR')`,
+  group_entities: `INSERT INTO group_entities (id, tenant_id, group_id, member_tenant_id, ownership_percent)
+     VALUES ('b0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
+       $1, 100)`,
+  elimination_entries: `INSERT INTO elimination_entries (id, tenant_id, group_id, fiscal_period_id, kind, description)
+     VALUES ('c0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
+       'c2c2c2c2-0000-4000-8000-000000000002', 'INTERCOMPANY', 'Attack elimination')`,
+  consolidation_runs: `INSERT INTO consolidation_runs (id, tenant_id, group_id, fiscal_period_id, status)
+     VALUES ('d0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
+       'c2c2c2c2-0000-4000-8000-000000000002', 'QUEUED')`,
 };
 
 beforeAll(async () => {

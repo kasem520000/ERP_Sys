@@ -44,17 +44,21 @@ beforeAll(async () => {
   group = await ensureFixtureGroup();
   const period = await ownerNovemberPeriod();
   periodId = period.id;
-  await setPeriodStatus(periodId, "SOFT_CLOSED");
+  // (PHASE-035 gate repair: eliminations post into the parent's books — the
+  // posting engine rejects entries in a closed period, so this spec must
+  // post while November is OPEN. The later suites re-close the period in
+  // their own beforeAlls for their BR-056 runs.)
+  await setPeriodStatus(periodId, "OPEN");
   await ensureApprover();
 });
 
 describe("G-32 · the intercompany elimination golden", () => {
   it("author + approve + post lands ONE balanced journal in the parent's consolidation books only", async () => {
-    const { EliminationService } = await import(
-      "../../modules/consolidation/application/elimination-service"
-    );
+    // (PHASE-035 gate repair: the service is constructed by
+    // newEliminationService below — the local destructure was unused.)
+    await import("../../modules/consolidation/application/elimination-service");
     const service = await newEliminationService();
-    const draft = await service.createDraft({
+    const draft = await withTenant(OWNER_TENANT, () => service.createDraft({
       groupId: group.groupId,
       fiscalPeriodId: periodId,
       kind: "INTERCOMPANY",
@@ -80,18 +84,18 @@ describe("G-32 · the intercompany elimination golden", () => {
         },
       ],
       actorId: ACTOR,
-    });
+    }));
     expect(draft.status).toBe("DRAFT");
     expect(draft.eliminationNo).toBeNull();
 
     // SoD: the creator cannot approve.
-    await expect(service.approve(draft.id, ACTOR)).rejects.toMatchObject({
+    await expect(withTenant(OWNER_TENANT, () => service.approve(draft.id, ACTOR))).rejects.toMatchObject({
       code: "SELF_APPROVAL_BLOCKED",
     });
-    const approved = await service.approve(draft.id, APPROVER);
+    const approved = await withTenant(OWNER_TENANT, () => service.approve(draft.id, APPROVER));
     expect(approved.approvedBy).toBe(APPROVER);
 
-    const posted = await service.post(draft.id, ACTOR);
+    const posted = await withTenant(OWNER_TENANT, () => service.post(draft.id, ACTOR));
     expect(posted.status).toBe("POSTED");
     expect(posted.eliminationNo).toMatch(/^EL-2026-\d{6}$/);
     expect(Array.isArray(posted.journalEntryIds)).toBe(true);
@@ -139,7 +143,7 @@ describe("G-32 · the intercompany elimination golden", () => {
   it("failure pack: ENTRY_NOT_BALANCED (zero residue)", async () => {
     const service = await newEliminationService();
     await expect(
-      service.createDraft({
+      withTenant(OWNER_TENANT, () => service.createDraft({
         groupId: group.groupId,
         fiscalPeriodId: periodId,
         kind: "INTERCOMPANY",
@@ -151,13 +155,13 @@ describe("G-32 · the intercompany elimination golden", () => {
           { purposeKey: "AR_CONTROL", direction: "CREDIT", amount: "499.0000", memberTenantId: MEMBER_USD, memoEn: "y", memoAr: "ص" },
         ],
         actorId: ACTOR,
-      }),
+      }),)
     ).rejects.toMatchObject({ code: "ENTRY_NOT_BALANCED" });
   });
 
   it("failure pack: ALREADY_POSTED (409 IMMUTABLE_DOCUMENT shape) + reversal-only counter-entry", async () => {
     const service = await newEliminationService();
-    const draft = await service.createDraft({
+    const draft = await withTenant(OWNER_TENANT, () => service.createDraft({
       groupId: group.groupId,
       fiscalPeriodId: periodId,
       kind: "INTERCOMPANY",
@@ -169,19 +173,19 @@ describe("G-32 · the intercompany elimination golden", () => {
         { purposeKey: "AR_CONTROL", direction: "CREDIT", amount: "100.0000", memberTenantId: MEMBER_USD, memoEn: "y", memoAr: "ص" },
       ],
       actorId: ACTOR,
-    });
-    await service.approve(draft.id, APPROVER);
-    const posted = await service.post(draft.id, ACTOR);
+    }));
+    await withTenant(OWNER_TENANT, () => service.approve(draft.id, APPROVER));
+    const posted = await withTenant(OWNER_TENANT, () => service.post(draft.id, ACTOR));
     // Re-posting the posted document: typed 409 shape, zero residue.
-    await expect(service.post(posted.id, ACTOR)).rejects.toMatchObject({
+    await expect(withTenant(OWNER_TENANT, () => service.post(posted.id, ACTOR))).rejects.toMatchObject({
       code: "ALREADY_POSTED",
     });
     // Reversal is a NEW DRAFT counter-entry linked through reversal_of.
-    const reversal = await service.reverse({ eliminationId: posted.id, actorId: ACTOR });
+    const reversal = await withTenant(OWNER_TENANT, () => service.reverse({ eliminationId: posted.id, actorId: ACTOR }));
     expect(reversal.status).toBe("DRAFT");
     expect(reversal.reversalOf).toBe(posted.id);
-    await service.approve(reversal.id, APPROVER);
-    const postedReversal = await service.post(reversal.id, ACTOR);
+    await withTenant(OWNER_TENANT, () => service.approve(reversal.id, APPROVER));
+    const postedReversal = await withTenant(OWNER_TENANT, () => service.post(reversal.id, ACTOR));
     expect(postedReversal.status).toBe("POSTED");
     expect(postedReversal.eliminationNo).toMatch(/^EL-2026-\d{6}$/);
   });
@@ -189,7 +193,7 @@ describe("G-32 · the intercompany elimination golden", () => {
   it("failure pack: PURPOSE_NOT_MAPPED (the engine's fail-closed surface)", async () => {
     const service = await newEliminationService();
     await expect(
-      service.createDraft({
+      withTenant(OWNER_TENANT, () => service.createDraft({
         groupId: group.groupId,
         fiscalPeriodId: periodId,
         kind: "INVESTMENT_EQUITY",
@@ -199,13 +203,13 @@ describe("G-32 · the intercompany elimination golden", () => {
           { purposeKey: "NOT_A_PURPOSE", direction: "CREDIT", amount: "10.0000", memberTenantId: null, memoEn: "y", memoAr: "ص" },
         ],
         actorId: ACTOR,
-      }),
+      }),)
     ).rejects.toMatchObject({ code: "PURPOSE_NOT_MAPPED" });
   });
 
   it("failure pack: posting without approval is the typed SoD backstop", async () => {
     const service = await newEliminationService();
-    const draft = await service.createDraft({
+    const draft = await withTenant(OWNER_TENANT, () => service.createDraft({
       groupId: group.groupId,
       fiscalPeriodId: periodId,
       kind: "INTERCOMPANY",
@@ -217,8 +221,8 @@ describe("G-32 · the intercompany elimination golden", () => {
         { purposeKey: "AR_CONTROL", direction: "CREDIT", amount: "10.0000", memberTenantId: MEMBER_USD, memoEn: "y", memoAr: "ص" },
       ],
       actorId: ACTOR,
-    });
-    await expect(service.post(draft.id, ACTOR)).rejects.toMatchObject({
+    }));
+    await expect(withTenant(OWNER_TENANT, () => service.post(draft.id, ACTOR))).rejects.toMatchObject({
       code: "ELIMINATION_NOT_APPROVED",
     });
   });
@@ -233,7 +237,7 @@ async function newEliminationService() {
   const { PostingService } = await import("../../modules/accounting/application/posting-service");
   const { NumberingService } = await import("../../modules/accounting/application/numbering-service");
   const { PartnerSubledgerService } = await import(
-    "../../modules/accounting/application/partner-subledger-port"
+    "../../modules/partners/application/subledger-service"
   );
   const audit = new AuditService(new DrizzleAuditStore());
   return new EliminationService(
@@ -248,4 +252,3 @@ void manualSpec;
 void newDocId;
 void setupAccountingFixture;
 void TENANT_A;
-void withTenant;

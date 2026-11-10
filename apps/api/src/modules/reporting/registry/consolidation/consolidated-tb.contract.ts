@@ -84,8 +84,9 @@ export const consolidationConsolidatedTbContract = defineReport({
   run: async (_ctx, params) => {
     const { consolidation } = reportingServices();
     const source = await consolidation.statementSource({
-      groupId: params.groupId,
-      fiscalPeriodId: params.fiscalPeriodId,
+      // (zod-validated uuids — the open ReportParams index is `unknown`)
+      groupId: params.groupId as string,
+      fiscalPeriodId: params.fiscalPeriodId as string,
       statement: "TB",
     });
     const rows = source.rows.filter((row) => {

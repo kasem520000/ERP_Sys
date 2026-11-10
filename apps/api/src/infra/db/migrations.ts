@@ -212,6 +212,15 @@ export const MIGRATIONS: readonly string[] = [
   // deferred, and the seven typed workflow-policy keys register in the
   // code-owned POLICY_REGISTRY.
   "0047_industry_rental_logistics",
+  // PHASE-035 T-01 (Blueprint v3.0 · CR-05): 0048_items_import_export_grant
+  // — the activation repair for audit EVAL-F-5 / H-18: the fully-built
+  // PHASE-006 import/export surface (screen, controller, dry-run validation)
+  // was granted to NO plan, so the sidebar never showed it. DATA-ONLY per the
+  // 0042/0043 plan-grant block precedent: items.import_export joins business +
+  // enterprise (starter keeps manual entry; BR-040 closure deps already in
+  // place); zero new tables/columns/enums/journals/permission keys (INV-022;
+  // drift stays 245=245); idempotent array_cat guard.
+  "0048_items_import_export_grant",
 ];
 
 /**

@@ -74,6 +74,12 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "inventory/items/new": { group: "navInventory", label: "navItemsNew" },
   "inventory/price-lists": { group: "navInventory", label: "navPriceLists" },
   "inventory/import": { group: "navInventory", label: "navImport" },
+  // -- PHASE-035 (T-02/03/04): the tracking + adjustments surfaces
+  // (registry-driven via NAV_ITEMS; these fallbacks cover nav-fetch failure
+  // — the support-sessions rule, crumbs only).
+  "inventory/batches": { group: "navInventory", label: "navBatches" },
+  "inventory/serials": { group: "navInventory", label: "navSerials" },
+  "inventory/adjustments": { group: "navInventory", label: "navAdjustments" },
   // -- T14-UI treasury list routes (registry-driven when resolved; the new/
   // detail subroutes resolve via the dynamic-prefix rule below) ------------
   "treasury/accounts": { group: "navTreasury", label: "navTreasuryAccounts" },

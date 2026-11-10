@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 
 import * as store from "../infrastructure/tax.store";
+import * as submissionsStore from "../submissions/store";
 
 /**
  * PHASE-013 · tax report queries (REPORT_CATALOG §6): the VAT return v2
@@ -8,6 +9,12 @@ import * as store from "../infrastructure/tax.store";
  * with treatment/rate buckets — plus the by-treatment summary. Wraps the
  * tax store aggregates (the module-owned authorized query surface);
  * INV-012 is the binding tie.
+ *
+ * PHASE-035 T-06 · the e-invoicing submission log (REPORT_CATALOG §6
+ * `tax.e-invoicing-log`, the documented-but-missing 86th contract): a
+ * read-only register over e_invoicing_submissions via the module-owned
+ * submissions store (ADR-0011 — reports never write, never raw-SQL across
+ * modules; the store is the authorized surface the funnel screens share).
  */
 
 export interface VatBothSides {
@@ -20,6 +27,25 @@ export interface VatBothSides {
     taxableBase: string;
     taxAmount: string;
   }[];
+}
+
+/** One e-invoicing submission-log row (PHASE-035 T-06 — the flattened
+ * register view the report renders; status/attempts/timestamps only, no
+ * secrets: payload digests and file ids stay in the operational funnel). */
+export interface EInvoicingLogRow {
+  readonly id: string;
+  readonly countryCode: string;
+  readonly adapterId: string;
+  readonly sourceType: string;
+  readonly sourceId: string;
+  readonly status: string;
+  readonly attempts: number;
+  readonly authorityReference: string | null;
+  readonly lastErrorCode: string | null;
+  readonly submittedAt: string | null;
+  readonly respondedAt: string | null;
+  readonly reportedAt: string | null;
+  readonly createdAt: string;
 }
 
 @Injectable()
@@ -68,5 +94,40 @@ export class TaxQueriesService {
         taxAmount: row.taxAmount,
       })),
     };
+  }
+
+  /** PHASE-035 T-06 · the e-invoicing submission log for a window: the
+   * registry's operational read surface (status/adapter/country filters,
+   * created_at window, newest first) — REPORT_CATALOG §6 tax.e-invoicing-log. */
+  async submissionLog(input: {
+    dateFrom?: string;
+    dateTo?: string;
+    status?: string;
+    adapterId?: string;
+    countryCode?: string;
+  }): Promise<readonly EInvoicingLogRow[]> {
+    const rows = await submissionsStore.listSubmissions({
+      createdFrom: input.dateFrom,
+      createdTo: input.dateTo,
+      status: input.status,
+      adapterId: input.adapterId,
+      countryCode: input.countryCode,
+      limit: 500,
+    });
+    return rows.map((row) => ({
+      id: row.id,
+      countryCode: row.countryCode,
+      adapterId: row.adapterId,
+      sourceType: row.sourceType,
+      sourceId: row.sourceId,
+      status: row.status,
+      attempts: row.attempts,
+      authorityReference: row.authorityReference,
+      lastErrorCode: row.lastErrorCode,
+      submittedAt: row.submittedAt,
+      respondedAt: row.respondedAt,
+      reportedAt: row.reportedAt,
+      createdAt: row.createdAt,
+    }));
   }
 }

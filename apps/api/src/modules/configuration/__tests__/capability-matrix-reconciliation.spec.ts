@@ -326,11 +326,11 @@ describe("capability-matrix reconciliation (register §L; CAPABILITY_MATRIX §1)
     // (032) and agriculture (033) shipped on the surviving lineage and were
     // mapped by the restoration merge — their strict reconciliation is the
     // test above, and both shells being live is asserted here.
-    expect(COLUMN_TO_TEMPLATE["RNT"]).toBeUndefined();
+    expect(COLUMN_TO_TEMPLATE["RNT"]).toBe("industry.rental_logistics");
     expect(COLUMN_TO_TEMPLATE["EDU"]).toBe("industry.education");
     expect(COLUMN_TO_TEMPLATE["AGR"]).toBe("industry.agriculture");
     const shippedIds = new Set(SHIPPED_TEMPLATE_MANIFESTS.map((manifest) => manifest.id));
-    expect(shippedIds.has("industry.rental_logistics")).toBe(false);
+    expect(shippedIds.has("industry.rental_logistics")).toBe(true);
     expect(shippedIds.has("industry.education")).toBe(true);
     expect(shippedIds.has("industry.agriculture")).toBe(true);
   });

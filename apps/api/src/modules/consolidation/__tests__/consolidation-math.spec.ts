@@ -36,7 +36,9 @@ function member(
 function elimination(
   eliminationId: string,
   accountCode: string,
-  accountType: string,
+  // (PHASE-035 gate repair: kept for the member() call-site symmetry — the
+  // effect line carries no accountType.)
+  _accountType: string,
   debit: string,
   credit: string,
   purposeKey: string | null = null,

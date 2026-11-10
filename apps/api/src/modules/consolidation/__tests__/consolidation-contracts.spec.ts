@@ -70,6 +70,9 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "reports.treasury.fx.read",
   "reports.tax.vat-return.read",
   "reports.tax.summary.read",
+  // PHASE-035 T-06: the tax.e-invoicing-log permission (module-register
+  // convention — the seeded key every e-invoicing route uses).
+  "tax.einvoicing.manage",
   "platform.audit.read",
   "platform.users.read",
   "platform.reporting.read",
@@ -98,15 +101,15 @@ const CONSOLIDATION_IDS = [
 ] as const;
 
 describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)", () => {
-  it("the 85-contract registry validates against the known-permission catalog", () => {
+  it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(85);
+    expect(result.count).toBe(86);
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(85);
+    expect(snapshot).toHaveLength(86);
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();

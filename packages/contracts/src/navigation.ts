@@ -521,6 +521,56 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "wizard",
     order: 80,
   },
+  // PHASE-035 (T-02/T-03): the batch/expiry and serial surfaces (audit
+  // EVAL-F-1) — the backing API (GET/POST /inventory/batches, /serials)
+  // shipped in PHASE-010/018 but no screen ever registered, so tracking
+  // tenants reached batches/serials only as columns on the movements list.
+  // Feature keys = the exact FEATURE_CATALOG capabilities (batch_tracking /
+  // serial_tracking — business+enterprise); permissions = the exact seeded
+  // keys the controller enforces on the list routes (inventory.moves.view;
+  // the manage actions stay inventory.tracking.manage inside the screens).
+  {
+    id: "inventory.batches",
+    parentGroup: "inventory",
+    label: { ar: "الدفعات والصلاحية", en: "Batches & expiry" },
+    icon: "calendar-clock",
+    route: "/inventory/batches",
+    featureKey: "inventory.batch_tracking",
+    permission: "inventory.moves.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 90,
+  },
+  {
+    id: "inventory.serials",
+    parentGroup: "inventory",
+    label: { ar: "الأرقام التسلسلية", en: "Serial numbers" },
+    icon: "barcode",
+    route: "/inventory/serials",
+    featureKey: "inventory.serial_tracking",
+    permission: "inventory.moves.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 100,
+  },
+  // PHASE-035 (T-04): the inventory-adjustments read surface (audit
+  // EVAL-F-2): a dedicated list over the existing adjustment journal flow
+  // (previously reachable only through stock counts). READ surface only —
+  // posting stays in the count wizard (design intent preserved; the phase
+  // doc records it). Rides the stock-ledger capability like stock/moves;
+  // permission = the seeded key the list route enforces.
+  {
+    id: "inventory.adjustments",
+    parentGroup: "inventory",
+    label: { ar: "تسويات المخزون", en: "Stock adjustments" },
+    icon: "arrow-left-right",
+    route: "/inventory/adjustments",
+    featureKey: "inventory.stock_ledger",
+    permission: "inventory.stock.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 110,
+  },
   // accounting group — PHASE-007 surfaces (matrix §3.1; archetype ids per
   // PAGE_ARCHETYPES; permission = the exact seeded keys).
   {
@@ -903,6 +953,25 @@ export const NAV_ITEMS: readonly NavItem[] = [
     branchScoped: false,
     archetype: "list-search",
     order: 10,
+  },
+  // PHASE-035 (T-05): the consolidated-statements entry (audit EVAL-F-3) —
+  // the five PHASE-034 /consolidation pages shipped reachable only via the
+  // rental_logistics template's injected nav, so a template-less tenant
+  // never saw القوائم الموحدة. CORE item (template-independent) per
+  // NAVIGATION_MODEL §1.1: featureKey = the granted consolidation.reports
+  // capability (0041 §plan-grants), permission = the seeded
+  // consolidation.reports.view the pages enforce.
+  {
+    id: "reports.consolidated",
+    parentGroup: "reports",
+    label: { ar: "القوائم الموحدة", en: "Consolidated statements" },
+    icon: "layers",
+    route: "/consolidation",
+    featureKey: "consolidation.reports",
+    permission: "consolidation.reports.view",
+    branchScoped: false,
+    archetype: "report",
+    order: 15,
   },
   // platform plane (ops tenant only): PERMISSION-gated only, no featureKey —
   // entitlements are a tenant-plane concept (matrix §3.10; the same rule the

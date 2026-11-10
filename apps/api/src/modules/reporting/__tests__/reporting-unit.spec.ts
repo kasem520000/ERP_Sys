@@ -85,6 +85,9 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "reports.treasury.fx.read",
   "reports.tax.vat-return.read",
   "reports.tax.summary.read",
+  // PHASE-035 T-06: the tax.e-invoicing-log permission (module-register
+  // convention — the seeded key every e-invoicing route uses).
+  "tax.einvoicing.manage",
   "platform.audit.read",
   "platform.users.read",
   "platform.reporting.read",
@@ -153,16 +156,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 85 frozen contracts validate against the known-permission catalog", () => {
+  it("the 86 frozen contracts validate against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(85);
+    expect(result.count).toBe(86);
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(85);
+    expect(snapshot).toHaveLength(86);
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

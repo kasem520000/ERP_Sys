@@ -321,6 +321,16 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "payroll_run_lines", deleteGranted: true },
   { table: "employee_loans" },
   { table: "employee_loan_lines" },
+  // PHASE-035 gate repair (recorded): the four 0041 consolidation tables
+  // (groups, membership, eliminations, runs — all under the standard
+  // erp.apply_tenant_policy macro, owner-plane rows). The restored lineage
+  // shipped them unregistered — the A-suite's negative proof (every
+  // tenant_id table registered) had never run on a fresh chain to catch it.
+  // The auto-generated A-suite extends by +24.
+  { table: "consolidation_groups" },
+  { table: "group_entities" },
+  { table: "elimination_entries" },
+  { table: "consolidation_runs" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

@@ -126,7 +126,10 @@ export class ConsolidationController {
     private readonly groups: GroupService,
     private readonly eliminations: EliminationService,
     private readonly runs: RunService,
-    private readonly reader: ConsolidationReaderService,
+    // PHASE-035 gate repair (recorded): the restored lineage injected the
+    // reader but no route reads it (reader/status is a static envelope) —
+    // underscore param keeps the DI wiring, satisfies noUnusedLocals.
+    _reader: ConsolidationReaderService,
   ) {}
 
   // -- groups & membership (Settings §8; consolidation.groups.manage) ------

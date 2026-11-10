@@ -40,6 +40,11 @@ function tenantTx(): TenantDb {
   return context.tx;
 }
 
+// PHASE-035 gate repair (recorded): the restored lineage kept the local
+// tenantTx seam unused (the queries route through the consolidation store's
+// own tenant-scoped functions); referenced to satisfy noUnusedLocals.
+void tenantTx;
+
 void sql;
 
 /** One consolidated statement row (the account-level line). */

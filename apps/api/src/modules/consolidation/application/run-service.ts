@@ -118,6 +118,14 @@ export class RunService {
       });
     }
     for (const member of members) {
+      // PHASE-035 gate repair (recorded): include_from bounds membership —
+      // a member whose window starts AFTER the run period is outside this
+      // run's scope entirely (skipped, never an error). The pre-check
+      // previously demanded a covering period from out-of-window members
+      // and failed every later run on the poisoned fixture state.
+      if (member.includeFrom !== null && member.includeFrom > period.endDate) {
+        continue;
+      }
       const windowStart =
         member.includeFrom !== null && member.includeFrom > period.startDate
           ? member.includeFrom
@@ -271,6 +279,11 @@ export class RunService {
     const passes: MemberPass[] = [];
     const currencies = new Set<string>();
     for (const member of members) {
+      // PHASE-035 gate repair (recorded): the include_from bound applies to
+      // the extract pass too — out-of-window members contribute nothing.
+      if (member.includeFrom !== null && member.includeFrom > input.periodEndDate) {
+        continue;
+      }
       const windowStart =
         member.includeFrom !== null && member.includeFrom > input.periodStartDate
           ? member.includeFrom
@@ -317,7 +330,12 @@ export class RunService {
     // (INV-008: latest stored ≤ period end, exactly as stored; the foreign
     // set excludes the group base — same-currency rows pass through).
     const foreignCurrencies = [...currencies].filter((currency) => currency !== groupCurrency);
-    const storedRates: StoredRate[] = await listOwnerRates(foreignCurrencies, input.periodEndDate);
+    // PHASE-035 gate repair (recorded): listOwnerRates returns StoredRateRow
+    // ({ currencyCode }) — map to the { currency } shape this index consumes
+    // (the restored lineage's seam drift; keys were undefined at runtime).
+    const storedRates: StoredRate[] = (
+      await listOwnerRates(foreignCurrencies, input.periodEndDate)
+    ).map((row) => ({ currency: row.currencyCode, rateDate: row.rateDate, rate: row.rate }));
     const rateIndex = new Map<string, StoredRate[]>();
     for (const rate of storedRates) {
       const bucket = rateIndex.get(rate.currency) ?? [];

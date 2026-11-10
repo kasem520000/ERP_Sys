@@ -76,6 +76,11 @@ export {
   INDUSTRY_TEMPLATE_ID_PATTERN,
   MODULE_NAMES,
   PROFESSIONAL_SERVICES_TEMPLATE_MANIFEST,
+  // PHASE-035 (truth repair): the delivery-completion's thirteenth template
+  // exported RENTAL_LOGISTICS_TEMPLATE_MANIFEST from industry/templates but
+  // missed this index re-export — the manifests test imports it from here
+  // (typecheck + the contracts suite failed on the clean 034 tree).
+  RENTAL_LOGISTICS_TEMPLATE_MANIFEST,
   RESTAURANT_MANIFEST,
   RETAIL_MANIFEST,
   SHIPPED_TEMPLATE_MANIFESTS,

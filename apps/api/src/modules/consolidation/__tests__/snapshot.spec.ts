@@ -9,6 +9,7 @@ import {
   snapshotContentHash,
   SNAPSHOT_SCHEMA_VERSION,
   type ConsolidationSnapshot,
+  type SnapshotMemberMeta,
 } from "../application/snapshot";
 import { computeConsolidatedLines, assertInv026 } from "../application/consolidation-math";
 
@@ -29,7 +30,10 @@ const MIGRATION_PATH = join(
 );
 
 function fixtureSnapshot(): ConsolidationSnapshot {
-  const members = [
+  // (PHASE-035 gate repair: the explicit annotation stops the array-literal
+  // widening — `{}` + `{ USD: string }` unifies to `{ USD?: undefined }`
+  // which is not assignable to Record<string, string>.)
+  const members: SnapshotMemberMeta[] = [
     {
       memberTenantId: "01990000-0000-7000-8000-0000000000a1",
       memberName: null,
@@ -173,11 +177,13 @@ describe("T2 · the platform-plane reader grant's scope (asserted off the migrat
 
   it("grants SELECT-only on exactly the member GL read models + the consolidation tables", () => {
     // The exact grant statements (the scope IS the list).
+    // (PHASE-035 lint repair: {2} quantifier instead of literal double
+    // spaces — the no-regex-spaces rule; semantics identical.)
     expect(sql).toMatch(
-      /GRANT SELECT ON "journal_entries", "journal_lines", "accounts", "account_purposes",\n  "fiscal_periods", "partner_subledger_entries", "partners" TO erp_consolidation_reader;/,
+      /GRANT SELECT ON "journal_entries", "journal_lines", "accounts", "account_purposes",\n {2}"fiscal_periods", "partner_subledger_entries", "partners" TO erp_consolidation_reader;/,
     );
     expect(sql).toMatch(
-      /GRANT SELECT ON "consolidation_groups", "group_entities", "elimination_entries",\n  "consolidation_runs" TO erp_consolidation_reader;/,
+      /GRANT SELECT ON "consolidation_groups", "group_entities", "elimination_entries",\n {2}"consolidation_runs" TO erp_consolidation_reader;/,
     );
   });
 

@@ -329,6 +329,13 @@
       "when": 1794480800000,
       "tag": "0047_industry_rental_logistics",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1794481600000,
+      "tag": "0048_items_import_export_grant",
+      "breakpoints": true
     }
   ],
   "version": "7"

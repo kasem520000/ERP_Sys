@@ -655,6 +655,119 @@ export const taxSummaryByTreatmentContract = defineReport({
 });
 
 // ---------------------------------------------------------------------------
+// PHASE-035 T-06 · tax.e-invoicing-log (REPORT_CATALOG §6 — the documented-
+// but-missing 86th contract, audit EVAL-F-6): the e-invoicing submission
+// log over the existing e_invoicing_submissions registry. Operational
+// register shape (the platform.report-runs precedent): status/adapter
+// filters over a created_at window, newest first; no GL tie (INV-012 does
+// not apply — submissions precede posting); permission rides the module's
+// existing `tax.einvoicing.manage` (the §12 module-register convention,
+// same key as every e-invoicing route; the catalog row's documented
+// `reports.tax.einvoice-log.read` never existed as a seed — corrected in
+// the same phase; zero-drift stays 245=245).
+// ---------------------------------------------------------------------------
+
+const EINVOICING_STATUSES = [
+  "PENDING",
+  "GENERATED",
+  "SIGNED",
+  "SUBMITTED",
+  "ACCEPTED",
+  "REJECTED",
+  "REPORTED",
+  "FAILED",
+] as const;
+
+export const taxEInvoicingLogContract = defineReport({
+  id: "tax.e-invoicing-log",
+  version: 1,
+  title: bilingual("سجل الفوترة الإلكترونية", "E-Invoicing Submission Log"),
+  category: "tax",
+  description: bilingual(
+    "سجل عمليات الإرسال للفوترة الإلكترونية: الحالة والمحاولات ومراجع الجهة والطوابع الزمنية",
+    "E-invoicing submission attempts: status, attempts, authority references, and timestamps",
+  ),
+  parameters: z.object({
+    ...WINDOW_PARAMS,
+    status: z.enum(EINVOICING_STATUSES).optional(),
+    adapterId: z.string().optional(),
+    jurisdiction: z.string().length(2).optional(),
+  }),
+  requiredPermission: "tax.einvoicing.manage",
+  dataSources: [
+    source(
+      "tax",
+      "taxQueries.submissionLog",
+      ["e_invoicing_submissions"],
+      "سجل إرسالات الفوترة الإلكترونية",
+      "The e-invoicing submission registry",
+    ),
+  ],
+  exportFormats: ["xlsx", "csv"],
+  scopeRules: { asOf: "forbidden" },
+  freshness: { semantics: "current", cacheTtlSeconds: 0, invalidationEvents: [] },
+  assertions: [
+    assertDecl(
+      "einvoicing-log-status-vocabulary",
+      "every row carries a state-machine status",
+      "صف بس حالة خارج آلة حالات الإرسال",
+      "A row with a status outside the submission state machine",
+    ),
+  ],
+  run: async (_ctx, params) => {
+    const { tax } = reportingServices();
+    const rows = await tax.submissionLog({
+      dateFrom: params.dateFrom!,
+      dateTo: params.dateTo!,
+      status: typeof params.status === "string" ? params.status : undefined,
+      adapterId: typeof params.adapterId === "string" ? params.adapterId : undefined,
+      countryCode: typeof params.jurisdiction === "string" ? params.jurisdiction : undefined,
+    });
+    const inVocabulary = rows.filter((row) =>
+      (EINVOICING_STATUSES as readonly string[]).includes(row.status),
+    ).length;
+    return {
+      columns: [
+        col("sourceType", "نوع المستند", "Source type"),
+        col("sourceId", "المستند", "Document"),
+        col("adapterId", "المحوّل", "Adapter"),
+        col("countryCode", "الولاية", "Jurisdiction"),
+        col("status", "الحالة", "Status", "status"),
+        col("attempts", "المحاولات", "Attempts", "text", true),
+        col("authorityReference", "مرجع الجهة", "Authority ref"),
+        col("lastErrorCode", "رمز الخطأ", "Error code"),
+        col("submittedAt", "أُرسل", "Submitted", "date"),
+        col("respondedAt", "الرد", "Responded", "date"),
+        col("reportedAt", "أُبلغ", "Reported", "date"),
+        col("createdAt", "الإنشاء", "Created", "date"),
+      ],
+      groups: [],
+      rows: rows.map((row) => ({
+        key: row.id,
+        values: {
+          sourceType: row.sourceType,
+          sourceId: row.sourceId,
+          adapterId: row.adapterId,
+          countryCode: row.countryCode,
+          status: row.status,
+          attempts: row.attempts,
+          authorityReference: row.authorityReference ?? "—",
+          lastErrorCode: row.lastErrorCode ?? "—",
+          submittedAt: row.submittedAt ?? "—",
+          respondedAt: row.respondedAt ?? "—",
+          reportedAt: row.reportedAt ?? "—",
+          createdAt: row.createdAt,
+        },
+      })),
+      totals: [],
+      assertionResults: [
+        assertExact("einvoicing-log-status-vocabulary", String(inVocabulary), String(rows.length)),
+      ],
+    };
+  },
+});
+
+// ---------------------------------------------------------------------------
 // Platform (§7)
 // ---------------------------------------------------------------------------
 

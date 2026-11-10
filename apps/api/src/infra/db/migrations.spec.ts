@@ -96,7 +96,11 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // ≡ the CAPABILITY_MATRIX §1 RNT column strict both directions; the seven
     // typed workflow-policy keys register in the code-owned POLICY_REGISTRY —
     // zero new schema objects, permissions, or grants).
-    expect(files.at(-1)?.tag).toBe("0047_industry_rental_logistics");
+    // PHASE-035 T-01: 0048_items_import_export_grant (the activation repair
+    // for EVAL-F-5 / H-18: the built PHASE-006 import/export surface joins
+    // business + enterprise — DATA-ONLY, the 0042/0043 grant-block precedent,
+    // drift stays 245=245).
+    expect(files.at(-1)?.tag).toBe("0048_items_import_export_grant");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {
