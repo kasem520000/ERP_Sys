@@ -1,6 +1,6 @@
 # Feature Catalog
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-08
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-035 truth restoration — DR-035-01/02/03)
 
 The canonical, exhaustive registry of product features. Every feature has exactly one
 **feature key** (`module.feature_name`). This file is the single source of truth referenced by:
@@ -97,7 +97,7 @@ by the `tenancy`, `identity`, `audit`, `notifications`, and `files` modules.
 | `platform.audit_trail` | Audit trail · سجل التدقيق | Immutable `audit_events` with actor, time, before/after; filterable console per entity/actor/correlation id | MVP | 003 | `platform.audit.read` | — |
 | `platform.entitlements` | Entitlement service · خدمة الاستحقاقات | Materializes effective feature grants per tenant (plan + add-ons + overrides); consumed server-side at module load and per action | MVP | 004 | `platform.entitlements.manage` | `platform.tenant_lifecycle` |
 | `platform.subscriptions` | Subscriptions & billing · الاشتراك والفوترة | Plan assignment, checkout via payment-provider adapter with manual-invoicing fallback, renewal, dunning, plan-change history | MVP | 014 | `platform.subscriptions.manage` | `platform.entitlements` |
-| `platform.payouts` | Refunds & payout reconciliation · الاستردادات وتسوية دفعات المزوّد | **SHIPPED PHASE-023** (migration 0035): the provider refund call on the sandbox adapter port (audited `payment.refunded` billing event — the invoice stays PAID, history append-only) + payout-batch reconciliation (sync provider-reported gross/fee/net batches; compare against settled platform payments in the window → RECONCILED or DRIFT with detail, never auto-corrected; the runPayoutReconciliation job). Sandbox depth until [product/DR-002](../decisions/product/DR-002-payment-provider-selection.md) decides the provider — no production cutover claim | 3 | 023 (sandbox depth; DR-002 OPEN) | `platform.subscriptions.manage` | `platform.subscriptions` |
+| `platform.payouts` | Refunds & payout reconciliation · الاستردادات وتسوية دفعات المزوّد | **SUBSTRATE SHIPPED 0035 — the platform feature surface is DEFERRED-059** ([DR-035-03](../decisions/product/DR-035-03-platform-payouts.md); the former "SHIPPED-PHASE-023" claim is retracted): migration 0035 delivered the payout/refund substrate — the provider refund call on the sandbox adapter port (audited `payment.refunded` billing event — the invoice stays PAID, history append-only) + payout-batch reconciliation (sync provider-reported gross/fee/net batches; compare against settled platform payments in the window → RECONCILED or DRIFT with detail, never auto-corrected; the runPayoutReconciliation job, pinned by the `__db__` job test) — but no grant array carries the `platform.payouts` key and no operator screen exists; the console surface lands with PHASE-059. Sandbox depth until [product/DR-002](../decisions/product/DR-002-payment-provider-selection.md) decides the provider — no production cutover claim | 3 | 059 (substrate 0035; DR-035-03; DR-002 OPEN) | `platform.subscriptions.manage` | `platform.subscriptions` |
 | `platform.admin_console` | Platform admin console · وحدة تحكم المنصة | Internal staff console: tenant search, status changes, entitlement overrides, suspension, audit review — every action tenant-scoped + audited | MVP | 004 | `platform.admin.access` | `platform.entitlements` |
 | `platform.support_access` | Support access · وصول الدعم | Time-boxed, reason-required, audited impersonation of a tenant user by platform staff; tenant-visible entry in audit trail | MVP | 004 | `platform.support.access` | `platform.admin_console` |
 | `platform.support_review` | Support-access review report · تقرير مراجعة وصول الدعم | **SHIPPED PHASE-024** (T12; matrix §7): the platform review report over a window — every support session with its grant + end + proxied-read counts + the explicit gap list (expired-unclosed / zero-action / orphaned reads); platform-provided (never plan-metered — security tooling is not paywalled, the `platform.support_access` precedent) | MVP | 024 | `platform.support.access` | `platform.support_access` |
@@ -141,7 +141,7 @@ Unified party model (customers, suppliers, both) — [../accounting/RECEIVABLES_
 | `partners.credit_management` | Credit management · إدارة الائتمان | Per-partner credit limit + overdue policy (block/warn/ignore) enforced at sales-document approval (BR-001) | MVP | 012 | `partners.credit.manage` | `partners.credit_terms` |
 | `partners.statements` | Partner statements · كشوف الحسابات | Open items + activity with running balance and aging, bilingual RTL print, as-of determinism | MVP | 012 (data) / 013 (print) | `partners.statements.read` | `partners.directory` |
 | `partners.personal_accounts` | Personal account views · الحسابات الشخصية | Shareable-documents-only mobile view of balance, invoices, receipts for the partner's own scope | 2 | 022 | customer-scoped token | `partners.statements` |
-| `partners.customer_portal` | Customer self-service portal · بوابة العملاء | Web self-service: statements, invoice download, dispute messages | 3 | 023–025 | customer-scoped token | `partners.personal_accounts` |
+| `partners.customer_portal` | Customer self-service portal · بوابة العملاء | Web self-service: statements, invoice download, dispute messages | 3 | 060 (PLANNED — [DR-035-02](../decisions/product/DR-035-02-customer-portal.md)) | customer-scoped token | `partners.personal_accounts` |
 
 ## 6. Module: items
 
@@ -259,7 +259,7 @@ Report contract, statements, printing — rendering rules in the reporting works
 | `reporting.print_templates` | Print templates · قوالب الطباعة | Versioned bilingual RTL-correct templates: A4 documents, statements, 80/58 mm receipts | MVP | 013 | `reporting.print` | `reporting.engine` |
 | `reporting.exports` | Exports · التصدير | PDF/XLSX/CSV export of any report run with tenant-scoped signed files | MVP | 013 | `reporting.export` | `reporting.engine` |
 | `reporting.dashboards` | Dashboards · لوحات المعلومات | Role-appropriate KPI dashboards with drill-down (owner/CEO view at PHASE-014) | MVP | 014 | `reporting.dashboards.read` | `reporting.engine` |
-| `reporting.scheduled_reports` | Scheduled reports · التقارير المجدولة | Scheduled generation + email delivery | 3 | 025 | `reporting.schedule.manage` | `reporting.exports`, `platform.notifications` |
+| `reporting.scheduled_reports` | Scheduled reports · التقارير المجدولة | Scheduled generation + email delivery | 3 | 057 (DEFERRED — [DR-035-01](../decisions/product/DR-035-01-scheduled-reports.md)) | `reporting.schedule.manage` | `reporting.exports`, `platform.notifications` |
 
 ## 13. Module: crm
 

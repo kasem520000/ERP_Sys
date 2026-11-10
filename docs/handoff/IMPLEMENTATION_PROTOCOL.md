@@ -1,6 +1,6 @@
 # Implementation Protocol
 
-> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-10-27
+> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-11-10
 
 The operating rules for implementing agents. Entry point:
 [AGENT_START_HERE.md](AGENT_START_HERE.md). Ground rules overview:
@@ -81,3 +81,12 @@ suites).
 Every phase adds a dated entry to [CHANGELOG.md](CHANGELOG.md):
 `PHASE-NNN — one-line summary — status change`. Docs-only changes get minor entries.
 ADR changes get explicit "BREAKING-ARCH" entries.
+
+## 8. Volatile statistics policy (PHASE-035, audit §9.ج item 11)
+
+No code comment or doc outside a phase-completion report may carry a live count that
+drifts with growth (e.g. "85 contracts", "245 permissions"). Use registry-relative
+language ("the registry count", "zero-drift") or pin the phase ("245 = 245 at
+PHASE-035"). Completion reports pin their phase's counts frozen. A lint rule was
+assessed and judged not cheap (counts are prose, not syntax) — the policy is the
+control.

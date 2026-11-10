@@ -1,6 +1,6 @@
 # Subscription and Entitlements
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-04
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-035 truth restoration — DR-035-01/03)
 
 **Delivery status (PHASE-014, 2026-11-01):** the mechanics described in this file are
 **LIVE in the MVP release** — plan seeds, entitlement materialization with
@@ -58,7 +58,7 @@ includes everything of the plan to its left):
 | accounting | `accounting.chart_of_accounts`, `accounting.fiscal_calendar`, `accounting.journal_entries`, `accounting.approvals`, `accounting.general_ledger`, `accounting.opening_balances`, `accounting.period_close`, `accounting.year_end_close`, `accounting.reconciliation` | `accounting.multi_currency`, `accounting.cost_centers`, `accounting.projects` (PHASE-019 grant) | — |
 | master data & trade | `partners.*` (directory, credit_terms, statements), `items.*` (core), `inventory.stock_ledger`, `inventory.valuation`, `inventory.multi_warehouse`, `sales.quotations`…`sales.receivables_aging` core chain, `purchasing.requests`…`purchasing.three_way_matching` | `inventory.batch_tracking`, `inventory.serial_tracking`, `inventory.stock_counts`, `inventory.stock_transfers`, `sales.credit_limits`, `partners.credit_management`, `purchasing.landed_costs`, `inventory.reservations` (PHASE-017 grant), `sales.commissions` (PHASE-017 grant) | `inventory.reorder_levels` |
 | treasury & tax | `treasury.accounts`, `treasury.receipts_disbursements`, `treasury.expenses`, `treasury.expense_categories`, `tax.engine`, `tax.codes`, `tax.registrations`, `tax.jurisdiction_packs`, `tax.vat_return` | `treasury.petty_cash`, `treasury.cash_transfers`, `treasury.bank_reconciliation`, `treasury.cashier_shifts`, `treasury.cheques` | `tax.einvoicing_framework` (adapters per jurisdiction add-on) |
-| reporting | `reporting.engine`, `reporting.financial_statements`, `reporting.operational_reports` (core), `reporting.print_templates`, `reporting.exports` | `reporting.dashboards` | `reporting.scheduled_reports` |
+| reporting | `reporting.engine`, `reporting.financial_statements`, `reporting.operational_reports` (core), `reporting.print_templates`, `reporting.exports` | `reporting.dashboards` | `reporting.scheduled_reports` (consumer DEFERRED PHASE-057 — [DR-035-01](../decisions/product/DR-035-01-scheduled-reports.md); the key is preserved) |
 | growth tier | — | `pos.terminals`, `pos.sales`, `pos.shifts`, `pos.receipts`, `pos.barcode_scanning`, `pos.offline_queue`, `industry.template_engine`, `industry.terminology`, one industry add-on of choice, `sales.job_cards` + `distribution.*` (routes, van_stock, settlements, customer_tiers, free_goods — PHASE-017 grants), `crm.*` (leads, tasks_activities, service_contracts, recurring_billing, service_orders — PHASE-019 grant), `manufacturing.*` (PHASE-018 grant) | `industry.addons` (3), `offline.desktop_app`, `offline.android_app`, `offline.mobile_accounts`, `offline.device_management` |
 
 ## 3. Industry add-ons (PLACEHOLDER pricing ⚠)
@@ -148,11 +148,16 @@ creation blocked).
 > `treasury.bank_statement_parking` (the parked-lines manual-mapping aid + the two new
 > format families) and `sales.commerce_channels` (the channel staging import behind
 > `sales.commerce.manage` — permission catalog 243→244) to both plans (starter does
-> NOT get them; the idempotent array_cat guard). `platform.payouts` (refund + payout
-> reconciliation) is the operator console — the `platform.subscriptions` pattern,
-> never plan-gated. Both tenant keys resolve **live** at CURRENT_SHIPPED_PHASE 23
-> (2026-11-05): the parking surface, the parsers, and the commerce staging import are
-> shipped — see the PHASE-023 completion report. The ZATCA/ETA adapter features stay
+> NOT get them; the idempotent array_cat guard). Both tenant keys resolve **live** at
+> CURRENT_SHIPPED_PHASE 23 (2026-11-05): the parking surface, the parsers, and the
+> commerce staging import are shipped — see the PHASE-023 completion report.
+> `platform.payouts` (refund + payout reconciliation) is the operator console — the
+> `platform.subscriptions` pattern, never plan-gated; per
+> [DR-035-03](../decisions/product/DR-035-03-platform-payouts.md) its **substrate** is
+> live (migration 0035's payout/refund tables + the `runPayoutReconciliation` job,
+> pinned by the `__db__` payout-reconciliation job test) while the **platform feature
+> surface is DEFERRED to PHASE-059** — no operator screen exists and no grant array
+> carries the key. The ZATCA/ETA adapter features stay
 > honestly UNVERIFIED/deferred (DR-001 OPEN option C; DR-003 draft) — no entitlement
 > can light up an unverified integration (the no-fabrication gate).
 

@@ -35,3 +35,12 @@ sbom*.json
 # PHASE-021 desktop export prebuild stash (defense-in-depth — the prebuild's
 # finally-restore removes it; ignored so a crashed run never dirties status)
 .desktop-stash/
+# PHASE-035 repository hygiene (audit §9.ج item 14): generated artifacts are
+# never tracked — regenerate locally (README / VISUAL_TESTING §5):
+#   storybook build:  pnpm --filter @erp/ui build:storybook  → dist-storybook/
+#   visual baselines: pnpm test:visual  (first run writes __image_snapshots__/)
+packages/ui/dist-storybook/
+packages/ui/__image_snapshots__/
+__image_snapshots__/
+.playwright-artifacts/
+.playwright-artifacts-perf/

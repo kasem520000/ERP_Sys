@@ -64,6 +64,13 @@ docs/         the blueprint (authoritative)
 scripts/      docs validation + boundary meta-test tooling
 ```
 
+## Generated artifacts (PHASE-035 hygiene)
+
+`packages/ui/dist-storybook/`, `__image_snapshots__/`, and `.playwright-artifacts*/`
+are gitignored build outputs — never committed; CI fails if they reappear. Regenerate
+locally: `pnpm --filter @erp/ui build:storybook` (Storybook static build) and
+`pnpm test:visual` (first run writes the visual baselines). Policy: [docs/ui/VISUAL_TESTING.md](docs/ui/VISUAL_TESTING.md) §5.
+
 ## For AI agents and engineers
 
 Start at [docs/handoff/AGENT_START_HERE.md](docs/handoff/AGENT_START_HERE.md)

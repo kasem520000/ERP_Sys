@@ -1,8 +1,24 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-10 (Blueprint v3.0 — the completeness program)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-10 (PHASE-035 — Activation & Truth Restoration delivered)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-10 — **PHASE-035 — Activation & Truth Restoration — COMPLETE** (Blueprint v3.0's entry phase; evidence:
+  [PHASE-035-COMPLETION.md](../implementation/phases/reports/PHASE-035-COMPLETION.md)): (1) migration `0048`
+  (DATA-ONLY) — the `items.import_export` grant repair (EVAL-F-5): business+enterprise (starter keeps manual
+  entry; the tier-4 precedent), schema_version 48, permissions drift 245=245, BR-040 closure 11/11. (2) three
+  activation screens — `/inventory/batches` + `/inventory/serials` (List+Search; register + write-off /
+  sold-at under `inventory.tracking.manage`) and the read-only `/inventory/adjustments` register (posting
+  stays in the count wizard by design) — plus `reports.consolidated` as a CORE NAV_ITEMS entry (route
+  `/consolidation`, template-independent); web i18n 4,290=4,290 / mobile 371=371. (3) `tax.e-invoicing-log`:
+  registry 85 → 86; REPORT_CATALOG reconciled 86/86 (7 unlisted rows added, the sales.commissions_due
+  duplicate removed); permission rides `tax.einvoicing.manage` (§12). (4) DR-035-01/02/03 — scheduled
+  reports DEFERRED-057 (grant key preserved) · customer portal PLANNED-060 · platform.payouts DEFERRED-059.
+  (5) repo hygiene: 251 generated files untracked, `.gitignore`, the ci-visual.yml guard, VISUAL_TESTING §5
+  + README notes; the recorded pre-existing 034-tree gate repairs (0041 fresh-chain boot · include_from
+  semantics · elimination INV-009 intercompany partner · isolation registry + 0041 tables · manifest/
+  typecheck/lint — full ledger in the report); gates green: typecheck 8/8 · lint 8/8 · unit 1,386 · docs 32/32 · DB fresh-chain (migrations 7/7, entitlements 11/11, einvoicing-log 4/4, golden 86-pin, consolidation 22/22, isolation/RLS 1,095/1,095). Delivery: `ERP_PLATFORM_PHASE035.zip` (OA-07). Next: PHASE-036.
 
 - 2026-11-10 — **BLUEPRINT v3.0 — THE COMPLETENESS PROGRAM (31 phases, PHASE-035…065,
   stages 12–15) — documentation-only planning delivery, zero code**:

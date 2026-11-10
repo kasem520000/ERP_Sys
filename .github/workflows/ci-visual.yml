@@ -20,8 +20,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install chromium --with-deps
-      # deterministic fonts are self-hosted (@fontsource); baselines are
-      # committed PNGs regenerated only from green runs (VISUAL_TESTING §5)
+      # deterministic fonts are self-hosted (@fontsource); baselines are local,
+      # untracked artifacts regenerated fresh every run (PHASE-035 hygiene,
+      # VISUAL_TESTING §5)
       - name: design-token contrast gate (DESIGN_TOKENS §16)
         run: pnpm check:token-contrast
       - name: build Storybook (--test)
@@ -30,11 +31,11 @@ jobs:
         run: pnpm --filter @erp/ui test:visual
       - name: DataTable 10k-row 60fps gate (isolated)
         run: pnpm --filter @erp/ui test:perf
-      - name: ensure baseline changes ship with a changeset (§5)
+      - name: guard — baselines/build artifacts stay untracked (§5)
         run: |
-          changed=$(git diff --name-only origin/${{ github.base_ref }}... -- 'packages/ui/__image_snapshots__' || true)
-          if [ -n "$changed" ] && [ -z "$(ls .changeset/*.md 2>/dev/null)" ]; then
-            echo "::error::baseline changes require a changeset naming the cause (VISUAL_TESTING §5)"; exit 1
+          tracked=$(git ls-files -- 'packages/ui/__image_snapshots__' 'packages/ui/dist-storybook')
+          if [ -n "$tracked" ]; then
+            echo "::error::generated artifacts must never be committed — regenerate locally (PHASE-035 hygiene, VISUAL_TESTING §5): $tracked"; exit 1
           fi
 
   headers-csp:

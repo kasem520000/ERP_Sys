@@ -1,6 +1,6 @@
 # Product Decision Records
 
-> **Status:** STABLE · **Owner:** Product Owner · **Updated:** 2026-11-06
+> **Status:** STABLE · **Owner:** Product Owner · **Updated:** 2026-11-10
 
 Commercial and product-scope decisions: pricing, packaging, payment providers, and
 product commitments that bind roadmap phases. Process and format:
@@ -18,6 +18,9 @@ architecture owner.
 | [DR-P25-02-support-sla.md](DR-P25-02-support-sla.md) | Support SLA commitments per plan (OQ-008) | **PROPOSED** (post-GA slot) | Post-GA review, once staffing for the first GA cohorts is known (target: before the first Enterprise cohort) |
 | [DR-P25-03-personal-payments.md](DR-P25-03-personal-payments.md) | Personal-account online payments (OQ-007) | **PROPOSED** (post-GA slot) | Demand signal + DR-002 resolution (whichever is later) |
 | [DR-P25-05-ios-client.md](DR-P25-05-ios-client.md) | iOS client decision slot (the ADR-0014 deferral) | **PROPOSED** (post-GA slot) | iOS demand signal in the KSA/UAE target market, or an enterprise procurement requirement |
+| [DR-035-01-scheduled-reports.md](DR-035-01-scheduled-reports.md) | Scheduled reports: DEFERRED to PHASE-057 (grant key preserved) | **ACCEPTED** 2026-11-10 | Decided — the PHASE-025-era "delivered" claim retracted; PHASE-057 intake consumes it |
+| [DR-035-02-customer-portal.md](DR-035-02-customer-portal.md) | Customer portal (S-20): PLANNED PHASE-060 | **ACCEPTED** 2026-11-10 | Decided — classification recorded (was unclassified "priority 3 / 023–025"); PHASE-060 intake consumes it |
+| [DR-035-03-platform-payouts.md](DR-035-03-platform-payouts.md) | platform.payouts: DEFERRED to PHASE-059; the SHIPPED-PHASE-023 claim retracted | **ACCEPTED** 2026-11-10 | Decided — substrate/surface split recorded; PHASE-059 intake consumes it |
 
 The `DR-P25-NN` rows are **post-GA pointer stubs** (PHASE-025 T14): filed owning slots
 for GA-deliberately-open items — context + options + trigger + owner recorded; not

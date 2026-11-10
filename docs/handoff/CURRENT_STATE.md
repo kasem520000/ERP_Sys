@@ -1,10 +1,19 @@
 # Current State
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-09
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-035 — activation & truth restoration delivered)
 
 What actually exists in this repository right now. Paired with
 [../planning/IMPLEMENTATION_STATUS.md](../planning/IMPLEMENTATION_STATUS.md) (phase
 table) and [NEXT_ACTION.md](NEXT_ACTION.md).
+
+> **PHASE-035 (2026-11-10) — Activation & Truth Restoration — COMPLETE** (Blueprint v3.0's
+> entry phase): the three activation screens `/inventory/batches` · `/inventory/serials` ·
+> `/inventory/adjustments` (read-only) + `reports.consolidated` as a core NAV_ITEMS entry
+> (i18n 4,290=4,290); migration `0048` (DATA-ONLY: items.import_export →
+> business+enterprise; schema_version 48; permissions 245=245); `tax.e-invoicing-log`
+> (registry 85 → 86; REPORT_CATALOG 86/86); DR-035-01/02/03; the truth sweep + the
+> recorded pre-existing gate repairs. Next: PHASE-036 — evidence:
+> [../implementation/phases/reports/PHASE-035-COMPLETION.md](../implementation/phases/reports/PHASE-035-COMPLETION.md).
 
 ## Repository contents
 
@@ -32,7 +41,8 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
   system, 49-component catalog, 12 page archetypes, navigation (10 groups), RTL rules,
   accessibility, motion, visual testing), reporting (architecture, report contract,
   catalog with 67 core + v2.0 reports plus the per-phase industry sets (13 shipped
-  industry contracts across 015–018; registry 66), financial statement rules, printing/export,
+  industry contracts across 015–018; registry 86 (66 at PHASE-018; 80 at 034; 85
+  pre-035; +1 tax.e-invoicing-log at 035)), financial statement rules, printing/export,
   reconciliation), offline (architecture, local DB, sync protocol, conflict
   resolution, idempotency, device security, capabilities matrix, failure recovery),
   security (threat model, authorization matrix, data protection, secrets, security
@@ -44,8 +54,11 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
   provider, costing default, ZATCA scope, Yemen scope, observability vendors, and the
   v2.0 expansion set: platform expansion, fixed assets, notes & installments,
   budgeting, payroll scope, consolidation), and this handoff set.
-- **Application code: PHASE-001 … PHASE-025 (all COMPLETE) — **GA RELEASED
-  (v1.1.0 / CalVer v1.26.11.0, tags real in this repository)** — the MVP v1.0
+- **Application code: PHASE-001 … PHASE-034 (all COMPLETE — the restoration merge
+  united both lineages) + PHASE-035 (Blueprint v3.0's entry phase, delivered
+  2026-11-10) — **GA RELEASED
+  (v1.1.0 / CalVer v1.26.11.0 — released 2026-11-06; the release tag lived on the
+  pre-archive lineage, which the squash collapsed — see the Git note below)** — the MVP v1.0
   release + the industry configuration engine + Point of Sale + the
   automotive/distribution templates + Manufacturing & Production + CRM/Service
   Contracts & Projects + the Offline Synchronization Foundation + the Desktop
@@ -67,10 +80,12 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
   eliminations via the posting engine into the parent's consolidation books,
   BR-056-gated read-only runs over the audited platform-plane reader with
   ZERO cross-tenant writes, the DR-P34-FX-1 dated-FX translation decision,
-  the four §10 consolidated-statement report contracts — registry 80) with
-  the web surfaces and the unit/DB suites. The sibling phases 028–031 were
-  lost to environment resets on this lineage and remain NOT_STARTED (the
-  honest lineage note in IMPLEMENTATION_STATUS); every shipped phase's
+  the four §10 consolidated-statement report contracts — registry 80 at 034;
+  86 after PHASE-035's tax.e-invoicing-log + the catalog reconciliation) with
+  the web surfaces and the unit/DB suites. The sibling phases 028–031 — once
+  lost to environment resets on this lineage — were RESTORED by the post-034
+  restoration merge that united both lineages: no phase 001–035 is
+  NOT_STARTED; every shipped phase's
   evidence is in its completion report under
   [../implementation/phases/reports/](../implementation/phases/reports/).
   Post-completion: the maintenance/ops handoff per MASTER_ROADMAP §Handoff.
@@ -642,13 +657,14 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
     evidence items are waived to first infrastructure availability by project-owner
     directive — the CI-equivalent local gate (`pnpm gate:local`) is green and is the
     recorded substitute; follow-ups tracked in the phase report §Deferred evidence.
-- **Git:** initialized on `main` during PHASE-001 (the pre-implementation state was a
-  plain directory — see the phase report's doc-reality reconciliation); baseline
-  committed and tagged `blueprint/v1.1`; PHASE-001 implementation committed and tagged
-  `phase/001`; blueprint v2.0 expansion committed on top; `phase/006` tagged 2026-10-29;
-  `phase/007` tagged 2026-10-30; `phase/008` tagged 2026-10-30; `phase/009` tagged
-  2026-10-30; `phase/010` tagged 2026-10-30; `phase/011` tagged 2026-10-30;
-  `phase/012` tagged 2026-10-31; `phase/013` tagged 2026-11-01.
+- **Git:** the delivered history lives on `main` as the single squashed commit
+  `3d19e2f` "PHASE-034 FINAL: Complete ERP platform — 34 phases, full source +
+  delivery archive" (the delivery archive's squash of the pre-restoration
+  lineage) — the repository carries **no tags** (the per-phase tags
+  `blueprint/v1.1`/`phase/001…013` named in the earlier per-phase builds did
+  not survive the archive's squash). PHASE-035 lands as the next commit(s) on
+  `main` (the activation surfaces + the truth-restored docs), per the v3.0
+  per-phase archive convention `ERP_PLATFORM_PHASE0NN.zip` (OA-07).
 
 ## Status of the world (honest statement per directive §24)
 
@@ -699,9 +715,9 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
   incl. the FEFO dispensing pick and the G-26 dishonor restoring the claim
   exactly; the zero-clinical-surface CI gate — no clinical field, key, or
   screen exists anywhere in the shell)
-  (migrations 0001–0043 — schema_version 43; CURRENT_SHIPPED_PHASE
-  PHASE-031; 10 shipped industry templates; report registry 81 contracts;
-  permissions 245=245; web i18n 4,069=4,069; the centralized posting engine with the full
+  (migrations 0001–0048 — schema_version 48; CURRENT_SHIPPED_PHASE
+  PHASE-035; 13 shipped industry templates; report registry 86 contracts;
+  permissions 245=245; web i18n 4,290=4,290; the centralized posting engine with the full
   invariant suite is live and proven by its consumers — treasury posts every
   money movement through it, tax stamps every tax-carrying line with frozen
   rate snapshots BR-033, inventory posts every stock movement through it
@@ -812,7 +828,8 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
   drift detection; `industry.food_manufacturing` seeded at v1.0.0 and applied through
   the UNMODIFIED PHASE-015 engine (CURRENT_SHIPPED_PHASE 18 — restaurant switch
   safety proven BR-038), the 3 industry reports over the PHASE-013 contract
-  (registry 66; `manufacturing.production_cost` tolerance-0 GL-tied), the four web
+  (registry 66; `manufacturing.production_cost` tolerance-0 GL-tied — registry
+  since grown: 86 at PHASE-035), the four web
   surfaces (boms / orders / qc / genealogy) with i18n parity 2556/2556, and the docs
   set authored in-phase (TABLES + ERD cluster specs, ENTITY_CATALOG manufacturing
   section, POSTING_ENGINE §4 production rows incl. qc_scrap, CHART_OF_ACCOUNTS labor/

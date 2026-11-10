@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (Blueprint v3.0 planning — the 31-phase completeness program documented; no v3.0 phase implemented yet)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-035 COMPLETE — the v3.0 program's first phase delivered)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -9,6 +9,13 @@ describes fact. Evidence = completion reports in
 
 **Legend:** `NOT_STARTED` · `IN_PROGRESS` · `COMPLETE` (all exit criteria met with
 evidence) · `BLOCKED` (with reason) · `WAIVED` (with decision record).
+
+> **PHASE-035 — Activation & Truth Restoration — COMPLETE 2026-11-10** (Blueprint v3.0's first delivered
+> phase): migration `0048` (DATA-ONLY — items.import_export → business+enterprise; schema_version 48;
+> permissions 245=245); the three inventory activation screens + `reports.consolidated` core nav (web i18n
+> 4,290=4,290 / mobile 371=371); `tax.e-invoicing-log` (registry 85 → 86, REPORT_CATALOG 86/86); DR-035-01/02/03;
+> the repo-hygiene sweep + the recorded pre-existing gate repairs; all gates green — evidence:
+> [reports/PHASE-035-COMPLETION.md](../implementation/phases/reports/PHASE-035-COMPLETION.md).
 
 ## Current state: BLUEPRINT v2.0 + **PHASE-001..034 ALL COMPLETE — THE 34-PHASE ROADMAP IS FINISHED IN ONE BUILD** (the restoration merge united the surviving lineage's 032 education · 033 agriculture · 034 consolidation with the restored lineage's 028 budgeting · 029 payroll · 030 wholesale+electronics · 031 healthcare) — **MVP v1.0 RELEASE + INDUSTRY EXPANSION + OFFLINE SYNC FOUNDATION + DESKTOP APPLICATION + ANDROID APPLICATION + EXTERNAL INTEGRATIONS & E-INVOICING SUBSTRATE + SECURITY HARDENING & COMPLIANCE REVIEW + POST-GA STAGE 9 (FIXED ASSETS · NOTES & INSTALLMENTS · BUDGETING · PAYROLL) + WHOLESALE & ELECTRONICS INDUSTRY TEMPLATES + HEALTHCARE COMMERCIAL SHELL + EDUCATION & AGRICULTURE COMMERCIAL SHELLS + MULTI-ENTITY CONSOLIDATION (THE ENTERPRISE DEPTH GATE)**
 
@@ -33,10 +40,10 @@ evidence) · `BLOCKED` (with reason) · `WAIVED` (with decision record).
 > [COMPLETENESS_REGISTER.md](COMPLETENESS_REGISTER.md), indexed by
 > [COMPLETENESS_ROADMAP.md](COMPLETENESS_ROADMAP.md), detailed in
 > [../implementation/phases/PHASE-035.md](../implementation/phases/PHASE-035.md) …
-> [PHASE-065.md](../implementation/phases/PHASE-065.md). Every v3.0 phase is
-> **NOT_STARTED — PLANNED** (CR-03 scope honesty); the first eligible phase is
-> **PHASE-035 — Activation & Truth Restoration**. The compact v3.0 ledger lives in
-> §"Blueprint v3.0 planned phases" below.
+> [PHASE-065.md](../implementation/phases/PHASE-065.md). Every v3.0 phase was
+> **NOT_STARTED — PLANNED** at planning time (CR-03 scope honesty); the entry phase
+> **PHASE-035 — Activation & Truth Restoration** is now **COMPLETE** (2026-11-10 — the
+> note below). The compact v3.0 ledger lives in §"Blueprint v3.0 phases" below.
 
 The repository contains the consolidated blueprint (v1.1 baseline + v2.0 expansion)
 plus the delivered trust substrate: PHASE-001 (monorepo scaffold, tooling, CI
@@ -104,14 +111,15 @@ recorded here with evidence.
 | Compliance | NONE — no jurisdiction pack data verified against official sources | — |
 | Deployment | NONE — dev compose + CI files (incl. new ci-db.yml); first hosted runs waived pending infra | `docker-compose.yml`, `.github/workflows/` |
 
-## Blueprint v3.0 planned phases (2026-11-10 — documentation-only, none implemented)
+## Blueprint v3.0 phases (2026-11-10 — PHASE-035 delivered; the rest planned)
 
-All 31 phases are **NOT_STARTED — PLANNED** per CR-03. Authoritative scope per phase
+30 of 31 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035 COMPLETE (2026-11-10).
+Authoritative scope per phase
 document; this ledger tracks status only. Effort figures are planning estimates.
 
 | Phase | Title | Wave/Stage | Prereqs | Status |
 |-------|-------|------------|---------|--------|
-| [PHASE-035](../implementation/phases/PHASE-035.md) | Activation & Truth Restoration | 1 / 12 | 034 ✓ | NOT_STARTED — PLANNED |
+| [PHASE-035](../implementation/phases/PHASE-035.md) | Activation & Truth Restoration | 1 / 12 | 034 ✓ | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-035-COMPLETION.md) |
 | [PHASE-036](../implementation/phases/PHASE-036.md) | Extensibility Core — Custom Fields | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-037](../implementation/phases/PHASE-037.md) | ZATCA Phase-1 & QR Compliance | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | NOT_STARTED — PLANNED |

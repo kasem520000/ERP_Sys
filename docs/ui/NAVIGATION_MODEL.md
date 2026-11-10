@@ -1,6 +1,6 @@
 # Navigation Model
 
-> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-10 (PHASE-035)
 
 How users move through the platform: the information architecture, the entitlement-driven
 navigation registry, the command menu as universal navigation, back/deep-link behavior,
@@ -55,11 +55,25 @@ precedent).
 | `accounting.budgets` | 5 المحاسبة | الموازنات / Budgets | `budgeting.budgets` | `budgeting.budgets.view` | List + Search (§2) + Create/Edit Form (§3) for budget lines |
 | `treasury.cheques-notes` | 6 الخزينة | الشيكات والأوراق التجارية / Cheques & notes | `notes.received` | `notes.notes.view` | List + Search (§2) — route `/notes`; note lifecycle on Document Detail (§5) with the `note_events` custody timeline (`TimelinePanel`) |
 | `treasury.pdc-calendar` | 6 الخزينة | تقويم الاستحقاق / Maturity calendar | `notes.pdc_calendar` | `notes.notes.view` | Dashboard (§1 — the maturity workspace) — route `/notes/calendar`, with list drill (§2) |
-| `reports.consolidated` | 7 التقارير | القوائم الموحدة / Consolidated statements | `consolidation.reports` | `consolidation.reports.view` | Report Page (§7) |
+| `reports.consolidated` | 7 التقارير | القوائم الموحدة / Consolidated statements | `consolidation.reports` | `consolidation.reports.view` | Report Page (§7) — route `/consolidation`; promoted from template-injected nav to a **CORE NAV_ITEMS entry at PHASE-035** (template-independent — template-less tenants now see القوائم الموحدة) |
 | `payroll.employees` | 10 الموظفون والرواتب | الموظفون / Employees | `payroll.employees` | `payroll.employees.view` | List + Search (§2) |
 | `payroll.salary-structures` | 10 الموظفون والرواتب | هياكل الرواتب / Salary structures | `payroll.salary_structures` | `payroll.salary_structures.manage` (view implied) | List + Search (§2) + Create/Edit Form (§3) |
 | `payroll.runs` | 10 الموظفون والرواتب | تشغيلات الرواتب / Payroll runs | `payroll.runs` | `payroll.runs.view` | List + Search (§2); pending approvals surface in Approval Queue (§6) |
 | `payroll.loans` | 10 الموظفون والرواتب | سلف الموظفين / Employee loans | `payroll.loans` | `payroll.loans.manage` (view implied) | List + Search (§2) |
+
+### 1.2 PHASE-035 registry additions (Blueprint v3.0 — activation)
+
+The three inventory surfaces (audit EVAL-F-1/F-2): fully-built APIs and flows that
+no tenant could reach from the sidebar until PHASE-035 registered them. Same
+resolution rule as every item — `entitlement(featureKey)` AND `permission(user,
+branch)`; the register + write-off / sold-at actions inside batches/serials run
+under `inventory.tracking.manage`.
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `inventory.batches` | 4 المخزون | الدفعات والصلاحية / Batches & expiry | `inventory.batch_tracking` | `inventory.moves.view` | List + Search (§2) — route `/inventory/batches`, order 90; register + write-off actions under `inventory.tracking.manage` |
+| `inventory.serials` | 4 المخزون | الأرقام التسلسلية / Serial numbers | `inventory.serial_tracking` | `inventory.moves.view` | List + Search (§2) — route `/inventory/serials`, order 100; register + sold-at actions under `inventory.tracking.manage` |
+| `inventory.adjustments` | 4 المخزون | تسويات المخزون / Stock adjustments | `inventory.stock_ledger` | `inventory.stock.view` | List + Search (§2), read-only — route `/inventory/adjustments`, order 110; posting stays in the count wizard by design |
 
 ## 2. Navigation registry (data model, normative)
 
@@ -89,6 +103,18 @@ not "forbidden lists" that leak feature existence
 templates may patch `label`, add items, or hide optional items via the configuration
 engine; the registry stays the single source consumed by sidebar, command menu, mobile
 tabs, and shortcuts.
+
+### 2.1 Contextual flows (intentionally outside NAV_ITEMS)
+
+Confirmed intentional at PHASE-035 (audit F-4) — these routes never appear in the
+sidebar because they are session / billing / shell flows, not workspace destinations:
+
+- `/security` — the MFA/security challenge surface: session-contextual (reached from
+  the user menu and the identity flows, never browsed to).
+- `/checkout` — the billing checkout flow, entered from the pricing/plans surface.
+- `/onboarding` — the first-run provisioning wizard (Journey A), one-time per tenant.
+- `/offline` — the desktop shell's offline console (the DR-P21-07 exported-shell route
+  include), desktop-context only.
 
 ## 3. Command menu — universal navigation (⌘K / Ctrl+K)
 
@@ -186,3 +212,4 @@ hard-coded listeners in screens). POS terminal profiles define their own F-key m
 | Budgets under المحاسبة | PHASE-028 |
 | HR & Payroll group (group 10) + its items | PHASE-029 |
 | Consolidated statements under التقارير | PHASE-034 — **LIVE** (delivered 2026-11-09: the `/consolidation` surfaces — group Settings, the elimination Transaction Entry workspace with the live balanced DR/CR preview, the run Report Page with the snapshot viewer — nav items under group 7 التقارير, `reports.consolidated`) |
+| Inventory batches & expiry + serial numbers + stock adjustments (read-only) under المخزون; the import/export visibility repair; consolidated statements as a core item | PHASE-035 — **LIVE** (delivered 2026-11-10: `/inventory/batches` + `/inventory/serials` (register + write-off / sold-at under `inventory.tracking.manage`) and the read-only `/inventory/adjustments` register — posting stays in the count wizard; `items.import_export` granted business+enterprise by the DATA-ONLY migration `0048`; `reports.consolidated` promoted from template-injected to a core NAV_ITEMS entry — template-less tenants see القوائم الموحدة) |

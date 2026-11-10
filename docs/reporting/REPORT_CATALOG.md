@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-02
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-10 (PHASE-035 — catalog↔registry reconciliation: 86/86; the 7 unlisted rows added, the sales.commissions_due duplicate removed, tax.e-invoicing-log delivered with its permission reconciled)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -85,7 +85,7 @@ accounts via INV-009 assertion displayed as a footer badge.
 | `sales.document-flow` | Sales Document Flow / حركة مستندات البيع | sales · `salesAnalytics.pipelineConversion` · quotations, sales_orders, delivery_notes, sales_invoices | period, branches, rep, conversion stage filter | `reports.sales.pipeline.read` | XLSX · CSV | PHASE-013 |
 | `sales.by-branch` | Sales by Branch / المبيعات حسب الفرع | sales · `salesAnalytics.branchRevenue` | period, branch consolidation | `reports.sales.by-branch.read` | PDF · XLSX · CSV | PHASE-013 |
 | `sales.profitability` | Profitability / الربحية | sales + inventory · revenue minus COGS by item/customer/rep/branch | period, dimension, branches | `reports.sales.profitability.read` | PDF · XLSX · CSV | PHASE-013 |
-| `sales.commissions_due` | Commissions Due / العمولات المستحقة | sales · `distributionQueries.commissionsDue` · sales_reps + commission runs/lines (registered as the §8 PHASE-017 industry contract; total tied to the accrual journals) | period, reps | `reports.sales.by-rep.read` | PDF · XLSX · CSV | PHASE-017 |
+| `sales.daily-revenue` | Daily Sales Revenue / إيراد المبيعات اليومي | sales · `salesAnalytics.dailyRevenue` · sales_invoices, sales_invoice_lines, credit_notes, credit_note_lines (the PHASE-014 "sales today" dashboard-widget binding — §14) | dateFrom/To | `reports.sales.pipeline.read` | XLSX · CSV | PHASE-014 |
 | `purchasing.by-supplier` | Purchases by Supplier / المشتريات حسب المورد | purchasing · `apAnalytics.supplierSpend` · supplier_invoices + lines | period, branches, suppliers | `reports.purchasing.by-supplier.read` | PDF · XLSX · CSV | PHASE-013 |
 | `purchasing.by-item` | Purchases by Item / المشتريات حسب الصنف | purchasing · `apAnalytics.itemSpend` | period, branches, categories | `reports.purchasing.by-item.read` | PDF · XLSX · CSV | PHASE-013 |
 | `purchasing.grni` | GRNI Register / سجل المستلم غير المفوتر | purchasing · `matchingQueries.grniRegister` · goods_receipts vs supplier_invoices | asOf, branches, suppliers | `reports.purchasing.grni.read` | XLSX · CSV | PHASE-011 |
@@ -108,6 +108,7 @@ movements for the same scope) — see worked example in
 | `inventory.slow-moving` | Slow-Moving Stock / المخزون الراكد | inventory · `stockQueries.turnover` | asOf, no-sale days threshold, warehouses | `inventory.stock.read` | XLSX · CSV | PHASE-013 |
 | `inventory.transfer-log` | Stock Transfer Log / سجل التحويلات | inventory · `stockQueries.transferLog` · stock_transfers, stock_moves | dateFrom/To, from/to warehouses, status (in-transit/posted) | `inventory.moves.read` | PDF · XLSX · CSV | PHASE-010 |
 | `inventory.serial-tracking` | Serial / IMEI Tracking / تتبع المسلسلات و IMEI | inventory · `serialQueries.tracking` · item_serials (+ sale/purchase provenance) | serial/IMEI exact match or item+date range | `inventory.serials.read` | XLSX · CSV | PHASE-010 |
+| `inventory.reorder-alerts` | Reorder Alerts / تنبيهات إعادة الطلب | inventory · `inventoryQueries.reorderCandidates` · item_warehouse_settings, item_stock, items, warehouses (the PHASE-014 "stock alerts" dashboard-widget binding — §14; alert only, never autopilot — BR-019) | — (no filters; live per-warehouse snapshot) | `inventory.stock.read` | XLSX · CSV | PHASE-014 |
 
 Valuation and stock-on-hand reports assert INV-010 (Σ qty×valuation = inventory account)
 and display the check result in the footer ([REPORT_RECONCILIATION.md](REPORT_RECONCILIATION.md)).
@@ -133,11 +134,18 @@ Cash reports assert INV-019 (account balance = Σ movements) per account in scop
 |------------|------------------|-----------------|----------------|------|---------|-------|
 | `tax.vat-return` | VAT Return / الإقرار الضريبي | tax · `returnQueries.vatReturn` · document tax summaries + GL tax accounts (INV-012 tie) | jurisdiction, period, registration, output/input breakdown by treatment | `reports.tax.vat-return.read` | PDF · XLSX · CSV | PHASE-009 |
 | `tax.summary-by-treatment` | Sales/Purchases by Tax Treatment / الملخص حسب المعاملة الضريبية | tax · `taxQueries.byTreatment` + sales/purchasing analytics | period, branches, direction (sales/purchases) | `reports.tax.summary.read` | XLSX · CSV | PHASE-009 |
-| `tax.e-invoicing-log` | E-Invoicing Submission Log / سجل الفوترة الإلكترونية | tax · `eInvoicingQueries.submissions` · e_invoicing_submissions | period, status (cleared/reported/failed), adapter | `reports.tax.einvoice-log.read` | XLSX · CSV | PHASE-023 |
+| `tax.e-invoicing-log` | E-Invoicing Submission Log / سجل الفوترة الإلكترونية | tax · `taxQueries.submissionLog` · e_invoicing_submissions | period, status (PENDING/GENERATED/SIGNED/SUBMITTED/ACCEPTED/REJECTED/REPORTED/FAILED), adapter, jurisdiction | `tax.einvoicing.manage` | XLSX · CSV | PHASE-035 (delivered; documented since 023) |
 
 The VAT return renders both sides (document summaries vs GL movements) side-by-side; a
 mismatch marks the draft "unfileable" ([../accounting/RECONCILIATION.md](../accounting/RECONCILIATION.md)
 §5) — the platform reports; humans file.
+
+Reconciliation note (PHASE-035, T-08): this row was documented from PHASE-023 with the
+permission `reports.tax.einvoice-log.read` — a key that never existed in the 0004
+seed. The delivered contract (T-06, audit EVAL-F-6) registers over the PHASE-013
+engine and rides the tax module's existing `tax.einvoicing.manage` per the §12
+module-register convention (the `platform.report-runs` precedent) — permission drift
+stays zero (245 = 245).
 
 ## 7. Platform administration (المنصة)
 
@@ -211,10 +219,42 @@ Notes: `automotive.job_card_profitability` carries the `jc-parts-cogs-tie` asser
 `credit_note:reentry`, tolerance 0); `distribution.rep_settlement` carries
 `settlement-gl-tie` (|variance| + deposit = the variance + deposit journal debits);
 `distribution.van_stock_balances` carries `van-conservation-tie` (mirror = Σ signed
-stock moves); `sales.commissions_due` carries `commissions-total-tie` (posted run totals
+stock moves); the commissions-due row carries `commissions-total-tie` (posted run totals
 = COMMISSION_EXPENSE debits of `commission_run:accrual` journals); the two operational
 rows (vehicle history, route compliance) carry no GL assertion per the §11 rule-2 note
 (README rules 2/3 — planning data / read model).
+
+**Shipped (PHASE-018, category `industry`)** — the three manufacturing contracts over
+the PHASE-013 engine (registry 63 → 66; permissions reuse the 0026 seed keys — no new
+report permissions; the v2.0 agriculture template pins `manufacturing.production_cost`
+and `manufacturing.batch_genealogy` at apply time):
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `manufacturing.production_cost` | Production Cost / تكلفة الإنتاج | manufacturing · `manufacturingQueries.productionCost` · production_orders, production_order_lines, production_consumptions, production_scraps, items (+ accounting journals for the materials tie) | dateFrom/To, status (DRAFT/RELEASED/IN_PROGRESS/COMPLETED/CANCELLED), branchIds | `manufacturing.costing.read` | PDF · XLSX · CSV | PHASE-018 |
+| `manufacturing.batch_genealogy` | Batch Genealogy / شجرة الدفعات | manufacturing · `manufacturingQueries.batchGenealogy` (the recall walk + sales doc-number enrichment) · production_consumptions, production_orders, item_batches, items, stock_moves (+ sales sales_invoices/delivery_notes) | batchId | `manufacturing.genealogy.read` | PDF · XLSX · CSV | PHASE-018 |
+| `manufacturing.qc_inspection_log` | QC Inspection Log / سجل فحوص الجودة | manufacturing · `manufacturingQueries.qcInspectionLog` · inspections, production_orders, goods_receipts, item_batches | dateFrom/To | `manufacturing.qc.manage` | PDF · XLSX · CSV | PHASE-018 |
+
+Notes: `manufacturing.production_cost` carries the `production-materials-gl-tie`
+assertion (Σ consumed-materials value = Σ WIP debits of the production consume journals
+in the window, INV-010); the genealogy and QC rows are operational — no standalone GL
+tie-out (industry-reports rule 2, the §11 note).
+
+**Shipped (PHASE-019, category `industry`)** — the two professional-services contracts
+over the PHASE-013 engine (registry 66 → 68; both reuse the 0027 seed key
+`crm.contracts.manage` — no new report permissions; the professional-services template
+manifest pins the exact keys, both dashboard-bound):
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `services.contract_revenue_schedule` | Contract Revenue Schedule / جدول إيرادات العقود | crm · `crmQueries.contractRevenueSchedule` · service_contracts, contract_billing_schedule, contract_invoices, crm_time_entries, partners, projects (+ sales AR open items for the overdue bucket + accounting journals for the revenue tie) | dateFrom/To, contractId, asOf | `crm.contracts.manage` | PDF · XLSX · CSV | PHASE-019 |
+| `services.time_billing_summary` | Time & Billing Summary / ملخص وقت العمل والفوترة | crm · `crmQueries.timeBillingSummary` · crm_time_entries, projects, service_contracts (+ sales `sales_invoices` billedInvoiceId stamp) | dateFrom/To, projectId | `crm.contracts.manage` | PDF · XLSX · CSV | PHASE-019 |
+
+Notes: `services.contract_revenue_schedule` carries the `contract-revenue-gl-tie`
+assertion (Σ invoiced net = Σ revenue-account credit lines of the posted
+contract-invoice journals) and `schedule-reconciliation` (per contract, Σ contracted =
+Σ invoiced + Σ draft + Σ backlog); `services.time_billing_summary` is operational — no
+standalone GL tie-out (industry-reports rule 2).
 
 ## 9. Financial depth (v2.0 — fixed assets, notes, installments, budgeting, payroll)
 
@@ -250,7 +290,9 @@ run is audited and the permission is not granted to `viewer`-derived templates b
 
 Delivered by PHASE-034 (**COMPLETE 2026-11-09** — registry rows 76 → 80; the four
 contracts run on the PHASE-013 engine reading the completed run's immutable
-snapshots). A legal entity = a tenant: consolidated statements are read-runs
+snapshots). The registry has since grown to **86 contracts at PHASE-035** (the §6
+`tax.e-invoicing-log` delivered as the 86th — §13). A legal entity = a tenant:
+consolidated statements are read-runs
 over member books plus eliminations posted in the parent's consolidation books
 ([ADR-0018](../architecture/ADR/ADR-0018-multi-entity-consolidation.md)); member books are
 never written (INV-026).
@@ -329,6 +371,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-028 | budgeting reports (budget vs actual, variance analysis) |
 | PHASE-029 | payroll reports (register, cost summary, EOS provision) |
 | PHASE-034 | consolidation reports (consolidated TB/IS/BS, eliminations log) — **delivered 2026-11-09, registry 80** |
+| PHASE-035 | tax.e-invoicing-log delivered — registry 85 → 86; catalog reconciled 79 → 86 rows (7 unlisted added, 1 duplicate removed) |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 
@@ -387,3 +430,9 @@ A report cannot be registered before its data phase — the registry cross-check
    version bumps re-validate saved views on open.
 4. Every report appears in the command menu index with its bilingual title
    ([../ui/NAVIGATION_MODEL.md](../ui/NAVIGATION_MODEL.md) §3).
+5. PHASE-035 (2026-11-10) catalog↔registry reconciliation: every one of the 86 registry
+   keys now has exactly one catalog row (86/86) — the 7 unlisted contracts added
+   (`sales.daily-revenue`, `inventory.reorder-alerts`, the `manufacturing.*` trio, the
+   `services.*` pair), the §3 Commissions-Due duplicate row removed (the §8 PHASE-017
+   row is canonical), and the `tax.e-invoicing-log` row updated to the delivered
+   contract (`tax.einvoicing.manage` per the §12 module-register convention).
