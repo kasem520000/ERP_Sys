@@ -54,6 +54,20 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  * last-writer-wins), never a duplicate primary effect.
  */
 
+/**
+ * PHASE-036 (CR-36 g — the sync surface): custom-field values ride the
+ * first-wave fed entities' projections (items, partners, sales_invoices)
+ * as ONE additive `customFields` jsonb payload field — the typed columns
+ * fold per data_type (NUMBER/BOOLEAN/DATE/MULTISELECT native, everything
+ * else text). The aggregation joins ACTIVE definitions only, so archived
+ * fields drop off the feed while their values stay in the store
+ * (BR-057). Offline clients ignore unknown payload keys by construction
+ * (explicit-column upserts), and server pushes never touch the value
+ * store — offline entity editing preserves UDF data. The manager and
+ * designer surfaces are online-only (N/A-recorded for the offline
+ * clients' configuration plane).
+ */
+
 /** The POS feed group (016 §11 — kept verbatim for the 016 compat surface). */
 export const POS_FEED_ENTITIES = [
   "items",
@@ -107,7 +121,20 @@ async function projectSource(
                i.kind, i.uom_id AS "uomId", i.category_id AS "categoryId",
                i.tax_code_id AS "taxCodeId", i.base_price AS "basePrice",
                i.track_batch AS "trackBatch", i.track_serial AS "trackSerial",
-               i.track_imei AS "trackImei", i.status, i.deleted_at AS "deletedAt"
+               i.track_imei AS "trackImei", i.status, i.deleted_at AS "deletedAt",
+               (SELECT COALESCE(jsonb_object_agg(d.key,
+                        CASE d.data_type
+                          WHEN 'NUMBER' THEN to_jsonb(v.value_number)
+                          WHEN 'BOOLEAN' THEN to_jsonb(v.value_boolean)
+                          WHEN 'DATE' THEN to_jsonb(v.value_date)
+                          WHEN 'MULTISELECT' THEN v.value_json
+                          ELSE to_jsonb(v.value_text)
+                        END), '{}'::jsonb)
+                  FROM custom_field_values v
+                  JOIN custom_field_definitions d
+                    ON d.id = v.field_id AND d.tenant_id = v.tenant_id
+                 WHERE v.entity_type = 'items' AND v.entity_id = i.id
+                   AND d.status = 'ACTIVE') AS "customFields"
         FROM items i
         WHERE (${sinceFallback}::boolean AND i.updated_at IS NOT NULL)
            OR i.updated_at ${sinceClause}
@@ -154,7 +181,20 @@ async function projectSource(
         SELECT p.id, p.updated_at AS "changedAt", p.version, p.code, p.name, p.name_ar AS "nameAr",
                p.kind, p.status, p.credit_limit AS "creditLimit",
                p.price_list_id AS "priceListId", p.tax_number AS "taxNumber",
-               p.deleted_at AS "deletedAt"
+               p.deleted_at AS "deletedAt",
+               (SELECT COALESCE(jsonb_object_agg(d.key,
+                        CASE d.data_type
+                          WHEN 'NUMBER' THEN to_jsonb(v.value_number)
+                          WHEN 'BOOLEAN' THEN to_jsonb(v.value_boolean)
+                          WHEN 'DATE' THEN to_jsonb(v.value_date)
+                          WHEN 'MULTISELECT' THEN v.value_json
+                          ELSE to_jsonb(v.value_text)
+                        END), '{}'::jsonb)
+                  FROM custom_field_values v
+                  JOIN custom_field_definitions d
+                    ON d.id = v.field_id AND d.tenant_id = v.tenant_id
+                 WHERE v.entity_type = 'partners' AND v.entity_id = p.id
+                   AND d.status = 'ACTIVE') AS "customFields"
         FROM partners p
         WHERE (${sinceFallback}::boolean AND p.updated_at IS NOT NULL)
            OR p.updated_at ${sinceClause}
@@ -218,7 +258,20 @@ async function projectSource(
         SELECT v.id, v.updated_at AS "changedAt", v.version, v.invoice_no AS "invoiceNo",
                v.status, v.kind, v.channel, v.customer_id AS "customerId",
                v.invoice_date AS "orderDate", v.total_gross AS "totalAmount",
-               v.currency_code AS "currency", v.owner_device_id AS "ownerDeviceId"
+               v.currency_code AS "currency", v.owner_device_id AS "ownerDeviceId",
+               (SELECT COALESCE(jsonb_object_agg(d.key,
+                        CASE d.data_type
+                          WHEN 'NUMBER' THEN to_jsonb(cf.value_number)
+                          WHEN 'BOOLEAN' THEN to_jsonb(cf.value_boolean)
+                          WHEN 'DATE' THEN to_jsonb(cf.value_date)
+                          WHEN 'MULTISELECT' THEN cf.value_json
+                          ELSE to_jsonb(cf.value_text)
+                        END), '{}'::jsonb)
+                  FROM custom_field_values cf
+                  JOIN custom_field_definitions d
+                    ON d.id = cf.field_id AND d.tenant_id = cf.tenant_id
+                 WHERE cf.entity_type = 'sales_invoices' AND cf.entity_id = v.id
+                   AND d.status = 'ACTIVE') AS "customFields"
         FROM sales_invoices v
         WHERE (${sinceFallback}::boolean AND v.updated_at IS NOT NULL)
            OR v.updated_at ${sinceClause}

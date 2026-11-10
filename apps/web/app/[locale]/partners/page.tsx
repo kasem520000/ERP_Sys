@@ -13,7 +13,7 @@ import { AppShell } from "../../../components/app-shell";
 import { PartnersTable } from "../../../components/partners-table";
 import { RetryButton } from "../../../components/retry-button";
 import { getDictionary, isLocale, type Locale } from "../../../i18n/dictionaries";
-import type { PartnerRow } from "../../../lib/api-types";
+import type { CustomFieldDefinitionRow, PartnerRow } from "../../../lib/api-types";
 import { localizedApiError } from "../../../lib/messages";
 import { fetchApi, requireSessionToken } from "../../../lib/server-api";
 
@@ -33,9 +33,16 @@ export default async function PartnersPage({
 
   await requireSessionToken(localeValue);
 
-  const partners = await fetchApi<readonly PartnerRow[]>(
-    `partners/partners?limit=${PAGE_LIMIT}`,
-  );
+  const [partners, customFields] = await Promise.all([
+    fetchApi<readonly PartnerRow[]>(
+      `partners/partners?limit=${PAGE_LIMIT}`,
+    ),
+    // WEB-036: the partner surface (session route) — dynamic list columns;
+    // any failure degrades to the plain table (starter tenants ship zero).
+    fetchApi<readonly CustomFieldDefinitionRow[]>(
+      "configuration/custom-fields/surface?entityType=partners",
+    ),
+  ]);
   if (!partners.ok && partners.status === 401) {
     redirect(`/${locale}/login`);
   }
@@ -60,6 +67,7 @@ export default async function PartnersPage({
         initialRows={partners.data}
         initialHasMore={partners.meta?.hasMore ?? false}
         initialNextCursor={partners.meta?.nextCursor}
+        customFieldDefinitions={customFields.ok ? customFields.data : []}
       />
     );
   }

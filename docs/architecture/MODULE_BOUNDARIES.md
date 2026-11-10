@@ -1,6 +1,6 @@
 # Module Boundaries
 
-> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-10-28
+> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-11-10 (PHASE-036)
 
 The authoritative module (bounded context) catalog. Modules live in `apps/api/src/modules/`
 as NestJS modules with a strict internal layout (`api/` = published surface,
@@ -26,7 +26,7 @@ as NestJS modules with a strict internal layout (`api/` = published surface,
 | `notifications` | In-app + email/SMS/push adapters | notifications, notification_preferences | notify(user, event) | P-003 (email) / P-015 |
 | `files` | Attachments, exports storage | file_objects | signed URL issuance, upload validation | P-002 |
 | `audit` | Immutable audit events | audit_events | recordEvent (used via decorator/interceptor) | P-003 |
-| `configuration` | Industry templates, feature config resolution | industry_templates, tenant_industry_config, feature_flags | resolveEffectiveConfig(tenant) | P-004/015 |
+| `configuration` | Industry templates, feature config resolution, **custom fields / picklists / form layouts (the extensibility core, P-036)** | industry_templates, tenant_industry_config, feature_flags, **custom_field_definitions, custom_field_values, custom_picklists, custom_picklist_options, form_layouts (P-036, migration `0049`)** | resolveEffectiveConfig(tenant); **the custom-field value guard — `validateValues`/`persistValues`/`attachValues`/`mergeValuesInto` on its `api/` surface (ADR-0019) — consumed by partners/items/sales/purchasing/payroll/accounting for the six first-wave entities (partners, items, sales invoices, purchase orders, employees, projects): published-service calls only, never cross-module writes** | P-004/015 (custom fields P-036) |
 | `crm` | Leads, tasks, activities, contracts, service orders, time | leads, crm_tasks, crm_activities, service_contracts, **contract_billing_schedule, contract_invoices, contract_advances (P-019)**, service_orders, service_order_lines, **crm_time_entries (P-019)** | — | P-019 |
 | `manufacturing` | BOM, production orders, WIP, QC, costing | bills_of_materials, production_orders, production_consumptions, inspections | production costing services | P-018 |
 | `distribution` | Routes, van stock, rep settlements | routes, route_visits, van_stock, rep_settlements | settlement services | P-017 |

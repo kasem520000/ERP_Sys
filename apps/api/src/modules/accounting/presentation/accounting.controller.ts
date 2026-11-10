@@ -25,6 +25,13 @@ import { FxService } from "../application/fx-service";
 import { NumberingService } from "../application/numbering-service";
 import { ReconciliationService } from "../application/reconciliation-service";
 import { ProjectCodeTakenError, ProjectNotFoundError } from "../domain/accounting-errors";
+import {
+  attachValues,
+  customFieldsPayloadSchema,
+  mergeValuesInto,
+  persistValues,
+  validateValues,
+} from "../../configuration/api";
 
 /**
  * Accounting routes (PHASE-007 §4; matrix §3.1): CoA + purposes, fiscal
@@ -106,12 +113,18 @@ const projectCreateSchema = z.object({
   name: z.string().min(1).max(200),
   nameAr: z.string().min(1).max(200).nullish(),
   parentId: z.string().uuid().nullish(),
+  // PHASE-036 (ADR-0019): typed custom-field values validate BEFORE the
+  // insert (zero partial writes) and persist inside the same ambient UoW.
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const projectPatchSchema = z.object({
   name: z.string().min(1).max(200).optional(),
   nameAr: z.string().min(1).max(200).nullish(),
   status: z.enum(["OPEN", "CLOSED"]).optional(),
+  // PHASE-036 (ADR-0019): full-replace custom-field payload (absent keys
+  // clear; `undefined` never touches the store).
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 /** uq_projects_tenant_code surfaced typed: the natural-key 23505 (walk the
@@ -400,7 +413,8 @@ export class AccountingController {
   @RequirePermissions("accounting.journal_entries.view")
   async listProjects(): Promise<unknown> {
     const { listProjects } = await import("../infrastructure/accounting.store");
-    return envelope(await listProjects());
+    // PHASE-036: the batched custom-fields read merge.
+    return envelope(await mergeValuesInto("projects", await listProjects()));
   }
 
   @Post("projects")
@@ -409,6 +423,14 @@ export class AccountingController {
   async createProject(@Req() request: Request, @Body() body: unknown): Promise<unknown> {
     const identity = requireIdentity(request);
     const input = projectCreateSchema.parse(body);
+    // PHASE-036 (ADR-0019): validate custom-field values BEFORE the insert
+    // (zero partial writes); persistence + read merge ride the ambient UoW.
+    const { customFields: customFieldsInput, ...entityInput } = input;
+    const validated =
+      customFieldsInput === undefined
+        ? undefined
+        : await validateValues("projects", customFieldsInput);
+    void entityInput; // PHASE-036: customFields only — the insert input is explicit below
     const { insertProject } = await import("../infrastructure/accounting.store");
     let created: Awaited<ReturnType<typeof insertProject>>;
     try {
@@ -433,7 +455,10 @@ export class AccountingController {
       actorId: identity.userId,
       after: { code: created.code, name: created.name, status: created.status },
     });
-    return envelope(created);
+    if (validated !== undefined) {
+      await persistValues("projects", created.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("projects", created));
   }
 
   @Patch("projects/:id")
@@ -445,15 +470,20 @@ export class AccountingController {
   ): Promise<unknown> {
     const identity = requireIdentity(request);
     const input = projectPatchSchema.parse(body);
+    const { customFields: customFieldsInput, ...entityPatch } = input;
+    const validated =
+      customFieldsInput === undefined
+        ? undefined
+        : await validateValues("projects", customFieldsInput);
     const { findProjectById, updateProject } = await import("../infrastructure/accounting.store");
     const before = await findProjectById(id);
     if (before === undefined) {
       throw new ProjectNotFoundError(id);
     }
     const updated = await updateProject(id, {
-      name: input.name,
-      nameAr: input.nameAr,
-      status: input.status,
+      name: entityPatch.name,
+      nameAr: entityPatch.nameAr,
+      status: entityPatch.status,
     });
     if (updated === undefined) {
       throw new ProjectNotFoundError(id);
@@ -478,7 +508,10 @@ export class AccountingController {
         after: { status: updated.status },
       });
     }
-    return envelope(updated);
+    if (validated !== undefined) {
+      await persistValues("projects", updated.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("projects", updated));
   }
 
   // -- numbering audit view + reconciliation ----------------------------------------

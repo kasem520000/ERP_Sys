@@ -8,17 +8,24 @@
  * creator-≠-approver SoD (BR-034) and threshold routing (BR-010) — both
  * enforced server-side.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { JSX } from "react";
 
 import { Button, DataTable, DatePicker, Input, Select } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { ItemRow, PartnerRow, PurchaseOrderRow, PurchaseRequestRow } from "../lib/api-types";
+import type {
+  CustomFieldDefinitionRow,
+  ItemRow,
+  PartnerRow,
+  PurchaseOrderRow,
+  PurchaseRequestRow,
+} from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedName, localizedPurchasingError, purchasingStatusLabel } from "../lib/messages";
 import { Card } from "./card";
+import { CustomFieldSurface } from "./custom-field-surface";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
 
@@ -64,6 +71,29 @@ export function PurchasingOrders({
   const [expectedDate, setExpectedDate] = useState("");
   const [neededBy, setNeededBy] = useState("");
   const [lines, setLines] = useState<DraftLine[]>([{ itemId: "", qty: "", unitPrice: "" }]);
+
+  // WEB-036 (PHASE-036): the purchase-order custom-field surface (session
+  // route; silent on failure) — rides the ORDER create form only (purchase
+  // requests are not a registered custom-field entity); the epoch remounts a
+  // fresh surface after each successful create.
+  const [fieldDefinitions, setFieldDefinitions] = useState<readonly CustomFieldDefinitionRow[]>([]);
+  const [customPayload, setCustomPayload] = useState<Record<string, unknown> | null>(null);
+  const [surfaceEpoch, setSurfaceEpoch] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async (): Promise<void> => {
+      const surface = await bffFetch<readonly CustomFieldDefinitionRow[]>(
+        "configuration/custom-fields/surface?entityType=purchase_orders",
+      );
+      if (!cancelled && surface.ok) {
+        setFieldDefinitions(surface.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const supplierNameById = useMemo(() => {
     const map = new Map<string, string>();
@@ -135,6 +165,9 @@ export function PurchasingOrders({
           expectedDate: expectedDate === "" ? null : expectedDate,
           currencyCode: "SAR",
           lines: lines.map((l) => ({ itemId: l.itemId, qty: l.qty, unitPrice: l.unitPrice })),
+          ...(customPayload !== null && Object.keys(customPayload).length > 0
+            ? { customFields: customPayload }
+            : {}),
         },
       }),
     );
@@ -142,6 +175,8 @@ export function PurchasingOrders({
       setNotice(d.purchasingNoticeCreated);
       setOrders((rows) => [created, ...rows]);
       setLines([{ itemId: "", qty: "", unitPrice: "" }]);
+      setCustomPayload(null);
+      setSurfaceEpoch((epoch) => epoch + 1);
     }
   }
 
@@ -252,6 +287,18 @@ export function PurchasingOrders({
               {d.purchasingAddLine}
             </Button>
           </div>
+          {mode === "order" && (
+            <div className="mt-4">
+              <CustomFieldSurface
+                key={surfaceEpoch}
+                locale={locale}
+                entityType="purchase_orders"
+                definitions={fieldDefinitions}
+                values={{}}
+                onChange={setCustomPayload}
+              />
+            </div>
+          )}
           <div className="mt-4">
             <Button
               disabled={busy !== null}

@@ -1,33 +1,46 @@
 # Current State
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-035 — activation & truth restoration delivered)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-036 — extensibility core delivered)
 
 What actually exists in this repository right now. Paired with
 [../planning/IMPLEMENTATION_STATUS.md](../planning/IMPLEMENTATION_STATUS.md) (phase
 table) and [NEXT_ACTION.md](NEXT_ACTION.md).
 
-> **PHASE-035 (2026-11-10) — Activation & Truth Restoration — COMPLETE** (Blueprint v3.0's
-> entry phase): the three activation screens `/inventory/batches` · `/inventory/serials` ·
-> `/inventory/adjustments` (read-only) + `reports.consolidated` as a core NAV_ITEMS entry
-> (i18n 4,290=4,290); migration `0048` (DATA-ONLY: items.import_export →
-> business+enterprise; schema_version 48; permissions 245=245); `tax.e-invoicing-log`
-> (registry 85 → 86; REPORT_CATALOG 86/86); DR-035-01/02/03; the truth sweep + the
-> recorded pre-existing gate repairs. Next: PHASE-036 — evidence:
-> [../implementation/phases/reports/PHASE-035-COMPLETION.md](../implementation/phases/reports/PHASE-035-COMPLETION.md).
+> **PHASE-036 (2026-11-10) — Extensibility Core — Custom Fields — COMPLETE** (Blueprint
+> v3.0 wave 1 / CR-06 — the audit's single most important functional gap, FD-18/FD-19/
+> FD-20): migration `0049` — five RLS'd tables (custom_field_definitions + the TYPED
+> value store custom_field_values with the num_nonnulls=1 law + the picklist pair +
+> form_layouts with the two partial uniques); the code-owned entity registry
+> (ADR-0019's additive rule) over the six first-wave entities (partners, items, sales
+> invoices, purchase orders, employees, projects); the ONE reusable value guard
+> injected into all six entities' create/update/read paths (validate-before-insert,
+> typed 400 packs, full-replace); the `/settings/custom-fields` manager (definitions +
+> picklist editor + form designer with role overrides, BR-059) + the shared
+> CustomFieldSurface on the six forms + dynamic partner-list columns; BR-057/058/059;
+> permissions 245 → 248 (the three §3.8 keys); platform.custom_fields →
+> business+enterprise (starter excluded); sync feeds carry the additive
+> `customFields` payload on items/partners/sales_invoices pulls; i18n 4,447=4,447
+> (+157); ENTITY_CATALOG 198 → 203 domain rows; isolation registry +5 (A-suite +30);
+> two recorded 034-tree gate repairs (the reporting boot rule's missing
+> consolidation.reports.view; the 0041 consolidation account/purpose pins) + one
+> environmental item (report-hammer, this hardware's 15s concurrent-lane budget).
+> Next: PHASE-037 — evidence:
+> [../implementation/phases/reports/PHASE-036-COMPLETION.md](../implementation/phases/reports/PHASE-036-COMPLETION.md).
 
 ## Repository contents
 
 - **Documentation blueprint v2.0 — COMPLETE** (v1.1 consolidated baseline + platform depth
   & breadth expansion per [../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md)): 265
   Markdown documents under `docs/` covering vision, product
-  requirements, scope, glossary (EN↔AR), architecture (system overview, 18 ADRs,
+  requirements, scope, glossary (EN↔AR), architecture (system overview, 19 ADRs (ADR-0019 — the custom-fields typed value store at 036),
   module boundaries, dependency rules, data flows, security, multi-tenancy, deployment,
   observability), planning (34-phase roadmap, dependency graph, acceptance criteria,
   status, release strategy, risk register), database (conventions, entity catalog, data
   dictionary, relationships, constraints/indexes, tenant isolation, migration strategy,
   backup/recovery, ERDs, table specs, seeds), product (personas, journeys, workflows,
-  BR-001…056 business rules, industry/feature catalogs — 22 modules, 172 feature keys
-  (131 v1.1 + 38 v2.0) — subscriptions & entitlements,
+  BR-001…059 business rules (the 036 extensibility trio BR-057/058/059),
+  industry/feature catalogs — 22 modules, 173 feature keys (131 v1.1 + 38 v2.0 +
+  platform.custom_fields at 036) — subscriptions & entitlements,
   configuration engine), accounting (principles, bilingual CoA, posting engine,
   document lifecycle, journal rules with golden postings G-01…G-32, AR/AP, inventory
   accounting, period closing,
@@ -715,9 +728,11 @@ table) and [NEXT_ACTION.md](NEXT_ACTION.md).
   incl. the FEFO dispensing pick and the G-26 dishonor restoring the claim
   exactly; the zero-clinical-surface CI gate — no clinical field, key, or
   screen exists anywhere in the shell)
-  (migrations 0001–0048 — schema_version 48; CURRENT_SHIPPED_PHASE
-  PHASE-035; 13 shipped industry templates; report registry 86 contracts;
-  permissions 245=245; web i18n 4,290=4,290; the centralized posting engine with the full
+  (migrations 0001–0049 — schema_version 49; CURRENT_SHIPPED_PHASE
+  PHASE-036; 13 shipped industry templates; report registry 86 contracts;
+  permissions 248=248; web i18n 4,447=4,447; five custom-field tables with
+  the ADR-0019 typed value store + the six-entity reusable value guard; the
+  centralized posting engine with the full
   invariant suite is live and proven by its consumers — treasury posts every
   money movement through it, tax stamps every tax-carrying line with frozen
   rate snapshots BR-033, inventory posts every stock movement through it

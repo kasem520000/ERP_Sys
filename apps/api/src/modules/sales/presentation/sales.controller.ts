@@ -15,6 +15,13 @@ import { SalesReallocationService } from "../application/reallocations";
 import { ArQueriesService } from "../application/ar-queries";
 import { SalesRepService, InvoiceOverdueService } from "../application/reps";
 import { creditCheckPreview } from "../application/credit-limits";
+import {
+  attachValues,
+  customFieldsPayloadSchema,
+  mergeValuesInto,
+  persistValues,
+  validateValues,
+} from "../../configuration/api";
 
 /**
  * Sales routes (PHASE-012 §4; matrix §3.2): every route is
@@ -161,6 +168,10 @@ const createInvoiceSchema = z.object({
   note: z.string().min(1).max(500).nullable().optional(),
   noteAr: z.string().min(1).max(500).nullable().optional(),
   lines: z.array(invoiceLineSchema).min(1).max(200),
+  // PHASE-036 (ADR-0019): typed custom-field values validate BEFORE the
+  // DRAFT insert (zero partial writes) and persist in the same ambient
+  // UoW; documents are post-only — no PATCH surface, values ride create.
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const creditLineSchema = z.object({
@@ -524,67 +535,77 @@ export class SalesController {
 
   @Get("sales-invoices")
   @RequirePermissions("sales.invoices.view")
-  listInvoices(
+  async listInvoices(
     @Query("status") status?: string,
     @Query("customerId") customerId?: string,
     @Query("orderId") orderId?: string,
     @Query("kind") kind?: string,
     @Query("limit") limit?: string,
   ) {
-    return envelope(
-      this.invoices.list({
-        status,
-        customerId,
-        orderId,
-        kind,
-        limit: z.coerce.number().int().min(1).max(500).parse(limit ?? 100),
-      }),
-    );
+    // PHASE-036: the batched custom-fields read merge.
+    const rows = await this.invoices.list({
+      status,
+      customerId,
+      orderId,
+      kind,
+      limit: z.coerce.number().int().min(1).max(500).parse(limit ?? 100),
+    });
+    return envelope(await mergeValuesInto("sales_invoices", rows));
   }
 
   @Get("sales-invoices/:id")
   @RequirePermissions("sales.invoices.view")
-  getInvoice(@Param("id") id: string) {
-    return envelope(this.invoices.findWithLines(id));
+  async getInvoice(@Param("id") id: string) {
+    return envelope(
+      await attachValues("sales_invoices", await this.invoices.findWithLines(id)),
+    );
   }
 
   @Post("sales-invoices")
   @HttpCode(HttpStatus.CREATED)
   @RequirePermissions("sales.invoices.create")
-  createInvoice(@Req() request: Request, @Body() body: unknown) {
+  async createInvoice(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = createInvoiceSchema.parse(body);
-    return envelope(
-      this.invoices.create({
-        ...input,
-        salesRepId: input.salesRepId ?? null,
-        dueDate: input.dueDate ?? null,
-        exchangeRate: input.exchangeRate ?? null,
-        orderId: input.orderId ?? null,
-        deliveryId: input.deliveryId ?? null,
-        warehouseId: input.warehouseId ?? null,
-        cashAccountId: input.cashAccountId ?? null,
-        insured: input.insured ?? false,
-        claimRef: input.claimRef ?? null,
-        note: input.note ?? null,
-        noteAr: input.noteAr ?? null,
-        actorId: identity.userId,
-        lines: input.lines.map((line) => ({
-          itemId: line.itemId ?? null,
-          accountId: line.accountId ?? null,
-          deliveryLineId: line.deliveryLineId ?? null,
-          description: line.description ?? null,
-          descriptionAr: line.descriptionAr ?? null,
-          qty: line.qty,
-          unitPrice: line.unitPrice,
-          discountAmount: line.discountAmount ?? null,
-          taxCodeId: line.taxCodeId ?? null,
-          batchId: line.batchId ?? null,
-          serialIds: line.serialIds ?? null,
-          note: line.note ?? null,
-        })),
-      }),
-    );
+    // PHASE-036 (ADR-0019): validate custom-field values BEFORE the insert
+    // (zero partial writes); persistence + read merge ride the ambient UoW.
+    const validated =
+      input.customFields === undefined
+        ? undefined
+        : await validateValues("sales_invoices", input.customFields);
+    const row = await this.invoices.create({
+      ...input,
+      salesRepId: input.salesRepId ?? null,
+      dueDate: input.dueDate ?? null,
+      exchangeRate: input.exchangeRate ?? null,
+      orderId: input.orderId ?? null,
+      deliveryId: input.deliveryId ?? null,
+      warehouseId: input.warehouseId ?? null,
+      cashAccountId: input.cashAccountId ?? null,
+      insured: input.insured ?? false,
+      claimRef: input.claimRef ?? null,
+      note: input.note ?? null,
+      noteAr: input.noteAr ?? null,
+      actorId: identity.userId,
+      lines: input.lines.map((line) => ({
+        itemId: line.itemId ?? null,
+        accountId: line.accountId ?? null,
+        deliveryLineId: line.deliveryLineId ?? null,
+        description: line.description ?? null,
+        descriptionAr: line.descriptionAr ?? null,
+        qty: line.qty,
+        unitPrice: line.unitPrice,
+        discountAmount: line.discountAmount ?? null,
+        taxCodeId: line.taxCodeId ?? null,
+        batchId: line.batchId ?? null,
+        serialIds: line.serialIds ?? null,
+        note: line.note ?? null,
+      })),
+    });
+    if (validated !== undefined) {
+      await persistValues("sales_invoices", row.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("sales_invoices", row));
   }
 
   @Post("sales-invoices/:id/submit")

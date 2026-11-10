@@ -2128,6 +2128,120 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "configuration.templates.apply",
   },
 
+  // PHASE-036 (Blueprint v3.0 · CR-06; ADR-0019; matrix §3.8): the
+  // extensibility core — the definitions manager, the picklist editor
+  // (FD-20), the form-layout designer (FD-19), and the entity-values read.
+  // All carry @RequireFeature(platform.custom_fields — migration 0049's
+  // business+enterprise grant). The render surface (definitions with
+  // inlined options for the six first-wave entity forms) and the entity
+  // registry are session routes (SESSION_ROUTES below); entity value
+  // WRITES ride the owning entity's own routes/permissions.
+  {
+    method: "GET",
+    path: "/api/v1/configuration/custom-fields/definitions",
+    permission: "configuration.custom_fields.read",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/definitions",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/configuration/custom-fields/definitions/:id",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/definitions/:id/archive",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/definitions/:id/restore",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/configuration/custom-fields/picklists",
+    permission: "configuration.custom_fields.read",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/configuration/custom-fields/picklists/:id",
+    permission: "configuration.custom_fields.read",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklists",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/configuration/custom-fields/picklists/:id",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklists/:id/archive",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklists/:id/restore",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklists/:id/options",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/configuration/custom-fields/picklist-options/:optionId",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklist-options/:optionId/archive",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklist-options/:optionId/restore",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/configuration/custom-fields/picklists/:id/options/reorder",
+    permission: "configuration.custom_fields.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/configuration/form-layouts",
+    permission: "configuration.custom_fields.read",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/configuration/form-layouts/:entityType",
+    permission: "configuration.form_layouts.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/configuration/form-layouts/:entityType/roles/:roleKey",
+    permission: "configuration.form_layouts.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/configuration/form-layouts/:entityType/roles/:roleKey",
+    permission: "configuration.form_layouts.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/configuration/custom-fields/values/:entityType/:entityId",
+    permission: "configuration.custom_fields.read",
+  },
+
   // PHASE-017 (matrix §3.2/§3.8): the automotive job-card workspace
   // (sales.job_cards.* family — the manage key covers the card lifecycle;
   // posting runs through the sales invoice chain's own keys).
@@ -2856,6 +2970,13 @@ export const SESSION_ROUTES: readonly { method: string; path: string }[] = [
   { method: "GET", path: "/api/v1/configuration/templates" },
   { method: "GET", path: "/api/v1/configuration/templates/activity-map" },
   { method: "GET", path: "/api/v1/configuration/templates/:key" },
+  // PHASE-036 (BR-039 derived-only pattern): the custom-fields render
+  // surface — ACTIVE definitions + inlined ACTIVE picklist options for the
+  // six first-wave entity forms — and the code-owned entity registry
+  // (ADR-0019). Every tenant member renders entity forms; RLS scopes the
+  // rows; a starter tenant simply sees zero definitions.
+  { method: "GET", path: "/api/v1/configuration/custom-fields/surface" },
+  { method: "GET", path: "/api/v1/configuration/custom-fields/entities" },
   // PHASE-014: the notifications self plane (inbox + preferences; every
   // authenticated user manages their own — matrix carries no key).
   { method: "GET", path: "/api/v1/notifications" },

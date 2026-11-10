@@ -448,6 +448,8 @@ export interface PartnerRow {
   createdAt: string;
   updatedAt: string;
   version: number;
+  /** WEB-036 (PHASE-036): the tenant's custom-field values on get/list rows. */
+  customFields?: Record<string, CustomFieldValueView>;
 }
 
 export interface CreditTermsRow {
@@ -533,6 +535,8 @@ export interface ItemRow {
   createdAt: string;
   updatedAt: string;
   version: number;
+  /** WEB-036 (PHASE-036): the tenant's custom-field values on get/list rows. */
+  customFields?: Record<string, CustomFieldValueView>;
 }
 
 export interface UomRow {
@@ -1232,6 +1236,107 @@ export interface VatReturnExportResult {
   rowCount: number;
   format: "CSV" | "XLSX";
   expiresInSeconds: number;
+}
+
+// -- WEB-036 (PHASE-036): custom fields extensibility core ----------------------
+// Row shapes mirror apps/api/src/modules/configuration (custom-fields-schema.ts
+// + custom-field-service.ts / picklist-service.ts / form-layout-service.ts).
+
+export type CustomFieldDataType =
+  | "TEXT"
+  | "NUMBER"
+  | "DATE"
+  | "BOOLEAN"
+  | "SELECT"
+  | "MULTISELECT"
+  | "REFERENCE";
+
+/** Per-type definition config (SELECT/MULTISELECT → picklistId, REFERENCE →
+ *  referenceEntity, NUMBER → precision 0–6). */
+export interface CustomFieldConfig {
+  picklistId?: string;
+  referenceEntity?: string;
+  precision?: number;
+}
+
+/** GET /configuration/custom-fields/surface + /definitions rows. `options` is
+ *  inlined only on the surface payload (SELECT/MULTISELECT bindings). */
+export interface CustomFieldDefinitionRow {
+  id: string;
+  entityType: string;
+  key: string;
+  label: string;
+  labelAr: string;
+  dataType: CustomFieldDataType;
+  config: CustomFieldConfig;
+  required: boolean;
+  validationRegex: string | null;
+  minValue: number | null;
+  maxValue: number | null;
+  minLength: number | null;
+  maxLength: number | null;
+  status: "ACTIVE" | "ARCHIVED";
+  version: number;
+  options?: readonly CustomPicklistOptionRow[];
+}
+
+/** GET /configuration/custom-fields/picklists rows (optionCount = live count). */
+export interface CustomPicklistRow {
+  id: string;
+  key: string;
+  name: string;
+  nameAr: string;
+  status: "ACTIVE" | "ARCHIVED";
+  optionCount: number;
+  version: number;
+}
+
+/** Picklist option rows (nested in picklist detail + surface definitions). */
+export interface CustomPicklistOptionRow {
+  id: string;
+  picklistId: string;
+  label: string;
+  labelAr: string;
+  sortOrder: number;
+  status: "ACTIVE" | "ARCHIVED";
+}
+
+/** GET /configuration/custom-fields/entities rows (the code-owned ADR-0019
+ *  registry; nativeFields.mandatory rows are BR-059-protected). */
+export interface CustomFieldEntityInfo {
+  entityType: string;
+  label: string;
+  labelAr: string;
+  nativeFields: Array<{
+    key: string;
+    label: string;
+    labelAr: string;
+    mandatory: boolean;
+  }>;
+}
+
+/** GET /configuration/form-layouts?entityType= rows (roleKey null = default). */
+export interface FormLayoutRow {
+  id: string;
+  entityType: string;
+  roleKey: string | null;
+  name: string;
+  sections: Array<{
+    key: string;
+    label: string;
+    labelAr: string;
+    collapsed: boolean;
+    columns: number;
+    fields: Array<{ key: string; custom: boolean }>;
+  }>;
+  version: number;
+}
+
+/** The customFields map merged into the six entity APIs' get/list rows. */
+export interface CustomFieldValueView {
+  value: unknown;
+  optionLabel?: string;
+  optionLabelAr?: string;
 }
 
 // -- T14-UI (PHASE-010): inventory & warehousing --------------------------------
@@ -4304,6 +4409,8 @@ export interface EmployeeListRow {
   note: string | null;
   noteAr: string | null;
   createdAt: string;
+  /** WEB-036 (PHASE-036): the tenant's custom-field values on get/list rows. */
+  customFields?: Record<string, CustomFieldValueView>;
 }
 
 /** POST /payroll/employees body + PUT /payroll/employees/:id (partial). */

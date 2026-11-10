@@ -2208,6 +2208,54 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-036 (Blueprint v3.0 · CR-06): the custom-fields cluster — one
+  // picklist + option + TEXT definition + typed value (on the partner
+  // fixture) + default form layout per tenant. The value row's FK follows
+  // the owning tenant's definition; the layout seeds the entity DEFAULT
+  // (role_key NULL — the partial unique allows one per tenant).
+  await superuser.query(
+    `INSERT INTO custom_picklists (id, tenant_id, key, name, name_ar)
+     VALUES
+       ('b3603636-0000-4000-8000-000000000001', $1, 'iso_list', 'Isolation list', 'قائمة العزل'),
+       ('b3603636-0000-4000-8000-000000000002', $2, 'iso_list', 'Isolation list', 'قائمة العزل')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO custom_picklist_options (id, tenant_id, picklist_id, label, label_ar, sort_order)
+     VALUES
+       ('c3603636-0000-4000-8000-000000000001', $1, 'b3603636-0000-4000-8000-000000000001', 'Option', 'خيار', 1),
+       ('c3603636-0000-4000-8000-000000000002', $2, 'b3603636-0000-4000-8000-000000000002', 'Option', 'خيار', 1)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO custom_field_definitions (id, tenant_id, entity_type, key, label, label_ar, data_type)
+     VALUES
+       ('a3603636-0000-4000-8000-000000000001', $1, 'partners', 'iso_field', 'Isolation field', 'حقل العزل', 'TEXT'),
+       ('a3603636-0000-4000-8000-000000000002', $2, 'partners', 'iso_field', 'Isolation field', 'حقل العزل', 'TEXT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO custom_field_values (id, tenant_id, entity_type, entity_id, field_id, value_text)
+     VALUES
+       ('d3603636-0000-4000-8000-000000000001', $1, 'partners', 'b5b5b5b5-0000-4000-8000-000000000001',
+        'a3603636-0000-4000-8000-000000000001', 'iso'),
+       ('d3603636-0000-4000-8000-000000000002', $2, 'partners', 'b5b5b5b5-0000-4000-8000-000000000002',
+        'a3603636-0000-4000-8000-000000000002', 'iso')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO form_layouts (id, tenant_id, entity_type, role_key, name, sections)
+     VALUES
+       ('e3603636-0000-4000-8000-000000000001', $1, 'partners', NULL, 'Isolation layout', '[]'::jsonb),
+       ('e3603636-0000-4000-8000-000000000002', $2, 'partners', NULL, 'Isolation layout', '[]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -2648,6 +2696,11 @@ const OWN_ROW: Record<string, [string, string]> = {
   group_entities: ["b0410411-0000-4000-8000-000000000001", "b0410411-0000-4000-8000-000000000002"],
   elimination_entries: ["c0410411-0000-4000-8000-000000000001", "c0410411-0000-4000-8000-000000000002"],
   consolidation_runs: ["d0410411-0000-4000-8000-000000000001", "d0410411-0000-4000-8000-000000000002"],
+  custom_picklists: ["b3603636-0000-4000-8000-000000000001", "b3603636-0000-4000-8000-000000000002"],
+  custom_picklist_options: ["c3603636-0000-4000-8000-000000000001", "c3603636-0000-4000-8000-000000000002"],
+  custom_field_definitions: ["a3603636-0000-4000-8000-000000000001", "a3603636-0000-4000-8000-000000000002"],
+  custom_field_values: ["d3603636-0000-4000-8000-000000000001", "d3603636-0000-4000-8000-000000000002"],
+  form_layouts: ["e3603636-0000-4000-8000-000000000001", "e3603636-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3283,6 +3336,23 @@ const MISMATCHED_INSERT: Record<string, string> = {
   consolidation_runs: `INSERT INTO consolidation_runs (id, tenant_id, group_id, fiscal_period_id, status)
      VALUES ('d0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
        'c2c2c2c2-0000-4000-8000-000000000002', 'QUEUED')`,
+  // PHASE-036 (0049): the custom-fields cluster — FK targets are tenant B's
+  // own fixtures so the composite tenant FKs stay satisfied and the RLS
+  // WITH CHECK is the isolated rejection (the consolidation pattern). The
+  // layout attack uses a role override (the entity DEFAULT partial unique
+  // is taken by tenant B's seeded row).
+  custom_picklists: `INSERT INTO custom_picklists (id, tenant_id, key, name, name_ar)
+     VALUES ('b3603636-3000-4000-8000-000000000003', $1, 'atk_list', 'Attack list', 'قائمة الهجوم')`,
+  custom_picklist_options: `INSERT INTO custom_picklist_options (id, tenant_id, picklist_id, label, label_ar, sort_order)
+     VALUES ('c3603636-3000-4000-8000-000000000003', $1, 'b3603636-0000-4000-8000-000000000002',
+       'Attack option', 'خيار الهجوم', 2)`,
+  custom_field_definitions: `INSERT INTO custom_field_definitions (id, tenant_id, entity_type, key, label, label_ar, data_type)
+     VALUES ('a3603636-3000-4000-8000-000000000003', $1, 'partners', 'atk_field', 'Attack field', 'حقل الهجوم', 'TEXT')`,
+  custom_field_values: `INSERT INTO custom_field_values (id, tenant_id, entity_type, entity_id, field_id, value_text)
+     VALUES ('d3603636-3000-4000-8000-000000000003', $1, 'partners', 'b5b5b5b5-0000-4000-8000-000000000002',
+       'a3603636-0000-4000-8000-000000000002', 'atk')`,
+  form_layouts: `INSERT INTO form_layouts (id, tenant_id, entity_type, role_key, name, sections)
+     VALUES ('e3603636-3000-4000-8000-000000000003', $1, 'partners', 'sales', 'Attack layout', '[]'::jsonb)`,
 };
 
 beforeAll(async () => {

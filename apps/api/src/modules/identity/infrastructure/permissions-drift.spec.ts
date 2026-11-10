@@ -28,6 +28,7 @@ const SEED_PATHS = [
   join(process.cwd(), "migrations", "0027_crm_projects.sql"), // PHASE-019 crm/projects family
   join(process.cwd(), "migrations", "0029_sync_foundation.sql"), // PHASE-020 sync-plane re-assertions
   join(process.cwd(), "migrations", "0035_external_integrations.sql"), // PHASE-023 commerce channel gate
+  join(process.cwd(), "migrations", "0049_custom_fields.sql"), // PHASE-036 extensibility core (245 → 248)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

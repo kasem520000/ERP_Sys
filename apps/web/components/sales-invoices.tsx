@@ -8,7 +8,7 @@
  * sales.credit_check.override server-side) → post (G-01/G-02 + G-03 when
  * with-goods). Print stays honestly disabled until PHASE-013 (§7).
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { JSX } from "react";
 
@@ -19,6 +19,7 @@ import type {
   AccountRow,
   BranchRow,
   CashAccountRow,
+  CustomFieldDefinitionRow,
   ItemRow,
   PartnerRow,
   SalesInvoiceRow,
@@ -27,6 +28,7 @@ import type {
 import { bffFetch } from "../lib/client-api";
 import { localizedName, localizedSalesError, salesStatusLabel } from "../lib/messages";
 import { Card } from "./card";
+import { CustomFieldSurface } from "./custom-field-surface";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
 
@@ -128,6 +130,28 @@ export function SalesInvoices({
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
 
+  // WEB-036 (PHASE-036): the sales-invoice custom-field surface (session
+  // route; silent on failure) — rides the create form; the epoch remounts a
+  // fresh surface after each successful create (inputs clear with the lines).
+  const [fieldDefinitions, setFieldDefinitions] = useState<readonly CustomFieldDefinitionRow[]>([]);
+  const [customPayload, setCustomPayload] = useState<Record<string, unknown> | null>(null);
+  const [surfaceEpoch, setSurfaceEpoch] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async (): Promise<void> => {
+      const surface = await bffFetch<readonly CustomFieldDefinitionRow[]>(
+        "configuration/custom-fields/surface?entityType=sales_invoices",
+      );
+      if (!cancelled && surface.ok) {
+        setFieldDefinitions(surface.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const customerNameById = useMemo(() => {
     const map = new Map<string, string>();
     for (const customer of customers) {
@@ -215,6 +239,9 @@ export function SalesInvoices({
             discountAmount: l.discount === "" ? null : l.discount,
             taxCodeId: l.taxCodeId === "" ? null : l.taxCodeId,
           })),
+          ...(customPayload !== null && Object.keys(customPayload).length > 0
+            ? { customFields: customPayload }
+            : {}),
         },
       }),
     );
@@ -222,6 +249,8 @@ export function SalesInvoices({
       setInvoices((rows) => [created, ...rows]);
       setNotice(d.salesNoticeCreated);
       setLines([{ ...EMPTY_LINE }]);
+      setCustomPayload(null);
+      setSurfaceEpoch((epoch) => epoch + 1);
     }
   }
 
@@ -434,6 +463,16 @@ export function SalesInvoices({
             <Button variant="secondary" onClick={() => setLines((rows) => [...rows, { ...EMPTY_LINE }])}>
               {d.salesAddLine}
             </Button>
+          </div>
+          <div className="mt-4">
+            <CustomFieldSurface
+              key={surfaceEpoch}
+              locale={locale}
+              entityType="sales_invoices"
+              definitions={fieldDefinitions}
+              values={{}}
+              onChange={setCustomPayload}
+            />
           </div>
           <div className="mt-4">
             <Button disabled={busy !== null} onClick={() => void create()}>

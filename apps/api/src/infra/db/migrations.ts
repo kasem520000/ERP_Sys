@@ -221,6 +221,17 @@ export const MIGRATIONS: readonly string[] = [
   // place); zero new tables/columns/enums/journals/permission keys (INV-022;
   // drift stays 245=245); idempotent array_cat guard.
   "0048_items_import_export_grant",
+  // PHASE-036 (Blueprint v3.0 · CR-06): 0049_custom_fields — the
+  // extensibility core per ADR-0019 / FD-18/FD-19/FD-20 + DF-39: five
+  // RLS'd tenant tables (custom_field_definitions + the TYPED value store
+  // custom_field_values with the num_nonnulls one-typed-column law +
+  // custom_picklists/custom_picklist_options with archive-preserving
+  // history + form_layouts with the two partial uniques for default/role
+  // layouts), the three §3.8 permission seeds (drift 245 → 248) + the
+  // accountant read grant, and the platform.custom_fields plan grant
+  // (business + enterprise — the tier-4 precedent; starter excluded).
+  // NOT ledger documents — zero journal rules by construction.
+  "0049_custom_fields",
 ];
 
 /**

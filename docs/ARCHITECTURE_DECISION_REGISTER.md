@@ -1,9 +1,9 @@
 # ARCHITECTURE_DECISION_REGISTER — Master Decision Register
 
-> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-10-28
+> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-11-10 (AD-19 / ADR-0019)
 > **Authority:** One-line index + durable record for every major decision. Full ADRs
 > remain the normative record for architecture decisions
-> ([architecture/ARCHITECTURE_DECISIONS.md](architecture/ARCHITECTURE_DECISIONS.md), ADR-0001…ADR-0018);
+> ([architecture/ARCHITECTURE_DECISIONS.md](architecture/ARCHITECTURE_DECISIONS.md), ADR-0001…ADR-0019);
 > product/compliance commitments live in [decisions/](decisions/) (DR-xxx). This register
 > cross-indexes all of them and adds the consolidation decisions (CD-xxx) that do not
 > warrant standalone ADRs but must never be silently re-litigated.
@@ -30,6 +30,7 @@
 | AD-16 | Tailwind v4 + Radix + custom RTL-first design system | [ADR-0016](architecture/ADR/ADR-0016-ui-tailwind-radix.md) | — | — |
 | AD-17 | **No event sourcing** — relational journal + append-only audit | [ADR-0017](architecture/ADR/ADR-0017-no-event-sourcing.md) (adopted from Folder 4 during consolidation) | One source of financial truth; audit via triggers + events | Regulatory demand for event-log chaining |
 | AD-18 | **Multi-entity consolidation** — legal entity = tenant; read-only member aggregation via one audited platform-plane reader; eliminations posted by the engine into the parent's consolidation books; zero cross-tenant writes (Blueprint v2.0) | [ADR-0018](architecture/ADR/ADR-0018-multi-entity-consolidation.md) (policy: [decisions/accounting/DR-006](decisions/accounting/DR-006-consolidation.md)) | Member RLS never relaxed; consolidated statements are derived artifacts; eliminations are real journals (INV-006/013/026) | Group calendar misalignment; mandated statutory translation method; intercompany document automation request |
+| AD-19 | **Custom fields: typed value store + code-owned entity registry** — `custom_field_values` with five typed columns pinned by the `num_nonnulls=1` row law (BR-057) over a jsonb blob; `CUSTOM_FIELD_ENTITIES` as code (no DB entity CHECK) so 042+ phases register entities in the same PR with zero migrations; polymorphic `(entity_type, entity_id)` with no DB FK (registry validates writes, orphan-sweep reconciles); one reusable value guard on the configuration module's `api/` surface; the DF-39 plugin substrate without the DF-38 marketplace (Blueprint v3.0) | [ADR-0019](architecture/ADR/ADR-0019-custom-fields-typed-value-store.md) (canonical spec: [implementation/phases/PHASE-036.md](implementation/phases/PHASE-036.md), CR-06) | RLS on all five 0049 tables (isolation registry +5); values ride the owning entity's permission; a UDF value never posts (INV-022); archive preserves history | Field scripting/logic requests; workflow conditions (052) / report dimensions (057) / public-API exposure (055) — consuming phases own them; DF-38 revival |
 
 ## 2. Consolidation decisions (2026-10-28) — new rationale recorded during this pass
 

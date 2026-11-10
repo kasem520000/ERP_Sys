@@ -20,6 +20,7 @@ import { RequirePermissions } from "../../../infra/auth/require-permissions.deco
 import { UnauthenticatedError } from "../../identity/api/identity";
 import { AttachmentsService } from "../../files/api/files";
 import { AuditService } from "../../audit/api/audit";
+import { customFieldsPayloadSchema, attachValues, mergeValuesInto, persistValues, validateValues } from "../../configuration/api";
 import { PartnerService } from "../application/partner-service";
 import { CreditTermsService } from "../application/credit-terms-service";
 import { CreditCheckService } from "../application/credit-check-service";
@@ -51,6 +52,9 @@ const partnerCreateSchema = z.object({
   creditLimit: z.string().regex(/^-?\d{1,16}(\.\d{1,4})?$/, "decimal string").nullish(),
   creditTermsId: z.string().uuid().nullish(),
   priceListId: z.string().uuid().nullish(),
+  // PHASE-036 (ADR-0019): typed custom-field values validate BEFORE the
+  // insert (zero partial writes) and persist inside the same ambient UoW.
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const partnerPatchSchema = z.object({
@@ -66,6 +70,9 @@ const partnerPatchSchema = z.object({
   customerTierId: z.string().uuid().nullish(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   version: z.number().int().positive().optional(),
+  // PHASE-036 (ADR-0019): full-replace custom-field payload (absent keys
+  // clear; `undefined` never touches the store).
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const kindChangeSchema = z.object({ kind: z.enum(["CUSTOMER", "SUPPLIER", "BOTH"]) });
@@ -164,7 +171,11 @@ export class PartnersController {
       cursor,
       LIMIT.parse(limit ?? undefined),
     );
-    return paginatedEnvelope(page.rows, {
+    // PHASE-036: the batched custom-fields read merge (one values query +
+    // one option-label query for the whole page; the no-definitions fast
+    // path adds zero queries on UDF-free tenants).
+    const rows = await mergeValuesInto("partners", page.rows);
+    return paginatedEnvelope(rows, {
       limit: page.rows.length,
       hasMore: page.hasMore,
       nextCursor: page.nextCursor ?? undefined,
@@ -177,24 +188,33 @@ export class PartnersController {
   async create(@Req() request: Request, @Body() body: unknown): Promise<unknown> {
     const identity = requireIdentity(request);
     const input = partnerCreateSchema.parse(body);
-    return envelope(
-      await this.partners.create(identity.userId, {
-        kind: input.kind,
-        code: input.code,
-        name: input.name,
-        nameAr: input.nameAr ?? null,
-        taxNumber: input.taxNumber ?? null,
-        creditLimit: input.creditLimit ?? null,
-        creditTermsId: input.creditTermsId ?? null,
-        priceListId: input.priceListId ?? null,
-      }),
-    );
+    // PHASE-036 (ADR-0019): validate custom-field values BEFORE the insert
+    // so every failure path leaves zero partial writes (the 031 discipline);
+    // persistence + the read merge ride the same ambient tenant UoW.
+    const validated =
+      input.customFields === undefined
+        ? undefined
+        : await validateValues("partners", input.customFields);
+    const row = await this.partners.create(identity.userId, {
+      kind: input.kind,
+      code: input.code,
+      name: input.name,
+      nameAr: input.nameAr ?? null,
+      taxNumber: input.taxNumber ?? null,
+      creditLimit: input.creditLimit ?? null,
+      creditTermsId: input.creditTermsId ?? null,
+      priceListId: input.priceListId ?? null,
+    });
+    if (validated !== undefined) {
+      await persistValues("partners", row.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("partners", row));
   }
 
   @Get("partners/:id")
   @RequirePermissions("partners.view")
   async get(@Param("id") id: string): Promise<unknown> {
-    return envelope(await this.partners.get(id));
+    return envelope(await attachValues("partners", await this.partners.get(id)));
   }
 
   @Patch("partners/:id")
@@ -202,7 +222,16 @@ export class PartnersController {
   async update(@Req() request: Request, @Param("id") id: string, @Body() body: unknown): Promise<unknown> {
     const identity = requireIdentity(request);
     const patch = partnerPatchSchema.parse(body);
-    return envelope(await this.partners.update(identity.userId, id, patch));
+    const { customFields: customFieldsInput, ...entityPatch } = patch;
+    const validated =
+      customFieldsInput === undefined
+        ? undefined
+        : await validateValues("partners", customFieldsInput);
+    const row = await this.partners.update(identity.userId, id, entityPatch);
+    if (validated !== undefined) {
+      await persistValues("partners", row.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("partners", row));
   }
 
   /** BR-025: kind change (only while no postings). */

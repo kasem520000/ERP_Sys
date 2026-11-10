@@ -6060,3 +6060,154 @@ export const employeeLoanLines = pgTable(
     index("ix_employee_loan_lines_tenant_loan").on(table.tenantId, table.loanId),
   ],
 );
+
+/** PHASE-036 T2 (FD-20): tenant-managed picklist value lists — the
+ * registry row; options live in customPicklistOptions. ACTIVE/ARCHIVED
+ * (archive-not-delete); key is the tenant-scoped natural key (BR-058
+ * syntax). */
+export const customPicklists = pgTable(
+  "custom_picklists",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    key: text("key").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar").notNull(),
+    status: text("status").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_custom_picklists_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_custom_picklists_tenant_key").on(table.tenantId, table.key),
+    index("ix_custom_picklists_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** PHASE-036 T2 (FD-20): the picklist options — AR/EN labels + tenant
+ * ordering; ACTIVE/ARCHIVED. Archived options are rejected for NEW values
+ * while historical ones keep rendering their labels (BR-057 history). */
+export const customPicklistOptions = pgTable(
+  "custom_picklist_options",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    picklistId: uuid("picklist_id").notNull(),
+    label: text("label").notNull(),
+    labelAr: text("label_ar").notNull(),
+    sortOrder: integer("sort_order").notNull(),
+    status: text("status").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_custom_picklist_options_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_custom_picklist_options_tenant_list_order").on(
+      table.tenantId,
+      table.picklistId,
+      table.sortOrder,
+    ),
+    index("ix_custom_picklist_options_tenant_list_status").on(
+      table.tenantId,
+      table.picklistId,
+      table.status,
+    ),
+  ],
+);
+
+/** PHASE-036 T2 (FD-18): the tenant-owned custom-field registry —
+ * entity_type from the CODE-OWNEN entity registry (ADR-0019: no DB CHECK
+ * pins the entity list; later phases register entities additively), key
+ * per the BR-058 namespace discipline, seven typed data_types, config
+ * jsonb (REFERENCE target / picklist binding / precision), the validation
+ * rule set, ACTIVE/ARCHIVED (archive preserves values). */
+export const customFieldDefinitions = pgTable(
+  "custom_field_definitions",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    entityType: text("entity_type").notNull(),
+    key: text("key").notNull(),
+    label: text("label").notNull(),
+    labelAr: text("label_ar").notNull(),
+    dataType: text("data_type").notNull(),
+    config: jsonb("config").notNull(),
+    required: boolean("required").notNull(),
+    validationRegex: text("validation_regex"),
+    minValue: numeric("min_value", { precision: 19, scale: 6 }),
+    maxValue: numeric("max_value", { precision: 19, scale: 6 }),
+    minLength: integer("min_length"),
+    maxLength: integer("max_length"),
+    status: text("status").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_custom_field_definitions_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_custom_field_definitions_tenant_entity_key").on(
+      table.tenantId,
+      table.entityType,
+      table.key,
+    ),
+    index("ix_custom_field_definitions_tenant_entity_status").on(
+      table.tenantId,
+      table.entityType,
+      table.status,
+    ),
+  ],
+);
+
+/** PHASE-036 T2 (FD-18, ADR-0019): the TYPED value store — one row per
+ * (entity, field); exactly one typed column non-null (the num_nonnulls
+ * law); polymorphic (entityType, entityId) validated by the code-owned
+ * registry (no DB FK by design; the orphan-sweep job reconciles). */
+export const customFieldValues = pgTable(
+  "custom_field_values",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    entityType: text("entity_type").notNull(),
+    entityId: uuid("entity_id").notNull(),
+    fieldId: uuid("field_id").notNull(),
+    valueText: text("value_text"),
+    valueNumber: numeric("value_number", { precision: 19, scale: 6 }),
+    valueDate: date("value_date"),
+    valueBoolean: boolean("value_boolean"),
+    valueJson: jsonb("value_json"),
+  },
+  (table) => [
+    uniqueIndex("uq_custom_field_values_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_custom_field_values_tenant_entity_field").on(
+      table.tenantId,
+      table.entityType,
+      table.entityId,
+      table.fieldId,
+    ),
+    index("ix_custom_field_values_tenant_entity_ids").on(
+      table.tenantId,
+      table.entityType,
+      table.entityId,
+    ),
+    index("ix_custom_field_values_tenant_field").on(table.tenantId, table.fieldId),
+  ],
+);
+
+/** PHASE-036 T2 (FD-19/UX-12): the per-entity form-layout designer store —
+ * sections jsonb (ordered native+custom field groups), roleKey NULL = the
+ * entity's DEFAULT layout (two partial uniques, the BR-050 precedent);
+ * BR-059 mandatory-native protection is service-guarded. */
+export const formLayouts = pgTable(
+  "form_layouts",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    entityType: text("entity_type").notNull(),
+    roleKey: text("role_key"),
+    name: text("name").notNull(),
+    sections: jsonb("sections").notNull(),
+    status: text("status").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_form_layouts_id_tenant").on(table.id, table.tenantId),
+    index("ix_form_layouts_tenant_entity").on(table.tenantId, table.entityType),
+  ],
+);

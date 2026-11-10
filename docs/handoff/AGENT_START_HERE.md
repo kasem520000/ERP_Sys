@@ -14,7 +14,8 @@ blueprint (**65-phase roadmap — v1.1 stages 1–8 + v2.0 stages 9–11 in
 [../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) + v3.0 stages 12–15 in
 [../planning/COMPLETENESS_REGISTER.md](../planning/COMPLETENESS_REGISTER.md)** —
 stages 1–34 are ALL COMPLETE; stages 12–15 (PHASE-035…065) are the
-Full-ERP completion program — PHASE-035 delivered 2026-11-10, 036…065
+Full-ERP completion program — PHASE-035 and PHASE-036 delivered 2026-11-10,
+037…065
 planned), and implementation happens strictly
 phase-by-phase. The Platform is a multi-tenant SaaS ERP for MENA/GCC — Arabic-first
 RTL, double-entry accounting with a centralized posting engine, PostgreSQL with

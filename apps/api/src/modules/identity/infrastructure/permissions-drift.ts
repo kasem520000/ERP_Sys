@@ -126,6 +126,10 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // PHASE-023 T8: 0035 seeds sales.commerce.manage (the commerce-channel
   // import gate — operator-plane, granted to platform ops roles only).
   "apps/api/migrations/0035_external_integrations.sql",
+  // PHASE-036 (Blueprint v3.0 · CR-06): 0049 seeds the three extensibility
+  // keys (configuration.custom_fields.read/.manage +
+  // configuration.form_layouts.manage — matrix §3.8; 245 → 248).
+  "apps/api/migrations/0049_custom_fields.sql",
 ];
 
 export async function main(): Promise<void> {

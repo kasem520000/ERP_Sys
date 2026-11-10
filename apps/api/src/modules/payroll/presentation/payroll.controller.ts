@@ -14,6 +14,13 @@ import { PayoutService } from "../application/payout-service";
 import { RunCalculationService } from "../application/run-calculation-service";
 import { RunPostingService } from "../application/run-posting-service";
 import { StructureService } from "../application/structure-service";
+import {
+  attachValues,
+  customFieldsPayloadSchema,
+  mergeValuesInto,
+  persistValues,
+  validateValues,
+} from "../../configuration/api";
 
 /**
  * Payroll routes (PHASE-029 §4; matrix §3.14): every route
@@ -76,9 +83,14 @@ const createEmployeeSchema = z.object({
   bankAccount: TEXT,
   note: TEXT,
   noteAr: TEXT,
+  // PHASE-036 (ADR-0019): typed custom-field values validate BEFORE the
+  // insert (zero partial writes) and persist inside the same ambient UoW.
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
-const updateEmployeeSchema = createEmployeeSchema.partial().omit({ code: true, hireDate: true });
+const updateEmployeeSchema = createEmployeeSchema
+  .partial()
+  .omit({ code: true, hireDate: true });
 
 const createStructureSchema = z.object({
   code: CODE,
@@ -185,9 +197,11 @@ export class PayrollController {
     const filter: { status?: "ACTIVE" | "SUSPENDED" | "TERMINATED"; branchId?: string } = {};
     if (status !== undefined && status !== "") filter.status = ENUM_STATUS.parse(status);
     if (branchId !== undefined && branchId !== "") filter.branchId = UUID.parse(branchId);
-    // The register renders MASKED by construction (C-PII).
+    // The register renders MASKED by construction (C-PII). PHASE-036:
+    // the batched custom-fields read merge rides the masked views (UDF
+    // values are tenant-defined, not the C-PII class).
     const rows = await this.employees.list(filter);
-    return envelope(rows.map(toEmployeeView));
+    return envelope(await mergeValuesInto("employees", rows.map(toEmployeeView)));
   }
 
   @Post("employees")
@@ -195,8 +209,18 @@ export class PayrollController {
   async createEmployee(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = createEmployeeSchema.parse(body);
-    const created = await this.employees.create({ ...input, actorId: identity.userId });
-    return envelope(toEmployeeView(created));
+    // PHASE-036 (ADR-0019): validate custom-field values BEFORE the insert
+    // (zero partial writes); persistence + read merge ride the ambient UoW.
+    const { customFields: customFieldsInput, ...entityInput } = input;
+    const validated =
+      customFieldsInput === undefined
+        ? undefined
+        : await validateValues("employees", customFieldsInput);
+    const created = await this.employees.create({ ...entityInput, actorId: identity.userId });
+    if (validated !== undefined) {
+      await persistValues("employees", created.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("employees", toEmployeeView(created)));
   }
 
   @Get("employees/:id")
@@ -204,7 +228,7 @@ export class PayrollController {
   async getEmployee(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
     const employee = await this.employees.get(UUID.parse(id), identity.userId);
-    return envelope(toEmployeeView(employee));
+    return envelope(await attachValues("employees", toEmployeeView(employee)));
   }
 
   @Put("employees/:id")
@@ -212,8 +236,16 @@ export class PayrollController {
   async updateEmployee(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = updateEmployeeSchema.parse(body);
-    const updated = await this.employees.update(UUID.parse(id), input, identity.userId);
-    return envelope(toEmployeeView(updated));
+    const { customFields: customFieldsInput, ...entityPatch } = input;
+    const validated =
+      customFieldsInput === undefined
+        ? undefined
+        : await validateValues("employees", customFieldsInput);
+    const updated = await this.employees.update(UUID.parse(id), entityPatch, identity.userId);
+    if (validated !== undefined) {
+      await persistValues("employees", updated.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("employees", toEmployeeView(updated)));
   }
 
   @Post("employees/:id/suspend")

@@ -1,6 +1,6 @@
 # Sync Protocol
 
-> **Status:** STABLE (generalized foundation LIVE since 2026-11-04) · **Owner:** Offline & API Architecture · **Updated:** 2026-11-04
+> **Status:** STABLE (generalized foundation LIVE since 2026-11-04) · **Owner:** Offline & API Architecture · **Updated:** 2026-11-10 (PHASE-036)
 
 The normative device↔server synchronization protocol implementing
 [ADR-0012](../architecture/ADR/ADR-0012-offline-sync.md). Transport is HTTPS against the
@@ -87,6 +87,17 @@ Endpoint summary (v1):
 8. **Server-side cursor (hint)**: `POST /sync/pull/ack` lets the server record the
    device's last confirmed position (`sync_cursors`) for support/monitoring; correctness
    does NOT depend on it — the client's local cursor is authoritative for resume.
+9. **Additive payload fields (PHASE-036, CR-36 g)**: custom-field values ride the
+   first-wave fed entities' pull projections — `items`, `partners`, `sales_invoices` —
+   as **one additive payload field `customFields`** (jsonb object: custom-field key →
+   typed value, folded per `data_type`; **ACTIVE definitions only**, so archived fields
+   drop off the feed while their values stay in the store — BR-057;
+   [ADR-0019](../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md)).
+   Offline clients ignore unknown payload keys by construction (explicit-column
+   upserts — [LOCAL_DATABASE.md](LOCAL_DATABASE.md) §1.1 rule 3). Pushes never touch
+   the value store, so offline entity editing preserves UDF data. The custom-fields
+   manager and form designer are **online-only** (N/A-recorded for the offline clients'
+   configuration plane — [OFFLINE_CAPABILITIES_MATRIX.md](OFFLINE_CAPABILITIES_MATRIX.md)).
 
 ## 3. Push contract
 

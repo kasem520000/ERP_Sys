@@ -16,10 +16,17 @@ import type { FormEvent, JSX } from "react";
 import { Badge, Button, Input, MoneyInput, Select, useToast } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { CreditTermsRow, PartnerRow, PriceListRow } from "../lib/api-types";
+import type {
+  CreditTermsRow,
+  CustomFieldDefinitionRow,
+  CustomFieldValueView,
+  PartnerRow,
+  PriceListRow,
+} from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedMasterDataError, localizedName } from "../lib/messages";
 import { Card } from "./card";
+import { CustomFieldSurface } from "./custom-field-surface";
 import { DefList } from "./def-list";
 import { ErrorNotice } from "./notices";
 
@@ -71,6 +78,32 @@ export function PartnerForm({
   const [error, setError] = useState<string | null>(null);
   const [kindChangeBusy, setKindChangeBusy] = useState(false);
 
+  // WEB-036 (PHASE-036): the tenant's ACTIVE custom-field definitions for
+  // partners (session surface — a starter tenant or a failed fetch simply
+  // renders no extra inputs) + the seeded values and the emitted payload
+  // (null = untouched — an untouched PATCH omits customFields = no-op).
+  const [fieldDefinitions, setFieldDefinitions] = useState<readonly CustomFieldDefinitionRow[]>([]);
+  const [customPayload, setCustomPayload] = useState<Record<string, unknown> | null>(null);
+  const customSeedValues = useMemo<Record<string, CustomFieldValueView>>(
+    () => partner?.customFields ?? {},
+    [partner],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async (): Promise<void> => {
+      const surface = await bffFetch<readonly CustomFieldDefinitionRow[]>(
+        "configuration/custom-fields/surface?entityType=partners",
+      );
+      if (!cancelled && surface.ok) {
+        setFieldDefinitions(surface.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const dirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(initial), [form, initial]);
 
   // dirty-guard: native unload warning (full navigations/refreshes)
@@ -103,6 +136,9 @@ export function PartnerForm({
       if (form.creditLimit.trim() !== "") body.creditLimit = form.creditLimit.trim();
       if (form.creditTermsId !== "") body.creditTermsId = form.creditTermsId;
       if (form.priceListId !== "") body.priceListId = form.priceListId;
+      if (customPayload !== null && Object.keys(customPayload).length > 0) {
+        body.customFields = customPayload;
+      }
       const created = await bffFetch<PartnerRow>("partners/partners", {
         method: "POST",
         body,
@@ -131,6 +167,9 @@ export function PartnerForm({
     else body.creditTermsId = null;
     if (form.priceListId !== "") body.priceListId = form.priceListId;
     else body.priceListId = null;
+    if (customPayload !== null) {
+      body.customFields = customPayload;
+    }
     const updated = await bffFetch<PartnerRow>(`partners/partners/${partner?.id}`, {
       method: "PATCH",
       body,
@@ -305,6 +344,13 @@ export function PartnerForm({
             </div>
           </div>
         )}
+        <CustomFieldSurface
+          locale={locale}
+          entityType="partners"
+          definitions={fieldDefinitions}
+          values={customSeedValues}
+          onChange={setCustomPayload}
+        />
         {error !== null && <ErrorNotice>{error}</ErrorNotice>}
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-subtle pt-3">
           <Button

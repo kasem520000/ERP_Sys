@@ -9,7 +9,7 @@ Runs deterministic, read-only checks over docs/:
   4. Consolidation corrections are present (DEF-001/002/003/004/007/008 markers,
      no stale CASH_BANK purpose, no `treasury.receipts.*`/`treasury.payments.*`
      permission keys, blanket money regex gone).
-  5. ADR set (0001..0018) is complete and indexed.
+  5. ADR set (0001..0019) is complete and indexed.
   6. Authoritative consolidated documents exist.
   7. Blueprint v2.0 expansion artifacts are present and internally consistent
      (EXPANSION_REGISTER ED-01..ED-19, six new modules in FEATURE_CATALOG, new
@@ -174,7 +174,7 @@ def structure_check() -> None:
     adr_dir = DOCS / "architecture" / "ADR"
     adrs = sorted(p.name for p in adr_dir.glob("ADR-*.md"))
     have = {int(re.search(r"ADR-(\d{4})", a).group(1)) for a in adrs}
-    check("4b. ADR set 0001..0018 complete", have == set(range(1, 19)), f"have={sorted(have)}")
+    check("4b. ADR set 0001..0019 complete", have == set(range(1, 20)), f"have={sorted(have)}")
     phases = sorted(p.name for p in (DOCS / "implementation" / "phases").glob("PHASE-*.md"))
     # Blueprint v3.0 (2026-11-10): 34 -> 65 phase documents (stages 12-15 added
     # PHASE-035..065 per COMPLETENESS_REGISTER.md; check 8b verifies their headings).

@@ -4646,6 +4646,167 @@ export interface Dictionary {
   consolidationInv026Pass: string;
   consolidationInv026Fail: string;
   consolidationInv026Compared: string;
+
+  // -- WEB-036 (PHASE-036): custom fields extensibility core ---------------------
+  // the /settings/custom-fields manager (definitions + picklists + form
+  // designer), the shared CustomFieldSurface and the typed-error family
+  customFieldsTitle: string;
+  customFieldsSubtitle: string;
+  customFieldsDefinitionsTab: string;
+  customFieldsPicklistsTab: string;
+  customFieldsLayoutsTab: string;
+  customFieldsEntityFilter: string;
+  customFieldsAllEntities: string;
+  customFieldsColEntity: string;
+  customFieldsColKey: string;
+  customFieldsColLabel: string;
+  customFieldsColDataType: string;
+  customFieldsColRequired: string;
+  customFieldsColOptions: string;
+  customFieldsColVersion: string;
+  customFieldsColOrder: string;
+  customFieldsDefinitionsNote: string;
+  customFieldsEmpty: string;
+  customFieldsAddField: string;
+  customFieldsCreateTitle: string;
+  customFieldsEditTitle: string;
+  customFieldsEntityLabel: string;
+  customFieldsEntityPlaceholder: string;
+  customFieldsKeyLabel: string;
+  customFieldsKeyHint: string;
+  customFieldsLabelEn: string;
+  customFieldsLabelAr: string;
+  customFieldsDataTypeLabel: string;
+  customFieldsTypeText: string;
+  customFieldsTypeNumber: string;
+  customFieldsTypeDate: string;
+  customFieldsTypeBoolean: string;
+  customFieldsTypeSelect: string;
+  customFieldsTypeMultiselect: string;
+  customFieldsTypeReference: string;
+  customFieldsPicklistLabel: string;
+  customFieldsPicklistPlaceholder: string;
+  customFieldsReferenceEntityLabel: string;
+  customFieldsPrecisionLabel: string;
+  customFieldsPrecisionHint: string;
+  customFieldsRequiredLabel: string;
+  customFieldsValidationTitle: string;
+  customFieldsValidationTextOnly: string;
+  customFieldsValidationNumberOnly: string;
+  customFieldsRegexLabel: string;
+  customFieldsMinLengthLabel: string;
+  customFieldsMaxLengthLabel: string;
+  customFieldsMinValueLabel: string;
+  customFieldsMaxValueLabel: string;
+  customFieldsImmutableNote: string;
+  customFieldsCreatedToast: string;
+  customFieldsSavedToast: string;
+  customFieldsArchivedToast: string;
+  customFieldsRestoredToast: string;
+  customFieldsArchiveAction: string;
+  customFieldsRestoreAction: string;
+  customFieldsArchiveConfirm: string;
+  customFieldsPicklistsNote: string;
+  customFieldsPicklistsEmpty: string;
+  customFieldsPicklistCreateTitle: string;
+  customFieldsPicklistNameEn: string;
+  customFieldsPicklistNameAr: string;
+  customFieldsPicklistKeyHint: string;
+  customFieldsPicklistCreatedToast: string;
+  customFieldsPicklistSavedToast: string;
+  customFieldsPicklistArchivedToast: string;
+  customFieldsPicklistRestoredToast: string;
+  customFieldsManageOptions: string;
+  customFieldsOptionsTitle: string;
+  customFieldsPicklistOptionsForTitle: string;
+  customFieldsOptionsEmpty: string;
+  customFieldsOptionLabelEn: string;
+  customFieldsOptionLabelAr: string;
+  customFieldsOptionAdd: string;
+  customFieldsOptionAddedToast: string;
+  customFieldsOptionSavedToast: string;
+  customFieldsOptionArchivedToast: string;
+  customFieldsOptionRestoredToast: string;
+  customFieldsOptionMoveUp: string;
+  customFieldsOptionMoveDown: string;
+  customFieldsOptionsReorderedToast: string;
+  customFieldsOptionEdit: string;
+  customFieldsLayoutsNote: string;
+  customFieldsLayoutsEmpty: string;
+  customFieldsLayoutEntityLabel: string;
+  customFieldsLayoutDefaultLabel: string;
+  customFieldsLayoutDefaultBadge: string;
+  customFieldsLayoutRoleLabel: string;
+  customFieldsLayoutNewOverride: string;
+  customFieldsLayoutOverrideBadge: string;
+  customFieldsLayoutOverridesList: string;
+  customFieldsLayoutEditingDefault: string;
+  customFieldsLayoutEditingOverride: string;
+  customFieldsLayoutNameLabel: string;
+  customFieldsLayoutNoLayout: string;
+  customFieldsLayoutDefaultNote: string;
+  customFieldsLayoutOverrideNote: string;
+  customFieldsLayoutSectionsTitle: string;
+  customFieldsLayoutAddSection: string;
+  customFieldsLayoutSectionNew: string;
+  customFieldsLayoutSectionLabelEn: string;
+  customFieldsLayoutSectionLabelAr: string;
+  customFieldsLayoutSectionUp: string;
+  customFieldsLayoutSectionDown: string;
+  customFieldsLayoutRemoveSection: string;
+  customFieldsLayoutCollapsedLabel: string;
+  customFieldsLayoutColumnsLabel: string;
+  customFieldsLayoutFieldsTitle: string;
+  customFieldsLayoutAddField: string;
+  customFieldsLayoutFieldPlaceholder: string;
+  customFieldsNativeFieldsGroup: string;
+  customFieldsCustomFieldsGroup: string;
+  customFieldsLayoutFieldNative: string;
+  customFieldsLayoutFieldCustom: string;
+  customFieldsLayoutMandatoryBadge: string;
+  customFieldsLayoutLockHint: string;
+  customFieldsLayoutFieldUp: string;
+  customFieldsLayoutFieldDown: string;
+  customFieldsLayoutRemoveField: string;
+  customFieldsLayoutSavedToast: string;
+  customFieldsLayoutOverrideSavedToast: string;
+  customFieldsLayoutDeleteOverride: string;
+  customFieldsLayoutOverrideDeletedToast: string;
+  customFieldsRoleOwner: string;
+  customFieldsRoleAccountant: string;
+  customFieldsRoleSales: string;
+  customFieldsRolePurchasing: string;
+  customFieldsRoleWarehouse: string;
+  customFieldsRoleCashier: string;
+  customFieldsRoleViewer: string;
+  customFieldsRolePayrollOfficer: string;
+  customFieldsErrorKeyTaken: string;
+  customFieldsErrorKeyInvalid: string;
+  customFieldsErrorConfigInvalid: string;
+  customFieldsErrorEntityUnknown: string;
+  customFieldsErrorValidationMismatch: string;
+  customFieldsErrorNotFound: string;
+  customFieldsErrorArchived: string;
+  customFieldsErrorUnknownKey: string;
+  customFieldsErrorRequired: string;
+  customFieldsErrorValueInvalid: string;
+  customFieldsErrorImmutable: string;
+  customFieldsErrorPicklistKeyTaken: string;
+  customFieldsErrorPicklistNotFound: string;
+  customFieldsErrorPicklistOptionNotFound: string;
+  customFieldsErrorPicklistArchived: string;
+  customFieldsErrorPicklistOrderInvalid: string;
+  customFieldsErrorLayoutNotFound: string;
+  customFieldsErrorLayoutInvalid: string;
+  customFieldsErrorLayoutProtected: string;
+  customFieldsErrorLayoutProtectedHint: string;
+  customFieldsFormSectionTitle: string;
+  customFieldsFormSectionDescription: string;
+  customFieldsYesOption: string;
+  customFieldsNoOption: string;
+  customFieldsSelectEmpty: string;
+  customFieldsMultiselectEmpty: string;
+  customFieldsReferenceHint: string;
 }
 
 const ar: Dictionary = {
@@ -9288,6 +9449,171 @@ const ar: Dictionary = {
   consolidationInv026Pass: "INV-026: سليمة",
   consolidationInv026Fail: "INV-026: انحراف",
   consolidationInv026Compared: "المقارنة: {left} مقابل {right}",
+
+  // -- WEB-036 (PHASE-036): custom fields extensibility core ---------------------
+  customFieldsTitle: "الحقول المخصصة",
+  customFieldsSubtitle:
+    "وسّع نماذج كياناتك بحقول خاصة بالمنشأة — التعريفات وقوائم القيم ومصمم النماذج",
+  customFieldsDefinitionsTab: "التعريفات",
+  customFieldsPicklistsTab: "قوائم القيم",
+  customFieldsLayoutsTab: "مصمم النماذج",
+  customFieldsEntityFilter: "تصفية حسب الكيان",
+  customFieldsAllEntities: "كل الكيانات",
+  customFieldsColEntity: "الكيان",
+  customFieldsColKey: "المفتاح",
+  customFieldsColLabel: "التسمية",
+  customFieldsColDataType: "نوع البيانات",
+  customFieldsColRequired: "إلزامي",
+  customFieldsColOptions: "الخيارات",
+  customFieldsColVersion: "الإصدار",
+  customFieldsColOrder: "الترتيب",
+  customFieldsDefinitionsNote:
+    "تظهر الحقول النشطة تلقائيًا في نماذج الكيان وقوائمه، وتُطبَّق قواعد التحقق عند الحفظ.",
+  customFieldsEmpty: "لا توجد حقول مخصصة بعد — أنشئ أول حقل.",
+  customFieldsAddField: "إضافة حقل",
+  customFieldsCreateTitle: "إنشاء حقل مخصص",
+  customFieldsEditTitle: "تعديل الحقل المخصص",
+  customFieldsEntityLabel: "الكيان",
+  customFieldsEntityPlaceholder: "اختر كيانًا",
+  customFieldsKeyLabel: "المفتاح",
+  customFieldsKeyHint: "أحرف صغيرة بشرطات سفلية (snake_case) مثل preferred_branch",
+  customFieldsLabelEn: "التسمية (إنجليزي)",
+  customFieldsLabelAr: "التسمية (عربي)",
+  customFieldsDataTypeLabel: "نوع البيانات",
+  customFieldsTypeText: "نص",
+  customFieldsTypeNumber: "رقم",
+  customFieldsTypeDate: "تاريخ",
+  customFieldsTypeBoolean: "نعم/لا",
+  customFieldsTypeSelect: "اختيار واحد",
+  customFieldsTypeMultiselect: "اختيار متعدد",
+  customFieldsTypeReference: "مرجع لسجل",
+  customFieldsPicklistLabel: "قائمة القيم",
+  customFieldsPicklistPlaceholder: "اختر قائمة قيم",
+  customFieldsReferenceEntityLabel: "الكيان المرجعي",
+  customFieldsPrecisionLabel: "عدد الخانات العشرية",
+  customFieldsPrecisionHint: "من 0 إلى 6 خانات عشرية (الافتراضي 2)",
+  customFieldsRequiredLabel: "حقل إلزامي",
+  customFieldsValidationTitle: "قواعد التحقق",
+  customFieldsValidationTextOnly: "تعبير النمط والحدود الطولية تنطبق على الحقول النصية فقط.",
+  customFieldsValidationNumberOnly: "الحدود العددية تنطبق على الحقول الرقمية فقط.",
+  customFieldsRegexLabel: "تعبير نمطي (Regex)",
+  customFieldsMinLengthLabel: "أقل طول",
+  customFieldsMaxLengthLabel: "أقصى طول",
+  customFieldsMinValueLabel: "أقل قيمة",
+  customFieldsMaxValueLabel: "أقصى قيمة",
+  customFieldsImmutableNote:
+    "الكيان والمفتاح ونوع البيانات ثابتة بعد الإنشاء — أرشف الحقل وأنشئ بديلًا عند الحاجة.",
+  customFieldsCreatedToast: "أُنشئ الحقل المخصص.",
+  customFieldsSavedToast: "حُفظ الحقل المخصص.",
+  customFieldsArchivedToast: "أُرشف الحقل المخصص — القيم التاريخية تبقى ظاهرة.",
+  customFieldsRestoredToast: "استُعيد الحقل المخصص.",
+  customFieldsArchiveAction: "أرشفة",
+  customFieldsRestoreAction: "استعادة",
+  customFieldsArchiveConfirm:
+    "سيختفي الحقل المؤرشف من النماذج الجديدة مع بقاء القيم التاريخية. هل تريد المتابعة؟",
+  customFieldsPicklistsNote:
+    "قوائم القيم المشتركة تُستخدم في حقول الاختيار — الخيارات المؤرشفة تُرفض في القيم الجديدة وتبقى في السجل.",
+  customFieldsPicklistsEmpty: "لا توجد قوائم قيم بعد.",
+  customFieldsPicklistCreateTitle: "إنشاء قائمة قيم",
+  customFieldsPicklistNameEn: "الاسم (إنجليزي)",
+  customFieldsPicklistNameAr: "الاسم (عربي)",
+  customFieldsPicklistKeyHint: "مفتاح فريد بأحرف صغيرة وشرطات سفلية (snake_case)",
+  customFieldsPicklistCreatedToast: "أُنشئت قائمة القيم.",
+  customFieldsPicklistSavedToast: "حُفظت قائمة القيم.",
+  customFieldsPicklistArchivedToast: "أُرشفت قائمة القيم.",
+  customFieldsPicklistRestoredToast: "استُعيدت قائمة القيم.",
+  customFieldsManageOptions: "إدارة الخيارات",
+  customFieldsOptionsTitle: "الخيارات",
+  customFieldsPicklistOptionsForTitle: "خيارات: {name}",
+  customFieldsOptionsEmpty: "لا خيارات في هذه القائمة بعد.",
+  customFieldsOptionLabelEn: "الخيار (إنجليزي)",
+  customFieldsOptionLabelAr: "الخيار (عربي)",
+  customFieldsOptionAdd: "إضافة خيار",
+  customFieldsOptionAddedToast: "أُضيف الخيار.",
+  customFieldsOptionSavedToast: "حُفظ الخيار.",
+  customFieldsOptionArchivedToast: "أُرشف الخيار.",
+  customFieldsOptionRestoredToast: "استُعيد الخيار.",
+  customFieldsOptionMoveUp: "تحريك لأعلى",
+  customFieldsOptionMoveDown: "تحريك لأسفل",
+  customFieldsOptionsReorderedToast: "حُدِّث ترتيب الخيارات.",
+  customFieldsOptionEdit: "تعديل الخيار",
+  customFieldsLayoutsNote:
+    "صمّم ترتيب الأقسام والحقول لكل كيان؛ يتجاوز تخطيط الدور التخطيط الافتراضي لأصحاب ذلك الدور فقط.",
+  customFieldsLayoutsEmpty: "لا يوجد تخطيط محفوظ لهذا الكيان بعد — يُعرض النموذج الأصلي بترتيبه المعتاد.",
+  customFieldsLayoutEntityLabel: "الكيان",
+  customFieldsLayoutDefaultLabel: "التخطيط الافتراضي",
+  customFieldsLayoutDefaultBadge: "افتراضي",
+  customFieldsLayoutRoleLabel: "الدور",
+  customFieldsLayoutNewOverride: "تجاوز جديد لدور",
+  customFieldsLayoutOverrideBadge: "تجاوز",
+  customFieldsLayoutOverridesList: "التجاوزات المحفوظة",
+  customFieldsLayoutEditingDefault: "تحرير التخطيط الافتراضي",
+  customFieldsLayoutEditingOverride: "تحرير تجاوز الدور",
+  customFieldsLayoutNameLabel: "اسم التخطيط",
+  customFieldsLayoutNoLayout: "لا يوجد تخطيط",
+  customFieldsLayoutDefaultNote: "ينطبق التخطيط الافتراضي على كل الأدوار التي ليس لها تجاوز خاص.",
+  customFieldsLayoutOverrideNote: "ينطبق هذا التجاوز على أصحاب هذا الدور فقط.",
+  customFieldsLayoutSectionsTitle: "الأقسام",
+  customFieldsLayoutAddSection: "إضافة قسم",
+  customFieldsLayoutSectionNew: "قسم جديد",
+  customFieldsLayoutSectionLabelEn: "عنوان القسم (إنجليزي)",
+  customFieldsLayoutSectionLabelAr: "عنوان القسم (عربي)",
+  customFieldsLayoutSectionUp: "تحريك القسم لأعلى",
+  customFieldsLayoutSectionDown: "تحريك القسم لأسفل",
+  customFieldsLayoutRemoveSection: "حذف القسم",
+  customFieldsLayoutCollapsedLabel: "مطوي افتراضيًا",
+  customFieldsLayoutColumnsLabel: "عدد الأعمدة",
+  customFieldsLayoutFieldsTitle: "الحقول",
+  customFieldsLayoutAddField: "إضافة حقل إلى القسم",
+  customFieldsLayoutFieldPlaceholder: "اختر حقلًا",
+  customFieldsNativeFieldsGroup: "الحقول الأصلية",
+  customFieldsCustomFieldsGroup: "الحقول المخصصة",
+  customFieldsLayoutFieldNative: "أصلي",
+  customFieldsLayoutFieldCustom: "مخصص",
+  customFieldsLayoutMandatoryBadge: "إلزامي",
+  customFieldsLayoutLockHint: "الحقول الأصلية الإلزامية محمية (BR-059) — لا يمكن حذفها أو تغيير ترتيبها.",
+  customFieldsLayoutFieldUp: "تحريك الحقل لأعلى",
+  customFieldsLayoutFieldDown: "تحريك الحقل لأسفل",
+  customFieldsLayoutRemoveField: "إزالة الحقل",
+  customFieldsLayoutSavedToast: "حُفظ التخطيط الافتراضي.",
+  customFieldsLayoutOverrideSavedToast: "حُفظ تجاوز الدور.",
+  customFieldsLayoutDeleteOverride: "حذف التجاوز",
+  customFieldsLayoutOverrideDeletedToast: "حُذف تجاوز الدور — يعود الدور إلى التخطيط الافتراضي.",
+  customFieldsRoleOwner: "المالك",
+  customFieldsRoleAccountant: "المحاسب",
+  customFieldsRoleSales: "المبيعات",
+  customFieldsRolePurchasing: "المشتريات",
+  customFieldsRoleWarehouse: "المستودع",
+  customFieldsRoleCashier: "أمين الصندوق",
+  customFieldsRoleViewer: "المشاهد",
+  customFieldsRolePayrollOfficer: "مسؤول الرواتب",
+  customFieldsErrorKeyTaken: "المفتاح مستخدم بالفعل لهذا الكيان.",
+  customFieldsErrorKeyInvalid: "مفتاح غير صالح: {reason}",
+  customFieldsErrorConfigInvalid: "إعداد غير صالح لهذا النوع: {reason}",
+  customFieldsErrorEntityUnknown: "نوع الكيان غير مسجل للحقول المخصصة.",
+  customFieldsErrorValidationMismatch: "قاعدة التحقق لا تنطبق على نوع البيانات هذا.",
+  customFieldsErrorNotFound: "العنصر غير موجود في هذا المستأجر.",
+  customFieldsErrorArchived: "الحقل المخصص مؤرشف — قيمه للقراءة فقط.",
+  customFieldsErrorUnknownKey: "الحقل المخصص {key} غير معرَّف لهذا الكيان.",
+  customFieldsErrorRequired: "الحقل المخصص {key} إلزامي.",
+  customFieldsErrorValueInvalid: "قيمة غير صالحة للحقل المخصص {key}.",
+  customFieldsErrorImmutable: "الكيان والمفتاح والنوع ثابتة — أرشف الحقل وأنشئ بديلًا.",
+  customFieldsErrorPicklistKeyTaken: "مفتاح قائمة القيم مستخدم بالفعل.",
+  customFieldsErrorPicklistNotFound: "قائمة القيم غير موجودة.",
+  customFieldsErrorPicklistOptionNotFound: "الخيار غير موجود.",
+  customFieldsErrorPicklistArchived: "قائمة القيم مؤرشفة — اختر قائمة نشطة.",
+  customFieldsErrorPicklistOrderInvalid: "يجب أن يشمل الترتيب كل الخيارات النشطة مرة واحدة كل منها.",
+  customFieldsErrorLayoutNotFound: "لا يوجد تخطيط لهذا الكيان.",
+  customFieldsErrorLayoutInvalid: "تخطيط غير صالح: {reason}",
+  customFieldsErrorLayoutProtected: "قاعدة BR-059: {violation}",
+  customFieldsErrorLayoutProtectedHint: "الحقول الأصلية الإلزامية لا يمكن حذفها أو إعادة ترتيبها.",
+  customFieldsFormSectionTitle: "الحقول المخصصة",
+  customFieldsFormSectionDescription: "حقول إضافية خاصة بمنشأتك.",
+  customFieldsYesOption: "نعم",
+  customFieldsNoOption: "لا",
+  customFieldsSelectEmpty: "—",
+  customFieldsMultiselectEmpty: "لا خيارات متاحة",
+  customFieldsReferenceHint: "معرّف UUID لسجل في: {entity}",
 };
 
 const en: Dictionary = {
@@ -13938,6 +14264,174 @@ const en: Dictionary = {
   consolidationInv026Pass: "INV-026: PASS",
   consolidationInv026Fail: "INV-026: FAIL",
   consolidationInv026Compared: "Compared: {left} vs {right}",
+
+  // -- WEB-036 (PHASE-036): custom fields extensibility core ---------------------
+  customFieldsTitle: "Custom fields",
+  customFieldsSubtitle:
+    "Extend your entity forms with workspace-owned fields — definitions, picklists and the form designer",
+  customFieldsDefinitionsTab: "Definitions",
+  customFieldsPicklistsTab: "Picklists",
+  customFieldsLayoutsTab: "Form designer",
+  customFieldsEntityFilter: "Filter by entity",
+  customFieldsAllEntities: "All entities",
+  customFieldsColEntity: "Entity",
+  customFieldsColKey: "Key",
+  customFieldsColLabel: "Label",
+  customFieldsColDataType: "Data type",
+  customFieldsColRequired: "Required",
+  customFieldsColOptions: "Options",
+  customFieldsColVersion: "Version",
+  customFieldsColOrder: "Order",
+  customFieldsDefinitionsNote:
+    "ACTIVE fields render automatically on the entity's forms and lists; validation rules apply on save.",
+  customFieldsEmpty: "No custom fields yet — create the first one.",
+  customFieldsAddField: "Add field",
+  customFieldsCreateTitle: "Create custom field",
+  customFieldsEditTitle: "Edit custom field",
+  customFieldsEntityLabel: "Entity",
+  customFieldsEntityPlaceholder: "Choose an entity",
+  customFieldsKeyLabel: "Key",
+  customFieldsKeyHint: "lowercase snake_case, e.g. preferred_branch",
+  customFieldsLabelEn: "Label (English)",
+  customFieldsLabelAr: "Label (Arabic)",
+  customFieldsDataTypeLabel: "Data type",
+  customFieldsTypeText: "Text",
+  customFieldsTypeNumber: "Number",
+  customFieldsTypeDate: "Date",
+  customFieldsTypeBoolean: "Yes/No",
+  customFieldsTypeSelect: "Single select",
+  customFieldsTypeMultiselect: "Multi select",
+  customFieldsTypeReference: "Record reference",
+  customFieldsPicklistLabel: "Picklist",
+  customFieldsPicklistPlaceholder: "Choose a picklist",
+  customFieldsReferenceEntityLabel: "Reference entity",
+  customFieldsPrecisionLabel: "Decimal precision",
+  customFieldsPrecisionHint: "0 to 6 decimal places (default 2)",
+  customFieldsRequiredLabel: "Required field",
+  customFieldsValidationTitle: "Validation rules",
+  customFieldsValidationTextOnly: "Regex and length bounds apply to TEXT fields only.",
+  customFieldsValidationNumberOnly: "Numeric bounds apply to NUMBER fields only.",
+  customFieldsRegexLabel: "Regex pattern",
+  customFieldsMinLengthLabel: "Min length",
+  customFieldsMaxLengthLabel: "Max length",
+  customFieldsMinValueLabel: "Min value",
+  customFieldsMaxValueLabel: "Max value",
+  customFieldsImmutableNote:
+    "Entity, key and data type are immutable after creation — archive the field and create a new one if needed.",
+  customFieldsCreatedToast: "Custom field created.",
+  customFieldsSavedToast: "Custom field saved.",
+  customFieldsArchivedToast: "Custom field archived — historical values keep rendering.",
+  customFieldsRestoredToast: "Custom field restored.",
+  customFieldsArchiveAction: "Archive",
+  customFieldsRestoreAction: "Restore",
+  customFieldsArchiveConfirm:
+    "The archived field disappears from new forms while historical values stay. Continue?",
+  customFieldsPicklistsNote:
+    "Shared value lists for select fields — archived options are rejected for new values and stay in history.",
+  customFieldsPicklistsEmpty: "No picklists yet.",
+  customFieldsPicklistCreateTitle: "Create picklist",
+  customFieldsPicklistNameEn: "Name (English)",
+  customFieldsPicklistNameAr: "Name (Arabic)",
+  customFieldsPicklistKeyHint: "unique lowercase snake_case key",
+  customFieldsPicklistCreatedToast: "Picklist created.",
+  customFieldsPicklistSavedToast: "Picklist saved.",
+  customFieldsPicklistArchivedToast: "Picklist archived.",
+  customFieldsPicklistRestoredToast: "Picklist restored.",
+  customFieldsManageOptions: "Manage options",
+  customFieldsOptionsTitle: "Options",
+  customFieldsPicklistOptionsForTitle: "Options: {name}",
+  customFieldsOptionsEmpty: "No options in this picklist yet.",
+  customFieldsOptionLabelEn: "Option (English)",
+  customFieldsOptionLabelAr: "Option (Arabic)",
+  customFieldsOptionAdd: "Add option",
+  customFieldsOptionAddedToast: "Option added.",
+  customFieldsOptionSavedToast: "Option saved.",
+  customFieldsOptionArchivedToast: "Option archived.",
+  customFieldsOptionRestoredToast: "Option restored.",
+  customFieldsOptionMoveUp: "Move up",
+  customFieldsOptionMoveDown: "Move down",
+  customFieldsOptionsReorderedToast: "Option order saved.",
+  customFieldsOptionEdit: "Edit option",
+  customFieldsLayoutsNote:
+    "Design each entity's section/field order; a role override wins over the default layout for that role only.",
+  customFieldsLayoutsEmpty:
+    "No saved layout for this entity yet — the native form renders in its usual order.",
+  customFieldsLayoutEntityLabel: "Entity",
+  customFieldsLayoutDefaultLabel: "Default layout",
+  customFieldsLayoutDefaultBadge: "Default",
+  customFieldsLayoutRoleLabel: "Role",
+  customFieldsLayoutNewOverride: "New role override",
+  customFieldsLayoutOverrideBadge: "Override",
+  customFieldsLayoutOverridesList: "Saved overrides",
+  customFieldsLayoutEditingDefault: "Editing the default layout",
+  customFieldsLayoutEditingOverride: "Editing a role override",
+  customFieldsLayoutNameLabel: "Layout name",
+  customFieldsLayoutNoLayout: "No layout",
+  customFieldsLayoutDefaultNote: "The default layout applies to every role without its own override.",
+  customFieldsLayoutOverrideNote: "This override applies to holders of this role only.",
+  customFieldsLayoutSectionsTitle: "Sections",
+  customFieldsLayoutAddSection: "Add section",
+  customFieldsLayoutSectionNew: "New section",
+  customFieldsLayoutSectionLabelEn: "Section title (English)",
+  customFieldsLayoutSectionLabelAr: "Section title (Arabic)",
+  customFieldsLayoutSectionUp: "Move section up",
+  customFieldsLayoutSectionDown: "Move section down",
+  customFieldsLayoutRemoveSection: "Remove section",
+  customFieldsLayoutCollapsedLabel: "Collapsed by default",
+  customFieldsLayoutColumnsLabel: "Columns",
+  customFieldsLayoutFieldsTitle: "Fields",
+  customFieldsLayoutAddField: "Add field to section",
+  customFieldsLayoutFieldPlaceholder: "Choose a field",
+  customFieldsNativeFieldsGroup: "Native fields",
+  customFieldsCustomFieldsGroup: "Custom fields",
+  customFieldsLayoutFieldNative: "Native",
+  customFieldsLayoutFieldCustom: "Custom",
+  customFieldsLayoutMandatoryBadge: "Mandatory",
+  customFieldsLayoutLockHint:
+    "Mandatory native fields are protected (BR-059) — they cannot be removed or reordered.",
+  customFieldsLayoutFieldUp: "Move field up",
+  customFieldsLayoutFieldDown: "Move field down",
+  customFieldsLayoutRemoveField: "Remove field",
+  customFieldsLayoutSavedToast: "Default layout saved.",
+  customFieldsLayoutOverrideSavedToast: "Role override saved.",
+  customFieldsLayoutDeleteOverride: "Delete override",
+  customFieldsLayoutOverrideDeletedToast: "Role override deleted — the role falls back to the default layout.",
+  customFieldsRoleOwner: "Owner",
+  customFieldsRoleAccountant: "Accountant",
+  customFieldsRoleSales: "Sales",
+  customFieldsRolePurchasing: "Purchasing",
+  customFieldsRoleWarehouse: "Warehouse",
+  customFieldsRoleCashier: "Cashier",
+  customFieldsRoleViewer: "Viewer",
+  customFieldsRolePayrollOfficer: "Payroll officer",
+  customFieldsErrorKeyTaken: "This key is already used for this entity.",
+  customFieldsErrorKeyInvalid: "Invalid key: {reason}",
+  customFieldsErrorConfigInvalid: "Invalid config for this data type: {reason}",
+  customFieldsErrorEntityUnknown: "The entity type is not registered for custom fields.",
+  customFieldsErrorValidationMismatch: "The validation rule does not apply to this data type.",
+  customFieldsErrorNotFound: "Not found in this tenant.",
+  customFieldsErrorArchived: "The custom field is archived — its values are read-only.",
+  customFieldsErrorUnknownKey: "Custom field {key} is not defined for this entity.",
+  customFieldsErrorRequired: "Custom field {key} is required.",
+  customFieldsErrorValueInvalid: "Invalid value for custom field {key}.",
+  customFieldsErrorImmutable:
+    "Entity, key and data type are immutable — archive the field and create a new one.",
+  customFieldsErrorPicklistKeyTaken: "The picklist key is already used.",
+  customFieldsErrorPicklistNotFound: "Picklist not found.",
+  customFieldsErrorPicklistOptionNotFound: "Picklist option not found.",
+  customFieldsErrorPicklistArchived: "The picklist is archived — choose an ACTIVE one.",
+  customFieldsErrorPicklistOrderInvalid: "The order must list every ACTIVE option exactly once.",
+  customFieldsErrorLayoutNotFound: "No form layout exists for this entity.",
+  customFieldsErrorLayoutInvalid: "Invalid layout: {reason}",
+  customFieldsErrorLayoutProtected: "BR-059: {violation}",
+  customFieldsErrorLayoutProtectedHint: "Mandatory native fields cannot be removed or reordered.",
+  customFieldsFormSectionTitle: "Custom fields",
+  customFieldsFormSectionDescription: "Additional fields defined by your workspace.",
+  customFieldsYesOption: "Yes",
+  customFieldsNoOption: "No",
+  customFieldsSelectEmpty: "—",
+  customFieldsMultiselectEmpty: "No options available",
+  customFieldsReferenceHint: "UUID of a record in: {entity}",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

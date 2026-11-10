@@ -183,6 +183,9 @@ permissions cannot be granted to `viewer`-derived templates).
 | `audit.export` | Export audit trail (audited) / تصدير سجل التدقيق | owner | tenant | no (audited) |
 | `configuration.templates.apply` | Apply/switch industry template / تطبيق قالب الصناعة | owner | tenant | **yes** |
 | `configuration.settings.manage` | Tenant settings, numbering, feature config / إعدادات المستأجر | owner | tenant | no |
+| `configuration.custom_fields.read` | View custom-field definitions, picklists, form layouts (PHASE-036) / عرض الحقول المخصصة | accountant, owner | tenant | no |
+| `configuration.custom_fields.manage` | Create/update/archive custom fields + picklists (PHASE-036) / إدارة الحقول المخصصة | owner | tenant | no (audited; values ride the owning entity's permission) |
+| `configuration.form_layouts.manage` | Design per-entity form layouts + role overrides, BR-059 native protection (PHASE-036) / تصميم تخطيطات النماذج | owner | tenant | no (BR-059 guards mandatory native fields) |
 | `industry.templates.manage` | Manage industry templates & registry reads / إدارة قوالب الصناعة | owner | tenant | no |
 | `industry.templates.switch` | Switch/extend industry template (additive-only BR-038) / تبديل القالب (إضافي فقط) | owner | tenant | **yes** |
 | `industry.terminology.manage` | Manage bilingual terminology overrides / إدارة المصطلحات ثنائية اللغة | owner | tenant | no |

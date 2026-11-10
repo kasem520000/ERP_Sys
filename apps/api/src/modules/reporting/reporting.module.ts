@@ -93,6 +93,13 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // existing e-invoicing permission (the §12 module-register convention —
   // same key as every /tax/einvoicing route; zero-drift stays 245=245).
   "tax.einvoicing.manage",
+  // PHASE-036 (recorded 034-tree repair): the restored-lineage consolidation
+  // report contracts (consolidated TB/IS/BS + the eliminations log) ride
+  // consolidation.reports.view — seeded by 0004 §x since PHASE-034 but
+  // missing from this boot-time known set (the 035 evidence run covered
+  // only its spec subset, so the boot rule never fired on a full-suite
+  // boot; crm/billing and the other AppModule-booting specs surfaced it).
+  "consolidation.reports.view",
   "platform.audit.read",
   "platform.users.read",
   "platform.reporting.read",

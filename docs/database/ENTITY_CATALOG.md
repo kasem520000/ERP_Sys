@@ -382,6 +382,21 @@ truth: [TABLES/notes-installments.md](TABLES/notes-installments.md).
 | `elimination_entries` | Intercompany eliminations | group_id, fiscal_period_id, description, status DRAFT/POSTED, journal_entry_ids | 034 | no |
 | `consolidation_runs` | Consolidation execution records | group_id, fiscal_period_id, status QUEUED/RUNNING/COMPLETED/FAILED, output refs | 034 | no |
 
+## custom fields (PHASE-036 — DELIVERED by migration `0049_custom_fields.sql`, schema_version 49)
+
+The extensibility core (ADR-0019): typed custom fields (FD-18) + tenant
+picklists (FD-20) + per-entity form layouts (FD-19). The entity list is
+CODE-OWNED (`CUSTOM_FIELD_ENTITIES`) — later phases register entities
+additively with zero migrations.
+
+| Entity | Purpose | Key fields | Phase | OC |
+|--------|---------|-----------|-------|----|
+| `custom_field_definitions` | Tenant-owned field registry (FD-18) | entity_type (code-owned registry), key (BR-058 namespace), label/label_ar, data_type TEXT/NUMBER/DATE/BOOLEAN/SELECT/MULTISELECT/REFERENCE, config jsonb, required, validation rule set, status ACTIVE/ARCHIVED | 036 | no |
+| `custom_field_values` | Typed value store (ADR-0019: one typed column per row — num_nonnulls=1) | entity_type, entity_id (polymorphic, registry-validated), field_id, value_text/value_number/value_date/value_boolean/value_json | 036 | no |
+| `custom_picklists` | Tenant-managed value lists (FD-20) | key, name, name_ar, status ACTIVE/ARCHIVED | 036 | no |
+| `custom_picklist_options` | Picklist options | picklist_id, label, label_ar, sort_order, status ACTIVE/ARCHIVED (archived rejected for new values, labels preserved for history) | 036 | no |
+| `form_layouts` | Per-entity designer layouts + role overrides (FD-19) | entity_type, role_key (NULL = default; two partial uniques), name, sections jsonb, status | 036 | no |
+
 ## Diagrams
 
 ER diagrams per domain cluster: [ERD/](ERD/) — tenancy-identity, accounting-core,

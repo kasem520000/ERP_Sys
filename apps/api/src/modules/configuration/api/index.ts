@@ -197,3 +197,32 @@ export {
   type DriftCheckResult,
   type DriftKind,
 } from "../application/closure/drift-service";
+
+// PHASE-036 (Blueprint v3.0 · CR-06; ADR-0019): the extensibility core's
+// cross-module surface — the REUSABLE per-entity value guard the six
+// first-wave entity APIs (partners, items, sales invoices, purchase
+// orders, employees, projects) call on create/update/read. Values ride
+// the OWNING entity's permission; the definitions manager carries its own
+// configuration.custom_fields.* keys (matrix §3.8). Every later module
+// (042+) registers its entity into the code-owned registry and gets the
+// same one-import mechanism.
+export {
+  attachValues,
+  customFieldsPayloadSchema,
+  mergeValuesInto,
+  persistValues,
+  readValues,
+  validateValues,
+  type CustomFieldsPayload,
+  type CustomFieldValueMap,
+  type CustomFieldValueView,
+  type ValidatedValues,
+} from "../application/custom-field-service";
+export {
+  CUSTOM_FIELD_ENTITIES,
+  customFieldEntity,
+  isCustomFieldEntity,
+  type CustomFieldEntityDescriptor,
+  type CustomFieldNativeField,
+} from "../domain/custom-fields-schema";
+export type { DefinitionDto } from "../application/custom-field-service";

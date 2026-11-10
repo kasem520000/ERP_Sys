@@ -22,9 +22,14 @@ import {
 } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { PartnerRow } from "../lib/api-types";
+import type { CustomFieldDefinitionRow, PartnerRow } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
-import { localizedMasterDataError, localizedName, statusTone } from "../lib/messages";
+import {
+  customFieldValueLabel,
+  localizedMasterDataError,
+  localizedName,
+  statusTone,
+} from "../lib/messages";
 import { LinkButton } from "./link-button";
 import { ErrorNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
@@ -36,11 +41,16 @@ export function PartnersTable({
   initialRows,
   initialHasMore,
   initialNextCursor,
+  customFieldDefinitions = [],
 }: {
   locale: Locale;
   initialRows: readonly PartnerRow[];
   initialHasMore: boolean;
   initialNextCursor?: string;
+  /** WEB-036: the tenant's ACTIVE partner custom fields (server-fetched
+   *  surface) — one dynamic column per definition, defensive on missing
+   *  values (em dash). */
+  customFieldDefinitions?: readonly CustomFieldDefinitionRow[];
 }): JSX.Element {
   const d = getDictionary(locale);
   const router = useRouter();
@@ -181,6 +191,19 @@ export function PartnersTable({
               </Badge>
             ),
           },
+          ...customFieldDefinitions.map((definition) => ({
+            id: `custom-${definition.key}`,
+            header: activeLocaleHeader(
+              localizedName(definition.label, definition.labelAr, locale),
+            ),
+            accessor: (row: PartnerRow) =>
+              customFieldValueLabel(row.customFields?.[definition.key], locale),
+            render: (row: PartnerRow) => (
+              <span className="truncate">
+                {customFieldValueLabel(row.customFields?.[definition.key], locale)}
+              </span>
+            ),
+          })),
           {
             id: "creditLimit",
             header: activeLocaleHeader(d.partnersColCreditLimit),

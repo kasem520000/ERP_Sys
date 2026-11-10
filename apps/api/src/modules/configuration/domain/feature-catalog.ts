@@ -38,6 +38,10 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "platform.notifications": [],
   "platform.files": [],
   "platform.data_export": ["platform.tenant_lifecycle"],
+  // PHASE-036 (Blueprint v3.0 · CR-06): the extensibility core — typed
+  // custom fields + form layouts + picklists (FD-18/FD-19/FD-20); the
+  // DF-39 plugin substrate WITHOUT the marketplace (DF-38 non-goal).
+  "platform.custom_fields": ["platform.onboarding"],
   // accounting
   "accounting.chart_of_accounts": ["platform.onboarding"],
   "accounting.fiscal_calendar": [],

@@ -1,6 +1,6 @@
 # Navigation Model
 
-> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-10 (PHASE-035)
+> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-10 (PHASE-035 / PHASE-036)
 
 How users move through the platform: the information architecture, the entitlement-driven
 navigation registry, the command menu as universal navigation, back/deep-link behavior,
@@ -74,6 +74,19 @@ under `inventory.tracking.manage`.
 | `inventory.batches` | 4 المخزون | الدفعات والصلاحية / Batches & expiry | `inventory.batch_tracking` | `inventory.moves.view` | List + Search (§2) — route `/inventory/batches`, order 90; register + write-off actions under `inventory.tracking.manage` |
 | `inventory.serials` | 4 المخزون | الأرقام التسلسلية / Serial numbers | `inventory.serial_tracking` | `inventory.moves.view` | List + Search (§2) — route `/inventory/serials`, order 100; register + sold-at actions under `inventory.tracking.manage` |
 | `inventory.adjustments` | 4 المخزون | تسويات المخزون / Stock adjustments | `inventory.stock_ledger` | `inventory.stock.view` | List + Search (§2), read-only — route `/inventory/adjustments`, order 110; posting stays in the count wizard by design |
+
+### 1.3 PHASE-036 registry additions (Blueprint v3.0 — extensibility core)
+
+The custom-fields manager (audit FD-18/FD-19/FD-20; [ADR-0019](../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md)):
+the settings-plane surface for definitions, picklists, and per-entity form layouts.
+Same resolution rule as every item — `entitlement(featureKey)` AND `permission(user,
+branch)`; a starter tenant sees no custom-fields navigation (the `platform.custom_fields`
+plan grant rides migration `0049`). The per-entity form designer and the shared
+`CustomFieldSurface` render inside the first-wave entity forms — not sidebar items.
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `settings.custom_fields` | 9 الإعدادات | الحقول المخصصة / Custom fields | `platform.custom_fields` | `configuration.custom_fields.read` | Settings (§8) — route `/settings/custom-fields`: the definitions + picklists manager (definitions / قوائم القيم), with the per-entity form designer (مصمم النماذج) opening from it; create/update/archive actions run under `configuration.custom_fields.manage` / `configuration.form_layouts.manage` |
 
 ## 2. Navigation registry (data model, normative)
 
@@ -213,3 +226,4 @@ hard-coded listeners in screens). POS terminal profiles define their own F-key m
 | HR & Payroll group (group 10) + its items | PHASE-029 |
 | Consolidated statements under التقارير | PHASE-034 — **LIVE** (delivered 2026-11-09: the `/consolidation` surfaces — group Settings, the elimination Transaction Entry workspace with the live balanced DR/CR preview, the run Report Page with the snapshot viewer — nav items under group 7 التقارير, `reports.consolidated`) |
 | Inventory batches & expiry + serial numbers + stock adjustments (read-only) under المخزون; the import/export visibility repair; consolidated statements as a core item | PHASE-035 — **LIVE** (delivered 2026-11-10: `/inventory/batches` + `/inventory/serials` (register + write-off / sold-at under `inventory.tracking.manage`) and the read-only `/inventory/adjustments` register — posting stays in the count wizard; `items.import_export` granted business+enterprise by the DATA-ONLY migration `0048`; `reports.consolidated` promoted from template-injected to a core NAV_ITEMS entry — template-less tenants see القوائم الموحدة) |
+| Custom-fields manager (definitions + picklists + per-entity form designer) under الإعدادات; typed values render on the six first-wave entity forms | PHASE-036 |

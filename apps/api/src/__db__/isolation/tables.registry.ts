@@ -331,6 +331,19 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "group_entities" },
   { table: "elimination_entries" },
   { table: "consolidation_runs" },
+  // PHASE-036 (Blueprint v3.0 · CR-06): the extensibility core's five
+  // tenant tables (migration 0049 — the FD-18/FD-19/FD-20 substrate):
+  // the definitions registry (archive-not-delete — NO delete grant), the
+  // TYPED value store (deleteGranted: the replace-semantics path — a
+  // PATCH omitting a key clears its value), the picklist pair
+  // (archive-not-delete), and the form-layout store (deleteGranted: the
+  // role-override removal path). Five tables — the auto-generated A-suite
+  // extends by +30.
+  { table: "custom_field_definitions" },
+  { table: "custom_field_values", deleteGranted: true },
+  { table: "custom_picklists" },
+  { table: "custom_picklist_options" },
+  { table: "form_layouts", deleteGranted: true },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

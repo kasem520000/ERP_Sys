@@ -150,10 +150,12 @@ describe("seeds (acceptance 9)", () => {
     // commerce-channel staging import surface).
     // + 1 PHASE-027 key (0004 seed §3.12 completion: notes.notes.return — the
     // doc-sync action key for the return money event; role grants in 0005).
+    // + 3 PHASE-036 keys (0049 seed §7: configuration.custom_fields.read/
+    // .manage + configuration.form_layouts.manage — the extensibility core).
     // (233 after 0025 + 8 = 241; 241 + 2 = 243 after 0027; 243 + 1 = 244
-    // after 0035; 244 + 1 = 245 after 0038-phase; the drift CLI agrees:
-    // matrix 245 = seed 245.)
-    expect(result.rows[0]?.n).toBe(245);
+    // after 0035; 244 + 1 = 245 after 0038-phase; 245 + 3 = 248 after 0049;
+    // the drift CLI agrees: matrix 248 = seed 248.)
+    expect(result.rows[0]?.n).toBe(248);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

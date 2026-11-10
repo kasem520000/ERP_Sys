@@ -5,7 +5,7 @@ bilingual (AR/EN), RTL-first. This repository is the **consolidated canonical
 baseline (Blueprint v1.1 + v2.0 + v3.0)** plus its implementation; the documentation
 blueprint under `docs/` is the single source of truth, and code lands phase by phase
 per the [65-phase roadmap](docs/planning/MASTER_ROADMAP.md) — stages 1–34 COMPLETE,
-stages 12–15 (PHASE-035…065) planned per
+stages 12–15 (PHASE-035…065) in delivery per
 [docs/planning/COMPLETENESS_REGISTER.md](docs/planning/COMPLETENESS_REGISTER.md) and
 [docs/planning/COMPLETENESS_ROADMAP.md](docs/planning/COMPLETENESS_ROADMAP.md) (the
 Full-ERP completion program closing the 495 audited gaps).

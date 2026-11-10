@@ -905,6 +905,24 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "settings",
     order: 120,
   },
+  // settings group — WEB-036 (PHASE-036): the custom-fields extensibility
+  // manager (/settings/custom-fields: definitions, picklists, form layouts).
+  // The plan gate is migration 0049's platform.custom_fields grant
+  // (business + enterprise); the read key is the seeded matrix's
+  // configuration.custom_fields.read (matrix §3.8 — accountant + owner; the
+  // in-screen writes gate on configuration.custom_fields.manage).
+  {
+    id: "settings.custom_fields",
+    parentGroup: "settings",
+    label: { ar: "الحقول المخصصة", en: "Custom fields" },
+    icon: "layers",
+    route: "/settings/custom-fields",
+    featureKey: "platform.custom_fields",
+    permission: "configuration.custom_fields.read",
+    branchScoped: false,
+    archetype: "settings",
+    order: 125,
+  },
   // settings group — T19-WEB (PHASE-014): the owner billing home (plan card,
   // usage meters, billing history, trial countdown). NAVIGATION_MODEL §1 lists
   // "subscription" under settings; NO featureKey on purpose — billing must

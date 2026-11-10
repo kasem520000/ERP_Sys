@@ -12,7 +12,7 @@
  * law). Structure/branch/cost-center/project selects ride the
  * server-fetched reference pools.
  */
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { JSX } from "react";
 
@@ -22,6 +22,8 @@ import { getDictionary, type Locale } from "../i18n/dictionaries";
 import type {
   BranchRow,
   CostCenterRow,
+  CustomFieldDefinitionRow,
+  CustomFieldValueView,
   EmployeeListRow,
   ProjectRow,
   SalaryStructureRow,
@@ -29,6 +31,7 @@ import type {
 import { bffFetch } from "../lib/client-api";
 import { formatMessage, localizedName, localizedPayrollError } from "../lib/messages";
 import { Card } from "./card";
+import { CustomFieldSurface } from "./custom-field-surface";
 import { ErrorNotice } from "./notices";
 
 const CONTRACTS = ["FULL_TIME", "PART_TIME", "CONTRACTOR"] as const;
@@ -82,6 +85,31 @@ export function EmployeeForm({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  // WEB-036 (PHASE-036): the employees custom-field surface (session route;
+  // silent on failure) — hidden on the TERMINATED frozen row (the frozen-row
+  // law: read-only except the note fields). null payload = untouched → no-op.
+  const [fieldDefinitions, setFieldDefinitions] = useState<readonly CustomFieldDefinitionRow[]>([]);
+  const [customPayload, setCustomPayload] = useState<Record<string, unknown> | null>(null);
+  const customSeedValues = useMemo<Record<string, CustomFieldValueView>>(
+    () => employee?.customFields ?? {},
+    [employee],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async (): Promise<void> => {
+      const surface = await bffFetch<readonly CustomFieldDefinitionRow[]>(
+        "configuration/custom-fields/surface?entityType=employees",
+      );
+      if (!cancelled && surface.ok) {
+        setFieldDefinitions(surface.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const structureOptions = structures
     .filter((structure) => structure.status === "ACTIVE")
     .map((structure) => ({
@@ -125,6 +153,9 @@ export function EmployeeForm({
           bankAccount: bankAccount.trim() === "" ? null : bankAccount.trim(),
           note: note.trim() === "" ? null : note.trim(),
           noteAr: noteAr.trim() === "" ? null : noteAr.trim(),
+          ...(customPayload !== null && Object.keys(customPayload).length > 0
+            ? { customFields: customPayload }
+            : {}),
         },
       });
       setBusy(false);
@@ -173,6 +204,9 @@ export function EmployeeForm({
     }
     if (noteAr.trim() !== (employee?.noteAr ?? "")) {
       body.noteAr = noteAr.trim() === "" ? null : noteAr.trim();
+    }
+    if (customPayload !== null && !frozen) {
+      body.customFields = customPayload;
     }
     if (Object.keys(body).length === 0) {
       setBusy(false);
@@ -379,6 +413,15 @@ export function EmployeeForm({
             onValueChange={setNoteAr}
           />
         </div>
+        {!frozen && (
+          <CustomFieldSurface
+            locale={locale}
+            entityType="employees"
+            definitions={fieldDefinitions}
+            values={customSeedValues}
+            onChange={setCustomPayload}
+          />
+        )}
         <div className="flex flex-wrap justify-end gap-2">
           <Button variant="primary" onClick={() => void save()} loading={busy}>
             {d.payEmployeeSave}

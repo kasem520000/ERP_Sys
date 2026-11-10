@@ -14,6 +14,7 @@ import { TemplateApplyService } from "./application/apply/apply-service";
 import { TemplateSwitchService } from "./application/switch/switch-service";
 import { TemplateDriftService } from "./application/closure/drift-service";
 import { ConfigurationController } from "./presentation/configuration.controller";
+import { CustomFieldsController } from "./presentation/custom-fields.controller";
 
 /**
  * The configuration module (MODULE_BOUNDARIES.md: owns
@@ -32,10 +33,16 @@ import { ConfigurationController } from "./presentation/configuration.controller
  * (upgrade offers through the notifications inbox), and the configuration
  * routes (effective-config, registry reads, apply/preview/switch/extend,
  * drift-check).
+ *
+ * PHASE-036 (Blueprint v3.0 · CR-06) adds the extensibility core surface
+ * (ADR-0019): the custom-fields controller — definitions manager, picklist
+ * editor, form-layout designer, and the session render surface the six
+ * first-wave entities' forms consume. Services are pure functions over the
+ * ambient tenant UoW (no extra providers).
  */
 @Module({
   imports: [AuditModule, NotificationsModule],
-  controllers: [ConfigurationController],
+  controllers: [ConfigurationController, CustomFieldsController],
   providers: [
     ConfigRepository,
     { provide: CONFIG_REPOSITORY, useExisting: ConfigRepository },

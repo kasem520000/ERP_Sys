@@ -27,6 +27,13 @@ import { ItemService } from "../application/item-service";
 import { PriceListService } from "../application/price-list-service";
 import { CompositeService } from "../application/composite-service";
 import { AttachmentOwnerNotFoundError } from "../../partners/domain/partner-errors";
+import {
+  attachValues,
+  customFieldsPayloadSchema,
+  mergeValuesInto,
+  persistValues,
+  validateValues,
+} from "../../configuration/api";
 
 /**
  * Items routes (PHASE-006 §4; matrix §3.6): the item master, categories,
@@ -63,6 +70,9 @@ const itemCreateSchema = z.object({
   reorderLevel: z.string().regex(/^\d{1,16}(\.\d{1,6})?$/, "decimal string").nullish(),
   reorderQty: z.string().regex(/^\d{1,16}(\.\d{1,6})?$/, "decimal string").nullish(),
   basePrice: z.string().regex(/^\d{1,16}(\.\d{1,6})?$/, "decimal string").nullish(),
+  // PHASE-036 (ADR-0019): typed custom-field values validate BEFORE the
+  // insert (zero partial writes) and persist inside the same ambient UoW.
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const itemPatchSchema = z.object({
@@ -79,6 +89,9 @@ const itemPatchSchema = z.object({
   basePrice: z.string().regex(/^\d{1,16}(\.\d{1,6})?$/, "decimal string").nullish(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   version: z.number().int().positive().optional(),
+  // PHASE-036 (ADR-0019): full-replace custom-field payload (absent keys
+  // clear; `undefined` never touches the store).
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const categoryCreateSchema = z.object({
@@ -204,7 +217,9 @@ export class ItemsController {
       cursor,
       LIMIT.parse(limit ?? undefined),
     );
-    return paginatedEnvelope(page.rows, {
+    // PHASE-036: the batched custom-fields read merge.
+    const rows = await mergeValuesInto("items", page.rows);
+    return paginatedEnvelope(rows, {
       limit: page.rows.length,
       hasMore: page.hasMore,
       nextCursor: page.nextCursor ?? undefined,
@@ -217,31 +232,39 @@ export class ItemsController {
   async create(@Req() request: Request, @Body() body: unknown): Promise<unknown> {
     const identity = requireIdentity(request);
     const input = itemCreateSchema.parse(body);
-    return envelope(
-      await this.items.create(identity.userId, {
-        sku: input.sku,
-        name: input.name,
-        nameAr: input.nameAr ?? null,
-        kind: input.kind,
-        uomId: input.uomId,
-        categoryId: input.categoryId ?? null,
-        taxCodeId: input.taxCodeId ?? null,
-        costingMethod: input.costingMethod ?? "WAC",
-        trackBatch: input.trackBatch ?? false,
-        trackSerial: input.trackSerial ?? false,
-        trackImei: input.trackImei ?? false,
-        hasExpiry: input.hasExpiry ?? false,
-        reorderLevel: input.reorderLevel ?? null,
-        reorderQty: input.reorderQty ?? null,
-        basePrice: input.basePrice ?? null,
-      }),
-    );
+    // PHASE-036 (ADR-0019): validate custom-field values BEFORE the insert
+    // (zero partial writes); persistence + read merge ride the ambient UoW.
+    const validated =
+      input.customFields === undefined
+        ? undefined
+        : await validateValues("items", input.customFields);
+    const row = await this.items.create(identity.userId, {
+      sku: input.sku,
+      name: input.name,
+      nameAr: input.nameAr ?? null,
+      kind: input.kind,
+      uomId: input.uomId,
+      categoryId: input.categoryId ?? null,
+      taxCodeId: input.taxCodeId ?? null,
+      costingMethod: input.costingMethod ?? "WAC",
+      trackBatch: input.trackBatch ?? false,
+      trackSerial: input.trackSerial ?? false,
+      trackImei: input.trackImei ?? false,
+      hasExpiry: input.hasExpiry ?? false,
+      reorderLevel: input.reorderLevel ?? null,
+      reorderQty: input.reorderQty ?? null,
+      basePrice: input.basePrice ?? null,
+    });
+    if (validated !== undefined) {
+      await persistValues("items", row.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("items", row));
   }
 
   @Get("items/:id")
   @RequirePermissions("items.view")
   async get(@Param("id") id: string): Promise<unknown> {
-    return envelope(await this.items.get(id));
+    return envelope(await attachValues("items", await this.items.get(id)));
   }
 
   @Patch("items/:id")
@@ -249,7 +272,16 @@ export class ItemsController {
   async update(@Req() request: Request, @Param("id") id: string, @Body() body: unknown): Promise<unknown> {
     const identity = requireIdentity(request);
     const patch = itemPatchSchema.parse(body);
-    return envelope(await this.items.update(identity.userId, id, patch));
+    const { customFields: customFieldsInput, ...entityPatch } = patch;
+    const validated =
+      customFieldsInput === undefined
+        ? undefined
+        : await validateValues("items", customFieldsInput);
+    const row = await this.items.update(identity.userId, id, entityPatch);
+    if (validated !== undefined) {
+      await persistValues("items", row.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("items", row));
   }
 
   @Post("items/:id/archive")

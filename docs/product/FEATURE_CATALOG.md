@@ -1,6 +1,6 @@
 # Feature Catalog
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-035 truth restoration — DR-035-01/02/03)
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-035 truth restoration — DR-035-01/02/03 · PHASE-036 `platform.custom_fields`)
 
 The canonical, exhaustive registry of product features. Every feature has exactly one
 **feature key** (`module.feature_name`). This file is the single source of truth referenced by:
@@ -74,6 +74,7 @@ the maintenance protocol in §25.
 | **2** | PHASE-020…022 | Offline sync foundation and native clients |
 | **3** | PHASE-023…025 | Integrations, enterprise hardening, GA-tier features |
 | **4** | PHASE-026…034 | Blueprint v2.0 post-GA expansion — financial depth, industry expansion II, enterprise consolidation ([../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) §B; MVP and GA gates unchanged — ED-01) |
+| **5** | PHASE-035…065 | Blueprint v3.0 completeness program — the audit-gap closure waves, stages 12–15 ([../planning/COMPLETENESS_ROADMAP.md](../planning/COMPLETENESS_ROADMAP.md); phase ids immutable per CR-37; MVP and GA gates unchanged) |
 
 Priority is derived from the delivering phase. Where [../PRODUCT_REQUIREMENTS.md](../PRODUCT_REQUIREMENTS.md)
 groups a capability in a different tier (e.g., manufacturing at PHASE-018 is grouped with
@@ -106,6 +107,7 @@ by the `tenancy`, `identity`, `audit`, `notifications`, and `files` modules.
 | `platform.notifications` | Notifications · الإشعارات | In-app inbox + email at MVP; SMS/push adapters later. Event-driven (invoice.overdue, stock.below_reorder, einvoice failures, sync rejections). **Split note (PHASE-014): the billing-critical subset shipped 014** — in-app inbox + preferences + owner emails for limit warnings, subscription state changes, invoice.overdue, stock.below_reorder, reconciliation/assertion failures; **PHASE-015 generalized the in-app leg** (category domains widened to `stock` + `templates`: BR-019 reorder digests, template upgrade offers — never auto-applied); e-invoice/sync event integrations and SMS/push adapters remain with their owning phases (023/020+) | MVP | 003 (email) / 014 (billing-critical in-app) / 015 (generalized in-app) | `platform.notifications.manage` | — |
 | `platform.files` | Attachments & files · المرفقات | Tenant-scoped file objects (receipts, contracts, exports) with signed URLs and upload validation | MVP | 002 (infra) / 006 (usage) | `platform.files.upload` | — |
 | `platform.data_export` | Tenant data export · تصدير بيانات المستأجر | Full structured export (JSON + CSV per entity + document PDFs) used for offboarding and on-demand download | MVP | 014 | `platform.tenants.manage` | `platform.tenant_lifecycle` | *(marker corrected 004→014 per PHASE-004 §2: the export/offboarding flows land with the PHASE-014 billing/offboarding work; the `tenancy.export.request`/`tenancy.offboarding.execute` permissions exist in the PHASE-003 seed — corrected at PHASE-004 completion)* |
+| `platform.custom_fields` | Custom fields & form designer · الحقول المخصصة ومصمم النماذج | Typed custom fields (TEXT/NUMBER/DATE/BOOLEAN/SELECT/MULTISELECT/REFERENCE) on the six first-wave entities (partners, items, sales invoices, purchase orders, employees, projects), tenant-managed picklists (قوائم القيم), and per-entity form layouts with role overrides (مصمم النماذج) — a tenant adds, validates and renders a field with zero code changes, zero migrations, zero deploys (migration `0049`; ADR-0019; BR-057/058/059); values injected into the entities' APIs via one reusable guard; the `/settings/custom-fields` manager is online-only; plan grants: **business + enterprise** (starter excluded — the tier-4 precedent, riding 0049's DATA-ONLY tail block, the 0048 convention) | 5 | 036 | `configuration.custom_fields.manage` (+ `configuration.custom_fields.read`, `configuration.form_layouts.manage`) | `platform.onboarding` |
 
 ## 4. Module: accounting
 

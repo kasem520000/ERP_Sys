@@ -1,6 +1,6 @@
 # Architecture Decision Records — Index
 
-> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-10-28
+> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-11-10 (ADR-0019)
 
 Architecture Decision Records (ADRs) capture each significant, hard-to-reverse decision:
 context, decision, alternatives, consequences, and the conditions under which the decision
@@ -31,6 +31,7 @@ impact analysis, migration plan, affected phases, updated ADR, regression tests)
 | [ADR-0016](ADR/ADR-0016-ui-tailwind-radix.md) | UI: Tailwind CSS v4 + Radix primitives + custom RTL-first ERP design system | ACCEPTED |
 | [ADR-0017](ADR/ADR-0017-no-event-sourcing.md) | No event sourcing: relational journal + append-only audit (consolidation 2026-10-28, rationale from Folder 4) | ACCEPTED |
 | [ADR-0018](ADR/ADR-0018-multi-entity-consolidation.md) | Multi-entity consolidation: legal entity = tenant; read-only member aggregation + eliminations in parent books (Blueprint v2.0, 2026-10-28) | ACCEPTED |
+| [ADR-0019](ADR/ADR-0019-custom-fields-typed-value-store.md) | Custom fields: typed value store (num_nonnulls=1 row law) + code-owned entity registry + the additive 042+ registration rule (Blueprint v3.0, 2026-11-10) | ACCEPTED |
 
 ## Decisions deliberately NOT taken (with reasons)
 

@@ -15,13 +15,13 @@
  * the localized accounting mapper (PROJECT_NOT_FOUND/PROJECT_CODE_TAKEN
  * are the T44 typed codes).
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { JSX } from "react";
 
 import { Badge, Button, DataTable, Dialog, Input, Select } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { ProjectRow } from "../lib/api-types";
+import type { CustomFieldDefinitionRow, ProjectRow } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import {
   localizedName,
@@ -29,6 +29,7 @@ import {
   localizedProjectStatus,
 } from "../lib/messages";
 import { Card } from "./card";
+import { CustomFieldSurface } from "./custom-field-surface";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
 
@@ -61,6 +62,28 @@ export function AccountingProjects({
 
   // Status-flip confirm dialog.
   const [closeTarget, setCloseTarget] = useState<ProjectRow | null>(null);
+
+  // WEB-036 (PHASE-036): the projects custom-field surface (session route;
+  // silent on failure) — rides the CREATE dialog; the epoch remounts a fresh
+  // surface after each successful create (the rename dialog stays native).
+  const [fieldDefinitions, setFieldDefinitions] = useState<readonly CustomFieldDefinitionRow[]>([]);
+  const [customPayload, setCustomPayload] = useState<Record<string, unknown> | null>(null);
+  const [surfaceEpoch, setSurfaceEpoch] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async (): Promise<void> => {
+      const surface = await bffFetch<readonly CustomFieldDefinitionRow[]>(
+        "configuration/custom-fields/surface?entityType=projects",
+      );
+      if (!cancelled && surface.ok) {
+        setFieldDefinitions(surface.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const labelById = useMemo(() => {
     const map = new Map<string, string>();
@@ -101,6 +124,9 @@ export function AccountingProjects({
         name: createName.trim(),
         nameAr: createNameAr.trim() === "" ? null : createNameAr.trim(),
         parentId: createParentId === "" ? null : createParentId,
+        ...(customPayload !== null && Object.keys(customPayload).length > 0
+          ? { customFields: customPayload }
+          : {}),
       },
     });
     setBusy(null);
@@ -113,6 +139,8 @@ export function AccountingProjects({
     setCreateName("");
     setCreateNameAr("");
     setCreateParentId("");
+    setCustomPayload(null);
+    setSurfaceEpoch((epoch) => epoch + 1);
     setNotice(d.accountingProjectCreatedToast);
     await reload();
   }
@@ -293,6 +321,16 @@ export function AccountingProjects({
                 label: labelById.get(project.id) ?? project.code,
               })),
             ]}
+          />
+        </div>
+        <div className="mt-3">
+          <CustomFieldSurface
+            key={surfaceEpoch}
+            locale={locale}
+            entityType="projects"
+            definitions={fieldDefinitions}
+            values={{}}
+            onChange={setCustomPayload}
           />
         </div>
         <div className="mt-4 flex justify-end gap-2">

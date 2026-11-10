@@ -216,8 +216,8 @@ describe("owner journey: login → onboarding → branches → settings", () => 
     // set (64 accounts / 41 purposes: 2170/2180/2190 SALARIES_PAYABLE /
     // DEDUCTIONS_PAYABLE / EOS_PROVISION + 5270/5280/5295 SALARIES_EXPENSE /
     // EMPLOYER_CONTRIBUTIONS / EOS_PROVISION_EXPENSE).
-    expect(diff.accounts.created).toBe(64);
-    expect(diff.purposes.created).toBe(41);
+    expect(diff.accounts.created).toBe(65); // 64 + 3220 CONSOLIDATION_ADJUSTMENT (0041 — restored-lineage drift, repaired in PHASE-036)
+    expect(diff.purposes.created).toBe(42); // 41 + CONSOLIDATION_ADJUSTMENT (same drift)
 
     const reRun = await request(
       "POST",

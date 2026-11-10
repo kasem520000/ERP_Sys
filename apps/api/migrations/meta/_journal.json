@@ -336,6 +336,13 @@
       "when": 1794481600000,
       "tag": "0048_items_import_export_grant",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794568000000,
+      "tag": "0049_custom_fields",
+      "breakpoints": true
     }
   ],
   "version": "7"

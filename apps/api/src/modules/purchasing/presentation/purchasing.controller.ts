@@ -16,6 +16,13 @@ import { ApQueriesService } from "../application/ap-queries";
 import { LandedCostService } from "../application/landed-costs";
 import { OpeningApService } from "../application/opening-ap";
 import { PurchasingReconciliationService } from "../application/purchasing-reconciliation";
+import {
+  attachValues,
+  customFieldsPayloadSchema,
+  mergeValuesInto,
+  persistValues,
+  validateValues,
+} from "../../configuration/api";
 
 /**
  * Purchasing routes (PHASE-011 §4; matrix §3.3): every route is
@@ -81,6 +88,10 @@ const createOrderSchema = z.object({
   requestId: UUID.nullable().optional(),
   revisionOfId: UUID.nullable().optional(),
   lines: z.array(orderLineSchema).min(1).max(200),
+  // PHASE-036 (ADR-0019): typed custom-field values validate BEFORE the
+  // insert (zero partial writes); documents are lifecycle-state machines —
+  // no PATCH surface, values ride create.
+  customFields: customFieldsPayloadSchema.optional(),
 });
 
 const grnLineSchema = z.object({
@@ -288,14 +299,14 @@ export class PurchasingController {
 
   @Get("purchase-orders")
   @RequirePermissions("purchasing.purchase_orders.view")
-  listOrders(
+  async listOrders(
     @Query("status") status?: string,
     @Query("supplierId") supplierId?: string,
     @Query("limit") limit?: string,
   ) {
-    return envelope(
-      this.orders.list({ status, supplierId, limit: z.coerce.number().int().min(1).max(500).parse(limit ?? 100) }),
-    );
+    // PHASE-036: the batched custom-fields read merge.
+    const rows = await this.orders.list({ status, supplierId, limit: z.coerce.number().int().min(1).max(500).parse(limit ?? 100) });
+    return envelope(await mergeValuesInto("purchase_orders", rows));
   }
 
   @Post("purchase-orders")
@@ -304,6 +315,12 @@ export class PurchasingController {
   async createOrder(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = createOrderSchema.parse(body);
+    // PHASE-036 (ADR-0019): validate custom-field values BEFORE the insert
+    // (zero partial writes); persistence + read merge ride the ambient UoW.
+    const validated =
+      input.customFields === undefined
+        ? undefined
+        : await validateValues("purchase_orders", input.customFields);
     const created = await this.orders.create({
       ...input,
       expectedDate: input.expectedDate ?? null,
@@ -322,13 +339,18 @@ export class PurchasingController {
         note: line.note ?? null,
       })),
     });
-    return envelope(created);
+    if (validated !== undefined) {
+      await persistValues("purchase_orders", created.id, identity.userId, validated);
+    }
+    return envelope(await attachValues("purchase_orders", created));
   }
 
   @Get("purchase-orders/:id")
   @RequirePermissions("purchasing.purchase_orders.view")
   async findOrder(@Param("id") id: string) {
-    return envelope(await this.orders.findWithLines(id));
+    return envelope(
+      await attachValues("purchase_orders", await this.orders.findWithLines(id)),
+    );
   }
 
   @Post("purchase-orders/:id/submit")

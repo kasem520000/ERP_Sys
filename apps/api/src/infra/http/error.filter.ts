@@ -56,6 +56,18 @@ import {
   UnknownSettingKeyError,
 } from "../../modules/configuration/api";
 import {
+  CustomFieldNotFoundError,
+  CustomFieldUnknownKeyError,
+  CustomFieldArchivedError,
+  CustomFieldValueInvalidError,
+  CustomFieldRequiredError,
+  CustomFieldKeyTakenError,
+  PicklistNotFoundError,
+  PicklistOptionNotFoundError,
+  PicklistKeyTakenError,
+  FormLayoutNotFoundError,
+} from "../../modules/configuration/domain/custom-field-errors";
+import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
   CreditTermsCodeTakenError,
@@ -1000,6 +1012,33 @@ function domainStatus(error: DomainError): number {
     error instanceof SyncCommandInvalidError ||
     error instanceof DeviceAttestationUnavailableError ||
     error instanceof DeviceAttestationFailedError
+  ) {
+    return HttpStatus.BAD_REQUEST;
+  }
+  // PHASE-036 custom fields (ADR-0019): 404 not-founds (A7 parity — unknown
+  // == foreign ids, never an existence disclosure), 409 natural-key
+  // conflicts (the uq tenant/entity/key + tenant/key laws), and the VALUE
+  // guard's typed 400 failure packs (wrong type, regex/min/max violations,
+  // unknown picklist options, unknown field keys, writes against ARCHIVED
+  // definitions — acceptance 3; zero partial writes). The definition/
+  // policy family (entity registry, BR-058 namespace, config shape,
+  // BR-059 native protection) falls through to the 422 default by design.
+  if (
+    error instanceof CustomFieldNotFoundError ||
+    error instanceof PicklistNotFoundError ||
+    error instanceof PicklistOptionNotFoundError ||
+    error instanceof FormLayoutNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (error instanceof CustomFieldKeyTakenError || error instanceof PicklistKeyTakenError) {
+    return HttpStatus.CONFLICT;
+  }
+  if (
+    error instanceof CustomFieldUnknownKeyError ||
+    error instanceof CustomFieldArchivedError ||
+    error instanceof CustomFieldValueInvalidError ||
+    error instanceof CustomFieldRequiredError
   ) {
     return HttpStatus.BAD_REQUEST;
   }

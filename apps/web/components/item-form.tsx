@@ -15,10 +15,17 @@ import type { FormEvent, JSX } from "react";
 import { Badge, Button, Checkbox, Input, MoneyInput, NumberInput, RadioGroup, Select, useToast } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { ItemCategoryRow, ItemRow, UomRow } from "../lib/api-types";
+import type {
+  CustomFieldDefinitionRow,
+  CustomFieldValueView,
+  ItemCategoryRow,
+  ItemRow,
+  UomRow,
+} from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedMasterDataError, localizedName } from "../lib/messages";
 import { Card } from "./card";
+import { CustomFieldSurface } from "./custom-field-surface";
 import { DefList } from "./def-list";
 import { ErrorNotice } from "./notices";
 
@@ -81,6 +88,31 @@ export function ItemForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // WEB-036 (PHASE-036): the items custom-field surface (session route;
+  // silent on failure — a starter tenant renders no extra inputs) + the
+  // seeded values and the emitted payload (null = untouched → no-op PATCH).
+  const [fieldDefinitions, setFieldDefinitions] = useState<readonly CustomFieldDefinitionRow[]>([]);
+  const [customPayload, setCustomPayload] = useState<Record<string, unknown> | null>(null);
+  const customSeedValues = useMemo<Record<string, CustomFieldValueView>>(
+    () => item?.customFields ?? {},
+    [item],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async (): Promise<void> => {
+      const surface = await bffFetch<readonly CustomFieldDefinitionRow[]>(
+        "configuration/custom-fields/surface?entityType=items",
+      );
+      if (!cancelled && surface.ok) {
+        setFieldDefinitions(surface.data);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const dirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(initial), [form, initial]);
 
   // dirty-guard: native unload warning (full navigations/refreshes)
@@ -131,6 +163,9 @@ export function ItemForm({
       if (form.reorderLevel.trim() !== "") body.reorderLevel = form.reorderLevel.trim();
       if (form.reorderQty.trim() !== "") body.reorderQty = form.reorderQty.trim();
       if (form.basePrice.trim() !== "") body.basePrice = form.basePrice.trim();
+      if (customPayload !== null && Object.keys(customPayload).length > 0) {
+        body.customFields = customPayload;
+      }
       const created = await bffFetch<ItemRow>("items/items", {
         method: "POST",
         body,
@@ -163,6 +198,9 @@ export function ItemForm({
     else body.reorderQty = null;
     if (form.basePrice.trim() !== "") body.basePrice = form.basePrice.trim();
     else body.basePrice = null;
+    if (customPayload !== null) {
+      body.customFields = customPayload;
+    }
     const updated = await bffFetch<ItemRow>(`items/items/${item?.id}`, {
       method: "PATCH",
       body,
@@ -331,6 +369,13 @@ export function ItemForm({
           amount={form.basePrice}
           onAmountChange={(amount) => setField("basePrice", amount)}
           currency="SAR"
+        />
+        <CustomFieldSurface
+          locale={locale}
+          entityType="items"
+          definitions={fieldDefinitions}
+          values={customSeedValues}
+          onChange={setCustomPayload}
         />
         {isEdit && (
           <div className="grid gap-4 sm:grid-cols-2">

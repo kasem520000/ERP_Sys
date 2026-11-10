@@ -2295,3 +2295,149 @@ export function localizedPayrollError(
       return localizedApiError(d, error, retryAfterSeconds);
   }
 }
+
+// -- WEB-036 (PHASE-036): custom fields -------------------------------------------
+
+/** Picks a string detail off a typed error pack (details: { key, reason, … }). */
+function detailStringOf(details: unknown, field: string): string {
+  if (isRecord(details) && typeof details[field] === "string") {
+    return details[field] as string;
+  }
+  return "";
+}
+
+/** The custom-fields typed-error map (BR-057/058/059 + picklists + layouts). */
+export function localizedCustomFieldsError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "CUSTOM_FIELD_KEY_TAKEN":
+      return d.customFieldsErrorKeyTaken;
+    case "CUSTOM_FIELD_KEY_INVALID":
+      return formatMessage(d.customFieldsErrorKeyInvalid, {
+        reason: detailStringOf(error.details, "reason") || error.message,
+      });
+    case "CUSTOM_FIELD_CONFIG_INVALID":
+      return formatMessage(d.customFieldsErrorConfigInvalid, {
+        reason: detailStringOf(error.details, "reason") || error.message,
+      });
+    case "CUSTOM_FIELD_ENTITY_UNKNOWN":
+      return d.customFieldsErrorEntityUnknown;
+    case "CUSTOM_FIELD_VALIDATION_MISMATCH":
+      return d.customFieldsErrorValidationMismatch;
+    case "CUSTOM_FIELD_NOT_FOUND":
+    case "PICKLIST_NOT_FOUND":
+    case "PICKLIST_OPTION_NOT_FOUND":
+    case "FORM_LAYOUT_NOT_FOUND":
+      return d.customFieldsErrorNotFound;
+    case "CUSTOM_FIELD_ARCHIVED":
+      return d.customFieldsErrorArchived;
+    case "CUSTOM_FIELD_UNKNOWN_KEY":
+      return formatMessage(d.customFieldsErrorUnknownKey, {
+        key: detailStringOf(error.details, "key") || "—",
+      });
+    case "CUSTOM_FIELD_REQUIRED":
+      return formatMessage(d.customFieldsErrorRequired, {
+        key: detailStringOf(error.details, "key") || "—",
+      });
+    case "CUSTOM_FIELD_VALUE_INVALID":
+      return formatMessage(d.customFieldsErrorValueInvalid, {
+        key: detailStringOf(error.details, "key") || "—",
+      });
+    case "CUSTOM_FIELD_IMMUTABLE":
+      return d.customFieldsErrorImmutable;
+    case "PICKLIST_KEY_TAKEN":
+      return d.customFieldsErrorPicklistKeyTaken;
+    case "PICKLIST_ARCHIVED":
+      return d.customFieldsErrorPicklistArchived;
+    case "PICKLIST_ORDER_INVALID":
+      return d.customFieldsErrorPicklistOrderInvalid;
+    case "FORM_LAYOUT_INVALID":
+      return formatMessage(d.customFieldsErrorLayoutInvalid, {
+        reason: detailStringOf(error.details, "reason") || error.message,
+      });
+    case "FORM_LAYOUT_NATIVE_PROTECTED":
+      return formatMessage(d.customFieldsErrorLayoutProtected, {
+        violation: detailStringOf(error.details, "violation") || error.message,
+      });
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}
+
+/** The data-type vocabulary (FD-18) for definitions tables + selects. */
+export function localizedCustomFieldDataType(
+  d: Dictionary,
+  dataType: string,
+): string {
+  switch (dataType) {
+    case "TEXT":
+      return d.customFieldsTypeText;
+    case "NUMBER":
+      return d.customFieldsTypeNumber;
+    case "DATE":
+      return d.customFieldsTypeDate;
+    case "BOOLEAN":
+      return d.customFieldsTypeBoolean;
+    case "SELECT":
+      return d.customFieldsTypeSelect;
+    case "MULTISELECT":
+      return d.customFieldsTypeMultiselect;
+    case "REFERENCE":
+      return d.customFieldsTypeReference;
+    default:
+      return dataType;
+  }
+}
+
+/** The form-layout role-override keys (matrix role keys, lowercase). */
+export function localizedCustomFieldRole(d: Dictionary, roleKey: string): string {
+  switch (roleKey) {
+    case "owner":
+      return d.customFieldsRoleOwner;
+    case "accountant":
+      return d.customFieldsRoleAccountant;
+    case "sales":
+      return d.customFieldsRoleSales;
+    case "purchasing":
+      return d.customFieldsRolePurchasing;
+    case "warehouse":
+      return d.customFieldsRoleWarehouse;
+    case "cashier":
+      return d.customFieldsRoleCashier;
+    case "viewer":
+      return d.customFieldsRoleViewer;
+    case "payroll_officer":
+      return d.customFieldsRolePayrollOfficer;
+    default:
+      return roleKey;
+  }
+}
+
+/** The custom-field value's display label (optionLabel per locale, else the raw value). */
+export function customFieldValueLabel(
+  view: { value: unknown; optionLabel?: string; optionLabelAr?: string } | undefined,
+  locale: Locale,
+): string {
+  if (view === undefined || view === null) {
+    return "—";
+  }
+  if (view.value === null || view.value === undefined || view.value === "") {
+    return "—";
+  }
+  if (locale === "ar" && view.optionLabelAr !== undefined && view.optionLabelAr !== "") {
+    return view.optionLabelAr;
+  }
+  if (view.optionLabel !== undefined && view.optionLabel !== "") {
+    return view.optionLabel;
+  }
+  if (Array.isArray(view.value)) {
+    return view.value.map((entry) => String(entry)).join(", ");
+  }
+  if (typeof view.value === "boolean") {
+    return view.value ? "✓" : "✗";
+  }
+  return String(view.value);
+}

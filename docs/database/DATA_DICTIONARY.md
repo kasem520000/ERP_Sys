@@ -1,6 +1,6 @@
 # Data Dictionary — Shared Column Semantics
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-10 (PHASE-036)
 
 The semantic dictionary for **recurring columns and value sets** across all tables. It
 sits between [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) (mechanical rules:
@@ -192,6 +192,8 @@ are pre-registered at blueprint level per [../EXPANSION_REGISTER.md](../EXPANSIO
 | `loan_status` | ACTIVE, CLOSED, WRITE_OFF | employee_loans | 029 |
 | `loan_line_status` | PENDING, DEDUCTED, WAIVED | employee_loan_lines | 029 |
 | `consolidation_run_status` | QUEUED, RUNNING, COMPLETED, FAILED | consolidation_runs | 034 |
+| `custom_field_data_type` | TEXT, NUMBER, DATE, BOOLEAN, SELECT, MULTISELECT, REFERENCE | custom_field_definitions | 036 |
+| `custom_field_status` | ACTIVE, ARCHIVED | custom_field_definitions, custom_picklists, custom_picklist_options, form_layouts | 036 |
 
 ## 10. `memo` vs `description`
 
@@ -256,3 +258,56 @@ dictionary term — no table may redefine them.
 | `component_snapshot` | `jsonb` | Frozen-copy rule, same discipline as §8 `tax_snapshot` | `payroll_run_lines`: frozen per-employee copy of the resolved salary components (amounts, rates, structure version) at run posting — structure edits never mutate posted lines (INV-025); recomputing a DRAFT run must reproduce it exactly (determinism); missing snapshot on a posting attempt is an engine rejection |
 | `late_fee_policy` | `jsonb` | Policy blob, not a data channel ([DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) §4); delivered shape `{rate, cap, grace_days, auto_charge, defaulted_after_lines}` with PLACEHOLDER defaults (rate 2% · cap 500 · grace 7 d · auto_charge off · defaulted_after 3 — never silent) | `installment_plans`: per-plan rate + cap + grace (BR-049) — defaults PLACEHOLDER pending [OQ-002](../ASSUMPTIONS_AND_OPEN_QUESTIONS.md); enforced server-side, fee posts via the engine only (golden G-28); flat fees only — no interest computation or compounding path exists (DR-003) |
 | `national_id` | `text` | Sensitive personal data — C-PII class | `employees`: national identity number; handled per [DATA_PROTECTION.md](../security/DATA_PROTECTION.md) §2/§3 (masked in UI, excluded from logs by the redaction allow-list, never in job payloads); reads gated by `payroll.employees.*` permissions ([../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) §K) |
+
+## 15. The UDF key namespace (PHASE-036 · BR-058)
+
+The extensibility core ([ADR-0019](../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md),
+migration `0049_custom_fields.sql`) introduces a tenant-owned identifier namespace: the
+custom-field `key` on `custom_field_definitions` (and the picklist `key` on
+`custom_picklists`). The discipline below is enforced by the **code-owned entity registry**
+(`CUSTOM_FIELD_ENTITIES` in `apps/api/src/modules/configuration/domain/custom-fields-schema.ts`)
+— the DB CHECKs are a syntax floor only; the registry is the rule.
+
+| Rule | Value | Enforcement |
+|------|-------|-------------|
+| Syntax | lowercase `snake_case` matching `^[a-z][a-z0-9_]{0,63}$` — leading letter, letters/digits/underscore, **≤ 64 chars** | `ck_custom_field_definitions_key` (floor) + the registry's key guard (typed 422 `CUSTOM_FIELD_KEY_INVALID`) |
+| Reserved platform stems — never valid on ANY entity | `id`, `tenant_id`/`tenantid`, `created_at`/`createdat`, `updated_at`/`updatedat`, `version`, `created_by`/`createdby`, `deleted_at`/`deletedat`, `status`, `custom_fields`/`customfields` (the API payload stem itself) | The registry's reserved-stem list (BR-058) |
+| Per-entity native blocklist — never valid on the target entity | every `nativeFields` key of the target entity's registry descriptor (e.g. `partners`: `kind`, `code`, `name`, `nameAr`, `taxNumber`, `creditLimit`, `creditTermsId`, `priceListId`; `items`: `sku`, `uomId`, `categoryId`, `taxCodeId`, `basePrice`; …) | The registry descriptor lookup (BR-058) — a custom key can never shadow a native column |
+| Future native columns | Any new native column is checked against the registry's native-field lists **at design time** — a migration adding a column that collides with an existing tenant key is a design defect, caught in review | The ADR-0019 additive-registration rule (registry line + `ENTITY_CATALOG` row in the same PR) |
+
+**The `entity_type` vocabulary** is the code-owned registry's `entityType` strings —
+deliberately identical to the sync `PULLED_ENTITY_TYPES` naming so values ride the feeds'
+entity vocabulary unchanged. First wave (PHASE-036): `partners`, `items`,
+`sales_invoices`, `purchase_orders`, `employees`, `projects`. Later phases register new
+entities into the registry in the same PR (one registry line + the `ENTITY_CATALOG` row)
+— zero migrations; there is **no DB-level entity CHECK** by design (ADR-0019).
+
+**The `data_type` → typed-column mapping** (`custom_field_values`, one row per
+`(tenant_id, entity_type, entity_id, field_id)`; exactly ONE typed column non-null — the
+`num_nonnulls = 1` row law, BR-057):
+
+| `data_type` | Stored in | Shape |
+|-------------|-----------|-------|
+| `TEXT` | `value_text` | free text; `validation_regex`/`min_length`/`max_length` rules apply (TEXT-only — the validation × data-type matrix) |
+| `NUMBER` | `value_number numeric(19,6)` | `min_value`/`max_value` rules apply (NUMBER-only); display precision from `config.precision` (0–6, default 2) |
+| `DATE` | `value_date` | ISO date (no time component — §11 timestamps-vs-dates) |
+| `BOOLEAN` | `value_boolean` | true/false |
+| `SELECT` | `value_text` | the chosen `custom_picklist_options.id` (uuid string); archived options rejected for NEW values, labels preserved for history (BR-057) |
+| `MULTISELECT` | `value_json` | a **jsonb array of option ids** — `["<uuid>", …]`, array shape pinned by `ck_custom_field_values_multiselect_shape`; duplicates rejected by the guard |
+| `REFERENCE` | `value_text` | the referenced entity row's `id` (uuid string); target entity must itself be a registry entity (`config.referenceEntity`), existence checked against the registry's physical table |
+
+**The `config` jsonb keys** (`custom_field_definitions.config`, `{}` by default — a policy
+blob, never a data channel, per [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) §4):
+
+| `data_type` | Required config | Forbidden config |
+|-------------|-----------------|-------------------|
+| `SELECT` / `MULTISELECT` | `picklistId` (uuid → `custom_picklists`) | `referenceEntity`, `precision` |
+| `REFERENCE` | `referenceEntity` (a registry `entityType`) | `picklistId`, `precision` |
+| `NUMBER` | — (`precision` optional, 0–6, default 2) | `picklistId`, `referenceEntity` |
+| `TEXT` / `DATE` / `BOOLEAN` | — | all three keys |
+
+Related semantics: form layouts (`form_layouts.sections` jsonb — ordered section groups of
+native + custom field refs with `role_key` overrides, BR-059) and the ADR-0019 value guard
+(full-replace writes; values ride the owning entity's permission) are documented in
+[ADR-0019](../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md) and
+[BUSINESS_RULES.md](../product/BUSINESS_RULES.md) (BR-057…BR-059).

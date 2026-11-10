@@ -100,7 +100,12 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // for EVAL-F-5 / H-18: the built PHASE-006 import/export surface joins
     // business + enterprise — DATA-ONLY, the 0042/0043 grant-block precedent,
     // drift stays 245=245).
-    expect(files.at(-1)?.tag).toBe("0048_items_import_export_grant");
+    // PHASE-036 (Blueprint v3.0 · CR-06): 0049_custom_fields (the
+    // extensibility core per ADR-0019 — five RLS'd tenant tables: the
+    // definitions registry + the typed value store + the picklist pair +
+    // form layouts; the three §3.8 permission seeds move the drift count
+    // 245 → 248; the platform.custom_fields plan grant rides the tail).
+    expect(files.at(-1)?.tag).toBe("0049_custom_fields");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

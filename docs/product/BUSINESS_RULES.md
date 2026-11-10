@@ -1,6 +1,6 @@
 # Business Rules
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-10-28
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-036)
 
 The numbered, normative rule catalog for tenant-configurable business behavior. Rules are
 referenced as `BR-xxx` across the blueprint (phases, tests, workflows). Each rule fixes a
@@ -209,6 +209,24 @@ lifecycle from PHASE-027. The table extends the per-group format with **Phase** 
 | BR-054 | Loan deduction per period ≤ cap percent of net (default 25% — PLACEHOLDER) | Protects net pay from over-deduction of loan recovery | `payroll` loan deduction in run lines · `payroll.loans.manage` | `payroll.loan_deduction_cap_pct = 25%` — PLACEHOLDER ([OQ-002](../ASSUMPTIONS_AND_OPEN_QUESTIONS.md) family) | INV-025 | 029 | `payroll.loans` |
 | BR-055 | EOS accrual per tenant policy table; no jurisdiction rates fabricated | End-of-service formulas are jurisdiction/contract-specific; the platform provides the mechanism, the tenant provides the terms | `payroll` EOS accrual in runs (settlement G-31) · `payroll.runs.post` | tenant EOS policy table per contract type — **no product defaults** | INV-003, INV-025 | 029 | `payroll.eos_provision` |
 | BR-056 | Consolidation members must have closed fiscal periods; eliminations reversible only by counter-entry | Consolidating open books produces moving targets; eliminations follow the reversal-only correction law (G-32) | `consolidation` run precheck + elimination posting · `consolidation.runs.execute` / `consolidation.eliminations.post` | (**fixed**) | INV-011, INV-014, INV-026 | 034 | `consolidation.runs`, `consolidation.eliminations` |
+
+## Blueprint v3.0 — extensibility rules (BR-057 … BR-059)
+
+The three rules below are fixed by [../planning/COMPLETENESS_REGISTER.md](../planning/COMPLETENESS_REGISTER.md)
+CR-06 and delivered by PHASE-036 (migration `0049_custom_fields.sql`) — the extensibility
+core: typed custom fields (FD-18), per-entity form layouts (FD-19), tenant-managed
+picklists (FD-20), on the ADR-0019 substrate
+([../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md](../architecture/ADR/ADR-0019-custom-fields-typed-value-store.md)).
+Numbering continues from BR-056, the last shipped rule; boundary rules 1–2 above apply
+unchanged (a UDF value never posts — INV-022; no rule here invents legal content). The
+per-group table format applies; each rule's delivering phase is 036 and the feature key
+is `platform.custom_fields`.
+
+| ID | Statement | Rationale | Enforcement point (module · permission) | Tenant policy (default) | Invariants |
+|----|-----------|-----------|------------------------------------------|--------------------------|------------|
+| BR-057 | Custom-field type integrity: a value row exists only for a definition of matching `data_type`, and exactly ONE typed column is non-null per row (the `num_nonnulls` DB law); archiving a definition hides its field but PRESERVES its values (history renders forever); archived picklist options are rejected for NEW values while their labels keep rendering for history | The typed store is the queryable, indexable, type-safe substrate (ADR-0019); values are business history — a definition retiring may never destroy recorded facts | `configuration` value guard (validate before entity insert — zero partial writes; full-replace semantics) · `configuration.custom_fields.manage` (writes ride the OWNING entity's permission) | (**fixed**) | INV-022 |
+| BR-058 | Key namespace discipline: tenant keys are lowercase snake_case ≤ 64 chars (leading letter), never a reserved platform stem (`id`, `tenant_id`, `created_at`, `updated_at`, `version`, `created_by`, `status`, `custom_fields`/`customFields`, …), and never a native column of the target entity (the code-owned registry's native-field blocklist); future native columns are checked against the registry at design time | A custom key that shadows a platform stem or a native column silently forks the entity's own vocabulary and breaks every future native migration | `configuration` definition service at create (key guard) · `configuration.custom_fields.manage` | (**fixed**) | — |
+| BR-059 | Form-layout native protection: every mandatory native field appears exactly ONCE in any saved layout and the mandatory fields keep their canonical registry order; role overrides layer on the default layout, never replace it | A layout that drops or reorders a mandatory field renders a form that cannot save — the designer composes presentation, never the entry contract | `configuration` form-layout service at upsert (guarded against the registry's mandatory list) · `configuration.form_layouts.manage` | (**fixed**) | — |
 
 ## 8. Enforcement & test matrix
 
