@@ -142,7 +142,14 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // tables; the projection consumers: login + the interceptor), then
     // 0062 (BR-066) — the import_jobs mapping snapshot column (the T-10
     // spec catch: the worker re-validates against the preview's map).
-    expect(files.at(-1)?.tag).toBe("0063_tenant_kind_reader");
+    // PHASE-041 (CR-11): 0064_communications_hub — the four RLS'd tables
+    // (message_templates, outbound_messages, notification_preferences,
+    // communication_log) + the tenant-default preference seed (the
+    // erp_definer BYPASSRLS one-shot window) + the five communication.*
+    // permission keys (267 → 272, matrix §3.19) + the six feature plan
+    // grants (templates/outbound all plans; the provider tiers
+    // business+enterprise).
+    expect(files.at(-1)?.tag).toBe("0064_communications_hub");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

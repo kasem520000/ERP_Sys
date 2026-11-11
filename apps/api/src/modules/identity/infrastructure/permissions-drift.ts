@@ -148,6 +148,11 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // matrix §3.10 + the identity-flows checklist pin platform.* as never
   // tenant-assignable — recorded deviation in the completion report §4).
   "apps/api/migrations/0060_import_toolkit.sql",
+  // PHASE-041 (Blueprint v3.0 · CR-11): 0064 seeds the FIVE communications
+  // keys (matrix §3.19; 267 → 272) — communication.templates.manage,
+  // communication.outbox.read, communication.preferences.manage,
+  // communication.inbox.read, communication.calendar.connect.
+  "apps/api/migrations/0064_communications_hub.sql",
 ];
 
 export async function main(): Promise<void> {

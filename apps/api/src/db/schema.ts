@@ -12,6 +12,7 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   uuid,
   varchar,
@@ -928,6 +929,168 @@ export const importMappings = pgTable(
       table.kind,
       table.name,
     ),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-041 communications hub (migration 0064; CR-11).
+// ---------------------------------------------------------------------------
+
+/**
+ * PHASE-041 (FD-30): tenant message templates — channel × locale × module
+ * with typed variable declarations; the builtin code catalog is the
+ * fallback so tenants start from working AR/EN defaults.
+ */
+export const messageTemplates = pgTable(
+  "message_templates",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    key: text("key").notNull(),
+    channel: text("channel").notNull(),
+    locale: text("locale").notNull(),
+    module: text("module").notNull(),
+    subject: text("subject"),
+    body: text("body").notNull(),
+    variables: jsonb("variables").notNull().default([]),
+    isActive: boolean("is_active").notNull().default(true),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    index("ix_message_templates_tenant_module_channel").on(
+      table.tenantId,
+      table.module,
+      table.channel,
+    ),
+    uniqueIndex("uq_message_templates_key").on(
+      table.tenantId,
+      table.key,
+      table.channel,
+      table.locale,
+    ),
+  ],
+);
+
+/**
+ * PHASE-041: the outbound send ledger — every send is a row (status
+ * QUEUED/SENT/DELIVERED/FAILED, provider id + ref, cost, retry policy,
+ * rendered snapshot, source linkage). Ledger semantics: no app-role DELETE.
+ */
+export const outboundMessages = pgTable(
+  "outbound_messages",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    channel: text("channel").notNull(),
+    status: text("status").notNull().default("QUEUED"),
+    recipient: text("recipient").notNull(),
+    recipientUserId: uuid("recipient_user_id"),
+    partnerId: uuid("partner_id"),
+    module: text("module").notNull(),
+    templateKey: text("template_key").notNull(),
+    locale: text("locale").notNull(),
+    subject: text("subject"),
+    bodySnapshot: text("body_snapshot").notNull(),
+    provider: text("provider"),
+    providerRef: text("provider_ref"),
+    costAmount: numeric("cost_amount"),
+    costCurrency: text("cost_currency"),
+    attempts: integer("attempts").notNull().default(0),
+    maxAttempts: integer("max_attempts").notNull().default(3),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true, mode: "string" }),
+    lastError: text("last_error"),
+    sentAt: timestamp("sent_at", { withTimezone: true, mode: "string" }),
+    deliveredAt: timestamp("delivered_at", { withTimezone: true, mode: "string" }),
+    sourceType: text("source_type"),
+    sourceId: uuid("source_id"),
+    correlationId: text("correlation_id"),
+    payload: jsonb("payload"),
+  },
+  (table) => [
+    index("ix_outbound_messages_queue").on(
+      table.tenantId,
+      table.status,
+      table.nextAttemptAt,
+    ),
+    index("ix_outbound_messages_partner").on(
+      table.tenantId,
+      table.partnerId,
+      table.createdAt.desc(),
+    ),
+    index("ix_outbound_messages_report").on(
+      table.tenantId,
+      table.createdAt,
+      table.channel,
+      table.status,
+    ),
+    index("ix_outbound_messages_source").on(
+      table.tenantId,
+      table.sourceType,
+      table.sourceId,
+    ),
+  ],
+);
+
+/**
+ * PHASE-041 (TB-23): the user × module × channel notification matrix;
+ * user_id NULL = the tenant default row (one per module×channel).
+ */
+export const notificationPreferences = pgTable(
+  "notification_preferences",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    userId: uuid("user_id"),
+    module: text("module").notNull(),
+    channel: text("channel").notNull(),
+    enabled: boolean("enabled").notNull(),
+    updatedBy: uuid("updated_by"),
+  },
+  (table) => [
+    index("ix_notification_preferences_user").on(
+      table.tenantId,
+      table.userId,
+      table.module,
+    ),
+    unique("uq_notification_preferences_matrix")
+      .on(table.tenantId, table.userId, table.module, table.channel)
+      .nullsNotDistinct(),
+  ],
+);
+
+/**
+ * PHASE-041 (UX-14/IN-16): the unified interaction log — messages +
+ * manually logged calls (outcome + duration, partner + user links)
+ * feeding the unified inbox surface.
+ */
+export const communicationLog = pgTable(
+  "communication_log",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    kind: text("kind").notNull(),
+    direction: text("direction").notNull(),
+    channel: text("channel").notNull(),
+    at: timestamp("at", { withTimezone: true, mode: "string" }).notNull(),
+    partnerId: uuid("partner_id"),
+    userId: uuid("user_id"),
+    counterparty: text("counterparty"),
+    summary: text("summary"),
+    body: text("body"),
+    outcome: text("outcome"),
+    durationMinutes: integer("duration_minutes"),
+    outboundMessageId: uuid("outbound_message_id"),
+    relatedType: text("related_type"),
+    relatedId: uuid("related_id"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    index("ix_communication_log_partner").on(
+      table.tenantId,
+      table.partnerId,
+      table.at.desc(),
+    ),
+    index("ix_communication_log_tenant_at").on(table.tenantId, table.at.desc()),
   ],
 );
 

@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-040 — §3.18 data onboarding & migration toolkit; permission catalog 265 → 267)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -452,6 +452,27 @@ The baseline items import console (`items.import.run`, §3.6) is untouched.
 |------------|---------------------|---------------|-------|-------|
 | `configuration.imports.manage` | Run the import toolkit: seven kinds, mapping wizard, saved mappings (import + export templates), migration adapters, error-report exports / تشغيل عدّة الاستيراد: سبعة أنواع ومعيّن ربط الأعمدة والخرائط المحفوظة ومحوّلات الترحيل وتصدير تقارير الأخطاء | owner, accountant | tenant | no (audited; the dry-run writes NOTHING — BR-066 zero-write gate; the commit is atomic per run with no partial state) |
 | `configuration.demo_data.manage` | Seed one-click realistic demo data per industry template (idempotent; refuses tenants with posted real documents) and provision time-boxed SANDBOX demo tenants from the platform plane / تحميل البيانات التجريبية الواقعية لكل قالب قطاعي وإنشاء المستأجرين التجريبيين المحدودين المدة | owner | tenant (the loader); platform (`platform.subscriptions.manage` on the sandbox route) | **yes** (audited; demo data is flagged + idempotent; a sandbox tenant is quota-capped, time-boxed, and never a consolidation member) |
+
+### 3.19 `communication` communications hub (PHASE-041)
+
+The PHASE-041 Communications Hub (CR-11 · H-22 · N-06…N-08 · FD-30 · TB-23 · UX-14 · IN-16/IN-17):
+the channel-port adapters (WhatsApp Business Cloud API, Unifonic/Msegat/Twilio SMS,
+SMTP/SendGrid/SES/Mailgun email — ALL behind the port, BR-067: the SANDBOX default provider
+makes zero external calls until a real one is configured and credentialed), the tenant
+template hub (FD-30), the outbound send ledger, the preference matrix (TB-23), the unified
+inbox with call logging, and the Google/Outlook calendar connect. **All five keys seed in
+migration `0064` §9 — the permission catalog extends 267 → 272 (seed = mirror, zero
+drift).** Users manage their OWN preference rows on the self plane (the `/me` route pattern
+— `notification_prefs` precedent); `communication.preferences.manage` governs the TENANT
+DEFAULT rows only.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `communication.templates.manage` | Manage tenant message templates (channel × locale × module, typed variables, builtin-catalog fallback) / إدارة قوالب رسائل المستأجر (قناة × لغة × وحدة بمتغيرات مطبَّعة مع سقوطٍ على القوالب المدمجة) | owner, accountant | tenant | no (audited; templates are render-only data — a bad template cannot post or move money) |
+| `communication.outbox.read` | Read the outbound send ledger (status transitions, provider references, cost, retries) and the delivery-log report / قراءة سجل الإرسال الخارجي (انتقالات الحالة ومراجع المزوّدين والتكلفة والإعادات) وتقرير سجل التسليم | owner, accountant | tenant | no (read-only over the ledger; costs are advisory inputs, never postings) |
+| `communication.preferences.manage` | Manage the TENANT DEFAULT notification-preference rows (module × channel matrix); users self-manage their own rows / إدارة صفوف الافتراضات لتفضيلات الإشعار للمستأجر (مصفوفة الوحدة × القناة)؛ ويدير كل مستخدم صفوفه بنفسه | owner | tenant | no (preferences suppress only — they never fabricate events) |
+| `communication.inbox.read` | Read the unified inbox (per-partner interaction timeline with filters) and log calls (outcome/duration linked to partner + user) / قراءة الصندوق الموحّد (خط تفاعلات كل شريك مع المرشحات) وتسجيل المكالمات (النتيجة والمدة مربوطة بالشريك والمستخدم) | owner, accountant, sales | tenant | no (audited; call entries are editable by their logger — log semantics, no delete) |
+| `communication.calendar.connect` | Connect Google/Outlook calendars via OAuth (minimal scopes), write task/appointment events, opt into two-way contacts sync with match review (never auto-merge) / ربط تقويمات Google/Outlook عبر OAuth بأدنى الصلاحيات وكتابة أحداث المهام والمواعيد وتفعيل مزامنة جهات الاتصال ثنائية الاتجاه مع مراجعة المطابقة (لا دمج تلقائي أبداً) | owner | tenant | **yes** (OAuth tokens sealed in the secret store — never logged, masked in settings; rotation documented; contacts sync is per-tenant opt-in with review-only merging) |
 
 ## 4. Segregation of duties & approval limits
 

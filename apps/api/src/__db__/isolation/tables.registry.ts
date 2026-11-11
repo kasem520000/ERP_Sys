@@ -400,6 +400,16 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   // (mappings are re-editable and removable), the entitlements precedent.
   // One table — the auto-generated A-suite extends by +6.
   { table: "import_mappings", deleteGranted: true },
+  // PHASE-041 (Blueprint v3.0 · CR-11, migration 0064): the communications
+  // hub. message_templates + notification_preferences are tenant user data
+  // (re-editable and removable — the import_mappings precedent); the other
+  // two are LEDGER/log semantics (SELECT/INSERT/UPDATE only — no app-role
+  // DELETE, the dunning_letters precedent). Four tables — the
+  // auto-generated A-suite extends by +24.
+  { table: "message_templates", deleteGranted: true },
+  { table: "outbound_messages" },
+  { table: "notification_preferences", deleteGranted: true },
+  { table: "communication_log" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

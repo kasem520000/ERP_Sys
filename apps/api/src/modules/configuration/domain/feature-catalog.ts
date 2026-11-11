@@ -137,6 +137,19 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   // (no dependency edges — they ride the modules they write into).
   "platform.data_migration": [],
   "platform.demo_data": [],
+  // PHASE-041 communications hub keys (migration 0064 §10):
+  // communication.templates + communication.outbound → ALL plans (base
+  // messaging over the SANDBOX default provider — BR-067); the provider
+  // tiers (whatsapp/sms/email_providers) and calendar_integration →
+  // business + enterprise (the 0051 tier-4 precedent). The outbound
+  // pipeline renders from the template substrate; every real provider
+  // rides the outbound ledger.
+  "communication.templates": [],
+  "communication.outbound": ["communication.templates"],
+  "communication.whatsapp": ["communication.outbound"],
+  "communication.sms": ["communication.outbound"],
+  "communication.email_providers": ["communication.outbound"],
+  "communication.calendar_integration": [],
   // treasury
   "treasury.accounts": ["accounting.chart_of_accounts"],
   "treasury.receipts_disbursements": ["treasury.accounts"],

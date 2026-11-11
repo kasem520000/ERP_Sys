@@ -493,3 +493,20 @@ books; **zero cross-tenant writes** (PHASE-034; INV-026, golden G-32,
    note for tenants holding the entitlement.
 4. **Completeness rule**: phase completion reports must list every feature key their phase
    delivers and confirm each exists in this catalog — orphan keys fail review.
+
+## 26. Module: communication (PHASE-041)
+
+The Communications Hub (CR-11 · H-22 · N-06…N-08 · IN-13…IN-18 · FD-30 · TB-23 · UX-14 ·
+PP-13/PP-15). Every outbound send goes through the channel port (BR-067): no provider is
+called outside it, and the SANDBOX default provider makes ZERO external calls until a real
+provider is configured and credentialed. Numbering note: this section is appended AFTER the
+§25 maintenance protocol (not before it) so existing "§25 protocol" references stay stable.
+
+| Feature key | Feature (EN · AR) | Scope | Phase | Permission(s) | Depends on |
+|------------|-------------------|-------|-------|---------------|------------|
+| `communication.templates` | Tenant message templates · قوالب رسائل المستأجر | **SHIPPED PHASE-041** (migration `0064`; FD-30 — the "no email_templates, strings in code" audit gap): channel × locale × module templates with typed variable declarations, tenant-editable, the builtin bilingual catalog as fallback (tenants start from working AR/EN defaults); the print-template variable documentation ships in DATA_DICTIONARY; plan grants: **ALL plans** (0064 §10 — base messaging substrate) | 4 | 041 | `communication.templates.manage` | — |
+| `communication.outbound` | Outbound send ledger & pipeline · سجل الإرسال الخارجي ومساره | **SHIPPED PHASE-041** (migration `0064`): every send is a row — queue → provider → status transitions (QUEUED/SENT/DELIVERED/FAILED) with provider reference, cost, and bounded retries with backoff (attempts/max_attempts/next_attempt_at); the dunning letters (the 039/036 WHATSAPP/SMS QUEUED handoff) ride the source linkage; plan grants: **ALL plans** (over the SANDBOX default provider — BR-067) | 4 | 041 | `communication.outbox.read` | `communication.templates` |
+| `communication.whatsapp` | WhatsApp Business Cloud channel · قناة واتساب للأعمال | **SHIPPED PHASE-041** (H-22/N-06/IN-13): template-message sends, per-market sender numbers (market → phone-number-id routing), approval-dependent behaviors REQUIRES_VERIFICATION-flagged; the SANDBOX adapter keeps tests hermetic; plan grants: **business + enterprise** (0064 §10 — the 0051 tier-4 precedent) | 3 | 041 | `communication.outbox.read` | `communication.outbound` |
+| `communication.sms` | SMS providers · مزوّدو الرسائل القصيرة | **SHIPPED PHASE-041** (N-07/IN-14): Unifonic + Msegat + Twilio adapters behind the port, per-market selection; plan grants: **business + enterprise** | 3 | 041 | `communication.outbox.read` | `communication.outbound` |
+| `communication.email_providers` | Verified email providers · مزوّدو البريد الموثَّقون | **SHIPPED PHASE-041** (N-08/IN-15): SMTP/SendGrid/SES/Mailgun environment-selectable abstraction with the DKIM/SPF/DMARC deliverability guide + per-environment verification checklist; plan grants: **business + enterprise** | 3 | 041 | `communication.outbox.read` | `communication.outbound` |
+| `communication.calendar_integration` | Google/Outlook calendar + contacts sync · تكامل التقويم ومزامنة جهات الاتصال | **SHIPPED PHASE-041** (IN-17/IN-18): OAuth connect with minimal scopes (tokens sealed in the secret store), task/appointment event write, and opt-in two-way contacts sync with exact + fuzzy candidate review — never auto-merge; plan grants: **business + enterprise** | 3 | 041 | `communication.calendar.connect` | — |

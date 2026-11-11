@@ -441,6 +441,13 @@
       "when": 1795777600000,
       "tag": "0063_tenant_kind_reader",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1795864000000,
+      "tag": "0064_communications_hub",
+      "breakpoints": true
     }
   ],
   "version": "7"

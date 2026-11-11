@@ -335,6 +335,18 @@ export const MIGRATIONS: readonly string[] = [
   // the PARENT's tenant scope (the definer-reader precedent — the tenants
   // RLS policy correctly hides cross-tenant rows otherwise).
   "0063_tenant_kind_reader",
+  // PHASE-041 (Blueprint v3.0 · CR-11): 0064_communications_hub — the four
+  // RLS'd tables: message_templates (FD-30 tenant template substrate),
+  // outbound_messages (the send ledger — status/provider ref/cost/retry
+  // policy; every send is a row), notification_preferences (TB-23 user ×
+  // module × channel matrix + tenant-default seeds), communication_log
+  // (UX-14/IN-16 unified interaction log + call logging). +5 permissions
+  // (267 → 272, matrix §3.19) +6 feature keys (templates/outbound all
+  // plans; whatsapp/sms/email_providers/calendar_integration business+
+  // enterprise). Numbering note: the phase doc planned 0059 — written
+  // before CR-50's 0055–0059 and PHASE-040's 0060–0063; 0064 is the
+  // honest next slot.
+  "0064_communications_hub",
 ];
 
 /**

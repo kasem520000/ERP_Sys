@@ -113,6 +113,9 @@ const EXPECTED_ROWS_PER_TENANT: Record<string, number> = {
   // PHASE-015: the stock fixture + the COMPOSITE fixture (item_components
   // needs two distinct items per tenant — the distinct-component CHECK).
   items: 2,
+  // PHASE-041: the unified interaction log carries a MESSAGE + a CALL row
+  // per tenant (both kinds exercise the kind↔channel CHECK shapes).
+  communication_log: 2,
 };
 function expectedRowsFor(table: string): number {
   return EXPECTED_ROWS_PER_TENANT[table] ?? 1;
@@ -2555,6 +2558,60 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // -- PHASE-041 communications-hub fixtures (0064) --
+  // message_templates: an EMAIL template per tenant (EMAIL requires a
+  // subject; the typed variables array pins array-ness).
+  await superuser.query(
+    `INSERT INTO message_templates (id, tenant_id, key, channel, locale, module, subject, body, variables)
+     VALUES
+       ('45454541-0000-4000-8000-000000000001', $1, 'dunning.step1', 'EMAIL', 'ar', 'invoice_overdue',
+        'تذكير بمستحقاتكم', 'عزيزي {{customer_name}}، رصيدكم المستحق {{amount_due}}', '[]'::jsonb),
+       ('45454541-0000-4000-8000-000000000002', $2, 'dunning.step1', 'EMAIL', 'ar', 'invoice_overdue',
+        'تذكير بمستحقاتكم', 'عزيزي {{customer_name}}، رصيدكم المستحق {{amount_due}}', '[]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // outbound_messages: a QUEUED EMAIL row per tenant (QUEUED is the
+  // pre-evidence status — no sent_at/delivered_at/last_error needed).
+  await superuser.query(
+    `INSERT INTO outbound_messages (id, tenant_id, channel, status, recipient, module, template_key, locale, subject, body_snapshot)
+     VALUES
+       ('46464641-0000-4000-8000-000000000001', $1, 'EMAIL', 'QUEUED', 'customer@example.com',
+        'invoice_overdue', 'dunning.step1', 'ar', 'تذكير بمستحقاتكم', 'عزيزي العميل، رصيدكم المستحق 100.00'),
+       ('46464641-0000-4000-8000-000000000002', $2, 'EMAIL', 'QUEUED', 'customer@example.com',
+        'invoice_overdue', 'dunning.step1', 'ar', 'تذكير بمستحقاتكم', 'عزيزي العميل، رصيدكم المستحق 100.00')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // notification_preferences: a USER row per tenant (the tenant-default
+  // rows for user_id NULL were already seeded by migration 0064 §8 for
+  // every existing tenant — the unique NULLS NOT DISTINCT key therefore
+  // demands a non-NULL user_id here).
+  await superuser.query(
+    `INSERT INTO notification_preferences (id, tenant_id, user_id, module, channel, enabled)
+     VALUES
+       ('47474741-0000-4000-8000-000000000001', $1, '99999999-0000-4000-8000-000000000001', 'digest', 'EMAIL', true),
+       ('47474741-0000-4000-8000-000000000002', $2, '99999999-0000-4000-8000-000000000002', 'digest', 'EMAIL', true)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // communication_log: a MESSAGE + a CALL row per tenant (the CALL row
+  // carries outcome + duration per the kind↔channel CHECK).
+  await superuser.query(
+    `INSERT INTO communication_log (id, tenant_id, kind, direction, channel, at, summary, body, outcome, duration_minutes)
+     VALUES
+       ('48484841-0000-4000-8000-000000000001', $1, 'MESSAGE', 'OUTBOUND', 'EMAIL', now(),
+        'تذكير بمستحقاتكم', 'عزيزي العميل، رصيدكم المستحق 100.00', NULL, NULL),
+       ('48484841-0000-4000-8000-000000000002', $2, 'MESSAGE', 'OUTBOUND', 'EMAIL', now(),
+        'تذكير بمستحقاتكم', 'عزيزي العميل، رصيدكم المستحق 100.00', NULL, NULL),
+       ('48484841-0000-4000-8000-000000000003', $1, 'CALL', 'INBOUND', 'CALL', now(),
+        'مكالمة تحصيل', 'وعد بالسداد خلال ٣ أيام', 'COMPLETED', 7),
+       ('48484841-0000-4000-8000-000000000004', $2, 'CALL', 'INBOUND', 'CALL', now(),
+        'مكالمة تحصيل', 'وعد بالسداد خلال ٣ أيام', 'COMPLETED', 7)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3031,6 +3088,13 @@ const OWN_ROW: Record<string, [string, string]> = {
   supplier_return_authorization_lines: ["43434339-0000-4000-8000-000000000001", "43434339-0000-4000-8000-000000000002"],
   // PHASE-040 data-onboarding substrate (0060)
   import_mappings: ["44444440-0000-4000-8000-000000000001", "44444440-0000-4000-8000-000000000002"],
+  // PHASE-041 communications hub (0064)
+  message_templates: ["45454541-0000-4000-8000-000000000001", "45454541-0000-4000-8000-000000000002"],
+  outbound_messages: ["46464641-0000-4000-8000-000000000001", "46464641-0000-4000-8000-000000000002"],
+  notification_preferences: ["47474741-0000-4000-8000-000000000001", "47474741-0000-4000-8000-000000000002"],
+  // communication_log owns FOUR fixture rows (MESSAGE + CALL per tenant);
+  // the A-suite probes key on `id` — the MESSAGE rows are the OWN_ROW pair.
+  communication_log: ["48484841-0000-4000-8000-000000000001", "48484841-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3775,6 +3839,21 @@ const MISMATCHED_INSERT: Record<string, string> = {
   import_mappings: `INSERT INTO import_mappings (id, tenant_id, name, direction, kind, column_map)
      VALUES ('44444440-3000-4000-8000-000000000003', $1, 'ISO attack', 'IMPORT', 'COA',
              '{"code":"Account Code","name":"Account Name"}'::jsonb)`,
+  // PHASE-041 communications hub (0064) — each attack row satisfies its
+  // table's CHECKs (EMAIL templates carry a subject; QUEUED is the
+  // pre-evidence status; preferences use a non-NULL user_id so the
+  // NULLS NOT DISTINCT tenant-default key never collides).
+  message_templates: `INSERT INTO message_templates (id, tenant_id, key, channel, locale, module, subject, body, variables)
+     VALUES ('45454541-3000-4000-8000-000000000003', $1, 'attack.step', 'EMAIL', 'ar', 'invoice_overdue',
+             'رسالة هجومية', 'محتوى هجومي', '[]'::jsonb)`,
+  outbound_messages: `INSERT INTO outbound_messages (id, tenant_id, channel, status, recipient, module, template_key, locale, subject, body_snapshot)
+     VALUES ('46464641-3000-4000-8000-000000000003', $1, 'EMAIL', 'QUEUED', 'attacker@example.com',
+             'invoice_overdue', 'attack.step', 'ar', 'رسالة هجومية', 'محتوى هجومي')`,
+  notification_preferences: `INSERT INTO notification_preferences (id, tenant_id, user_id, module, channel, enabled)
+     VALUES ('47474741-3000-4000-8000-000000000003', $1, '99999999-0000-4000-8000-000000000003', 'digest', 'SMS', true)`,
+  communication_log: `INSERT INTO communication_log (id, tenant_id, kind, direction, channel, at, summary, body)
+     VALUES ('48484841-3000-4000-8000-000000000003', $1, 'MESSAGE', 'OUTBOUND', 'EMAIL', now(),
+             'رسالة هجومية', 'محتوى هجومي')`,
 };
 
 beforeAll(async () => {

@@ -1,6 +1,6 @@
 # Entity Catalog
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-12 (PHASE-040 — the data-onboarding substrate, 227 → 228 domain rows)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-12 (PHASE-041 — the communications hub, 228 → 232 domain rows)
 
 All planned entities grouped by owning module, with the phase that introduces them and
 key relationships. This is the catalog-level map; column-level specifications for core
@@ -472,6 +472,26 @@ lands through EXISTING engines (BR-066's negative ledger proof).
 | Entity | Purpose | Key fields | Phase | OC |
 |--------|---------|-----------|-------|----|
 | `import_mappings` | Saved column maps + export templates (§2.3): tenant-scoped named maps reusable across files of the same shape (IMPORT direction — canonical column → file header) and recurring one-click extract shapes (EXPORT direction — entity, column selection, format, filters; the L1-21 half) | tenant_id, name (UNIQUE per tenant+direction+kind), direction (IMPORT/EXPORT), kind (the import kind vocabulary — the 3 baseline + the 7 PHASE-040 kinds; EXPORT names its entity, shape `^[a-z][a-z0-9_.]{1,60}$`), entity? (NULL on IMPORT — shape CHECK), column_map jsonb (the map itself), options? jsonb, created_by; grants SELECT/INSERT/UPDATE/**DELETE** (tenant user data — re-editable and removable, the entitlements precedent) | 040 | no |
+
+## communications (PHASE-041 — DELIVERED by migration `0064_communications_hub.sql`, schema_version 64)
+
+The Communications Hub substrate (H-22 · N-06…N-08 · IN-13…IN-18 · FD-30 · TB-23 · UX-14 · PP-13/PP-15):
+the tenant message-template store (FD-30 — the "no email_templates, strings in code" gap), the
+outbound send ledger (every send is a row — status/provider ref/cost/retry policy, BR-067 port
+discipline), the user × module × channel notification-preference matrix (TB-23; user_id NULL = the
+tenant default row — NULLS NOT DISTINCT), and the unified interaction log (UX-14/IN-16 — messages
++ logged calls per partner). +4 tables — the catalog count moves 228 → 232 (the RLS-suite parity
+gate checks the number). The adapters/pipeline are application code (the communication module);
+zero new journal rules — the hub posts through EXISTING engines only. Numbering note: the phase
+doc planned `0059` — written before CR-50's 0055–0059 and PHASE-040's 0060–0063; 0064 is the
+honest next slot (the 0060 numbering-note precedent).
+
+| Entity | Purpose | Key fields | Phase | OC |
+|--------|---------|-----------|-------|----|
+| `message_templates` | Tenant message templates (FD-30): channel × locale × module with typed variable declarations — the email/print template substrate; the builtin code catalog is the fallback (tenants start from working AR/EN defaults) | tenant_id, key + channel + locale (UNIQUE per tenant — the effective-template resolution key), channel (EMAIL/WHATSAPP/SMS; EMAIL requires a subject, the others are body-only), locale (ar/en), module (the notification-category vocabulary), subject?, body (1..20000), variables jsonb `[{name, required}]` (typed declarations, shape CHECK), is_active, created_by; grants SELECT/INSERT/UPDATE/**DELETE** (tenant user data — the import_mappings precedent) | 041 | no |
+| `outbound_messages` | The outbound send ledger (BR-067): every outbound send is a row — queue → provider → status transitions with evidence | tenant_id, channel (EMAIL/WHATSAPP/SMS), status (QUEUED/SENT/DELIVERED/FAILED — the status-evidence CHECK pins sent_at/delivered_at/last_error coherence), recipient, recipient_user_id?, partner_id?, module, template_key, locale, subject?, body_snapshot (the deterministic rendered record), provider?, provider_ref?, cost_amount/cost_currency? (numeric 19,4 — travel together), attempts/max_attempts (1..10)/next_attempt_at (the retry policy), last_error?, sent_at?, delivered_at?, source_type? (DUNNING_LETTER — the 039/036 handoff — / DIGEST / NUDGE / MANUAL / CALENDAR / NOTIFICATION) + source_id?, correlation_id?, payload? jsonb; queue/partner/report/source indexes (OA-06); grants SELECT/INSERT/UPDATE (LEDGER — no app-role DELETE, the dunning_letters precedent) | 041 | no |
+| `notification_preferences` | The notification-preference matrix (TB-23): user × module × channel with tenant defaults | tenant_id, user_id? (NULL = the tenant default row — UNIQUE NULLS NOT DISTINCT per tenant+module+channel), module (the notification-category vocabulary + digest), channel (IN_APP/EMAIL/SMS/WHATSAPP), enabled, updated_by?; grants SELECT/INSERT/UPDATE/**DELETE** (tenant user data — users manage their own rows; the matrix CRUD surface) | 041 | no |
+| `communication_log` | The unified interaction log (UX-14/IN-16): messages + manually logged calls per partner feeding the unified inbox | tenant_id, kind (MESSAGE/CALL — the kind↔channel CHECK pins CALL↔CALL), direction (INBOUND/OUTBOUND), channel (EMAIL/WHATSAPP/SMS/CALL), at, partner_id?, user_id?, counterparty?, summary?, body?, outcome? (CALL vocabulary — COMPLETED/NO_ANSWER/BUSY/VOICEMAIL/FAILED/SCHEDULED), duration_minutes? (0..1440), outbound_message_id? (ledger linkage), related_type?/related_id? (polymorphic document link), created_by?; a logged call records outcome + summary (CHECK); partner/at indexes (the inbox hot path); grants SELECT/INSERT/UPDATE (log semantics — DELETE rides the purge path only) | 041 | no |
 
 ## Diagrams
 
