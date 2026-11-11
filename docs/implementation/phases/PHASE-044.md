@@ -1,7 +1,7 @@
 # PHASE-044 — WMS & Inventory Intelligence
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-14](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-07 · §6 I-01…I-25 · §20 PP-11/PP-12, DF-12/DF-17 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 inventory depth
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 2 / Stage 13 · **Register:** [CR-14](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-07 · §6 I-01…I-25 · §20 PP-11/PP-12, DF-12/DF-17 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 inventory depth · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-20 returnable packaging — the v3.1 scope extension)
 
 ## 1. Phase Overview
 
@@ -84,10 +84,18 @@ In scope:
     (cost / markup % / fixed price) with explicit valuation-difference posting.
 14. **Automatic UOM conversion** (I-15): `uom_conversions` applied automatically
     inside bin moves and picks when the bin's UOM differs from the move's UOM.
-15. **Sync duty (OA-02)**: pick and putaway tasks sync to the Android field client —
+15. **Returnable packaging deposits** (**L1-20** — added by v3.1/CR-46):
+    `returnable_packaging` (the container register: pallets/crates/containers as
+    tracked asset-items) + movements riding the bin/LPN machinery (issue with a
+    delivery, return on receipt back) + **deposit accounting**: issue posts the
+    customer-deposit liability (DR cash/AR · CR deposits payable), return releases it,
+    damage/non-return writes it off — all through the posting engine with the mapped
+    control-account discipline (fail-closed when unmapped, the 038 precedent); the
+    deposit balance report per customer and container type.
+16. **Sync duty (OA-02)**: pick and putaway tasks sync to the Android field client —
     the offline outbox/inbox contracts are extended (task state transitions,
     scan confirmations) and the sync-fleet harness runs as an acceptance gate.
-16. **Screens** (12-template discipline, AR/EN parity, RTL, ⌘K registration):
+17. **Screens** (12-template discipline, AR/EN parity, RTL, ⌘K registration):
     `/inventory/locations` (zone tree with bins), `/inventory/pick-waves`,
     `/inventory/cycle-counts`, `/inventory/abc`, and the quarantine board; bin / LPN
     selectors embed into the existing receipt, delivery, transfer, and count screens.
@@ -96,6 +104,11 @@ Out of scope: MRP / planning consumption (PHASE-043 — built on top of this pha
 barcode label template designer (PHASE-062) · warehouse automation hardware
 (conveyors / PLC integration) · slotting optimization engine (ABC hints only) ·
 warehouse billing / 3PL invoicing.
+
+**v3.1 scope note (CR-46):** the returnable-packaging deposit layer (L1-20) was
+consolidated into this phase before implementation — the container tracking rides its
+bin/LPN machinery and the deposit postings ride the mapped control-account
+discipline; the effort estimate moves from ~6–8 to ~6–9 weeks.
 
 ## 3. Prerequisites
 

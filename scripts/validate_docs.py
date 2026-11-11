@@ -90,7 +90,9 @@ def phase_ref_check() -> None:
             n = int(m.group(1))
             # Blueprint v3.0 (2026-11-10): range widened 001-034 -> 001-065
             # (stages 12-15, PHASE-035..065) per COMPLETENESS_REGISTER.md CR-37.
-            if not (1 <= n <= 65):
+            # Blueprint v3.1 (2026-11-11): widened to 001-068 (PHASE-066..068,
+            # the gap-consolidation wave) per COMPLETENESS_REGISTER.md CR-37/42-44.
+            if not (1 <= n <= 68):
                 bad.append(f"{rel}: out-of-range PHASE-{m.group(1)}")
         # targeted label check: lines that *declare* a client app's phase label
         # (e.g. mermaid nodes / ADR titles), not prose about phase eligibility order
@@ -176,9 +178,11 @@ def structure_check() -> None:
     have = {int(re.search(r"ADR-(\d{4})", a).group(1)) for a in adrs}
     check("4b. ADR set 0001..0019 complete", have == set(range(1, 20)), f"have={sorted(have)}")
     phases = sorted(p.name for p in (DOCS / "implementation" / "phases").glob("PHASE-*.md"))
-    # Blueprint v3.0 (2026-11-10): 34 -> 65 phase documents (stages 12-15 added
-    # PHASE-035..065 per COMPLETENESS_REGISTER.md; check 8b verifies their headings).
-    check("4c. 65 phase documents present (34 baseline + 31 v3.0)", len(phases) == 65, f"count={len(phases)}")
+    # Blueprint v3.0 (2026-11-10): 34 -> 65 phase documents (stages 12-15);
+    # Blueprint v3.1 (2026-11-11): 65 -> 68 (the gap-consolidation wave added
+    # PHASE-035..068 per COMPLETENESS_REGISTER.md (v3.0 + v3.1); check 8b verifies
+    # their headings).
+    check("4c. 68 phase documents present (34 baseline + 31 v3.0 + 3 v3.1)", len(phases) == 68, f"count={len(phases)}")
     n = len(md_files())
     print(f"INFO  total markdown files under docs/: {n}")
 
@@ -245,14 +249,15 @@ def completeness_check() -> None:
     ok_reg = (DOCS / "planning" / "COMPLETENESS_REGISTER.md").exists()
     ok_road = (DOCS / "planning" / "COMPLETENESS_ROADMAP.md").exists()
     ok_reg = ok_reg and has("planning/COMPLETENESS_REGISTER.md", "CR-01") and \
-        has("planning/COMPLETENESS_REGISTER.md", "CR-40")
+        has("planning/COMPLETENESS_REGISTER.md", "CR-40") and \
+        has("planning/COMPLETENESS_REGISTER.md", "CR-48")
     ok_road = ok_road and has("planning/COMPLETENESS_ROADMAP.md", "PHASE-035") and \
         has("planning/COMPLETENESS_ROADMAP.md", "PHASE-065")
-    check("8a. v3.0 register + roadmap present (CR-01..CR-40, phases 035..065)",
+    check("8a. v3.0/v3.1 register + roadmap present (CR-01..CR-48, phases 035..068)",
           ok_reg and ok_road)
 
     bad_ph = []
-    for n in range(35, 66):
+    for n in range(35, 69):
         p = DOCS / "implementation" / "phases" / f"PHASE-{n:03d}.md"
         if not p.exists():
             bad_ph.append(f"PHASE-{n:03d} missing"); continue
@@ -266,15 +271,17 @@ def completeness_check() -> None:
         # so the marker can never silently vanish.
         if "NOT_STARTED" not in t and "COMPLETE" not in t:
             bad_ph.append(f"PHASE-{n:03d}: no NOT_STARTED/COMPLETE status marker")
-    check("8b. PHASE-035..065 present with 8 canonical headings + planned status",
+    check("8b. PHASE-035..068 present with 8 canonical headings + planned status",
           not bad_ph, "; ".join(bad_ph[:5]))
 
     ok_gap = (DOCS / "planning" / "gap-analysis").is_dir() and all(
         (DOCS / "planning" / "gap-analysis" / name).exists() for name in (
             "PROJECT_EVALUATION_2026-11-10.md",
             "ERP_COMPLETENESS_GAP_REPORT.md",
-            "ERP_FULL_GAP_ANALYSIS.md"))
-    check("8c. the three audit evidence reports preserved under planning/gap-analysis/", ok_gap)
+            "ERP_FULL_GAP_ANALYSIS.md",
+            "GAP_ANALYSIS_LAYER1_23_GAPS.md",
+            "GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md"))
+    check("8c. the three first-round audit reports + the two v3.1 layer files preserved under planning/gap-analysis/", ok_gap)
 
 
 def main() -> int:

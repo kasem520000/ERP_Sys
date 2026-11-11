@@ -1,17 +1,34 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-038 COMPLETE — next eligible: PHASE-039)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (roadmap v3.1 gap consolidation COMPLETE — next eligible: PHASE-039)
 
 ## The single next action
 
-**Start PHASE-039 (Returns & Collections — RMA + Dunning, CR-09)** — «ابدأ تنفيذ
-المرحلة PHASE-039». Per EXPANSION sequencing the wave-1 siblings are parallel-safe;
-039's prerequisites (035 ✓, the AR/AP module + journal infrastructure from the
-34-phase baseline) are all satisfied. Read
-[PHASE-039.md](../implementation/phases/PHASE-039.md) first — the sales RMA cycle
+**Start PHASE-039 (Returns & Collections — RMA + Dunning + Late Fees + Agencies, CR-09
++ CR-46)** — «ابدأ تنفيذ المرحلة PHASE-039». Per EXPANSION sequencing the wave-1
+siblings are parallel-safe; 039's prerequisites (035 ✓, the AR/AP module + journal
+infrastructure from the 34-phase baseline) are all satisfied. **The phase's scope was
+finalized by the v3.1 consolidation (CR-46) BEFORE implementation starts** — read
+[PHASE-039.md](../implementation/phases/PHASE-039.md) first: the sales RMA cycle
 (authorization → receipt → credit-note/replace with G-35-style posting discipline per
-the phase doc's own numbering), purchase returns (RTV), and the receivables dunning
-sweep (aging-bucket escalation letters + the collection-status surfacing).
+the phase doc's own numbering), purchase returns (RTV), the receivables dunning sweep
+(aging-bucket escalation letters + the collection-status surfacing), **plus the three
+v3.1 additions — the periodic credit-review workflow (L1-10), the late-fee engine with
+VAT treatment + waiver path (L1-12), and the collection-agency referral layer with the
+hashed-token callback port (L1-11)**.
+
+## Post-consolidation context for the next author (v3.1 — 2026-11-11)
+
+The gap-consolidation wave (CR-41…CR-48) is COMPLETE and pushed: the two layer files
+under [../planning/gap-analysis/](../planning/gap-analysis/) document the 43
+second/third-round gaps (L1-01…L1-23 · L2-01…L2-20) with dispositions; PHASE-066/067/
+068 were created; ten phase docs (039/040/042/044/048/053/054/055/058/062) received
+their scope extensions with updated effort estimates; the register carries CR-41…48;
+the roadmap is v3.1 (34 phases, 536 in-scope gaps, ~136–185 single-agent weeks with
+~121–171 remaining) with the count reconciliation in its §9; the completion-report
+template now requires the code-evidence checklist; the gap-intake protocol (CR-47)
+and the triple-flip rule (CR-48) bind every future phase. Full detail:
+[the v3.1 consolidation report](../implementation/phases/reports/ROADMAP-V3.1-CONSOLIDATION.md).
 
 ## Post-PHASE-038 context for the next author
 

@@ -1,7 +1,7 @@
 # PHASE-042 — Manufacturing I — Routing, Work Centers & Costing
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-12](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-04 · §7 M-02…M-04, M-12…M-19 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 1: التصنيع»
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-45) · **Wave:** 2 / Stage 13 · **Register:** [CR-12](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-04 · §7 M-02…M-04, M-12…M-19 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 1: التصنيع» · [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-12 standard costing — the v3.1 scope extension, decided pre-042 per the owner mandate)
 
 ## 1. Phase Overview
 
@@ -60,6 +60,17 @@ In scope:
    classified as setup, run/usage, and rate variance, plus order-level yield variance;
    statistical scrap treatment (M-12) via operation-level scrap quantity with reason
    codes feeding yield analysis.
+5a. **Standard costing layer** (**L2-12** — added by v3.1/CR-45 before this phase
+   starts, per the owner's mandate that the decision precede 042/043): item standard
+   costs by cost type (material, labor, overhead — and overhead sub-splits), **cost
+   roll-up over BOM + routing** (low-level explosion computing the frozen standard per
+   item from component standards + routing times × work-center rates), standard
+   **freeze/activate** with effective dates (the BOM versioning discipline),
+   **purchase-price variance** posting at receipt (standard vs actual, through the
+   landed-cost point), and **stock revaluation** on standard change (the G-13/G-14
+   adjustment shapes, batch-posted with a variance account). PHASE-043's planning
+   costing consumes the frozen standards; WMS (044) values movements at standard when
+   the item's policy elects it.
 6. **Rework orders** (`rework_orders`) (M-14): reference the defective batch/serial and
    parent production order, carry their own routing and cost roll-up; rework cost posts
    to rework expense — never capitalized into the parent finished-goods layer.
@@ -84,6 +95,13 @@ at operations (PHASE-050) · maintenance work orders and meters (PHASE-049) · l
 cost in manufacturing (foreign-trade family) · sub-assembly WIP valuation across
 warehouses (WMS valuation stays PHASE-044).
 
+**v3.1 scope note (CR-45):** the standard-costing layer (L2-12) was consolidated into
+this phase before implementation — the phase's literal mandate is "Routing, Work
+Centers & **Costing**" and its variance machinery (M-13/M-18/M-19) is the direct
+consumer; shipping it here hands PHASE-043 a frozen standard to plan against instead
+of coupling MRP to an unshipped costing substrate. The effort estimate moves from
+~4–6 to ~5–7 weeks.
+
 ## 3. Prerequisites
 
 | Prerequisite | Status |
@@ -101,19 +119,22 @@ complete — only PHASE-036 does.
 ## 4. Design Impact
 
 - **Migrations**: the sequence continues from PHASE-041's last journal entry (≈ 0059;
-  exact numbers are taken at implementation time — this document plans ≈ 0060…0066):
+  exact numbers are taken at implementation time — this document plans ≈ 0060…0068):
   work centers · routings + routing_operations · production order extension columns +
-  `production_order_operations` · rework orders · downtime records · OEE views + seed
+  `production_order_operations` · rework orders · downtime records · **item standard
+  costs + cost roll-up + freeze/activate (the v3.1 L2-12 addition)** · OEE views + seed
   migration (permissions, feature grants, reason codes — DATA-ONLY, following the
   0044/0046/0047 convention). Drizzle `_journal.json` + `migrations.ts/spec` updated
   per house convention.
-- **Entities/catalog parity**: +6 tables (`work_centers`, `routings`,
+- **Entities/catalog parity**: +7 tables (`work_centers`, `routings`,
   `routing_operations`, `production_order_operations`, `rework_orders`,
-  `downtime_records`) and +2 documented views (OEE per work center / per period) —
+  `downtime_records`, `item_standard_costs` — the last is the v3.1 L2-12 addition)
+  and +2 documented views (OEE per work center / per period) —
   each with SQL + Drizzle mirror + `ENTITY_CATALOG.md` row (CR-36 (a)).
-- **Permissions**: +6 keys (`manufacturing.routings`, `manufacturing.work_centers`,
+- **Permissions**: +7 keys (`manufacturing.routings`, `manufacturing.work_centers`,
   `manufacturing.shopfloor`, `manufacturing.rework_orders`, `manufacturing.downtime`,
-  `manufacturing.costing`); the 245-discipline zero-drift check extends to the new
+  `manufacturing.costing`, `manufacturing.standard_costs` — the last is v3.1/L2-12);
+  the 245-discipline zero-drift check extends to the new
   baseline — both sides of the seeded set must stay equal (CR-36 (b)).
 - **i18n**: ~160 new AR/EN dictionary keys across the four screens + terminal +
   operations tab; parity check extended (equality enforced on both locales).

@@ -1,7 +1,7 @@
 # PHASE-053 — Accounting Depth & Treasury
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 3 / Stage 14 · **Register:** [CR-23](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §3 A-01…A-15 · §12 T-01…T-13 · §4 S-19 · §28.1 PP-05/PP-09 · §29 DF-55 · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 3 / Stage 14 · **Register:** [CR-23](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §3 A-01…A-15 · §12 T-01…T-13 · §4 S-19 · §28.1 PP-05/PP-09 · §29 DF-55 · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-07 travel residual · L1-08 mileage · L1-09 corporate cards — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2
 
 ## 1. Phase Overview
 
@@ -70,7 +70,25 @@ In scope:
     gateway event ingestion lands with the payment integrations phase (056).
 12. **Employee custody/advances** (T-11, A-12): custody documents issued from treasury
     with settlement against expense documents.
-13. **Accountant polish** (PP-05, PP-09, A-14, A-07, A-04): one-click period-vs-period
+13. **Travel & expense depth** (**L1-07 residual — added by v3.1/CR-46**):
+    `travel_requests` (trip, dates, pre-approval routing through the BR-023
+    approval-policy machinery) linked to travel advances issued from treasury
+    (the 038 supplier-advance accounting pattern applied to employees) and settled
+    against expense claims with per-diem tables (`per_diem_policies` — destination ×
+    grade × day rates, tenant-defined with documented sources; no fabricated rates);
+    the settlement reconciles advance ↔ claims ↔ per-diem entitlement with variance
+    handling (refund / additional payout).
+14. **Mileage reimbursement** (**L1-08**): the mileage expense kind on the claims
+    engine — distance × tenant rate (rate register with effective dates), trip purpose
+    and route evidence, odometer start/end with the `vehicles` registry as the
+    evidence source where the vehicle is platform-tracked.
+15. **Corporate-card program** (**L1-09**): `corporate_cards` (card register —
+    holder, limit, currency, linked `cash_accounts` CARD-type account) + card
+    statement import riding the `bank_statements`/`bank_statement_lines` machinery
+    + statement-line → expense-claim splitting (business/personal split rules,
+    VAT handling per line) + the card-charge reconciliation surface extending the
+    T-09/T-10 card/gateway reconciliation item from acquiring to the spend program.
+16. **Accountant polish** (PP-05, PP-09, A-14, A-07, A-04): one-click period-vs-period
     comparison, a closing checklist per period (tasks + verification steps), the
     indirect-method cash-flow statement, and group period-close orchestration across
     tenants through the platform-plane reader.
@@ -80,6 +98,14 @@ Out of scope: live bank-feed aggregation import (056) · budget what-if scenario
 forecasting) · accounting document archival (A-13 — ECM surfaces land with the UX
 phase 062) · duplicate statutory/management ledgers (deferred decision) · open-banking
 APIs.
+
+**v3.1 scope note (CR-46):** the travel/expense depth (L1-07 residual — requests,
+advances, per-diem settlement), mileage reimbursement (L1-08), and the corporate-card
+program (L1-09) were consolidated into this phase — treasury owns employee-spend
+instruments and the advance/settlement accounting pattern (038) transfers directly;
+the effort estimate moves from ~5–6 to ~6–8 weeks. The generic accrual/deferral and
+recurring-billing families (L1-01…05, L1-15, L1-16) deliberately moved to the new
+PHASE-068 instead (CR-44) to keep this phase's scope reviewable.
 
 ## 3. Prerequisites
 

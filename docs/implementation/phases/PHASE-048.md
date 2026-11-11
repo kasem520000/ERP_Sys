@@ -1,7 +1,7 @@
 # PHASE-048 — Projects & Contracting
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-18](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-06) · §11 (PR-01…PR-15) · §29.1 (DF-08) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, IDs bound by v3.1/CR-45) · **Wave:** 2 / Stage 13 · **Register:** [CR-18](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-06) · §11 (PR-01…PR-15) · §29.1 (DF-08) · [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-15 milestone billing · L2-20 subcontracting — v3.1 ID bindings on existing scope) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2
 
 ## 1. Phase Overview
 
@@ -55,17 +55,27 @@ In scope:
    schedule delta; approval is required before any budget, billing or contract-value
    effect (G-59); multi-step approval chains bind here when the workflow engine of
    PHASE-052 lands.
-7. **Subcontracting (PR-06)**: `subcontractor_agreements` (value, currency, retention %,
+7. **Subcontracting (PR-06 — the L2-20 home since v3.1/CR-45)**:
+   `subcontractor_agreements` (value, currency, retention %,
    period) + `subcontractor_certificates` (progress %, gross value, retention withheld,
    net payable); subcontractor retention is tracked in the same retention ledger.
+   The v3.1 binding documents the **inbound-subcontract purchase linkage**: each
+   certificate drives its subcontractor purchase obligation through the purchasing
+   chain (the AP debit-note/PO linkage), and PHASE-043's tolling flow (M-21) covers
+   the manufacturing-side subcontract — together closing L2-20.
 8. **Retention (PR-07, DF-08)**: `retention_accounts` — hold %, accrued balance, release
    schedule tied to taking-over and defect-liability dates; G-56 (hold at each
    certificate) and G-57 (release at final acceptance) define the postings.
-9. **Progress-certificated billing (PR-11, PR-08)**: `progress_certificates` — type
+9. **Progress-certificated billing (PR-11, PR-08 — the L2-15 home since
+   v3.1/CR-45)**: `progress_certificates` — type
    PROGRESS/ADVANCE/FINAL, cumulative completed %, gross value, retention, net — generate
    sales invoices on approval; G-58 recognizes revenue at the approved cumulative value;
    advance applications post as customer advances amortized against later certificates,
    mirroring the supplier-advance discipline of PHASE-038 on the customer side.
+   The v3.1 binding adds the **IFRS-15 output-method alignment rule**: the certificate
+   completion measure and PHASE-068's recognition schedules (L1-02) must use a
+   consistent output method per contract (the interface contract both sides honor;
+   L2-15's residual is exactly this alignment, not a rebuild).
 10. **Field service (PR-13, PR-14, PR-15)**: `service_visits` on the existing service
     orders — technician, time window, status
     NEW→SCHEDULED→DISPATCHED→IN_PROGRESS→COMPLETED→CLOSED, SLA response/resolution

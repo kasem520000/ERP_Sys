@@ -1,7 +1,7 @@
 # PHASE-055 — Public API & Webhooks Platform
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 3 / Stage 14 · **Register:** [CR-25](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-21 · §17 N-10/N-11/N-21 · §26.4 IN-19…IN-25 · §20 UX-09 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 OpenAPI designed-not-generated row
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 3 / Stage 14 · **Register:** [CR-25](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-21 · §17 N-10/N-11/N-21 · §26.4 IN-19…IN-25 · §20 UX-09 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 OpenAPI designed-not-generated row · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-23 EDI — the v3.1 scope extension)
 
 ## 1. Phase Overview
 
@@ -67,11 +67,29 @@ In scope:
 13. **CRM integration recipes** (N-15): the documented API recipe pattern for
     external CRM sync (partners/leads/invoices) riding the public API — recipes and
     scopes, not a per-vendor adapter.
+14. **EDI interchange with major trading partners** (**L1-23 — added by
+    v3.1/CR-46**): `edi_interchanges` + `edi_documents` (the inbound/outbound
+    document ledger) + a translation-adapter family for the two dominant dialects —
+    **X12** (850 PO / 855 ACK / 810 invoice / 856 ASN / 997 functional ack) and
+    **EDIFACT** (ORDERS / ORDRSP / INVOIC / DESADV / CONTRL) — over orders,
+    invoices, and dispatch advice on both the sales and purchasing sides;
+    partner-level interchange agreements (dialect, version, envelope settings,
+    delivery: AS2/SFTP placeholder ports with the verified-credential discipline);
+    functional acknowledgements tracked per document with failure surfacing; every
+    translation is audited and **unmappable segments park for human mapping, never
+    guess** (the bank-statement parked-lines precedent).
 
 Out of scope: the payment/commerce provider adapters themselves (056) · per-vendor
 CRM connectors (recipes only here) · GraphQL surface · public API v2 or
 deprecation tooling beyond the documented policy · marketplace/app store (kept
 non-goal per DF-38).
+
+**v3.1 scope note (CR-46):** the EDI interchange layer (L1-23) was consolidated into
+this phase — the large-account machine-to-machine requirement rides the same
+platform substrate (keys, rate limits, delivery ledger, audited adapters) and shares
+the webhooks delivery console UX; the effort estimate moves from ~3–4 to ~4–5 weeks.
+AS2/SFTP transport adapters ship as placeholder ports until a partner's verified
+credentials exist (no fabricated endpoints).
 
 ## 3. Prerequisites
 

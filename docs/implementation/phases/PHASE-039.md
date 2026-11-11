@@ -1,7 +1,7 @@
 # PHASE-039 — Returns & Collections (RMA + Dunning)
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 1 / Stage 12 · **Register:** [CR-09](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-12/H-13) · §4 (S-14/S-15/S-16) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 1 / Stage 12 · **Register:** [CR-09](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-12/H-13) · §4 (S-14/S-15/S-16) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-10/L1-11/L1-12 — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.2
 
 ## 1. Phase Overview
 
@@ -65,8 +65,10 @@ In scope:
    now; WhatsApp post-041 through the channel-port), and logged actions
    (calls, promises-to-pay, disputes) with outcome codes.
 6. **Partner credit-risk fields** on `partners` (the register's credit-risk
-   addition): credit score class + review rules (next review date,
-   reviewer) — interplaying with the existing credit-management block.
+   addition — **L1-10** since v3.1/CR-46): credit score class + review rules
+   (next review date, reviewer) — interplaying with the existing
+   credit-management block. The periodic review workflow (review-due sweep,
+   reviewer assignment, outcome history) closes the L1-10 residual.
 7. **Aging-report linkage**: the dunning step surfaces inside the existing
    `ar.aging` contract (additive column, no new key) — collectors work one
    screen; a NEW `sales.dunning_status` report tracks the ladder per
@@ -74,10 +76,22 @@ In scope:
 8. **Jobs**: the daily dunning sweep (bounded pg-boss) advances steps per
    policy, emits letters/notifications, and logs actions — the ladder is
    monotonic, no step skipping (BR-065).
-9. **Goldens registered**: G-35/G-36/G-37 in JOURNAL_RULES.md with worked
-   examples and failure packs — the numbering continues from G-32 through
-   G-33/G-34 (PHASE-038).
-10. **RMA register report** (`sales.rma_register`): the RMA lifecycle
+9. **Late-payment fees** (**L1-12** since v3.1/CR-46): late-fee rules on
+   the dunning policy (contractual rate or statutory cap — the latter only
+   from verified jurisdiction sources, REQUIRES_VERIFICATION; no fabricated
+   rates), fee-invoice generation with correct VAT treatment through the
+   tax engine, a waiver path with reason + approval, and the fee register
+   per overdue invoice.
+10. **Collection-agency integration** (**L1-11** since v3.1/CR-46): agency
+    referral as the ladder's terminal action — `collection_agencies`
+    (partner-linked agency register) + referral records (referred balance,
+    commission terms, status), commission posting through the engine, and
+    an integration port for agency status callbacks (the 038 portal-token
+    pattern — hashed tokens, audited, rate-limited).
+11. **Goldens registered**: G-35/G-36/G-37 in JOURNAL_RULES.md with worked
+    examples and failure packs — the numbering continues from G-32 through
+    G-33/G-34 (PHASE-038).
+12. **RMA register report** (`sales.rma_register`): the RMA lifecycle
     register with disposition mix and cycle times.
 
 Out of scope: WhatsApp letter delivery (041 — the channel-port ships there;
@@ -85,7 +99,16 @@ policies store the channel now) · dispute-management workflow engine (052;
 disputes are recorded as collection actions) · supplier-side return orders
 (the purchasing debit-note path remains) · repair/field-service RMAs (the
 service-order surfaces) · credit-scoring integrations (the class is
-tenant-entered or rule-computed locally).
+tenant-entered or rule-computed locally; the agency register refers, it
+does not score).
+
+**v3.1 scope note (CR-46):** the late-fee engine (L1-12), the agency
+referral layer (L1-11), and the periodic credit-review workflow (L1-10
+residual) were consolidated into this phase's scope from the Layer-1 gap
+audit before implementation started — the effort estimate moves from
+~2–3 to ~3 weeks. Deciding this before 039 started was mandated by the
+owner (the collections-engine scope must be final before the engine is
+built).
 
 ## 3. Prerequisites
 
@@ -105,17 +128,23 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
 - **Migrations**: `0055_rma_warranty.sql` (return_authorizations + lines,
   warranty_registrations with structured terms) ·
   `0056_dunning_collections.sql` (dunning_policies, dunning_letters,
-  collection_actions) · `0057_partner_credit_risk.sql` (additive partner
-  credit-risk columns) — journal 54 → 57, next in sequence after
-  PHASE-038's 0054; all tables RLS'd; Drizzle journal/spec updated.
-- **Entities**: +6 tables (ENTITY_CATALOG.md 217 → 223); the partner
+  collection_actions, late-fee rule columns on the policy) ·
+  `0057_partner_credit_risk.sql` (additive partner credit-risk + review
+  columns) · `0058_collection_agencies.sql` (the agency register +
+  referral records + commission terms — the v3.1 L1-11 addition) —
+  journal 54 → 58, next in sequence after PHASE-038's 0054; all tables
+  RLS'd; Drizzle journal/spec updated. Exact file numbers bound at
+  implementation as the next free sequence.
+- **Entities**: +7 tables (ENTITY_CATALOG.md 217 → 224); the partner
   columns are additive on a catalogued table.
-- **Permissions**: +5 keys — `sales.rma.read`, `sales.rma.manage`,
+- **Permissions**: +7 keys — `sales.rma.read`, `sales.rma.manage`,
   `sales.rma.approve`, `sales.dunning.manage`,
-  `sales.warranties.manage`; zero-drift extended (256 → 261; seed =
-  mirror).
-- **i18n**: ~150 new AR/EN keys (RMA screens, dunning workspace, warranty
-  surfaces, letter templates, credit-risk labels); parity gate as ever.
+  `sales.warranties.manage`, `sales.late-fees.manage`,
+  `sales.collection-agencies.manage` (the last two are the v3.1 L1-11/12
+  additions); zero-drift extended (256 → 263; seed = mirror).
+- **i18n**: ~170 new AR/EN keys (RMA screens, dunning workspace, warranty
+  surfaces, letter templates, credit-risk labels, late-fee + agency
+  surfaces — the v3.1 additions); parity gate as ever.
 - **Reports**: +2 contracts — `sales.rma_register` and
   `sales.dunning_status` (registry 88 → 90); the `ar.aging` additive
   dunning-step column documented in REPORT_CATALOG.md (no new key).
@@ -130,7 +159,7 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
   (the dunning ladder is monotonic per policy — steps advance, never skip
   or regress) appended to BUSINESS_RULES.md (continues from BR-063 shipped
   with PHASE-038).
-- **Docs**: JOURNAL_RULES.md · BUSINESS_RULES.md · ENTITY_CATALOG.md (+6) ·
+- **Docs**: JOURNAL_RULES.md · BUSINESS_RULES.md · ENTITY_CATALOG.md (+7) ·
   FEATURE_CATALOG.md (+3) · REPORT_CATALOG.md (+2 + the aging note) ·
   DATA_DICTIONARY.md (letter/action/disposition vocabularies) ·
   NAVIGATION_MODEL.md (+ returns and collections items).
@@ -139,8 +168,8 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
   offline writes N/A-recorded.
 - **Performance (OA-06)**: EXPLAIN-verified hot paths — RMA list by
   (tenant, status), the dunning sweep's overdue-invoice scan, aging
-  grouping; command-palette entries for RMA/warranty/dunning entities
-  (OA-04).
+  grouping, the fee register scan; command-palette entries for
+  RMA/warranty/dunning/agency entities (OA-04).
 
 ## 5. Implementation Plan
 
@@ -153,19 +182,21 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
 | T-05 | Warranty registrations + structured terms + expiry notification sweep | api |
 | T-06 | Dunning policies service (step ladder config, attachment scopes) + BR-065 monotonic guard | api |
 | T-07 | Daily dunning sweep job (letters via email, notifications, action logging) | api |
-| T-08 | Collection actions + partner credit-risk fields + review rules + credit-block interplay | api |
-| T-09 | Aging linkage (additive dunning-step column) + `sales.dunning_status` contract | api |
-| T-10 | `sales.rma_register` report contract + catalog rows | api |
-| T-11 | Web screens: RMA workspace, dunning workspace, warranty surfaces (12-template discipline) | web |
-| T-12 | NAV_ITEMS + command palette + feature gating + AR/EN dictionaries | web |
-| T-13 | Rule specs (BR-064/065, G-35..37 worked examples, spoof battery) + RLS A1–A10 + docs wave + full gates | all |
+| T-08 | Collection actions + partner credit-risk fields + review-due workflow + credit-block interplay (L1-10) | api |
+| T-09 | Late-fee engine: policy rules, fee invoices with VAT treatment, waiver path, fee register (L1-12) | api |
+| T-10 | Collection-agency layer: agency register, referrals, commission posting, callback port (L1-11) | api |
+| T-11 | Aging linkage (additive dunning-step column) + `sales.dunning_status` contract | api |
+| T-12 | `sales.rma_register` report contract + catalog rows | api |
+| T-13 | Web screens: RMA workspace, dunning workspace, warranty + fee + agency surfaces (12-template discipline) | web |
+| T-14 | NAV_ITEMS + command palette + feature gating + AR/EN dictionaries | web |
+| T-15 | Rule specs (BR-064/065, G-35..37 worked examples, spoof battery) + RLS A1–A10 + docs wave + full gates | all |
 
 ## 6. Verification
 
 Acceptance criteria (all must pass with recorded evidence):
 
-1. Migrations 0055–0057 apply cleanly; the six new tables are RLS'd with
-   composite tenant FKs; Drizzle + ENTITY_CATALOG.md parity (223 rows); the
+1. Migrations 0055–0058 apply cleanly; the seven new tables are RLS'd with
+   composite tenant FKs; Drizzle + ENTITY_CATALOG.md parity (224 rows); the
    partner columns are additive with zero reshape.
 2. RMA end-to-end: REQUESTED → APPROVED → RECEIVED → INSPECTED →
    RESTOCKED — the completion auto-generates the credit note through the
@@ -192,11 +223,20 @@ Acceptance criteria (all must pass with recorded evidence):
    render over seeded data with REPORT_CATALOG.md rows (registry 90).
 8. Credit risk: partner score class + review dates persist and interplay
    with the existing credit-management block (a blocked class behaves like
-   an over-limit block in the documented scenarios).
-9. House gates green (CR-36): RLS A1–A10 for the six tables · typecheck ·
-   lint · unit · `docs:validate` · i18n parity (~150 keys) · permissions
-   drift 256 → 261 · EXPLAIN budgets for the sweep and RMA list paths.
-10. Completion report `docs/implementation/phases/reports/PHASE-039-COMPLETION.md`
+   an over-limit block in the documented scenarios); the review-due sweep
+   assigns reviewers on seeded fixtures (L1-10).
+9. Late fees (L1-12): a seeded policy with a contractual rate generates the
+   fee invoice with correct VAT treatment; a statutory-capped jurisdiction
+   without a verified source refuses to post (worksheet mode); the waiver
+   path records reason + approver.
+10. Agency referral (L1-11): the terminal ladder step refers a seeded
+    overdue balance to an agency, the commission posts through the engine,
+    and the callback port authenticates a hashed token (the 038 portal
+    pattern) with audit events.
+11. House gates green (CR-36): RLS A1–A10 for the seven tables · typecheck ·
+    lint · unit · `docs:validate` · i18n parity (~170 keys) · permissions
+    drift 256 → 263 · EXPLAIN budgets for the sweep and RMA list paths.
+12. Completion report `docs/implementation/phases/reports/PHASE-039-COMPLETION.md`
     appended with evidence; `IMPLEMENTATION_STATUS.md` row flipped; archive
     delivered as `ERP_PLATFORM_PHASE039.zip` (OA-07).
 

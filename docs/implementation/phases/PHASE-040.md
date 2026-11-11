@@ -1,7 +1,7 @@
 # PHASE-040 — Data Onboarding & Migration Toolkit
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 1 / Stage 12 · **Register:** [CR-10](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-17) · §26.4 (IN-26) · §27.2 (TB-19/TB-20) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §7 (OA-05)
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 1 / Stage 12 · **Register:** [CR-10](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-17) · §26.4 (IN-26) · §27.2 (TB-19/TB-20) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-21 export-templates half — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §7 (OA-05)
 
 ## 1. Phase Overview
 
@@ -51,9 +51,13 @@ In scope:
    hints, per-row typed AR + EN errors, and the DRY-RUN → COMMIT gate —
    BR-066: atomic per run, no partial commits (the PHASE-028 XLSX
    discipline generalized).
-3. **Saved mappings** (`import_mappings`): tenant-scoped named column maps
-   reusable across files and future imports (kind, column map jsonb,
-   options).
+3. **Saved mappings** (`import_mappings`) — **extended to export templates
+   by v3.1 (L1-21, CR-46)**: tenant-scoped named column maps reusable
+   across files and future imports (kind, column map jsonb, options), now
+   also serving the **export direction** — saved export templates (entity,
+   column selection, format, filters) so recurring extracts (bank-feeds
+   handoffs, accountant packs, partner file exchanges) run one-click with
+   consistent shape.
 4. **Migration adapters** (IN-26): Excel generic + QuickBooks-shaped
    (chart/accounts, customers/vendors, items, open invoices/bills) +
    Odoo-shaped (COA, partners, products) extract templates with DOCUMENTED

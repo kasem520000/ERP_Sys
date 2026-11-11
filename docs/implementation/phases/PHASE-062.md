@@ -1,7 +1,7 @@
 # PHASE-062 — UX Excellence & Document Design
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 4 / Stage 15 · **Register:** [CR-32](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) TB-01…TB-18 · TB-22 · TB-34 · FD-01…FD-17 · FD-21…FD-29 · FD-34/FD-35 · H-23 · UX-02…UX-09 · UX-11…UX-18 · PP-01…PP-10 · PP-13/PP-14 · PP-18/PP-19 · PP-29…PP-34 · [gap-analysis/PROJECT_EVALUATION_2026-11-10.md](../../planning/gap-analysis/PROJECT_EVALUATION_2026-11-10.md) §5.1 (shipped surfaces stay prerequisites per CR-04) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.3
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, L1-21 batch-ops ID bound by v3.1/CR-46) · **Wave:** 4 / Stage 15 · **Register:** [CR-32](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) TB-01…TB-18 · TB-22 · TB-34 · FD-01…FD-17 · FD-21…FD-29 · FD-34/FD-35 · H-23 · UX-02…UX-09 · UX-11…UX-18 · PP-01…PP-10 · PP-13/PP-14 · PP-18/PP-19 · PP-29…PP-34 · [gap-analysis/PROJECT_EVALUATION_2026-11-10.md](../../planning/gap-analysis/PROJECT_EVALUATION_2026-11-10.md) §5.1 (shipped surfaces stay prerequisites per CR-04) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-21 batch-operations half — v3.1 ID binding on existing scope) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.3
 
 ## 1. Phase Overview
 
@@ -60,11 +60,15 @@ In scope:
    - **Deep personalization** (UX-17, PP-14): density/compact mode, default landing page
      per role, sidebar ordering — persisted in `user_ui_preferences`.
 2. **List operations** (FD-01…FD-10, PP-19, PP-32, PP-33, PP-34):
-   - **Bulk-actions framework** (FD-01): row selection exposes only the operations the
+   - **Bulk-actions framework** (FD-01 — **the L1-21 batch-operations home since
+     v3.1/CR-46**): row selection exposes only the operations the
      user is permitted on **every selected row** (per-row permission re-check — no bulk
      privilege escalation); execution runs server-side as `bulk_operations` jobs with live
      progress (PP-32) and **undo where safe** (FD-10) — undo composes the house
-     reversal-only pattern, never mutating posted rows.
+     reversal-only pattern, never mutating posted rows. The v3.1 binding records that
+     the second-round audit's productivity gap (L1-21: batch operations + reusable
+     import/export templates) closes its batch half here — the templates half closes
+     in PHASE-040's saved-mappings/export-templates item.
    - **Column chooser** (FD-02) · **saved views/filters per user per list** (`saved_views`,
      FD-03) · **export from the list itself** (FD-04).
    - **Unified server-side pagination pattern** (FD-05) across all lists with a per-list

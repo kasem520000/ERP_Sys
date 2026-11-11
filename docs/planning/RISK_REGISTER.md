@@ -1,6 +1,6 @@
 # Risk Register
 
-> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-10-28
+> **Status:** STABLE — extended by v3.1 (RISK-026…RISK-028) · **Owner:** Platform Architecture · **Updated:** 2026-11-11
 
 Living risk register. Likelihood/Impact: L/M/H. Each risk has mitigations (built into
 phases) and a trigger (when it becomes an issue to escalate). IDs referenced by phase
@@ -55,6 +55,14 @@ documents. **Update protocol:** any phase that materializes a risk must update t
 | RISK-023 | Payroll jurisdiction variance — GOSI/social-insurance/EOS rules REQUIRE_VERIFICATION per country | M | H | Tenant-configured components; **no fabricated rates** (BR-055, DR-005); official-sources protocol governs any jurisdiction rule; EOS accrual per tenant policy table | A country-specific rate is demanded without a verified official source → payroll owner / product |
 | RISK-024 | Expansion dilution — stages 9–11 alter MVP/GA gates or pull scope backward | M | H | ED-01: stages 9–11 are additive post-GA releases; scope-discipline rules in [MASTER_ROADMAP.md](MASTER_ROADMAP.md) keep MVP/GA acceptance criteria frozen | Any v2.0 change touching MVP/GA gate criteria → platform architecture |
 | RISK-025 | Consolidation complexity — FX translation + elimination correctness | M | H | INV-026 (consolidated = Σ members − eliminations); read-only consolidation runs (ADR-0018); golden G-32; member-period-closed prerequisite (BR-056); eliminations reversible only by counter-entry | Consolidated statements fail to reconcile to member books → block Enterprise Depth release |
+
+## Blueprint v3.1 risks (gap-consolidation wave — CR-41…CR-48)
+
+| ID | Risk | L | I | Mitigation | Trigger / owner |
+|----|------|---|---|------------|-----------------|
+| RISK-026 | Advanced-IFRS measurement rules misapplied (IAS 36/37/19/29, IFRS 3/5) — wrong impairment, provisions, or combination numbers are worse than none | M | H | REQUIRES_VERIFICATION on every rate/assumption (worksheet mode refuses to post); source-evidenced estimates; disclosure packs never print unsourced numbers; standards-framework tests pinned per phase 066/067 | Any measurement posting lacking a cited source → block the 066/067 release / platform architecture |
+| RISK-027 | Program scope growth from the consolidation wave (34 phases, 536 in-scope gaps) overloads the sequential agent protocol and pushes delivery far out | M | H | The honest re-estimate is recorded (roadmap §1 v3.1); wave gates stay binding; parallel-safe sets documented for team execution; every new gap now enters through CR-47's same-commit intake (no more silent scope) | 2+ consecutive phases exceed their estimate by >50% → product owner re-prioritizes wave content |
+| RISK-028 | Standard-costing layer (L2-12 in 042) destabilizes inventory valuation — PPV/revaluation postings corrupt WAC-era balances | M | H | Frozen-standard effective dating; revaluation rides the G-13/G-14 shapes with a variance account; dual mode (routing-less orders keep the legacy path) documented; failure packs + golden worked examples mandatory in 042 | Any invariant failure in standard-cost postings → Sev-1 (the RISK-009 class) |
 
 ## Top-5 watchlist (reviewed at every phase boundary)
 

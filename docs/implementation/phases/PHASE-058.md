@@ -1,7 +1,7 @@
 # PHASE-058 — Enterprise Identity & Governance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 3 / Stage 14 · **Register:** [CR-28](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-20) · §19 (G-01…G-13, G-19, G-20) · §20 (UX-19) · §26.5 (IN-28…IN-32) · §28.3 (PP-28)
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 3 / Stage 14 · **Register:** [CR-28](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-20) · §19 (G-01…G-13, G-19, G-20) · §20 (UX-19) · §26.5 (IN-28…IN-32) · §28.3 (PP-28) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-13 signing-authority residual · L1-17 board resolutions · L1-18 risk-register ID binding · L1-19 contractual compliance — the v3.1 scope extension)
 
 ## 1. Phase Overview
 
@@ -65,9 +65,12 @@ In scope:
 8. **Retention policies with legal hold** (G-03): `retention_policies` — per entity
    class, period, action (anonymize or purge), legal-hold override; an automation job
    with dry-run preview and audited execution. Screen `/governance/retention`.
-9. **Internal audit module and risk register** (G-05, G-06): `internal_audit_programs`
+9. **Internal audit module and risk register** (G-05, G-06 — **the L1-18 home
+   since v3.1/CR-46**): `internal_audit_programs`
    (programs, engagements, findings with severity and CAPA links) and `risk_registers`
    (likelihood/impact, mitigation, owner, review cycle). Screen `/governance/audit`.
+   The v3.1 binding adds the corporate-risk catalog surface with review cycles
+   feeding the audit program (L1-18's full closure).
 10. **Fraud-detection rules engine** (G-07): `fraud_rules` (GL and user-behavior
     heuristics — threshold rules, deviation-from-pattern rules, schedules) and
     `fraud_cases` (case queue: opened from rule hits, investigation states,
@@ -89,12 +92,40 @@ In scope:
     bug-bounty policy stub, and a SOC 2 / ISO 27001 readiness controls-matrix report
     generator — external certification itself stays out of scope and is recorded as
     such.
+15. **Signing-authority matrix** (**L1-13 residual — added by v3.1/CR-46**):
+    `signing_authority_rules` — the consolidated authority matrix (role × document
+    type × amount ceiling × currency, effective-dated) generalizing the shipped
+    per-doc-type `approval_policies` (BR-034) into one queryable surface
+    ("who may sign what up to how much"), time-boxed **delegation of authority**
+    (delegator, delegatee, scope, expiry — auto-expiring), binding into the
+    PHASE-052 workflow engine's amount branching, and checked at e-signature time
+    (item 13 — a signature request outside the matrix is a typed rejection).
+    Screen `/governance/authority`.
+16. **Board & shareholder resolutions register** (**L1-17 — added by v3.1/CR-46**):
+    `board_resolutions` (meeting date, resolution text AR/EN, effective date,
+    attachments, links to the transactions they authorize — dividends, guarantees,
+    major CAPEX, financing) with append-only amendment history and audit-trail
+    reads. Screen `/governance/resolutions`.
+17. **Contractual compliance register** (**L1-19 residual — added by v3.1/CR-46**):
+    `contract_obligations` — the obligation-level register across contract families
+    (service contracts, purchasing contracts from 038, subcontractor agreements
+    from 048): each obligation (party, duty, due/recurrence, penalty exposure,
+    evidence link, status), renewal/expiry alert rules feeding the notification
+    center, and the compliance posture report per counterparty. Screen
+    `/governance/contracts`.
 
 Out of scope: external CA-qualified signatures (this is audit-grade e-signature, not
 a licensed trust-service provider) · the compliance calendar (054) · AI anomaly
 detection (064 — this phase ships the deterministic rules substrate) · IP whitelisting
 and edge controls (059) · any change to the existing password/2FA login stack beyond
 adding methods and policy.
+
+**v3.1 scope note (CR-46):** the signing-authority matrix (L1-13 residual — the
+structured role × document × ceiling surface over the shipped BR-034 policies), the
+board-resolutions register (L1-17), the corporate-risk surface on the risk register
+(L1-18 ID binding), and the contractual-compliance register (L1-19 residual) were
+consolidated into this phase — governance owns the authority/compliance registers;
+the effort estimate moves from ~4–5 to ~5–7 weeks.
 
 ## 3. Prerequisites
 

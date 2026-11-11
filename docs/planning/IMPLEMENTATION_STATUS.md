@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-035 COMPLETE — the v3.0 program's first phase delivered)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-038 COMPLETE — the v3.0 program's fourth phase delivered; roadmap v3.1 gap consolidation applied 2026-11-11)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -111,10 +111,18 @@ recorded here with evidence.
 | Compliance | NONE — no jurisdiction pack data verified against official sources | — |
 | Deployment | NONE — dev compose + CI files (incl. new ci-db.yml); first hosted runs waived pending infra | `docker-compose.yml`, `.github/workflows/` |
 
-## Blueprint v3.0 phases (2026-11-10 — PHASE-038 delivered; the rest planned)
+## Blueprint v3.0 phases (2026-11-11 — PHASE-038 delivered; roadmap v3.1 consolidation applied; the rest planned)
 
-27 of 31 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035, PHASE-036,
+30 of 34 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035, PHASE-036,
 PHASE-037 and PHASE-038 COMPLETE (2026-11-10).
+**Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
+new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
+[../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
+and [GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md)),
+three new phases (066/067/068 below), scope extensions to 039/040/042/044/048/053/
+054/055/058/062, and took the program to 34 phases / 536 in-scope gaps / ~136–185
+single-agent weeks (see [../planning/COMPLETENESS_ROADMAP.md](../planning/COMPLETENESS_ROADMAP.md)
+§1+§9 and the [v3.1 consolidation report](../implementation/phases/reports/ROADMAP-V3.1-CONSOLIDATION.md)).
 Authoritative scope per phase
 document; this ledger tracks status only. Effort figures are planning estimates.
 
@@ -124,7 +132,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-036](../implementation/phases/PHASE-036.md) | Extensibility Core — Custom Fields | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-036-COMPLETION.md) |
 | [PHASE-037](../implementation/phases/PHASE-037.md) | ZATCA Phase-1 & QR Compliance | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-037-COMPLETION.md) |
 | [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-038-COMPLETION.md) |
-| [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies — v3.1/CR-46) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers | 2 / 13 | 036 | NOT_STARTED — PLANNED |
@@ -151,6 +159,9 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-063](../implementation/phases/PHASE-063.md) | Gulf & Arabic Differentiators | 4 / 15 | 037, 045 | NOT_STARTED — PLANNED |
 | [PHASE-064](../implementation/phases/PHASE-064.md) | AI Copilot & Intelligent Automation | 4 / 15 | 055, 041 | NOT_STARTED — PLANNED |
 | [PHASE-065](../implementation/phases/PHASE-065.md) | Growth Platform & Customer Success | 4 / 15 | 062, 059 | NOT_STARTED — PLANNED |
+| [PHASE-066](../implementation/phases/PHASE-066.md) | IFRS Advanced Compliance I — Measurements & Provisions *(v3.1)* | 3 / 14 | 053, 054 | NOT_STARTED — PLANNED |
+| [PHASE-067](../implementation/phases/PHASE-067.md) | IFRS Advanced Compliance II — Business, Ownership & Disclosure *(v3.1)* | 4 / 15 | 054, 066, 046 | NOT_STARTED — PLANNED |
+| [PHASE-068](../implementation/phases/PHASE-068.md) | Accrual Engine, Revenue Recognition & Recurring Commerce *(v3.1)* | 3 / 14 | 053 | NOT_STARTED — PLANNED |
 
 ## Update protocol (normative)
 

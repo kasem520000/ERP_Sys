@@ -1,6 +1,6 @@
 # Phase Dependency Graph
 
-> **Status:** STABLE · **Owner:** Platform Architecture · **Updated:** 2026-11-10 (Blueprint v3.0 graph reference added)
+> **Status:** STABLE — extended by v3.1 (PHASE-066…068 edges below) · **Owner:** Platform Architecture · **Updated:** 2026-11-11 (Blueprint v3.1 gap-consolidation wave)
 
 Full dependency graph with edge semantics. Nodes: `Pxxx` phases; edges: `A --> B` means
 "B requires A complete with evidence". The graph is validated acyclic by the
@@ -15,6 +15,37 @@ the hard ordering rules (035 first; 036 before 042+; 042→043 with 044+038 into
 [COMPLETENESS_ROADMAP.md](COMPLETENESS_ROADMAP.md) §5 (the authoritative v3.0 graph,
 governed by CR-37's immutable numbering). The same edge semantics apply: a v3.0 phase
 requires its prerequisites COMPLETE with evidence per the 15-step protocol.
+
+**Blueprint v3.1 (2026-11-11 — P066…P068, CR-42/43/44):** three phases were added by
+the gap-consolidation wave. Their edges (same semantics — "B requires A complete with
+evidence"):
+
+```mermaid
+flowchart LR
+  P052[P052 Workflow] --> P053[P053 Accounting Depth]
+  P053 --> P066[P066 IFRS Advanced I]
+  P053 --> P068[P068 Accrual Engine & Recurring]
+  P054[P054 Tax Compliance] --> P066
+  P066 --> P067[P067 IFRS Advanced II]
+  P054 --> P067
+  P048[P048 Projects] -.->|L2-14 interface| P068
+  P046[P046 Payroll] -.->|IAS 19 read-only| P067
+```
+
+| Edge | Why B requires A | Strength |
+|------|------------------|----------|
+| 053 → 066 | The measurement/disclosure registers consume 053's analytic dimensions, segment reporting, and cash-flow forecasting (VIU inputs) | hard |
+| 054 → 066 | The intangible-asset register (L1-22) is an impairment object; the compliance/export precedents are reused | hard |
+| 053 → 068 | The allocation-schedule posting discipline, control-account mappings, and accountant-pack surfaces ride 053's substrate | hard |
+| 066 → 067 | The goodwill/CGU machinery (066) is the landing zone for 067's combination balances | hard |
+| 054 → 067 | The SAF-T export-wizard precedent and the compliance framing feed the XBRL surface | hard |
+| 048 → 068 | The L2-14 contract-asset derivation defines an interface contract the 048 progress certificates feed; the derivation is dormant until 048 ships — 068 never blocks | soft (interface) |
+| 046 → 067 | IAS 19 defined-benefit computation consumes payroll/EOS data read-only | hard |
+| 034 → 067 | NCI and combination entries extend the shipped consolidation machinery additively | hard (already shipped) |
+
+066/068 are Wave-3 siblings of 055–059 (parallel-safe once 053/054 land); 067 is a
+Wave-4 phase after 054/066. All three inherit the CR-36 discipline gates and CR-37's
+immutable numbering (extended by v3.1).
 
 ```mermaid
 flowchart TD

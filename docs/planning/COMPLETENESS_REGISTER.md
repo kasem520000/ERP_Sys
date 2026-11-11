@@ -1,22 +1,40 @@
 # Completeness Register — Blueprint v3.0 (The Full-ERP Completion Program)
 
-> **Status:** ACCEPTED · **Owner:** Product Owner & Platform Architecture · **Date:** 2026-11-10
+> **Status:** ACCEPTED — extended by v3.1 (CR-41…CR-48, the gap-consolidation wave) · **Owner:** Product Owner & Platform Architecture · **Date:** 2026-11-10 (v3.0) · 2026-11-11 (v3.1)
 > **Extends:** [EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) (v2.0, stages 9–11, PHASE-026…034) without altering any prior decision. v1.1 and v2.0 content remain binding and untouched.
 
 This register is the **single canonical source** for Blueprint v3.0: the post-Enterprise-Depth
 completion program that takes the platform from **ERP-L3.2 (60% of a full ERP per the
 independent audit)** to a **genuinely complete, integrated, differentiated ERP** —
 closing the **495 audited gaps** (plus this register's own additions) across
-**31 phases (PHASE-035…065)** organized in **4 waves (stage groups 12–15)**.
+**31 phases (PHASE-035…065)** organized in **4 waves (stage groups 12–15)** — **extended
+by v3.1 (2026-11-11): the second-round gap consolidation adds 43 new gaps (L1-01…L1-23,
+L2-01…L2-20) and three new phases (PHASE-066…068), taking the program to 34 phases and
+536 in-scope gaps (CR-41…CR-48 below).**
 
 **Any document that conflicts with this register is wrong and must be corrected; this
-register governs v3.0 additions only.** Evidence base: the three independent audit
+register governs v3.0/v3.1 additions only.** Evidence base: the three independent audit
 reports copied verbatim into [gap-analysis/](gap-analysis/)
 (`PROJECT_EVALUATION_2026-11-10.md` · `ERP_COMPLETENESS_GAP_REPORT.md` ·
-`ERP_FULL_GAP_ANALYSIS.md`) — every gap ID cited by the phase documents traces to one of
-those three reports or to §D of this register (owner additions).
+`ERP_FULL_GAP_ANALYSIS.md`) plus the two v3.1 layer files
+(`GAP_ANALYSIS_LAYER1_23_GAPS.md` · `GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md`) — every
+gap ID cited by the phase documents traces to one of those five reports or to §D of
+this register (owner additions).
 
-## A. Program decisions (CR-01…CR-40)
+## A. Program decisions (CR-01…CR-48)
+
+### v3.1 — The gap-consolidation wave (CR-41…CR-48, 2026-11-11)
+
+| # | Decision | Authority |
+|---|----------|-----------|
+| CR-41 | **The all-gaps policy + the L1/L2 identifier namespaces:** every gap discovered by any audit round — regardless of severity (حرجة/عالية/متوسطة/منخفضة) — enters the plan; nothing is excluded for being small. The 43 second/third-round gaps are documented in [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-01…L1-23) and [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-01…L2-20). **Identifier disambiguation:** the requested `N-xx` prefix for Layer-1 collided with the existing Integrations gap family N-01…N-21 (FULL_GAP §17, consumed by phases 037/040/041/045/047/054/055/056/061) — Layer-1 is therefore numbered **L1-xx** (1:1 with the requested N-01…N-23), mirroring L2-xx. Gap knowledge never lives only in conversations (see CR-47). | Owner directive 2026-11-11 + this register |
+| CR-42 | **PHASE-066 — IFRS Advanced Compliance I (Measurements & Provisions):** related-party registry & disclosure (IAS 24, L2-01), government grants (IAS 20, L2-02), held-for-sale & discontinued operations (IFRS 5, L2-03), investment property (IAS 40, L2-04), goodwill register & annual test (IFRS 3 measurement side, L2-05), provisions & contingencies (IAS 37, L2-11), impairment machinery (IAS 36, L2-13), going-concern assessment (IAS 1, L2-19). Wave 3 / Stage 14, after 053/054; REQUIRES_VERIFICATION governs every estimate. | [PHASE-066.md](../implementation/phases/PHASE-066.md) |
+| CR-43 | **PHASE-067 — IFRS Advanced Compliance II (Business, Ownership & Disclosure):** business combinations with PPA and the consolidation entry (IFRS 3, L2-06), share-based payments (IFRS 2, L2-07), defined-benefit plans + actuarial assumptions & sensitivity (IAS 19, L2-08/09), hyperinflation restatement (IAS 29, L2-10, designation-gated), non-controlling interests (IFRS 10/3, L2-16), XBRL-tagged statutory statements (L2-18). Wave 4 / Stage 15, after 054/066. | [PHASE-067.md](../implementation/phases/PHASE-067.md) |
+| CR-44 | **PHASE-068 — Accrual Engine, Revenue Recognition & Recurring Commerce:** the allocation-schedule engine (deferred revenue L1-01, revenue recognition L1-02, prepaid amortization L1-03, monthly accruals with auto-reversal L1-05 — extending the shipped `recurring_journals`), the recurring-generation engine (recurring invoices L1-04, customer standing orders L1-15, subscription depth L1-16 — extending the shipped service-contract cluster), and the IFRS-15 contract balances (L2-14 contract assets, L2-17 contract liabilities/RPO). Created **instead of** ballooning PHASE-053 (the owner's "أو مرحلة جديدة إن تضخم النطاق" rule); Wave 3 / Stage 14, after 053. | [PHASE-068.md](../implementation/phases/PHASE-068.md) |
+| CR-45 | **The Layer-2 special-case bindings (decided early because they are early dependencies):** L2-12 (standard costing) → **PHASE-042** scope extension, decided BEFORE 042/043 start per the owner mandate (042's variance machinery consumes it; 043 plans against the frozen standard); L2-15 (milestone billing) + L2-20 (subcontracting) → bound to **PHASE-048** existing scope items 9/7 (PR-11/PR-06) with the IFRS-15 output-method alignment rule and the inbound-subcontract linkage documented — no parallel scope invented; L2-14/L2-17 (contract balances) → **PHASE-068** (they derive mechanically from 068's own schedules — placing them in 066/067 would split one substrate across three phases). | [GAP_ANALYSIS_LAYER2 §3](gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) |
+| CR-46 | **The Layer-1 triage dispositions (evidence-cited in the L1 file):** L1-06 (petty cash — BR-020 + `cash_accounts` PETTY, PHASE-008) and L1-14 (official statements — `partner.statement`/`supplier.statement`, PHASE-011/012) are **SHIPPED, never re-planned**; the partial-shipped residuals and orphans are assigned: **039** ← L1-10 (already scoped item 6) + L1-11 + L1-12 (new scope items — decided before 039 starts, the owner mandate); **040** ← L1-21 export-templates half; **042** ← L1-… none (L2-12 only, per CR-45); **044** ← L1-20; **048** ← L2-15/20 IDs; **053** ← L1-07 residual + L1-08 + L1-09; **054** ← L1-22; **055** ← L1-23; **058** ← L1-13 residual + L1-17 + L1-18 (ID binding) + L1-19 residual; **062** ← L1-21 batch-ops ID binding; **068** ← L1-01…05 residuals, L1-15, L1-16. Effort estimates updated in each phase doc and the roadmap. | [GAP_ANALYSIS_LAYER1 §1](gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) |
+| CR-47 | **The gap-intake protocol (process hardening):** any gap discovered in the future — by the owner, an audit, or an implementing agent — receives an identifier (next free in its family), a severity, an effort estimate, and a phase home **in the same commit** that records it, into the owning gap-analysis file + the roadmap mapping. Gap knowledge that lives only in a conversation is a defect (the 035/036 lesson — knowledge generated in sessions was lost until re-derived). A gap with no phase home is an invalid state and fails `docs:validate` once the check exists. | Owner directive 2026-11-11 |
+| CR-48 | **The completion-evidence hardening (process hardening):** (a) the completion-report template now carries a **mandatory code-evidence checklist** (new tables with schema.ts line numbers, migration file names, web page paths, test files with counts, new permission counts) — a report without it is invalid; (b) a phase may be marked COMPLETE only when **all three** flip together — the phase doc header, the IMPLEMENTATION_STATUS row, and the completion report with evidence — "الثلاثة معاً أو لا شيء"; (c) IMPLEMENTATION_STATUS's own header must state the last completed phase (the line-3 lesson). | Owner directive 2026-11-11 |
 
 ### Wave boundaries and release gates
 
@@ -83,24 +101,24 @@ those three reports or to §D of this register (owner additions).
 | # | Decision | Authority |
 |---|----------|-----------|
 | CR-36 | **Discipline gates (every phase):** each phase MUST ship with (a) its new tables in SQL migration **and** Drizzle mirror **and** `ENTITY_CATALOG.md`; (b) new permissions seeded with the 245-discipline zero-drift check extended; (c) AR/EN dictionary parity (4,186-style equality) for every new screen key; (d) `docs:validate` green; (e) RLS attack tests A1–A10 for every new tenant table; (f) feature-flag gating with template-composable grants; (g) offline sync surface assessment (desktop/mobile clients updated or explicitly N/A-recorded). | House disciplines (audit §21) |
-| CR-37 | **Sequential numbering is binding:** PHASE-035…065 identifiers are fixed by this register and may not be renumbered. A phase may ship early/late but its ID is immutable. | This register |
+| CR-37 | **Sequential numbering is binding:** PHASE-035…065 identifiers are fixed by this register and may not be renumbered. A phase may ship early/late but its ID is immutable. v3.1 extends the same immutability to PHASE-066…068. | This register |
 | CR-38 | **Wave gates:** Stage-12 gate = "sellable" (ZATCA-1 + pricing decision OQ-002 + payments-ready); Stage-13 gate = "full ERP" (MRP + HR + WMS + projects live); Stage-14 gate = "enterprise" (API platform + SSO + BI + ops); Stage-15 gate = "differentiated" (Arabic/AI/growth advantages). Release strategy updates the tier table accordingly. | RELEASE_STRATEGY.md v3.0 rows |
 | CR-39 | **OQ-002 (pricing) is a Wave-1 entry condition, not a phase:** final plan pricing is an owner decision recorded in SUBSCRIPTION_AND_ENTITLEMENTS.md; PHASE-037/056 phases assume it resolved. | OQ register |
-| CR-40 | **The program is documentation-first:** this register + [COMPLETENESS_ROADMAP.md](COMPLETENESS_ROADMAP.md) + the 31 phase documents are the authoritative plan. Implementation happens phase-by-phase per the 15-step protocol; each completion appends a report and flips the IMPLEMENTATION_STATUS row. | AGENT_START_HERE.md protocol |
+| CR-40 | **The program is documentation-first:** this register + [COMPLETENESS_ROADMAP.md](COMPLETENESS_ROADMAP.md) + the 31 phase documents are the authoritative plan. Implementation happens phase-by-phase per the 15-step protocol; each completion appends a report and flips the IMPLEMENTATION_STATUS row. v3.1 extends the document set to 34 phase documents + the two gap-analysis layer files. | AGENT_START_HERE.md protocol |
 
-## B. Identifier allocation (v3.0)
+## B. Identifier allocation (v3.0 + v3.1)
 
-| Namespace | v1.1/v2.0 range | v3.0 range | Notes |
-|---|---|---|---|
-| Phases | 001…034 | **035…065** | immutable (CR-37) |
-| Stage groups | 1…11 | **12…15** | waves 1…4 |
-| Decisions | DR-001…, ED-01…19 | **CR-01…40** | this register |
-| Modules | 26 existing | new module keys per phase doc | feature keys follow `<module>.<capability>` convention |
-| Entities | 198 | +N per phase doc | every new table: SQL + Drizzle + ENTITY_CATALOG row (CR-36) |
-| Permissions | 245 | +N per phase doc | zero-drift discipline extended |
-| Reports | 85 contracts | +N per phase doc | REPORT_CATALOG rows mandatory |
-| Goldens/INV/BR | G-01…32, INV-001…26, BR-001…056 | continue numbering per phase doc | JOURNAL_RULES/ACCOUNTING_INVARIANTS/BUSINESS_RULES updated |
-| Gap IDs | — | H-01…H-23, A/S/P/I/M/Q/F/HR/PR/T/X/L/R/W/N/PL/G/UX + FD/IN/TB/PP/DF | full mapping in COMPLETENESS_ROADMAP.md §F |
+| Namespace | v1.1/v2.0 range | v3.0 range | v3.1 range | Notes |
+|---|---|---|---|---|
+| Phases | 001…034 | 035…065 | **066…068** | immutable (CR-37 extended) |
+| Stage groups | 1…11 | 12…15 | — (066/068 → 14, 067 → 15) | waves 1…4 |
+| Decisions | DR-001…, ED-01…19 | CR-01…40 | **CR-41…48** | this register |
+| Modules | 26 existing | new module keys per phase doc | +`ifrs` (066/067) | feature keys follow `<module>.<capability>` |
+| Entities | 198 | +N per phase doc | +N per 066/067/068 doc | every new table: SQL + Drizzle + ENTITY_CATALOG row (CR-36) |
+| Permissions | 245 | +N per phase doc | +N per 066/067/068 doc | zero-drift discipline extended |
+| Reports | 85 contracts | +N per phase doc | +N per 066/067/068 doc | REPORT_CATALOG rows mandatory |
+| Goldens/INV/BR | G-01…32, INV-001…26, BR-001…056 | continue per phase doc | continue (next free at implementation) | JOURNAL_RULES/ACCOUNTING_INVARIANTS/BUSINESS_RULES updated |
+| Gap IDs | — | H-01…H-23, A/S/P/I/M/Q/F/HR/PR/T/X/L/R/W/N/PL/G/UX + FD/IN/TB/PP/DF | **L1-01…L1-23, L2-01…L2-20** | full mapping in COMPLETENESS_ROADMAP.md §6 |
 
 ## C. What this program does NOT redo (already delivered / already shipped)
 
@@ -123,11 +141,13 @@ Items the independent audits did not enumerate, added by the platform owner's re
 | OA-05 | **Demo/sandbox tenant per industry template** with realistic seeded data for sales demos | PHASE-040 |
 | OA-06 | **Performance budgets per new table** (index strategy, EXPLAIN-verified hot paths) as phase acceptance criteria | CR-36 (all) |
 | OA-07 | **Interim delivery convention:** the program ships as versioned archives `ERP_PLATFORM_PHASE0NN.zip` per completed phase, built from this repository state | This register |
+| OA-08 | **The second/third-round gap layers (v3.1):** the 43 gaps documented in the two gap-analysis layer files carry the same authority as audited gaps (CR-41); their dispositions are CR-45/CR-46 | This register (v3.1) |
 
 ---
 
-*This register was authored as part of the 2026-11-10 completeness planning session. It
+*This register was authored as part of the 2026-11-10 completeness planning session and
+extended 2026-11-11 by the v3.1 gap-consolidation wave (CR-41…CR-48). It
 extends — and never contradicts — CONSOLIDATION_REGISTER.md (v1.1), EXPANSION_REGISTER.md
 (v2.0), and the 18 binding ADRs. Validation: `scripts/validate_docs.py` check 8 (v3.0
-artifacts) verifies this register, the roadmap, and the 31 phase documents exist with
+artifacts) verifies this register, the roadmap, and the 34 phase documents exist with
 canonical headings.*
