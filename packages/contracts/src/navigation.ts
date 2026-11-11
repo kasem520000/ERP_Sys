@@ -282,6 +282,35 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 60,
   },
+  // PHASE-039 returns & collections rows (matrix §3.2/§3.3; the seeded
+  // 0055/0056/0059 keys): the customer RMA + warranty workspace (the
+  // warranties ride the returns screen as its second tab) and the dunning
+  // engine's collections workspace (letters/policies/actions/credit
+  // reviews/agencies).
+  {
+    id: "sales.returns",
+    parentGroup: "sales",
+    label: { ar: "مرتجعات البيع", en: "Sales returns" },
+    icon: "undo-2",
+    route: "/sales/returns",
+    featureKey: "sales.rma",
+    permission: "sales.rma.read",
+    branchScoped: false,
+    archetype: "transaction-entry",
+    order: 70,
+  },
+  {
+    id: "sales.dunning",
+    parentGroup: "sales",
+    label: { ar: "التحصيل والمطالبات", en: "Collections & dunning" },
+    icon: "hourglass",
+    route: "/sales/dunning",
+    featureKey: "sales.dunning",
+    permission: "sales.dunning.manage",
+    branchScoped: false,
+    archetype: "transaction-entry",
+    order: 80,
+  },
   // settings group — the PHASE-003/004 admin surfaces (real routes today)
   {
     id: "settings.users",
@@ -785,6 +814,20 @@ export const NAV_ITEMS: readonly NavItem[] = [
     branchScoped: false,
     archetype: "transaction-entry",
     order: 40,
+  },
+  // PHASE-039 supplier returns (matrix §3.3; the seeded 0059 keys): the RTV
+  // authorizations REQUESTED → approve → ship → credit (G-38).
+  {
+    id: "purchasing.returns",
+    parentGroup: "purchasing",
+    label: { ar: "مرتجعات الموردين", en: "Supplier returns" },
+    icon: "corner-up-left",
+    route: "/purchasing/returns",
+    featureKey: "purchasing.rma",
+    permission: "purchasing.rma.read",
+    branchScoped: false,
+    archetype: "transaction-entry",
+    order: 45,
   },
   {
     id: "purchasing.ap",

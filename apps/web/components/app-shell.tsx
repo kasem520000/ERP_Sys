@@ -216,6 +216,14 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "purchasing/blanket-orders": { group: "navPurchasing", label: "sourcingBlanketNav" },
   "purchasing/supplier-scorecards": { group: "navPurchasing", label: "sourcingScorecardsNav" },
   "purchasing/capex-requests": { group: "navPurchasing", label: "sourcingCapexNav" },
+  // -- WEB-039 (PHASE-039): the returns & collections surfaces (matrix
+  // §3.2/§3.3). The registry rows `sales.returns` / `sales.dunning` /
+  // `purchasing.returns` (contracts NAV_ITEMS) drive the sidebar; these
+  // fallbacks cover nav-fetch failure for the module's surfaces (the
+  // support-sessions rule — crumbs only; the sidebar stays registry-driven).
+  "sales/returns": { group: "navSales", label: "returnsNav" },
+  "sales/dunning": { group: "navSales", label: "dunningNav" },
+  "purchasing/returns": { group: "navPurchasing", label: "supplierReturnsNav" },
 };
 
 /**

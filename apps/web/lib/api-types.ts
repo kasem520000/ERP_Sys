@@ -5126,3 +5126,382 @@ export interface TenderIntakeRow {
   status: "OPEN" | "CLOSED";
   createdAt: string;
 }
+
+// ---------------------------------------------------------------------------
+// WEB-039 (PHASE-039) — Returns & collections rows. Mirrors the 0055/0059
+// selects (apps/api sales/infrastructure/returns.store.ts, dunning.store.ts,
+// purchasing/infrastructure/supplier-returns.store.ts); money stays canonical
+// 4-dp decimal strings (ADR-0009), ids UUID strings, dates ISO text. The
+// customer RMA ladder REQUESTED → APPROVED → RECEIVED → INSPECTED →
+// RESTOCKED/SCRAPPED/REFUNDED (BR-064); warranties ride the returns screen;
+// the dunning engine carries policies (BR-065 monotonic ladder), letters
+// with their late fees (L1-12), logged actions, credit reviews (L1-10) and
+// the agency terminal layer (L1-11); supplier RMAs close the loop to the
+// RTV credit (G-38).
+// ---------------------------------------------------------------------------
+
+/** GET sales/sales-invoices/:id → one invoice line (the RMA create picker). */
+export interface SalesInvoiceLineRow {
+  id: string;
+  lineNo: number;
+  itemId: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  qty: string;
+  unitPrice: string;
+  netAmount: string;
+  taxAmount: string;
+  note: string | null;
+}
+
+/** GET sales/sales-invoices/:id → the invoice with its lines. */
+export interface SalesInvoiceWithLines extends SalesInvoiceRow {
+  lines: readonly SalesInvoiceLineRow[];
+}
+
+/** GET purchasing/purchase-orders/:id → one PO line (the SRMA create picker). */
+export interface PurchaseOrderLineRow {
+  id: string;
+  orderId: string;
+  lineNo: number;
+  itemId: string;
+  qty: string;
+  unitPrice: string;
+  netAmount: string;
+  taxAmount: string;
+  note: string | null;
+}
+
+/** GET purchasing/purchase-orders/:id → the PO with its lines. */
+export interface PurchaseOrderWithLines extends PurchaseOrderRow {
+  lines: readonly PurchaseOrderLineRow[];
+}
+
+/** The customer RMA reason vocabulary (0055 domain enum). */
+export type RmaReasonCode =
+  | "DAMAGED"
+  | "DEFECTIVE"
+  | "WRONG_ITEM"
+  | "LATE_DELIVERY"
+  | "CUSTOMER_REMORSE"
+  | "OTHER";
+
+/** The inspection disposition (BR-064: INSPECTED must record one). */
+export type RmaDisposition = "RESTOCK" | "SCRAP" | "REFUND";
+
+/** GET sales/returns → one customer RMA header (0055). */
+export interface RmaRow {
+  id: string;
+  branchId: string;
+  rmaNo: string | null;
+  partnerId: string;
+  invoiceId: string;
+  reasonCode: RmaReasonCode;
+  reason: string | null;
+  reasonAr: string | null;
+  status:
+    | "REQUESTED"
+    | "APPROVED"
+    | "RECEIVED"
+    | "INSPECTED"
+    | "RESTOCKED"
+    | "SCRAPPED"
+    | "REFUNDED"
+    | "CANCELLED";
+  disposition: RmaDisposition | null;
+  currencyCode: string;
+  totalNet: string;
+  totalTax: string;
+  totalGross: string;
+  requestedAt: string;
+  approvedAt: string | null;
+  receivedAt: string | null;
+  inspectedAt: string | null;
+  inspectionNote: string | null;
+  completedAt: string | null;
+  creditNoteId: string | null;
+  postedJournalId: string | null;
+  entryNo: string | null;
+  refundCashAccountId: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** One RMA line (keyed by the referenced invoice line). */
+export interface RmaLineRow {
+  id: string;
+  rmaId: string;
+  lineNo: number;
+  invoiceLineId: string;
+  itemId: string | null;
+  qty: string;
+  unitPrice: string;
+  netAmount: string;
+  taxAmount: string;
+  note: string | null;
+}
+
+/** GET sales/returns/:id → the RMA with its lines (findWithLines). */
+export interface RmaWithLines extends RmaRow {
+  lines: readonly RmaLineRow[];
+}
+
+/** Managed-warranty terms (S-15; validated whole months, UTC month math). */
+export interface WarrantyTerms {
+  durationMonths: number;
+  coverage: "REPAIR" | "REPLACE" | "REFUND" | "LABOR_ONLY" | "PARTS_ONLY";
+  basis: "INVOICE_DATE" | "DELIVERY_DATE";
+  mileageLimitKm?: number | null;
+}
+
+/** GET/POST sales/warranties → one warranty registration. */
+export interface WarrantyRow {
+  id: string;
+  partnerId: string;
+  itemId: string;
+  serialNo: string | null;
+  invoiceId: string | null;
+  jobCardId: string | null;
+  terms: Record<string, unknown>;
+  startDate: string;
+  endDate: string;
+  status: "ACTIVE" | "EXPIRED" | "VOID";
+  lastNotifiedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** One BR-065 ladder step (monotonic day thresholds, one channel each). */
+export interface DunningStep {
+  stepNo: number;
+  daysOverdue: number;
+  channel: "EMAIL" | "WHATSAPP" | "SMS";
+  templateKey: string;
+  escalate: boolean;
+  referToAgency: boolean;
+}
+
+/** GET/POST sales/dunning/policies → one dunning policy. */
+export interface DunningPolicyRow {
+  id: string;
+  name: string;
+  nameAr: string | null;
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+  partnerTierIds: string[];
+  isDefault: boolean;
+  steps: readonly Record<string, unknown>[];
+  lateFeeMode: "DISABLED" | "CONTRACT_RATE" | "STATUTORY_CAP";
+  lateFeeRatePct: string | null;
+  lateFeeGraceDays: number;
+  lateFeeMaxAmount: string | null;
+  lateFeeSource: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET sales/dunning/letters → one dunning letter (the register IS the
+ * delivery evidence for EMAIL; WHATSAPP/SMS stay QUEUED for the port). */
+export interface DunningLetterRow {
+  id: string;
+  policyId: string;
+  partnerId: string;
+  invoiceId: string;
+  stepNo: number;
+  daysOverdue: number;
+  letterDate: string;
+  channel: "EMAIL" | "WHATSAPP" | "SMS";
+  templateKey: string;
+  status: "QUEUED" | "SENT" | "FAILED";
+  sentAt: string | null;
+  emailTo: string | null;
+  subject: string | null;
+  feeAmount: string | null;
+  feeInvoiceId: string | null;
+  feeWaivedAt: string | null;
+  feeWaiverReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET/POST sales/dunning/actions → one logged collection action. */
+export interface CollectionActionRow {
+  id: string;
+  partnerId: string;
+  invoiceId: string | null;
+  policyId: string | null;
+  actionType:
+    | "CALL"
+    | "EMAIL"
+    | "PROMISE_TO_PAY"
+    | "DISPUTE"
+    | "FIELD_VISIT"
+    | "PAYMENT_PLAN"
+    | "WRITE_OFF_REQUEST"
+    | "AGENCY_REFERRAL"
+    | "OTHER";
+  actionDate: string;
+  outcome: "PENDING" | "PROMISED" | "BROKEN" | "PAID" | "ESCALATED" | "NO_ANSWER" | "OTHER";
+  promisedDate: string | null;
+  followUpDate: string | null;
+  amount: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET sales/credit-reviews?due=1 → one partner credit-risk row. */
+export interface CreditReviewRow {
+  partnerId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  customerTierId: string | null;
+  creditScoreClass: string | null;
+  creditReviewFrequencyDays: number | null;
+  nextCreditReviewAt: string | null;
+  lastCreditReviewAt: string | null;
+  creditReviewNote: string | null;
+}
+
+/** GET/POST sales/collection-agencies → one agency register row (the raw
+ * token is shown ONCE at issue; only sha256(token) persists). */
+export interface CollectionAgencyRow {
+  id: string;
+  partnerId: string;
+  contactName: string | null;
+  email: string | null;
+  phone: string | null;
+  commissionMode: "PCT_OF_COLLECTED" | "FLAT_FEE";
+  commissionPct: string | null;
+  flatFee: string | null;
+  status: "ACTIVE" | "SUSPENDED";
+  tokenIssuedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET/POST sales/collection-referrals → one agency referral (L1-11). */
+export interface CollectionReferralRow {
+  id: string;
+  agencyId: string;
+  partnerId: string;
+  invoiceId: string | null;
+  actionId: string | null;
+  currencyCode: string;
+  referralDate: string;
+  referredAmount: string;
+  commissionMode: "PCT_OF_COLLECTED" | "FLAT_FEE";
+  commissionPct: string | null;
+  flatFee: string | null;
+  status:
+    | "REFERRED"
+    | "ACKNOWLEDGED"
+    | "PARTIAL"
+    | "SETTLED"
+    | "COMMISSION_POSTED"
+    | "CLOSED"
+    | "CANCELLED";
+  settledAmount: string;
+  settledAt: string | null;
+  commissionAmount: string | null;
+  commissionEntryNo: string | null;
+  closedAt: string | null;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** POST sales/dunning/run → the sweep outcome (one step per run, BR-065). */
+export interface DunningSweepResult {
+  asOf: string;
+  scanned: number;
+  lettersFired: number;
+  escalated: number;
+}
+
+/** POST sales/dunning/charge-fee → the fee invoice stamp (one fee per invoice). */
+export interface LateFeeChargeResult {
+  letterId: string;
+  stepNo: number;
+  feeAmount: string;
+  feeInvoiceId: string;
+  feeInvoiceNo: string | null;
+  totalGross: string;
+}
+
+/** The supplier RMA reason vocabulary (0059 domain enum). */
+export type SupplierRmaReasonCode =
+  | "DAMAGED"
+  | "DEFECTIVE"
+  | "WRONG_ITEM"
+  | "OVER_SHIPMENT"
+  | "EXPIRED"
+  | "RECALL"
+  | "OTHER";
+
+/** GET purchasing/returns → one supplier RMA header (0059; G-38 at credit). */
+export interface SupplierRmaRow {
+  id: string;
+  branchId: string;
+  srmaNo: string | null;
+  supplierId: string;
+  purchaseOrderId: string;
+  reasonCode: SupplierRmaReasonCode;
+  reason: string | null;
+  reasonAr: string | null;
+  status: "REQUESTED" | "APPROVED" | "SHIPPED" | "CREDITED" | "CANCELLED";
+  currencyCode: string;
+  totalNet: string;
+  totalTax: string;
+  totalGross: string;
+  requestedAt: string;
+  approvedAt: string | null;
+  shippedAt: string | null;
+  creditedAt: string | null;
+  debitNoteId: string | null;
+  postedJournalId: string | null;
+  entryNo: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** One supplier RMA line (keyed by the referenced PO line). */
+export interface SupplierRmaLineRow {
+  id: string;
+  srmaId: string;
+  lineNo: number;
+  poLineId: string;
+  itemId: string | null;
+  qty: string;
+  unitCost: string;
+  netAmount: string;
+  note: string | null;
+}
+
+/** GET purchasing/returns/:id → the SRMA with its lines (findWithLines). */
+export interface SupplierRmaWithLines extends SupplierRmaRow {
+  lines: readonly SupplierRmaLineRow[];
+}

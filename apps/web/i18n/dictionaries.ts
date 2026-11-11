@@ -5068,6 +5068,333 @@ export interface Dictionary {
   sourcingErrNotInvited: string;
   sourcingErrCurrencyMismatch: string;
   sourcingErrNoQuotes: string;
+
+  // -- WEB-039 (PHASE-039): returns & collections -----------------------------
+  // the returns & collections surfaces (/sales/returns with the warranties
+  // tab, /sales/dunning, /purchasing/returns) over the 0055/0057/0059
+  // routes (matrix §3.2/§3.3; the seeded sales.rma.* / sales.warranties /
+  // sales.dunning.* / sales.late-fees / sales.collection-agencies /
+  // purchasing.rma.* keys).
+  returnsNav: string;
+  dunningNav: string;
+  supplierReturnsNav: string;
+  returnsTitle: string;
+  returnsSubtitle: string;
+  dunningTitle: string;
+  dunningSubtitle: string;
+  supplierReturnsTitle: string;
+  supplierReturnsSubtitle: string;
+  returnsTabRmas: string;
+  returnsTabWarranties: string;
+  dunningTabLetters: string;
+  dunningTabPolicies: string;
+  dunningTabActions: string;
+  dunningTabReviews: string;
+  dunningTabAgencies: string;
+  returnsColRmaNo: string;
+  returnsColPartner: string;
+  returnsColInvoice: string;
+  returnsColStatus: string;
+  returnsColDisposition: string;
+  returnsColTotal: string;
+  returnsColRequested: string;
+  returnsColCompleted: string;
+  returnsColLine: string;
+  returnsColItem: string;
+  returnsColQty: string;
+  returnsColUnitPrice: string;
+  returnsColNet: string;
+  returnsColTax: string;
+  returnsColNote: string;
+  returnsStatusRequested: string;
+  returnsStatusApproved: string;
+  returnsStatusReceived: string;
+  returnsStatusInspected: string;
+  returnsStatusRestocked: string;
+  returnsStatusScrapped: string;
+  returnsStatusRefunded: string;
+  returnsStatusCancelled: string;
+  returnsDispositionRestock: string;
+  returnsDispositionScrap: string;
+  returnsDispositionRefund: string;
+  returnsDispositionNone: string;
+  returnsReasonDamaged: string;
+  returnsReasonDefective: string;
+  returnsReasonWrongItem: string;
+  returnsReasonLateDelivery: string;
+  returnsReasonCustomerRemorse: string;
+  returnsReasonOverShipment: string;
+  returnsReasonExpired: string;
+  returnsReasonRecall: string;
+  returnsReasonOther: string;
+  returnsFormInvoice: string;
+  returnsFormPickInvoice: string;
+  returnsFormReasonCode: string;
+  returnsFormReason: string;
+  returnsFormReasonAr: string;
+  returnsFormNote: string;
+  returnsFormInvoiceLine: string;
+  returnsActionCreate: string;
+  returnsActionView: string;
+  returnsActionApprove: string;
+  returnsActionReceive: string;
+  returnsActionInspect: string;
+  returnsActionComplete: string;
+  returnsActionCancel: string;
+  returnsActionVoid: string;
+  returnsCreateTitle: string;
+  returnsDetailTitle: string;
+  returnsInspectTitle: string;
+  returnsCompleteTitle: string;
+  returnsCancelReasonLabel: string;
+  returnsCashAccountLabel: string;
+  returnsRefundHint: string;
+  returnsInvoiceHint: string;
+  returnsConfirmApprove: string;
+  returnsConfirmReceive: string;
+  returnsConfirmComplete: string;
+  returnsConfirmCancel: string;
+  returnsToastCreated: string;
+  returnsToastDone: string;
+  returnsRmasEmpty: string;
+  returnsInvoiceLinesEmpty: string;
+  returnsColSerial: string;
+  returnsColStart: string;
+  returnsColEnd: string;
+  returnsColCoverage: string;
+  returnsColDuration: string;
+  returnsColMileage: string;
+  returnsWarrantyActive: string;
+  returnsWarrantyExpired: string;
+  returnsWarrantyVoid: string;
+  returnsCoverageRepair: string;
+  returnsCoverageReplace: string;
+  returnsCoverageRefund: string;
+  returnsCoverageLaborOnly: string;
+  returnsCoveragePartsOnly: string;
+  returnsBasisInvoiceDate: string;
+  returnsBasisDeliveryDate: string;
+  returnsDurationMonths: string;
+  returnsMileageKm: string;
+  returnsWarrantyCreateTitle: string;
+  returnsFormSerial: string;
+  returnsFormStart: string;
+  returnsFormDuration: string;
+  returnsFormCoverage: string;
+  returnsFormBasis: string;
+  returnsFormMileageOptional: string;
+  returnsFormInvoiceOptional: string;
+  returnsConfirmVoid: string;
+  returnsWarrantiesEmpty: string;
+  returnsErrState: string;
+  returnsErrQtyExceeds: string;
+  returnsErrDisposition: string;
+  returnsErrScrapUnmapped: string;
+  returnsErrWarrantyTerms: string;
+  dunningColPartner: string;
+  dunningColInvoice: string;
+  dunningColStep: string;
+  dunningColDays: string;
+  dunningColChannel: string;
+  dunningColLetterDate: string;
+  dunningColSent: string;
+  dunningColSubject: string;
+  dunningColFee: string;
+  dunningColFeeInvoice: string;
+  dunningColWaiver: string;
+  dunningChannelEmail: string;
+  dunningChannelWhatsapp: string;
+  dunningChannelSms: string;
+  dunningLetterQueued: string;
+  dunningLetterSent: string;
+  dunningLetterFailed: string;
+  dunningFeeWaived: string;
+  dunningDaysValue: string;
+  dunningActionRunSweep: string;
+  dunningSweepHint: string;
+  dunningSweepAsOfLabel: string;
+  dunningSweepResult: string;
+  dunningActionChargeFee: string;
+  dunningActionWaiveFee: string;
+  dunningWaiveTitle: string;
+  dunningWaiveReasonLabel: string;
+  dunningConfirmCharge: string;
+  dunningConfirmWaive: string;
+  dunningToastSweepDone: string;
+  dunningPolicyDraft: string;
+  dunningPolicyActive: string;
+  dunningPolicyArchived: string;
+  dunningFeeModeDisabled: string;
+  dunningFeeModeContractRate: string;
+  dunningFeeModeStatutoryCap: string;
+  dunningDefaultBadge: string;
+  dunningEscalateBadge: string;
+  dunningReferAgencyBadge: string;
+  dunningLadderTitle: string;
+  dunningLateFeeTitle: string;
+  dunningLateFeeRateLabel: string;
+  dunningLateFeeGraceLabel: string;
+  dunningLateFeeMaxLabel: string;
+  dunningPolicyCreateTitle: string;
+  dunningFormPolicyName: string;
+  dunningFormPolicyNameAr: string;
+  dunningFormIsDefault: string;
+  dunningFormStepNo: string;
+  dunningFormDaysOverdue: string;
+  dunningFormChannel: string;
+  dunningFormTemplateKey: string;
+  dunningFormEscalate: string;
+  dunningFormReferToAgency: string;
+  dunningAddStep: string;
+  dunningRemoveStep: string;
+  dunningFormFeeMode: string;
+  dunningFormRatePct: string;
+  dunningFormGraceDays: string;
+  dunningFormMaxAmount: string;
+  dunningFormFeeSource: string;
+  dunningActionCreatePolicy: string;
+  dunningActionActivate: string;
+  dunningActionArchive: string;
+  dunningConfirmActivate: string;
+  dunningConfirmArchive: string;
+  dunningActionTypeCall: string;
+  dunningActionTypeEmail: string;
+  dunningActionTypePromiseToPay: string;
+  dunningActionTypeDispute: string;
+  dunningActionTypeFieldVisit: string;
+  dunningActionTypePaymentPlan: string;
+  dunningActionTypeWriteOffRequest: string;
+  dunningActionTypeAgencyReferral: string;
+  dunningActionTypeOther: string;
+  dunningOutcomePending: string;
+  dunningOutcomePromised: string;
+  dunningOutcomeBroken: string;
+  dunningOutcomePaid: string;
+  dunningOutcomeEscalated: string;
+  dunningOutcomeNoAnswer: string;
+  dunningOutcomeOther: string;
+  dunningColActionType: string;
+  dunningColActionDate: string;
+  dunningColOutcome: string;
+  dunningColPromised: string;
+  dunningColAmount: string;
+  dunningActionLogTitle: string;
+  dunningFormActionType: string;
+  dunningFormActionDate: string;
+  dunningFormOutcome: string;
+  dunningFormPromisedDate: string;
+  dunningFormFollowUpDate: string;
+  dunningFormAmount: string;
+  dunningFormNote: string;
+  dunningPromiseDateHint: string;
+  dunningFormInvoiceOptional: string;
+  dunningColCode: string;
+  dunningColClass: string;
+  dunningColNextReview: string;
+  dunningColLastReview: string;
+  dunningNoClass: string;
+  dunningRecordReviewTitle: string;
+  dunningFormScoreClass: string;
+  dunningFormNextReview: string;
+  dunningFormReviewNote: string;
+  dunningAgencyActive: string;
+  dunningAgencySuspended: string;
+  dunningColAgency: string;
+  dunningColContact: string;
+  dunningColCommissionMode: string;
+  dunningColCommissionPct: string;
+  dunningColFlatFee: string;
+  dunningColTokenIssued: string;
+  dunningColReferralDate: string;
+  dunningColReferredAmount: string;
+  dunningColSettledAmount: string;
+  dunningColCommissionAmount: string;
+  dunningCommissionPctOfCollected: string;
+  dunningCommissionFlatFee: string;
+  dunningAgencyCreateTitle: string;
+  dunningFormContactName: string;
+  dunningFormEmail: string;
+  dunningFormPhone: string;
+  dunningFormCommissionMode: string;
+  dunningActionIssueToken: string;
+  dunningActionSuspend: string;
+  dunningAgencyTokenTitle: string;
+  dunningAgencyTokenOnce: string;
+  dunningConfirmIssueToken: string;
+  dunningConfirmSuspend: string;
+  dunningReferralReferred: string;
+  dunningReferralAcknowledged: string;
+  dunningReferralPartial: string;
+  dunningReferralSettled: string;
+  dunningReferralCommissionPosted: string;
+  dunningReferralClosed: string;
+  dunningReferralCancelled: string;
+  dunningReferralCreateTitle: string;
+  dunningSettleTitle: string;
+  dunningFormAgency: string;
+  dunningFormPartner: string;
+  dunningFormReferredAmount: string;
+  dunningFormReferralDate: string;
+  dunningFormSettledAmount: string;
+  dunningActionRefer: string;
+  dunningActionSettle: string;
+  dunningActionPostCommission: string;
+  dunningActionCloseReferral: string;
+  dunningConfirmPostCommission: string;
+  dunningConfirmClose: string;
+  dunningToastDone: string;
+  dunningLettersEmpty: string;
+  dunningPoliciesEmpty: string;
+  dunningActionsEmpty: string;
+  dunningReviewsEmpty: string;
+  dunningAgenciesEmpty: string;
+  dunningReferralsEmpty: string;
+  dunningErrSteps: string;
+  dunningErrLateFee: string;
+  dunningErrFeeAlreadyCharged: string;
+  dunningErrFeeNotWaivable: string;
+  dunningErrReview: string;
+  dunningErrReferralState: string;
+  dunningErrCommissionUnmapped: string;
+  srmaColNo: string;
+  srmaColSupplier: string;
+  srmaColPo: string;
+  srmaColTotal: string;
+  srmaColRequested: string;
+  srmaColLine: string;
+  srmaColItem: string;
+  srmaColQty: string;
+  srmaColUnitCost: string;
+  srmaColNet: string;
+  srmaStatusRequested: string;
+  srmaStatusApproved: string;
+  srmaStatusShipped: string;
+  srmaStatusCredited: string;
+  srmaStatusCancelled: string;
+  srmaActionCreate: string;
+  srmaActionView: string;
+  srmaActionApprove: string;
+  srmaActionShip: string;
+  srmaActionCredit: string;
+  srmaActionCancel: string;
+  srmaCreateTitle: string;
+  srmaDetailTitle: string;
+  srmaShipTitle: string;
+  srmaFormPo: string;
+  srmaFormPickPo: string;
+  srmaFormPoLine: string;
+  srmaFormWarehouse: string;
+  srmaConfirmApprove: string;
+  srmaConfirmShip: string;
+  srmaConfirmCredit: string;
+  srmaConfirmCancel: string;
+  srmaToastCreated: string;
+  srmaToastDone: string;
+  srmaEmpty: string;
+  srmaLinesEmpty: string;
+  srmaErrState: string;
+  srmaErrQtyExceeds: string;
+  srmaErrUnmapped: string;
 }
 
 const ar: Dictionary = {
@@ -10140,6 +10467,337 @@ const ar: Dictionary = {
   sourcingErrNotInvited: "المورد غير مدرج في قائمة المدعوين لهذا الطلب.",
   sourcingErrCurrencyMismatch: "عملة العرض لا تطابق عملة الطلب.",
   sourcingErrNoQuotes: "لا عروض مقدَّمة لمقارنتها — جهّز المقارنة بعد استلام العروض.",
+  // WEB-039 (PHASE-039) — المرتجعات والتحصيل (عربي أولًا).
+  returnsNav: "مرتجعات البيع",
+  dunningNav: "التحصيل والمطالبات",
+  supplierReturnsNav: "مرتجعات الموردين",
+  returnsTitle: "المبيعات — مرتجعات البيع",
+  returnsSubtitle:
+    "طلبات إذن الإرجاع من العملاء مع الفحص والقرار، وسجلات الضمان.",
+  dunningTitle: "المبيعات — التحصيل والمطالبات",
+  dunningSubtitle:
+    "سلّم خطابات الاستذكار والرسوم المتأخرة، ومتابعة إجراءات التحصيل، ومراجعات الائتمان، ووكالات التحصيل.",
+  supplierReturnsTitle: "المشتريات — مرتجعات الموردين",
+  supplierReturnsSubtitle:
+    "طلبات إرجاع البضاعة إلى الموردين حتى الإشعار الدائن (G-38).",
+  returnsTabRmas: "أذونات الإرجاع",
+  returnsTabWarranties: "الضمانات",
+  dunningTabLetters: "خطابات الاستذكار",
+  dunningTabPolicies: "سياسات الاستذكار",
+  dunningTabActions: "إجراءات التحصيل",
+  dunningTabReviews: "مراجعات الائتمان",
+  dunningTabAgencies: "وكالات التحصيل",
+  returnsColRmaNo: "رقم الإرجاع",
+  returnsColPartner: "العميل",
+  returnsColInvoice: "الفاتورة",
+  returnsColStatus: "الحالة",
+  returnsColDisposition: "القرار",
+  returnsColTotal: "الإجمالي",
+  returnsColRequested: "تاريخ الطلب",
+  returnsColCompleted: "تاريخ الإتمام",
+  returnsColLine: "السطر",
+  returnsColItem: "الصنف",
+  returnsColQty: "الكمية",
+  returnsColUnitPrice: "سعر الوحدة",
+  returnsColNet: "الصافي",
+  returnsColTax: "الضريبة",
+  returnsColNote: "ملاحظة",
+  returnsStatusRequested: "مطلوب",
+  returnsStatusApproved: "معتمد",
+  returnsStatusReceived: "مستلم",
+  returnsStatusInspected: "مفحوص",
+  returnsStatusRestocked: "معاد للمخزون",
+  returnsStatusScrapped: "متلف",
+  returnsStatusRefunded: "مسترد",
+  returnsStatusCancelled: "ملغى",
+  returnsDispositionRestock: "إعادة للمخزون",
+  returnsDispositionScrap: "إتلاف",
+  returnsDispositionRefund: "استرداد نقدي",
+  returnsDispositionNone: "بدون قرار",
+  returnsReasonDamaged: "تالف",
+  returnsReasonDefective: "معيب",
+  returnsReasonWrongItem: "صنف خاطئ",
+  returnsReasonLateDelivery: "تأخر التسليم",
+  returnsReasonCustomerRemorse: "عدول العميل",
+  returnsReasonOverShipment: "زيادة في التوريد",
+  returnsReasonExpired: "منتهي الصلاحية",
+  returnsReasonRecall: "سحب من السوق",
+  returnsReasonOther: "أخرى",
+  returnsFormInvoice: "الفاتورة المرجعية",
+  returnsFormPickInvoice: "اختر فاتورة مرحّلة",
+  returnsFormReasonCode: "سبب الإرجاع",
+  returnsFormReason: "السبب",
+  returnsFormReasonAr: "السبب (عربي)",
+  returnsFormNote: "ملاحظة",
+  returnsFormInvoiceLine: "سطر الفاتورة",
+  returnsActionCreate: "طلب إرجاع",
+  returnsActionView: "عرض",
+  returnsActionApprove: "اعتماد",
+  returnsActionReceive: "استلام",
+  returnsActionInspect: "فحص",
+  returnsActionComplete: "إتمام",
+  returnsActionCancel: "إلغاء",
+  returnsActionVoid: "إبطال",
+  returnsCreateTitle: "طلب إرجاع جديد",
+  returnsDetailTitle: "تفاصيل الإرجاع",
+  returnsInspectTitle: "فحص المرتجع وتحديد القرار",
+  returnsCompleteTitle: "إتمام الإرجاع",
+  returnsCancelReasonLabel: "سبب الإلغاء",
+  returnsCashAccountLabel: "حساب النقدية للاسترداد",
+  returnsRefundHint:
+    "قرار الاسترداد النقدي يتطلب اختيار حساب نقدية تُصرف منه القيمة.",
+  returnsInvoiceHint:
+    "تُنشأ أذونات الإرجاع على فواتير مرحّلة ضمن نافذة الإرجاع المعمول بها.",
+  returnsConfirmApprove: "اعتماد طلب الإرجاع؟",
+  returnsConfirmReceive: "تأكيد استلام المرتجع؟",
+  returnsConfirmComplete: "إتمام الإرجاع وإصدار المستندات؟ لا يمكن التراجع.",
+  returnsConfirmCancel: "إلغاء طلب الإرجاع؟",
+  returnsToastCreated: "تم إنشاء طلب الإرجاع بنجاح.",
+  returnsToastDone: "تم تنفيذ الإجراء.",
+  returnsRmasEmpty: "لا توجد طلبات إرجاع.",
+  returnsInvoiceLinesEmpty: "لا توجد أسطر على هذه الفاتورة.",
+  returnsColSerial: "الرقم التسلسلي",
+  returnsColStart: "يبدأ في",
+  returnsColEnd: "ينتهي في",
+  returnsColCoverage: "نطاق التغطية",
+  returnsColDuration: "المدة",
+  returnsColMileage: "حد الأميال",
+  returnsWarrantyActive: "نشط",
+  returnsWarrantyExpired: "منتهي",
+  returnsWarrantyVoid: "مبطل",
+  returnsCoverageRepair: "إصلاح",
+  returnsCoverageReplace: "استبدال",
+  returnsCoverageRefund: "استرداد",
+  returnsCoverageLaborOnly: "العمالة فقط",
+  returnsCoveragePartsOnly: "قطع الغيار فقط",
+  returnsBasisInvoiceDate: "تاريخ الفاتورة",
+  returnsBasisDeliveryDate: "تاريخ التسليم",
+  returnsDurationMonths: "{months} شهر",
+  returnsMileageKm: "{km} كم",
+  returnsWarrantyCreateTitle: "تسجيل ضمان",
+  returnsFormSerial: "الرقم التسلسلي",
+  returnsFormStart: "تاريخ البداية",
+  returnsFormDuration: "المدة (أشهر)",
+  returnsFormCoverage: "نطاق التغطية",
+  returnsFormBasis: "أساس الاحتساب",
+  returnsFormMileageOptional: "حد الأميال (كم)",
+  returnsFormInvoiceOptional: "الفاتورة",
+  returnsConfirmVoid: "إبطال الضمان؟ لا يمكن التراجع.",
+  returnsWarrantiesEmpty: "لا توجد ضمانات مسجلة.",
+  returnsErrState: "الحالة الحالية لا تسمح بهذا الإجراء.",
+  returnsErrQtyExceeds: "الكمية المطلوب إرجاعها تتجاوز الرصيد المتاح لهذا السطر.",
+  returnsErrDisposition: "يجب تسجيل قرار الفحص قبل الإتمام.",
+  returnsErrScrapUnmapped:
+    "حساب خسارة الإتلاف غير مربوط — اربط إعداد sales.scrap_loss_account ثم أعد المحاولة.",
+  returnsErrWarrantyTerms: "شروط الضمان غير صالحة.",
+  dunningColPartner: "العميل",
+  dunningColInvoice: "الفاتورة",
+  dunningColStep: "الخطوة",
+  dunningColDays: "أيام التأخير",
+  dunningColChannel: "القناة",
+  dunningColLetterDate: "تاريخ الخطاب",
+  dunningColSent: "أُرسل في",
+  dunningColSubject: "الموضوع",
+  dunningColFee: "الرسوم",
+  dunningColFeeInvoice: "فاتورة الرسوم",
+  dunningColWaiver: "التنازل",
+  dunningChannelEmail: "بريد إلكتروني",
+  dunningChannelWhatsapp: "واتساب",
+  dunningChannelSms: "رسالة نصية",
+  dunningLetterQueued: "في الانتظار",
+  dunningLetterSent: "مُرسل",
+  dunningLetterFailed: "فشل الإرسال",
+  dunningFeeWaived: "تم التنازل عن الرسوم",
+  dunningDaysValue: "{days} يوم",
+  dunningActionRunSweep: "تشغيل دورة الاستذكار",
+  dunningSweepHint:
+    "تفحص الدورة الفواتير المتأخرة وتصدر الخطوة التالية لكل فاتورة (خطوة واحدة لكل دورة).",
+  dunningSweepAsOfLabel: "كما في تاريخ",
+  dunningSweepResult: "صدر {letters} خطاب · تصعيد {escalated} · فحص {scanned} بند.",
+  dunningActionChargeFee: "احتساب الرسوم",
+  dunningActionWaiveFee: "التنازل عن الرسوم",
+  dunningWaiveTitle: "التنازل عن الرسوم المتأخرة",
+  dunningWaiveReasonLabel: "سبب التنازل",
+  dunningConfirmCharge: "احتساب الرسوم المتأخرة على فاتورة هذا الخطاب؟",
+  dunningConfirmWaive: "التنازل عن الرسوم؟ تبقى فاتورة الرسوم دليلًا محاسبيًا.",
+  dunningToastSweepDone: "اكتملت دورة الاستذكار.",
+  dunningPolicyDraft: "مسودة",
+  dunningPolicyActive: "نشطة",
+  dunningPolicyArchived: "مؤرشفة",
+  dunningFeeModeDisabled: "بدون رسوم",
+  dunningFeeModeContractRate: "نسبة تعاقدية",
+  dunningFeeModeStatutoryCap: "السقف النظامي",
+  dunningDefaultBadge: "افتراضية",
+  dunningEscalateBadge: "تصعيد",
+  dunningReferAgencyBadge: "إحالة لوكالة",
+  dunningLadderTitle: "سلّم الخطوات",
+  dunningLateFeeTitle: "الرسوم المتأخرة",
+  dunningLateFeeRateLabel: "نسبة {rate}%",
+  dunningLateFeeGraceLabel: "سماحة {days} يوم",
+  dunningLateFeeMaxLabel: "سقف {amount}",
+  dunningPolicyCreateTitle: "سياسة استذكار جديدة",
+  dunningFormPolicyName: "اسم السياسة",
+  dunningFormPolicyNameAr: "اسم السياسة (عربي)",
+  dunningFormIsDefault: "السياسة الافتراضية",
+  dunningFormStepNo: "الخطوة",
+  dunningFormDaysOverdue: "أيام التأخير",
+  dunningFormChannel: "القناة",
+  dunningFormTemplateKey: "مفتاح القالب",
+  dunningFormEscalate: "تصعيد",
+  dunningFormReferToAgency: "إحالة لوكالة",
+  dunningAddStep: "إضافة خطوة",
+  dunningRemoveStep: "حذف الخطوة",
+  dunningFormFeeMode: "نظام الرسوم",
+  dunningFormRatePct: "النسبة (%)",
+  dunningFormGraceDays: "أيام السماحة",
+  dunningFormMaxAmount: "الحد الأقصى للرسوم",
+  dunningFormFeeSource: "المصدر النظامي",
+  dunningActionCreatePolicy: "سياسة جديدة",
+  dunningActionActivate: "تنشيط",
+  dunningActionArchive: "أرشفة",
+  dunningConfirmActivate: "تنشيط هذه السياسة؟",
+  dunningConfirmArchive: "أرشفة هذه السياسة؟",
+  dunningActionTypeCall: "مكالمة",
+  dunningActionTypeEmail: "بريد إلكتروني",
+  dunningActionTypePromiseToPay: "وعد بالسداد",
+  dunningActionTypeDispute: "نزاع",
+  dunningActionTypeFieldVisit: "زيارة ميدانية",
+  dunningActionTypePaymentPlan: "خطة سداد",
+  dunningActionTypeWriteOffRequest: "طلب شطب",
+  dunningActionTypeAgencyReferral: "إحالة لوكالة",
+  dunningActionTypeOther: "أخرى",
+  dunningOutcomePending: "قيد المتابعة",
+  dunningOutcomePromised: "وعد بالسداد",
+  dunningOutcomeBroken: "أخل بالوعد",
+  dunningOutcomePaid: "سدد",
+  dunningOutcomeEscalated: "مُصعَّد",
+  dunningOutcomeNoAnswer: "لا رد",
+  dunningOutcomeOther: "أخرى",
+  dunningColActionType: "نوع الإجراء",
+  dunningColActionDate: "التاريخ",
+  dunningColOutcome: "النتيجة",
+  dunningColPromised: "موعد الوعد",
+  dunningColAmount: "المبلغ",
+  dunningActionLogTitle: "تسجيل إجراء تحصيل",
+  dunningFormActionType: "نوع الإجراء",
+  dunningFormActionDate: "تاريخ الإجراء",
+  dunningFormOutcome: "النتيجة",
+  dunningFormPromisedDate: "موعد الوعد بالسداد",
+  dunningFormFollowUpDate: "موعد المتابعة",
+  dunningFormAmount: "المبلغ",
+  dunningFormNote: "ملاحظة",
+  dunningPromiseDateHint: "إجراء «وعد بالسداد» يتطلب تحديد موعد الوعد.",
+  dunningFormInvoiceOptional: "الفاتورة",
+  dunningColCode: "الرمز",
+  dunningColClass: "الفئة",
+  dunningColNextReview: "المراجعة القادمة",
+  dunningColLastReview: "آخر مراجعة",
+  dunningNoClass: "بدون فئة",
+  dunningRecordReviewTitle: "تسجيل مراجعة ائتمان",
+  dunningFormScoreClass: "الفئة الائتمانية",
+  dunningFormNextReview: "تاريخ المراجعة القادمة",
+  dunningFormReviewNote: "ملاحظة المراجعة",
+  dunningAgencyActive: "نشطة",
+  dunningAgencySuspended: "موقوفة",
+  dunningColAgency: "الوكالة",
+  dunningColContact: "جهة الاتصال",
+  dunningColCommissionMode: "نظام العمولة",
+  dunningColCommissionPct: "النسبة",
+  dunningColFlatFee: "عمولة ثابتة",
+  dunningColTokenIssued: "آخر إصدار توكن",
+  dunningColReferralDate: "تاريخ الإحالة",
+  dunningColReferredAmount: "المبلغ المحال",
+  dunningColSettledAmount: "المبلغ المحصّل",
+  dunningColCommissionAmount: "العمولة",
+  dunningCommissionPctOfCollected: "نسبة من المحصّل",
+  dunningCommissionFlatFee: "عمولة ثابتة",
+  dunningAgencyCreateTitle: "تسجيل وكالة تحصيل",
+  dunningFormContactName: "جهة الاتصال",
+  dunningFormEmail: "البريد الإلكتروني",
+  dunningFormPhone: "الهاتف",
+  dunningFormCommissionMode: "نظام العمولة",
+  dunningActionIssueToken: "إصدار توكن",
+  dunningActionSuspend: "إيقاف",
+  dunningAgencyTokenTitle: "توكن بوابة الوكالة",
+  dunningAgencyTokenOnce:
+    "يظهر هذا التوكن مرة واحدة فقط ولا يمكن استعادته لاحقًا — انسخه الآن وسلّمه للوكالة عبر قناة آمنة.",
+  dunningConfirmIssueToken: "إصدار توكن جديد؟ يبطل أي توكن سابق للوكالة.",
+  dunningConfirmSuspend: "إيقاف الوكالة؟ لن تستقبل إحالات جديدة.",
+  dunningReferralReferred: "مُحالة",
+  dunningReferralAcknowledged: "مؤكدة من الوكالة",
+  dunningReferralPartial: "تحصيل جزئي",
+  dunningReferralSettled: "مسددة",
+  dunningReferralCommissionPosted: "مُرحّلة العمولة",
+  dunningReferralClosed: "مغلقة",
+  dunningReferralCancelled: "ملغاة",
+  dunningReferralCreateTitle: "إحالة إلى وكالة تحصيل",
+  dunningSettleTitle: "تسجيل مبلغ محصّل",
+  dunningFormAgency: "الوكالة",
+  dunningFormPartner: "العميل",
+  dunningFormReferredAmount: "المبلغ المحال",
+  dunningFormReferralDate: "تاريخ الإحالة",
+  dunningFormSettledAmount: "المبلغ المحصّل",
+  dunningActionRefer: "إحالة",
+  dunningActionSettle: "تسجيل تحصيل",
+  dunningActionPostCommission: "ترحيل العمولة",
+  dunningActionCloseReferral: "إغلاق",
+  dunningConfirmPostCommission: "ترحيل عمولة الوكالة (G-39)؟",
+  dunningConfirmClose: "إغلاق الإحالة؟",
+  dunningToastDone: "تم تنفيذ الإجراء.",
+  dunningLettersEmpty: "لا توجد خطابات استذكار.",
+  dunningPoliciesEmpty: "لا توجد سياسات استذكار.",
+  dunningActionsEmpty: "لا توجد إجراءات تحصيل مسجلة.",
+  dunningReviewsEmpty: "لا توجد مراجعات ائتمان مستحقة.",
+  dunningAgenciesEmpty: "لا توجد وكالات تحصيل مسجلة.",
+  dunningReferralsEmpty: "لا توجد إحالات.",
+  dunningErrSteps: "سلّم الخطوات غير صالح — أيام التأخير يجب أن تتزايد بدءًا من الخطوة 1.",
+  dunningErrLateFee: "إعدادات الرسوم المتأخرة غير مكتملة.",
+  dunningErrFeeAlreadyCharged: "حُمّلت هذه الفاتورة رسومًا متأخرة بالفعل — رسوم واحدة لكل فاتورة.",
+  dunningErrFeeNotWaivable: "لا يمكن التنازل عن هذه الرسوم (غير موجودة أو متنازل عنها سابقًا).",
+  dunningErrReview: "بيانات المراجعة غير صالحة.",
+  dunningErrReferralState: "حالة الإحالة لا تسمح بهذا الإجراء.",
+  dunningErrCommissionUnmapped:
+    "حساب عمولة التحصيل غير مربوط — اربط إعداد sales.collection_commission_account.",
+  srmaColNo: "رقم الإرجاع",
+  srmaColSupplier: "المورد",
+  srmaColPo: "أمر الشراء",
+  srmaColTotal: "الإجمالي",
+  srmaColRequested: "تاريخ الطلب",
+  srmaColLine: "السطر",
+  srmaColItem: "الصنف",
+  srmaColQty: "الكمية",
+  srmaColUnitCost: "تكلفة الوحدة",
+  srmaColNet: "الصافي",
+  srmaStatusRequested: "مطلوب",
+  srmaStatusApproved: "معتمد",
+  srmaStatusShipped: "مشحون",
+  srmaStatusCredited: "مُقيَّد دائنًا",
+  srmaStatusCancelled: "ملغى",
+  srmaActionCreate: "طلب إرجاع لمورد",
+  srmaActionView: "عرض",
+  srmaActionApprove: "اعتماد",
+  srmaActionShip: "شحن",
+  srmaActionCredit: "قيد دائن",
+  srmaActionCancel: "إلغاء",
+  srmaCreateTitle: "طلب إرجاع مورد جديد",
+  srmaDetailTitle: "تفاصيل إرجاع المورد",
+  srmaShipTitle: "شحن المرتجع إلى المورد",
+  srmaFormPo: "أمر الشراء",
+  srmaFormPickPo: "اختر أمر شراء",
+  srmaFormPoLine: "سطر أمر الشراء",
+  srmaFormWarehouse: "المستودع",
+  srmaConfirmApprove: "اعتماد طلب الإرجاع؟",
+  srmaConfirmShip: "شحن المرتجع؟ سيُخصم من رصيد المستودع المختار.",
+  srmaConfirmCredit: "إصدار الإشعار الدائن للمورد (G-38)؟",
+  srmaConfirmCancel: "إلغاء طلب الإرجاع؟",
+  srmaToastCreated: "تم إنشاء طلب الإرجاع بنجاح.",
+  srmaToastDone: "تم تنفيذ الإجراء.",
+  srmaEmpty: "لا توجد طلبات إرجاع موردين.",
+  srmaLinesEmpty: "لا توجد أسطر على هذا الأمر.",
+  srmaErrState: "الحالة الحالية لا تسمح بهذا الإجراء.",
+  srmaErrQtyExceeds: "الكمية المطلوب إرجاعها تتجاوز الرصيد المتاح لهذا السطر.",
+  srmaErrUnmapped:
+    "حساب مرتجعات المشتريات غير مربوط — اربط إعداد purchasing.supplier_return_account.",
 };
 
 const en: Dictionary = {
@@ -15226,6 +15884,337 @@ const en: Dictionary = {
   sourcingErrCurrencyMismatch: "The quote currency does not match the RFQ currency.",
   sourcingErrNoQuotes:
     "No submitted quotes to compare — prepare the comparison after quotes arrive.",
+  // WEB-039 (PHASE-039) — returns & collections (EN mirror).
+  returnsNav: "Sales returns",
+  dunningNav: "Collections & dunning",
+  supplierReturnsNav: "Supplier returns",
+  returnsTitle: "Sales — customer returns",
+  returnsSubtitle:
+    "Customer RMA requests with inspection and disposition, plus the managed-warranty register.",
+  dunningTitle: "Sales — collections & dunning",
+  dunningSubtitle:
+    "The dunning letter ladder and late fees, collection actions, credit reviews, and collection agencies.",
+  supplierReturnsTitle: "Purchasing — supplier returns",
+  supplierReturnsSubtitle:
+    "Return-to-vendor authorizations through the supplier credit (G-38).",
+  returnsTabRmas: "RMAs",
+  returnsTabWarranties: "Warranties",
+  dunningTabLetters: "Letters",
+  dunningTabPolicies: "Policies",
+  dunningTabActions: "Actions",
+  dunningTabReviews: "Credit reviews",
+  dunningTabAgencies: "Agencies",
+  returnsColRmaNo: "RMA no.",
+  returnsColPartner: "Customer",
+  returnsColInvoice: "Invoice",
+  returnsColStatus: "Status",
+  returnsColDisposition: "Disposition",
+  returnsColTotal: "Total",
+  returnsColRequested: "Requested at",
+  returnsColCompleted: "Completed at",
+  returnsColLine: "Line",
+  returnsColItem: "Item",
+  returnsColQty: "Qty",
+  returnsColUnitPrice: "Unit price",
+  returnsColNet: "Net",
+  returnsColTax: "Tax",
+  returnsColNote: "Note",
+  returnsStatusRequested: "Requested",
+  returnsStatusApproved: "Approved",
+  returnsStatusReceived: "Received",
+  returnsStatusInspected: "Inspected",
+  returnsStatusRestocked: "Restocked",
+  returnsStatusScrapped: "Scrapped",
+  returnsStatusRefunded: "Refunded",
+  returnsStatusCancelled: "Cancelled",
+  returnsDispositionRestock: "Restock",
+  returnsDispositionScrap: "Scrap",
+  returnsDispositionRefund: "Cash refund",
+  returnsDispositionNone: "No disposition",
+  returnsReasonDamaged: "Damaged",
+  returnsReasonDefective: "Defective",
+  returnsReasonWrongItem: "Wrong item",
+  returnsReasonLateDelivery: "Late delivery",
+  returnsReasonCustomerRemorse: "Customer remorse",
+  returnsReasonOverShipment: "Over-shipment",
+  returnsReasonExpired: "Expired",
+  returnsReasonRecall: "Recall",
+  returnsReasonOther: "Other",
+  returnsFormInvoice: "Reference invoice",
+  returnsFormPickInvoice: "Pick a POSTED invoice",
+  returnsFormReasonCode: "Return reason",
+  returnsFormReason: "Reason",
+  returnsFormReasonAr: "Reason (Arabic)",
+  returnsFormNote: "Note",
+  returnsFormInvoiceLine: "Invoice line",
+  returnsActionCreate: "New RMA",
+  returnsActionView: "View",
+  returnsActionApprove: "Approve",
+  returnsActionReceive: "Receive",
+  returnsActionInspect: "Inspect",
+  returnsActionComplete: "Complete",
+  returnsActionCancel: "Cancel",
+  returnsActionVoid: "Void",
+  returnsCreateTitle: "New return authorization",
+  returnsDetailTitle: "RMA detail",
+  returnsInspectTitle: "Inspect the return & record the disposition",
+  returnsCompleteTitle: "Complete the return",
+  returnsCancelReasonLabel: "Cancellation reason",
+  returnsCashAccountLabel: "Refund cash account",
+  returnsRefundHint:
+    "A REFUND disposition requires the cash account the refund is paid from.",
+  returnsInvoiceHint:
+    "RMAs reference POSTED invoices inside the active return window.",
+  returnsConfirmApprove: "Approve this return authorization?",
+  returnsConfirmReceive: "Confirm receipt of the returned goods?",
+  returnsConfirmComplete: "Complete the return and issue its documents? This cannot be undone.",
+  returnsConfirmCancel: "Cancel this return authorization?",
+  returnsToastCreated: "The return authorization was created.",
+  returnsToastDone: "Done.",
+  returnsRmasEmpty: "No return authorizations yet.",
+  returnsInvoiceLinesEmpty: "This invoice carries no lines.",
+  returnsColSerial: "Serial no.",
+  returnsColStart: "Starts",
+  returnsColEnd: "Ends",
+  returnsColCoverage: "Coverage",
+  returnsColDuration: "Duration",
+  returnsColMileage: "Mileage cap",
+  returnsWarrantyActive: "Active",
+  returnsWarrantyExpired: "Expired",
+  returnsWarrantyVoid: "Void",
+  returnsCoverageRepair: "Repair",
+  returnsCoverageReplace: "Replace",
+  returnsCoverageRefund: "Refund",
+  returnsCoverageLaborOnly: "Labor only",
+  returnsCoveragePartsOnly: "Parts only",
+  returnsBasisInvoiceDate: "Invoice date",
+  returnsBasisDeliveryDate: "Delivery date",
+  returnsDurationMonths: "{months} mo.",
+  returnsMileageKm: "{km} km",
+  returnsWarrantyCreateTitle: "Register a warranty",
+  returnsFormSerial: "Serial no.",
+  returnsFormStart: "Start date",
+  returnsFormDuration: "Duration (months)",
+  returnsFormCoverage: "Coverage",
+  returnsFormBasis: "Basis",
+  returnsFormMileageOptional: "Mileage cap (km)",
+  returnsFormInvoiceOptional: "Invoice",
+  returnsConfirmVoid: "Void this warranty? This cannot be undone.",
+  returnsWarrantiesEmpty: "No warranties registered.",
+  returnsErrState: "The current state does not permit this action.",
+  returnsErrQtyExceeds: "The return qty exceeds the available balance on this line.",
+  returnsErrDisposition: "The inspection disposition must be recorded before completion.",
+  returnsErrScrapUnmapped:
+    "The scrap-loss account is unmapped — map the sales.scrap_loss_account setting and retry.",
+  returnsErrWarrantyTerms: "The warranty terms are invalid.",
+  dunningColPartner: "Customer",
+  dunningColInvoice: "Invoice",
+  dunningColStep: "Step",
+  dunningColDays: "Days overdue",
+  dunningColChannel: "Channel",
+  dunningColLetterDate: "Letter date",
+  dunningColSent: "Sent at",
+  dunningColSubject: "Subject",
+  dunningColFee: "Fee",
+  dunningColFeeInvoice: "Fee invoice",
+  dunningColWaiver: "Waiver",
+  dunningChannelEmail: "Email",
+  dunningChannelWhatsapp: "WhatsApp",
+  dunningChannelSms: "SMS",
+  dunningLetterQueued: "Queued",
+  dunningLetterSent: "Sent",
+  dunningLetterFailed: "Failed",
+  dunningFeeWaived: "Fee waived",
+  dunningDaysValue: "{days} days",
+  dunningActionRunSweep: "Run dunning sweep",
+  dunningSweepHint:
+    "The sweep scans overdue invoices and fires each one's next ladder step (one step per run).",
+  dunningSweepAsOfLabel: "As of",
+  dunningSweepResult: "{letters} letters fired · {escalated} escalated · {scanned} items scanned.",
+  dunningActionChargeFee: "Charge late fee",
+  dunningActionWaiveFee: "Waive fee",
+  dunningWaiveTitle: "Waive the late fee",
+  dunningWaiveReasonLabel: "Waiver reason",
+  dunningConfirmCharge: "Charge the late fee on this letter's invoice?",
+  dunningConfirmWaive: "Waive the fee? The fee invoice stays as accounting evidence.",
+  dunningToastSweepDone: "The dunning sweep completed.",
+  dunningPolicyDraft: "Draft",
+  dunningPolicyActive: "Active",
+  dunningPolicyArchived: "Archived",
+  dunningFeeModeDisabled: "No fees",
+  dunningFeeModeContractRate: "Contract rate",
+  dunningFeeModeStatutoryCap: "Statutory cap",
+  dunningDefaultBadge: "Default",
+  dunningEscalateBadge: "Escalate",
+  dunningReferAgencyBadge: "Refer to agency",
+  dunningLadderTitle: "Step ladder",
+  dunningLateFeeTitle: "Late fees",
+  dunningLateFeeRateLabel: "{rate}% rate",
+  dunningLateFeeGraceLabel: "{days}-day grace",
+  dunningLateFeeMaxLabel: "capped at {amount}",
+  dunningPolicyCreateTitle: "New dunning policy",
+  dunningFormPolicyName: "Policy name",
+  dunningFormPolicyNameAr: "Policy name (Arabic)",
+  dunningFormIsDefault: "Default policy",
+  dunningFormStepNo: "Step",
+  dunningFormDaysOverdue: "Days overdue",
+  dunningFormChannel: "Channel",
+  dunningFormTemplateKey: "Template key",
+  dunningFormEscalate: "Escalate",
+  dunningFormReferToAgency: "Refer to agency",
+  dunningAddStep: "Add step",
+  dunningRemoveStep: "Remove step",
+  dunningFormFeeMode: "Fee mode",
+  dunningFormRatePct: "Rate (%)",
+  dunningFormGraceDays: "Grace days",
+  dunningFormMaxAmount: "Max fee",
+  dunningFormFeeSource: "Statutory source",
+  dunningActionCreatePolicy: "New policy",
+  dunningActionActivate: "Activate",
+  dunningActionArchive: "Archive",
+  dunningConfirmActivate: "Activate this policy?",
+  dunningConfirmArchive: "Archive this policy?",
+  dunningActionTypeCall: "Call",
+  dunningActionTypeEmail: "Email",
+  dunningActionTypePromiseToPay: "Promise to pay",
+  dunningActionTypeDispute: "Dispute",
+  dunningActionTypeFieldVisit: "Field visit",
+  dunningActionTypePaymentPlan: "Payment plan",
+  dunningActionTypeWriteOffRequest: "Write-off request",
+  dunningActionTypeAgencyReferral: "Agency referral",
+  dunningActionTypeOther: "Other",
+  dunningOutcomePending: "Pending",
+  dunningOutcomePromised: "Promised",
+  dunningOutcomeBroken: "Promise broken",
+  dunningOutcomePaid: "Paid",
+  dunningOutcomeEscalated: "Escalated",
+  dunningOutcomeNoAnswer: "No answer",
+  dunningOutcomeOther: "Other",
+  dunningColActionType: "Action type",
+  dunningColActionDate: "Date",
+  dunningColOutcome: "Outcome",
+  dunningColPromised: "Promised for",
+  dunningColAmount: "Amount",
+  dunningActionLogTitle: "Log a collection action",
+  dunningFormActionType: "Action type",
+  dunningFormActionDate: "Action date",
+  dunningFormOutcome: "Outcome",
+  dunningFormPromisedDate: "Promised payment date",
+  dunningFormFollowUpDate: "Follow-up date",
+  dunningFormAmount: "Amount",
+  dunningFormNote: "Note",
+  dunningPromiseDateHint: "A PROMISE_TO_PAY action requires its promised date.",
+  dunningFormInvoiceOptional: "Invoice",
+  dunningColCode: "Code",
+  dunningColClass: "Class",
+  dunningColNextReview: "Next review",
+  dunningColLastReview: "Last review",
+  dunningNoClass: "No class",
+  dunningRecordReviewTitle: "Record a credit review",
+  dunningFormScoreClass: "Credit score class",
+  dunningFormNextReview: "Next review date",
+  dunningFormReviewNote: "Review note",
+  dunningAgencyActive: "Active",
+  dunningAgencySuspended: "Suspended",
+  dunningColAgency: "Agency",
+  dunningColContact: "Contact",
+  dunningColCommissionMode: "Commission",
+  dunningColCommissionPct: "Rate",
+  dunningColFlatFee: "Flat fee",
+  dunningColTokenIssued: "Token issued",
+  dunningColReferralDate: "Referral date",
+  dunningColReferredAmount: "Referred amount",
+  dunningColSettledAmount: "Settled amount",
+  dunningColCommissionAmount: "Commission",
+  dunningCommissionPctOfCollected: "% of collected",
+  dunningCommissionFlatFee: "Flat fee",
+  dunningAgencyCreateTitle: "Register a collection agency",
+  dunningFormContactName: "Contact name",
+  dunningFormEmail: "Email",
+  dunningFormPhone: "Phone",
+  dunningFormCommissionMode: "Commission mode",
+  dunningActionIssueToken: "Issue token",
+  dunningActionSuspend: "Suspend",
+  dunningAgencyTokenTitle: "Agency portal token",
+  dunningAgencyTokenOnce:
+    "This token is shown ONCE and cannot be recovered — copy it now and hand it to the agency over a secure channel.",
+  dunningConfirmIssueToken: "Issue a new token? Any previous token for this agency is revoked.",
+  dunningConfirmSuspend: "Suspend this agency? It stops receiving referrals.",
+  dunningReferralReferred: "Referred",
+  dunningReferralAcknowledged: "Acknowledged",
+  dunningReferralPartial: "Partial",
+  dunningReferralSettled: "Settled",
+  dunningReferralCommissionPosted: "Commission posted",
+  dunningReferralClosed: "Closed",
+  dunningReferralCancelled: "Cancelled",
+  dunningReferralCreateTitle: "Refer to a collection agency",
+  dunningSettleTitle: "Record a collected amount",
+  dunningFormAgency: "Agency",
+  dunningFormPartner: "Customer",
+  dunningFormReferredAmount: "Referred amount",
+  dunningFormReferralDate: "Referral date",
+  dunningFormSettledAmount: "Settled amount",
+  dunningActionRefer: "Refer",
+  dunningActionSettle: "Record settlement",
+  dunningActionPostCommission: "Post commission",
+  dunningActionCloseReferral: "Close",
+  dunningConfirmPostCommission: "Post the agency commission (G-39)?",
+  dunningConfirmClose: "Close this referral?",
+  dunningToastDone: "Done.",
+  dunningLettersEmpty: "No dunning letters yet.",
+  dunningPoliciesEmpty: "No dunning policies yet.",
+  dunningActionsEmpty: "No collection actions logged.",
+  dunningReviewsEmpty: "No credit reviews due.",
+  dunningAgenciesEmpty: "No collection agencies registered.",
+  dunningReferralsEmpty: "No referrals.",
+  dunningErrSteps: "The step ladder is invalid — overdue days must increase starting at step 1.",
+  dunningErrLateFee: "The late-fee configuration is incomplete.",
+  dunningErrFeeAlreadyCharged: "This invoice already carries a late fee — one fee per invoice.",
+  dunningErrFeeNotWaivable: "This fee cannot be waived (missing or already waived).",
+  dunningErrReview: "The review payload is invalid.",
+  dunningErrReferralState: "The referral's state does not permit this action.",
+  dunningErrCommissionUnmapped:
+    "The collection-commission account is unmapped — map the sales.collection_commission_account setting.",
+  srmaColNo: "SRMA no.",
+  srmaColSupplier: "Supplier",
+  srmaColPo: "Purchase order",
+  srmaColTotal: "Total",
+  srmaColRequested: "Requested at",
+  srmaColLine: "Line",
+  srmaColItem: "Item",
+  srmaColQty: "Qty",
+  srmaColUnitCost: "Unit cost",
+  srmaColNet: "Net",
+  srmaStatusRequested: "Requested",
+  srmaStatusApproved: "Approved",
+  srmaStatusShipped: "Shipped",
+  srmaStatusCredited: "Credited",
+  srmaStatusCancelled: "Cancelled",
+  srmaActionCreate: "New supplier RMA",
+  srmaActionView: "View",
+  srmaActionApprove: "Approve",
+  srmaActionShip: "Ship",
+  srmaActionCredit: "Issue credit",
+  srmaActionCancel: "Cancel",
+  srmaCreateTitle: "New supplier return authorization",
+  srmaDetailTitle: "Supplier RMA detail",
+  srmaShipTitle: "Ship the return to the supplier",
+  srmaFormPo: "Purchase order",
+  srmaFormPickPo: "Pick a purchase order",
+  srmaFormPoLine: "PO line",
+  srmaFormWarehouse: "Warehouse",
+  srmaConfirmApprove: "Approve this return authorization?",
+  srmaConfirmShip: "Ship the return? The chosen warehouse's stock is issued.",
+  srmaConfirmCredit: "Issue the supplier credit (G-38)?",
+  srmaConfirmCancel: "Cancel this return authorization?",
+  srmaToastCreated: "The supplier return was created.",
+  srmaToastDone: "Done.",
+  srmaEmpty: "No supplier returns yet.",
+  srmaLinesEmpty: "This order carries no lines.",
+  srmaErrState: "The current state does not permit this action.",
+  srmaErrQtyExceeds: "The return qty exceeds the available balance on this line.",
+  srmaErrUnmapped:
+    "The purchase-returns account is unmapped — map the purchasing.supplier_return_account setting.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };
