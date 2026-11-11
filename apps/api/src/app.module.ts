@@ -36,6 +36,10 @@ import { PayrollModule } from "./modules/payroll/payroll.module";
 // kind import engine + mapping wizard + saved mappings + adapters + demo
 // data + sandbox provisioning.
 import { OnboardingModule } from "./modules/onboarding/onboarding.module";
+// PHASE-041: the communications hub (CR-11) — the channel-port adapters
+// (BR-067) + provider config + the template substrate + the outbound
+// ledger/pipeline + the preference matrix + the unified inbox + calendar.
+import { CommunicationModule } from "./modules/communication/communication.module";
 // PHASE-034: the consolidation module (ADR-0018 / DR-006 option A — the
 // final roadmap phase, stage 11 / the Enterprise Depth gate).
 import { ConsolidationModule } from "./modules/consolidation/consolidation.module";
@@ -81,6 +85,7 @@ import { UsageLimitGuard } from "./infra/auth/usage-limit.guard";
     BudgetingModule,
     PayrollModule,
     OnboardingModule,
+    CommunicationModule,
     ConsolidationModule,
     SalesModule,
     DistributionModule,

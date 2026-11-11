@@ -1387,6 +1387,13 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "POST", path: "/api/v1/imports/mappings", permission: "configuration.imports.manage" },
   { method: "PATCH", path: "/api/v1/imports/mappings/:id", permission: "configuration.imports.manage" },
   { method: "DELETE", path: "/api/v1/imports/mappings/:id", permission: "configuration.imports.manage" },
+  // PHASE-041 (0064; matrix §3.19): the communications hub — provider
+  // selection + sealed credentials + per-market senders (T-03; the masked
+  // catalog read and the audited write both ride the settings/communication
+  // back-office key; per-channel tier-4 entitlement checks fire server-side
+  // in the service at write time).
+  { method: "GET", path: "/api/v1/communication/providers", permission: "communication.templates.manage" },
+  { method: "PUT", path: "/api/v1/communication/providers", permission: "communication.templates.manage" },
   // PHASE-040 T-06 (matrix §3.18): the demo-data loader — the 13-template
   // catalog + status + the one-click seed (feature-gated platform.demo_data,
   // ALL plans — the recorded trial-enablement decision).
