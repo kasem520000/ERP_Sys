@@ -1,6 +1,6 @@
 # Business Rules
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-037 — BR-060/061)
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-11 (PHASE-039 — BR-064/065)
 
 The numbered, normative rule catalog for tenant-configurable business behavior. Rules are
 referenced as `BR-xxx` across the blueprint (phases, tests, workflows). Each rule fixes a
@@ -228,21 +228,27 @@ is `platform.custom_fields`.
 | BR-058 | Key namespace discipline: tenant keys are lowercase snake_case ≤ 64 chars (leading letter), never a reserved platform stem (`id`, `tenant_id`, `created_at`, `updated_at`, `version`, `created_by`, `status`, `custom_fields`/`customFields`, …), and never a native column of the target entity (the code-owned registry's native-field blocklist); future native columns are checked against the registry at design time | A custom key that shadows a platform stem or a native column silently forks the entity's own vocabulary and breaks every future native migration | `configuration` definition service at create (key guard) · `configuration.custom_fields.manage` | (**fixed**) | — |
 | BR-059 | Form-layout native protection: every mandatory native field appears exactly ONCE in any saved layout and the mandatory fields keep their canonical registry order; role overrides layer on the default layout, never replace it | A layout that drops or reorders a mandatory field renders a form that cannot save — the designer composes presentation, never the entry contract | `configuration` form-layout service at upsert (guarded against the registry's mandatory list) · `configuration.form_layouts.manage` | (**fixed**) | — |
 
-## Blueprint v3.0 — compliance rules (BR-060 … BR-063)
+## Blueprint v3.0 — compliance rules (BR-060 … BR-065)
 
 The first two rules below are fixed by [../planning/COMPLETENESS_REGISTER.md](../planning/COMPLETENESS_REGISTER.md)
 CR-07 and delivered by PHASE-037 (migration `0050_zatca_phase1.sql`) — the ZATCA
 Phase-1 generation core (the TLV QR, the ICV/PIH chain, the fail-closed B2C guard);
 BR-062/BR-063 continue the section — fixed by CR-08 and delivered by PHASE-038
-(migrations `0051`–`0054`, the procurement sourcing cluster).
+(migrations `0051`–`0054`, the procurement sourcing cluster); BR-064/BR-065 close the
+section — fixed by CR-09 (scope extended by v3.1/CR-46 and v3.2/CR-50 · R-03) and
+delivered by PHASE-039 (migrations `0055`–`0059`, the returns & collections cluster).
 Numbering continues from BR-059, the last shipped rule; boundary rules 1–2 above apply
 unchanged (BR-060 guards INV-027's chain — [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md);
 no rule here invents legal content — the SA pack
 ([../localization/compliance-matrix/sa.md](../localization/compliance-matrix/sa.md)) stays
-the legal source). The per-group table format applies; the 037 rules' delivering phase is
+the legal source; the STATUTORY_CAP late-fee mode carries its own REQUIRES_VERIFICATION
+discipline — a statutory rate without its verified jurisdiction citation refuses to
+charge, worksheet mode). The per-group table format applies; the 037 rules' delivering phase is
 037 and the entitlement is the existing `tax.einvoicing_zatca` feature key (no new flag);
 the 038 rules deliver under the `purchasing.rfqs` feature key and the 0051 sourcing
-permission keys.
+permission keys; the 039 rules deliver under the `sales.rma`, `sales.warranties`,
+`sales.dunning` and `purchasing.rma` feature keys and the nine 0056 permission keys
+([../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.17).
 
 | ID | Statement | Rationale | Enforcement point (module · permission) | Tenant policy (default) | Invariants |
 |----|-----------|-----------|------------------------------------------|--------------------------|------------|
@@ -250,6 +256,8 @@ permission keys.
 | BR-061 | Honest generation vocabulary (PHASE-037): the ZATCA adapter produces GENERATED/FAILED only; no clearance/reporting/acceptance claim exists before PHASE-054; the Phase-2 surface (submit, CSID lifecycle, UBL 2.1, XAdES) is a typed NOT_IMPLEMENTED placeholder; device registration_status stays NOT_REGISTERED in Phase-1. | RISK-005 no-fabrication: a status that says ACCEPTED before an authority said it is a fabricated compliance claim — Phase-1 is pure computation with zero external calls (the audit's verdict), so the only honest outcomes are computed (GENERATED) or not (FAILED); every submission refusal carries the unmet GATE-1..4 pack ([GATE-DISCIPLINE-ZATCA.md](../decisions/compliance/GATE-DISCIPLINE-ZATCA.md)) | `tax` adapter contract (`zatca-stub.ts` → `ZatcaGenerationAdapter`): `ZATCA_GENERATION_STATUS_VOCABULARY` (grep-pinned by the contract tests), `submit()` typed `ZATCA_PHASE2_NOT_IMPLEMENTED` with `ZATCA_UNMET_GATE_ITEMS` · `zatca_devices.registration_status` CHECK admits the Phase-2 lifecycle states but the Phase-1 surface writes `NOT_REGISTERED` only · `tax.einvoicing.devices.manage` (device CRUD, online-only) | (**fixed**) | INV-022 |
 | BR-062 | The 3-bid rule (PHASE-038): awarding an RFQ below the tenant's configured minimum quote count (`purchasing.rfq.min_quote_count`) is a typed rejection in ENFORCED mode; ADVISORY warns once (one inbox notification + audit) and proceeds; OFF (default) ignores the floor. | Structured competitive buying is measurable savings — the discipline the H-11 audit finding demands. | purchasing award service + route (`purchasing.rfqs.award`) | (**policy** — tenant-configurable; default OFF) | threeBidDecision (sourcing-math) — both modes tested |
 | BR-063 | One award per RFQ round (PHASE-038); awarding closes the round for quote activity (the comparison is frozen evidence, never recomputed; generated documents stay traceable through generated_docs). | A round renegotiated after award destroys the audit trail. | RFQ state machine + quote/award guards + the one-live-comparison DB unique | (**fixed**) | RFQ AWARDED/CLOSED reject submissions and second awards (typed 409) |
+| BR-064 | RMA disposition gate + exactly-once completion (PHASE-039): a disposition is chosen only at/after INSPECTED (DB gate `ck_return_authorizations_disposition_gate`), completion fires only from INSPECTED, and the completion credit note — or the supplier mirror's AP debit note — is generated EXACTLY ONCE, atomically with the stock/refund (ship/credit) leg inside ONE ambient tenant UoW; a replayed completion is the typed `RMA_STATE_INVALID` / `SUPPLIER_RMA_STATE_INVALID` (the terminal-stamp CHECKs — terminal states imply `credit_note_id`/`debit_note_id` + `posted_journal_id` — are the DB floor, 0055/0059). Qty bounding: per line, return qty ≤ invoiced − already-credited − open-RMA (the three-way fold floored at zero — typed `RMA_QTY_EXCEEDS_INVOICED`; terminal RMAs count as credited, never double-subtracted); the purchasing mirror bounds ≤ purchased − open/returned supplier RMAs (typed `SUPPLIER_RMA_QTY_EXCEEDS_PURCHASED`; CREDITED rows stay in the fold — PO lines carry no credited twin). | A return that could re-fire its credit note, or skip inspection, is an AR-fraud channel; the bound keeps returns ≤ what was actually invoiced — BR-004's credit-note-reference law made operational | `sales` returns service (typed state machine + `computeReturnAvailability`) + `purchasing` supplier-returns service (the mirrored gate) · `sales.rma.manage` (+ `sales.rma.approve` — SoD creator ≠ approver) / `purchasing.rma.manage` | (**fixed**) | INV-013, INV-003 (the 0055/0059 lifecycle-stamp CHECKs) |
+| BR-065 | The dunning ladder is monotonic (PHASE-039): steps advance ONE per sweep run — target = min(the step the days-overdue earned, last fired step + 1) — never skipping, never regressing; at most ONE letter per (invoice, step): `uq_dunning_letters_invoice_step` UNIQUE (tenant_id, invoice_id, step_no) IS the evidence (a unique violation under a concurrent sweep skips the item — the register already holds it, the per-item SAVEPOINT keeps the run alive); `referToAgency` may mark only the TERMINAL step (the ladder's last escalation is the agency handoff, L1-11); ladders carry 1..20 steps with strictly ascending days-overdue > 0, channels EMAIL/WHATSAPP/SMS. | An escalating collections process that can re-send, skip, or retreat destroys its own compliance history and harasses customers; the agency referral is the ladder's designed terminal state, never a mid-ladder shortcut | `sales` dunning service (`validateDunningSteps` + `resolveCurrentStep`/`advanceStep` + `runSweep`) + the letters UNIQUE · `sales.dunning.manage` | (**fixed**) | the UNIQUE is the invariant — the re-fire guard is unit + DB tested (BR-065 both sides) |
 
 ## 8. Enforcement & test matrix
 

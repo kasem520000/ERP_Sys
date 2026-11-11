@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-11 (PHASE-039 — §3.17 returns & collections; permission catalog 256 → 265)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -387,6 +387,50 @@ every portal submission is audited + rate-limited and scoped to exactly
 | `purchasing.capex.read` | View CAPEX requests / عرض طلبات الشراء الرأسمالي | accountant, purchasing, owner | tenant | no |
 | `purchasing.capex.manage` | Create and submit CAPEX requests (the 028 budget guard) / إنشاء وإرسال طلبات الشراء الرأسمالي | purchasing, owner | tenant | no (audited) |
 | `purchasing.capex.approve` | Approve or reject CAPEX requests — creator ≠ approver / اعتماد أو رفض طلبات الشراء الرأسمالي (الفصل: المنشئ ≠ المعتمد) | owner | tenant | **yes** (SoD §4) |
+
+### 3.17 `sales` / `purchasing` returns & collections (PHASE-039)
+
+The returns & collections cluster (CR-09, scope extended by v3.1/CR-46 and v3.2/CR-50 ·
+R-03): the customer RMA workflow to its completion credit note (goldens G-35/G-36/G-37),
+the managed-warranty register, the BR-065 dunning ladder with its late-fee register
+(L1-12), the periodic partner credit reviews (L1-10), and the collection-agency terminal
+layer (L1-11, golden G-39) — plus the supplier RMA mirror to the AP debit note (G-38).
+**All nine keys seed in migration `0056` §9 — the permission catalog extends 256 → 265
+(seed = mirror, zero drift).** The **public agency-callback route**
+(`POST /api/v1/portal/collection-agencies/callback`) is PUBLIC — the agency's callback
+token IS the credential (the 038 supplier-portal pattern verbatim: a 256-bit random
+hex value, sha256-hashed at rest, shown once at issuance, rotatable by re-issuing);
+`erp.portal_resolve_agency_token` resolves the tenant pre-GUC (a read-only SECURITY
+DEFINER projection), the service re-validates the same token under RLS inside the
+tenant scope, and the route is fixed-window rate-limited (10/min per token hash) +
+audited — a referral outside the agency's own book draws the SAME typed rejection as
+an unknown token (no oracle).
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `sales.rma.read` | View customer RMAs and the returns workspace — both families feed `sales.rma_register` / عرض طلبات الإرجاع ومساحة عملها | accountant, sales, purchasing, owner | tenant | no |
+| `sales.rma.manage` | Create and progress customer RMAs — receive, inspect, complete (the completion posts the CN + the G-36/G-37 legs atomically) / إنشاء وتسيير مرتجعات العملاء عبر دورة الحياة | sales, owner | tenant | no (audited; the completion's money legs ride the credit note's OWN SoD gate — the CN's creator is the RMA's requester, so completer ≠ requester) |
+| `sales.rma.approve` | Approve customer RMAs (SoD: creator ≠ approver; reserves `RMA-{YYYY}-{SEQ:6}`) / اعتماد مرتجعات العملاء (الفصل: المنشئ ≠ المعتمد) | sales, owner | tenant | **yes** (SoD §4) |
+| `sales.warranties.manage` | Manage warranty registrations and structured terms + the 30/7/0-day expiry sweep / إدارة تسجيلات الضمان وشروطها المهيكلة | sales, owner | tenant | no (audited; operational evidence — no ledger legs) |
+| `sales.dunning.manage` | Manage dunning policies, run the BR-065 sweep, the letters register, collection actions, and the credit reviews / إدارة سياسات التحصيل والرسائل وإجراءات التحصيل والمراجعات الائتمانية | accountant, sales, owner | tenant | no (audited; the sweep only records — the fee charge and the commission post ride their own keys) |
+| `sales.late-fees.manage` | Charge and waive late-payment fees (L1-12) / احتساب وإعفاء غرامات التأخير | accountant, owner | tenant | **yes** (audited; the charge posts a fee invoice through the sales engine with VAT on the tenant-mapped fee item — fail-closed; the waiver stamps its reason + approver trio) |
+| `sales.collection-agencies.manage` | Manage collection agencies, referrals, and the G-39 commission postings (L1-11) / إدارة وكالات التحصيل والإحالات وقيود العمولة | accountant, owner | tenant | no (audited; the G-39 commission posts engine-gated exactly-once — the `sales.commissions.manage` precedent) |
+| `purchasing.rma.read` | View supplier return authorizations (the RTV register) / عرض طلبات إرجاع الموردين | accountant, purchasing, owner | tenant | no |
+| `purchasing.rma.manage` | Create and progress supplier RMAs to the G-38 debit note / إنشاء وتسيير مرتجعات الموردين حتى إشعار المدين | purchasing, owner | tenant | no (audited; the SoD creator ≠ approver gate is server-side on the approve hop — the route reuses the manage key; the G-38 credit + DN post engine-gated exactly-once) |
+
+**Guarded routes** (ROUTE_PERMISSIONS, PHASE-039): sales — `/api/v1/sales/returns`
+(GET/POST, `/:id`), `/:id/approve` (`sales.rma.approve`), `/:id/receive|inspect|complete|cancel`
+(`sales.rma.manage`); `/api/v1/sales/warranties` (GET/POST, `/:id/void`);
+`/api/v1/sales/dunning/policies` (GET/POST/PATCH, `/:id/activate|archive`),
+`/api/v1/sales/dunning/run`, `/letters`, `/actions` (`sales.dunning.manage`);
+`/api/v1/sales/dunning/charge-fee` + `/letters/:id/waive-fee` (`sales.late-fees.manage`);
+`/api/v1/sales/credit-reviews` (GET, `/:partnerId` POST); `/api/v1/sales/collection-agencies`
+(GET/POST, `/:id/issue-token|suspend|activate`) + `/api/v1/sales/collection-referrals`
+(GET/POST, `/:id/settle|post-commission|close`) — all under `sales.collection-agencies.manage`;
+purchasing — `/api/v1/purchasing/returns` (GET/POST, `/:id`, `/:id/approve|ship|credit|cancel`).
+Role grants per 0056 §9: owner holds all nine; accountant gains the two RMA reads +
+dunning + late-fees + agencies; sales gains the RMA trio + dunning + warranties;
+purchasing gains the purchasing pair + `sales.rma.read`.
 
 ## 4. Segregation of duties & approval limits
 

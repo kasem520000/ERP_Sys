@@ -1,6 +1,6 @@
 # Navigation Model
 
-> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-10 (PHASE-035 / PHASE-036 / PHASE-038)
+> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-11 (PHASE-035 / PHASE-036 / PHASE-038 / PHASE-039)
 
 How users move through the platform: the information architecture, the entitlement-driven
 navigation registry, the command menu as universal navigation, back/deep-link behavior,
@@ -105,6 +105,23 @@ side, never inferred in the client.
 | `purchasing.blanket_orders` | 3 المشتريات | الاتفاقيات الإطارية / Blanket agreements | `purchasing.blanket_orders` | `purchasing.rfqs.read` | List + Search (§2) — route `/purchasing/blanket-orders`; releases generate the executable PO in-document |
 | `purchasing.supplier_scorecards` | 3 المشتريات | تقييم الموردين / Supplier scorecards | `purchasing.supplier_scorecards` | `purchasing.rfqs.read` | Dashboard (§1) — route `/purchasing/supplier-scorecards`; the rolling scorecard + the approved-vendor-per-item list; recompute/review under `purchasing.suppliers.rate` |
 | `purchasing.capex` | 3 المشتريات | طلبات الشراء الرأسمالي / CAPEX requests | `purchasing.capex_requests` | `purchasing.capex.read` | List + Search (§2) — route `/purchasing/capex-requests`; the budget guard runs at submit (advisory default), approve/reject under `purchasing.capex.approve` (SoD creator ≠ approver) |
+
+### 1.5 PHASE-039 registry additions (Blueprint v3.0 — returns & collections)
+
+The returns & collections cluster (CR-09; [../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md)
+§8/§9): the customer RMA + warranty workspace (the warranties ride the returns screen
+as its second tab), the dunning engine's collections workspace (letters, policies,
+actions, credit reviews, agencies), and the supplier-returns (RTV) register. Same
+resolution rule as every item — `entitlement(featureKey)` AND `permission(user,
+branch)`; visibility is **server-resolved** (`resolveNavigation`) per BR-039, and all
+three mirror `packages/contracts/src/navigation.ts` (orders 70/80/45 — Transaction
+Entry workspaces under matrix §3.17's keys).
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `sales.returns` | 2 المبيعات | مرتجعات البيع / Sales returns | `sales.rma` | `sales.rma.read` | Transaction Entry (§4) — route `/sales/returns`, order 70: the RMA lifecycle (approve SoD, receive, inspect, complete) with the managed-warranty register as the screen's second tab; actions under `sales.rma.manage` / `sales.rma.approve` / `sales.warranties.manage` |
+| `sales.dunning` | 2 المبيعات | التحصيل والمطالبات / Collections & dunning | `sales.dunning` | `sales.dunning.manage` | Transaction Entry (§4) — route `/sales/dunning`, order 80: the collections worklist — policies ladder, letters register + sweep, late-fee charge/waive, actions log, credit reviews, and the agencies/referrals layer (`sales.late-fees.manage` / `sales.collection-agencies.manage`) |
+| `purchasing.returns` | 3 المشتريات | مرتجعات الموردين / Supplier returns | `purchasing.rma` | `purchasing.rma.read` | Transaction Entry (§4) — route `/purchasing/returns`, order 45: the RTV lifecycle (approve SoD, ship, credit — the G-38 debit note) under `purchasing.rma.manage` |
 
 ## 2. Navigation registry (data model, normative)
 

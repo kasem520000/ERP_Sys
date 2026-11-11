@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-10 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-11 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -74,6 +74,13 @@ Notes: aging and statements **recompute from immutable entries at the as-of date
 §2); statement rows drill to source documents; `partner.balances` ties to AR/AP control
 accounts via INV-009 assertion displayed as a footer badge.
 
+**`ar.aging` (PHASE-039, additive):** the contract gains the `dunningStep` column —
+the customer's highest fired dunning letter step (`dunning_letters` max `step_no`;
+null = no letter yet), the collections read on the aging surface. Additive to every
+existing column and parameter — **no new registry key** (the phase's two NEW contracts,
+§3, take the registry 88 → 90); the deterministic as-of recompute discipline is
+unchanged.
+
 ## 3. Sales & purchasing (المبيعات والمشتريات)
 
 | Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
@@ -93,6 +100,8 @@ accounts via INV-009 assertion displayed as a footer badge.
 | `purchasing.matching-exceptions` | Three-Way Match Exceptions / استثناءات المطابقة الثلاثية | purchasing · `matchingQueries.exceptions` · order/receipt/invoice comparison results | dateFrom/To, branches, exception type (price/qty/missing) | `reports.purchasing.matching.read` | XLSX · CSV | PHASE-011 |
 | `purchasing.rfq-award-matrix` | RFQ Award Matrix / مصفوفة ترسية عروض الأسعار | purchasing · `sourcing.awardMatrix` · rfqs, supplier_quotes(+lines), quote_comparisons | rfqId | `purchasing.rfqs.read` | XLSX · CSV | PHASE-038 |
 | `purchasing.supplier-scorecard` | Supplier Scorecard / بطاقة تقييم المورد | purchasing · `sourcing.scorecards` · supplier_ratings (+ goods_receipts/supplier_invoices/debit_notes provenance) | dateFrom/To, supplierId | `purchasing.rfqs.read` | XLSX · CSV | PHASE-038 |
+| `sales.rma_register` | RMA Register (Customer + Supplier) / سجل مرتجعات البيع والشراء | sales · `returnsDunning.rmaRegister` · return_authorizations(+lines), supplier_return_authorizations(+lines), credit_notes, debit_notes | dateFrom/To, family (CUSTOMER/SUPPLIER/ALL — default ALL) | `sales.rma.read` | XLSX · CSV | PHASE-039 |
+| `sales.dunning_status` | Dunning Status / حالة التحصيل | sales · `returnsDunning.dunningStatus` · sales_invoices, partner_subledger_entries, dunning_letters, dunning_policies, collection_referrals | asOf (required) | `sales.dunning.manage` | XLSX · CSV | PHASE-039 |
 
 Operational revenue reports carry a `sales-gl-tie` assertion (net+tax vs GL revenue/VAT
 movements for the same scope) — see worked example in
@@ -389,6 +398,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-035 | tax.e-invoicing-log delivered — registry 85 → 86; catalog reconciled 79 → 86 rows (7 unlisted added, 1 duplicate removed) |
 | PHASE-037 | tax.e-invoicing-log **v2** — the ZATCA device/ICV/PIH/QR-presence columns + the deviceId filter (§6); registry unchanged at 86 |
 | PHASE-038 | purchasing.rfq-award-matrix + purchasing.supplier-scorecard added; registry 86 → 88 |
+| PHASE-039 | sales.rma_register + sales.dunning_status added (the unified RMA register over both families — disposition mix, completion documents, cycle days — and the collections worklist: ladder step, days overdue, policy, fees charged/waived, referral state); `ar.aging` gains the additive `dunningStep` column (no new key); registry 88 → 90 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 

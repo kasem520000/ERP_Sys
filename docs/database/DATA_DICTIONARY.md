@@ -1,6 +1,6 @@
 # Data Dictionary — Shared Column Semantics
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-10 (PHASE-037 — the ZATCA Phase-1 chain columns + `zatca_devices`)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-11 (PHASE-038 — §17 procurement sourcing columns · PHASE-039 — §18 returns & collections vocabulary)
 
 The semantic dictionary for **recurring columns and value sets** across all tables. It
 sits between [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) (mechanical rules:
@@ -591,3 +591,100 @@ existing rows.
 | `source_url` | `text` | the announcement's source link |
 | `status` | `text` | NOT NULL DEFAULT `'OPEN'`; CHECK IN (OPEN, CLOSED) |
 | `note` / `note_ar` | `text` | §10 discipline |
+
+## 18. Returns & collections vocabulary (PHASE-039)
+
+Migrations `0055_rma_warranty.sql` → `0059_supplier_rma.sql` (schema_version 55…59) add
+the returns & collections cluster: ten RLS'd tenant tables (0055: 3 · 0056: 3 · 0058:
+2 · 0059: 2) plus the additive partner credit-risk columns (0057 — zero reshape of the
+catalogued `partners` table) and two CHECK widenings (0056 §8). Same rules as every
+dictionary term — no table may redefine them; the value lists below are exhaustive (the
+§9 registry discipline). Table-level shape detail lives in the
+[ENTITY_CATALOG.md](ENTITY_CATALOG.md) PHASE-039 rows; the journal goldens in
+[../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md) §7 (G-35…G-39); the
+rules in [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) (BR-064/BR-065).
+
+**The value vocabularies** (all `text` + CHECK + typed TS union, §4):
+
+| Vocabulary | Values | Used by (tables) | Migration |
+|-----------|--------|-------------------|-----------|
+| `return_authorization_status` | REQUESTED, APPROVED, RECEIVED, INSPECTED, RESTOCKED, SCRAPPED, REFUNDED, CANCELLED | return_authorizations | 0055 |
+| `return_reason_code` | DAMAGED, DEFECTIVE, WRONG_ITEM, LATE_DELIVERY, CUSTOMER_REMORSE, OTHER | return_authorizations | 0055 |
+| `rma_disposition` | RESTOCK, SCRAP, REFUND — **NULL until inspection** (the disposition gate: NULL or status INSPECTED/terminal, BR-064); maps to the terminal RESTOCKED/SCRAPPED/REFUNDED via the explicit map, never string+"ED" | return_authorizations | 0055 |
+| `supplier_return_authorization_status` | REQUESTED, APPROVED, SHIPPED, CREDITED, CANCELLED — CREDITED implies `debit_note_id` + `posted_journal_id` (the lifecycle-stamp CHECK) | supplier_return_authorizations | 0059 |
+| `supplier_return_reason_code` | DAMAGED, DEFECTIVE, WRONG_ITEM, OVER_SHIPMENT, EXPIRED, RECALL, OTHER | supplier_return_authorizations | 0059 |
+| `warranty_status` | ACTIVE, EXPIRED, VOID | warranty_registrations | 0055 |
+| `warranty_coverage` (inside `terms` jsonb) | REPAIR, REPLACE, REFUND, LABOR_ONLY, PARTS_ONLY | warranty_registrations | 0055 |
+| `warranty_basis` (inside `terms` jsonb) | INVOICE_DATE, DELIVERY_DATE — the anchor the start date was resolved from | warranty_registrations | 0055 |
+| `dunning_policy_status` | DRAFT, ACTIVE, ARCHIVED (archived = read-only ladder history; only DRAFT/ARCHIVED activate; one ACTIVE default per tenant) | dunning_policies | 0056 |
+| `dunning_step_channel` | EMAIL, WHATSAPP, SMS (per step in `steps` jsonb) | dunning_policies, dunning_letters | 0056 |
+| `dunning_letter_status` | QUEUED, SENT, FAILED | dunning_letters | 0056 |
+| `late_fee_mode` | DISABLED, CONTRACT_RATE, STATUTORY_CAP | dunning_policies | 0056 |
+| `collection_action_type` | CALL, EMAIL, PROMISE_TO_PAY, DISPUTE, FIELD_VISIT, PAYMENT_PLAN, WRITE_OFF_REQUEST, AGENCY_REFERRAL, OTHER | collection_actions | 0056 |
+| `collection_action_outcome` | PENDING, PROMISED, BROKEN, PAID, ESCALATED, NO_ANSWER, OTHER | collection_actions | 0056 |
+| `collection_agency_status` | ACTIVE, SUSPENDED — agencies suspend, never delete (the referral history is compliance evidence) | collection_agencies | 0058 |
+| `agency_commission_mode` | PCT_OF_COLLECTED (pct CHECK 0 < p ≤ 100), FLAT_FEE (fee CHECK > 0) — on the agency AND snapshotted verbatim on each referral (the register may change later; the referral keeps its own terms) | collection_agencies, collection_referrals | 0058 |
+| `collection_referral_status` | REFERRED, ACKNOWLEDGED, PARTIAL, SETTLED, COMMISSION_POSTED, CLOSED, CANCELLED — settlement precedes commission; COMMISSION_POSTED implies `commission_amount` + `commission_journal_id` (the exactly-once G-39 stamps) | collection_referrals | 0058 |
+| `partner_credit_score_class` | NULL or A, B, C, D | partners (additive) | 0057 |
+
+**Warranty terms shape (S-15).** `warranty_registrations.terms` jsonb — the DB CHECK
+pins the json object type only; the service validates the typed shape
+`{ durationMonths: int 1..120, coverage, basis, mileageLimitKm?: int > 0 }`.
+`end_date` = start + durationMonths in WHOLE UTC months, month-end clamped (Jan 31 + 1
+month lands on Feb 28/29, never March 3). The daily expiry sweep notifies ACTIVE
+warranties entering the 30/7/0-day windows — one inbox notification per window, deduped
+by `warranty-expiry:{id}:{window}`, category `warranties`.
+
+**Late-fee modes (L1-12) — REQUIRES_VERIFICATION.** `CONTRACT_RATE` requires its
+positive rate pct (the tenant's contractual rate); `STATUTORY_CAP` requires the positive
+rate **AND** its `late_fee_source` jurisdiction citation (3..500 chars) — the verified
+evidence a statutory cap may lean on: the DB CHECK (`ck_dunning_policies_late_fee_shape`)
+refuses the row without the source, and the charge path re-verifies at CHARGE time — a
+statutory cap without verified source evidence refuses to charge (worksheet mode).
+`DISABLED` carries nothing. Grace `late_fee_grace_days` 0..365; `late_fee_max_amount`
+the optional cap.
+
+**Letter delivery evidence.** EMAIL letters store the deterministic bilingual snapshot
+(subject + body) and the contact email on the letter row and mark SENT — the register IS
+the delivery evidence (the EmailService template union is closed; a partner with no
+email on file FAILS the letter — the step stays consumed, the register never lies about
+delivery). WHATSAPP/SMS letters persist QUEUED — delivered post-041 through the channel
+port (the phase doc's explicit deferral).
+
+**Promise discipline.** A `PROMISE_TO_PAY` action requires its `promised_date` (the DB
+CHECK + the typed service pre-flight so the client sees a 422, never a driver error).
+
+**The agency callback token.** `portal_token_hash` — a 256-bit random hex value,
+sha256-hashed at rest (CHECK `^[a-f0-9]{64}$` + `token_issued_at`); the raw token is
+shown ONCE at issuance and never stored (re-issuing rotates it). The public callback
+route resolves the tenant pre-GUC through `erp.portal_resolve_agency_token` (a read-only
+SECURITY DEFINER projection), then the service re-validates under RLS — the 038
+supplier-portal pattern verbatim ([../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md)
+§3.17).
+
+**Partner credit risk (0057, additive).** `credit_score_class` is tenant-entered or
+rule-computed locally — **never an external scoring claim**. The tenant's blocked class
+(setting `sales.credit_block_class`, default `D`) behaves EXACTLY like an over-limit
+breach in the BR-001 credit check: same posture shape (warn/block/allow per
+`sales.credit_limit_action`), reason `CREDIT_CLASS_BLOCKED`, and a review landing on the
+blocked class raises the `collections` notification. The review clock:
+`credit_review_frequency_days` NULL or ≥ 7, `next_credit_review_at` NULL or set —
+both-or-neither (CHECK); NULL frequency = no periodic review. The review outcome history
+rides the existing `audit_events` machinery (no new history table); the outcome stamps
+`last_credit_review_at`/`by` + `credit_review_note` on the partner.
+
+**The 0056 §8 CHECK widenings (the §11b 0051 discipline):**
+
+- `notifications` + `notification_prefs` category += `collections` (dunning letters,
+  escalations, credit reviews and class blocks, RMA completions) and `warranties` (the
+  expiry sweep).
+- `cash_movements` source_type += `return_authorization` — the G-37 refund leg's
+  treasury movement (base at rate 1, the G-33 disbursement pattern).
+
+**The stock-move source deviation (0059, documented).** The supplier-RMA ship leg's
+inventory issues ride the GENERIC `manual_issue` stock-move source with the reason
+marker `SUPPLIER_RETURN` and `source_id` = the SRMA — the `stock_moves` source CHECK was
+deliberately NOT widened for a new source type (the 0059 no-widening note); the ledger
+leg rides the G-38 ship journal (DR the mapped returns account · CR INVENTORY at issue
+cost). Cross-link: [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md)
+§7/note 12.

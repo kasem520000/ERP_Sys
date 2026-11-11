@@ -1,6 +1,6 @@
 # Journal Rules
 
-> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-11 (PHASE-039 — goldens G-35…G-39, migrations 0055–0059)
 
 Rules governing manual journals, recurring entries, approvals, FX entries, and rounding
 entries. Posted-entry mechanics (immutability, reversal) are defined in
@@ -108,6 +108,11 @@ mandatory failure pack ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_T
 | G-32 | Consolidation elimination (intercompany AR/AP) — `consolidation` | DR `AP_CONTROL` (entity B intercompany) · CR `AR_CONTROL` (entity A intercompany) — posted in the parent's consolidation books only | PHASE-034 |
 | G-33 | Supplier advance disbursement + application — `purchasing` | DISBURSE: DR `ADVANCES_TO_SUPPLIERS` (the tenant-mapped control — `purchasing.supplier_advance_control_account`; fail-closed when unmapped) · CR CASH/BANK (the treasury movement, base at rate 1 — the G-30 pattern) · APPLY: DR `AP_CONTROL` (partner-stamped) · CR `ADVANCES_TO_SUPPLIERS` | PHASE-038 |
 | G-34 | Early-payment discount capture — `purchasing` | DR `AP_CONTROL` (the discount share, partner-stamped — paid net early) · CR the tenant-mapped discount-income account (`purchasing.early_discount_income_account`; fail-closed when unmapped) — within the approved terms' window only (SoD: terms creator ≠ approver) | PHASE-038 |
+| G-35 | RMA restock — the return-to-stock completion — `sales` | The RMA's INV-013 source family is `return_authorization:{id}:restock|scrap|refund` (migration 0055); the delivered RESTOCK leg posts **no separate journal** — completion drives the credit note create → approve → post in-transaction and re-shelves through the CN's OWN re-entry leg (`credit_note:{id}:reentry`): DR `INVENTORY` · CR `COGS` at the ORIGINAL issue cost snapshotted on the invoice line (W-3 — never a current-average recompute; batch preserved, the originally sold serial re-shelves, BR-017/BR-018); the RMA stamps the CN's journal + entry_no | PHASE-039 |
+| G-36 | RMA scrap write-off — `sales` | DR the tenant-mapped scrap-loss account (`sales.scrap_loss_account`; fail-closed `SCRAP_LOSS_ACCOUNT_UNMAPPED` — the RMA stays INSPECTED, zero partial writes) · CR `COGS` at Σ qty × ORIGINAL issue cost (source `return_authorization:{id}:scrap`); the completion CN issues with re-entry SUPPRESSED — the goods never re-shelve; non-stock lines carry no cost (a zero-value scrap skips the journal) | PHASE-039 |
+| G-37 | RMA refund — the cash-out leg — `sales` | DR `AR_CONTROL` (partner — reversing the CN's credit) · CR the refund cash account (source `return_authorization:{id}:refund`, at the CN's gross; the cash account is required at completion — fail-closed) + the treasury money movement OUT (`cash_movements.source_type = 'return_authorization'`, base at rate 1 — the G-33 disbursement pattern); the CN still re-enters stock exactly like G-35 (a refund puts the goods back) | PHASE-039 |
+| G-38 | Supplier-return credit — the AP debit note — `purchasing` | SHIP (source `supplier_return_authorization:{id}:ship`): ONE inventory journal DR the tenant-mapped purchase-returns account (`purchasing.supplier_return_account`; fail-closed when unmapped) · CR `INVENTORY` at issue cost — the goods leave through the movement engine (no-negative-stock applies), the stock-move issues riding the generic `manual_issue` source with reason `SUPPLIER_RETURN` and source_id = the SRMA (the documented CHECK-domain deviation — 0059 did not widen the stock_moves source CHECK). CREDIT (source `supplier_return_authorization:{id}:credit`): DR `AP_CONTROL` (supplier, net) · CR the same mapped returns account (net — no VAT legs on a return credit); at cost == price the two journals net the returns account to zero, any cost/value difference stays in it (its documented purpose). The DN document is created + stamped POSTED against this journal in the same transaction — 0059's lifecycle CHECK requires `debit_note_id` at CREDITED (`debit_notes.ref_invoice_id` anchors it to the PO's earliest POSTED supplier invoice) | PHASE-039 |
+| G-39 | Collection-agency commission at settlement — `sales` | DR the tenant-mapped collection-commission expense (`sales.collection_commission_account`; fail-closed `COMMISSION_ACCOUNT_UNMAPPED` — zero partial writes) · CR `AP_CONTROL` on the AGENCY's partner (source `collection_referral:{id}:commission`, posted exactly once at settlement); commission = PCT_OF_COLLECTED ? settled × pct/100 (4dp) : the flat fee — over the referral's snapshotted terms, never the register's live ones | PHASE-039 |
 
 Notes:
 
@@ -171,4 +176,39 @@ Notes:
     the honesty floor: pay net early, then capture. SoD: an advance approves only by
     someone other than its creator; discount terms must be APPROVED (creator ≠ approver)
     before any capture posts.
+12. **G-35…G-39 delivered mechanics (PHASE-039, migrations 0055–0059).** Numbering: G-35
+    …G-38 were planned in the PHASE-039 document (numbering continues from G-34 shipped
+    with PHASE-038); G-39 is implementation-bound — the next free golden per the decision
+    register's "continue per phase doc" rule. The scrap-loss, supplier-return and
+    commission accounts are tenant-mapped SETTINGS (`sales.scrap_loss_account`,
+    `purchasing.supplier_return_account`, `sales.collection_commission_account`)
+    following the G-33/G-34 fail-closed settings precedent (the payroll G-29
+    loan-account discipline): typed unmapped rejections BEFORE any ledger work, zero
+    partial writes — the RMA/SRMA stays at its pre-completion status.
+    Every completion runs in ONE ambient tenant UoW: the credit note (create → approve →
+    post, the CN's creator = the RMA's requester so the CN's own SoD gate forces
+    completer ≠ requester — a deliberate two-person shape on the money leg), the
+    disposition journal, and the terminal stamps (disposition journal's `entry_no`,
+    `credit_note_id`, `posted_journal_id`) commit together or not at all; INV-013 source
+    keys (`return_authorization`/`supplier_return_authorization` × operation,
+    `collection_referral:commission`) make every journal exactly-once. The late-fee
+    charge (L1-12) deliberately posts **no** new golden: the fee is a one-line sales
+    invoice (kind CREDIT) through the invoice service's own G-04 lineage with VAT on the
+    tenant-mapped fee item (`sales.late_fee_item`, fail-closed); the waiver path never
+    posts — it stamps the letter's waiver trio. Worked examples as pinned by the DB
+    suites (`__db__/sales/returns.db.spec.ts`, `__db__/purchasing/supplier-returns.db.spec.ts`,
+    `__db__/sales/dunning.db.spec.ts`): **G-35** 2 × 60.0000 — the re-entry leg re-shelves
+    2 units at the invoice line's original issue-cost snapshot (WAC 60.0000) = 120.0000;
+    **G-36** 2 × 60.0000 = 120.0000 (DR scrap-loss · CR COGS — the goods never re-shelve,
+    the CN's `reentryValue` stays 0.0000); **G-37** 230.0000 — the CN's gross (2 × 100.0000
+    net 200.0000 + 30.0000 VAT at STD 15%): DR `AR_CONTROL` · CR cash 230.0000 with the
+    OUT treasury movement 230.0000 at rate 1; **G-38** 12.5000 — 5 × 2.5000 net (NS tax,
+    no VAT legs): DR `AP_CONTROL` · CR the mapped returns account 12.5000, the DN created
+    POSTED against that journal, and the ship journal carrying the same 12.5000 at
+    cost == price so the returns account nets to zero; **G-39** 1000.0000 × 10% =
+    100.0000 (PCT_OF_COLLECTED at full settlement): DR the mapped commission expense · CR
+    `AP_CONTROL` on the agency's partner. The stock-move CHECK-domain note (G-38): the
+    ship leg's inventory issues ride the generic `manual_issue` source with reason
+    `SUPPLIER_RETURN` — documented in [../database/DATA_DICTIONARY.md](../database/DATA_DICTIONARY.md)
+    §18 (the deviation 0059 chose over widening the source CHECK).
 
