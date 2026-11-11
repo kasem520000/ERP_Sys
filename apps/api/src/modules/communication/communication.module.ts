@@ -16,6 +16,7 @@ import { ProviderConfigService } from "./application/provider-config.service";
 import { TemplateService } from "./application/template-service";
 import { OutboxService } from "./application/outbox/outbox-service";
 import { PreferencesService } from "./application/preferences-service";
+import { DigestService, NudgeService } from "./application/digest-service";
 import { ProvidersController } from "./presentation/providers.controller";
 import { TemplatesController } from "./presentation/templates.controller";
 import { PreferencesController } from "./presentation/preferences.controller";
@@ -26,6 +27,10 @@ const log = childLogger({ module: "communication" });
 export const OUTBOUND_SWEEP_QUEUE = "communication-outbound-sweep";
 /** Every minute: the retry backoff floor is 1 minute. */
 export const OUTBOUND_SWEEP_CRON = "* * * * *";
+/** The daily digest: 03:30 UTC = 06:30 Riyadh (the house timezone). */
+export const DIGEST_CRON = "30 3 * * *";
+/** The deadline-ahead nudges: 04:00 UTC = 07:00 Riyadh. */
+export const NUDGE_CRON = "0 4 * * *";
 
 /**
  * PHASE-041 communications hub (CR-11): the channel-port adapters (BR-067),
@@ -44,11 +49,29 @@ export const OUTBOUND_SWEEP_CRON = "* * * * *";
 @Module({
   imports: [InfrastructureModule, AuditModule, NotificationsModule],
   controllers: [ProvidersController, TemplatesController, PreferencesController],
-  providers: [ProviderConfigService, TemplateService, OutboxService, PreferencesService],
-  exports: [ProviderConfigService, TemplateService, OutboxService, PreferencesService],
+  providers: [
+    ProviderConfigService,
+    TemplateService,
+    OutboxService,
+    PreferencesService,
+    DigestService,
+    NudgeService,
+  ],
+  exports: [
+    ProviderConfigService,
+    TemplateService,
+    OutboxService,
+    PreferencesService,
+    DigestService,
+    NudgeService,
+  ],
 })
 export class CommunicationModule implements OnModuleInit {
-  constructor(@Inject(OutboxService) private readonly outbox: OutboxService) {}
+  constructor(
+    @Inject(OutboxService) private readonly outbox: OutboxService,
+    @Inject(DigestService) private readonly digest: DigestService,
+    @Inject(NudgeService) private readonly nudges: NudgeService,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     const boss = getBoss();
@@ -71,6 +94,48 @@ export class CommunicationModule implements OnModuleInit {
     await boss
       .schedule(OUTBOUND_SWEEP_QUEUE, OUTBOUND_SWEEP_CRON, { system: true })
       .catch(() => undefined);
+    // The digest + nudge crons (PP-13/PP-15): daily, idempotent full
+    // passes per ACTIVE tenant — the reservation-sweep precedent.
+    await boss.createQueue("communication-digest").catch(() => undefined);
+    await boss
+      .work<{ system?: boolean }>("communication-digest", async (jobs) => {
+        for (let index = 0; index < jobs.length; index += 1) {
+          await this.runSystemPass(async () => this.digest.runDigest());
+        }
+      })
+      .catch(() => undefined);
+    await boss
+      .schedule("communication-digest", DIGEST_CRON, { system: true })
+      .catch(() => undefined);
+    await boss.createQueue("communication-nudges").catch(() => undefined);
+    await boss
+      .work<{ system?: boolean }>("communication-nudges", async (jobs) => {
+        for (let index = 0; index < jobs.length; index += 1) {
+          await this.runSystemPass(async () => {
+            await this.nudges.runInvoiceDueNudges();
+            await this.nudges.runTaskDueNudges();
+            await this.nudges.runContractRenewalNudges();
+          });
+        }
+      })
+      .catch(() => undefined);
+    await boss
+      .schedule("communication-nudges", NUDGE_CRON, { system: true })
+      .catch(() => undefined);
+  }
+
+  /** One idempotent per-tenant pass (ADR-0005: one UoW per tenant). */
+  private async runSystemPass(
+    pass: () => Promise<unknown>,
+  ): Promise<void> {
+    const tenantIds = await listActiveTenantIds();
+    for (const tenantId of tenantIds) {
+      try {
+        await withTenant(tenantId, () => pass());
+      } catch (error) {
+        log.error({ tenant_id: tenantId, err: error }, "communication scheduled pass failed");
+      }
+    }
   }
 
   /** One idempotent full pass: every ACTIVE tenant's due queue. */
