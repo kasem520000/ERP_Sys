@@ -1,24 +1,63 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (roadmap v3.2 residual layer applied — next eligible: PHASE-039, owner go received)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-039 COMPLETE — next eligible: PHASE-040; STOPPED awaiting the owner's go per the standing rule)
 
 ## The single next action
 
-**Start PHASE-039 (Returns & Collections — RMA + Dunning + Late Fees + Agencies +
-Supplier RMA, CR-09 + CR-46 + CR-50)** — the owner's go was received with the v3.2
-directive («ثم ابدأ فوراً تنفيذ PHASE-039»). Per EXPANSION sequencing the wave-1
-siblings are parallel-safe; 039's prerequisites (035 ✓, the AR/AP module + journal
-infrastructure from the 34-phase baseline) are all satisfied. **The phase's scope is
-FINAL before implementation starts** (CR-46 + CR-50) — read
-[PHASE-039.md](../implementation/phases/PHASE-039.md) first: the sales RMA cycle
-(authorization → receipt → inspection → disposition with G-35/G-36/G-37 posting
-discipline per the phase doc's own numbering), managed warranties, the receivables
-dunning sweep (aging-bucket escalation letters + collection-status surfacing), the
-three v3.1 additions — the periodic credit-review workflow (L1-10), the late-fee
-engine with VAT treatment + waiver path (L1-12), and the collection-agency referral
-layer with the hashed-token callback port (L1-11) — **plus the v3.2 addition:
-the supplier-RMA mirror (R-03 — return-to-vendor authorization → auto-generated AP
-debit note, G-38, ~4-week estimate)**.
+**PHASE-039 is COMPLETE and pushed** — the triple flip is done (the phase doc
+header, the IMPLEMENTATION_STATUS row + header, and
+[the completion report](../implementation/phases/reports/PHASE-039-COMPLETION.md)
+with the CR-48 code-evidence checklist). **Execution is stopped here per the
+owner's standing rule** — the next phase awaits the owner's go.
+
+**Start PHASE-040 (Data Onboarding & Migration Toolkit, CR-10)** — «ابدأ تنفيذ
+المرحلة PHASE-040» — when the owner gives the go. Wave-1 sibling (parallel-safe);
+prerequisites all satisfied (035 ✓; the import-toolkit substrate shipped with
+the 34-phase baseline). Read [PHASE-040.md](../implementation/phases/PHASE-040.md)
+first: the import-kind families (COA, opening balances, fixed assets, employees,
+price lists, contracts, budgets — H-17), the Excel/QuickBooks/Odoo-shaped
+migration adapters (IN-26), the demo-data loader per industry template
+(TB-19/20 + OA-05), and the L1-21 export-templates half (v3.1/CR-46).
+
+## Post-PHASE-039 context for the next author (2026-11-11)
+
+PHASE-039 (Returns & Collections) is COMPLETE — H-12, H-13, S-14…16, L1-10,
+L1-11, L1-12 and R-03 all closed: migrations `0055`–`0059` (schema_version 59;
+ten RLS'd tables + the partner credit-risk columns), the RMA workflow
+(G-35/36/37, BR-064 exactly-once), managed warranties, the monotonic dunning
+ladder (BR-065) with the late-fee engine (VAT-carrying fee invoices,
+REQUIRES_VERIFICATION) and the collection-agency layer (hashed-token callbacks,
+G-39), credit reviews (the blocked-class interplay), and the supplier-RMA
+mirror (G-38). CURRENT_SHIPPED_PHASE = "PHASE-039" (permissions 256 → **265**;
+feature keys +4; report registry 88 → **90**; web i18n **5,019=5,019** (+320);
+ENTITY_CATALOG 217 → **227**; the full DB suite 173 files / **2,577 green**;
+goldens G-35…G-39 + BR-064/065 registered).
+
+Key handoffs from 039 (read `agent-ctx/7-API-A-returns-api.md` +
+`7-API-B-dunning-collections-api.md` + `7-WEB-C-phase-039-returns-collections.md`
++ the [completion report](../implementation/phases/reports/PHASE-039-COMPLETION.md)
+first):
+
+- **The scorecard→credit-risk fold pattern is the one 040 should mirror** for
+  import progress surfacing: the rolling-window fold over live documents plus
+  the typed-settings fail-closed discipline (unmapped control account → typed
+  rejection, zero partial writes) — now in THREE places (038 advances, 039
+  scrap/returns/commission accounts).
+- **The re-pin procedure is documented**: any plan-granting migration or
+  FEATURE_DEPS edge moves ALL 37 golden-effective-configs pins — re-pin with a
+  review note (the P32/039 precedent in
+  `configuration/__tests__/golden-effective-configs.spec.ts`).
+- **The isolation OWN_ROW contract**: every new tables.registry row needs its
+  seed + OWN_ROW + MISMATCHED_INSERT triple in identity-isolation.db.spec.ts —
+  the generated A-suite crashes at collection otherwise (the 039 gate-repair
+  lesson).
+- **The late-fee invoice path**: the sales engine's approve-override arm
+  (`sales.credit_check_overridden` audit) is the pattern for any system-actor
+  invoice that must not be blocked by the very condition it remedies.
+- Watch items carried: the zatca-qr-decode Playwright environmental gap
+  (pre-existing), the `manual_issue`/SUPPLIER_RETURN stock-source note (the
+  mechanical rename path when a widening lands), WHATSAPP/SMS letters QUEUED
+  for the 041 channel-port (the letter rows already store the channel).
 
 ## Post-v3.2 context for the next author (2026-11-11)
 

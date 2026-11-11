@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-038 COMPLETE — the v3.0 program's fourth phase delivered; roadmap v3.1 gap consolidation + v3.2 residual layer applied 2026-11-11)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-039 COMPLETE — the v3.0 program's fifth phase delivered; roadmap v3.1 + v3.2 applied)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -111,10 +111,19 @@ recorded here with evidence.
 | Compliance | NONE — no jurisdiction pack data verified against official sources | — |
 | Deployment | NONE — dev compose + CI files (incl. new ci-db.yml); first hosted runs waived pending infra | `docker-compose.yml`, `.github/workflows/` |
 
-## Blueprint v3.0 phases (2026-11-11 — PHASE-038 delivered; roadmap v3.1 + v3.2 applied; the rest planned)
+## Blueprint v3.0 phases (2026-11-11 — PHASE-039 delivered; roadmap v3.1 + v3.2 applied; the rest planned)
 
-30 of 34 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035, PHASE-036,
-PHASE-037 and PHASE-038 COMPLETE (2026-11-10).
+29 of 34 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035…PHASE-039
+COMPLETE (035–038 on 2026-11-10; 039 on 2026-11-11).
+**PHASE-039 (2026-11-11 — CR-09/CR-46/CR-50):** Returns & Collections delivered —
+migrations `0055`–`0059` (schema_version 59; ten RLS'd tables + the additive
+partner credit-risk columns), the RMA workflow auto-generating credit notes
+(G-35/36/37, BR-064), managed warranties, the monotonic dunning ladder
+(BR-065) with late fees (L1-12) and collection agencies (L1-11, G-39), credit
+reviews (L1-10), and the supplier-RMA mirror (R-03, G-38). Permissions
+256 → **265**; feature keys +4; report registry 88 → **90**; i18n 4,699 →
+**5,019**; the full DB suite 173 files / 2,577 green. Evidence:
+[the completion report](../implementation/phases/reports/PHASE-039-COMPLETION.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -141,7 +150,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-036](../implementation/phases/PHASE-036.md) | Extensibility Core — Custom Fields | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-036-COMPLETION.md) |
 | [PHASE-037](../implementation/phases/PHASE-037.md) | ZATCA Phase-1 & QR Compliance | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-037-COMPLETION.md) |
 | [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-038-COMPLETION.md) |
-| [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies + supplier RMA — v3.1/CR-46 + v3.2/CR-50) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies + supplier RMA — v3.1/CR-46 + v3.2/CR-50) | 1 / 12 | 035 | **COMPLETE 2026-11-11** — [report](../implementation/phases/reports/PHASE-039-COMPLETION.md) |
 | [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers | 2 / 13 | 036 | NOT_STARTED — PLANNED |

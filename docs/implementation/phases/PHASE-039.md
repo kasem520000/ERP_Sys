@@ -1,6 +1,6 @@
 # PHASE-039 — Returns & Collections (RMA + Dunning)
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46 and v3.2/CR-50) · **Wave:** 1 / Stage 12 · **Register:** [CR-09](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE (2026-11-11 — evidence: [reports/PHASE-039-COMPLETION.md](reports/PHASE-039-COMPLETION.md); scope per Blueprint v3.0, extended by v3.1/CR-46 and v3.2/CR-50) · **Wave:** 1 / Stage 12 · **Register:** [CR-09](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-12/H-13) · §4 (S-14/S-15/S-16) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-10/L1-11/L1-12 — the v3.1 scope extension) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-03 supplier RMA — the v3.2 scope extension, mandated before any 039 code) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.2/§6.5
 
 ## 1. Phase Overview
