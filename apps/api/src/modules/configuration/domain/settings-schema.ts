@@ -374,6 +374,25 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "G-34: the income account early-payment discount captures post to (uuid of a tenant gl account); capture fails typed when unmapped — no fallback account exists.",
   }),
+  // PHASE-039 (0055; G-36): the tenant-mapped scrap-loss account a SCRAP
+  // return disposition writes off to (fail-closed when unmapped — the
+  // supplier-advance control precedent).
+  "sales.scrap_loss_account": Object.freeze({
+    key: "sales.scrap_loss_account",
+    schema: z.string().uuid().nullable(),
+    default: null,
+    description:
+      "G-36: the expense account scrapped customer-return dispositions write off to (uuid of a tenant gl account); a SCRAP RMA completion fails typed when unmapped — no fallback account exists.",
+  }),
+  // PHASE-039 (0059; G-38): the tenant-mapped purchase-returns account the
+  // supplier-return legs post through (fail-closed when unmapped).
+  "purchasing.supplier_return_account": Object.freeze({
+    key: "purchasing.supplier_return_account",
+    schema: z.string().uuid().nullable(),
+    default: null,
+    description:
+      "G-38: the account supplier-return shipments debit and the AP credit leg credits (uuid of a tenant gl account); supplier RMA ship/credit fail typed when unmapped — no fallback account exists.",
+  }),
   // P-11: the banded tolerance surface on the existing matching engine
   // (the flat pct keys above stay the default; bands refine by line
   // amount — no new tables).

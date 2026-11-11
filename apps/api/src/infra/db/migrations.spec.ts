@@ -119,7 +119,18 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // grant to business + enterprise. NOT ledger documents — awards/
     // releases generate purchase orders whose own lifecycles post; G-33/
     // G-34 post through the purchasing advances service (0053 tables).
-    expect(files.at(-1)?.tag).toBe("0054_capex_tenders");
+    // PHASE-039 (Blueprint v3.0 · CR-09; extended by v3.1/CR-46 and
+    // v3.2/CR-50): 0055_rma_warranty … 0059_supplier_rma — the returns
+    // & collections cluster (10 RLS'd tables: the customer RMA workflow
+    // + lines + managed warranties, the dunning ladder + letters +
+    // actions, the agency register + referrals, the additive partner
+    // credit-risk columns, and the supplier-RMA mirror — R-03). Nine
+    // permission seeds move the drift count 256 → 265 (matrix §3.17);
+    // the four feature keys (sales.rma, sales.warranties, sales.dunning,
+    // purchasing.rma) grant to business + enterprise. G-35…G-38 post
+    // through the returns services; G-39 (agency commission) through
+    // the dunning service.
+    expect(files.at(-1)?.tag).toBe("0059_supplier_rma");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

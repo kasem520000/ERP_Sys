@@ -24,10 +24,12 @@ import { ScorecardService } from "./application/scorecards";
 import { CapexService } from "./application/capex";
 import { SupplierAdvancesService } from "./application/advances";
 import { TenderIntakeService } from "./application/tenders";
+import { SupplierReturnsService } from "./application/supplier-rma";
 import { registerScorecardSweepJob } from "./infrastructure/scorecard-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
 import { PurchasingController } from "./presentation/purchasing.controller";
 import { SourcingController } from "./presentation/sourcing.controller";
+import { SupplierReturnsController } from "./presentation/supplier-returns.controller";
 import { PortalController } from "./presentation/portal.controller";
 
 /**
@@ -60,7 +62,12 @@ import { PortalController } from "./presentation/portal.controller";
  */
 @Module({
   imports: [AccountingModule, AuditModule, TaxModule, InventoryModule, NotificationsModule, BudgetingModule],
-  controllers: [PurchasingController, SourcingController, PortalController],
+  controllers: [
+    PurchasingController,
+    SourcingController,
+    PortalController,
+    SupplierReturnsController,
+  ],
   providers: [
     MatchingService,
     PurchaseRequestService,
@@ -81,6 +88,9 @@ import { PortalController } from "./presentation/portal.controller";
     CapexService,
     SupplierAdvancesService,
     TenderIntakeService,
+    // PHASE-039 (0059): the supplier RMA mirror — the return-to-vendor
+    // workflow ending in the G-38 debit note.
+    SupplierReturnsService,
   ],
   exports: [
     MatchingService,
@@ -98,6 +108,7 @@ import { PortalController } from "./presentation/portal.controller";
     AwardService,
     BlanketService,
     ScorecardService,
+    SupplierReturnsService,
   ],
 })
 export class PurchasingModule implements OnModuleInit {

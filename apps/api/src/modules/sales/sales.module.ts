@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Module, Inject, type OnModuleInit } from "@nestjs/common";
 
 import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
@@ -10,6 +10,8 @@ import { SalesOrderService } from "./application/orders";
 import { DeliveryNoteService } from "./application/deliveries";
 import { SalesInvoiceService } from "./application/invoices";
 import { CreditNoteService } from "./application/credit-notes";
+import { ReturnsService } from "./application/rma";
+import { WarrantiesService } from "./application/warranties";
 import { SalesReallocationService } from "./application/reallocations";
 import { ArQueriesService } from "./application/ar-queries";
 import { SalesRepService, InvoiceOverdueService } from "./application/reps";
@@ -19,6 +21,9 @@ import { JobCardPosting } from "./job-cards/application/posting/job-card-posting
 import { SalesController, PartnerCreditCheckController } from "./presentation/sales.controller";
 import { JobCardsController } from "./presentation/job-cards.controller";
 import { CommerceController } from "./presentation/commerce.controller";
+import { ReturnsController } from "./presentation/returns.controller";
+import { registerWarrantyExpiryJob } from "./infrastructure/warranty-expiry.job";
+import { getBoss } from "../../infra/jobs/boss";
 
 /**
  * Sales module (PHASE-012): the quote-to-cash chain — quotations (BR-006
@@ -43,13 +48,23 @@ import { CommerceController } from "./presentation/commerce.controller";
  */
 @Module({
   imports: [AccountingModule, AuditModule, TaxModule, InventoryModule, NotificationsModule],
-  controllers: [SalesController, PartnerCreditCheckController, JobCardsController, CommerceController],
+  controllers: [
+    SalesController,
+    PartnerCreditCheckController,
+    JobCardsController,
+    CommerceController,
+    ReturnsController,
+  ],
   providers: [
     QuotationService,
     SalesOrderService,
     DeliveryNoteService,
     SalesInvoiceService,
     CreditNoteService,
+    // PHASE-039 (0055): the customer RMA workflow (G-35/G-36/G-37 at
+    // completion) + the managed-warranty register with its expiry sweep.
+    ReturnsService,
+    WarrantiesService,
     SalesReallocationService,
     ArQueriesService,
     SalesRepService,
@@ -68,6 +83,8 @@ import { CommerceController } from "./presentation/commerce.controller";
     DeliveryNoteService,
     SalesInvoiceService,
     CreditNoteService,
+    ReturnsService,
+    WarrantiesService,
     SalesReallocationService,
     ArQueriesService,
     SalesRepService,
@@ -77,4 +94,14 @@ import { CommerceController } from "./presentation/commerce.controller";
     JobCardPosting,
   ],
 })
-export class SalesModule {}
+export class SalesModule implements OnModuleInit {
+  constructor(@Inject(WarrantiesService) private readonly warranties: WarrantiesService) {}
+
+  async onModuleInit(): Promise<void> {
+    // PHASE-039 T-05: the warranty expiry sweep (2:50 UTC) — the same
+    // degraded-boot discipline as the scorecard sweep (registration
+    // failure never takes the module down; the schedule is an idempotent
+    // replace).
+    await registerWarrantyExpiryJob(getBoss(), this.warranties).catch(() => undefined);
+  }
+}

@@ -189,3 +189,92 @@ export class ArQueryInvalidError extends DomainError {
     super("AR_QUERY_INVALID", message);
   }
 }
+
+// -- customer RMAs (PHASE-039 0055; BR-064, G-35/G-36/G-37) -----------------------------
+
+export class RmaNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("RMA_NOT_FOUND", `return authorization ${id} does not exist in this tenant`);
+  }
+}
+export class RmaStateInvalidError extends DomainError {
+  constructor(details: { current: string; attempted: string }) {
+    super(
+      "RMA_STATE_INVALID",
+      `return authorization is ${details.current} — the ${details.attempted} transition is not valid from that state (the lifecycle is REQUESTED → APPROVED → RECEIVED → INSPECTED → RESTOCKED/SCRAPPED/REFUNDED, CANCELLED off REQUESTED/APPROVED)`,
+      { current: details.current, attempted: details.attempted },
+    );
+  }
+}
+export class RmaQtyExceedsInvoicedError extends DomainError {
+  constructor(details: { lineId: string; qty: string; available: string }) {
+    super(
+      "RMA_QTY_EXCEEDS_INVOICED",
+      `return of ${details.qty} on invoice line ${details.lineId} exceeds the available ${details.available} (invoiced − already credited − open RMAs)`,
+      { lineId: details.lineId, qty: details.qty, available: details.available },
+    );
+  }
+}
+export class RmaDispositionRequiredError extends DomainError {
+  constructor(id: string) {
+    super(
+      "RMA_DISPOSITION_REQUIRED",
+      `return authorization ${id} carries no disposition — inspection must record RESTOCK/SCRAP/REFUND before completion (BR-064)`,
+    );
+  }
+}
+export class ScrapLossAccountUnmappedError extends DomainError {
+  constructor() {
+    super(
+      "SCRAP_LOSS_ACCOUNT_UNMAPPED",
+      "sales.scrap_loss_account is unmapped — a SCRAP disposition cannot post its G-36 write-off (fail-closed: no fallback account exists; map the setting and retry)",
+    );
+  }
+}
+
+// -- managed warranties (PHASE-039 0055; S-15) ------------------------------------------
+
+export class WarrantyNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("WARRANTY_NOT_FOUND", `warranty registration ${id} does not exist in this tenant`);
+  }
+}
+export class WarrantyTermsInvalidError extends DomainError {
+  constructor(message: string) {
+    super("WARRANTY_TERMS_INVALID", message);
+  }
+}
+
+// -- supplier RMAs (PHASE-039 0059; G-38) ------------------------------------------------
+
+export class SupplierRmaNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("SUPPLIER_RMA_NOT_FOUND", `supplier return authorization ${id} does not exist in this tenant`);
+  }
+}
+export class SupplierRmaStateInvalidError extends DomainError {
+  constructor(details: { current: string; attempted: string }) {
+    super(
+      "SUPPLIER_RMA_STATE_INVALID",
+      `supplier return authorization is ${details.current} — the ${details.attempted} transition is not valid from that state (the lifecycle is REQUESTED → APPROVED → SHIPPED → CREDITED, CANCELLED off REQUESTED/APPROVED)`,
+      { current: details.current, attempted: details.attempted },
+    );
+  }
+}
+export class SupplierRmaQtyExceedsPurchasedError extends DomainError {
+  constructor(details: { lineId: string; qty: string; available: string }) {
+    super(
+      "SUPPLIER_RMA_QTY_EXCEEDS_PURCHASED",
+      `return of ${details.qty} on PO line ${details.lineId} exceeds the available ${details.available} (purchased − already-returned/open supplier RMAs)`,
+      { lineId: details.lineId, qty: details.qty, available: details.available },
+    );
+  }
+}
+export class SupplierReturnAccountUnmappedError extends DomainError {
+  constructor() {
+    super(
+      "SUPPLIER_RETURN_ACCOUNT_UNMAPPED",
+      "purchasing.supplier_return_account is unmapped — a supplier return cannot post its inventory/G-38 legs (fail-closed: no fallback account exists; map the setting and retry)",
+    );
+  }
+}

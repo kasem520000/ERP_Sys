@@ -1358,6 +1358,16 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "PATCH", path: "/api/v1/purchasing/tender-intakes/:id", permission: "purchasing.rfqs.manage" },
   { method: "POST", path: "/api/v1/purchasing/tender-intakes/:id/decide", permission: "purchasing.rfqs.manage" },
   { method: "POST", path: "/api/v1/purchasing/tender-intakes/:id/close", permission: "purchasing.rfqs.manage" },
+  // PHASE-039 (0059; matrix §3.17): the supplier RMA mirror — the
+  // return-to-vendor lifecycle to the G-38 debit note (SoD rides the
+  // manage key's server-side gate).
+  { method: "GET", path: "/api/v1/purchasing/returns", permission: "purchasing.rma.read" },
+  { method: "POST", path: "/api/v1/purchasing/returns", permission: "purchasing.rma.manage" },
+  { method: "GET", path: "/api/v1/purchasing/returns/:id", permission: "purchasing.rma.read" },
+  { method: "POST", path: "/api/v1/purchasing/returns/:id/approve", permission: "purchasing.rma.manage" },
+  { method: "POST", path: "/api/v1/purchasing/returns/:id/ship", permission: "purchasing.rma.manage" },
+  { method: "POST", path: "/api/v1/purchasing/returns/:id/credit", permission: "purchasing.rma.manage" },
+  { method: "POST", path: "/api/v1/purchasing/returns/:id/cancel", permission: "purchasing.rma.manage" },
   // -- PHASE-023 T8: commerce channels (sales.commerce.manage) ----------------
   {
     method: "GET",
@@ -2085,6 +2095,21 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/sales/credit-notes/:id/cancel",
     permission: "sales.credit_notes.create",
   },
+  // PHASE-039 (0055; matrix §3.9): the customer RMA workflow — create and
+  // progress through the lifecycle to the completion credit note; the SoD
+  // approval hop is its own key. The managed-warranty register rides the
+  // single sales.warranties.manage key.
+  { method: "GET", path: "/api/v1/sales/returns", permission: "sales.rma.read" },
+  { method: "POST", path: "/api/v1/sales/returns", permission: "sales.rma.manage" },
+  { method: "GET", path: "/api/v1/sales/returns/:id", permission: "sales.rma.read" },
+  { method: "POST", path: "/api/v1/sales/returns/:id/approve", permission: "sales.rma.approve" },
+  { method: "POST", path: "/api/v1/sales/returns/:id/receive", permission: "sales.rma.manage" },
+  { method: "POST", path: "/api/v1/sales/returns/:id/inspect", permission: "sales.rma.manage" },
+  { method: "POST", path: "/api/v1/sales/returns/:id/complete", permission: "sales.rma.manage" },
+  { method: "POST", path: "/api/v1/sales/returns/:id/cancel", permission: "sales.rma.manage" },
+  { method: "GET", path: "/api/v1/sales/warranties", permission: "sales.warranties.manage" },
+  { method: "POST", path: "/api/v1/sales/warranties", permission: "sales.warranties.manage" },
+  { method: "POST", path: "/api/v1/sales/warranties/:id/void", permission: "sales.warranties.manage" },
   {
     method: "GET",
     path: "/api/v1/sales/ar/aging",

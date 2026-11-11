@@ -371,6 +371,17 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "early_payment_discount_terms" },
   { table: "capex_requests" },
   { table: "tender_intakes" },
+  // PHASE-039 (Blueprint v3.0 · CR-09, migrations 0055 + 0059): the
+  // returns cluster — the customer RMA pair, the managed-warranty register,
+  // and the supplier RMA mirror. Workflow history is archive-not-delete on
+  // the three headers (SELECT/INSERT/UPDATE only); the two line tables
+  // carry the DELETE grant (replace-on-edit, DRAFT only — the rfq_lines
+  // precedent). Five tables — the auto-generated A-suite extends by +30.
+  { table: "return_authorizations" },
+  { table: "return_authorization_lines", deleteGranted: true },
+  { table: "warranty_registrations" },
+  { table: "supplier_return_authorizations" },
+  { table: "supplier_return_authorization_lines", deleteGranted: true },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

@@ -58,7 +58,11 @@ export type NotificationCategory =
   // PHASE-038 (0051 category widening): the 3-bid advisory warning
   // (BR-062 — one inbox notification when the award proceeds below the
   // configured quote floor in ADVISORY mode).
-  | "purchasing";
+  | "purchasing"
+  // PHASE-039 (0056 category widening): the collections surface (the RMA
+  // completion notices) and the warranty expiry ladder (30/7/0-day).
+  | "collections"
+  | "warranties";
 export type NotificationSeverity = "info" | "warning" | "critical";
 
 export interface BilingualText {
