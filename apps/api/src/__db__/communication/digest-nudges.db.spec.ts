@@ -2,7 +2,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { sql } from "drizzle-orm";
 
 import { withTenant } from "../../infra/db/tenant-context";
-import { getDb } from "../../infra/db/client";
 import { superuserClient } from "../test-db";
 import { InboxService } from "../../modules/notifications/application/inbox-service";
 import { OutboxService } from "../../modules/communication/application/outbox/outbox-service";
