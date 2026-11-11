@@ -130,7 +130,15 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // purchasing.rma) grant to business + enterprise. G-35…G-38 post
     // through the returns services; G-39 (agency commission) through
     // the dunning service.
-    expect(files.at(-1)?.tag).toBe("0059_supplier_rma");
+    // PHASE-040 (Blueprint v3.0 · CR-10; extended by v3.1/CR-46 — the
+    // L1-21 export-templates half): 0060_import_toolkit — the data-
+    // onboarding substrate (import_mappings both directions + the
+    // import-jobs kind widening + the tenants SANDBOX/demo markers).
+    // The two configuration.* permission seeds move the drift count
+    // 265 → 267 (matrix §3.18); the two feature keys grant per §8
+    // (data_migration business+enterprise, demo_data all plans). Zero
+    // new journal rules — the toolkit posts through existing engines.
+    expect(files.at(-1)?.tag).toBe("0060_import_toolkit");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

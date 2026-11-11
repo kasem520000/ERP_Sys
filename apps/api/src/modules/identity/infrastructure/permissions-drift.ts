@@ -142,6 +142,12 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // sales.dunning.manage, sales.warranties.manage, sales.late-fees.manage,
   // sales.collection-agencies.manage, purchasing.rma.read/manage.
   "apps/api/migrations/0056_dunning_collections.sql",
+  // PHASE-040 (Blueprint v3.0 · CR-10): 0060 seeds the TWO data-onboarding
+  // keys (matrix §3.18; 265 → 267) — configuration.imports.manage +
+  // configuration.demo_data.manage (the doc's platform.* names renamed:
+  // matrix §3.10 + the identity-flows checklist pin platform.* as never
+  // tenant-assignable — recorded deviation in the completion report §4).
+  "apps/api/migrations/0060_import_toolkit.sql",
 ];
 
 export async function main(): Promise<void> {

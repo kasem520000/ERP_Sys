@@ -129,6 +129,14 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "sales.warranties": ["sales.rma"],
   "sales.dunning": ["sales.receivables_aging"],
   "purchasing.rma": ["purchasing.goods_receipts"],
+  // PHASE-040 data onboarding & migration toolkit keys (migration 0060 §8):
+  // platform.data_migration — the seven-kind import engine + mapping
+  // wizard + adapters (business + enterprise, the 0051 tier-4 precedent);
+  // platform.demo_data — the one-click demo loader + sandbox tenants (ALL
+  // plans, the recorded trial-enablement decision). Both are leaf keys
+  // (no dependency edges — they ride the modules they write into).
+  "platform.data_migration": [],
+  "platform.demo_data": [],
   // treasury
   "treasury.accounts": ["accounting.chart_of_accounts"],
   "treasury.receipts_disbursements": ["treasury.accounts"],

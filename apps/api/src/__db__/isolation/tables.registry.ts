@@ -394,6 +394,12 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "collection_actions" },
   { table: "collection_agencies" },
   { table: "collection_referrals" },
+  // PHASE-040 (Blueprint v3.0 · CR-10, migration 0060): the data-onboarding
+  // substrate — saved import column maps + export templates. Tenant user
+  // data (no document/compliance semantics): the DELETE grant is legitimate
+  // (mappings are re-editable and removable), the entitlements precedent.
+  // One table — the auto-generated A-suite extends by +6.
+  { table: "import_mappings", deleteGranted: true },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

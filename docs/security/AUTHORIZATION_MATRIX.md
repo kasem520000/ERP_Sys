@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-11 (PHASE-039 — §3.17 returns & collections; permission catalog 256 → 265)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-040 — §3.18 data onboarding & migration toolkit; permission catalog 265 → 267)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -431,6 +431,27 @@ purchasing — `/api/v1/purchasing/returns` (GET/POST, `/:id`, `/:id/approve|shi
 Role grants per 0056 §9: owner holds all nine; accountant gains the two RMA reads +
 dunning + late-fees + agencies; sales gains the RMA trio + dunning + warranties;
 purchasing gains the purchasing pair + `sales.rma.read`.
+
+### 3.18 `configuration` data onboarding & migration toolkit (PHASE-040)
+
+The PHASE-040 toolkit (CR-10, scope extended by v3.1/CR-46 — the L1-21 export-templates
+half): the seven-kind import engine (COA, ACCOUNT_OPENING_BALANCES, FIXED_ASSETS,
+EMPLOYEES, PRICE_LISTS, CONTRACTS, BUDGETS) with the dry-run → commit gate (BR-066),
+the column-mapping wizard, saved mappings (both directions — import maps + export
+templates), the QuickBooks/Odoo/Excel-generic migration adapters, the 13-template demo-data
+loader, and the platform-plane SANDBOX tenant provisioning (OA-05). **Both keys seed in
+migration `0060` §7 — the permission catalog extends 265 → 267 (seed = mirror, zero
+drift).** Naming note (recorded deviation, PHASE-040 completion report §4): the phase doc
+planned `platform.imports.manage`/`platform.demo_data.manage` — renamed because §3.10
+and the identity-flows checklist pin `platform.*` as never tenant-assignable; the
+platform-plane sandbox route (`POST /api/v1/platform/sandbox-tenants`) rides the existing
+`platform.subscriptions.manage` (never plan-gated — the `platform.payouts` precedent).
+The baseline items import console (`items.import.run`, §3.6) is untouched.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `configuration.imports.manage` | Run the import toolkit: seven kinds, mapping wizard, saved mappings (import + export templates), migration adapters, error-report exports / تشغيل عدّة الاستيراد: سبعة أنواع ومعيّن ربط الأعمدة والخرائط المحفوظة ومحوّلات الترحيل وتصدير تقارير الأخطاء | owner, accountant | tenant | no (audited; the dry-run writes NOTHING — BR-066 zero-write gate; the commit is atomic per run with no partial state) |
+| `configuration.demo_data.manage` | Seed one-click realistic demo data per industry template (idempotent; refuses tenants with posted real documents) and provision time-boxed SANDBOX demo tenants from the platform plane / تحميل البيانات التجريبية الواقعية لكل قالب قطاعي وإنشاء المستأجرين التجريبيين المحدودين المدة | owner | tenant (the loader); platform (`platform.subscriptions.manage` on the sandbox route) | **yes** (audited; demo data is flagged + idempotent; a sandbox tenant is quota-capped, time-boxed, and never a consolidation member) |
 
 ## 4. Segregation of duties & approval limits
 

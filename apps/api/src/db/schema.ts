@@ -66,6 +66,17 @@ export const tenants = pgTable(
     // legal-hold flag — blocks the offboarding purge of a tenant held for
     // investigation (security sign-off required; INCIDENT_RESPONSE).
     legalHold: boolean("legal_hold").notNull().default(false),
+    // PHASE-040 (migration 0060; OA-05): the SANDBOX plane — platform-
+    // provisioned, time-boxed (sandbox_expires_at), quota-capped
+    // (sandbox_max_users), never a consolidation member; plus the demo-seed
+    // idempotency markers (TB-19/TB-20).
+    kind: text("kind").notNull().default("STANDARD"),
+    sandboxExpiresAt: timestamp("sandbox_expires_at", { withTimezone: true, mode: "string" }),
+    sandboxMaxUsers: integer("sandbox_max_users"),
+    sandboxOwnerEmail: text("sandbox_owner_email"),
+    demoSeededAt: timestamp("demo_seeded_at", { withTimezone: true, mode: "string" }),
+    demoTemplate: text("demo_template"),
+    demoSeedHash: text("demo_seed_hash"),
   },
   (table) => [index("ix_tenants_status").on(table.status)],
 );
@@ -869,11 +880,50 @@ export const importJobs = pgTable(
     error: text("error"),
     committedAt: timestamp("committed_at", { withTimezone: true, mode: "string" }),
     createdBy: uuid("created_by"),
+    // PHASE-040 (migration 0060): the saved mapping that shaped this job
+    // (SET NULL when the mapping is removed) + per-job run options (e.g.
+    // the target budgetId for the BUDGETS kind).
+    mappingId: uuid("mapping_id"),
+    options: jsonb("options"),
   },
   (table) => [
     index("ix_import_jobs_tenant_status").on(table.tenantId, table.status),
     index("ix_import_jobs_tenant_created").on(table.tenantId, table.createdAt),
     uniqueIndex("uq_import_jobs_tenant_token").on(table.tenantId, table.uploadToken),
+  ],
+);
+
+/**
+ * PHASE-040 (migration 0060): saved import column maps + export templates —
+ * tenant-scoped named maps reusable across files (IMPORT direction) and
+ * recurring one-click extract shapes (EXPORT direction, the v3.1/CR-46
+ * L1-21 half). One name per (tenant, direction, kind).
+ */
+export const importMappings = pgTable(
+  "import_mappings",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    name: text("name").notNull(),
+    direction: text("direction").notNull().default("IMPORT"),
+    kind: text("kind").notNull(),
+    entity: text("entity"),
+    columnMap: jsonb("column_map").notNull(),
+    options: jsonb("options"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    index("ix_import_mappings_tenant_direction_kind").on(
+      table.tenantId,
+      table.direction,
+      table.kind,
+    ),
+    uniqueIndex("uq_import_mappings_tenant_direction_kind_name").on(
+      table.tenantId,
+      table.direction,
+      table.kind,
+      table.name,
+    ),
   ],
 );
 

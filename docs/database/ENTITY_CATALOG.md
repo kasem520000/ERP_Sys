@@ -1,6 +1,6 @@
 # Entity Catalog
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-11 (PHASE-039 — the returns & collections cluster, 217 → 227 domain rows)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-12 (PHASE-040 — the data-onboarding substrate, 227 → 228 domain rows)
 
 All planned entities grouped by owning module, with the phase that introduces them and
 key relationships. This is the catalog-level map; column-level specifications for core
@@ -456,6 +456,22 @@ review clock — the daily sweep assigns reviewers via `collections` notificatio
 the outcome history rides `audit_events`, the house record-timeline pattern — no new
 history table), `last_credit_review_at/by` + `credit_review_note`; indexed
 `(tenant_id, next_credit_review_at) WHERE NOT NULL` for the sweep's hot path.
+
+## data onboarding (PHASE-040 — DELIVERED by migration `0060_import_toolkit.sql`, schema_version 60)
+
+The Data Onboarding & Migration Toolkit substrate (H-17 · IN-26 · TB-19/TB-20 ·
+OA-05 · L1-21): the saved-mapping store both directions (import column maps + the
+v3.1/CR-46 export templates), the additive import-jobs widening (+7 kinds — COA,
+ACCOUNT_OPENING_BALANCES, FIXED_ASSETS, EMPLOYEES, PRICE_LISTS, CONTRACTS, BUDGETS —
+plus mapping_id/options), and the tenants SANDBOX/demo markers (kind, expires, quota,
+owner-email, demo_seeded_at/template/hash). +1 table — the catalog count moves
+227 → 228 (the RLS-suite parity gate checks the number). The engine itself is
+application code (the onboarding module); zero new journal rules — every import
+lands through EXISTING engines (BR-066's negative ledger proof).
+
+| Entity | Purpose | Key fields | Phase | OC |
+|--------|---------|-----------|-------|----|
+| `import_mappings` | Saved column maps + export templates (§2.3): tenant-scoped named maps reusable across files of the same shape (IMPORT direction — canonical column → file header) and recurring one-click extract shapes (EXPORT direction — entity, column selection, format, filters; the L1-21 half) | tenant_id, name (UNIQUE per tenant+direction+kind), direction (IMPORT/EXPORT), kind (the import kind vocabulary — the 3 baseline + the 7 PHASE-040 kinds; EXPORT names its entity, shape `^[a-z][a-z0-9_.]{1,60}$`), entity? (NULL on IMPORT — shape CHECK), column_map jsonb (the map itself), options? jsonb, created_by; grants SELECT/INSERT/UPDATE/**DELETE** (tenant user data — re-editable and removable, the entitlements precedent) | 040 | no |
 
 ## Diagrams
 

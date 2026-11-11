@@ -304,6 +304,19 @@ export const MIGRATIONS: readonly string[] = [
   // (REQUESTED→APPROVED(SoD)→SHIPPED→CREDITED; completion auto-generates
   // the AP debit note — G-38). Completes the phase's 10 tables.
   "0059_supplier_rma",
+  // PHASE-040 (Blueprint v3.0 · CR-10; scope extended by v3.1/CR-46 —
+  // L1-21 export templates): 0060_import_toolkit — the data-onboarding
+  // substrate: import_mappings (saved column maps, both directions),
+  // the import_jobs kind widening (+7 kinds: COA,
+  // ACCOUNT_OPENING_BALANCES, FIXED_ASSETS, EMPLOYEES, PRICE_LISTS,
+  // CONTRACTS, BUDGETS) + mapping_id/options, the tenants SANDBOX plane
+  // (kind/expires/quota/owner-email — OA-05) + demo-seed markers
+  // (TB-19/20), the two configuration.* permission keys (265 → 267) and
+  // the two feature plan grants (platform.data_migration business+
+  // enterprise; platform.demo_data all plans). Numbering note: the phase
+  // doc planned 0058 "next after 0057" — written before the v3.2/R-03
+  // extension consumed 0055–0059; 0060 is the honest next slot.
+  "0060_import_toolkit",
 ];
 
 /**

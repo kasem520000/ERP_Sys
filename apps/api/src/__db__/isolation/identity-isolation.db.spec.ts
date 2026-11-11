@@ -2543,6 +2543,18 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // -- PHASE-040 data-onboarding fixtures (0060) --
+  await superuser.query(
+    `INSERT INTO import_mappings (id, tenant_id, name, direction, kind, column_map)
+     VALUES
+       ('44444440-0000-4000-8000-000000000001', $1, 'ISO map', 'IMPORT', 'COA',
+        '{"code":"Account Code","name":"Account Name"}'::jsonb),
+       ('44444440-0000-4000-8000-000000000002', $2, 'ISO map', 'IMPORT', 'COA',
+        '{"code":"Account Code","name":"Account Name"}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3017,6 +3029,8 @@ const OWN_ROW: Record<string, [string, string]> = {
   collection_referrals: ["41414139-0000-4000-8000-000000000001", "41414139-0000-4000-8000-000000000002"],
   supplier_return_authorizations: ["42424239-0000-4000-8000-000000000001", "42424239-0000-4000-8000-000000000002"],
   supplier_return_authorization_lines: ["43434339-0000-4000-8000-000000000001", "43434339-0000-4000-8000-000000000002"],
+  // PHASE-040 data-onboarding substrate (0060)
+  import_mappings: ["44444440-0000-4000-8000-000000000001", "44444440-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3758,6 +3772,9 @@ const MISMATCHED_INSERT: Record<string, string> = {
   supplier_return_authorization_lines: `INSERT INTO supplier_return_authorization_lines (id, tenant_id, srma_id, line_no, po_line_id, qty)
      VALUES ('43434339-3000-4000-8000-000000000003', $1, '42424239-0000-4000-8000-000000000002', 1,
              '5d5d5d5d-0000-4000-8000-000000000002', 2)`,
+  import_mappings: `INSERT INTO import_mappings (id, tenant_id, name, direction, kind, column_map)
+     VALUES ('44444440-3000-4000-8000-000000000003', $1, 'ISO attack', 'IMPORT', 'COA',
+             '{"code":"Account Code","name":"Account Name"}'::jsonb)`,
 };
 
 beforeAll(async () => {
