@@ -732,6 +732,20 @@ export function OnboardingWizard({
               )}
             </Card>
           )}
+          {/* PHASE-040 T-09: the activity-selection journey links to the import
+              hub — bring your COA/opening balances/assets/employees/price
+              lists/contracts from QuickBooks, Odoo, or Excel (the hub's own
+              plan/permission gates decide visibility on arrival). */}
+          <div className="rounded-md border border-subtle bg-surface-sunken px-3 py-2">
+            <p className="text-sm font-medium text-gray-800">{d.onboardingImportDataCta}</p>
+            <p className="text-xs text-gray-600">{d.onboardingImportDataHint}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <LinkButton href={`/${locale}/settings/imports`} variant="secondary">
+                {d.toolkitTitle}
+              </LinkButton>
+              <span className="text-xs text-gray-500">{d.onboardingDemoDataCta}</span>
+            </div>
+          </div>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <Button variant="primary" onClick={() => setStep(4)}>
               {d.onboardingContinueJourney}

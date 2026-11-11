@@ -1038,6 +1038,97 @@ export interface Dictionary {
   importStatusCommitted: string;
   importStatusFailed: string;
   importErrorFileInvalid: string;
+  // -- PHASE-040 (T-08): the /settings/imports toolkit hub -------------------
+  toolkitTitle: string;
+  toolkitSubtitle: string;
+  toolkitTabWizard: string;
+  toolkitTabJobs: string;
+  toolkitTabMappings: string;
+  toolkitTabAdapters: string;
+  toolkitStepKindTitle: string;
+  toolkitStepKindHint: string;
+  toolkitStepFileTitle: string;
+  toolkitFilePick: string;
+  toolkitUploadAndAnalyze: string;
+  toolkitAnalyzing: string;
+  toolkitKindFormats: string;
+  toolkitRequiredOption: string;
+  toolkitBudgetPick: string;
+  toolkitBudgetRequired: string;
+  toolkitGridKindNote: string;
+  toolkitPiiNote: string;
+  toolkitStepMapTitle: string;
+  toolkitStepMapHint: string;
+  toolkitColCanonical: string;
+  toolkitColHeader: string;
+  toolkitColRequired: string;
+  toolkitColOptional: string;
+  toolkitColType: string;
+  toolkitMapEmpty: string;
+  toolkitAutoDetected: string;
+  toolkitSampleTitle: string;
+  toolkitUnmappedHeaders: string;
+  toolkitSaveMappingName: string;
+  toolkitSaveMappingBtn: string;
+  toolkitMappingSaveToast: string;
+  toolkitStepReviewTitle: string;
+  toolkitRunDryRun: string;
+  toolkitDryRunRunning: string;
+  toolkitReportUnmapped: string;
+  toolkitCommitAckLabel: string;
+  toolkitCommitAckHint: string;
+  toolkitCommitBtn: string;
+  toolkitCommitting: string;
+  toolkitCommitFailed: string;
+  toolkitCommittedTitle: string;
+  toolkitCommittedSummary: string;
+  toolkitErrorExportBtn: string;
+  toolkitStartNew: string;
+  toolkitJobsTitle: string;
+  toolkitJobsEmpty: string;
+  toolkitJobsColFile: string;
+  toolkitJobsRefresh: string;
+  toolkitMappingsTitle: string;
+  toolkitMappingsEmpty: string;
+  toolkitMappingColName: string;
+  toolkitMappingColKind: string;
+  toolkitMappingColDirection: string;
+  toolkitMappingColUpdated: string;
+  toolkitMappingDirectionImport: string;
+  toolkitMappingDirectionExport: string;
+  toolkitMappingDeleteBtn: string;
+  toolkitMappingDeletedToast: string;
+  toolkitAdaptersTitle: string;
+  toolkitAdaptersHint: string;
+  toolkitAdapterColSource: string;
+  toolkitAdapterColTarget: string;
+  toolkitAdapterColFormat: string;
+  toolkitAdapterTemplateBtn: string;
+  toolkitAdapterEngineConsole: string;
+  toolkitAdapterRequiresVerification: string;
+  toolkitErrKindUnknown: string;
+  toolkitErrFileInvalid: string;
+  toolkitErrJobNotFound: string;
+  toolkitErrCommitConflict: string;
+  toolkitErrNotPreviewed: string;
+  toolkitErrOptionsMissing: string;
+  toolkitErrBudgetInvalid: string;
+  toolkitErrMappingInvalid: string;
+  toolkitErrDemoRefused: string;
+  // -- PHASE-040 (T-06/T-09): the one-click demo-data surface ----------------
+  demoDataTitle: string;
+  demoDataHint: string;
+  demoDataTemplateLabel: string;
+  demoDataSeedBtn: string;
+  demoDataSeeding: string;
+  demoDataSeededBadge: string;
+  demoDataSeededAt: string;
+  demoDataDoneTitle: string;
+  demoDataSummaryLine: string;
+  demoDataRefused: string;
+  onboardingImportDataCta: string;
+  onboardingImportDataHint: string;
+  onboardingDemoDataCta: string;
   exportTitle: string;
   exportHint: string;
   exportSubmit: string;
@@ -6416,6 +6507,97 @@ const ar: Dictionary = {
   importStatusCommitted: "مطبّقة",
   importStatusFailed: "فاشلة",
   importErrorFileInvalid: "ملف غير صالح — تأكد من الصيغة والحدود.",
+  // -- PHASE-040 (T-08): مركز استيراد البيانات والترحيل -----------------------
+  toolkitTitle: "استيراد البيانات والترحيل",
+  toolkitSubtitle: "ارفع ملفك، اربط الأعمدة، عاين بلا كتابة، ثم طبّق — من QuickBooks وOdoo أو ملف Excel عام.",
+  toolkitTabWizard: "معالج الاستيراد",
+  toolkitTabJobs: "سجل المهام",
+  toolkitTabMappings: "الخرائط المحفوظة",
+  toolkitTabAdapters: "محوّلات الترحيل",
+  toolkitStepKindTitle: "١. نوع البيانات",
+  toolkitStepKindHint: "اختر نوع البيانات الذي تريد استيراده — كل نوع له أعمدته المعيارية وقواعده.",
+  toolkitStepFileTitle: "٢. الملف",
+  toolkitFilePick: "اختر ملف CSV أو XLSX",
+  toolkitUploadAndAnalyze: "رفع الملف وتحليل الأعمدة",
+  toolkitAnalyzing: "جارٍ التحليل…",
+  toolkitKindFormats: "الصيغ المقبولة",
+  toolkitRequiredOption: "خيار مطلوب",
+  toolkitBudgetPick: "الموازنة المستهدفة (مسودة)",
+  toolkitBudgetRequired: "نوع شبكة الموازنة يتطلب اختيار موازنة مسودة أولاً.",
+  toolkitGridKindNote: "هذا النوع يستورد بشبكة الفترات القياسية (PHASE-028) — لا حاجة لربط الأعمدة.",
+  toolkitPiiNote: "يتضمن بيانات شخصية",
+  toolkitStepMapTitle: "٣. ربط الأعمدة",
+  toolkitStepMapHint: "طابق كل عمود معياري مع عمود الملف — الربط التلقائي يقترح، وأنت توافق أو تعدّل.",
+  toolkitColCanonical: "العمود المعياري",
+  toolkitColHeader: "عمود الملف",
+  toolkitColRequired: "مطلوب",
+  toolkitColOptional: "اختياري",
+  toolkitColType: "النوع",
+  toolkitMapEmpty: "لم يُربط أي عمود بعد.",
+  toolkitAutoDetected: "تم اقتراح الربط تلقائياً",
+  toolkitSampleTitle: "أول صفوف الملف (معاينة)",
+  toolkitUnmappedHeaders: "أعمدة لم تُربط",
+  toolkitSaveMappingName: "اسم الخريطة المحفوظة",
+  toolkitSaveMappingBtn: "حفظ الخريطة لإعادة استخدامها",
+  toolkitMappingSaveToast: "تم حفظ الخريطة.",
+  toolkitStepReviewTitle: "٤. المعاينة والتطبيق",
+  toolkitRunDryRun: "تشغيل المعاينة (بلا كتابة)",
+  toolkitDryRunRunning: "جارٍ فحص الصفوف…",
+  toolkitReportUnmapped: "أعمدة معيارية مطلوبة لم تُربط",
+  toolkitCommitAckLabel: "أقرّ بوجود صفوف مرفوضة/مكرّرة وأرغب في تطبيق الصفوف الصالحة فقط",
+  toolkitCommitAckHint: "التطبيق ذرّي: إمّا كل الصفوف الصالحة دفعة واحدة أو لا شيء (BR-066).",
+  toolkitCommitBtn: "تطبيق الاستيراد",
+  toolkitCommitting: "جارٍ التطبيق…",
+  toolkitCommitFailed: "فشل التطبيق — لم يُكتب أي صف (يمكن إعادة المحاولة).",
+  toolkitCommittedTitle: "تم الاستيراد",
+  toolkitCommittedSummary: "تم تطبيق {count} صف بنجاح.",
+  toolkitErrorExportBtn: "تنزيل تقرير الأخطاء (عربي/إنجليزي)",
+  toolkitStartNew: "استيراد جديد",
+  toolkitJobsTitle: "سجل مهام الاستيراد",
+  toolkitJobsEmpty: "لا توجد مهام بعد.",
+  toolkitJobsColFile: "الملف",
+  toolkitJobsRefresh: "تحديث",
+  toolkitMappingsTitle: "الخرائط المحفوظة",
+  toolkitMappingsEmpty: "لا توجد خرائط محفوظة بعد — أنشئ واحدة من خطوة ربط الأعمدة.",
+  toolkitMappingColName: "الاسم",
+  toolkitMappingColKind: "النوع",
+  toolkitMappingColDirection: "الاتجاه",
+  toolkitMappingColUpdated: "آخر تحديث",
+  toolkitMappingDirectionImport: "استيراد",
+  toolkitMappingDirectionExport: "تصدير",
+  toolkitMappingDeleteBtn: "حذف",
+  toolkitMappingDeletedToast: "تم حذف الخريطة.",
+  toolkitAdaptersTitle: "محوّلات الترحيل من أنظمة أخرى",
+  toolkitAdaptersHint: "حمّل قالب CSV المطابق لنظامك، صدّر بياناتك به، ثم استورده عبر المعالج — الربط موثّق لكل عمود.",
+  toolkitAdapterColSource: "النظام المصدر",
+  toolkitAdapterColTarget: "النوع المستهدف",
+  toolkitAdapterColFormat: "الصيغة",
+  toolkitAdapterTemplateBtn: "تنزيل القالب",
+  toolkitAdapterEngineConsole: "يُستورد عبر لوحة المخزون الأساسية",
+  toolkitAdapterRequiresVerification: "يتطلب تحققاً",
+  toolkitErrKindUnknown: "نوع استيراد غير معروف.",
+  toolkitErrFileInvalid: "ملف غير صالح — تأكد من الصيغة وحدود الحجم.",
+  toolkitErrJobNotFound: "مهمة الاستيراد غير موجودة.",
+  toolkitErrCommitConflict: "المهمة قيد التطبيق بالفعل.",
+  toolkitErrNotPreviewed: "لا توجد صفوف معاينة لتطبيقها.",
+  toolkitErrOptionsMissing: "خيار مطلوب غير مكتمل.",
+  toolkitErrBudgetInvalid: "الموازنة غير صالحة للاستيراد (مسودات فقط).",
+  toolkitErrMappingInvalid: "خريطة أعمدة غير صالحة.",
+  toolkitErrDemoRefused: "لا يمكن بذر بيانات تجريبية — هذا المستأجر يحمل مستندات فعلية مرحّلة.",
+  // -- PHASE-040 (T-06/T-09): بيانات تجريبية بضغطة واحدة --------------------
+  demoDataTitle: "ابدأ ببيانات تجريبية واقعية",
+  demoDataHint: "اضغطة واحدة تبذر شركاء وأصناف وفواتير مرحّلة وقيوداً محاسبية كاملة لقطاعك — مناسبة للتجربة والعرض.",
+  demoDataTemplateLabel: "القالب القطاعي",
+  demoDataSeedBtn: "بذر البيانات التجريبية",
+  demoDataSeeding: "جارٍ البذر…",
+  demoDataSeededBadge: "مبذورة",
+  demoDataSeededAt: "بُذرت في",
+  demoDataDoneTitle: "تم بذر البيانات التجريبية",
+  demoDataSummaryLine: "شركاء: {partners} · أصناف: {items} · فواتير: {invoices} · سندات قبض: {receipts} — كلها عبر محرك الترحيل.",
+  demoDataRefused: "تعذّر البذر — قد يكون هناك مستندات فعلية أو بذرة سابقة بقالب آخر.",
+  onboardingImportDataCta: "استورد بياناتك من نظامك السابق",
+  onboardingImportDataHint: "دليل الحسابات، الأرصدة الافتتاحية، الأصول، الموظفون، قوائم الأسعار، العقود — من QuickBooks أو Odoo أو Excel.",
+  onboardingDemoDataCta: "أو ابدأ ببيانات تجريبية جاهزة",
   exportTitle: "تصدير",
   exportHint: "تصدير فوري بحد 10000 صف — يصدر رابط تنزيل مؤقت.",
   exportSubmit: "تصدير",
@@ -11821,6 +12003,97 @@ const en: Dictionary = {
   importStatusCommitted: "Committed",
   importStatusFailed: "Failed",
   importErrorFileInvalid: "Invalid file — check the format and the bounds.",
+  // -- PHASE-040 (T-08): the data import & migration hub ---------------------
+  toolkitTitle: "Data import & migration",
+  toolkitSubtitle: "Upload your file, map the columns, preview with zero writes, then apply — from QuickBooks, Odoo, or a plain Excel file.",
+  toolkitTabWizard: "Import wizard",
+  toolkitTabJobs: "Jobs history",
+  toolkitTabMappings: "Saved mappings",
+  toolkitTabAdapters: "Migration adapters",
+  toolkitStepKindTitle: "1. Data kind",
+  toolkitStepKindHint: "Pick what you are bringing in — every kind has its canonical columns and rules.",
+  toolkitStepFileTitle: "2. The file",
+  toolkitFilePick: "Choose a CSV or XLSX file",
+  toolkitUploadAndAnalyze: "Upload & analyze columns",
+  toolkitAnalyzing: "Analyzing…",
+  toolkitKindFormats: "Accepted formats",
+  toolkitRequiredOption: "Required option",
+  toolkitBudgetPick: "Target budget (draft)",
+  toolkitBudgetRequired: "The budget grid kind needs a DRAFT budget selected first.",
+  toolkitGridKindNote: "This kind rides the standard period grid (PHASE-028) — no column mapping needed.",
+  toolkitPiiNote: "Contains personal data",
+  toolkitStepMapTitle: "3. Column mapping",
+  toolkitStepMapHint: "Match every canonical column to a file column — auto-detect proposes, you approve or adjust.",
+  toolkitColCanonical: "Canonical column",
+  toolkitColHeader: "File column",
+  toolkitColRequired: "Required",
+  toolkitColOptional: "Optional",
+  toolkitColType: "Type",
+  toolkitMapEmpty: "No columns mapped yet.",
+  toolkitAutoDetected: "Auto-detected mapping",
+  toolkitSampleTitle: "First rows of the file (preview)",
+  toolkitUnmappedHeaders: "Unmapped file columns",
+  toolkitSaveMappingName: "Saved-mapping name",
+  toolkitSaveMappingBtn: "Save this mapping for reuse",
+  toolkitMappingSaveToast: "Mapping saved.",
+  toolkitStepReviewTitle: "4. Preview & apply",
+  toolkitRunDryRun: "Run the dry-run (zero writes)",
+  toolkitDryRunRunning: "Validating rows…",
+  toolkitReportUnmapped: "Required canonical columns left unmapped",
+  toolkitCommitAckLabel: "I acknowledge invalid/duplicate rows and want to apply the valid ones only",
+  toolkitCommitAckHint: "The apply is atomic: all valid rows in one shot or nothing at all (BR-066).",
+  toolkitCommitBtn: "Apply import",
+  toolkitCommitting: "Applying…",
+  toolkitCommitFailed: "The apply failed — zero rows written (you can retry).",
+  toolkitCommittedTitle: "Import applied",
+  toolkitCommittedSummary: "{count} rows applied successfully.",
+  toolkitErrorExportBtn: "Download the error report (AR/EN)",
+  toolkitStartNew: "New import",
+  toolkitJobsTitle: "Import jobs history",
+  toolkitJobsEmpty: "No jobs yet.",
+  toolkitJobsColFile: "File",
+  toolkitJobsRefresh: "Refresh",
+  toolkitMappingsTitle: "Saved mappings",
+  toolkitMappingsEmpty: "No saved mappings yet — create one from the column-mapping step.",
+  toolkitMappingColName: "Name",
+  toolkitMappingColKind: "Kind",
+  toolkitMappingColDirection: "Direction",
+  toolkitMappingColUpdated: "Last updated",
+  toolkitMappingDirectionImport: "Import",
+  toolkitMappingDirectionExport: "Export",
+  toolkitMappingDeleteBtn: "Delete",
+  toolkitMappingDeletedToast: "Mapping deleted.",
+  toolkitAdaptersTitle: "Migration adapters from other systems",
+  toolkitAdaptersHint: "Download the CSV template matching your system, export your data into it, then import through the wizard — every column mapping is documented.",
+  toolkitAdapterColSource: "Source system",
+  toolkitAdapterColTarget: "Target kind",
+  toolkitAdapterColFormat: "Format",
+  toolkitAdapterTemplateBtn: "Download template",
+  toolkitAdapterEngineConsole: "Imports through the baseline inventory console",
+  toolkitAdapterRequiresVerification: "Requires verification",
+  toolkitErrKindUnknown: "Unknown import kind.",
+  toolkitErrFileInvalid: "Invalid file — check the format and size bounds.",
+  toolkitErrJobNotFound: "The import job does not exist.",
+  toolkitErrCommitConflict: "The job is already committing.",
+  toolkitErrNotPreviewed: "No previewed rows to apply.",
+  toolkitErrOptionsMissing: "A required option is missing.",
+  toolkitErrBudgetInvalid: "The budget is not importable (drafts only).",
+  toolkitErrMappingInvalid: "Invalid column mapping.",
+  toolkitErrDemoRefused: "Demo seeding refused — this tenant carries posted real documents.",
+  // -- PHASE-040 (T-06/T-09): the one-click demo data -----------------------
+  demoDataTitle: "Start with realistic demo data",
+  demoDataHint: "One click seeds partners, items, posted invoices, receipts, and full GL journals for your industry — ideal for trials and demos.",
+  demoDataTemplateLabel: "Industry template",
+  demoDataSeedBtn: "Seed demo data",
+  demoDataSeeding: "Seeding…",
+  demoDataSeededBadge: "Seeded",
+  demoDataSeededAt: "Seeded at",
+  demoDataDoneTitle: "Demo data seeded",
+  demoDataSummaryLine: "Partners: {partners} · Items: {items} · Invoices: {invoices} · Receipts: {receipts} — all through the posting engine.",
+  demoDataRefused: "Seeding refused — there may be posted real documents, or a prior seed with another template.",
+  onboardingImportDataCta: "Import your data from your previous system",
+  onboardingImportDataHint: "Chart of accounts, opening balances, assets, employees, price lists, contracts — from QuickBooks, Odoo, or Excel.",
+  onboardingDemoDataCta: "Or start with ready-made demo data",
   exportTitle: "Export",
   exportHint: "Immediate export up to 10,000 rows — returns a temporary download link.",
   exportSubmit: "Export",

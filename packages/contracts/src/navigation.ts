@@ -406,6 +406,25 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 75,
   },
+  // PHASE-040 T-08 (§2.8): the data import & migration hub — the seven-kind
+  // toolkit wizard (COA, opening balances, fixed assets, employees, price
+  // lists, contracts, budget grids), saved mappings, and the IN-26
+  // QuickBooks/Odoo/Excel-generic adapter templates. The plan gate is
+  // migration 0060 §8's platform.data_migration grant (business +
+  // enterprise — the 0051 tier-4 precedent); the permission is the seeded
+  // configuration.imports.manage (matrix §3.18).
+  {
+    id: "settings.imports",
+    parentGroup: "settings",
+    label: { ar: "استيراد البيانات والترحيل", en: "Data import & migration" },
+    icon: "file-up",
+    route: "/settings/imports",
+    featureKey: "platform.data_migration",
+    permission: "configuration.imports.manage",
+    branchScoped: false,
+    archetype: "wizard",
+    order: 80,
+  },
   // partners group — PHASE-006 master data (T11): partner directory + the
   // opening-balance DRAFT capture console. Feature keys are the exact
   // FEATURE_CATALOG strings; permissions the exact seeded matrix keys.

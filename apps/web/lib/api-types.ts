@@ -621,6 +621,121 @@ export interface ExportJobResult {
   format: string;
 }
 
+// -- PHASE-040 (import toolkit): the /settings/imports hub wire shapes ----------
+
+/** GET /imports/kinds → data[] — the bilingual kind catalog. */
+export interface ToolkitKindInfo {
+  kind: string;
+  label: { en: string; ar: string };
+  description: { en: string; ar: string };
+  formats: readonly string[];
+  requiredOptions: readonly string[];
+  gridFormat: boolean;
+  columns: readonly {
+    name: string;
+    label: { en: string; ar: string };
+    required: boolean;
+    type: string;
+    enumValues: readonly string[];
+    pii: boolean;
+  }[];
+}
+
+/** The toolkit job row — kind is the WIDENED enum (7 kinds + baseline 3). */
+export interface ToolkitJobRow {
+  id: string;
+  kind: string;
+  format: ImportJobFormat;
+  uploadToken: string;
+  fileKey: string;
+  fileName: string | null;
+  status: ImportJobStatus;
+  totalRows: number;
+  validRows: number;
+  invalidRows: number;
+  duplicateRows: number;
+  committedRows: number;
+  report: unknown;
+  error: string | null;
+  committedAt: string | null;
+  createdBy: string | null;
+}
+
+/** POST /imports/preview-headers → data (read-only: headers + sample rows). */
+export interface ToolkitHeadersPreview {
+  headers: readonly string[];
+  sample: readonly (readonly string[])[];
+  mapping: Record<string, string>;
+}
+
+/** GET /imports/mappings → data[] — the saved-mapping rows (both directions). */
+export interface ToolkitMappingRow {
+  id: string;
+  name: string;
+  direction: "IMPORT" | "EXPORT";
+  kind: string;
+  entity: string | null;
+  columnMap: Record<string, unknown>;
+  options: Record<string, unknown> | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET /imports/adapters → data[] — the migration-adapter registry (IN-26). */
+export interface ToolkitAdapterInfo {
+  key: string;
+  source: "QUICKBOOKS" | "ODOO" | "EXCEL_GENERIC";
+  label: { en: string; ar: string };
+  targetKind: string;
+  engine: "toolkit" | "baseline-console";
+  format: "CSV" | "XLSX";
+  columns: readonly {
+    source: string;
+    canonical: string | null;
+    required: boolean;
+    requiresVerification?: boolean;
+  }[];
+}
+
+/** GET /imports/adapters/:key/template → data (the artifact download URL). */
+export interface ToolkitAdapterTemplate {
+  key: string;
+  url: string;
+}
+
+/** GET /onboarding/demo-data/status → data (13-template catalog + markers). */
+export interface DemoDataStatus {
+  tenant: { demoSeededAt: string | null; demoTemplate: string | null };
+  templates: readonly {
+    key: string;
+    name: string;
+    nameAr: string | null;
+    seeded: boolean;
+  }[];
+}
+
+/** POST /onboarding/demo-data → data (the one-click seed summary). */
+export interface DemoSeedSummary {
+  templateKey: string;
+  created: {
+    partners: number;
+    items: number;
+    invoices: number;
+    receipts: number;
+    priceLists: number;
+    warehouses: number;
+    cashAccounts: number;
+  };
+  skipped: { reason: string } | null;
+}
+
+/** POST /imports/jobs/:id/error-report → data (the bilingual CSV artifact). */
+export interface ToolkitErrorReport {
+  url: string;
+}
+
 /** POST partners|items attachment issuance → data (direct-upload slot). */
 export interface AttachmentIssuedUpload {
   attachmentId: string;
@@ -5438,7 +5553,9 @@ export interface DunningSweepResult {
 }
 
 /** POST sales/dunning/charge-fee → the fee invoice stamp (one fee per invoice). */
-export interface LateFeeChargeResult {
+// (PHASE-040 drive-by lint repair: this PHASE-039 shape shadowed the
+// installments LateFeeChargeResult above — renamed; no consumer imported it.)
+export interface DunningLateFeeChargeResult {
   letterId: string;
   stepNo: number;
   feeAmount: string;

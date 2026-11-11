@@ -2441,3 +2441,38 @@ export function customFieldValueLabel(
   }
   return String(view.value);
 }
+
+/**
+ * PHASE-040 (T-08): the onboarding/import-toolkit error vocabulary — the
+ * ONBOARDING_* domain codes (import jobs, mappings, budget-grid shape, the
+ * demo-seed guardrails). Falls back to the generic mapper.
+ */
+export function localizedOnboardingError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "ONBOARDING_IMPORT_KIND_UNKNOWN":
+      return d.toolkitErrKindUnknown;
+    case "ONBOARDING_IMPORT_FILE_INVALID":
+      return d.toolkitErrFileInvalid;
+    case "ONBOARDING_IMPORT_JOB_NOT_FOUND":
+      return d.toolkitErrJobNotFound;
+    case "ONBOARDING_IMPORT_COMMIT_CONFLICT":
+      return d.toolkitErrCommitConflict;
+    case "ONBOARDING_IMPORT_NOT_PREVIEWED":
+      return d.toolkitErrNotPreviewed;
+    case "ONBOARDING_IMPORT_OPTIONS_MISSING":
+      return d.toolkitErrOptionsMissing;
+    case "ONBOARDING_IMPORT_BUDGET_INVALID":
+      return d.toolkitErrBudgetInvalid;
+    case "ONBOARDING_IMPORT_MAPPING_INVALID":
+    case "ONBOARDING_IMPORT_MAPPING_NOT_FOUND":
+      return d.toolkitErrMappingInvalid;
+    case "ONBOARDING_DEMO_SEED_REFUSED":
+      return d.toolkitErrDemoRefused;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}

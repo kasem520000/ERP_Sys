@@ -87,6 +87,7 @@ import {
   WalletCards,
   X,
   Layers,
+  FileUp,
 } from "lucide-react";
 
 import { cn } from "./cn";
@@ -198,6 +199,10 @@ export const ICON_REGISTRY = {
   "warning": TriangleAlert,
   "circle-check": CircleCheck,
   "book-check": BookCheck,
+  // PHASE-040 T-08 (one-line registry review entry): the imports-hub nav
+  // icon — a document with an up arrow; non-directional (an upload action,
+  // not a movement toward start/end).
+  "file-up": FileUp,
   "hourglass": Hourglass,
   "cloud-off": CloudOff,
   "pencil": Pencil,
