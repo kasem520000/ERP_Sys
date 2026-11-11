@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 
 import { AuditService } from "../../audit/api/audit";
 import { FiscalYearNotFoundError } from "../../accounting/domain/accounting-errors";
@@ -31,7 +31,10 @@ export interface BudgetSummaryRow extends BudgetRow {
 
 @Injectable()
 export class BudgetVersionService {
-  constructor(private readonly audit: AuditService) {}
+  // PHASE-040 T-10: explicit @Inject (the JobCardService precedent — no
+  // design:paramtypes under vitest/esbuild; container-resolved instances
+  // would get audit === undefined).
+  constructor(@Inject(AuditService) private readonly audit: AuditService) {}
 
   /** Create a DRAFT version (multiple drafts may coexist with an ACTIVE —
    * revisions start as DRAFT; activation is the exclusive gate). */

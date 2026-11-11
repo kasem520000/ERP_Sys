@@ -884,6 +884,10 @@ export const importJobs = pgTable(
     // (SET NULL when the mapping is removed) + per-job run options (e.g.
     // the target budgetId for the BUDGETS kind).
     mappingId: uuid("mapping_id"),
+    // PHASE-040 (migration 0062): the EFFECTIVE mapping snapshot stamped
+    // at preview time (BR-066 — the worker re-validates against exactly
+    // what the preview promised, immune to later mapping edits).
+    mapping: jsonb("mapping"),
     options: jsonb("options"),
   },
   (table) => [

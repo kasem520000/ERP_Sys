@@ -37,7 +37,10 @@ interface OpeningDocRow {
 export class OpeningBalancesPostingService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
+    // PHASE-040 T-10: explicit @Inject (the JobCardService precedent — the
+    // vitest/esbuild pipeline does not emit design:paramtypes, so a
+    // container-resolved instance would get posting === undefined).
+    @Inject(PostingService) private readonly posting: PostingService,
   ) {}
 
   async listDrafts(kind?: string): Promise<OpeningDocRow[]> {
@@ -129,7 +132,11 @@ export class OpeningBalancesPostingService {
       else credit = addExact(credit, line.amount);
     }
     const difference = subExact(debit, credit);
-    if (difference !== "0") {
+    // PHASE-040 T-10 spec catch: a PERFECTLY balanced doc set renders the
+    // residual as "0.0000" (fromMinor always carries 4dp) — the old bare
+    // `!== "0"` guard pushed a zero OPENING_EQUITY leg and the posting
+    // engine refused it (INVALID_AMOUNT). Skip the leg on any zero render.
+    if (difference !== "0" && difference !== "0.0000") {
       lines.push({
         purpose: "OPENING_EQUITY",
         direction: Number(difference) > 0 ? "CREDIT" : "DEBIT",

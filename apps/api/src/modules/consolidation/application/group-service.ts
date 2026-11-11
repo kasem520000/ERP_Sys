@@ -1,4 +1,4 @@
-import { platformTenantKindOf } from "../../tenancy/infrastructure/tenancy.store";
+import { tenantKindOf } from "../../tenancy/infrastructure/tenancy.store";
 import { SandboxConsolidationMemberError } from "../../onboarding/domain/onboarding-errors";
 import { Inject, Injectable } from "@nestjs/common";
 
@@ -134,8 +134,10 @@ export class GroupService {
     }
     // PHASE-040 (OA-05): a SANDBOX tenant is NEVER a consolidation member —
     // demo data must never flow into consolidated statements (typed
-    // refusal; the platform-plane kind read rides withPlatformScope).
-    const memberKind = await platformTenantKindOf(input.memberTenantId);
+    // refusal; the kind read rides the erp.tenant_kind definer probe —
+    // migration 0063 — a cross-tenant read the tenants RLS policy
+    // otherwise hides from the parent's scope).
+    const memberKind = await tenantKindOf(input.memberTenantId);
     if (memberKind === "SANDBOX") {
       throw new SandboxConsolidationMemberError(input.memberTenantId);
     }

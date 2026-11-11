@@ -323,6 +323,18 @@ export const MIGRATIONS: readonly string[] = [
   // sandbox expiry from the projection they already read (the SUSPENDED
   // precedent). Zero tables; one definer function widened additively.
   "0061_sandbox_enforcement",
+  // PHASE-040 (BR-066, the T-10 spec catch): 0062_import_jobs_mapping —
+  // the import_jobs mapping snapshot column. The worker's re-validation
+  // uses EXACTLY the mapping the preview promised (an explicit wizard map
+  // without a saved row was lost; an edited saved mapping silently
+  // diverged from the preview). Additive column only.
+  "0062_import_jobs_mapping",
+  // PHASE-040 (OA-05, the T-10/T-11 spec catch): 0063_tenant_kind_reader —
+  // the erp.tenant_kind SECURITY DEFINER probe (one column, no joins):
+  // the consolidation group service reads the MEMBER tenant's kind from
+  // the PARENT's tenant scope (the definer-reader precedent — the tenants
+  // RLS policy correctly hides cross-tenant rows otherwise).
+  "0063_tenant_kind_reader",
 ];
 
 /**

@@ -153,7 +153,12 @@ export async function deleteImportMapping(id: string): Promise<boolean> {
 
 export async function stampImportJobExtras(
   jobId: string,
-  extras: { mappingId: string | null; options: Record<string, unknown> },
+  extras: {
+    mappingId: string | null;
+    options: Record<string, unknown>;
+    /** PHASE-040 (migration 0062): the effective-mapping snapshot. */
+    mapping?: Record<string, string> | null;
+  },
 ): Promise<void> {
   const tx = tenantTx();
   await tx
@@ -161,6 +166,7 @@ export async function stampImportJobExtras(
     .set({
       mappingId: extras.mappingId,
       options: extras.options,
+      ...(extras.mapping !== undefined ? { mapping: extras.mapping } : {}),
       updatedAt: sql`now()`,
     })
     .where(eq(schema.importJobs.id, jobId));
@@ -168,6 +174,8 @@ export async function stampImportJobExtras(
 
 export interface ImportJobExtras {
   mappingId: string | null;
+  /** The preview-time snapshot (migration 0062); pre-0062 rows fall back
+   *  to re-resolving the saved mapping by mappingId. */
   mapping: Record<string, string> | null;
   options: Record<string, unknown>;
 }
@@ -175,7 +183,13 @@ export interface ImportJobExtras {
 export async function findImportJobExtras(jobId: string): Promise<ImportJobExtras | undefined> {
   const tx = tenantTx();
   const jobRows = await tx
-    .select({ mappingId: schema.importJobs.mappingId, options: schema.importJobs.options })
+    .select({
+      mappingId: schema.importJobs.mappingId,
+      options: schema.importJobs.options,
+      // PHASE-040 (migration 0062): the preview-time snapshot — preferred
+      // over re-resolving the saved mapping (BR-066 re-validation honesty).
+      mappingSnapshot: schema.importJobs.mapping,
+    })
     .from(schema.importJobs)
     .where(eq(schema.importJobs.id, jobId))
     .limit(1);
@@ -183,8 +197,10 @@ export async function findImportJobExtras(jobId: string): Promise<ImportJobExtra
   if (row === undefined) {
     return undefined;
   }
-  let mapping: Record<string, string> | null = null;
-  if (row.mappingId !== null) {
+  let mapping =
+    (row.mappingSnapshot as Record<string, string> | null) ?? null;
+  if (mapping === null && row.mappingId !== null) {
+    // Pre-0062 rows: re-resolve the saved mapping the way they always did.
     const saved = await findImportMappingById(row.mappingId);
     if (saved !== undefined && saved.direction === "IMPORT") {
       mapping = saved.columnMap as Record<string, string>;

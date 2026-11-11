@@ -525,7 +525,7 @@ export async function countUsersAndOpenInvitations(tenantId: string): Promise<nu
       (SELECT count(*) FROM memberships WHERE tenant_id = ${tenantId} AND status = 'ACTIVE')
       + (SELECT count(*) FROM invitations
           WHERE tenant_id = ${tenantId}
-            AND revoked_at IS NULL
+            AND status = 'PENDING'
             AND accepted_at IS NULL
             AND expires_at > now())::int AS usage
   `);

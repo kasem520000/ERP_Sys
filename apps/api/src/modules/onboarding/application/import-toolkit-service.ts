@@ -251,6 +251,10 @@ export class ImportToolkitService implements OnModuleInit {
     await store.stampImportJobExtras(job.id, {
       mappingId: input.mappingId ?? null,
       options,
+      // PHASE-040 (migration 0062): snapshot the EFFECTIVE mapping — the
+      // worker's re-validation uses exactly what this preview promised
+      // (BR-066), immune to later edits of the saved mapping row.
+      mapping,
     });
     const tenantId = requireTenantContext().tenantId;
     try {
@@ -711,7 +715,13 @@ export class ImportToolkitService implements OnModuleInit {
           await this.coa.create(actorId, {
             code: row.values["code"] ?? "",
             name: row.values["name"] ?? "",
-            nameAr: row.values["name_ar"] === "" ? null : (row.values["name_ar"] ?? null),
+            // The DB column is NOT NULL — an absent Arabic name falls back
+            // to the English one (the tolerant import: a missing optional
+            // translation never aborts a 5,000-row file; the T-10 spec
+            // catch — a null here crashed the whole commit).
+            nameAr: row.values["name_ar"] === "" || row.values["name_ar"] === undefined
+              ? (row.values["name"] ?? "")
+              : row.values["name_ar"]!,
             type: normalizeAccountType(row.values["type"] ?? "") ?? "ASSET",
             parentId: parent?.id ?? null,
             currencyCode: row.values["currency"] === "" ? null : (row.values["currency"] ?? null),

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 
 import { AuditService } from "../../audit/api/audit";
 import { AccountNotFoundError, ProjectNotFoundError } from "../../accounting/domain/accounting-errors";
@@ -74,8 +74,10 @@ export interface BudgetGrid {
 @Injectable()
 export class BudgetGridService {
   constructor(
-    private readonly audit: AuditService,
-    private readonly consumptionService: ConsumptionService,
+    // PHASE-040 T-10: explicit @Inject on both (the JobCardService
+    // precedent — no design:paramtypes under vitest/esbuild).
+    @Inject(AuditService) private readonly audit: AuditService,
+    @Inject(ConsumptionService) private readonly consumptionService: ConsumptionService,
   ) {}
 
   /** The DRAFT-only bulk replace (the workspace save + import commit path). */

@@ -427,6 +427,20 @@
       "when": 1795604800000,
       "tag": "0061_sandbox_enforcement",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1795691200000,
+      "tag": "0062_import_jobs_mapping",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1795777600000,
+      "tag": "0063_tenant_kind_reader",
+      "breakpoints": true
     }
   ],
   "version": "7"

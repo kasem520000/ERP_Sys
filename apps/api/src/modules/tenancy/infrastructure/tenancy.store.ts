@@ -397,10 +397,17 @@ export interface InsertBranchInput {
   address: unknown;
 }
 
-/** PHASE-040 (OA-05): the member tenant's kind, platform-plane read. */
-export async function platformTenantKindOf(tenantId: string): Promise<string | undefined> {
-  const tx = platformTx();
-  const rows = await tx.execute(sql`SELECT kind FROM tenants WHERE id = ${tenantId}`);
+/**
+ * PHASE-040 (OA-05, migration 0063): the member tenant's kind via the
+ * erp.tenant_kind SECURITY DEFINER probe — the cross-tenant read the
+ * consolidation group service needs from the PARENT's tenant scope (the
+ * tenants RLS policy correctly hides other tenants' rows; the definer
+ * surfaces exactly one column, the consolidation_read_member_gl
+ * precedent).
+ */
+export async function tenantKindOf(tenantId: string): Promise<string | undefined> {
+  const tx = tenantTx();
+  const rows = await tx.execute(sql`SELECT erp.tenant_kind(${tenantId}) AS kind`);
   return (rows.rows as unknown as { kind: string }[])[0]?.kind;
 }
 

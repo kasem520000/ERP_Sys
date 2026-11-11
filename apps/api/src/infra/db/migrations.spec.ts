@@ -139,8 +139,10 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // (data_migration business+enterprise, demo_data all plans). Zero
     // new journal rules — the toolkit posts through existing engines.
     // PHASE-040 (OA-05): 0061 — the SANDBOX enforcement widening (zero
-    // tables; the projection consumers: login + the interceptor).
-    expect(files.at(-1)?.tag).toBe("0061_sandbox_enforcement");
+    // tables; the projection consumers: login + the interceptor), then
+    // 0062 (BR-066) — the import_jobs mapping snapshot column (the T-10
+    // spec catch: the worker re-validates against the preview's map).
+    expect(files.at(-1)?.tag).toBe("0063_tenant_kind_reader");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {
