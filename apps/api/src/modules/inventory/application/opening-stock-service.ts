@@ -29,7 +29,11 @@ import { applyReceipt, planReceipt, resolveInventoryAccount } from "./movement-c
 export class OpeningStockService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
+    // PHASE-040: explicit @Inject — the vitest/esbuild pipeline does not
+    // emit design:paramtypes (the JobCardService silent-undefined
+    // precedent); the onboarding module's demo loader is the first
+    // AppModule-constructed consumer of this service.
+    @Inject(PostingService) private readonly posting: PostingService,
   ) {}
 
   async listDrafts() {

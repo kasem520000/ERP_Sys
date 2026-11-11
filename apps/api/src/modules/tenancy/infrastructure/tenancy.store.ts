@@ -186,11 +186,18 @@ export interface TenantProfileRow {
   createdAt: string;
   updatedAt: string;
   version: number;
+  /** PHASE-040 (migration 0060): the SANDBOX plane + demo-seed markers. */
+  kind: string;
+  demoSeededAt: string | null;
+  demoTemplate: string | null;
+  sandboxExpiresAt: string | null;
 }
 
 const TENANT_COLUMNS = sql`id, name, name_ar AS "nameAr", status, base_currency AS "baseCurrency",
   country_code AS "countryCode", timezone, industry_template_key AS "industryTemplateKey",
-  deleted_at AS "deletedAt", created_at AS "createdAt", updated_at AS "updatedAt", version`;
+  deleted_at AS "deletedAt", created_at AS "createdAt", updated_at AS "updatedAt", version,
+  kind, demo_seeded_at AS "demoSeededAt", demo_template AS "demoTemplate",
+  sandbox_expires_at AS "sandboxExpiresAt"`;
 
 /** Cross-tenant list/search under the platform GUC (keyset on created_at/id). */
 export async function platformListTenants(input: {
@@ -345,6 +352,19 @@ export interface InsertBranchInput {
   name: string;
   nameAr: string | null;
   address: unknown;
+}
+
+/**
+ * PHASE-040 (TB-19/20): the demo-seed markers — idempotency + the status
+ * surface. Runs on the AMBIENT tenant scope (the demo loader's UoW).
+ */
+export async function stampDemoSeed(templateKey: string, seedHash: string): Promise<void> {
+  const tx = tenantTx();
+  await tx.execute(sql`
+    UPDATE tenants SET demo_seeded_at = now(), demo_template = ${templateKey},
+      demo_seed_hash = ${seedHash}, updated_at = now(), version = version + 1
+    WHERE id = erp.current_tenant_id()
+  `);
 }
 
 export async function insertBranch(input: InsertBranchInput): Promise<BranchRow> {

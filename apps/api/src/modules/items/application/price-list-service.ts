@@ -56,7 +56,8 @@ export interface PriceResolution {
 export class PriceListService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly uoms: UomService,
+    // PHASE-040: explicit @Inject (the JobCardService precedent — the
+    @Inject(UomService) private readonly uoms: UomService,
   ) {}
 
   // -- list CRUD --------------------------------------------------------------

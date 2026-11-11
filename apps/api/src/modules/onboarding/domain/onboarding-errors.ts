@@ -108,3 +108,10 @@ export class ImportPreviewStaleError extends DomainError {
     );
   }
 }
+
+/** Demo-data guardrails (§2.5): typed refusals, never silent skips. */
+export class DemoSeedRefusedError extends DomainError {
+  constructor(message: string) {
+    super("ONBOARDING_DEMO_SEED_REFUSED", message);
+  }
+}

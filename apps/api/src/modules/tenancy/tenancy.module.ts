@@ -78,6 +78,10 @@ import {
     SupportAccessService,
     SubscriptionService,
     UsageService,
+    // PHASE-040: the demo-data loader reuses the workspace provisioning +
+    // branch creation (idempotent, the onboarding diff contract).
+    OnboardingService,
+    BranchService,
   ],
 })
 export class TenancyModule implements OnModuleInit {

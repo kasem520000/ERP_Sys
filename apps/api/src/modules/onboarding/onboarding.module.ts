@@ -10,9 +10,17 @@ import { PayrollModule } from "../payroll/payroll.module";
 import { ItemsModule } from "../items/items.module";
 import { CrmModule } from "../crm/crm.module";
 import { BudgetingModule } from "../budgeting/budgeting.module";
+import { TenancyModule } from "../tenancy/tenancy.module";
+import { ConfigurationModule } from "../configuration/configuration.module";
+import { InventoryModule } from "../inventory/inventory.module";
+import { TreasuryModule } from "../treasury/treasury.module";
+import { SalesModule } from "../sales/sales.module";
+import { TaxModule } from "../tax/tax.module";
 import { ImportToolkitService } from "./application/import-toolkit-service";
 import { MappingsService } from "./application/mappings-service";
+import { DemoDataService } from "./application/demo-data-service";
 import { ImportsController } from "./presentation/imports.controller";
+import { DemoDataController } from "./presentation/demo-data.controller";
 
 /**
  * PHASE-040 data onboarding & migration toolkit (§2): the seven-kind import
@@ -22,11 +30,13 @@ import { ImportsController } from "./presentation/imports.controller";
  * the migration adapters (T-05), the demo-data loader (T-06) and sandbox
  * provisioning (T-07 — the platform-plane route lands with that task).
  *
- * The engine applies every row through the REAL module services (CoaService,
+ * The engines apply every row through the REAL module services (CoaService,
  * the partners opening engine, AssetService, EmployeeService,
- * PriceListService, ContractService, the PHASE-028 budgeting import) — no
- * raw inserts, no journal bypass — which is why this module imports (and
- * consumes exports of) the owning modules.
+ * PriceListService, ContractService, the PHASE-028 budgeting import; the
+ * demo loader rides the workspace provisioning, the apply engine, the
+ * posting engine, the sales/receipt lifecycles) — no raw inserts, no
+ * journal bypass — which is why this module imports (and consumes exports
+ * of) the owning modules.
  */
 @Module({
   imports: [
@@ -40,9 +50,15 @@ import { ImportsController } from "./presentation/imports.controller";
     ItemsModule,
     CrmModule,
     BudgetingModule,
+    TenancyModule,
+    ConfigurationModule,
+    InventoryModule,
+    TreasuryModule,
+    SalesModule,
+    TaxModule,
   ],
-  controllers: [ImportsController],
-  providers: [ImportToolkitService, MappingsService],
-  exports: [ImportToolkitService, MappingsService],
+  controllers: [ImportsController, DemoDataController],
+  providers: [ImportToolkitService, MappingsService, DemoDataService],
+  exports: [ImportToolkitService, MappingsService, DemoDataService],
 })
 export class OnboardingModule {}

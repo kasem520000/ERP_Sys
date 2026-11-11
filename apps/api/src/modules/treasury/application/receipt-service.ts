@@ -18,7 +18,8 @@ import { SettlementCore } from "./fx-settlement";
 export class ReceiptService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly settlement: SettlementCore,
+    // PHASE-040: explicit @Inject (the JobCardService precedent — see
+    @Inject(SettlementCore) private readonly settlement: SettlementCore,
   ) {}
 
   async list(filter: {

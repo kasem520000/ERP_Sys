@@ -201,6 +201,7 @@ import {
   ImportOptionsMissingError as OnboardingImportOptionsMissingError,
   ImportBudgetInvalidError as OnboardingImportBudgetInvalidError,
   ImportPreviewStaleError as OnboardingImportPreviewStaleError,
+  DemoSeedRefusedError as OnboardingDemoSeedRefusedError,
 } from "../../modules/onboarding/domain/onboarding-errors";
 import { PostingError } from "../../modules/accounting/domain/posting-engine/posting-errors";
 import {
@@ -981,6 +982,7 @@ function domainStatus(error: DomainError): number {
     error instanceof OnboardingImportOptionsMissingError ||
     error instanceof OnboardingImportBudgetInvalidError ||
     error instanceof OnboardingImportPreviewStaleError ||
+    error instanceof OnboardingDemoSeedRefusedError ||
     error instanceof CategoryCycleError ||
     error instanceof CategoryParentArchivedError ||
     error instanceof SystemCreditTermsImmutableError ||

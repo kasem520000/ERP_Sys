@@ -66,8 +66,12 @@ export interface SettlementPostResult {
 export class SettlementCore {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
-    private readonly numbering: NumberingService,
+    // PHASE-040: explicit @Inject on the remaining params — the
+    // vitest/esbuild pipeline does not emit design:paramtypes (the
+    // JobCardService silent-undefined precedent); the onboarding module's
+    // demo loader is the first AppModule-constructed consumer.
+    @Inject(PostingService) private readonly posting: PostingService,
+    @Inject(NumberingService) private readonly numbering: NumberingService,
   ) {}
 
   /**

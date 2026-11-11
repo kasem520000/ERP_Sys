@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 
 import { AuditService } from "../../audit/api/audit";
 import { addExact } from "../../accounting/application/decimal-strings";
@@ -65,8 +65,12 @@ export interface DryRunReport {
 @Injectable()
 export class ImportService {
   constructor(
-    private readonly audit: AuditService,
-    private readonly grid: BudgetGridService,
+    @Inject(AuditService) private readonly audit: AuditService,
+    // PHASE-040: explicit @Inject — the vitest/esbuild pipeline does not
+    // emit design:paramtypes (the JobCardService silent-undefined
+    // precedent); the onboarding module is the first AppModule-constructed
+    // consumer of this service.
+    @Inject(BudgetGridService) private readonly grid: BudgetGridService,
   ) {}
 
   /** Dry-run: parse + validate every row; write NOTHING. */

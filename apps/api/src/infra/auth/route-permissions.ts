@@ -1387,6 +1387,12 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "POST", path: "/api/v1/imports/mappings", permission: "configuration.imports.manage" },
   { method: "PATCH", path: "/api/v1/imports/mappings/:id", permission: "configuration.imports.manage" },
   { method: "DELETE", path: "/api/v1/imports/mappings/:id", permission: "configuration.imports.manage" },
+  // PHASE-040 T-06 (matrix §3.18): the demo-data loader — the 13-template
+  // catalog + status + the one-click seed (feature-gated platform.demo_data,
+  // ALL plans — the recorded trial-enablement decision).
+  { method: "GET", path: "/api/v1/onboarding/demo-data/templates", permission: "configuration.demo_data.manage" },
+  { method: "GET", path: "/api/v1/onboarding/demo-data/status", permission: "configuration.demo_data.manage" },
+  { method: "POST", path: "/api/v1/onboarding/demo-data", permission: "configuration.demo_data.manage" },
   // -- PHASE-023 T8: commerce channels (sales.commerce.manage) ----------------
   {
     method: "GET",
