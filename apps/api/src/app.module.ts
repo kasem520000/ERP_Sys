@@ -32,6 +32,10 @@ import { InstallmentsModule } from "./modules/installments/installments.module";
 // PHASE-028/029 (restored lineage): the budgeting + payroll modules.
 import { BudgetingModule } from "./modules/budgeting/budgeting.module";
 import { PayrollModule } from "./modules/payroll/payroll.module";
+// PHASE-040: the data onboarding & migration toolkit (CR-10) — the seven-
+// kind import engine + mapping wizard + saved mappings + adapters + demo
+// data + sandbox provisioning.
+import { OnboardingModule } from "./modules/onboarding/onboarding.module";
 // PHASE-034: the consolidation module (ADR-0018 / DR-006 option A — the
 // final roadmap phase, stage 11 / the Enterprise Depth gate).
 import { ConsolidationModule } from "./modules/consolidation/consolidation.module";
@@ -76,6 +80,7 @@ import { UsageLimitGuard } from "./infra/auth/usage-limit.guard";
     InstallmentsModule,
     BudgetingModule,
     PayrollModule,
+    OnboardingModule,
     ConsolidationModule,
     SalesModule,
     DistributionModule,

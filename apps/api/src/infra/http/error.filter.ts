@@ -185,6 +185,23 @@ import {
   UomCodeTakenError,
   UomNotFoundError,
 } from "../../modules/items/domain/items-errors";
+// PHASE-040 (matrix §3.18): the onboarding toolkit's typed errors — aliased
+// where the names collide with the items engine's family (the codes differ:
+// ONBOARDING_IMPORT_*).
+import {
+  ImportJobNotFoundError as OnboardingImportJobNotFoundError,
+  ImportCommitConflictError as OnboardingImportCommitConflictError,
+  ImportNotPreviewedError as OnboardingImportNotPreviewedError,
+  ImportAcknowledgementRequiredError as OnboardingImportAcknowledgementRequiredError,
+  ImportFileInvalidError as OnboardingImportFileInvalidError,
+  ImportKindUnknownError as OnboardingImportKindUnknownError,
+  ImportMappingNotFoundError as OnboardingImportMappingNotFoundError,
+  ImportMappingConflictError as OnboardingImportMappingConflictError,
+  ImportMappingInvalidError as OnboardingImportMappingInvalidError,
+  ImportOptionsMissingError as OnboardingImportOptionsMissingError,
+  ImportBudgetInvalidError as OnboardingImportBudgetInvalidError,
+  ImportPreviewStaleError as OnboardingImportPreviewStaleError,
+} from "../../modules/onboarding/domain/onboarding-errors";
 import { PostingError } from "../../modules/accounting/domain/posting-engine/posting-errors";
 import {
   StatementAlreadyReconciledError,
@@ -519,6 +536,8 @@ function domainStatus(error: DomainError): number {
     error instanceof PartnerPriceListNotFound ||
     error instanceof PriceListRowNotFoundError ||
     error instanceof ImportJobNotFoundError ||
+    error instanceof OnboardingImportJobNotFoundError ||
+    error instanceof OnboardingImportMappingNotFoundError ||
     error instanceof AttachmentNotFoundError ||
     error instanceof AttachmentOwnerNotFoundError ||
     // PHASE-013 reporting not-founds (404-shaped; A-series parity).
@@ -771,6 +790,7 @@ function domainStatus(error: DomainError): number {
     error instanceof UomCodeTakenError ||
     error instanceof ConversionDuplicateError ||
     error instanceof ImportCommitConflictError ||
+    error instanceof OnboardingImportCommitConflictError ||
     error instanceof PartnerKindChangeForbiddenError ||
     error instanceof OpeningBalanceDraftExistsError ||
     error instanceof PartnerArchivedError ||
@@ -952,6 +972,15 @@ function domainStatus(error: DomainError): number {
     error instanceof PriceListInvalidError ||
     error instanceof ImportFileInvalidError ||
     error instanceof ImportNotPreviewedError ||
+    error instanceof OnboardingImportNotPreviewedError ||
+    error instanceof OnboardingImportAcknowledgementRequiredError ||
+    error instanceof OnboardingImportFileInvalidError ||
+    error instanceof OnboardingImportKindUnknownError ||
+    error instanceof OnboardingImportMappingConflictError ||
+    error instanceof OnboardingImportMappingInvalidError ||
+    error instanceof OnboardingImportOptionsMissingError ||
+    error instanceof OnboardingImportBudgetInvalidError ||
+    error instanceof OnboardingImportPreviewStaleError ||
     error instanceof CategoryCycleError ||
     error instanceof CategoryParentArchivedError ||
     error instanceof SystemCreditTermsImmutableError ||

@@ -46,7 +46,10 @@ import { BudgetingController } from "./presentation/budgeting.controller";
     ControlGuard,
     ImportService,
   ],
-  exports: [ControlGuard, ConsumptionService, BudgetGridService],
+  // PHASE-040: the grid import service joins the exports — the onboarding
+  // module's BUDGETS kind delegates its dry-run/commit to this service
+  // (the PHASE-028 whole-grid-replace contract, unchanged).
+  exports: [ControlGuard, ConsumptionService, BudgetGridService, ImportService],
 })
 export class BudgetingModule implements OnModuleInit {
   constructor(

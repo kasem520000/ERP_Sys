@@ -1368,6 +1368,23 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "POST", path: "/api/v1/purchasing/returns/:id/ship", permission: "purchasing.rma.manage" },
   { method: "POST", path: "/api/v1/purchasing/returns/:id/credit", permission: "purchasing.rma.manage" },
   { method: "POST", path: "/api/v1/purchasing/returns/:id/cancel", permission: "purchasing.rma.manage" },
+  // PHASE-040 (0060; matrix §3.18): the data onboarding & migration toolkit
+  // — the /imports hub surface (kind catalog, header preview, the direct-
+  // upload slot, BR-066 dry-run → commit jobs, the bilingual error-report
+  // export) and the saved-mapping CRUD (both directions). All under the
+  // back-office hub key; the demo-data + sandbox routes land with T-06/T-07.
+  { method: "GET", path: "/api/v1/imports/kinds", permission: "configuration.imports.manage" },
+  { method: "POST", path: "/api/v1/imports/preview-headers", permission: "configuration.imports.manage" },
+  { method: "POST", path: "/api/v1/imports/uploads", permission: "configuration.imports.manage" },
+  { method: "GET", path: "/api/v1/imports/jobs", permission: "configuration.imports.manage" },
+  { method: "POST", path: "/api/v1/imports/jobs", permission: "configuration.imports.manage" },
+  { method: "GET", path: "/api/v1/imports/jobs/:id", permission: "configuration.imports.manage" },
+  { method: "POST", path: "/api/v1/imports/jobs/:id/commit", permission: "configuration.imports.manage" },
+  { method: "GET", path: "/api/v1/imports/jobs/:id/error-report", permission: "configuration.imports.manage" },
+  { method: "GET", path: "/api/v1/imports/mappings", permission: "configuration.imports.manage" },
+  { method: "POST", path: "/api/v1/imports/mappings", permission: "configuration.imports.manage" },
+  { method: "PATCH", path: "/api/v1/imports/mappings/:id", permission: "configuration.imports.manage" },
+  { method: "DELETE", path: "/api/v1/imports/mappings/:id", permission: "configuration.imports.manage" },
   // -- PHASE-023 T8: commerce channels (sales.commerce.manage) ----------------
   {
     method: "GET",
