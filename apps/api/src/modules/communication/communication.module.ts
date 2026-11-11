@@ -3,7 +3,9 @@ import { Module } from "@nestjs/common";
 import { InfrastructureModule } from "../../infra/infra.module";
 import { AuditModule } from "../audit/audit.module";
 import { ProviderConfigService } from "./application/provider-config.service";
+import { TemplateService } from "./application/template-service";
 import { ProvidersController } from "./presentation/providers.controller";
+import { TemplatesController } from "./presentation/templates.controller";
 
 /**
  * PHASE-041 communications hub (CR-11): the channel-port adapters (BR-067),
@@ -19,8 +21,8 @@ import { ProvidersController } from "./presentation/providers.controller";
  */
 @Module({
   imports: [InfrastructureModule, AuditModule],
-  controllers: [ProvidersController],
-  providers: [ProviderConfigService],
-  exports: [ProviderConfigService],
+  controllers: [ProvidersController, TemplatesController],
+  providers: [ProviderConfigService, TemplateService],
+  exports: [ProviderConfigService, TemplateService],
 })
 export class CommunicationModule {}

@@ -1394,6 +1394,13 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   // in the service at write time).
   { method: "GET", path: "/api/v1/communication/providers", permission: "communication.templates.manage" },
   { method: "PUT", path: "/api/v1/communication/providers", permission: "communication.templates.manage" },
+  // PHASE-041 T-04 (FD-30): the tenant template hub — the effective list
+  // (overrides + builtin fallbacks), the audited upsert/delete, and the
+  // fail-closed render preview.
+  { method: "GET", path: "/api/v1/communication/templates", permission: "communication.templates.manage" },
+  { method: "POST", path: "/api/v1/communication/templates", permission: "communication.templates.manage" },
+  { method: "DELETE", path: "/api/v1/communication/templates", permission: "communication.templates.manage" },
+  { method: "POST", path: "/api/v1/communication/templates/preview", permission: "communication.templates.manage" },
   // PHASE-040 T-06 (matrix §3.18): the demo-data loader — the 13-template
   // catalog + status + the one-click seed (feature-gated platform.demo_data,
   // ALL plans — the recorded trial-enablement decision).
