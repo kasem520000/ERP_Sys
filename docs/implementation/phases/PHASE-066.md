@@ -1,7 +1,7 @@
 # PHASE-066 — IFRS Advanced Compliance I — Measurements & Provisions
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.1) · **Wave:** 3 / Stage 14 · **Register:** [CR-42](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-01…L2-05, L2-11, L2-13, L2-19) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.5
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.1, scope extended by v3.2/CR-50) · **Wave:** 3 / Stage 14 · **Register:** [CR-42](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-01…L2-05, L2-11, L2-13, L2-19) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-01 ECL — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.5
 
 ## 1. Phase Overview
 
@@ -87,12 +87,27 @@ In scope:
 9. **Disclosure pack**: the IFRS disclosure report contracts (related
    parties, provisions movement schedule, impairment summary, going concern)
    registered in REPORT_CATALOG with bilingual rendering.
+10. **Expected credit losses — the ECL allowance** (**IFRS 9 · R-01 — added by
+    v3.2/CR-50**, per the owner the strongest remaining accounting gap): the
+    simplified-approach **provision matrix** — aging buckets × tenant-configured
+    loss rates (**REQUIRES_VERIFICATION**: each rate carries source evidence or the
+    run refuses to post — worksheet mode, no fabricated rates) — computing the AR
+    expected-credit-loss allowance per the `ar.aging` machinery and posting it
+    through the engine as a periodic ECL run (`ecl_runs` + `ecl_rates`), with the
+    movement (charge/release) disclosed in the provisions family's movement
+    schedule and the matrix rendered as a report contract.
 
 Out of scope: business-combination transaction accounting (067 — L2-06) ·
 share-based payments (067 — L2-07) · defined-benefit/actuarial (067 —
 L2-08/09) · hyperinflation restatement (067 — L2-10) · NCI (067 — L2-16) ·
 XBRL (067 — L2-18) · contract assets/liabilities presentation (068 —
 L2-14/17) · statutory e-filing adapters (054 territory).
+
+**v3.2 scope note (CR-50):** the IFRS-9 expected-credit-loss allowance (R-01 —
+the simplified provision matrix, per the owner the strongest remaining accounting
+gap) was added by the owner's residual-layer decision — it completes this phase's
+measurement/provision family exactly where the aging machinery feeds it; the
+effort estimate moves from ~5–7 to **~6.5–8.5 weeks**.
 
 ## 3. Prerequisites
 

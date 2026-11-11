@@ -1,7 +1,7 @@
 # PHASE-062 — UX Excellence & Document Design
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, L1-21 batch-ops ID bound by v3.1/CR-46) · **Wave:** 4 / Stage 15 · **Register:** [CR-32](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) TB-01…TB-18 · TB-22 · TB-34 · FD-01…FD-17 · FD-21…FD-29 · FD-34/FD-35 · H-23 · UX-02…UX-09 · UX-11…UX-18 · PP-01…PP-10 · PP-13/PP-14 · PP-18/PP-19 · PP-29…PP-34 · [gap-analysis/PROJECT_EVALUATION_2026-11-10.md](../../planning/gap-analysis/PROJECT_EVALUATION_2026-11-10.md) §5.1 (shipped surfaces stay prerequisites per CR-04) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-21 batch-operations half — v3.1 ID binding on existing scope) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.3
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, L1-21 batch-ops ID bound by v3.1/CR-46, scope extended by v3.2/CR-50) · **Wave:** 4 / Stage 15 · **Register:** [CR-32](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) TB-01…TB-18 · TB-22 · TB-34 · FD-01…FD-17 · FD-21…FD-29 · FD-34/FD-35 · H-23 · UX-02…UX-09 · UX-11…UX-18 · PP-01…PP-10 · PP-13/PP-14 · PP-18/PP-19 · PP-29…PP-34 · [gap-analysis/PROJECT_EVALUATION_2026-11-10.md](../../planning/gap-analysis/PROJECT_EVALUATION_2026-11-10.md) §5.1 (shipped surfaces stay prerequisites per CR-04) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-21 batch-operations half — v3.1 ID binding on existing scope) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-08 DMS covered-by-plan binding · R-12 calendar · R-13 maps · R-14 Excel paste — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.3/§6.5
 
 ## 1. Phase Overview
 
@@ -87,9 +87,12 @@ In scope:
      rendering the existing `audit_events` — no new audit mechanism, only the missing
      screen — plus `record_comments` with @mentions that notify through the realtime
      channel; visibility follows the record's permissions.
-   - **Unified attachments panel** (FD-17): one surface over the existing `file_objects`
+   - **Unified attachments panel** (FD-17 — **the R-08 central-DMS home since
+     v3.2/CR-50**): one surface over the existing `file_objects`
      for every entity, with ECM-style folders and versions (the A-13 reading shared with
-     the 053 accounting-depth ECM surfaces).
+     the 053 accounting-depth ECM surfaces). The v3.2 binding records the owner's
+     decision: the central document-management gap (R-08) closes exactly here —
+     covered by plan, ID bound, no parallel scope.
    - **The accountant polish pack** (PP-01…PP-10): journal entry card (PP-01 — the shipped
      pre-save check PP-02 stays as-is); post preview completion (PP-03); period compare
      (PP-05); outlier highlighting (PP-06); what-if preview (PP-07); a deterministic entry
@@ -150,12 +153,36 @@ In scope:
      audit (`sync_conflict_resolutions`); sync-fleet harness extended (OA-02).
    - **Customizable form surfaces** (UX-12): user-facing layout preferences layered on the
      PHASE-036 form-designer substrate.
+8. **Data-dimension surfaces — the v3.2 additions (R-12/R-13/R-14, CR-50)**:
+   - **Calendar view** (R-12): a shared table↔calendar toggle component (month/week
+     modes, AR/EN, Hijri-aware where 063 lands) surfaced on the date-bearing
+     worklists — invoice due dates, the aging/commitments worklist, service visits
+     (048), and leave calendars (045).
+   - **Route & customer maps** (R-13): a map view over the shipped distribution
+     substrate (`routes`/`route_visits`) and geocoded partner points — route-visit
+     planning and customer-location overlays for field-sales distribution (the 017
+     template; the 060 depth consumes the same surface). Tile provider behind the
+     provider-port discipline (no hard-coded third-party dependency; offline-safe
+     fallback).
+   - **Paste from Excel inside line grids** (R-14 — per the owner, among the
+     most-requested ERP productivity features): clipboard-range parsing into line
+     grids (invoice lines, order lines, journal-entry lines) with column mapping,
+     typed validation per cell, and a per-row error surface that never silently
+     drops a row. Rides every grid's existing validation machinery — no bypass of
+     any rule.
 
 Out of scope: AI copilot, OCR, suggesters, narration, voice (064) · Hijri, Tafqeet, season
 planning, Islamic finance, country packs, numerals rendering (063) · referrals, partners,
 trust center, public legal pages, self-serve conversion (065) · marketing websites DF-40/42
 (kept non-goal) · rewriting the command palette, shortcuts, or the offline sync engine
 (audit §21 "do not touch" — extended only) · any new accounting posting behavior.
+
+**v3.2 scope note (CR-50):** the calendar view (R-12), the route & customer maps
+(R-13), and Excel-paste into line grids (R-14) were added by the owner's
+residual-layer decision after a full review of this phase and 064 — these three
+were the absent productivity/UX items; R-08 (central DMS) was bound as covered by
+plan to item 3's ECM-style attachments panel (no new scope). The effort estimate
+moves from ~5–7 to **~7.5–9.5 weeks**.
 
 ## 3. Prerequisites
 

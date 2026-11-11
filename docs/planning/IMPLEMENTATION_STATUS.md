@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-038 COMPLETE — the v3.0 program's fourth phase delivered; roadmap v3.1 gap consolidation applied 2026-11-11)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-038 COMPLETE — the v3.0 program's fourth phase delivered; roadmap v3.1 gap consolidation + v3.2 residual layer applied 2026-11-11)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -111,7 +111,7 @@ recorded here with evidence.
 | Compliance | NONE — no jurisdiction pack data verified against official sources | — |
 | Deployment | NONE — dev compose + CI files (incl. new ci-db.yml); first hosted runs waived pending infra | `docker-compose.yml`, `.github/workflows/` |
 
-## Blueprint v3.0 phases (2026-11-11 — PHASE-038 delivered; roadmap v3.1 consolidation applied; the rest planned)
+## Blueprint v3.0 phases (2026-11-11 — PHASE-038 delivered; roadmap v3.1 + v3.2 applied; the rest planned)
 
 30 of 34 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035, PHASE-036,
 PHASE-037 and PHASE-038 COMPLETE (2026-11-10).
@@ -123,6 +123,15 @@ three new phases (066/067/068 below), scope extensions to 039/040/042/044/048/05
 054/055/058/062, and took the program to 34 phases / 536 in-scope gaps / ~136–185
 single-agent weeks (see [../planning/COMPLETENESS_ROADMAP.md](../planning/COMPLETENESS_ROADMAP.md)
 §1+§9 and the [v3.1 consolidation report](../implementation/phases/reports/ROADMAP-V3.1-CONSOLIDATION.md)).
+**Roadmap v3.2 (2026-11-11 — CR-49…CR-52):** the owner's final residual sweep added
+15 items (Layer 3, R-01…R-15 — evidence in
+[../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md);
+directive preserved as [../implementation/GAP_LAYER3_DIRECTIVE.md](../implementation/GAP_LAYER3_DIRECTIVE.md)):
+11 scope additions (039 +R-03 supplier RMA · 048 +R-04 · 049 +R-10 · 053 +R-02/R-07 ·
+054 +R-05 · 062 +R-12/13/14 · 064 +R-15 · 066 +R-01), R-08 bound to 062, R-06
+shipped-by-design, R-09/R-11 owner non-goals — taking the program to **548 in-scope
+gaps / ~147–197 single-agent weeks (~132–183 remaining)**. **PHASE-039's scope is
+final** (H-12/H-13/S-14…16 + L1-10…12 + R-03 — estimate ~4 weeks) per CR-46/CR-50.
 Authoritative scope per phase
 document; this ledger tracks status only. Effort figures are planning estimates.
 
@@ -132,7 +141,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-036](../implementation/phases/PHASE-036.md) | Extensibility Core — Custom Fields | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-036-COMPLETION.md) |
 | [PHASE-037](../implementation/phases/PHASE-037.md) | ZATCA Phase-1 & QR Compliance | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-037-COMPLETION.md) |
 | [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-038-COMPLETION.md) |
-| [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies — v3.1/CR-46) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies + supplier RMA — v3.1/CR-46 + v3.2/CR-50) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers | 2 / 13 | 036 | NOT_STARTED — PLANNED |

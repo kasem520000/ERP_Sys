@@ -1,34 +1,39 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (roadmap v3.1 gap consolidation COMPLETE — next eligible: PHASE-039)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (roadmap v3.2 residual layer applied — next eligible: PHASE-039, owner go received)
 
 ## The single next action
 
-**Start PHASE-039 (Returns & Collections — RMA + Dunning + Late Fees + Agencies, CR-09
-+ CR-46)** — «ابدأ تنفيذ المرحلة PHASE-039». Per EXPANSION sequencing the wave-1
+**Start PHASE-039 (Returns & Collections — RMA + Dunning + Late Fees + Agencies +
+Supplier RMA, CR-09 + CR-46 + CR-50)** — the owner's go was received with the v3.2
+directive («ثم ابدأ فوراً تنفيذ PHASE-039»). Per EXPANSION sequencing the wave-1
 siblings are parallel-safe; 039's prerequisites (035 ✓, the AR/AP module + journal
-infrastructure from the 34-phase baseline) are all satisfied. **The phase's scope was
-finalized by the v3.1 consolidation (CR-46) BEFORE implementation starts** — read
+infrastructure from the 34-phase baseline) are all satisfied. **The phase's scope is
+FINAL before implementation starts** (CR-46 + CR-50) — read
 [PHASE-039.md](../implementation/phases/PHASE-039.md) first: the sales RMA cycle
-(authorization → receipt → credit-note/replace with G-35-style posting discipline per
-the phase doc's own numbering), purchase returns (RTV), the receivables dunning sweep
-(aging-bucket escalation letters + the collection-status surfacing), **plus the three
-v3.1 additions — the periodic credit-review workflow (L1-10), the late-fee engine with
-VAT treatment + waiver path (L1-12), and the collection-agency referral layer with the
-hashed-token callback port (L1-11)**.
+(authorization → receipt → inspection → disposition with G-35/G-36/G-37 posting
+discipline per the phase doc's own numbering), managed warranties, the receivables
+dunning sweep (aging-bucket escalation letters + collection-status surfacing), the
+three v3.1 additions — the periodic credit-review workflow (L1-10), the late-fee
+engine with VAT treatment + waiver path (L1-12), and the collection-agency referral
+layer with the hashed-token callback port (L1-11) — **plus the v3.2 addition:
+the supplier-RMA mirror (R-03 — return-to-vendor authorization → auto-generated AP
+debit note, G-38, ~4-week estimate)**.
 
-## Post-consolidation context for the next author (v3.1 — 2026-11-11)
+## Post-v3.2 context for the next author (2026-11-11)
 
-The gap-consolidation wave (CR-41…CR-48) is COMPLETE and pushed: the two layer files
-under [../planning/gap-analysis/](../planning/gap-analysis/) document the 43
-second/third-round gaps (L1-01…L1-23 · L2-01…L2-20) with dispositions; PHASE-066/067/
-068 were created; ten phase docs (039/040/042/044/048/053/054/055/058/062) received
-their scope extensions with updated effort estimates; the register carries CR-41…48;
-the roadmap is v3.1 (34 phases, 536 in-scope gaps, ~136–185 single-agent weeks with
-~121–171 remaining) with the count reconciliation in its §9; the completion-report
-template now requires the code-evidence checklist; the gap-intake protocol (CR-47)
-and the triple-flip rule (CR-48) bind every future phase. Full detail:
-[the v3.1 consolidation report](../implementation/phases/reports/ROADMAP-V3.1-CONSOLIDATION.md).
+The residual layer (CR-49…CR-52) is COMPLETE and pushed: the Layer-3 file
+([../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md))
+documents the 15 final owner decisions (R-01…R-15 — 11 scope additions, R-08
+covered-by-plan, R-06 shipped-by-design, R-09/R-11 non-goals); the directive is
+preserved as [../implementation/GAP_LAYER3_DIRECTIVE.md](../implementation/GAP_LAYER3_DIRECTIVE.md);
+the register carries CR-49…52; the roadmap is v3.2 (34 phases, 548 in-scope gaps,
+~147–197 single-agent weeks with ~132–183 remaining, arithmetic in §9); eight phase
+docs (039/048/049/053/054/062/064/066) received their R-scope extensions with
+updated estimates; the risk register carries RISK-029/030; the v3.1 report's
+line-101 count is corrected. **The plan is now comprehensive at the planning level**
+— every future discovery enters through CR-47's same-commit intake. Execution is
+what remains, and 039 is the next step.
 
 ## Post-PHASE-038 context for the next author
 

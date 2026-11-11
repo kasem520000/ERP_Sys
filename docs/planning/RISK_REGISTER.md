@@ -1,6 +1,6 @@
 # Risk Register
 
-> **Status:** STABLE — extended by v3.1 (RISK-026…RISK-028) · **Owner:** Platform Architecture · **Updated:** 2026-11-11
+> **Status:** STABLE — extended by v3.1 (RISK-026…RISK-028) and v3.2 (RISK-029…RISK-030) · **Owner:** Platform Architecture · **Updated:** 2026-11-11
 
 Living risk register. Likelihood/Impact: L/M/H. Each risk has mitigations (built into
 phases) and a trigger (when it becomes an issue to escalate). IDs referenced by phase
@@ -61,8 +61,15 @@ documents. **Update protocol:** any phase that materializes a risk must update t
 | ID | Risk | L | I | Mitigation | Trigger / owner |
 |----|------|---|---|------------|-----------------|
 | RISK-026 | Advanced-IFRS measurement rules misapplied (IAS 36/37/19/29, IFRS 3/5) — wrong impairment, provisions, or combination numbers are worse than none | M | H | REQUIRES_VERIFICATION on every rate/assumption (worksheet mode refuses to post); source-evidenced estimates; disclosure packs never print unsourced numbers; standards-framework tests pinned per phase 066/067 | Any measurement posting lacking a cited source → block the 066/067 release / platform architecture |
-| RISK-027 | Program scope growth from the consolidation wave (34 phases, 536 in-scope gaps) overloads the sequential agent protocol and pushes delivery far out | M | H | The honest re-estimate is recorded (roadmap §1 v3.1); wave gates stay binding; parallel-safe sets documented for team execution; every new gap now enters through CR-47's same-commit intake (no more silent scope) | 2+ consecutive phases exceed their estimate by >50% → product owner re-prioritizes wave content |
+| RISK-027 | Program scope growth from the consolidation + residual waves (34 phases, 548 in-scope gaps) overloads the sequential agent protocol and pushes delivery far out | M | H | The honest re-estimate is recorded at every layer (roadmap §1/§3 v3.1→v3.2: ~147–197 total, ~132–183 remaining); wave gates stay binding; parallel-safe sets documented for team execution; every new gap now enters through CR-47's same-commit intake (no more silent scope) | 2+ consecutive phases exceed their estimate by >50% → product owner re-prioritizes wave content |
 | RISK-028 | Standard-costing layer (L2-12 in 042) destabilizes inventory valuation — PPV/revaluation postings corrupt WAC-era balances | M | H | Frozen-standard effective dating; revaluation rides the G-13/G-14 shapes with a variance account; dual mode (routing-less orders keep the legacy path) documented; failure packs + golden worked examples mandatory in 042 | Any invariant failure in standard-cost postings → Sev-1 (the RISK-009 class) |
+
+## Blueprint v3.2 risks (the residual layer — CR-49…CR-52)
+
+| ID | Risk | L | I | Mitigation | Trigger / owner |
+|----|------|---|---|------------|-----------------|
+| RISK-029 | Dual-book (R-02) + intercompany trade (R-07) in 053 corrupt the single-base posting invariants — a book-tagged reconciliation layer or a PO↔SO pair that double-counts breaks both books and the eliminations | M | H | Book tags live ONLY on reconciling adjustment entries (never a parallel ledger copy — one journal substrate, dual filters); dual statements render from the same lines with deterministic book filters; intercompany matching is proposal-first with tolerance rules and never auto-posts; golden worked examples for both books + the clearance statement; invariants suite extended before any 054 Zakat/IFRS consumer lands | Any statement pair (books or entities) failing to reconcile to the same journal substrate → block the 053 release / platform architecture |
+| RISK-030 | ECL estimate discipline (R-01 in 066, IFRS 9) — fabricated loss rates are worse than no allowance (the RISK-026 class applied to receivables) | M | H | REQUIRES_VERIFICATION on every matrix rate (tenant-entered with source evidence or the run refuses to post — worksheet mode); matrix versioned with effective dating; the ECL report never prints unsourced rates; movement postings ride the golden-numbered discipline with failure packs | Any ECL posting lacking a cited rate source → block the 066 release / platform architecture |
 
 ## Top-5 watchlist (reviewed at every phase boundary)
 

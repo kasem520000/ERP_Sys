@@ -1,7 +1,7 @@
 # PHASE-049 — CMMS — Asset Maintenance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-19](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-15) · §9 (FA-F-01…FA-F-09, F-11/F-12/F-13) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.2/CR-50) · **Wave:** 2 / Stage 13 · **Register:** [CR-19](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-15) · §9 (FA-F-01…FA-F-09, F-11/F-12/F-13) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-10 fleet light — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2/§6.5
 
 ## 1. Phase Overview
 
@@ -66,12 +66,26 @@ In scope:
    (maintenance expense, G-60); spares consumption = inventory issue (G-61); meter
    readings trigger plan evaluation; a daily `asset-expiry-sweep` job fires 30/7/0-day
    alerts for warranty, insurance and license expiries.
+10. **Fleet light — vehicle documents + odometer** (**R-10 — added by v3.2/CR-50**,
+    the owner's light-version-only decision): a fleet register view grouping
+    vehicle-class assets with their document status (license / insurance / inspection
+    expiry — the item-8 columns + the sweep) and the odometer binding over the
+    item-4 `asset_meters` KM type; the sweep gains the inspection-expiry class where
+    a tenant tracks it. **Full fuel management and traffic-violations management are
+    a sectoral non-goal** (the owner decision recorded in the Layer-3 file §3).
 
 Out of scope: tax depreciation, partial disposal and IFRS-16 leases (054 per the
 roadmap) · predictive maintenance analytics (064 candidate, recorded not committed) ·
 telemetry device integrations (readings arrive manually or via the import toolkit
 surface; live feeds wait on the API platform of 055) · capitalizable-improvement
-posting flow (default is expensed; a recorded decision can flip it later).
+posting flow (default is expensed; a recorded decision can flip it later) · **full
+fleet fuel and violations management (the R-10 sectoral non-goal within the owner's
+CR-50 decision — the light version in item 10 is the committed scope)**.
+
+**v3.2 scope note (CR-50):** the fleet-light tracking (R-10) was added by the owner's
+residual-layer decision — most of its substrate already ships in items 4 and 8, so
+the residual is the register view + bindings; the effort estimate moves from ~3–4
+to ~3.5–4.5 weeks.
 
 ## 3. Prerequisites
 

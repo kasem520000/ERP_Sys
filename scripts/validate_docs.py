@@ -242,7 +242,8 @@ def expansion_check() -> None:
 def completeness_check() -> None:
     """Check 8 — Blueprint v3.0 completeness-program artifacts (2026-11-10):
     the register, the roadmap, and the 31 phase documents (035..065) with the
-    8 canonical headings. Governed by docs/planning/COMPLETENESS_REGISTER.md."""
+    8 canonical headings. Governed by docs/planning/COMPLETENESS_REGISTER.md.
+    Extended by v3.1 (CR-41..48) and v3.2 (CR-49..52)."""
     def has(path: str, needle: str) -> bool:
         return needle in (DOCS / path).read_text(encoding="utf-8")
 
@@ -280,8 +281,22 @@ def completeness_check() -> None:
             "ERP_COMPLETENESS_GAP_REPORT.md",
             "ERP_FULL_GAP_ANALYSIS.md",
             "GAP_ANALYSIS_LAYER1_23_GAPS.md",
-            "GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md"))
-    check("8c. the three first-round audit reports + the two v3.1 layer files preserved under planning/gap-analysis/", ok_gap)
+            "GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md",
+            "GAP_ANALYSIS_LAYER3_RESIDUAL.md"))
+    check("8c. the three first-round audit reports + the two v3.1 layer files + the v3.2 residual file preserved under planning/gap-analysis/", ok_gap)
+
+    # Blueprint v3.2 (2026-11-11): the residual layer (R-01..R-15, CR-49..CR-52).
+    layer3 = DOCS / "planning" / "gap-analysis" / "GAP_ANALYSIS_LAYER3_RESIDUAL.md"
+    ok_l3 = layer3.exists() and all(
+        f"R-{i:02d}" in layer3.read_text(encoding="utf-8") for i in range(1, 16))
+    ok_l3 = ok_l3 and (DOCS / "implementation" / "GAP_LAYER3_DIRECTIVE.md").exists()
+    ok_reg52 = has("planning/COMPLETENESS_REGISTER.md", "CR-49") and \
+        has("planning/COMPLETENESS_REGISTER.md", "CR-52")
+    ok_road52 = has("planning/COMPLETENESS_ROADMAP.md", "R-03") and \
+        has("planning/COMPLETENESS_ROADMAP.md", "548") and \
+        has("planning/COMPLETENESS_ROADMAP.md", "Layer 3")
+    check("8d. v3.2 residual-layer artifacts (Layer-3 file R-01..R-15 + directive + CR-49..52 + roadmap §6.5/548)",
+          ok_l3 and ok_reg52 and ok_road52)
 
 
 def main() -> int:

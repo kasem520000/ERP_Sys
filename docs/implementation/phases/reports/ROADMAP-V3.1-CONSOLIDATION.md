@@ -98,7 +98,10 @@ scripts/validate_docs.py · and the ten phase docs 039/040/042/044/048/053/054/0
       documented CR-41 deviation from the requested N-xx — collision with the
       Integrations family)
 - [x] Every one of the 43 gaps has exactly one disposition: SHIPPED (2, with
-      evidence) / existing phase (15, named) / new phase 066/067/068 (26)
+      evidence) / existing phase (17, named) / new phase 066/067/068 (24)
+      *(count corrected 2026-11-11 in the v3.2 commit — the original line said
+      15/26, contradicting the tables above: Layer 1 into existing phases 14 +
+      Layer 2 into 042/048 3 = 17; into 066/068 7+2 and 067 8+7 = 24)*
 - [x] PHASE-066/067 created per the official template with Arabic executive
       summaries (+ PHASE-068 under the owner's new-phase authorization)
 - [x] L2-12 and L2-20 (and L2-15) have documented decisions re 042/043 and 048 —

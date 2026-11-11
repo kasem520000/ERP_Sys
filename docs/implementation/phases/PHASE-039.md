@@ -1,7 +1,7 @@
 # PHASE-039 — Returns & Collections (RMA + Dunning)
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 1 / Stage 12 · **Register:** [CR-09](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-12/H-13) · §4 (S-14/S-15/S-16) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-10/L1-11/L1-12 — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46 and v3.2/CR-50) · **Wave:** 1 / Stage 12 · **Register:** [CR-09](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-12/H-13) · §4 (S-14/S-15/S-16) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-10/L1-11/L1-12 — the v3.1 scope extension) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-03 supplier RMA — the v3.2 scope extension, mandated before any 039 code) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §3/§6.2/§6.5
 
 ## 1. Phase Overview
 
@@ -20,11 +20,16 @@
   engine**, managed warranties with structured terms
   (`warranty_registrations`), and the dunning engine (`dunning_policies`
   step ladder, `dunning_letters`, `collection_actions`) wired to the aging
-  report. Three NEW journal goldens register the dispositions — G-35 (RMA
-  restock reversal), G-36 (scrap write-off), G-37 (refund posting) — with
-  the numbering continuing from G-34 shipped with PHASE-038. Dunning
-  letters send over email now; the WhatsApp channel arrives post-041 through
-  the channel-port (policies already store the channel).
+  report. Four NEW journal goldens register the dispositions — G-35 (RMA
+  restock reversal), G-36 (scrap write-off), G-37 (refund posting), G-38
+  (supplier-return debit note) — with the numbering continuing from G-34
+  shipped with PHASE-038. Dunning letters send over email now; the WhatsApp
+  channel arrives post-041 through the channel-port (policies already store
+  the channel). The **supplier-side mirror (R-03, v3.2/CR-50)** ships in the
+  same phase: return-to-vendor authorizations whose completion auto-generates
+  the AP **debit note** through the posting engine — the purchasing
+  counterpart of the customer credit note, decided by the owner before any
+  039 code was written.
 - **Business value:** Returns become recoverable value instead of ad-hoc
   credit notes (stock returns to sellable inventory or writes off with an
   audit trail), warranties stop living in free-text blobs, and collections
@@ -88,16 +93,26 @@ In scope:
     commission terms, status), commission posting through the engine, and
     an integration port for agency status callbacks (the 038 portal-token
     pattern — hashed tokens, audited, rate-limited).
-11. **Goldens registered**: G-35/G-36/G-37 in JOURNAL_RULES.md with worked
+11. **Goldens registered**: G-35…G-38 in JOURNAL_RULES.md with worked
     examples and failure packs — the numbering continues from G-32 through
     G-33/G-34 (PHASE-038).
 12. **RMA register report** (`sales.rma_register`): the RMA lifecycle
-    register with disposition mix and cycle times.
+    register with disposition mix and cycle times — rendering **both the
+    customer and the supplier families** (one contract, a family filter).
+13. **Supplier RMA — return to vendor** (**R-03 — added by v3.2/CR-50**,
+    before any 039 code was written, per the owner mandate):
+    `supplier_return_authorizations` + lines mirroring the customer RMA
+    lifecycle (REQUESTED → APPROVED → SHIPPED → CREDITED) with lines bounded
+    by the received/purchased quantity; the completion auto-generates the
+    **AP debit note through the posting engine** (G-38) with the inventory
+    issue leg posting atomically — exactly once, the BR-064 discipline
+    applied to the purchasing side. The earlier "supplier-side return orders
+    out of scope" line is **superseded by this item** (the owner's decision
+    reversed it).
 
 Out of scope: WhatsApp letter delivery (041 — the channel-port ships there;
 policies store the channel now) · dispute-management workflow engine (052;
-disputes are recorded as collection actions) · supplier-side return orders
-(the purchasing debit-note path remains) · repair/field-service RMAs (the
+disputes are recorded as collection actions) · repair/field-service RMAs (the
 service-order surfaces) · credit-scoring integrations (the class is
 tenant-entered or rule-computed locally; the agency register refers, it
 does not score).
@@ -109,6 +124,11 @@ audit before implementation started — the effort estimate moves from
 ~2–3 to ~3 weeks. Deciding this before 039 started was mandated by the
 owner (the collections-engine scope must be final before the engine is
 built).
+
+**v3.2 scope note (CR-50):** the supplier-RMA mirror (R-03 — return-to-vendor
+authorization → auto-generated debit note, G-38) was added by the owner's
+residual-layer decision **before any 039 code was written**; the effort
+estimate moves from ~3 to **~4 weeks**.
 
 ## 3. Prerequisites
 
@@ -131,29 +151,38 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
   collection_actions, late-fee rule columns on the policy) ·
   `0057_partner_credit_risk.sql` (additive partner credit-risk + review
   columns) · `0058_collection_agencies.sql` (the agency register +
-  referral records + commission terms — the v3.1 L1-11 addition) —
-  journal 54 → 58, next in sequence after PHASE-038's 0054; all tables
-  RLS'd; Drizzle journal/spec updated. Exact file numbers bound at
-  implementation as the next free sequence.
-- **Entities**: +7 tables (ENTITY_CATALOG.md 217 → 224); the partner
-  columns are additive on a catalogued table.
-- **Permissions**: +7 keys — `sales.rma.read`, `sales.rma.manage`,
+  referral records + commission terms — the v3.1 L1-11 addition) ·
+  `0059_supplier_rma.sql` (supplier_return_authorizations + lines — the
+  v3.2 R-03 addition) — journal 54 → 59, next in sequence after
+  PHASE-038's 0054; all tables RLS'd; Drizzle journal/spec updated. Exact
+  file numbers bound at implementation as the next free sequence.
+- **Entities**: +10 tables (ENTITY_CATALOG.md 217 → 227 — the planning figure
+  said +9; the implementation binds the referral register as a first-class
+  `collection_referrals` table rather than an action subtype, the honest
+  correction); the partner columns are additive on a catalogued table.
+- **Permissions**: +9 keys — `sales.rma.read`, `sales.rma.manage`,
   `sales.rma.approve`, `sales.dunning.manage`,
   `sales.warranties.manage`, `sales.late-fees.manage`,
-  `sales.collection-agencies.manage` (the last two are the v3.1 L1-11/12
-  additions); zero-drift extended (256 → 263; seed = mirror).
-- **i18n**: ~170 new AR/EN keys (RMA screens, dunning workspace, warranty
-  surfaces, letter templates, credit-risk labels, late-fee + agency
-  surfaces — the v3.1 additions); parity gate as ever.
-- **Reports**: +2 contracts — `sales.rma_register` and
-  `sales.dunning_status` (registry 88 → 90); the `ar.aging` additive
-  dunning-step column documented in REPORT_CATALOG.md (no new key).
-- **Feature flags**: +3 keys — `sales.rma`, `sales.warranties`,
-  `sales.dunning` (business + enterprise, the tier-4 precedent;
-  FEATURE_CATALOG.md rows + dependency edges).
-- **Goldens**: G-35/G-36/G-37 registered in JOURNAL_RULES.md with
+  `sales.collection-agencies.manage`, `purchasing.rma.read`,
+  `purchasing.rma.manage` (the late-fee/agency pair is the v3.1 L1-11/12
+  addition; the purchasing pair is the v3.2 R-03 addition); zero-drift
+  extended (256 → 265; seed = mirror).
+- **i18n**: ~190 new AR/EN keys (RMA screens — customer and supplier —
+  dunning workspace, warranty surfaces, letter templates, credit-risk
+  labels, late-fee + agency surfaces — the v3.1/v3.2 additions); parity
+  gate as ever.
+- **Reports**: +2 contracts — `sales.rma_register` (rendering both RMA
+  families) and `sales.dunning_status` (registry 88 → 90); the `ar.aging`
+  additive dunning-step column documented in REPORT_CATALOG.md (no new
+  key).
+- **Feature flags**: +4 keys — `sales.rma`, `sales.warranties`,
+  `sales.dunning`, `purchasing.rma` (business + enterprise, the tier-4
+  precedent; FEATURE_CATALOG.md rows + dependency edges — the last is the
+  v3.2 R-03 addition).
+- **Goldens**: G-35…G-38 registered in JOURNAL_RULES.md with
   posting-engine source types and failure packs; the numbering continues
-  from G-32 (the last shipped golden) through G-33/G-34.
+  from G-32 (the last shipped golden) through G-33/G-34. G-38 is the
+  supplier-return debit note (the v3.2 R-03 addition).
 - **Rules**: BR-064 (dispositions only from INSPECTED; the credit note is
   generated exactly once, atomically with the stock/refund leg) and BR-065
   (the dunning ladder is monotonic per policy — steps advance, never skip
@@ -175,7 +204,7 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
 
 | Task | Description | Layer |
 |---|---|---|
-| T-01 | Migrations `0055`–`0057` (6 RLS'd tables + partner columns) + Drizzle journal/spec | api |
+| T-01 | Migrations `0055`–`0059` (10 RLS'd tables + partner columns, incl. the supplier-RMA pair and the referral register) + Drizzle journal/spec | api |
 | T-02 | RMA lifecycle service (state machine, quantity bounding, approval with SoD) + specs | api |
 | T-03 | Disposition engine: restock via inventory movements + G-35, scrap G-36, refund G-37 + failure packs | api |
 | T-04 | Auto-credit-note generation on RMA completion (atomic with the disposition leg, exactly once — BR-064) | api |
@@ -186,17 +215,18 @@ PHASE-038 shipped G-33/G-34 first on that lineage.
 | T-09 | Late-fee engine: policy rules, fee invoices with VAT treatment, waiver path, fee register (L1-12) | api |
 | T-10 | Collection-agency layer: agency register, referrals, commission posting, callback port (L1-11) | api |
 | T-11 | Aging linkage (additive dunning-step column) + `sales.dunning_status` contract | api |
-| T-12 | `sales.rma_register` report contract + catalog rows | api |
-| T-13 | Web screens: RMA workspace, dunning workspace, warranty + fee + agency surfaces (12-template discipline) | web |
-| T-14 | NAV_ITEMS + command palette + feature gating + AR/EN dictionaries | web |
-| T-15 | Rule specs (BR-064/065, G-35..37 worked examples, spoof battery) + RLS A1–A10 + docs wave + full gates | all |
+| T-12 | `sales.rma_register` report contract (both families) + catalog rows | api |
+| T-13 | Supplier RMA service: mirrored lifecycle, quantity bounding, G-38 debit-note generation, failure packs (R-03) | api |
+| T-14 | Web screens: RMA workspace (customer + supplier families), dunning workspace, warranty + fee + agency surfaces (12-template discipline) | web |
+| T-15 | NAV_ITEMS + command palette + feature gating + AR/EN dictionaries | web |
+| T-16 | Rule specs (BR-064/065, G-35..38 worked examples, spoof battery) + RLS A1–A10 + docs wave + full gates | all |
 
 ## 6. Verification
 
 Acceptance criteria (all must pass with recorded evidence):
 
-1. Migrations 0055–0058 apply cleanly; the seven new tables are RLS'd with
-   composite tenant FKs; Drizzle + ENTITY_CATALOG.md parity (224 rows); the
+1. Migrations 0055–0059 apply cleanly; the ten new tables are RLS'd with
+   composite tenant FKs; Drizzle + ENTITY_CATALOG.md parity (227 rows); the
    partner columns are additive with zero reshape.
 2. RMA end-to-end: REQUESTED → APPROVED → RECEIVED → INSPECTED →
    RESTOCKED — the completion auto-generates the credit note through the
@@ -233,10 +263,15 @@ Acceptance criteria (all must pass with recorded evidence):
     overdue balance to an agency, the commission posts through the engine,
     and the callback port authenticates a hashed token (the 038 portal
     pattern) with audit events.
-11. House gates green (CR-36): RLS A1–A10 for the seven tables · typecheck ·
-    lint · unit · `docs:validate` · i18n parity (~170 keys) · permissions
-    drift 256 → 263 · EXPLAIN budgets for the sweep and RMA list paths.
-12. Completion report `docs/implementation/phases/reports/PHASE-039-COMPLETION.md`
+11. Supplier RMA (R-03): REQUESTED → APPROVED → SHIPPED → CREDITED end-to-end
+    — the completion auto-generates the AP debit note (the G-38 worked
+    example, balanced, exactly once; a replay is a typed rejection) with the
+    inventory issue leg posting atomically; a return line above the received
+    quantity is a typed rejection.
+12. House gates green (CR-36): RLS A1–A10 for the ten tables · typecheck ·
+    lint · unit · `docs:validate` · i18n parity (~190 keys) · permissions
+    drift 256 → 265 · EXPLAIN budgets for the sweep and RMA list paths.
+13. Completion report `docs/implementation/phases/reports/PHASE-039-COMPLETION.md`
     appended with evidence; `IMPLEMENTATION_STATUS.md` row flipped; archive
     delivered as `ERP_PLATFORM_PHASE039.zip` (OA-07).
 

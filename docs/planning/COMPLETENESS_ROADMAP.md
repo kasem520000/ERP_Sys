@@ -1,14 +1,14 @@
 # Completeness Roadmap — The Full-ERP Program (PHASE-035…068)
 
-> **Status:** ACCEPTED — THE AUTHORITATIVE PLAN · v3.1 (gap consolidation, CR-41…CR-48) · **Owner:** Product Owner & Platform Architecture · **Date:** 2026-11-10 (v3.0) · 2026-11-11 (v3.1)
-> **Canonical register:** [COMPLETENESS_REGISTER.md](COMPLETENESS_REGISTER.md) (CR-01…CR-48) · **Evidence base:** [gap-analysis/](gap-analysis/) (the three independent audit reports + the two v3.1 layer files)
+> **Status:** ACCEPTED — THE AUTHORITATIVE PLAN · v3.2 (residual layer R-01…R-15, CR-49…CR-52 · v3.1 gap consolidation, CR-41…CR-48) · **Owner:** Product Owner & Platform Architecture · **Date:** 2026-11-10 (v3.0) · 2026-11-11 (v3.1/v3.2)
+> **Canonical register:** [COMPLETENESS_REGISTER.md](COMPLETENESS_REGISTER.md) (CR-01…CR-52) · **Evidence base:** [gap-analysis/](gap-analysis/) (the three independent audit reports + the two v3.1 layer files + [the v3.2 residual file](gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md)) · **Directive:** [GAP_LAYER3_DIRECTIVE.md](../implementation/GAP_LAYER3_DIRECTIVE.md)
 > **Reading rule:** this roadmap is the INDEX; the phase document is authoritative for its scope. If they conflict, the phase document wins and this file must be corrected.
 
 ---
 
 ## 0. الملخص التنفيذي بالعربية — كيف تستخدم هذه الخطة
 
-**ما هذه الوثيقة؟** هذه هي الخطة الرئيسية لتحويل المنصة من نظام ERP بمستوى نضج L3.2 (60% من ERP متكامل وفق التدقيق المستقل) إلى **نظام ERP شامل ومتكامل بكل ما تعنيه الكلمة**، عبر **34 مرحلة جديدة (PHASE-035 حتى PHASE-068)** موزعة على **4 موجات**، تسد **536 فجوة موثقة** (495 من التقارير الثلاثة الأولى + 43 من طبقتي التدقيق الثانية/الثالثة المدمجتين في v3.1 — راجع §9 لتفصيل الأعداد) بالإضافة إلى إضافات المالك. **قاعدة v3.1 الملزمة (CR-41): كل فجوة مهما كانت شدتها لها موضع في المخطط — لا استبعاد لأي فجوة لأنها "صغيرة".**
+**ما هذه الوثيقة؟** هذه هي الخطة الرئيسية لتحويل المنصة من نظام ERP بمستوى نضج L3.2 (60% من ERP متكامل وفق التدقيق المستقل) إلى **نظام ERP شامل ومتكامل بكل ما تعنيه الكلمة**، عبر **34 مرحلة جديدة (PHASE-035 حتى PHASE-068)** موزعة على **4 موجات**، تسد **548 فجوة موثقة** (495 من التقارير الثلاثة الأولى + 41 من طبقتي v3.1 + 12 من الطبقة الثالثة المتبقية R — راجع §9 لتفصيل الأعداد) بالإضافة إلى إضافات المالك. **قاعدة v3.1 الملزمة (CR-41): كل فجوة مهما كانت شدتها لها موضع في المخطط — لا استبعاد لأي فجوة لأنها "صغيرة".** وقاعدة v3.2 (CR-49): قرارات المالك في المسح الختامي للطبقة الثالثة نهائية وموثقة بالكامل — **الخطة الآن شاملة على مستوى التخطيط**، وكل اكتشاف مستقبلي يلتقطه بروتوكول CR-47 تلقائياً.
 
 **ما الذي استُثني من الخطة (لأنه نُفِّذ وسُلِّم فعلاً في `ERP_PLATFORM_PHASE034_FINAL.zip` بتاريخ 2026-11-09):**
 1. ✅ **القالب القطاعي الثالث عشر `industry.rental_logistics`** — نُفِّذ كاملاً (الترحيل `0047` + الثوابت + الاختبارات + التوثيق) — كانت فجوة «قالب واحد مؤجَّل من 13» في التدقيق.
@@ -29,8 +29,8 @@
 |---|---|
 | Phases | **34** — PHASE-035…065 (v3.0) + PHASE-066…068 (v3.1) — IDs immutable per CR-37 |
 | Waves / stage groups | **4** — stages 12–15 (CR-01); 066/068 sit in Wave 3, 067 in Wave 4 |
-| Gaps in scope | **536** — 495 from the three first-round audit reports + 41 in-scope additions from the two v3.1 layers (43 documented − 2 already shipped: L1-06 petty cash, L1-14 statements); full count reconciliation in §9 |
-| Evidence files | the three first-round reports + [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) + [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (CR-41) |
+| Gaps in scope | **548** — 495 from the three first-round audit reports + 41 in-scope additions from the two v3.1 layers (43 documented − 2 already shipped) + 12 in-scope additions from the v3.2 residual layer (15 documented − 2 owner non-goals − 1 shipped-by-design); full count reconciliation in §9 |
+| Evidence files | the three first-round reports + [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) + [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (v3.1, CR-41) + [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (v3.2, CR-49) |
 | Excluded (already delivered 2026-11-09) | rental_logistics template · marketing landing (CR-02) |
 | Confirmed shipped (never re-implemented) | platform console · subscription/billing + checkout · onboarding activity wizard (CR-04) · **petty cash (L1-06)** · **official partner statements (L1-14)** (CR-46) |
 | Discipline | every phase ships with the CR-36 gates (SQL+Drizzle+catalog parity, permission zero-drift, AR/EN parity, docs:validate, RLS attack tests, feature flags, sync-surface assessment) |
@@ -53,7 +53,7 @@
 | PHASE-036 | Extensibility Core — Custom Fields | نواة القابلية للتوسعة — الحقول المخصصة | 1 | ~3–4 weeks | FD-18 · FD-19 · FD-20 · DF-39 |
 | PHASE-037 | ZATCA Phase-1 & QR Compliance | الامتثال السعودي (المرحلة الأولى) ورمز QR | 1 | ~2–3 weeks | H-01 (P1) · H-02 · X-08 (P1) |
 | PHASE-038 | Procurement Sourcing & Supplier Collaboration | دورة المنافسة الشرائية وتعاون الموردين | 1 | ~3–4 weeks | H-11 · P-01…P-15 · DF-52/53 |
-| PHASE-039 | Returns & Collections (RMA + Dunning) | المرتجعات والتحصيل | 1 | ~3 weeks | H-12 · H-13 · S-14…S-16 · credit-risk · **L1-10…L1-12** |
+| PHASE-039 | Returns & Collections (RMA + Dunning) | المرتجعات والتحصيل | 1 | **~4 weeks** | H-12 · H-13 · S-14…S-16 · credit-risk · **L1-10…L1-12** · **R-03 (supplier RMA)** |
 | PHASE-040 | Data Onboarding & Migration Toolkit | عدة التهيئة والترحيل | 1 | ~2–3.5 weeks | H-17 · IN-26 · TB-19/20 · OA-05 · **L1-21 (export templates)** |
 | PHASE-041 | Communications Hub | مركز الاتصالات (واتساب/SMS/بريد) | 1 | ~2–3 weeks | H-22 · N-06…N-08 · IN-13…18 · FD-30 · TB-23 |
 | PHASE-042 | Manufacturing I — Routing & Work Centers | التصنيع ١ — مسارات التشغيل ومراكز العمل | 2 | ~5–7 weeks | H-04 · M-02…M-04 · M-12…M-19 · **L2-12 (standard costing)** |
@@ -62,13 +62,13 @@
 | PHASE-045 | HR Core — Attendance, Leaves & Shifts | الموارد البشرية الأساسية | 2 | ~4–6 weeks | H-05 (part) · HR-01…04 · HR-13 · N-17 |
 | PHASE-046 | HR Payroll Compliance | الامتثال الرواتبي (GOSI/الضريبة/نهاية الخدمة) | 2 | ~3–4 weeks | HR-11 · HR-12 · X-02 · IN-06 |
 | PHASE-047 | HR Growth — Talent & Performance | نمو الموارد البشرية — المواهب والأداء | 2 | ~4–6 weeks | HR-05…HR-10 · DF-51 |
-| PHASE-048 | Projects & Contracting | المشاريع والمقاولات | 2 | ~5–7 weeks | H-06 · PR-01…PR-15 · DF-08 · **L2-15 · L2-20** |
-| PHASE-049 | CMMS — Asset Maintenance | صيانة الأصول | 2 | ~3–4 weeks | H-15 · FA-F-01…F-13 |
+| PHASE-048 | Projects & Contracting | المشاريع والمقاولات | 2 | **~5.5–7.5 weeks** | H-06 · PR-01…PR-15 · DF-08 · **L2-15 · L2-20** · **R-04 (IAS 23)** |
+| PHASE-049 | CMMS — Asset Maintenance | صيانة الأصول | 2 | **~3.5–4.5 weeks** | H-15 · FA-F-01…F-13 · **R-10 (fleet light)** |
 | PHASE-050 | Quality Management (QMS) | إدارة الجودة | 2 | ~3–4 weeks | Q-01…Q-12 · M-23 |
 | PHASE-051 | Foreign Trade & Logistics | التجارة الخارجية واللوجستيات | 2 | ~4–5 weeks | H-08 · L-01…L-14 |
 | PHASE-052 | Workflow & Approvals Engine | محرك سير العمل والموافقات | 3 | ~4–6 weeks | H-14 · W-01…W-12 · PP-17 · UX-13 |
-| PHASE-053 | Accounting Depth & Treasury | العمق المحاسبي والخزينة | 3 | ~6–8 weeks | A-01…A-15 · T-01…T-13 · S-19 · DF-55 · **L1-07…L1-09** |
-| PHASE-054 | Tax & Corporate Compliance | الضرائب والامتثال المؤسسي | 3 | ~6–8 weeks | X-01…X-13 · N-02 · H-16 · G-08 · **L1-22 (intangibles)** |
+| PHASE-053 | Accounting Depth & Treasury | العمق المحاسبي والخزينة | 3 | **~8–11 weeks** | A-01…A-15 · T-01…T-13 · S-19 · DF-55 · **L1-07…L1-09** · **R-02 (dual-book) · R-07 (intercompany trade)** |
+| PHASE-054 | Tax & Corporate Compliance | الضرائب والامتثال المؤسسي | 3 | **~6.5–8.5 weeks** | X-01…X-13 · N-02 · H-16 · G-08 · **L1-22 (intangibles)** · **R-05 (IAS 33 EPS)** |
 | PHASE-055 | Public API & Webhooks Platform | منصة الـ API والـ Webhooks العامة | 3 | ~4–5 weeks | H-21 · N-10/11/21 · IN-19…25 · UX-09 · N-15 · **L1-23 (EDI)** |
 | PHASE-056 | Payments & Commerce Integrations | المدفوعات وتكاملات التجارة | 3 | ~4–5 weeks | H-09 · IN-01…04 · IN-07…10 · N-03…05 · S-13 |
 | PHASE-057 | BI & Analytics | ذكاء الأعمال والتحليلات | 3 | ~5–6 weeks | R-01…R-15 · F-7 · PP-20…27 |
@@ -76,20 +76,23 @@
 | PHASE-059 | Platform Operations & Trust | عمليات المنصة والثقة | 3 | ~5–6 weeks | H-19 · PL-01…18 · TB-21/24/25/26/27/31/32/33/35 · G-14…18 · FD-33 · OA-03 |
 | PHASE-060 | Sales & CRM Depth | عمق المبيعات وإدارة العملاء | 4 | ~4–5 weeks | S-01…S-07 · S-10/11/17/18/20/21 |
 | PHASE-061 | POS & Retail Depth | عمق نقاط البيع والتجزئة | 4 | ~3–4 weeks | S-08/S-09 · IN-11/12 · N-16/18/19 |
-| PHASE-062 | UX Excellence & Document Design | تميّز التجربة وتصميم المستندات | 4 | ~5–7 weeks | TB-01…18/22/34 · FD-01…17/21…29/34/35 · H-23 · UX-02…09/11…18 · PP-01…10/13/14/18/19/29…34 · OA-01 · **L1-21 (batch ops)** |
+| PHASE-062 | UX Excellence & Document Design | تميّز التجربة وتصميم المستندات | 4 | **~7.5–9.5 weeks** | TB-01…18/22/34 · FD-01…17/21…29/34/35 · H-23 · UX-02…09/11…18 · PP-01…10/13/14/18/19/29…34 · OA-01 · **L1-21 (batch ops)** · **R-08 (DMS binding) · R-12 (calendar) · R-13 (maps) · R-14 (Excel paste)** |
 | PHASE-063 | Gulf & Arabic Differentiators | المميزات الخليجية والعربية | 4 | ~4–6 weeks | DF-01…06/08/10/54 · OA-01 |
-| PHASE-064 | AI Copilot & Intelligent Automation | المساعد الذكي والأتمتة | 4 | ~5–6 weeks | DF-25…DF-35 · UX-20 · PP-16 · G-07 |
+| PHASE-064 | AI Copilot & Intelligent Automation | المساعد الذكي والأتمتة | 4 | **~5.5–6.5 weeks** | DF-25…DF-35 · UX-20 · PP-16 · G-07 · **R-15 (invoice-by-email)** |
 | PHASE-065 | Growth Platform & Customer Success | منصة النمو ونجاح العملاء | 4 | ~3–4 weeks | DF-36…50 · TB-28/29/30 · UX-16 |
-| **PHASE-066** (v3.1) | IFRS Advanced Compliance I — Measurements & Provisions | الامتثال المتقدم ١ — القياسات والمخصصات | 3 | ~5–7 weeks | **L2-01…L2-05 · L2-11 · L2-13 · L2-19** (IAS 24/20/40, IFRS 5/3, IAS 37/36, IAS 1) |
+| **PHASE-066** (v3.1) | IFRS Advanced Compliance I — Measurements & Provisions | الامتثال المتقدم ١ — القياسات والمخصصات | 3 | **~6.5–8.5 weeks** | **L2-01…L2-05 · L2-11 · L2-13 · L2-19** (IAS 24/20/40, IFRS 5/3, IAS 37/36, IAS 1) · **R-01 (IFRS 9 ECL)** |
 | **PHASE-067** (v3.1) | IFRS Advanced Compliance II — Business, Ownership & Disclosure | الامتثال المتقدم ٢ — الأعمال والملكية والإفصاح | 4 | ~5–7 weeks | **L2-06…L2-10 · L2-16 · L2-18** (IFRS 3/2, IAS 19/29, IFRS 10, XBRL) |
 | **PHASE-068** (v3.1) | Accrual Engine, Revenue Recognition & Recurring Commerce | محرك الاستحقاق والاعتراف بالإيراد والتجارة المتكررة | 3 | ~4–5 weeks | **L1-01…L1-05 · L1-15/L1-16 · L2-14 · L2-17** (IFRS 15 contract balances) |
 
 > **Effort figures** are planning estimates for a single senior full-stack agent working
 > phase-by-phase with the house discipline gates; they are not delivery promises.
-> **v3.1 honest re-estimate:** the consolidation wave grows the program from 31 phases /
-> 116–156 weeks to **34 phases / ~136–185 weeks** single-agent (~2.6–3.6 years), of which
-> 035–038 (~15–22 weeks) are already delivered — **remaining ≈ 121–171 weeks**. The
-> wave-parallel sets (§5) are the lever for team execution.
+> **v3.1 honest re-estimate:** the consolidation wave grew the program from 31 phases /
+> 116–156 weeks to **34 phases / ~136–185 weeks**. **v3.2 honest re-estimate (CR-52):**
+> the residual layer adds **+11–12 weeks** (the 11 scope additions: R-01 1.5 · R-02 2–3 ·
+> R-03 1 · R-04 0.5 · R-05 0.5 · R-07 2 · R-10 0.5 · R-12 0.5 · R-13 1 · R-14 1 ·
+> R-15 0.5) → the program totals **~147–197 single-agent weeks (~2.8–3.8 years)**, of
+> which 035–038 (~15–22 weeks) are already delivered — **remaining ≈ 132–183 weeks**.
+> The wave-parallel sets (§5) are the lever for team execution.
 
 ## 4. Exclusions — delivered or already shipped (NEVER re-plan)
 
@@ -100,6 +103,7 @@
 | Platform admin console / subscription+checkout / onboarding activity wizard | audit §5.1 + F-4 confirm shipped (CR-04) |
 | **Petty-cash fund accounting (L1-06)** | BR-020 + `cash_accounts` PETTY (PHASE-008, migration 0012) — CR-46 |
 | **Official customer/supplier statements (L1-14)** | `partner.statement` (012) + `supplier.statement` (011) in REPORT_CATALOG §2 — CR-46 |
+| **Interim reporting over arbitrary periods (R-06, IAS 34)** | SHIPPED-BY-DESIGN — arbitrary `dateFrom`/`dateTo` on every report run (`apps/api/src/modules/reporting/application/contract.ts` lines 154–155) + `fiscal_periods` calendar (schema.ts line 888) — CR-50 |
 | Audit §21 "exists & excellent — do not touch" (posting engine, RLS, decimal discipline, ⌘K + shortcuts, offline clients, consolidation, 8 reconciliations, template discipline) | preserved by CR-36 gates |
 
 ## 5. Dependency graph (summary)
@@ -238,10 +242,10 @@ disambiguated here: **EVAL-F-*** (screen gaps, evaluation report §5.2) and **FA
 | EVAL-F-8 customer portal classification | **035** decision-record → **060** implementation | |
 | EVAL-F-9 platform.payouts claim | **035** decision-record → **059** implementation | |
 
-### 6.5 The v3.1 layers (L1/L2) — complete gap→phase mapping
+### 6.5 The v3.1/v3.2 layers (L1/L2/R) — complete gap→phase mapping
 
-Every gap from the two v3.1 layer files maps to exactly one disposition (CR-45/CR-46;
-evidence in the layer files):
+Every gap from the two v3.1 layer files and the v3.2 residual file maps to exactly
+one disposition (CR-45/CR-46/CR-49/CR-50; evidence in the layer files):
 
 | Family | Range | Disposition |
 |---|---|---|
@@ -258,10 +262,18 @@ evidence in the layer files):
 | Layer 2 — costing (L2) | L2-12 | **042** (standard costing — decided pre-042, CR-45; 043 consumes) |
 | Layer 2 — contract balances (L2) | L2-14, L2-17 | **068** (derive from 068's own schedules) |
 | Layer 2 — project family (L2) | L2-15, L2-20 | **048** (bound to existing PR-11/PR-06 scope + alignment rules; 043 M-21 covers tolling) |
+| Layer 3 — accounting (R) | R-01, R-02, R-05 | **066** (IFRS 9 ECL — the strongest remaining accounting gap) · **053** (dual-book Zakat↔IFRS) · **054** (IAS 33 EPS) |
+| Layer 3 — returns/purchasing (R) | R-03 | **039** (supplier RMA → auto debit note — decided before any 039 code, the owner mandate; estimate → ~4 weeks) |
+| Layer 3 — projects (R) | R-04 | **048** (IAS 23 borrowing-costs capitalization over the WBS window) |
+| Layer 3 — intercompany (R) | R-07 | **053** (PO↔SO matching + the intercompany clearance statement, riding A-10) |
+| Layer 3 — fleet light (R) | R-10 | **049** (vehicle documents + odometer only; full fuel/violations = sectoral non-goal within the CR-50 decision) |
+| Layer 3 — UX/productivity (R) | R-12, R-13, R-14, R-15 | **062** (calendar view · maps · Excel paste) · **064** (invoice-by-email → OCR) |
+| Layer 3 — covered/shipped bindings (R) | R-06, R-08 | **R-08 COVERED BY PLAN** → 062 item 3 (ECM-style folders/versions — ID bound, no new scope) · **R-06 SHIPPED-BY-DESIGN** (arbitrary-period reporting — roadmap §4, never re-planned) |
+| Layer 3 — owner non-goals (R) | R-09, R-11 | **NEVER PLANNED** (R-09 configurator: alternatives 042 BOM variants + 036 custom fields, revisit post-065 · R-11 IAS 41 fair value: agriculture template stays historical-cost — CR-51) |
 
 ## 7. Owner additions (beyond the audits)
 
-OA-01 Arabic-Indic numerals → 063 · OA-02 sync-fleet duty → CR-36 all · OA-03 SDAIA note → 059 · OA-04 ⌘K coverage → CR-36 all · OA-05 demo tenants → 040 · OA-06 performance budgets → CR-36 all · OA-07 delivery convention → register · **OA-08 the v3.1 gap layers → CR-41…48**.
+OA-01 Arabic-Indic numerals → 063 · OA-02 sync-fleet duty → CR-36 all · OA-03 SDAIA note → 059 · OA-04 ⌘K coverage → CR-36 all · OA-05 demo tenants → 040 · OA-06 performance budgets → CR-36 all · OA-07 delivery convention → register · OA-08 the v3.1 gap layers → CR-41…48 · **OA-09 the v3.2 residual layer (R-01…R-15, owner-final decisions) → CR-49…52** (directive preserved as [GAP_LAYER3_DIRECTIVE.md](../implementation/GAP_LAYER3_DIRECTIVE.md)).
 
 ## 8. Execution protocol (for future conversations)
 
@@ -278,7 +290,7 @@ OA-01 Arabic-Indic numerals → 063 · OA-02 sync-fleet duty → CR-36 all · OA
 
 **Completion triple-flip rule (v3.1, CR-48 — binding):** a phase may be marked COMPLETE only when all three flip together — (1) the phase doc header, (2) its IMPLEMENTATION_STATUS row, (3) the completion report with the mandatory code-evidence checklist (template updated). **The three together or nothing.** IMPLEMENTATION_STATUS's own header line must state the last completed phase at every flip.
 
-## 9. Count reconciliation appendix (v3.1)
+## 9. Count reconciliation appendix (v3.1 + v3.2)
 
 The first-round reports contain **518 gap identifiers**: 23 critical (H-01…H-23) + 304
 module-family (A/S/P/I/M/Q/F/HR/PR/T/X/L/R/W/N/PL/G/UX) + 191 commercial
@@ -293,16 +305,29 @@ part of the 518 count; they map per §6.4.
 
 **The v3.1 consolidation adds 43 documented gaps** (L1-01…L1-23 + L2-01…L2-20), of
 which 2 are SHIPPED (L1-06, L1-14 — §4) → **41 enter the plan**: 21 from L1 (incl.
-residuals of the partial-shipped entries) + 20 from L2. New program total:
+residuals of the partial-shipped entries) + 20 from L2. The v3.1 program total was
 **495 + 41 = 536 in-scope gaps across 34 phases**; total documented identifiers:
-518 + 43 = **561** (+ 9 EVAL-F + the OA owner additions, which were never counted as
-audit gaps). The identity 536 = 561 − 23 (first-round non-program) − 2 (L1 shipped)
-holds and is the number this roadmap's §1 carries.
+518 + 43 = **561**.
+
+**The v3.2 residual layer adds 15 documented items** (R-01…R-15 — the owner's final
+sweep, CR-49), of which 2 are owner non-goals (R-09, R-11 — CR-51) and 1 is
+shipped-by-design (R-06, IAS 34 — §4) → **12 enter the plan**: 11 scope additions
+(R-01…R-05, R-07, R-10, R-12…R-15) + 1 covered-by-plan ID binding (R-08 → 062). New
+program total: **536 + 12 = 548 in-scope gaps across 34 phases**; total documented
+identifiers: 561 + 15 = **576** (+ 9 EVAL-F + the OA owner additions, which were never
+counted as audit gaps). The identity **548 = 576 − 23 (first-round non-program) − 2
+(L1 shipped) − 2 (R non-goals) − 1 (R-06 shipped-by-design)** holds and is the number
+this roadmap's §1 carries. The `R-xx` namespace is the Layer-3 family; the first-round
+BI family `R-01…R-15` (FULL_GAP §18, owner 057) predates it — Layer-3 citations always
+carry the "Layer 3"/"v3.2" qualifier where ambiguity is possible, exactly as the
+L1/N disambiguation precedent (CR-41) established.
 
 ---
 
 *Authored 2026-11-10 as part of the completeness planning session; extended 2026-11-11
 by the v3.1 gap-consolidation wave (CR-41…CR-48 — the two layer files, three new
-phases, the re-estimate, and the process hardening). This roadmap, the register, and
-the 34 phase documents constitute Blueprint v3.1. Validation:
-`scripts/validate_docs.py` (check 8) verifies the artifact set.*
+phases, the re-estimate, and the process hardening) and by the v3.2 residual layer
+(CR-49…CR-52 — the owner's final sweep, the 15 R-items with final decisions, the
++11–12-week re-estimate, and the directive preserved as GAP_LAYER3_DIRECTIVE.md).
+This roadmap, the register, and the 34 phase documents constitute Blueprint v3.2.
+Validation: `scripts/validate_docs.py` (check 8) verifies the artifact set.*

@@ -1,7 +1,7 @@
 # PHASE-053 — Accounting Depth & Treasury
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 3 / Stage 14 · **Register:** [CR-23](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §3 A-01…A-15 · §12 T-01…T-13 · §4 S-19 · §28.1 PP-05/PP-09 · §29 DF-55 · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-07 travel residual · L1-08 mileage · L1-09 corporate cards — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46 and v3.2/CR-50) · **Wave:** 3 / Stage 14 · **Register:** [CR-23](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §3 A-01…A-15 · §12 T-01…T-13 · §4 S-19 · §28.1 PP-05/PP-09 · §29 DF-55 · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-07 travel residual · L1-08 mileage · L1-09 corporate cards — the v3.1 scope extension) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-02 dual-book · R-07 intercompany trade — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2/§6.5
 
 ## 1. Phase Overview
 
@@ -47,7 +47,8 @@ In scope:
 4. **Branch P&L segment reporting** (A-06): a per-branch statement set (income
    statement with branch dimension filtering) and a segment report picker on the
    financial statements; management-vs-statutory views are served through dimensions
-   and segments (A-05 served; duplicate dual ledgers recorded as a deferred decision).
+   and segments (A-05 served) — the v3.0 "deferred decision" on duplicate ledgers is
+   now **resolved by R-02** (item 17: the dual-book layer, v3.2/CR-50).
 5. **`partner_netting_documents`** (A-09): AR/AP offset documents for dual-role
    partners with paired subledger application on both sides (G-70 zero-sum); partial
    application and currency handling defined.
@@ -92,12 +93,32 @@ In scope:
     comparison, a closing checklist per period (tasks + verification steps), the
     indirect-method cash-flow statement, and group period-close orchestration across
     tenants through the platform-plane reader.
+17. **Dual-book accounting — local Zakat ↔ IFRS** (**R-02 — added by v3.2/CR-50**,
+    resolving the v3.0 deferred decision): a second base layer built as
+    **book-tagged reconciliation entries** (قيود تسوية موسومة بالكتاب — a ZAKAT/IFRS
+    book tag on adjusting journals, never a parallel ledger copy) plus **dual
+    reporting**: each book's statement set renders from the same journal substrate
+    (base entries + the book's reconciling entries), with a book picker on the
+    statement surfaces and a book-reconciliation report showing every difference
+    line between the two bases. The Zakat-base rules consume the 054 declaration
+    worksheet definitions; IFRS is the default base. A recognized Saudi/Gulf
+    requirement per the owner — severity عالية.
+18. **Intercompany trade** (**R-07 — added by v3.2/CR-50**): automatic **PO↔SO
+    matching between entities** — an intercompany-flagged sales order in the selling
+    entity proposes/mirrors the purchase order in the buying entity (matched pair
+    with a shared correlation key, quantity/price tolerance rules, and
+    in-transit handling) — plus the **intercompany clearance statement** (كشف مقاصة
+    netting AR↔AP positions between entities over a period). Rides item 6's
+    `intercompany_vouchers` and the platform-plane reader (zero cross-tenant writes
+    preserved); feeds the shipped charged-elimination machinery its document-level
+    evidence trail.
 
 Out of scope: live bank-feed aggregation import (056) · budget what-if scenarios
 (A-15 — served by the BI phase 057; this phase feeds budget schedules into
 forecasting) · accounting document archival (A-13 — ECM surfaces land with the UX
-phase 062) · duplicate statutory/management ledgers (deferred decision) · open-banking
-APIs.
+phase 062) · open-banking APIs. *(The v3.0 "duplicate statutory/management ledgers
+— deferred decision" line is closed by R-02 in item 17: the dual-book layer ships
+here, per the owner's v3.2 decision.)*
 
 **v3.1 scope note (CR-46):** the travel/expense depth (L1-07 residual — requests,
 advances, per-diem settlement), mileage reimbursement (L1-08), and the corporate-card
@@ -106,6 +127,12 @@ instruments and the advance/settlement accounting pattern (038) transfers direct
 the effort estimate moves from ~5–6 to ~6–8 weeks. The generic accrual/deferral and
 recurring-billing families (L1-01…05, L1-15, L1-16) deliberately moved to the new
 PHASE-068 instead (CR-44) to keep this phase's scope reviewable.
+
+**v3.2 scope note (CR-50):** the dual-book layer (R-02 — the owner's ~2–3-week
+addition, a recognized Saudi/Gulf requirement) and intercompany trade (R-07 — the
+~2-week PO↔SO matching + clearance addition, the natural completion of the
+consolidation & eliminations family) were added by the owner's residual-layer
+decision; the effort estimate moves from ~6–8 to **~8–11 weeks**.
 
 ## 3. Prerequisites
 

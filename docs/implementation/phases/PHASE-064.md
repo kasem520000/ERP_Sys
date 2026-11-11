@@ -1,7 +1,7 @@
 # PHASE-064 — AI Copilot & Intelligent Automation
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 4 / Stage 15 · **Register:** [CR-34](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) DF-25…DF-35 · UX-20 · PP-16 · G-07 · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.3 (non-goal reversal)
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.2/CR-50) · **Wave:** 4 / Stage 15 · **Register:** [CR-34](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) DF-25…DF-35 · UX-20 · PP-16 · G-07 · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-15 invoice-by-email — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.3 (non-goal reversal) · §6.5
 
 ## 1. Phase Overview
 
@@ -90,6 +90,13 @@ In scope:
      shipped with PHASE-062 (PP-08); source-doc facts remain the ground truth.
    - **Voice entry assist** (DF-33): Arabic speech-to-text into quick forms (partner
      lookup, item lookup, quick payment notes) — voice fills fields, the user confirms.
+5. **Invoice-by-email** (**R-15 — added by v3.2/CR-50**): the inbound front door to
+   item 2's OCR pipeline — forwarding a supplier-invoice email to the tenant's
+   intake address lands the attachment in the OCR queue and returns an AP draft
+   (with per-field confidence + the human-confirmation gate, exactly as the upload
+   path). The intake address rides the 041 channel substrate (inbound email
+   provider behind the provider-port); every intake event is audited; spam/bounce
+   handling documented. No auto-posting — INV-044 governs this path identically.
 
 Out of scope: any AI write path to posted records (excluded by INV-044) · auto-approval or
 auto-matching that bypasses human confirmation · AI-generated financial advice or
@@ -97,6 +104,11 @@ automated decisioning on credit/limits · public/model training on tenant data (
 term in the adapter port, not a feature) · marketing-website content generation ·
 reversal of any other documented non-goal (DF-38 marketplace, DF-41 storefront stay
 non-goals per the register).
+
+**v3.2 scope note (CR-50):** the invoice-by-email intake (R-15) was added by the
+owner's residual-layer decision — it is the inbound front door to the already-scoped
+OCR pipeline, not a new engine; the effort estimate moves from ~5–6 to **~5.5–6.5
+weeks**.
 
 ## 3. Prerequisites
 

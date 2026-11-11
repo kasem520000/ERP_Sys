@@ -1,6 +1,6 @@
 # Completeness Register — Blueprint v3.0 (The Full-ERP Completion Program)
 
-> **Status:** ACCEPTED — extended by v3.1 (CR-41…CR-48, the gap-consolidation wave) · **Owner:** Product Owner & Platform Architecture · **Date:** 2026-11-10 (v3.0) · 2026-11-11 (v3.1)
+> **Status:** ACCEPTED — extended by v3.1 (CR-41…CR-48, the gap-consolidation wave) and v3.2 (CR-49…CR-52, the residual layer) · **Owner:** Product Owner & Platform Architecture · **Date:** 2026-11-10 (v3.0) · 2026-11-11 (v3.1/v3.2)
 > **Extends:** [EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) (v2.0, stages 9–11, PHASE-026…034) without altering any prior decision. v1.1 and v2.0 content remain binding and untouched.
 
 This register is the **single canonical source** for Blueprint v3.0: the post-Enterprise-Depth
@@ -10,7 +10,9 @@ closing the **495 audited gaps** (plus this register's own additions) across
 **31 phases (PHASE-035…065)** organized in **4 waves (stage groups 12–15)** — **extended
 by v3.1 (2026-11-11): the second-round gap consolidation adds 43 new gaps (L1-01…L1-23,
 L2-01…L2-20) and three new phases (PHASE-066…068), taking the program to 34 phases and
-536 in-scope gaps (CR-41…CR-48 below).**
+536 in-scope gaps (CR-41…CR-48 below) — and by v3.2 (2026-11-11): the owner's final
+residual sweep adds 15 items (R-01…R-15) with final decisions, taking the program to
+548 in-scope gaps (CR-49…CR-52 below).**
 
 **Any document that conflicts with this register is wrong and must be corrected; this
 register governs v3.0/v3.1 additions only.** Evidence base: the three independent audit
@@ -21,7 +23,16 @@ reports copied verbatim into [gap-analysis/](gap-analysis/)
 gap ID cited by the phase documents traces to one of those five reports or to §D of
 this register (owner additions).
 
-## A. Program decisions (CR-01…CR-48)
+## A. Program decisions (CR-01…CR-52)
+
+### v3.2 — The residual layer (CR-49…CR-52, 2026-11-11)
+
+| # | Decision | Authority |
+|---|----------|-----------|
+| CR-49 | **The Layer-3 residual sweep accepted — owner decisions final:** the owner's final independent review of the v3.1 plan (against standards/domains no previous audit round covered) found exactly **15 residual items** (11 standards/functional + 4 UX/productivity) and resolved every one by final decision in the same directive — no re-proposal, no further approval. Documented as [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) with the `R-xx` family (R-01…R-15); the directive itself is preserved as [implementation/GAP_LAYER3_DIRECTIVE.md](../implementation/GAP_LAYER3_DIRECTIVE.md). The v3.1 approvals ride the same decision: the L1-xx namespace (CR-41) is finally approved, and the v3.1 report's line-101 count (15/26 → 17/24) is corrected in the v3.2 commit. **After this layer the plan is comprehensive at the planning level** — every future discovery enters through CR-47 in the same commit. Note the `R-xx` collision discipline: the first-round BI family is also `R-01…R-15` (FULL_GAP §18 → 057); Layer-3 citations carry the "Layer 3"/"v3.2" qualifier wherever ambiguity is possible (the CR-41 precedent). | Owner directive 2026-11-11 + this register |
+| CR-50 | **The R dispositions (all owner-final):** **11 scope additions** — R-01 IFRS 9 ECL allowance → **066** (scope item 10; REQUIRES_VERIFICATION on every loss rate; per the owner the strongest remaining accounting gap) · R-02 dual-book Zakat↔IFRS → **053** (item 17: book-tagged reconciliation entries + dual reporting — resolves the v3.0 deferred decision) · R-03 supplier RMA → **039** (item 13: return-to-vendor → auto debit note G-38 — mandated BEFORE any 039 code; 039's estimate moves ~3 → ~4 weeks; the earlier supplier-returns out-of-scope line is superseded) · R-04 IAS 23 → **048** (item 12) · R-05 IAS 33 EPS → **054** (item 14) · R-07 intercompany trade → **053** (item 18: PO↔SO matching + clearance statement) · R-10 fleet light → **049** (item 10: vehicle documents + odometer ONLY — full fuel/violations is a sectoral non-goal within this decision) · R-12 calendar + R-13 maps + R-14 Excel-paste → **062** (item 8) · R-15 invoice-by-email → **064** (item 5). **1 covered-by-plan binding:** R-08 DMS → 062 item 3 (ECM-style folders/versions — no new scope). **1 shipped-by-design binding:** R-06 IAS 34 → arbitrary-period reporting (evidence: reporting contract dateFrom/dateTo, contract.ts 154–155 — roadmap §4). Roadmap §6.5 + §3 and all eight phase documents updated in the same commit. | [GAP_ANALYSIS_LAYER3 §1](gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) |
+| CR-51 | **The two owner non-goals (final):** **R-09 product configurator (CTO/CPQ)** — an independent product category, not ERP completeness; its planned alternatives are BOM variants (PHASE-042) + custom fields (PHASE-036); revisit only after PHASE-065 and only by a recorded owner decision. **R-11 IAS 41 biological assets at fair value** — rarely applicable to the target market; the agriculture template stays historical-cost + shrinkage accounts exactly as `docs/industries/templates/agriculture.md` documents it. Both are never planned; reversing either requires a new CR entry. | Owner directive 2026-11-11 |
+| CR-52 | **The v3.2 honest re-estimate:** the residual layer adds **+11–12 weeks** (11 scope additions: R-01 1.5 · R-02 2–3 · R-03 1 · R-04 0.5 · R-05 0.5 · R-07 2 · R-10 0.5 · R-12 0.5 · R-13 1 · R-14 1 · R-15 0.5 — the range widens past the owner's ~+10–11 expectation only through R-02's 2–3-week spread). Per-phase estimates updated: 039 ~3→**~4** · 048 ~5–7→**~5.5–7.5** · 049 ~3–4→**~3.5–4.5** · 053 ~6–8→**~8–11** · 054 ~6–8→**~6.5–8.5** · 062 ~5–7→**~7.5–9.5** · 064 ~5–6→**~5.5–6.5** · 066 ~5–7→**~6.5–8.5**. Program totals: **~147–197 single-agent weeks** (~2.8–3.8 years), 035–038 (~15–22 weeks) delivered → **~132–183 weeks remaining**. In-scope gaps 536 → **548**; documented identifiers 561 → **576** (arithmetic in roadmap §9). Stating the growth plainly is the policy (CR-41 lineage). | This register + roadmap §1/§3/§9 |
 
 ### v3.1 — The gap-consolidation wave (CR-41…CR-48, 2026-11-11)
 
@@ -106,19 +117,19 @@ this register (owner additions).
 | CR-39 | **OQ-002 (pricing) is a Wave-1 entry condition, not a phase:** final plan pricing is an owner decision recorded in SUBSCRIPTION_AND_ENTITLEMENTS.md; PHASE-037/056 phases assume it resolved. | OQ register |
 | CR-40 | **The program is documentation-first:** this register + [COMPLETENESS_ROADMAP.md](COMPLETENESS_ROADMAP.md) + the 31 phase documents are the authoritative plan. Implementation happens phase-by-phase per the 15-step protocol; each completion appends a report and flips the IMPLEMENTATION_STATUS row. v3.1 extends the document set to 34 phase documents + the two gap-analysis layer files. | AGENT_START_HERE.md protocol |
 
-## B. Identifier allocation (v3.0 + v3.1)
+## B. Identifier allocation (v3.0 + v3.1 + v3.2)
 
-| Namespace | v1.1/v2.0 range | v3.0 range | v3.1 range | Notes |
-|---|---|---|---|---|
-| Phases | 001…034 | 035…065 | **066…068** | immutable (CR-37 extended) |
-| Stage groups | 1…11 | 12…15 | — (066/068 → 14, 067 → 15) | waves 1…4 |
-| Decisions | DR-001…, ED-01…19 | CR-01…40 | **CR-41…48** | this register |
-| Modules | 26 existing | new module keys per phase doc | +`ifrs` (066/067) | feature keys follow `<module>.<capability>` |
-| Entities | 198 | +N per phase doc | +N per 066/067/068 doc | every new table: SQL + Drizzle + ENTITY_CATALOG row (CR-36) |
-| Permissions | 245 | +N per phase doc | +N per 066/067/068 doc | zero-drift discipline extended |
-| Reports | 85 contracts | +N per phase doc | +N per 066/067/068 doc | REPORT_CATALOG rows mandatory |
-| Goldens/INV/BR | G-01…32, INV-001…26, BR-001…056 | continue per phase doc | continue (next free at implementation) | JOURNAL_RULES/ACCOUNTING_INVARIANTS/BUSINESS_RULES updated |
-| Gap IDs | — | H-01…H-23, A/S/P/I/M/Q/F/HR/PR/T/X/L/R/W/N/PL/G/UX + FD/IN/TB/PP/DF | **L1-01…L1-23, L2-01…L2-20** | full mapping in COMPLETENESS_ROADMAP.md §6 |
+| Namespace | v1.1/v2.0 range | v3.0 range | v3.1 range | v3.2 range | Notes |
+|---|---|---|---|---|---|
+| Phases | 001…034 | 035…065 | **066…068** | — (no new phases) | immutable (CR-37 extended) |
+| Stage groups | 1…11 | 12…15 | — (066/068 → 14, 067 → 15) | — | waves 1…4 |
+| Decisions | DR-001…, ED-01…19 | CR-01…40 | **CR-41…48** | **CR-49…52** | this register |
+| Modules | 26 existing | new module keys per phase doc | +`ifrs` (066/067) | — | feature keys follow `<module>.<capability>` |
+| Entities | 198 | +N per phase doc | +N per 066/067/068 doc | +N per the R-item scope additions | every new table: SQL + Drizzle + ENTITY_CATALOG row (CR-36) |
+| Permissions | 245 | +N per phase doc | +N per 066/067/068 doc | +N per the R-item scope additions | zero-drift discipline extended |
+| Reports | 85 contracts | +N per phase doc | +N per 066/067/068 doc | +N per the R-item scope additions | REPORT_CATALOG rows mandatory |
+| Goldens/INV/BR | G-01…32, INV-001…26, BR-001…056 | continue per phase doc | continue (next free at implementation) | continue (G-38 binds to 039/R-03 at implementation) | JOURNAL_RULES/ACCOUNTING_INVARIANTS/BUSINESS_RULES updated |
+| Gap IDs | — | H-01…H-23, A/S/P/I/M/Q/F/HR/PR/T/X/L/R/W/N/PL/G/UX + FD/IN/TB/PP/DF | **L1-01…L1-23, L2-01…L2-20** | **R-01…R-15 (Layer 3 — cite with the "Layer 3"/v3.2 qualifier where the BI family R-01…R-15 could be ambiguous)** | full mapping in COMPLETENESS_ROADMAP.md §6.5 |
 
 ## C. What this program does NOT redo (already delivered / already shipped)
 
@@ -142,12 +153,14 @@ Items the independent audits did not enumerate, added by the platform owner's re
 | OA-06 | **Performance budgets per new table** (index strategy, EXPLAIN-verified hot paths) as phase acceptance criteria | CR-36 (all) |
 | OA-07 | **Interim delivery convention:** the program ships as versioned archives `ERP_PLATFORM_PHASE0NN.zip` per completed phase, built from this repository state | This register |
 | OA-08 | **The second/third-round gap layers (v3.1):** the 43 gaps documented in the two gap-analysis layer files carry the same authority as audited gaps (CR-41); their dispositions are CR-45/CR-46 | This register (v3.1) |
+| OA-09 | **The residual layer (v3.2):** the 15 items of the owner's final sweep (R-01…R-15) carry the same authority as audited gaps, with the owner's decisions final as received (CR-49); dispositions CR-50, non-goals CR-51, re-estimate CR-52; the directive preserved as `docs/implementation/GAP_LAYER3_DIRECTIVE.md` | This register (v3.2) |
 
 ---
 
 *This register was authored as part of the 2026-11-10 completeness planning session and
-extended 2026-11-11 by the v3.1 gap-consolidation wave (CR-41…CR-48). It
-extends — and never contradicts — CONSOLIDATION_REGISTER.md (v1.1), EXPANSION_REGISTER.md
-(v2.0), and the 18 binding ADRs. Validation: `scripts/validate_docs.py` check 8 (v3.0
+extended 2026-11-11 by the v3.1 gap-consolidation wave (CR-41…CR-48) and the v3.2
+residual layer (CR-49…CR-52 — the owner's final sweep). It extends — and never
+contradicts — CONSOLIDATION_REGISTER.md (v1.1), EXPANSION_REGISTER.md (v2.0), and the 18
+binding ADRs. Validation: `scripts/validate_docs.py` check 8 (v3.0/v3.1/v3.2
 artifacts) verifies this register, the roadmap, and the 34 phase documents exist with
 canonical headings.*

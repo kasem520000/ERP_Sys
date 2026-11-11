@@ -1,7 +1,7 @@
 # PHASE-048 — Projects & Contracting
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, IDs bound by v3.1/CR-45) · **Wave:** 2 / Stage 13 · **Register:** [CR-18](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-06) · §11 (PR-01…PR-15) · §29.1 (DF-08) · [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-15 milestone billing · L2-20 subcontracting — v3.1 ID bindings on existing scope) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, IDs bound by v3.1/CR-45, scope extended by v3.2/CR-50) · **Wave:** 2 / Stage 13 · **Register:** [CR-18](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-06) · §11 (PR-01…PR-15) · §29.1 (DF-08) · [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-15 milestone billing · L2-20 subcontracting — v3.1 ID bindings on existing scope) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-04 borrowing costs — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2/§6.5
 
 ## 1. Phase Overview
 
@@ -84,11 +84,24 @@ In scope:
 11. **Contracting print pack (DF-08)**: bilingual AR/EN print templates for progress
     certificates, subcontractor certificates and retention statements; contracts in any
     enabled currency with FX applied at posting per the existing FX discipline.
+12. **Borrowing costs capitalization** (**IAS 23 · R-04 — added by v3.2/CR-50**):
+    financing costs on qualifying construction assets capitalize over the
+    construction window — a capitalization-rate register (weighted average of
+    borrowings, tenant-entered **with source evidence or the posting refuses** —
+    REQUIRES_VERIFICATION), the window driven by the WBS schedule start/end on
+    qualifying projects, and the capitalized-vs-expensed split posted through the
+    engine (the golden numbered at implementation). Scope tracking (`ias23_
+    capitalizations`) rides the project budget lines it capitalizes.
 
 Out of scope: analytic dimensions beyond project (053) · the approval-chain engine
 itself (052) · resource capacity leveling (043 owns work-center capacity) · customer
 portal certificate approval (060) · FX revaluation runs (053) · intercompany
 charge-backs (053).
+
+**v3.2 scope note (CR-50):** the IAS 23 borrowing-costs capitalization (R-04) was
+added by the owner's residual-layer decision — construction financing is this
+phase's substrate (the WBS window defines the capitalization period); the effort
+estimate moves from ~5–7 to ~5.5–7.5 weeks.
 
 ## 3. Prerequisites
 

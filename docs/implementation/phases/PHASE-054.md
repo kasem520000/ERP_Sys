@@ -1,7 +1,7 @@
 # PHASE-054 — Tax & Corporate Compliance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 3 / Stage 14 · **Register:** [CR-24](../../planning/COMPLETENESS_REGISTER.md)
-> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-16 · §13 X-01…X-13 · §17 N-02 · §19 G-08 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §5 ZATCA-stub honesty row · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-22 intangible assets — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2
+> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46 and v3.2/CR-50) · **Wave:** 3 / Stage 14 · **Register:** [CR-24](../../planning/COMPLETENESS_REGISTER.md)
+> **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-16 · §13 X-01…X-13 · §17 N-02 · §19 G-08 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §5 ZATCA-stub honesty row · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-22 intangible assets — the v3.1 scope extension) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-05 EPS — the v3.2 scope extension · R-06 IAS 34 shipped-by-design binding) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2/§6.5
 
 ## 1. Phase Overview
 
@@ -83,6 +83,18 @@ In scope:
     and the **impairment interface stub** for PHASE-066 (L2-13 consumes the register).
     Tax-amortization profiles feed the provision runs exactly as F-10 does for
     tangibles.
+14. **Earnings per share** (**IAS 33 · R-05 — added by v3.2/CR-50**): basic and
+    diluted EPS on the statutory statement set — weighted-average shares computed
+    from the equity/share-register data (tenant-entered share capital and movements
+    with source evidence, REQUIRES_VERIFICATION), the dilution layer from
+    convertible/equity-instrument registers where they exist (the PHASE-067
+    instruments interface — computed when present, cleanly omitted when not),
+    EPS lines rendered on the income statement with the IAS 33 disclosure note.
+    **R-06 (IAS 34 interim reporting) is SHIPPED-BY-DESIGN** and binds here for the
+    record: every statement renders over arbitrary `dateFrom`/`dateTo` ranges
+    (`apps/api/src/modules/reporting/application/contract.ts` lines 154–155) beside
+    the `fiscal_periods` calendar (schema.ts line 888) — interim reporting needs no
+    new machinery.
 
 Out of scope: payroll income tax withholding (PIT — 046) · VAT engine changes
 (shipped, do not touch) · TP documentation authoring · other jurisdictions'
@@ -93,6 +105,12 @@ submission until verification (GATE discipline preserved).
 consolidated into this phase — it extends the fixed-asset register exactly where the
 F-10/F-14/F-15 extensions already live, and its impairment interface prepares the
 PHASE-066 landing; the effort estimate moves from ~5–7 to ~6–8 weeks.
+
+**v3.2 scope note (CR-50):** the IAS 33 earnings-per-share computation (R-05) was
+added by the owner's residual-layer decision — statutory/corporate reporting is this
+phase's territory; the effort estimate moves from ~6–8 to **~6.5–8.5 weeks**. The
+same decision records R-06 (IAS 34) as shipped-by-design (item 14's evidence) — no
+scope, ID bound.
 
 ## 3. Prerequisites
 
