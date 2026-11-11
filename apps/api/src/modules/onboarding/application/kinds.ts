@@ -98,6 +98,7 @@ function issue(field: string, en: string, ar: string): RowIssue {
 }
 
 const ACCOUNT_TYPES: Readonly<Record<string, string>> = {
+  // Canonical + Arabic (the COA kind's own vocabulary).
   asset: "ASSET",
   assets: "ASSET",
   الأصول: "ASSET",
@@ -117,6 +118,32 @@ const ACCOUNT_TYPES: Readonly<Record<string, string>> = {
   expenses: "EXPENSE",
   المصروفات: "EXPENSE",
   مصروفات: "EXPENSE",
+  // PHASE-040 T-05: QuickBooks-shaped account types (the migration-adapter
+  // translation table — docs/migration/MIGRATION_ADAPTERS.md §2; the mapping
+  // document is the contract).
+  bank: "ASSET",
+  accountsreceivable: "ASSET",
+  othercurrentasset: "ASSET",
+  fixedasset: "ASSET",
+  otherasset: "ASSET",
+  accountspayable: "LIABILITY",
+  othercurrentliability: "LIABILITY",
+  longtermliability: "LIABILITY",
+  income: "REVENUE",
+  otherincome: "REVENUE",
+  costofgoodssold: "EXPENSE",
+  // PHASE-040 T-05: Odoo-shaped account types (odoo account.account
+  // "Type" column export).
+  receivable: "ASSET",
+  payable: "LIABILITY",
+  assetcurrent: "ASSET",
+  assetfixed: "ASSET",
+  assetnoncurrent: "ASSET",
+  liabilitycurrent: "LIABILITY",
+  liabilitynoncurrent: "LIABILITY",
+  equityunallocated: "EQUITY",
+  incomenoncurrent: "REVENUE",
+  expensedepreciation: "EXPENSE",
 };
 
 export function normalizeAccountType(raw: string): string | null {

@@ -1373,6 +1373,8 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   // upload slot, BR-066 dry-run → commit jobs, the bilingual error-report
   // export) and the saved-mapping CRUD (both directions). All under the
   // back-office hub key; the demo-data + sandbox routes land with T-06/T-07.
+  { method: "GET", path: "/api/v1/imports/adapters", permission: "configuration.imports.manage" },
+  { method: "GET", path: "/api/v1/imports/adapters/:key/template", permission: "configuration.imports.manage" },
   { method: "GET", path: "/api/v1/imports/kinds", permission: "configuration.imports.manage" },
   { method: "POST", path: "/api/v1/imports/preview-headers", permission: "configuration.imports.manage" },
   { method: "POST", path: "/api/v1/imports/uploads", permission: "configuration.imports.manage" },

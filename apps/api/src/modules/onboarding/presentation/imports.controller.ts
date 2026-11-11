@@ -20,9 +20,11 @@ import { identityOf, type SessionContext } from "../../../infra/context/session-
 import { RequirePermissions } from "../../../infra/auth/require-permissions.decorator";
 import { requireTenantContext } from "../../../infra/db/tenant-context";
 import { UnauthenticatedError } from "../../identity/api/identity";
+import { ImportKindUnknownError as OnboardingImportKindUnknownError } from "../domain/onboarding-errors";
 import { FilesService } from "../../files/api/files";
 import { ImportToolkitService } from "../application/import-toolkit-service";
 import { MappingsService } from "../application/mappings-service";
+import { MIGRATION_ADAPTERS, adapterTemplateCsv, findAdapter } from "../application/adapters";
 
 /**
  * PHASE-040 import toolkit routes (§2.8; matrix §3.18 — all under
@@ -189,6 +191,32 @@ export class ImportsController {
   @RequirePermissions("configuration.imports.manage")
   async errorReport(@Param("id") id: string): Promise<unknown> {
     return envelope(await this.imports.errorReportUrl(id));
+  }
+
+  // -- migration adapters (IN-26 — extract-then-import) ------------------------------
+
+  @Get("adapters")
+  @RequirePermissions("configuration.imports.manage")
+  async adapters(): Promise<unknown> {
+    return envelope(MIGRATION_ADAPTERS);
+  }
+
+  @Get("adapters/:key/template")
+  @RequirePermissions("configuration.imports.manage")
+  async adapterTemplate(@Param("key") key: string): Promise<unknown> {
+    const adapter = findAdapter(key);
+    if (adapter === undefined) {
+      throw new OnboardingImportKindUnknownError(`migration adapter ${key}`);
+    }
+    const tenantId = requireTenantContext().tenantId;
+    const key2 = await this.files.writeArtifact(
+      tenantId,
+      "migration_adapters",
+      `${adapter.key}.csv`,
+      Buffer.from(adapterTemplateCsv(adapter), "utf8"),
+    );
+    const url = await this.files.issueDownloadUrl(tenantId, key2);
+    return envelope({ key: adapter.key, url });
   }
 
   // -- saved mappings (both directions) ------------------------------------------------
