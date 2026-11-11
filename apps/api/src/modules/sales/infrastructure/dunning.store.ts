@@ -936,3 +936,24 @@ export async function findPartnerContactEmail(partnerId: string): Promise<string
   `);
   return (rows.rows as unknown as { email: string }[])[0]?.email ?? null;
 }
+
+/**
+ * PHASE-041 (the 036/039 handoff): the letter's contact phone for the
+ * WHATSAPP/SMS channels — the partner's primary contact with a phone,
+ * else the first contact carrying one. E.164 normalized (+ prefix added
+ * when the stored shape is digits-only — the partner_contacts CHECK
+ * allows both shapes); null = no phone on file.
+ */
+export async function findPartnerContactPhone(partnerId: string): Promise<string | null> {
+  const rows = await tenantTx().execute(sql`
+    SELECT phone FROM partner_contacts
+    WHERE partner_id = ${partnerId} AND phone IS NOT NULL
+    ORDER BY is_primary DESC, created_at
+    LIMIT 1
+  `);
+  const phone = (rows.rows as unknown as { phone: string }[])[0]?.phone ?? null;
+  if (phone === null) {
+    return null;
+  }
+  return phone.startsWith("+") ? phone : `+${phone}`;
+}

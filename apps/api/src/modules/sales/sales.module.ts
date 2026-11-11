@@ -13,6 +13,7 @@ import { CreditNoteService } from "./application/credit-notes";
 import { ReturnsService } from "./application/rma";
 import { WarrantiesService } from "./application/warranties";
 import { DunningService } from "./application/dunning";
+import { CommunicationModule } from "../communication/communication.module";
 import { SalesReallocationService } from "./application/reallocations";
 import { ArQueriesService } from "./application/ar-queries";
 import { SalesRepService, InvoiceOverdueService } from "./application/reps";
@@ -51,7 +52,17 @@ import { getBoss } from "../../infra/jobs/boss";
  * PostingEngine.post (ADR-0007).
  */
 @Module({
-  imports: [AccountingModule, AuditModule, TaxModule, InventoryModule, NotificationsModule],
+  // PHASE-041 (CR-11): the communication module — the dunning letters
+  // ride the outbound pipeline through the channel port (BR-067; the
+  // 036/039 WHATSAPP/SMS QUEUED handoff delivered).
+  imports: [
+    AccountingModule,
+    AuditModule,
+    TaxModule,
+    InventoryModule,
+    NotificationsModule,
+    CommunicationModule,
+  ],
   controllers: [
     SalesController,
     PartnerCreditCheckController,

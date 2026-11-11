@@ -9,6 +9,9 @@ import { AuditService } from "../../audit/api/audit";
 import { PostingService } from "../../accounting/application/posting-service";
 import type { JournalSpec } from "../../accounting/domain/posting-engine/journal-spec";
 import { InboxService } from "../../notifications/application/inbox-service";
+import type { OutboxService } from "../../communication/application/outbox/outbox-service";
+import type { RenderedTemplate } from "../../communication/application/template-service";
+import { TemplateService } from "../../communication/application/template-service";
 import { ambientTx } from "../../../infra/db/tenant-context";
 import { readEffectiveSetting, ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
 import * as salesStore from "../infrastructure/sales.store";
@@ -227,6 +230,11 @@ export function validateLateFeeConfig(
 
 /** The deterministic bilingual letter render (register evidence — the
  * snapshot is byte-identical for identical inputs, RC-10 style). */
+/** PHASE-041: the amount-due string for the outbox template variables. */
+function formatAmountDue(outstanding: string, currencyCode: string): string {
+  return `${outstanding} ${currencyCode}`;
+}
+
 function renderLetter(input: {
   templateKey: string;
   partnerName: string;
@@ -281,7 +289,29 @@ export class DunningService {
     @Inject(PostingService) private readonly posting: PostingService,
     @Inject(InboxService) private readonly inbox: InboxService,
     @Inject(SalesInvoiceService) private readonly invoices: SalesInvoiceService,
-  ) {}
+    /**
+     * PHASE-041 (the 036/039 handoff): the outbound pipeline the letters
+     * ride — optional at construction (legacy specs construct the service
+     * without it) but REQUIRED for channel delivery: WHATSAPP/SMS letters
+     * enqueue and stay QUEUED until the outbox reaches terminal status
+     * (the registered source handler below flips them SENT); EMAIL
+     * letters enqueue + mark SENT in the same step (the 039
+     * register-as-evidence semantics, now backed by a REAL ledger row).
+     */
+    private readonly outbox?: OutboxService | null,
+    @Inject(TemplateService) private readonly templates?: TemplateService | null,
+  ) {
+    if (this.outbox !== undefined && this.outbox !== null) {
+      this.outbox.registerSourceHandler("DUNNING_LETTER", async (event) => {
+        if (event.status === "SENT" || event.status === "DELIVERED") {
+          await store.markLetterSent(event.sourceId!, event.recipient);
+        }
+        // FAILED: the letter STAYS QUEUED — the error lives on the ledger
+        // row (last_error), retries continue per policy; the register
+        // never fabricates a send.
+      });
+    }
+  }
 
   // -- policies ---------------------------------------------------------------------------
 
@@ -581,18 +611,35 @@ export class DunningService {
           subject: rendered.subject,
           bodySnapshot: rendered.body,
         });
-        if (step.channel === "EMAIL") {
-          // Register = delivery evidence (the EmailService union is closed —
-          // see the file header): store the contact email + mark SENT; a
-          // partner with no email on file FAILS the letter (the step stays
-          // consumed — the register never lies about delivery).
-          const emailTo = await store.findPartnerContactEmail(item.partnerId);
-          if (emailTo === null) {
-            await store.markLetterFailed(letterId, "no contact email on file — update the partner's contacts");
-          } else {
-            await store.markLetterSent(letterId, emailTo);
-          }
+        // PHASE-041 (the 036/039 handoff delivered): every channel now
+        // rides the outbound pipeline through the channel port (BR-067).
+        // - EMAIL: enqueue + mark SENT in the same step — the 039
+        //   register-as-evidence semantics, now backed by a REAL ledger
+        //   row (source_type DUNNING_LETTER, source_id = the letter).
+        // - WHATSAPP/SMS: enqueue + the letter STAYS QUEUED; the outbox's
+        //   terminal hook (registered at construction) flips it SENT when
+        //   the port delivers. No contact on file FAILS the letter (the
+        //   step stays consumed — the register never lies about delivery).
+        const sentTo = await this.dispatchLetterThroughOutbox({
+          letterId,
+          channel: step.channel,
+          templateKey: step.templateKey,
+          partnerId: item.partnerId,
+          partnerName,
+          invoiceNo: item.invoiceNo ?? item.invoiceId,
+          amountDue: formatAmountDue(item.outstanding, item.currencyCode),
+          rendered,
+        });
+        if (sentTo === null) {
+          const missing =
+            step.channel === "EMAIL"
+              ? "no contact email on file — update the partner's contacts"
+              : "no contact phone on file — update the partner's contacts";
+          await store.markLetterFailed(letterId, missing);
+        } else if (step.channel === "EMAIL") {
+          await store.markLetterSent(letterId, sentTo);
         }
+        // WHATSAPP/SMS letters stay QUEUED here — the outbox hook decides.
       } catch (error) {
         // ROLLBACK TO also destroys the savepoint — no RELEASE after this.
         await tx?.execute(sql`ROLLBACK TO SAVEPOINT dunning_letter_step`).catch(() => undefined);
@@ -626,7 +673,79 @@ export class DunningService {
     return { asOf, scanned: items.length, lettersFired, escalated };
   }
 
-  // -- letters ------------------------------------------------------------------------------
+  /**
+   * PHASE-041 — the per-letter outbox dispatch (the 036/039 handoff):
+   * resolve the recipient, render the channel template when one exists
+   * (WHATSAPP requires the approved-template shape + positional params),
+   * and enqueue through the port. Returns the recipient address/phone or
+   * null when no contact is on file.
+   *
+   * Fallback semantics (documented): when the step's templateKey does not
+   * resolve for the channel, EMAIL/SMS fall back to the letter's own
+   * deterministic bilingual snapshot (the 039 register shape — those
+   * channels carry free-form text); WHATSAPP FAILS CLOSED (the adapter
+   * only sends approved template messages — a missing template is a
+   * configuration error the letter row records, never a silent no-op).
+   */
+  private async dispatchLetterThroughOutbox(input: {
+    letterId: string;
+    channel: "EMAIL" | "WHATSAPP" | "SMS";
+    templateKey: string;
+    partnerId: string;
+    partnerName: string;
+    invoiceNo: string;
+    amountDue: string;
+    rendered: { subject: string | null; body: string };
+  }): Promise<string | null> {
+    if (this.outbox === undefined || this.outbox === null) {
+      // Legacy construction (pre-041 specs): keep the 039 behavior —
+      // EMAIL resolves its recipient for the register; WHATSAPP/SMS
+      // report no delivery (the letter stays QUEUED).
+      if (input.channel === "EMAIL") {
+        return store.findPartnerContactEmail(input.partnerId);
+      }
+      return null;
+    }
+    const recipient =
+      input.channel === "EMAIL"
+        ? await store.findPartnerContactEmail(input.partnerId)
+        : await store.findPartnerContactPhone(input.partnerId);
+    if (recipient === null) {
+      return null;
+    }
+
+    let templateRender: RenderedTemplate | null = null;
+    if (this.templates !== undefined && this.templates !== null) {
+      templateRender = await this.templates
+        .render(input.templateKey, input.channel, "ar", {
+          customer_name: input.partnerName,
+          invoice_number: input.invoiceNo,
+          amount_due: input.amountDue,
+        })
+        .catch(() => null);
+    }
+
+    await this.outbox.enqueue({
+      channel: input.channel,
+      recipient,
+      locale: "ar",
+      templateKey: input.templateKey,
+      module: "collections",
+      subject: templateRender?.subject ?? input.rendered.subject,
+      body: templateRender?.body ?? input.rendered.body,
+      partnerId: input.partnerId,
+      sourceType: "DUNNING_LETTER",
+      sourceId: input.letterId,
+      whatsappTemplateName:
+        input.channel === "WHATSAPP"
+          ? (templateRender !== null ? input.templateKey : null)
+          : null,
+      whatsappTemplateParams: templateRender?.whatsappParams ?? null,
+    });
+    return recipient;
+  }
+
+  // -- letters ------------------------------------------------------------------
 
   async listLetters(filter: { partnerId?: string; invoiceId?: string; limit: number }) {
     return store.listLetters(filter);
