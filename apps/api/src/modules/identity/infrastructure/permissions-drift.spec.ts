@@ -31,6 +31,7 @@ const SEED_PATHS = [
   join(process.cwd(), "migrations", "0049_custom_fields.sql"), // PHASE-036 extensibility core (245 → 248)
   join(process.cwd(), "migrations", "0050_zatca_phase1.sql"), // PHASE-037 ZATCA device registry (248 → 249)
   join(process.cwd(), "migrations", "0051_rfq_quotes.sql"), // PHASE-038 sourcing keys (249 → 256)
+  join(process.cwd(), "migrations", "0056_dunning_collections.sql"), // PHASE-039 returns & collections keys (256 → 265)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

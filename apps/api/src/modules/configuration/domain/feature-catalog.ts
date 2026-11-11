@@ -120,6 +120,15 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "purchasing.supplier_scorecards": ["purchasing.goods_receipts"],
   "purchasing.capex_requests": ["purchasing.requests"],
   "purchasing.supplier_portal": ["purchasing.rfqs"],
+  // PHASE-039 returns & collections keys (migration 0056 §10 — business
+  // + enterprise, the tier-4 precedent): the RMA workflow rides the
+  // sales-invoice chain; warranties ride the returns substrate; the
+  // dunning engine rides receivables aging; the supplier mirror (R-03,
+  // v3.2/CR-50) rides the purchasing chain.
+  "sales.rma": ["sales.invoices"],
+  "sales.warranties": ["sales.rma"],
+  "sales.dunning": ["sales.receivables_aging"],
+  "purchasing.rma": ["purchasing.goods_receipts"],
   // treasury
   "treasury.accounts": ["accounting.chart_of_accounts"],
   "treasury.receipts_disbursements": ["treasury.accounts"],

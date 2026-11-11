@@ -2426,6 +2426,123 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // -- PHASE-039 returns & collections fixtures (0055–0059) --
+  await superuser.query(
+    `INSERT INTO dunning_policies (id, tenant_id, name, steps)
+     VALUES
+       ('3a3a3a39-0000-4000-8000-000000000001', $1, 'ISO dunning',
+        '[{"stepNo":1,"daysOverdue":30,"channel":"EMAIL","templateKey":"dunning.reminder.1","escalate":false}]'::jsonb),
+       ('3a3a3a39-0000-4000-8000-000000000002', $2, 'ISO dunning',
+        '[{"stepNo":1,"daysOverdue":30,"channel":"EMAIL","templateKey":"dunning.reminder.1","escalate":false}]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO return_authorizations (id, tenant_id, branch_id, partner_id, invoice_id,
+                                         reason_code, status, currency_code)
+     VALUES
+       ('3b3b3b39-0000-4000-8000-000000000001', $1, 'abababab-0000-4000-8000-000000000001',
+        'b5b5b5b5-0000-4000-8000-000000000001', '77777777-0000-4000-8000-000000000001',
+        'DAMAGED', 'REQUESTED', 'SAR'),
+       ('3b3b3b39-0000-4000-8000-000000000002', $2, 'abababab-0000-4000-8000-000000000002',
+        'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002',
+        'DAMAGED', 'REQUESTED', 'SAR')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO return_authorization_lines (id, tenant_id, rma_id, line_no, invoice_line_id, qty)
+     VALUES
+       ('3c3c3c39-0000-4000-8000-000000000001', $1, '3b3b3b39-0000-4000-8000-000000000001', 1,
+        '78787878-0000-4000-8000-000000000001', 2),
+       ('3c3c3c39-0000-4000-8000-000000000002', $2, '3b3b3b39-0000-4000-8000-000000000002', 1,
+        '78787878-0000-4000-8000-000000000002', 2)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO warranty_registrations (id, tenant_id, partner_id, item_id, terms,
+                                          start_date, end_date, status)
+     VALUES
+       ('3d3d3d39-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001',
+        '{"durationMonths":12,"coverage":"REPAIR","basis":"INVOICE_DATE"}'::jsonb,
+        '2027-02-01', '2028-02-01', 'ACTIVE'),
+       ('3d3d3d39-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002',
+        '{"durationMonths":12,"coverage":"REPAIR","basis":"INVOICE_DATE"}'::jsonb,
+        '2027-02-01', '2028-02-01', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO dunning_letters (id, tenant_id, policy_id, partner_id, invoice_id, step_no,
+                                   days_overdue, letter_date, channel, template_key, status)
+     VALUES
+       ('3e3e3e39-0000-4000-8000-000000000001', $1, '3a3a3a39-0000-4000-8000-000000000001',
+        'b5b5b5b5-0000-4000-8000-000000000001', '77777777-0000-4000-8000-000000000001', 1,
+        30, '2027-03-01', 'EMAIL', 'dunning.reminder.1', 'SENT'),
+       ('3e3e3e39-0000-4000-8000-000000000002', $2, '3a3a3a39-0000-4000-8000-000000000002',
+        'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002', 1,
+        30, '2027-03-01', 'EMAIL', 'dunning.reminder.1', 'SENT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO collection_actions (id, tenant_id, partner_id, action_type, action_date)
+     VALUES
+       ('3f3f3f39-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        'CALL', '2027-03-01'),
+       ('3f3f3f39-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        'CALL', '2027-03-01')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO collection_agencies (id, tenant_id, partner_id, commission_mode, commission_pct)
+     VALUES
+       ('40404039-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        'PCT_OF_COLLECTED', 10),
+       ('40404039-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        'PCT_OF_COLLECTED', 10)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO collection_referrals (id, tenant_id, agency_id, partner_id, currency_code,
+                                        referral_date, referred_amount, commission_mode, commission_pct)
+     VALUES
+       ('41414139-0000-4000-8000-000000000001', $1, '40404039-0000-4000-8000-000000000001',
+        'b5b5b5b5-0000-4000-8000-000000000001', 'SAR', '2027-03-01', 50, 'PCT_OF_COLLECTED', 10),
+       ('41414139-0000-4000-8000-000000000002', $2, '40404039-0000-4000-8000-000000000002',
+        'b5b5b5b5-0000-4000-8000-000000000002', 'SAR', '2027-03-01', 50, 'PCT_OF_COLLECTED', 10)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_return_authorizations (id, tenant_id, branch_id, supplier_id,
+                                                   purchase_order_id, reason_code, status, currency_code)
+     VALUES
+       ('42424239-0000-4000-8000-000000000001', $1, 'abababab-0000-4000-8000-000000000001',
+        'b5b5b5b5-0000-4000-8000-000000000001', '5c5c5c5c-0000-4000-8000-000000000001',
+        'DAMAGED', 'REQUESTED', 'SAR'),
+       ('42424239-0000-4000-8000-000000000002', $2, 'abababab-0000-4000-8000-000000000002',
+        'b5b5b5b5-0000-4000-8000-000000000002', '5c5c5c5c-0000-4000-8000-000000000002',
+        'DAMAGED', 'REQUESTED', 'SAR')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_return_authorization_lines (id, tenant_id, srma_id, line_no, po_line_id, qty)
+     VALUES
+       ('43434339-0000-4000-8000-000000000001', $1, '42424239-0000-4000-8000-000000000001', 1,
+        '5d5d5d5d-0000-4000-8000-000000000001', 2),
+       ('43434339-0000-4000-8000-000000000002', $2, '42424239-0000-4000-8000-000000000002', 1,
+        '5d5d5d5d-0000-4000-8000-000000000002', 2)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -2889,6 +3006,17 @@ const OWN_ROW: Record<string, [string, string]> = {
   early_payment_discount_terms: ["e1388038-0000-4000-8000-000000000001", "e1388038-0000-4000-8000-000000000002"],
   capex_requests: ["f1388038-0000-4000-8000-000000000001", "f1388038-0000-4000-8000-000000000002"],
   tender_intakes: ["a2388038-0000-4000-8000-000000000001", "a2388038-0000-4000-8000-000000000002"],
+  // PHASE-039 returns & collections (0055–0059)
+  dunning_policies: ["3a3a3a39-0000-4000-8000-000000000001", "3a3a3a39-0000-4000-8000-000000000002"],
+  return_authorizations: ["3b3b3b39-0000-4000-8000-000000000001", "3b3b3b39-0000-4000-8000-000000000002"],
+  return_authorization_lines: ["3c3c3c39-0000-4000-8000-000000000001", "3c3c3c39-0000-4000-8000-000000000002"],
+  warranty_registrations: ["3d3d3d39-0000-4000-8000-000000000001", "3d3d3d39-0000-4000-8000-000000000002"],
+  dunning_letters: ["3e3e3e39-0000-4000-8000-000000000001", "3e3e3e39-0000-4000-8000-000000000002"],
+  collection_actions: ["3f3f3f39-0000-4000-8000-000000000001", "3f3f3f39-0000-4000-8000-000000000002"],
+  collection_agencies: ["40404039-0000-4000-8000-000000000001", "40404039-0000-4000-8000-000000000002"],
+  collection_referrals: ["41414139-0000-4000-8000-000000000001", "41414139-0000-4000-8000-000000000002"],
+  supplier_return_authorizations: ["42424239-0000-4000-8000-000000000001", "42424239-0000-4000-8000-000000000002"],
+  supplier_return_authorization_lines: ["43434339-0000-4000-8000-000000000001", "43434339-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3594,6 +3722,42 @@ const MISMATCHED_INSERT: Record<string, string> = {
   tender_intakes: `INSERT INTO tender_intakes (id, tenant_id, intake_no, title, announcing_authority, our_decision, status)
      VALUES ('a2388038-3000-4000-8000-000000000003', $1, 'ISO-TND', 'Isolation tender',
              'Isolation authority', 'PENDING', 'OPEN')`,
+  // PHASE-039 returns & collections (0055–0059)
+  dunning_policies: `INSERT INTO dunning_policies (id, tenant_id, name, steps)
+     VALUES ('3a3a3a39-3000-4000-8000-000000000003', $1, 'ISO attack',
+             '[{"stepNo":1,"daysOverdue":30,"channel":"EMAIL","templateKey":"dunning.reminder.1","escalate":false}]'::jsonb)`,
+  return_authorizations: `INSERT INTO return_authorizations (id, tenant_id, branch_id, partner_id, invoice_id, reason_code, status, currency_code)
+     VALUES ('3b3b3b39-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+             'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002',
+             'DAMAGED', 'REQUESTED', 'SAR')`,
+  return_authorization_lines: `INSERT INTO return_authorization_lines (id, tenant_id, rma_id, line_no, invoice_line_id, qty)
+     VALUES ('3c3c3c39-3000-4000-8000-000000000003', $1, '3b3b3b39-0000-4000-8000-000000000002', 1,
+             '78787878-0000-4000-8000-000000000002', 2)`,
+  warranty_registrations: `INSERT INTO warranty_registrations (id, tenant_id, partner_id, item_id, terms, start_date, end_date, status)
+     VALUES ('3d3d3d39-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002',
+             '{"durationMonths":12,"coverage":"REPAIR","basis":"INVOICE_DATE"}'::jsonb,
+             '2027-02-01', '2028-02-01', 'ACTIVE')`,
+  dunning_letters: `INSERT INTO dunning_letters (id, tenant_id, policy_id, partner_id, invoice_id, step_no, days_overdue, letter_date, channel, template_key)
+     VALUES ('3e3e3e39-3000-4000-8000-000000000003', $1, '3a3a3a39-0000-4000-8000-000000000002',
+             'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002', 1,
+             30, '2027-03-01', 'EMAIL', 'dunning.reminder.1')`,
+  collection_actions: `INSERT INTO collection_actions (id, tenant_id, partner_id, action_type, action_date)
+     VALUES ('3f3f3f39-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             'CALL', '2027-03-01')`,
+  collection_agencies: `INSERT INTO collection_agencies (id, tenant_id, partner_id, commission_mode, commission_pct)
+     VALUES ('40404039-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             'PCT_OF_COLLECTED', 10)`,
+  collection_referrals: `INSERT INTO collection_referrals (id, tenant_id, agency_id, partner_id, currency_code, referral_date, referred_amount, commission_mode, commission_pct)
+     VALUES ('41414139-3000-4000-8000-000000000003', $1, '40404039-0000-4000-8000-000000000002',
+             'b5b5b5b5-0000-4000-8000-000000000002', 'SAR', '2027-03-01', 50, 'PCT_OF_COLLECTED', 10)`,
+  supplier_return_authorizations: `INSERT INTO supplier_return_authorizations (id, tenant_id, branch_id, supplier_id, purchase_order_id, reason_code, status, currency_code)
+     VALUES ('42424239-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+             'b5b5b5b5-0000-4000-8000-000000000002', '5c5c5c5c-0000-4000-8000-000000000002',
+             'DAMAGED', 'REQUESTED', 'SAR')`,
+  supplier_return_authorization_lines: `INSERT INTO supplier_return_authorization_lines (id, tenant_id, srma_id, line_no, po_line_id, qty)
+     VALUES ('43434339-3000-4000-8000-000000000003', $1, '42424239-0000-4000-8000-000000000002', 1,
+             '5d5d5d5d-0000-4000-8000-000000000002', 2)`,
 };
 
 beforeAll(async () => {
