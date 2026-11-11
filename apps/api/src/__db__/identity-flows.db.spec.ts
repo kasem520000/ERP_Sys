@@ -163,7 +163,12 @@ describe("seeds (acceptance 9)", () => {
     // manage/approve, sales.dunning.manage, sales.warranties.manage,
     // sales.late-fees.manage, sales.collection-agencies.manage,
     // purchasing.rma.read/manage).
-    expect(result.rows[0]?.n).toBe(265);
+    // 265 + 2 = 267 after 0060 — the two PHASE-040 onboarding keys
+    // (configuration.imports.manage, configuration.demo_data.manage — the
+    // toolkit surface; zero platform.* additions per the identity-flows
+    // platform rule, the deviation note in PHASE-040 §2.5 records the
+    // rename from the phase doc's platform.imports.* spelling).
+    expect(result.rows[0]?.n).toBe(267);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

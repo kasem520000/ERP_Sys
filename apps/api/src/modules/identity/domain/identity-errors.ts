@@ -101,6 +101,31 @@ export class TenantSuspendedError extends DomainError {
   }
 }
 
+/**
+ * PHASE-040 (OA-05): a SANDBOX tenant past its sandbox_expires_at — login
+ * and every tenant-scoped request refuse with this typed error (the
+ * SUSPENDED precedent; the account itself survives).
+ */
+export class SandboxTenantExpiredError extends DomainError {
+  constructor() {
+    super("SANDBOX_TENANT_EXPIRED", "this demo tenant's time box has expired — provision a fresh one");
+  }
+}
+
+/**
+ * PHASE-040 (OA-05): the SANDBOX user quota — ACTIVE memberships + open
+ * invitations reached sandbox_max_users.
+ */
+export class SandboxUserQuotaExceededError extends DomainError {
+  constructor(details: { cap: number; usage: number }) {
+    super(
+      "SANDBOX_USER_QUOTA_EXCEEDED",
+      `this demo tenant's user quota is full (${details.usage}/${details.cap}) — provision a larger sandbox or close seats`,
+      details,
+    );
+  }
+}
+
 export class InvalidTotpCodeError extends DomainError {
   constructor() {
     super("VALIDATION_ERROR", "the verification code is not valid");

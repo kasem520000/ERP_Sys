@@ -115,3 +115,20 @@ export class DemoSeedRefusedError extends DomainError {
     super("ONBOARDING_DEMO_SEED_REFUSED", message);
   }
 }
+
+/** A SANDBOX tenant can never join a consolidation group (§2.6). */
+export class SandboxConsolidationMemberError extends DomainError {
+  constructor(tenantId: string) {
+    super(
+      "ONBOARDING_SANDBOX_CONSOLIDATION_MEMBER",
+      `tenant ${tenantId} is a SANDBOX demo tenant — demo data never flows into consolidated statements`,
+    );
+  }
+}
+
+/** Sandbox provisioning failures (OA-05): typed, one error per cause. */
+export class SandboxProvisioningError extends DomainError {
+  constructor(message: string) {
+    super("ONBOARDING_SANDBOX_PROVISIONING", message);
+  }
+}

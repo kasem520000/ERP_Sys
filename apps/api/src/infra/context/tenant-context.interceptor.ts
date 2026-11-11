@@ -10,6 +10,7 @@ import { membershipOptions } from "../../modules/identity/infrastructure/identit
 import {
   TenantSuspendedError,
   TenantContextRequiredError,
+  SandboxTenantExpiredError,
 } from "../../modules/identity/domain/identity-errors";
 import { SubscriptionReadOnlyError } from "../../modules/tenancy/domain/subscription-errors";
 import { RESOLVING_ACTIONS } from "../../modules/tenancy/application/billing/billing-config";
@@ -90,6 +91,12 @@ export class TenantContextInterceptor implements NestInterceptor {
       // operations tenant is lifecycle-protected from suspension; if it
       // ever ends up suspended this fails closed too.)
       throw new TenantSuspendedError(); // 503 tenant_suspended (S-02)
+    }
+    // PHASE-040 (OA-05, migration 0061): an expired SANDBOX tenant kills
+    // its sessions at the first request past sandbox_expires_at (the
+    // SUSPENDED precedent — the enforcement rides the same projection).
+    if (active.sandboxExpired) {
+      throw new SandboxTenantExpiredError();
     }
     // PHASE-014: read-only grace enforcement (§2.3). The subscription
     // state resolves through the migration-0021 pre-GUC projection and is

@@ -29,6 +29,8 @@ import {
   RateLimitedError,
   StaleVersionError,
   TenantContextRequiredError,
+  SandboxTenantExpiredError,
+  SandboxUserQuotaExceededError,
   TenantSuspendedError,
   UnauthenticatedError,
 } from "../../modules/identity/domain/identity-errors";
@@ -202,6 +204,8 @@ import {
   ImportBudgetInvalidError as OnboardingImportBudgetInvalidError,
   ImportPreviewStaleError as OnboardingImportPreviewStaleError,
   DemoSeedRefusedError as OnboardingDemoSeedRefusedError,
+  SandboxProvisioningError as OnboardingSandboxProvisioningError,
+  SandboxConsolidationMemberError as OnboardingSandboxConsolidationMemberError,
 } from "../../modules/onboarding/domain/onboarding-errors";
 import { PostingError } from "../../modules/accounting/domain/posting-engine/posting-errors";
 import {
@@ -806,6 +810,11 @@ function domainStatus(error: DomainError): number {
   if (error instanceof TenantSuspendedError) {
     return HttpStatus.SERVICE_UNAVAILABLE;
   }
+  // PHASE-040 (OA-05): an expired SANDBOX tenant — 410 GONE (the demo's
+  // time box is over; the account itself survives).
+  if (error instanceof SandboxTenantExpiredError) {
+    return HttpStatus.GONE;
+  }
   // PHASE-018 (migration 0026): the manufacturing quarantine/provenance
   // lifecycle conflicts (409) — the internal inventory surface the QC gate
   // and completion flow call. The policy-class rejections
@@ -983,6 +992,9 @@ function domainStatus(error: DomainError): number {
     error instanceof OnboardingImportBudgetInvalidError ||
     error instanceof OnboardingImportPreviewStaleError ||
     error instanceof OnboardingDemoSeedRefusedError ||
+    error instanceof OnboardingSandboxProvisioningError ||
+    error instanceof SandboxUserQuotaExceededError ||
+    error instanceof OnboardingSandboxConsolidationMemberError ||
     error instanceof CategoryCycleError ||
     error instanceof CategoryParentArchivedError ||
     error instanceof SystemCreditTermsImmutableError ||

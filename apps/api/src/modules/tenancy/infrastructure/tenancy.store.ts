@@ -191,13 +191,14 @@ export interface TenantProfileRow {
   demoSeededAt: string | null;
   demoTemplate: string | null;
   sandboxExpiresAt: string | null;
+  sandboxMaxUsers: number | null;
 }
 
 const TENANT_COLUMNS = sql`id, name, name_ar AS "nameAr", status, base_currency AS "baseCurrency",
   country_code AS "countryCode", timezone, industry_template_key AS "industryTemplateKey",
   deleted_at AS "deletedAt", created_at AS "createdAt", updated_at AS "updatedAt", version,
   kind, demo_seeded_at AS "demoSeededAt", demo_template AS "demoTemplate",
-  sandbox_expires_at AS "sandboxExpiresAt"`;
+  sandbox_expires_at AS "sandboxExpiresAt", sandbox_max_users AS "sandboxMaxUsers"`;
 
 /** Cross-tenant list/search under the platform GUC (keyset on created_at/id). */
 export async function platformListTenants(input: {
@@ -233,11 +234,24 @@ export async function platformGetTenant(id: string): Promise<TenantProfileRow | 
   return (rows.rows as unknown as TenantProfileRow[])[0];
 }
 
-/** Own-tenant profile read inside the ambient tenant scope. */
+/**
+ * Own-tenant profile read inside the ambient tenant scope.
+ *
+ * PHASE-040 T-07 fix: pinned to `erp.current_tenant_id()` instead of a bare
+ * `LIMIT 1`. In a pure tenant scope RLS already reduces the table to one
+ * row, so the pin is a no-op; in the platform + tenant-on-tx combo (the
+ * sandbox/registration provisioning UoW) the tenants policy is
+ * `id = current_tenant_id() OR platform_scope_active()` — both GUCs ride
+ * the same transaction, and a bare `LIMIT 1` could surface ANY platform-
+ * visible tenant (the first inserted row). The pin returns the ambient
+ * tenant deterministically in both shapes.
+ */
 export async function getOwnTenant(): Promise<TenantProfileRow> {
   const tx = tenantTx();
   const rows = await tx.execute(sql`
-    SELECT ${TENANT_COLUMNS} FROM tenants LIMIT 1
+    SELECT ${TENANT_COLUMNS} FROM tenants
+    WHERE id = erp.current_tenant_id()
+    LIMIT 1
   `);
   const row = (rows.rows as unknown as TenantProfileRow[])[0];
   if (row === undefined) {
@@ -262,6 +276,35 @@ export async function insertTenant(input: InsertTenantInput): Promise<TenantProf
     INSERT INTO tenants (id, name, name_ar, status, base_currency, country_code, timezone, industry_template_key)
     VALUES (${generateUuidV7()}, ${input.name}, ${input.nameAr}, 'ACTIVE', ${input.baseCurrency},
             ${input.countryCode}, ${input.timezone}, ${input.industryTemplateKey})
+    RETURNING ${TENANT_COLUMNS}
+  `);
+  return (rows.rows as unknown as TenantProfileRow[])[0]!;
+}
+
+/**
+ * PHASE-040 (OA-05): the SANDBOX tenant — platform-plane provisioning with
+ * the time-box/quota/owner-email columns (migration 0060 §3). STANDARD
+ * tenants never carry them (the CHECK).
+ */
+export async function insertSandboxTenant(input: {
+  name: string;
+  nameAr: string | null;
+  baseCurrency: string;
+  countryCode: string;
+  timezone: string;
+  industryTemplateKey: string;
+  sandboxExpiresAt: string;
+  sandboxMaxUsers: number;
+  sandboxOwnerEmail: string;
+}): Promise<TenantProfileRow> {
+  const tx = platformTx();
+  const rows = await tx.execute(sql`
+    INSERT INTO tenants (id, name, name_ar, status, base_currency, country_code, timezone,
+      industry_template_key, kind, sandbox_expires_at, sandbox_max_users, sandbox_owner_email)
+    VALUES (${generateUuidV7()}, ${input.name}, ${input.nameAr}, 'ACTIVE', ${input.baseCurrency},
+            ${input.countryCode}, ${input.timezone}, ${input.industryTemplateKey},
+            'SANDBOX', ${input.sandboxExpiresAt}::timestamptz, ${input.sandboxMaxUsers},
+            ${input.sandboxOwnerEmail})
     RETURNING ${TENANT_COLUMNS}
   `);
   return (rows.rows as unknown as TenantProfileRow[])[0]!;
@@ -352,6 +395,13 @@ export interface InsertBranchInput {
   name: string;
   nameAr: string | null;
   address: unknown;
+}
+
+/** PHASE-040 (OA-05): the member tenant's kind, platform-plane read. */
+export async function platformTenantKindOf(tenantId: string): Promise<string | undefined> {
+  const tx = platformTx();
+  const rows = await tx.execute(sql`SELECT kind FROM tenants WHERE id = ${tenantId}`);
+  return (rows.rows as unknown as { kind: string }[])[0]?.kind;
 }
 
 /**

@@ -492,6 +492,9 @@ export interface MembershipOption {
   roleNameAr: string | null;
   branchScope: string[] | null;
   membershipStatus: string;
+  /** PHASE-040 (migration 0061): the SANDBOX plane on the same projection. */
+  tenantKind: string;
+  sandboxExpired: boolean;
 }
 
 export async function membershipOptions(userId: string): Promise<MembershipOption[]> {
@@ -506,6 +509,27 @@ export async function effectivePermissions(userId: string, tenantId: string): Pr
     sql`SELECT permission_key FROM erp.user_effective_permissions(${userId}, ${tenantId})`,
   );
   return new Set((rows.rows as { permission_key: string }[]).map((r) => r.permission_key));
+}
+
+/**
+ * PHASE-040 (OA-05): the SANDBOX user-quota usage — ACTIVE memberships +
+ * open (unexpired, unrevoked) invitations in the ambient tenant.
+ */
+export async function countUsersAndOpenInvitations(tenantId: string): Promise<number> {
+  const tx = ambientTx();
+  if (tx === undefined) {
+    throw new Error("invitation quota check requires an ambient tenant scope");
+  }
+  const rows = await tx.execute(sql`
+    SELECT
+      (SELECT count(*) FROM memberships WHERE tenant_id = ${tenantId} AND status = 'ACTIVE')
+      + (SELECT count(*) FROM invitations
+          WHERE tenant_id = ${tenantId}
+            AND revoked_at IS NULL
+            AND accepted_at IS NULL
+            AND expires_at > now())::int AS usage
+  `);
+  return Number((rows.rows as unknown as { usage: number }[])[0]?.usage ?? 0);
 }
 
 // ---------------------------------------------------------------------------

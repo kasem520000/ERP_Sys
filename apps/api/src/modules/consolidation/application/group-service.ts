@@ -1,3 +1,5 @@
+import { platformTenantKindOf } from "../../tenancy/infrastructure/tenancy.store";
+import { SandboxConsolidationMemberError } from "../../onboarding/domain/onboarding-errors";
 import { Inject, Injectable } from "@nestjs/common";
 
 import { compareExact } from "../../accounting/application/decimal-strings";
@@ -129,6 +131,13 @@ export class GroupService {
       compareExact(input.ownershipPercent, "100") > 0
     ) {
       throw new OwnershipPercentInvalidError(input.ownershipPercent);
+    }
+    // PHASE-040 (OA-05): a SANDBOX tenant is NEVER a consolidation member —
+    // demo data must never flow into consolidated statements (typed
+    // refusal; the platform-plane kind read rides withPlatformScope).
+    const memberKind = await platformTenantKindOf(input.memberTenantId);
+    if (memberKind === "SANDBOX") {
+      throw new SandboxConsolidationMemberError(input.memberTenantId);
     }
     const member = await insertGroupMember({
       groupId: input.groupId,

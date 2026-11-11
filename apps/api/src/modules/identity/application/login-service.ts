@@ -1,3 +1,4 @@
+import { SandboxTenantExpiredError } from "../domain/identity-errors";
 import { AuditService } from "../../audit/api/audit";
 import { childLogger } from "../../../infra/observability/logger";
 import { withTenant } from "../../../infra/db/tenant-context";
@@ -130,6 +131,12 @@ export class LoginService {
       throw new UnauthenticatedError();
     }
     const tenant = activeOnes[0]!;
+    // PHASE-040 (OA-05): an expired SANDBOX refuses login (typed — the
+    // account survives, the demo does not; the per-request interceptor
+    // enforces the same check for live sessions).
+    if (tenant.sandboxExpired) {
+      throw new SandboxTenantExpiredError();
+    }
 
     // PHASE-024 (ADR-0015 §4): policy-driven enforcement — resolve the
     // mandatory role keys for the login-selected tenant (plan list ∪/△ the

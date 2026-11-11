@@ -317,6 +317,12 @@ export const MIGRATIONS: readonly string[] = [
   // doc planned 0058 "next after 0057" — written before the v3.2/R-03
   // extension consumed 0055–0059; 0060 is the honest next slot.
   "0060_import_toolkit",
+  // PHASE-040 (OA-05): 0061_sandbox_enforcement — the SANDBOX time-box
+  // substrate: user_membership_options gains tenantKind + sandboxExpired
+  // (computed) so login and the per-request interceptor enforce the
+  // sandbox expiry from the projection they already read (the SUSPENDED
+  // precedent). Zero tables; one definer function widened additively.
+  "0061_sandbox_enforcement",
 ];
 
 /**

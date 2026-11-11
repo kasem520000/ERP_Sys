@@ -8,6 +8,8 @@ import {
   NotFoundError,
 } from "../domain/identity-errors";
 import * as store from "../infrastructure/identity.store";
+import { getOwnTenant } from "../../tenancy/infrastructure/tenancy.store";
+import { SandboxUserQuotaExceededError } from "../domain/identity-errors";
 import { PasswordService } from "./password-service";
 import { SessionService } from "./session-service";
 import type { InvitationView } from "../infrastructure/identity.store";
@@ -68,6 +70,18 @@ export class InvitationService {
     roleId: string;
     invitedBy: string;
   }): Promise<IssuedInvitation> {
+    // PHASE-040 (OA-05): SANDBOX tenants are quota-capped — ACTIVE
+    // memberships + open invitations may not exceed sandbox_max_users
+    // (typed refusal; STANDARD tenants are unbounded here — plan limits
+    // are the billing plane's own enforcement).
+    const tenant = await getOwnTenant();
+    if (tenant.kind === "SANDBOX") {
+      const cap = tenant.sandboxMaxUsers ?? 3;
+      const usage = await store.countUsersAndOpenInvitations(input.tenantId);
+      if (usage >= cap) {
+        throw new SandboxUserQuotaExceededError({ cap, usage });
+      }
+    }
     const email = input.email.trim().toLowerCase();
     const token = generateOpaqueToken();
     const expiresAt = new Date(Date.now() + INVITATION_TTL_MS).toISOString();

@@ -138,7 +138,9 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // 265 → 267 (matrix §3.18); the two feature keys grant per §8
     // (data_migration business+enterprise, demo_data all plans). Zero
     // new journal rules — the toolkit posts through existing engines.
-    expect(files.at(-1)?.tag).toBe("0060_import_toolkit");
+    // PHASE-040 (OA-05): 0061 — the SANDBOX enforcement widening (zero
+    // tables; the projection consumers: login + the interceptor).
+    expect(files.at(-1)?.tag).toBe("0061_sandbox_enforcement");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

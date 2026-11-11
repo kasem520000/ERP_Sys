@@ -1393,6 +1393,12 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "GET", path: "/api/v1/onboarding/demo-data/templates", permission: "configuration.demo_data.manage" },
   { method: "GET", path: "/api/v1/onboarding/demo-data/status", permission: "configuration.demo_data.manage" },
   { method: "POST", path: "/api/v1/onboarding/demo-data", permission: "configuration.demo_data.manage" },
+  // PHASE-040 T-07 (OA-05): the platform-plane sandbox provisioning —
+  // platform staff only (PlatformScope), riding platform.subscriptions.
+  // manage (the manual-plan-assignment family — never plan-gated, the
+  // platform.payouts precedent).
+  { method: "POST", path: "/api/v1/platform/sandbox-tenants", permission: "platform.subscriptions.manage" },
+  { method: "GET", path: "/api/v1/platform/sandbox-tenants", permission: "platform.subscriptions.manage" },
   // -- PHASE-023 T8: commerce channels (sales.commerce.manage) ----------------
   {
     method: "GET",
