@@ -43,12 +43,16 @@ export interface CustomerRow {
   creditLimit: string | null;
   priceListId: string | null;
   status: string;
+  /** PHASE-039 (0057; L1-10): the credit score class A|B|C|D (the blocked
+   *  class triggers the BR-001 posture — credit-limits.ts). */
+  creditScoreClass: string | null;
 }
 
 export async function findCustomerById(id: string): Promise<CustomerRow | undefined> {
   const rows = await tenantTx().execute(sql`
     SELECT id, code, name, name_ar AS "nameAr", kind, credit_terms_id AS "creditTermId",
-           credit_limit AS "creditLimit", price_list_id AS "priceListId", status
+           credit_limit AS "creditLimit", price_list_id AS "priceListId", status,
+           credit_score_class AS "creditScoreClass"
     FROM partners WHERE id = ${id} LIMIT 1
   `);
   return (rows.rows as unknown as CustomerRow[])[0];

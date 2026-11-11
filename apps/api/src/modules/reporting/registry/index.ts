@@ -130,6 +130,13 @@ import {
   purchasingRfqAwardMatrixContract,
   purchasingSupplierScorecardContract,
 } from "./operational/sourcing";
+// PHASE-039 · the returns + collections set (REPORT_CATALOG §3 additions —
+// the unified RMA register over both families and the dunning status
+// worklist).
+import {
+  salesRmaRegisterContract,
+  salesDunningStatusContract,
+} from "./operational/returns-dunning";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -272,6 +279,12 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // rolling-window scores with the sample decomposition).
   purchasingRfqAwardMatrixContract,
   purchasingSupplierScorecardContract,
+  // §sales returns + collections (REPORT_CATALOG §3 PHASE-039 rows): the
+  // unified RMA register (customer 0055 + supplier 0059 families with
+  // their completion documents and cycle days) and the dunning status
+  // worklist (overdue items × ladder step × fee register × referrals).
+  salesRmaRegisterContract,
+  salesDunningStatusContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

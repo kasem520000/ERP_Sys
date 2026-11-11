@@ -111,6 +111,10 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "consolidation.eliminations.create",
   // PHASE-038 (0051 seed, matrix §3.16): the sourcing report keys.
   "purchasing.rfqs.read",
+  // PHASE-039 (0056 seed): the returns + collections report keys (the same
+  // §12 module-register convention — both gate on their route permissions).
+  "sales.rma.read",
+  "sales.dunning.manage",
 ]);
 
 /** A minimal but type-complete stored envelope for cache/CSV/XLSX tests. */
@@ -158,16 +162,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 88 frozen contracts validate against the known-permission catalog", () => { // PHASE-038: 86 → 88
+  it("the 90 frozen contracts validate against the known-permission catalog", () => { // PHASE-039: 88 → 90
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(88); // PHASE-038: 86 → 88
+    expect(result.count).toBe(90); // PHASE-039: 88 → 90
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(88); // PHASE-038: 86 → 88
+    expect(snapshot).toHaveLength(90); // PHASE-039: 88 → 90
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

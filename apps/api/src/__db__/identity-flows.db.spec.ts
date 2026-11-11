@@ -159,7 +159,11 @@ describe("seeds (acceptance 9)", () => {
     // 248 + 1 = 249 after 0050; 249 + 7 = 256 after 0051 — the seven
     // PHASE-038 sourcing keys (§9); the drift CLI agrees: matrix 256 = seed
     // 256.)
-    expect(result.rows[0]?.n).toBe(256);
+    // 256 + 9 = 265 after 0056 — the nine PHASE-039 keys (sales.rma.read/
+    // manage/approve, sales.dunning.manage, sales.warranties.manage,
+    // sales.late-fees.manage, sales.collection-agencies.manage,
+    // purchasing.rma.read/manage).
+    expect(result.rows[0]?.n).toBe(265);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

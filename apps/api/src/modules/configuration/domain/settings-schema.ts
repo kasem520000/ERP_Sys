@@ -393,6 +393,33 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "G-38: the account supplier-return shipments debit and the AP credit leg credits (uuid of a tenant gl account); supplier RMA ship/credit fail typed when unmapped — no fallback account exists.",
   }),
+  // PHASE-039 (0056; L1-12): the fee item the late-fee invoice's single
+  // line carries (fail-closed when unmapped — the scrap-account precedent).
+  "sales.late_fee_item": Object.freeze({
+    key: "sales.late_fee_item",
+    schema: z.string().uuid().nullable(),
+    default: null,
+    description:
+      "L1-12: the sellable item the late-fee invoice's single line charges on (uuid of a tenant item); a late-fee charge fails typed when unmapped — the fee invoice is never built on a fallback item.",
+  }),
+  // PHASE-039 (0058; G-39): the tenant-mapped collection-commission
+  // expense account (fail-closed when unmapped).
+  "sales.collection_commission_account": Object.freeze({
+    key: "sales.collection_commission_account",
+    schema: z.string().uuid().nullable(),
+    default: null,
+    description:
+      "G-39: the expense account collection-agency commissions debit (uuid of a tenant gl account; the credit leg is AP_CONTROL on the agency partner); commission posting fails typed when unmapped — no fallback account exists.",
+  }),
+  // PHASE-039 (0057; L1-10): the credit class that behaves exactly like an
+  // over-limit block in the BR-001 credit check.
+  "sales.credit_block_class": Object.freeze({
+    key: "sales.credit_block_class",
+    schema: z.enum(["A", "B", "C", "D"]),
+    default: "D",
+    description:
+      "L1-10: the partner credit score class that triggers the BR-001 credit-check posture (reason CREDIT_CLASS_BLOCKED); default D.",
+  }),
   // P-11: the banded tolerance surface on the existing matching engine
   // (the flat pct keys above stay the default; bands refine by line
   // amount — no new tables).

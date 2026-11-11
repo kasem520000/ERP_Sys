@@ -123,6 +123,12 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // permission (the §12 module-register convention — both contracts gate on
   // the same `purchasing.rfqs.read` key as the /purchasing/rfq routes).
   "purchasing.rfqs.read",
+  // PHASE-039 (0056 §9 seed): the returns + collections report keys ride
+  // their route permissions (the same §12 convention — the RMA register
+  // gates on sales.rma.read like the /sales/returns routes; the dunning
+  // status worklist on sales.dunning.manage like the dunning routes).
+  "sales.rma.read",
+  "sales.dunning.manage",
 ]);
 
 @Module({

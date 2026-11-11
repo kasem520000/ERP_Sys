@@ -14,6 +14,10 @@ import {
  *   exposure = partner open AR balance (base) + this document (base)
  *   breach   = limit !== null && exposure > limit
  *   overdue  = open AR items past due (count > 0 factors in)
+ *   class    = creditScoreClass equals the tenant's blocked class
+ *              (sales.credit_block_class, default "D" — PHASE-039 0057:
+ *              the blocked class behaves EXACTLY like an over-limit breach
+ *              below, same posture shape, reason CREDIT_CLASS_BLOCKED)
  *
  * Postures (sales.credit_limit_action, BR-001): warn (default — the
  * document proceeds with the decision + math recorded on it), block
@@ -76,8 +80,15 @@ export async function runCreditCheck(input: {
   const math = `${new Decimal(openBalance).toFixed(4)} + ${new Decimal(input.documentAmountBase).toFixed(4)} ${
     wouldExceed ? ">" : "<="
   } ${limit ?? "∞"}`;
-  // BR-001: over-limit OR overdue triggers the posture.
-  const triggered = wouldExceed || overdueCount > 0;
+  // PHASE-039 (0057; L1-10): the blocked credit class joins the BR-001
+  // trigger fold — the SAME block posture shape the over-limit path
+  // produces, with the reason carried in the math string
+  // (CREDIT_CLASS_BLOCKED) so the CreditLimitExceededError payload and the
+  // document's recorded decision both name it. No other behavior changes.
+  const blockedClass = (await store.readSetting<string>("sales.credit_block_class")) ?? "D";
+  const classBlocked = customer.creditScoreClass !== null && customer.creditScoreClass === blockedClass;
+  // BR-001: over-limit OR overdue OR the blocked class triggers the posture.
+  const triggered = wouldExceed || overdueCount > 0 || classBlocked;
   return {
     posture,
     partnerId: input.customerId,
@@ -87,7 +98,9 @@ export async function runCreditCheck(input: {
     wouldExceed,
     overdueCount,
     decision: triggered ? (posture === "block" ? "BLOCK" : "WARN") : "ALLOW",
-    math,
+    math: classBlocked
+      ? `${math}; CREDIT_CLASS_BLOCKED — class ${customer.creditScoreClass} is the tenant's blocked class (sales.credit_block_class)`
+      : math,
   };
 }
 

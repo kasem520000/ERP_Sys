@@ -12,6 +12,7 @@ import { SalesInvoiceService } from "./application/invoices";
 import { CreditNoteService } from "./application/credit-notes";
 import { ReturnsService } from "./application/rma";
 import { WarrantiesService } from "./application/warranties";
+import { DunningService } from "./application/dunning";
 import { SalesReallocationService } from "./application/reallocations";
 import { ArQueriesService } from "./application/ar-queries";
 import { SalesRepService, InvoiceOverdueService } from "./application/reps";
@@ -22,7 +23,10 @@ import { SalesController, PartnerCreditCheckController } from "./presentation/sa
 import { JobCardsController } from "./presentation/job-cards.controller";
 import { CommerceController } from "./presentation/commerce.controller";
 import { ReturnsController } from "./presentation/returns.controller";
+import { DunningController } from "./presentation/dunning.controller";
+import { AgencyPortalController } from "./presentation/agency-portal.controller";
 import { registerWarrantyExpiryJob } from "./infrastructure/warranty-expiry.job";
+import { registerDunningSweepJob } from "./infrastructure/dunning-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
 
 /**
@@ -54,6 +58,8 @@ import { getBoss } from "../../infra/jobs/boss";
     JobCardsController,
     CommerceController,
     ReturnsController,
+    DunningController,
+    AgencyPortalController,
   ],
   providers: [
     QuotationService,
@@ -65,6 +71,11 @@ import { getBoss } from "../../infra/jobs/boss";
     // completion) + the managed-warranty register with its expiry sweep.
     ReturnsService,
     WarrantiesService,
+    // PHASE-039 (0056/0057/0058): the dunning engine — the policy ladder
+    // (BR-065 monotonic), the late-fee register (L1-12) with its fee
+    // invoice through SalesInvoiceService, the collection-agency layer
+    // (L1-11, G-39) and the partner credit reviews (L1-10).
+    DunningService,
     SalesReallocationService,
     ArQueriesService,
     SalesRepService,
@@ -85,6 +96,7 @@ import { getBoss } from "../../infra/jobs/boss";
     CreditNoteService,
     ReturnsService,
     WarrantiesService,
+    DunningService,
     SalesReallocationService,
     ArQueriesService,
     SalesRepService,
@@ -95,7 +107,10 @@ import { getBoss } from "../../infra/jobs/boss";
   ],
 })
 export class SalesModule implements OnModuleInit {
-  constructor(@Inject(WarrantiesService) private readonly warranties: WarrantiesService) {}
+  constructor(
+    @Inject(WarrantiesService) private readonly warranties: WarrantiesService,
+    @Inject(DunningService) private readonly dunning: DunningService,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     // PHASE-039 T-05: the warranty expiry sweep (2:50 UTC) — the same
@@ -103,5 +118,9 @@ export class SalesModule implements OnModuleInit {
     // failure never takes the module down; the schedule is an idempotent
     // replace).
     await registerWarrantyExpiryJob(getBoss(), this.warranties).catch(() => undefined);
+    // PHASE-039 T-07: the dunning sweep (2:45 UTC — BEFORE the warranty
+    // sweep at 2:50): the BR-065 ladder pass + the credit-review-due
+    // notifications, same degraded-boot discipline.
+    await registerDunningSweepJob(getBoss(), this.dunning).catch(() => undefined);
   }
 }

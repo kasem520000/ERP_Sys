@@ -2110,6 +2110,36 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "GET", path: "/api/v1/sales/warranties", permission: "sales.warranties.manage" },
   { method: "POST", path: "/api/v1/sales/warranties", permission: "sales.warranties.manage" },
   { method: "POST", path: "/api/v1/sales/warranties/:id/void", permission: "sales.warranties.manage" },
+  // PHASE-039 (0056/0057/0058; matrix §3.9): the dunning + collections
+  // workspace — the policy ladder (BR-065), the letters register with the
+  // late-fee charge/waive pair (L1-12, its own key), the logged collection
+  // actions + the periodic credit reviews (L1-10), and the
+  // collection-agency terminal layer (L1-11, its own key). The public
+  // agency callback rides PUBLIC_ROUTES below (the token IS the
+  // credential).
+  { method: "GET", path: "/api/v1/sales/dunning/policies", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/policies", permission: "sales.dunning.manage" },
+  { method: "PATCH", path: "/api/v1/sales/dunning/policies/:id", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/policies/:id/activate", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/policies/:id/archive", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/run", permission: "sales.dunning.manage" },
+  { method: "GET", path: "/api/v1/sales/dunning/letters", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/letters/:id/waive-fee", permission: "sales.late-fees.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/charge-fee", permission: "sales.late-fees.manage" },
+  { method: "GET", path: "/api/v1/sales/dunning/actions", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/dunning/actions", permission: "sales.dunning.manage" },
+  { method: "GET", path: "/api/v1/sales/credit-reviews", permission: "sales.dunning.manage" },
+  { method: "POST", path: "/api/v1/sales/credit-reviews/:partnerId", permission: "sales.dunning.manage" },
+  { method: "GET", path: "/api/v1/sales/collection-agencies", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-agencies", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-agencies/:id/issue-token", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-agencies/:id/suspend", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-agencies/:id/activate", permission: "sales.collection-agencies.manage" },
+  { method: "GET", path: "/api/v1/sales/collection-referrals", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-referrals", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-referrals/:id/settle", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-referrals/:id/post-commission", permission: "sales.collection-agencies.manage" },
+  { method: "POST", path: "/api/v1/sales/collection-referrals/:id/close", permission: "sales.collection-agencies.manage" },
   {
     method: "GET",
     path: "/api/v1/sales/ar/aging",
@@ -3174,6 +3204,12 @@ export const PUBLIC_ROUTES: readonly { method: string; path: string }[] = [
   // re-validates under RLS). Rate-limited + audited by the controller; the
   // full portal (060) shares this surface.
   { method: "POST", path: "/api/v1/portal/rfqs/:rfqId/quotes" },
+  // PHASE-039 (L1-11): the collection-agency callback — the agency's
+  // callback token IS the credential (the supplier-portal pattern verbatim;
+  // erp.portal_resolve_agency_token resolves it pre-GUC, then the service
+  // re-validates under RLS). Fixed-window rate-limited (10/min per token
+  // hash) + audited by the controller.
+  { method: "POST", path: "/api/v1/portal/collection-agencies/callback" },
 ];
 
 /** Routes whose POSTs require an Idempotency-Key header (IDEMPOTENCY §1). */

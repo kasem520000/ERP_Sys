@@ -571,6 +571,18 @@ export const partners = pgTable(
     // PHASE-017 (migration 0025): tier assignment drives BR-003 resolution
     // (customer's list → tier list → branch default → base).
     customerTierId: uuid("customer_tier_id"),
+    // PHASE-039 (0057; L1-10): the credit-risk block — score class A|B|C|D
+    // (tenant-entered/rule-computed; the tenant-mapped blocked class behaves
+    // exactly like an over-limit block in the BR-001 credit check) + the
+    // periodic review clock. The outcome history rides audit_events (no new
+    // history table). The foundation commit's mirrors missed these columns —
+    // restored here (additive only, migration untouched).
+    creditScoreClass: text("credit_score_class"),
+    creditReviewFrequencyDays: integer("credit_review_frequency_days"),
+    nextCreditReviewAt: date("next_credit_review_at"),
+    lastCreditReviewAt: date("last_credit_review_at"),
+    lastCreditReviewBy: uuid("last_credit_review_by"),
+    creditReviewNote: text("credit_review_note"),
     status: text("status").notNull().default("ACTIVE"),
     deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
   },
@@ -578,6 +590,8 @@ export const partners = pgTable(
     index("ix_partners_tenant_kind").on(table.tenantId, table.kind),
     index("ix_partners_tenant_status").on(table.tenantId, table.status),
     index("ix_partners_tenant_credit_terms").on(table.tenantId, table.creditTermsId),
+    // PHASE-039 (0057): the review-due sweep's hot path.
+    index("ix_partners_tenant_credit_review").on(table.tenantId, table.nextCreditReviewAt),
     uniqueIndex("uq_partners_tenant_code").on(table.tenantId, table.code),
   ],
 );

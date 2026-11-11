@@ -19,6 +19,7 @@ import { PayrollQueriesService } from "./payroll/payroll-queries";
 import { ConsolidationQueriesService } from "./consolidation/consolidation-queries";
 import { TreasuryQueriesService } from "../../treasury/application/treasury-queries";
 import { SourcingQueriesService } from "./sourcing/sourcing-queries";
+import { ReturnsDunningQueriesService } from "./sales/returns-dunning-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -67,6 +68,8 @@ export interface ReportingServices {
   consolidation: ConsolidationQueriesService;
   /** PHASE-038 · the sourcing query surface (the frozen award matrix rendered verbatim from the stored snapshot, the scorecard list). */
   sourcing: SourcingQueriesService;
+  /** PHASE-039 · the returns + collections query surface (the unified customer+supplier RMA register, the dunning status worklist). */
+  returnsDunning: ReturnsDunningQueriesService;
   treasury: TreasuryQueriesService;
   partners: PartnerQueriesService;
   tax: TaxQueriesService;
@@ -99,6 +102,7 @@ export function reportingServices(): ReportingServices {
       payroll: new PayrollQueriesService(),
       consolidation: new ConsolidationQueriesService(),
       sourcing: new SourcingQueriesService(),
+      returnsDunning: new ReturnsDunningQueriesService(),
       treasury: new TreasuryQueriesService(),
       partners: new PartnerQueriesService(),
       tax: new TaxQueriesService(),

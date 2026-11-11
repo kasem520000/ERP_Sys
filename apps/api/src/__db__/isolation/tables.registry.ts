@@ -382,6 +382,18 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "warranty_registrations" },
   { table: "supplier_return_authorizations" },
   { table: "supplier_return_authorization_lines", deleteGranted: true },
+  // PHASE-039 (Blueprint v3.0 · CR-09, migrations 0056 + 0058): the
+  // dunning + collections cluster — the policy ladder, the BR-065 letter
+  // register with its late-fee columns, the logged collection actions, and
+  // the collection-agency pair. All archive-not-delete (compliance
+  // history: agencies suspend, referrals close, letters and actions are
+  // evidence — NO deleteGranted on any of the five). Five tables — the
+  // auto-generated A-suite extends by +30.
+  { table: "dunning_policies" },
+  { table: "dunning_letters" },
+  { table: "collection_actions" },
+  { table: "collection_agencies" },
+  { table: "collection_referrals" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

@@ -352,6 +352,9 @@ import {
   DeviceRefreshInvalidError,
   DeviceRevokedError,
 } from "../../modules/sync/application/device-tokens";
+// PHASE-039 (L1-11): the public agency-callback port's typed token
+// rejection — 401-shaped like every credential error (ERROR_MODEL §2).
+import { AgencyTokenInvalidError } from "../../modules/sales/domain/sales-errors";
 
 /**
  * ERROR_MODEL exception filter: the single error envelope —
@@ -1000,6 +1003,12 @@ function domainStatus(error: DomainError): number {
     return HttpStatus.FORBIDDEN;
   }
   if (error instanceof DeviceRefreshInvalidError) {
+    return HttpStatus.UNAUTHORIZED;
+  }
+  // PHASE-039 (L1-11): the agency callback's token IS the credential — an
+  // invalid/suspended/revoked one is a 401-shaped rejection (the device
+  // refresh-token pattern; shape-uniform, no oracle).
+  if (error instanceof AgencyTokenInvalidError) {
     return HttpStatus.UNAUTHORIZED;
   }
   if (error instanceof SyncContractUnsupportedError) {

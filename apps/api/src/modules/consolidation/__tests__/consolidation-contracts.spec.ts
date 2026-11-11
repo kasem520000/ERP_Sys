@@ -93,6 +93,9 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "consolidation.eliminations.create",
   // PHASE-038 (0051 seed, matrix §3.16): the sourcing report keys.
   "purchasing.rfqs.read",
+  // PHASE-039 (0056 seed): the returns + collections report keys.
+  "sales.rma.read",
+  "sales.dunning.manage",
 ]);
 
 const CONSOLIDATION_IDS = [
@@ -106,12 +109,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(88); // PHASE-038: +2 sourcing rows (86 → 88)
+    expect(result.count).toBe(90); // PHASE-039: +2 returns/collections rows (88 → 90)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(88); // PHASE-038: 86 → 88
+    expect(snapshot).toHaveLength(90); // PHASE-039: 88 → 90
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();

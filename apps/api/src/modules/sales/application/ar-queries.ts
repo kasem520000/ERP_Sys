@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Decimal } from "@erp/domain-core";
 
 import * as store from "../infrastructure/sales.store";
+import * as dunningStore from "../infrastructure/dunning.store";
 import { ArQueryInvalidError } from "../domain/sales-errors";
 
 /**
@@ -32,6 +33,10 @@ export interface AgingRow {
   total: string;
   baseTotal: string;
   itemCount: number;
+  /** PHASE-039 (0056): the customer's highest fired dunning step
+   *  (dunning_letters max step_no; null = no letter yet) — the collections
+   *  read on the aging surface, additive to every existing key. */
+  dunningStep: number | null;
 }
 
 export interface StatementEntry {
@@ -104,6 +109,7 @@ export class ArQueriesService {
           total: "0.0000",
           baseTotal: "0.0000",
           itemCount: 0,
+          dunningStep: null,
         };
         byCustomer.set(item.partnerId, row);
       }
@@ -143,6 +149,13 @@ export class ArQueriesService {
         row.customerName = customer.name;
         row.customerNameAr = customer.nameAr;
       }
+    }
+    // PHASE-039 (0056): the dunning column — the max step fired per
+    // partner (0/absent partners stay null; every existing key untouched).
+    const stepByPartner = await dunningStore.maxLetterStepByPartner([...byCustomer.keys()]);
+    for (const row of byCustomer.values()) {
+      const step = stepByPartner.get(row.customerId);
+      row.dunningStep = step !== undefined && step > 0 ? step : null;
     }
     return [...byCustomer.values()].sort((a, b) =>
       a.customerCode < b.customerCode ? -1 : a.customerCode > b.customerCode ? 1 : 0,

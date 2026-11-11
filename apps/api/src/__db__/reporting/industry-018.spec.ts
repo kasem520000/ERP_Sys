@@ -1098,7 +1098,7 @@ describe("registry integration (the shared contract)", () => {
       expect(contract!.executionClass).toBe("inline");
       expect(ALL_KNOWN_PERMISSIONS.has(permission), permission).toBe(true);
     }
-    expect(snapshot).toHaveLength(88); // PHASE-028: +2 budgeting; PHASE-029: +3 payroll; PHASE-034: +4 consolidation; PHASE-035: +1 tax.e-invoicing-log; PHASE-038: +2 sourcing
+    expect(snapshot).toHaveLength(90); // PHASE-028: +2 budgeting; PHASE-029: +3 payroll; PHASE-034: +4 consolidation; PHASE-035: +1 tax.e-invoicing-log; PHASE-038: +2 sourcing; PHASE-039: +2 returns/collections
   });
 
   it("exports flow through the shared contract (CSV renderer over the stored envelope)", async () => {

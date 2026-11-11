@@ -278,3 +278,75 @@ export class SupplierReturnAccountUnmappedError extends DomainError {
     );
   }
 }
+
+// -- dunning, late fees & collections (PHASE-039 0056/0057/0058; BR-065, L1-10..12) ----
+
+export class DunningPolicyNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("DUNNING_POLICY_NOT_FOUND", `dunning policy ${id} does not exist in this tenant`);
+  }
+}
+export class DunningPolicyStepsInvalidError extends DomainError {
+  constructor(message: string) {
+    super("DUNNING_POLICY_STEPS_INVALID", message);
+  }
+}
+export class LateFeeConfigInvalidError extends DomainError {
+  constructor(message: string) {
+    super("LATE_FEE_CONFIG_INVALID", message);
+  }
+}
+export class LateFeeAlreadyChargedError extends DomainError {
+  constructor(details: { invoiceId: string; letterId: string; feeAmount: string }) {
+    super(
+      "LATE_FEE_ALREADY_CHARGED",
+      `invoice ${details.invoiceId} already carries a late fee of ${details.feeAmount} on letter ${details.letterId} — one fee per invoice (L1-12); waive it before charging another`,
+      { invoiceId: details.invoiceId, letterId: details.letterId, feeAmount: details.feeAmount },
+    );
+  }
+}
+export class LateFeeNotWaivableError extends DomainError {
+  constructor(message: string) {
+    super("LATE_FEE_NOT_WAIVABLE", message);
+  }
+}
+export class CollectionAgencyNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("COLLECTION_AGENCY_NOT_FOUND", `collection agency ${id} does not exist in this tenant`);
+  }
+}
+export class AgencyTokenInvalidError extends DomainError {
+  constructor() {
+    super(
+      "AGENCY_TOKEN_INVALID",
+      "the collection-agency callback token is invalid, suspended, or revoked",
+    );
+  }
+}
+export class ReferralNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("REFERRAL_NOT_FOUND", `collection referral ${id} does not exist in this tenant`);
+  }
+}
+export class ReferralStateInvalidError extends DomainError {
+  constructor(details: { current: string; attempted: string }) {
+    super(
+      "REFERRAL_STATE_INVALID",
+      `collection referral is ${details.current} — the ${details.attempted} transition is not valid from that state (the ladder is REFERRED → ACKNOWLEDGED → PARTIAL/SETTLED → COMMISSION_POSTED → CLOSED, CANCELLED off REFERRED/ACKNOWLEDGED)`,
+      { current: details.current, attempted: details.attempted },
+    );
+  }
+}
+export class CommissionAccountUnmappedError extends DomainError {
+  constructor() {
+    super(
+      "COMMISSION_ACCOUNT_UNMAPPED",
+      "sales.collection_commission_account is unmapped — an agency commission cannot post its G-39 pair (fail-closed: no fallback account exists; map the setting and retry)",
+    );
+  }
+}
+export class CreditReviewInvalidError extends DomainError {
+  constructor(message: string) {
+    super("CREDIT_REVIEW_INVALID", message);
+  }
+}
