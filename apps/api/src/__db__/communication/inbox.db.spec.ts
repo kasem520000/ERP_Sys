@@ -4,7 +4,6 @@ import { withTenant } from "../../infra/db/tenant-context";
 import { InboxService } from "../../modules/notifications/application/inbox-service";
 import { OutboxService } from "../../modules/communication/application/outbox/outbox-service";
 import { ProviderConfigService } from "../../modules/communication/application/provider-config.service";
-import { TemplateService } from "../../modules/communication/application/template-service";
 import { UnifiedInboxService } from "../../modules/communication/application/inbox-service";
 import { CallLogInvalidError } from "../../modules/communication/domain/communication-errors";
 import { S_ACTOR, TENANT_S, setupSalesFixture } from "../sales/fixtures";
@@ -19,7 +18,6 @@ import { S_ACTOR, TENANT_S, setupSalesFixture } from "../sales/fixtures";
 
 const notifications = new InboxService();
 const providers = new ProviderConfigService();
-const templates = new TemplateService();
 const outbox = new OutboxService(providers, notifications);
 const inbox = new UnifiedInboxService();
 
