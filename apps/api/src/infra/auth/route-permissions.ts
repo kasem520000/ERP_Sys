@@ -1408,6 +1408,12 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   // notifications self plane at the file's session section).
   { method: "GET", path: "/api/v1/communication/preferences/defaults", permission: "communication.preferences.manage" },
   { method: "POST", path: "/api/v1/communication/preferences/defaults", permission: "communication.preferences.manage" },
+  // PHASE-041 T-08 (UX-14/IN-16): the unified inbox — the per-partner
+  // interaction timeline with filters + the call logging (owner +
+  // accountant + sales — the sales/support surface).
+  { method: "GET", path: "/api/v1/communication/inbox", permission: "communication.inbox.read" },
+  { method: "POST", path: "/api/v1/communication/inbox/calls", permission: "communication.inbox.read" },
+  { method: "PATCH", path: "/api/v1/communication/inbox/calls/:id", permission: "communication.inbox.read" },
   // PHASE-040 T-06 (matrix §3.18): the demo-data loader — the 13-template
   // catalog + status + the one-click seed (feature-gated platform.demo_data,
   // ALL plans — the recorded trial-enablement decision).
