@@ -15,8 +15,10 @@ import type { InboxService } from "../notifications/application/inbox-service";
 import { ProviderConfigService } from "./application/provider-config.service";
 import { TemplateService } from "./application/template-service";
 import { OutboxService } from "./application/outbox/outbox-service";
+import { PreferencesService } from "./application/preferences-service";
 import { ProvidersController } from "./presentation/providers.controller";
 import { TemplatesController } from "./presentation/templates.controller";
+import { PreferencesController } from "./presentation/preferences.controller";
 
 const log = childLogger({ module: "communication" });
 
@@ -41,9 +43,9 @@ export const OUTBOUND_SWEEP_CRON = "* * * * *";
  */
 @Module({
   imports: [InfrastructureModule, AuditModule, NotificationsModule],
-  controllers: [ProvidersController, TemplatesController],
-  providers: [ProviderConfigService, TemplateService, OutboxService],
-  exports: [ProviderConfigService, TemplateService, OutboxService],
+  controllers: [ProvidersController, TemplatesController, PreferencesController],
+  providers: [ProviderConfigService, TemplateService, OutboxService, PreferencesService],
+  exports: [ProviderConfigService, TemplateService, OutboxService, PreferencesService],
 })
 export class CommunicationModule implements OnModuleInit {
   constructor(@Inject(OutboxService) private readonly outbox: OutboxService) {}

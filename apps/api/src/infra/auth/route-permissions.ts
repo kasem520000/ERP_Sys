@@ -1401,6 +1401,13 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "POST", path: "/api/v1/communication/templates", permission: "communication.templates.manage" },
   { method: "DELETE", path: "/api/v1/communication/templates", permission: "communication.templates.manage" },
   { method: "POST", path: "/api/v1/communication/templates/preview", permission: "communication.templates.manage" },
+  // PHASE-041 T-06 (TB-23): the preference matrix — the SELF plane
+  // (authenticated-only, the notification_prefs precedent) and the
+  // tenant-default plane (communication.preferences.manage).
+  // (the self-plane entries themselves are SESSION_ROUTES — see the
+  // notifications self plane at the file's session section).
+  { method: "GET", path: "/api/v1/communication/preferences/defaults", permission: "communication.preferences.manage" },
+  { method: "POST", path: "/api/v1/communication/preferences/defaults", permission: "communication.preferences.manage" },
   // PHASE-040 T-06 (matrix §3.18): the demo-data loader — the 13-template
   // catalog + status + the one-click seed (feature-gated platform.demo_data,
   // ALL plans — the recorded trial-enablement decision).
@@ -3187,6 +3194,10 @@ export const SESSION_ROUTES: readonly { method: string; path: string }[] = [
   { method: "PATCH", path: "/api/v1/notifications/:id/read" },
   { method: "GET", path: "/api/v1/notifications/preferences" },
   { method: "PUT", path: "/api/v1/notifications/preferences" },
+  // PHASE-041 (TB-23): the communication preference-matrix self plane —
+  // every authenticated user manages their own rows.
+  { method: "GET", path: "/api/v1/communication/preferences/me" },
+  { method: "POST", path: "/api/v1/communication/preferences/me" },
   { method: "DELETE", path: "/api/v1/identity/sessions/current" },
   { method: "POST", path: "/api/v1/identity/sessions/refresh" },
   { method: "POST", path: "/api/v1/identity/sessions/switch-tenant" },
