@@ -275,6 +275,35 @@ export const MIGRATIONS: readonly string[] = [
   // persists) and tender_intakes (P-14/DF-52/DF-53: intake records ONLY
   // — no bidding-platform claims). Zero new permission/feature keys.
   "0054_capex_tenders",
+  // PHASE-039: 0055_rma_warranty — the customer RMA workflow (H-12/S-14:
+  // return_authorizations + lines, REQUESTED→APPROVED(SoD)→RECEIVED→
+  // INSPECTED→RESTOCKED/SCRAPPED/REFUNDED, completion auto-generates the
+  // credit note — G-35/G-36/G-37, BR-064) + warranty_registrations with
+  // structured terms (S-15). 3 of the phase's 10 tables.
+  "0055_rma_warranty",
+  // PHASE-039: 0056_dunning_collections — the dunning engine (H-13/S-16:
+  // dunning_policies step ladder + dunning_letters — the BR-065 monotonic
+  // evidence — + collection_actions) with the late-fee rules ON the policy
+  // (L1-12). CHECK widenings: notifications += 'collections','warranties';
+  // cash_movements += 'return_authorization'. ALL NINE permission keys
+  // (256 → 265) + ALL FOUR feature keys (sales.rma, sales.warranties,
+  // sales.dunning, purchasing.rma).
+  "0056_dunning_collections",
+  // PHASE-039: 0057_partner_credit_risk — the L1-10 additive partner
+  // columns (credit_score_class A|B|C|D + the periodic review clock) —
+  // zero reshape; the review-due sweep assigns via notifications and the
+  // outcome history rides audit_events.
+  "0057_partner_credit_risk",
+  // PHASE-039: 0058_collection_agencies — the L1-11 layer: the
+  // partner-linked agency register (hashed callback tokens — the 038
+  // portal pattern, erp.portal_resolve_agency_token) + collection_referrals
+  // (settlement ladder; the G-39 commission posts through the engine).
+  "0058_collection_agencies",
+  // PHASE-039 (v3.2/R-03, decided before any 039 code): 0059_supplier_rma
+  // — the supplier RMA mirror: supplier_return_authorizations + lines
+  // (REQUESTED→APPROVED(SoD)→SHIPPED→CREDITED; completion auto-generates
+  // the AP debit note — G-38). Completes the phase's 10 tables.
+  "0059_supplier_rma",
 ];
 
 /**

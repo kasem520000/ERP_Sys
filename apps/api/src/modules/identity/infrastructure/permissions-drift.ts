@@ -136,6 +136,12 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // PHASE-038 (Blueprint v3.0 · CR-08): 0051 seeds the SEVEN sourcing
   // keys (matrix §3.16; 249 → 256).
   "apps/api/migrations/0051_rfq_quotes.sql",
+  // PHASE-039 (Blueprint v3.0 · CR-09; extended by v3.1/CR-46 +
+  // v3.2/CR-50): 0056 seeds the NINE returns & collections keys
+  // (matrix §3.17; 256 → 265) — sales.rma.read/manage/approve,
+  // sales.dunning.manage, sales.warranties.manage, sales.late-fees.manage,
+  // sales.collection-agencies.manage, purchasing.rma.read/manage.
+  "apps/api/migrations/0056_dunning_collections.sql",
 ];
 
 export async function main(): Promise<void> {

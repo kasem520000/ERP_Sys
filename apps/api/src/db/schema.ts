@@ -6763,3 +6763,416 @@ export const tenderIntakes = pgTable(
     index("ix_tender_intakes_tenant_status").on(table.tenantId, table.status, table.submissionDeadline),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// PHASE-039 (Blueprint v3.0 · CR-09; extended by v3.1/CR-46 and
+// v3.2/CR-50): Returns & Collections — the RMA workflow (customer +
+// supplier), managed warranties, the dunning engine, late fees,
+// collection agencies and partner credit risk. Migrations 0055–0059.
+// ---------------------------------------------------------------------------
+
+/** PHASE-039 (0055): customer RMA workflow (H-12/S-14) — REQUESTED →
+ * APPROVED (SoD) → RECEIVED → INSPECTED → RESTOCKED/SCRAPPED/REFUNDED;
+ * completion auto-generates the credit note through the posting engine
+ * (G-35/G-36/G-37, BR-064 exactly-once). */
+export const returnAuthorizations = pgTable(
+  "return_authorizations",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    branchId: uuid("branch_id").notNull(),
+    rmaNo: text("rma_no"),
+    partnerId: uuid("partner_id").notNull(),
+    invoiceId: uuid("invoice_id").notNull(),
+    reasonCode: text("reason_code").notNull(),
+    reason: text("reason"),
+    reasonAr: text("reason_ar"),
+    status: text("status").notNull().default("REQUESTED"),
+    disposition: text("disposition"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    totalNet: numeric("total_net", { precision: 19, scale: 4 }).notNull().default("0"),
+    totalTax: numeric("total_tax", { precision: 19, scale: 4 }).notNull().default("0"),
+    totalGross: numeric("total_gross", { precision: 19, scale: 4 }).notNull().default("0"),
+    requestedAt: timestamp("requested_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    receivedAt: timestamp("received_at", { withTimezone: true, mode: "string" }),
+    receivedBy: uuid("received_by"),
+    inspectedAt: timestamp("inspected_at", { withTimezone: true, mode: "string" }),
+    inspectedBy: uuid("inspected_by"),
+    inspectionNote: text("inspection_note"),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    completedBy: uuid("completed_by"),
+    creditNoteId: uuid("credit_note_id"),
+    postedJournalId: uuid("posted_journal_id"),
+    entryNo: text("entry_no"),
+    refundCashAccountId: uuid("refund_cash_account_id"),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true, mode: "string" }),
+    cancelledBy: uuid("cancelled_by"),
+    cancelReason: text("cancel_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_return_authorizations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_return_authorizations_tenant_no")
+      .on(table.tenantId, table.rmaNo)
+      .where(sql`${table.rmaNo} IS NOT NULL`),
+    index("ix_return_authorizations_tenant_status").on(table.tenantId, table.status),
+    index("ix_return_authorizations_tenant_partner").on(table.tenantId, table.partnerId, table.status),
+    index("ix_return_authorizations_tenant_invoice").on(table.tenantId, table.invoiceId),
+  ],
+);
+
+/** PHASE-039 (0055): RMA lines — invoice-line referenced, qty bounded by
+ * invoiced − credited − open-RMA (the service fold). Replace-on-edit. */
+export const returnAuthorizationLines = pgTable(
+  "return_authorization_lines",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    rmaId: uuid("rma_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    invoiceLineId: uuid("invoice_line_id").notNull(),
+    itemId: uuid("item_id"),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    unitPrice: numeric("unit_price", { precision: 19, scale: 4 }).notNull().default("0"),
+    discountAmount: numeric("discount_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    taxCodeId: uuid("tax_code_id"),
+    netAmount: numeric("net_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    taxAmount: numeric("tax_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_return_authorization_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_return_authorization_lines_rma_line").on(table.rmaId, table.tenantId, table.lineNo),
+    index("ix_return_authorization_lines_tenant_rma").on(table.tenantId, table.rmaId),
+    index("ix_return_authorization_lines_tenant_invoice_line").on(table.tenantId, table.invoiceLineId),
+  ],
+);
+
+/** PHASE-039 (0055): managed warranties with structured terms (S-15) —
+ * { durationMonths, coverage, basis, mileageLimitKm? } replacing the
+ * free-text blob; the daily expiry sweep emits 30/7/0-day notifications. */
+export const warrantyRegistrations = pgTable(
+  "warranty_registrations",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    partnerId: uuid("partner_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    serialNo: text("serial_no"),
+    invoiceId: uuid("invoice_id"),
+    jobCardId: uuid("job_card_id"),
+    terms: jsonb("terms").notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    status: text("status").notNull().default("ACTIVE"),
+    lastNotifiedAt: timestamp("last_notified_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_warranty_registrations_id_tenant").on(table.id, table.tenantId),
+    index("ix_warranty_registrations_tenant_status").on(table.tenantId, table.status),
+    index("ix_warranty_registrations_tenant_partner").on(table.tenantId, table.partnerId),
+    index("ix_warranty_registrations_tenant_expiry").on(table.tenantId, table.status, table.endDate),
+  ],
+);
+
+/** PHASE-039 (0056): the dunning step ladder (H-13/S-16) — steps jsonb
+ * [{stepNo, daysOverdue, channel, templateKey, escalate, referToAgency}]
+ * + the late-fee rules ON the policy (L1-12; REQUIRES_VERIFICATION for
+ * statutory caps). BR-065: the ladder is monotonic. */
+export const dunningPolicies = pgTable(
+  "dunning_policies",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    status: text("status").notNull().default("DRAFT"),
+    partnerTierIds: jsonb("partner_tier_ids").notNull().default([]),
+    isDefault: boolean("is_default").notNull().default(false),
+    steps: jsonb("steps").notNull(),
+    lateFeeMode: text("late_fee_mode").notNull().default("DISABLED"),
+    lateFeeRatePct: numeric("late_fee_rate_pct", { precision: 5, scale: 2 }),
+    lateFeeGraceDays: integer("late_fee_grace_days").notNull().default(0),
+    lateFeeMaxAmount: numeric("late_fee_max_amount", { precision: 19, scale: 4 }),
+    lateFeeSource: text("late_fee_source"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_dunning_policies_id_tenant").on(table.id, table.tenantId),
+    index("ix_dunning_policies_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** PHASE-039 (0056): one letter per (invoice, step) — the BR-065 monotonic
+ * evidence + the late-fee register (fee columns stamped by the charging
+ * step; the waiver path records reason + approver). */
+export const dunningLetters = pgTable(
+  "dunning_letters",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    tenantId: uuid("tenant_id").notNull(),
+    policyId: uuid("policy_id").notNull(),
+    partnerId: uuid("partner_id").notNull(),
+    invoiceId: uuid("invoice_id").notNull(),
+    stepNo: integer("step_no").notNull(),
+    daysOverdue: integer("days_overdue").notNull(),
+    letterDate: date("letter_date").notNull(),
+    channel: text("channel").notNull(),
+    templateKey: text("template_key").notNull(),
+    status: text("status").notNull().default("QUEUED"),
+    sentAt: timestamp("sent_at", { withTimezone: true, mode: "string" }),
+    emailTo: text("email_to"),
+    subject: text("subject"),
+    bodySnapshot: text("body_snapshot"),
+    error: text("error"),
+    feeAmount: numeric("fee_amount", { precision: 19, scale: 4 }),
+    feeInvoiceId: uuid("fee_invoice_id"),
+    feeWaivedAt: timestamp("fee_waived_at", { withTimezone: true, mode: "string" }),
+    feeWaivedBy: uuid("fee_waived_by"),
+    feeWaiverReason: text("fee_waiver_reason"),
+  },
+  (table) => [
+    uniqueIndex("uq_dunning_letters_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_dunning_letters_invoice_step").on(table.tenantId, table.invoiceId, table.stepNo),
+    index("ix_dunning_letters_tenant_invoice").on(table.tenantId, table.invoiceId),
+    index("ix_dunning_letters_tenant_partner").on(table.tenantId, table.partnerId, table.letterDate),
+    index("ix_dunning_letters_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** PHASE-039 (0056): logged collection actions with outcome codes —
+ * calls, promises-to-pay, disputes, agency referrals. */
+export const collectionActions = pgTable(
+  "collection_actions",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    partnerId: uuid("partner_id").notNull(),
+    invoiceId: uuid("invoice_id"),
+    policyId: uuid("policy_id"),
+    actionType: text("action_type").notNull(),
+    actionDate: date("action_date").notNull(),
+    outcome: text("outcome").notNull().default("PENDING"),
+    promisedDate: date("promised_date"),
+    followUpDate: date("follow_up_date"),
+    amount: numeric("amount", { precision: 19, scale: 4 }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_collection_actions_id_tenant").on(table.id, table.tenantId),
+    index("ix_collection_actions_tenant_partner").on(table.tenantId, table.partnerId, table.actionDate),
+    index("ix_collection_actions_tenant_invoice").on(table.tenantId, table.invoiceId),
+  ],
+);
+
+/** PHASE-039 (0058): the partner-linked collection-agency register (L1-11)
+ * — commission terms + the hashed callback token (the 038 portal
+ * pattern: sha256 at rest, unenumerable, revocable). */
+export const collectionAgencies = pgTable(
+  "collection_agencies",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    partnerId: uuid("partner_id").notNull(),
+    contactName: text("contact_name"),
+    email: text("email"),
+    phone: text("phone"),
+    commissionMode: text("commission_mode").notNull(),
+    commissionPct: numeric("commission_pct", { precision: 5, scale: 2 }),
+    flatFee: numeric("flat_fee", { precision: 19, scale: 4 }),
+    status: text("status").notNull().default("ACTIVE"),
+    portalTokenHash: text("portal_token_hash"),
+    tokenIssuedAt: timestamp("token_issued_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_collection_agencies_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_collection_agencies_tenant_partner").on(table.tenantId, table.partnerId),
+    index("ix_collection_agencies_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** PHASE-039 (0058): referral records (L1-11) — referred balance,
+ * commission-terms snapshot, settlement ladder; the commission posts
+ * through the engine (G-39, implementation-bound). */
+export const collectionReferrals = pgTable(
+  "collection_referrals",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    agencyId: uuid("agency_id").notNull(),
+    partnerId: uuid("partner_id").notNull(),
+    invoiceId: uuid("invoice_id"),
+    actionId: uuid("action_id"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    referralDate: date("referral_date").notNull(),
+    referredAmount: numeric("referred_amount", { precision: 19, scale: 4 }).notNull(),
+    commissionMode: text("commission_mode").notNull(),
+    commissionPct: numeric("commission_pct", { precision: 5, scale: 2 }),
+    flatFee: numeric("flat_fee", { precision: 19, scale: 4 }),
+    status: text("status").notNull().default("REFERRED"),
+    settledAmount: numeric("settled_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    settledAt: timestamp("settled_at", { withTimezone: true, mode: "string" }),
+    commissionAmount: numeric("commission_amount", { precision: 19, scale: 4 }),
+    commissionJournalId: uuid("commission_journal_id"),
+    commissionEntryNo: text("commission_entry_no"),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_collection_referrals_id_tenant").on(table.id, table.tenantId),
+    index("ix_collection_referrals_tenant_agency").on(table.tenantId, table.agencyId, table.status),
+    index("ix_collection_referrals_tenant_partner").on(table.tenantId, table.partnerId, table.status),
+    index("ix_collection_referrals_tenant_invoice").on(table.tenantId, table.invoiceId),
+  ],
+);
+
+/** PHASE-039 (0059, v3.2/R-03): the supplier RMA mirror — REQUESTED →
+ * APPROVED (SoD) → SHIPPED → CREDITED; completion auto-generates the AP
+ * debit note through the posting engine (G-38). */
+export const supplierReturnAuthorizations = pgTable(
+  "supplier_return_authorizations",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    branchId: uuid("branch_id").notNull(),
+    srmaNo: text("srma_no"),
+    supplierId: uuid("supplier_id").notNull(),
+    purchaseOrderId: uuid("purchase_order_id").notNull(),
+    reasonCode: text("reason_code").notNull(),
+    reason: text("reason"),
+    reasonAr: text("reason_ar"),
+    status: text("status").notNull().default("REQUESTED"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    totalNet: numeric("total_net", { precision: 19, scale: 4 }).notNull().default("0"),
+    totalTax: numeric("total_tax", { precision: 19, scale: 4 }).notNull().default("0"),
+    totalGross: numeric("total_gross", { precision: 19, scale: 4 }).notNull().default("0"),
+    requestedAt: timestamp("requested_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    shippedAt: timestamp("shipped_at", { withTimezone: true, mode: "string" }),
+    shippedBy: uuid("shipped_by"),
+    creditedAt: timestamp("credited_at", { withTimezone: true, mode: "string" }),
+    creditedBy: uuid("credited_by"),
+    debitNoteId: uuid("debit_note_id"),
+    postedJournalId: uuid("posted_journal_id"),
+    entryNo: text("entry_no"),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true, mode: "string" }),
+    cancelledBy: uuid("cancelled_by"),
+    cancelReason: text("cancel_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_return_authorizations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_return_authorizations_tenant_no")
+      .on(table.tenantId, table.srmaNo)
+      .where(sql`${table.srmaNo} IS NOT NULL`),
+    index("ix_supplier_return_authorizations_tenant_status").on(table.tenantId, table.status),
+    index("ix_supplier_return_authorizations_tenant_supplier").on(
+      table.tenantId,
+      table.supplierId,
+      table.status,
+    ),
+    index("ix_supplier_return_authorizations_tenant_po").on(table.tenantId, table.purchaseOrderId),
+  ],
+);
+
+/** PHASE-039 (0059, v3.2/R-03): supplier-RMA lines — PO-line referenced,
+ * qty bounded by purchased − returned (the service fold). */
+export const supplierReturnAuthorizationLines = pgTable(
+  "supplier_return_authorization_lines",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    srmaId: uuid("srma_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    poLineId: uuid("po_line_id").notNull(),
+    itemId: uuid("item_id"),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    unitCost: numeric("unit_cost", { precision: 19, scale: 4 }).notNull().default("0"),
+    netAmount: numeric("net_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_return_authorization_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_return_authorization_lines_srma_line").on(
+      table.srmaId,
+      table.tenantId,
+      table.lineNo,
+    ),
+    index("ix_supplier_return_authorization_lines_tenant_srma").on(table.tenantId, table.srmaId),
+    index("ix_supplier_return_authorization_lines_tenant_po_line").on(
+      table.tenantId,
+      table.poLineId,
+    ),
+  ],
+);
