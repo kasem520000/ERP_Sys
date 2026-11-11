@@ -243,6 +243,38 @@ export const MIGRATIONS: readonly string[] = [
   // drift 248 → 249). NOT ledger documents — the stamp rides the
   // invoice's own post transaction; zero journal rules.
   "0050_zatca_phase1",
+  // PHASE-038 (Blueprint v3.0 · CR-08): 0051_rfq_quotes — the sourcing
+  // negotiation loop (H-11/P-01/P-02/P-08): rfqs (open/invited, lifecycle
+  // DRAFT→ISSUED→QUOTED→AWARDED→CLOSED with stamp-shape CHECKs, portal
+  // invite token hashes), rfq_lines, supplier_quotes (+lines, one per
+  // supplier per RFQ), and quote_comparisons (the frozen snapshot + the
+  // award; ONE live per RFQ). Seven permission seeds (drift 249 → 256 —
+  // matrix §3.16) + the FIVE feature-key plan grants (business +
+  // enterprise — the tier-4 precedent). NOT ledger documents — awards
+  // generate purchase orders, never journals.
+  "0051_rfq_quotes",
+  // PHASE-038: 0052_blanket_orders — the commitment instruments (P-03):
+  // blanket_orders (validity window, min/max commitment, price lock, the
+  // transactional released_amount accumulator) + the append-only
+  // blanket_releases ledger (each release carries its generated purchase
+  // order) + the additive purchase_orders.contract_id (P-06 contract
+  // linkage → crm.service_contracts). Zero new permission/feature keys
+  // (rides 0051's).
+  "0052_blanket_orders",
+  // PHASE-038: 0053_supplier_collaboration — the collaboration cluster
+  // (P-04/P-12/P-13): supplier_ratings (the rolling-window scorecard),
+  // approved_supplier_items (the approved-vendor-per-item gate),
+  // supplier_advances (G-33 disbursement/apply tracking with the
+  // tenant-mapped control account), and early_payment_discount_terms
+  // (G-34 capture rides the approved terms). Zero new permission keys;
+  // the G-33/G-34 journal rules register in JOURNAL_RULES §7.
+  "0053_supplier_collaboration",
+  // PHASE-038: 0054_capex_tenders — capex_requests (P-10/P-15: the
+  // workflow with SoD + the PHASE-028 budget guard at submit —
+  // ADVISORY default / ENFORCE_DRAFT per policy, the evaluation snapshot
+  // persists) and tender_intakes (P-14/DF-52/DF-53: intake records ONLY
+  // — no bidding-platform claims). Zero new permission/feature keys.
+  "0054_capex_tenders",
 ];
 
 /**

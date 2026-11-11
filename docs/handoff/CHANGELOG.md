@@ -1,8 +1,88 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-10 (PHASE-035 — Activation & Truth Restoration delivered)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-10 (PHASE-038 — Procurement Sourcing & Supplier Collaboration delivered)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-10 — **PHASE-038 — Procurement Sourcing & Supplier Collaboration — COMPLETE**
+  (Blueprint v3.0 wave 1 / CR-08 — the audit's H-11 verdict resolved; evidence:
+  [PHASE-038-COMPLETION.md](../implementation/phases/reports/PHASE-038-COMPLETION.md)):
+  (1) migrations `0051`–`0054` (schema_version 54) — thirteen RLS'd tenant tables: the
+  RFQ round (`rfqs`/`rfq_lines` OPEN/INVITED, `rfq_no` at ISSUE), supplier quotes
+  (one per supplier per RFQ, re-submit replaces lines while open), the frozen award
+  matrix (`quote_comparisons` — evidence written once, never recomputed; the
+  one-live-comparison unique = the BR-063 DB floor), blanket agreements
+  (`blanket_orders`/`blanket_releases` — transactional `released_amount`, releases
+  mint the executable PO in-transaction; the additive NULLABLE
+  `purchase_orders.contract_id` → crm.service_contracts), the collaboration cluster
+  (`supplier_ratings`, `approved_supplier_items`, `supplier_advances`,
+  `early_payment_discount_terms`), CAPEX + tenders (`capex_requests` with the 028
+  budget guard advisory/enforced + the persisted evaluation snapshot,
+  `tender_intakes` — intake records only). (2) two NEW goldens **G-33** (supplier
+  advance disbursement + application — the tenant-mapped
+  `purchasing.supplier_advance_control_account`, fail-closed when unmapped, BASE at
+  rate 1, treasury via the store API INV-019 exact, supplier-level netting) and
+  **G-34** (early-payment discount capture — once per invoice, POSTED payment +
+  window + allocation verified). (3) the P-05 supplier-portal skeleton — ONE public
+  endpoint (`POST /api/v1/portal/rfqs/:rfqId/quotes` in PUBLIC_ROUTES): scoped
+  sha256-hashed tokens in `rfqs.portal_invites` (plaintext shown once), the SECURITY
+  DEFINER `erp.portal_resolve_rfq_token` pre-GUC projection, re-validation under
+  RLS, audited + rate-limited. (4) BR-062 (the 3-bid rule as tenant policy:
+  ENFORCED/ADVISORY/OFF) + BR-063 (one award per round; awarding closes the RFQ)
+  with traceability via `quote_comparisons.generated_docs` + PO line notes;
+  scorecards fold delivery 40/quality 40/price 20 from LIVE documents (the
+  `purchasing.scorecard-sweep` queue); the approved-vendor gate OFF/FLAG/BLOCK in
+  pricing; matching gains `purchasing.match.tolerance_bands`. (5) web: the four
+  sourcing screens (`/purchasing/rfq` + comparison/award matrix,
+  `/purchasing/blanket-orders`, `/purchasing/supplier-scorecards`,
+  `/purchasing/capex-requests`) + NAV_ITEMS §1.4 + command palette (OA-04). (6)
+  reports +2 (`purchasing.rfq-award-matrix`, `purchasing.supplier-scorecard`;
+  registry 86 → 88) + the RunService single-flight coalescing gate repair;
+  permissions 249 → 256 (0051 §9, seven keys); feature keys +5; i18n
+  4,699=4,699 (+163); ENTITY_CATALOG 204 → 217; isolation +13 tables (A1–A10);
+  docs wave (BR-062/063 · G-33/G-34 + JOURNAL_RULES note 11 · DATA_DICTIONARY §17 ·
+  FEATURE_CATALOG +5 · NAVIGATION_MODEL §1.4). Gates: typecheck 8/8 · lint 8/8 ·
+  depcruise 0 · unit 1,414 · **DB 2,555/2,555 (176 files)** · build 8/8 · i18n
+  parity · drift 256=256 · manifests 13 · token contrast · ui catalog · web-security
+  6/6. Five recorded gate repairs + the notifications-email environmental item.
+  Delivery: `ERP_PLATFORM_PHASE038.zip` (OA-07). Next: PHASE-039.
+
+- 2026-11-10 — **PHASE-037 — ZATCA Phase-1 & QR Compliance — COMPLETE** (Blueprint
+  v3.0 wave 1 / CR-07 — the audit's H-01 verdict resolved: Phase-1 is pure
+  mathematical encoding, zero external APIs; evidence:
+  [PHASE-037-COMPLETION.md](../implementation/phases/reports/PHASE-037-COMPLETION.md)):
+  migration `0050` (the seven additive NULLABLE sales_invoices chain columns with
+  the all-or-nothing stamp CHECK + the partial UNIQUE INV-027 floor; the RLS'd
+  `zatca_devices` registry); the pure-computation core (TLV encoder with byte-pinned
+  vectors, the `invoice-hash-v1` chain with the genesis PIH, the QR PNG/SVG
+  renderer); post-transaction stamping (ICV under a row lock, PIH = predecessor
+  hash) + the verification walk + the idempotent backfill + the daily pg-boss sweep;
+  BR-060 fail-closed; the print templates v2 render a real scannable QR
+  (Chromium-decoded to the exact payload — H-02 closed); the honest
+  `ZatcaGenerationAdapter` (GENERATION only; submit = `ZATCA_PHASE2_NOT_IMPLEMENTED`
+  with the GATE-1..4 checklist preserved); the `tax.e-invoicing-log` report v2; the
+  `/settings/tax/zatca-devices` screen; permissions 248 → 249; i18n
+  4,536=4,536 (+89); ENTITY_CATALOG 203 → 204; the GCC readiness matrix (DF-54) +
+  `GATE-DISCIPLINE-ZATCA.md`. Gates green (typecheck 8/8 · lint 8/8 · DB full suite
+  2,407/2,407). Three recorded gate repairs + one environmental item. Delivery:
+  `ERP_PLATFORM_PHASE037.zip` (OA-07). Next: PHASE-038.
+
+- 2026-11-10 — **PHASE-036 — Extensibility Core — Custom Fields — COMPLETE**
+  (Blueprint v3.0 wave 1 / CR-06 — the audit's single most important functional gap
+  FD-18/19/20 closed; evidence:
+  [PHASE-036-COMPLETION.md](../implementation/phases/reports/PHASE-036-COMPLETION.md)):
+  migration `0049` (five RLS'd tables — `custom_field_definitions`, the ADR-0019
+  TYPED value store `custom_field_values` with the num_nonnulls=1 law, the picklist
+  pair, `form_layouts` with the two partial uniques); the code-owned entity registry
+  over the six first-wave entities; the ONE reusable value guard
+  (validate-before-insert — zero partial writes; typed 400 packs; full-replace
+  semantics) injected into all six entities' create/update/read paths; the
+  `/settings/custom-fields` manager + picklist editor + BR-059 form designer; the
+  shared CustomFieldSurface on the six forms; dynamic columns on the partner list.
+  Permissions 245 → 248; i18n 4,290 → 4,447; ENTITY_CATALOG 198 → 203. Two recorded
+  034-tree gate repairs (the reporting boot rule's missing
+  `consolidation.reports.view`; the 0041 consolidation account/purpose pins).
+  Delivery: `ERP_PLATFORM_PHASE036.zip` (OA-07). Next: PHASE-037.
 
 - 2026-11-10 — **PHASE-035 — Activation & Truth Restoration — COMPLETE** (Blueprint v3.0's entry phase; evidence:
   [PHASE-035-COMPLETION.md](../implementation/phases/reports/PHASE-035-COMPLETION.md)): (1) migration `0048`

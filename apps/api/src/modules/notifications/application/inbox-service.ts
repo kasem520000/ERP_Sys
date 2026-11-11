@@ -54,7 +54,11 @@ export type NotificationCategory =
   // PHASE-028 (0039 category widening): the advisory overspend warnings
   // (BR-051 — notification + banner at/over budget) and the
   // at/over-threshold sweep surface.
-  | "budgeting";
+  | "budgeting"
+  // PHASE-038 (0051 category widening): the 3-bid advisory warning
+  // (BR-062 — one inbox notification when the award proceeds below the
+  // configured quote floor in ADVISORY mode).
+  | "purchasing";
 export type NotificationSeverity = "info" | "warning" | "critical";
 
 export interface BilingualText {

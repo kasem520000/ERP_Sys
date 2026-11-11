@@ -1300,6 +1300,64 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/tax/zatca/devices/:id/backfill",
     permission: "tax.einvoicing.devices.manage",
   },
+  // -- PHASE-038 (Blueprint v3.0 · CR-08; matrix §3.16): the procurement
+  // sourcing + supplier-collaboration surfaces — the RFQ negotiation loop
+  // (H-11/P-01), quotes (P-02), comparison/award with the 3-bid floor
+  // (BR-062) and BR-063's one-award-per-round, blanket agreements (P-03),
+  // scorecards + approved items (P-04), advances + early-payment
+  // discounts (G-33/G-34), CAPEX with the 028 guard (P-10/P-15), tender
+  // intake (P-14). Seven keys (249 → 256 zero-drift; migration 0051 §9).
+  // The SUPPLIER-FACING portal route is deliberately NOT here — it is the
+  // PUBLIC_ROUTES surface (the token IS the credential; see below).
+  { method: "GET", path: "/api/v1/purchasing/rfqs", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/rfqs/:id", permission: "purchasing.rfqs.read" },
+  { method: "PATCH", path: "/api/v1/purchasing/rfqs/:id", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/issue", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/close", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/cancel", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/rfqs/:id/quotes", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/quotes", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/portal-invites", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/portal-invites/revoke", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/rfqs/:id/comparison", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/rfqs/:id/comparison", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/comparisons/:id/award", permission: "purchasing.rfqs.award" },
+  { method: "POST", path: "/api/v1/purchasing/comparisons/:id/cancel", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/blanket-orders", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/blanket-orders", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/blanket-orders/:id", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/blanket-orders/:id/releases", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/blanket-orders/:id/close", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/supplier-ratings", permission: "purchasing.rfqs.read" },
+  { method: "GET", path: "/api/v1/purchasing/supplier-ratings/:supplierId", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/supplier-ratings/:supplierId/recompute", permission: "purchasing.suppliers.rate" },
+  { method: "GET", path: "/api/v1/purchasing/approved-supplier-items", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/approved-supplier-items", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/supplier-advances", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/supplier-advances", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/supplier-advances/:id/approve", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/supplier-advances/:id/disburse", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/supplier-advances/:id/apply", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/supplier-advances/:id/cancel", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/early-payment-discount-terms", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/early-payment-discount-terms", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/early-payment-discount-terms/:id/approve", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/early-payment-discount-captures", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/capex-requests", permission: "purchasing.capex.read" },
+  { method: "POST", path: "/api/v1/purchasing/capex-requests", permission: "purchasing.capex.manage" },
+  { method: "GET", path: "/api/v1/purchasing/capex-requests/:id", permission: "purchasing.capex.read" },
+  { method: "PATCH", path: "/api/v1/purchasing/capex-requests/:id", permission: "purchasing.capex.manage" },
+  { method: "POST", path: "/api/v1/purchasing/capex-requests/:id/submit", permission: "purchasing.capex.manage" },
+  { method: "POST", path: "/api/v1/purchasing/capex-requests/:id/approve", permission: "purchasing.capex.approve" },
+  { method: "POST", path: "/api/v1/purchasing/capex-requests/:id/reject", permission: "purchasing.capex.approve" },
+  { method: "POST", path: "/api/v1/purchasing/capex-requests/:id/cancel", permission: "purchasing.capex.manage" },
+  { method: "GET", path: "/api/v1/purchasing/tender-intakes", permission: "purchasing.rfqs.read" },
+  { method: "POST", path: "/api/v1/purchasing/tender-intakes", permission: "purchasing.rfqs.manage" },
+  { method: "GET", path: "/api/v1/purchasing/tender-intakes/:id", permission: "purchasing.rfqs.read" },
+  { method: "PATCH", path: "/api/v1/purchasing/tender-intakes/:id", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/tender-intakes/:id/decide", permission: "purchasing.rfqs.manage" },
+  { method: "POST", path: "/api/v1/purchasing/tender-intakes/:id/close", permission: "purchasing.rfqs.manage" },
   // -- PHASE-023 T8: commerce channels (sales.commerce.manage) ----------------
   {
     method: "GET",
@@ -3085,6 +3143,12 @@ export const PUBLIC_ROUTES: readonly { method: string; path: string }[] = [
   // devices.device_key_hash on success, so replay is impossible and the
   // Idempotency-Key exemption applies like refresh).
   { method: "POST", path: "/api/v1/devices/:id/enroll" },
+  // PHASE-038 (P-05): the supplier-portal quote submission — the invitation
+  // token IS the credential (the enrollment/refresh login pattern verbatim;
+  // the SECURITY DEFINER projection resolves it pre-GUC, then the service
+  // re-validates under RLS). Rate-limited + audited by the controller; the
+  // full portal (060) shares this surface.
+  { method: "POST", path: "/api/v1/portal/rfqs/:rfqId/quotes" },
 ];
 
 /** Routes whose POSTs require an Idempotency-Key header (IDEMPOTENCY §1). */

@@ -332,6 +332,65 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "BR-010: purchase orders above this base-currency gross amount require approval (null = no threshold — the single-owner MVP default).",
   }),
+  // PHASE-038 sourcing keys (BR-062/BR-063 + the phase §2 policy
+  // surface). The 3-bid rule is a tenant policy: a configurable minimum
+  // quote count before award, advisory or enforced (both modes tested).
+  "purchasing.rfq.min_quote_count": Object.freeze({
+    key: "purchasing.rfq.min_quote_count",
+    schema: z.number().int().min(0).max(100),
+    default: 0,
+    description:
+      "BR-062: the minimum number of SUBMITTED supplier quotes required before an RFQ award; 0 (default) disables the floor.",
+  }),
+  "purchasing.rfq.three_bid_mode": Object.freeze({
+    key: "purchasing.rfq.three_bid_mode",
+    schema: z.enum(["OFF", "ADVISORY", "ENFORCED"]),
+    default: "OFF",
+    description:
+      "BR-062: the 3-bid rule posture — OFF ignores the minimum, ADVISORY warns (one inbox notification) and lets the award proceed, ENFORCED rejects the award typed when the quote count is below purchasing.rfq.min_quote_count.",
+  }),
+  // P-04: the approved-vendor-per-item gate on vendor suggestions.
+  "purchasing.approved_vendor_list.mode": Object.freeze({
+    key: "purchasing.approved_vendor_list.mode",
+    schema: z.enum(["OFF", "FLAG", "BLOCK"]),
+    default: "OFF",
+    description:
+      "PHASE-038 (P-04): the approved-vendor-list posture on purchase price resolution — OFF ignores the list, FLAG flags unapproved vendors in the resolved price provenance, BLOCK rejects PO lines whose supplier is not approved for the item.",
+  }),
+  // P-12 (G-33): the tenant-mapped supplier-advance control account
+  // (fail-closed when unmapped — the payroll loan-account precedent).
+  "purchasing.supplier_advance_control_account": Object.freeze({
+    key: "purchasing.supplier_advance_control_account",
+    schema: z.string().uuid().nullable(),
+    default: null,
+    description:
+      "G-33: the GL account the ADVANCES-TO-SUPPLIERS control posts to (uuid of a tenant gl account); disbursement and application fail typed when unmapped — no fallback account exists.",
+  }),
+  // P-13 (G-34): the tenant-mapped early-payment discount income account.
+  "purchasing.early_discount_income_account": Object.freeze({
+    key: "purchasing.early_discount_income_account",
+    schema: z.string().uuid().nullable(),
+    default: null,
+    description:
+      "G-34: the income account early-payment discount captures post to (uuid of a tenant gl account); capture fails typed when unmapped — no fallback account exists.",
+  }),
+  // P-11: the banded tolerance surface on the existing matching engine
+  // (the flat pct keys above stay the default; bands refine by line
+  // amount — no new tables).
+  "purchasing.match.tolerance_bands": Object.freeze({
+    key: "purchasing.match.tolerance_bands",
+    schema: z.array(
+      z.object({
+        /** Inclusive upper bound of the invoice LINE amount this band governs. */
+        maxLineAmount: z.string().regex(/^\d+(\.\d{1,4})?$/, "canonical decimal string"),
+        qtyPct: z.string().regex(/^\d+(\.\d{1,4})?$/, "non-negative decimal string"),
+        pricePct: z.string().regex(/^\d+(\.\d{1,4})?$/, "non-negative decimal string"),
+      }),
+    ),
+    default: [],
+    description:
+      "P-11: amount-banded three-way-match tolerances — the first band whose maxLineAmount ≥ the invoice line amount governs that line (empty default = the flat pct keys govern). Example: [{maxLineAmount: '1000.0000', qtyPct: '2', pricePct: '3'}].",
+  }),
   // PHASE-018 manufacturing keys (the PHASE-018 §6 policy surface; the
   // food_manufacturing manifest sets the same four as L1 defaults via
   // workflow_policies, and the manufacturing services read them from the

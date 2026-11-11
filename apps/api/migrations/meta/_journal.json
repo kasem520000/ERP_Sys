@@ -350,6 +350,34 @@
       "when": 1794654400000,
       "tag": "0050_zatca_phase1",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794740800000,
+      "tag": "0051_rfq_quotes",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1794827200000,
+      "tag": "0052_blanket_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1794913600000,
+      "tag": "0053_supplier_collaboration",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1795000000000,
+      "tag": "0054_capex_tenders",
+      "breakpoints": true
     }
   ],
   "version": "7"

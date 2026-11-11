@@ -111,10 +111,10 @@ recorded here with evidence.
 | Compliance | NONE — no jurisdiction pack data verified against official sources | — |
 | Deployment | NONE — dev compose + CI files (incl. new ci-db.yml); first hosted runs waived pending infra | `docker-compose.yml`, `.github/workflows/` |
 
-## Blueprint v3.0 phases (2026-11-10 — PHASE-037 delivered; the rest planned)
+## Blueprint v3.0 phases (2026-11-10 — PHASE-038 delivered; the rest planned)
 
-28 of 31 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035, PHASE-036 and
-PHASE-037 COMPLETE (2026-11-10).
+27 of 31 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035, PHASE-036,
+PHASE-037 and PHASE-038 COMPLETE (2026-11-10).
 Authoritative scope per phase
 document; this ledger tracks status only. Effort figures are planning estimates.
 
@@ -123,7 +123,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-035](../implementation/phases/PHASE-035.md) | Activation & Truth Restoration | 1 / 12 | 034 ✓ | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-035-COMPLETION.md) |
 | [PHASE-036](../implementation/phases/PHASE-036.md) | Extensibility Core — Custom Fields | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-036-COMPLETION.md) |
 | [PHASE-037](../implementation/phases/PHASE-037.md) | ZATCA Phase-1 & QR Compliance | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-037-COMPLETION.md) |
-| [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-038-COMPLETION.md) |
 | [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email) | 1 / 12 | 035 | NOT_STARTED — PLANNED |

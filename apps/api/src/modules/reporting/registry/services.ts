@@ -18,6 +18,7 @@ import { BudgetingQueriesService } from "./budgeting/budgeting-queries";
 import { PayrollQueriesService } from "./payroll/payroll-queries";
 import { ConsolidationQueriesService } from "./consolidation/consolidation-queries";
 import { TreasuryQueriesService } from "../../treasury/application/treasury-queries";
+import { SourcingQueriesService } from "./sourcing/sourcing-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -64,6 +65,8 @@ export interface ReportingServices {
   payroll: PayrollQueriesService;
   /** PHASE-034 · the consolidation query surface (the completed run's immutable snapshot → consolidated TB/IS/BS with the render-time INV-026 line-by-line re-check, the eliminations log with its journal-chain tie). Statements read snapshots — never live member books. */
   consolidation: ConsolidationQueriesService;
+  /** PHASE-038 · the sourcing query surface (the frozen award matrix rendered verbatim from the stored snapshot, the scorecard list). */
+  sourcing: SourcingQueriesService;
   treasury: TreasuryQueriesService;
   partners: PartnerQueriesService;
   tax: TaxQueriesService;
@@ -95,6 +98,7 @@ export function reportingServices(): ReportingServices {
       budgeting: new BudgetingQueriesService(),
       payroll: new PayrollQueriesService(),
       consolidation: new ConsolidationQueriesService(),
+      sourcing: new SourcingQueriesService(),
       treasury: new TreasuryQueriesService(),
       partners: new PartnerQueriesService(),
       tax: new TaxQueriesService(),

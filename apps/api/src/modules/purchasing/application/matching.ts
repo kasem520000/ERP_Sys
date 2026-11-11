@@ -8,6 +8,7 @@ import {
   MatchRequiresLinesError,
   SupplierInvoiceNotFoundError,
 } from "../domain/purchasing-errors";
+import { resolveToleranceForLine, type ToleranceBand } from "./sourcing-math";
 
 /**
  * Three-way matching (PHASE-011 T4/T5; BR-009; ACCOUNTING_TESTS §2): PO ↔
@@ -23,6 +24,13 @@ import {
  * persists on the supplier invoice BEFORE approval and is audit-visible;
  * `purchasing.matching.override` (risky) may widen tolerances per match
  * run — every override lands in the recorded result.
+ *
+ * PHASE-038 (P-11): the banded refinement —
+ * `purchasing.match.tolerance_bands` (no new tables) refines the flat
+ * keys by INVOICE LINE AMOUNT: the first band whose maxLineAmount ≥ the
+ * line amount governs that line; un-banded lines keep the flat keys.
+ * The per-line effective tolerances land in the recorded result (the
+ * match outcome stays reproducible evidence).
  */
 
 export type MatchLineOutcome =
@@ -61,6 +69,8 @@ export interface MatchResult {
   matchedBy: string | null;
   tolerances: { qtyPct: string; pricePct: string };
   overrideApplied: boolean;
+  /** PHASE-038 (P-11): the band refinement state for this run. */
+  bandsApplied: boolean;
   lines: MatchLineResult[];
   summary: { outcome: "MATCHED" | "EXCEPTION" | "DISPOSITIONED"; exceptions: number; undisposed: number };
 }
@@ -103,8 +113,27 @@ export class MatchingService {
       input.tolerancesOverride?.pricePct ??
       (await store.readSetting<string>("purchasing.match.price_tolerance_pct")) ??
       "0";
+    // PHASE-038 (P-11): the band refinement (skipped entirely when an
+    // override drives the run — the override IS the tolerance decision).
+    const bands =
+      input.tolerancesOverride?.qtyPct !== undefined
+        ? []
+        : ((await store.readSetting<ToleranceBand[]>("purchasing.match.tolerance_bands")) ?? []);
+    const bandsApplied = bands.length > 0;
     const qtyTolerance = new Decimal(qtyPct);
     const priceTolerance = new Decimal(pricePct);
+
+    /** The effective tolerance pair for one line (band-first, flat
+     * fallback). */
+    const tolerancesFor = (lineAmount: Decimal): { qty: Decimal; price: Decimal } => {
+      if (!bandsApplied) return { qty: qtyTolerance, price: priceTolerance };
+      const band = resolveToleranceForLine(
+        lineAmount.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toFixed(4),
+        bands,
+      );
+      if (band === null) return { qty: qtyTolerance, price: priceTolerance };
+      return { qty: new Decimal(band.qtyPct), price: new Decimal(band.pricePct) };
+    };
 
     // GRN lines + PO lines lookup (posted GRNs only — direct id lookups).
     const grnLineById = new Map<string, { qty: string; unitCost: string; poLineId: string | null; receiptSupplier: string }>();
@@ -171,10 +200,12 @@ export class MatchingService {
         const qtyVariance = new Decimal(line.qty).minus(new Decimal(grn.qty));
         qtyVariancePct = pct(qtyVariance, new Decimal(grn.qty));
         const invoiceExceedsReceived = qtyVariance.gt(0);
+        const lineAmount = new Decimal(line.qty).times(new Decimal(line.unitPrice));
+        const effective = tolerancesFor(lineAmount);
         const priceVariance = new Decimal(line.unitPrice).minus(new Decimal(grn.unitCost));
         const priceBase = new Decimal(grn.unitCost);
         priceVariancePct = pct(priceVariance, priceBase);
-        const priceAbove = priceVariancePct !== null && new Decimal(priceVariancePct).gt(priceTolerance);
+        const priceAbove = priceVariancePct !== null && new Decimal(priceVariancePct).gt(effective.price);
         const priceHasVariance =
           priceVariancePct !== null && new Decimal(priceVariancePct).gt(0);
 
@@ -193,7 +224,7 @@ export class MatchingService {
           // tolerance passes — the PO stays open for the remainder).
           const poQtyVariance = new Decimal(grn.qty).minus(new Decimal(poLine.qty));
           const poQtyVarPct = pct(poQtyVariance, new Decimal(poLine.qty));
-          if (poQtyVarPct !== null && new Decimal(poQtyVarPct).gt(qtyTolerance)) {
+          if (poQtyVarPct !== null && new Decimal(poQtyVarPct).gt(effective.qty)) {
             outcome = "QTY_EXCEPTION";
             exceptions += 1;
           } else {
@@ -249,6 +280,7 @@ export class MatchingService {
       matchedBy: input.actorId,
       tolerances: { qtyPct, pricePct },
       overrideApplied: input.tolerancesOverride !== undefined && input.tolerancesOverride !== null,
+      bandsApplied,
       lines,
       summary: { outcome: summaryOutcome, exceptions, undisposed },
     };

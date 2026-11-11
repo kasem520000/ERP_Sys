@@ -17,7 +17,8 @@ import {
   PurchasingDocumentStateError,
   SupplierNotFoundError,
 } from "../domain/purchasing-errors";
-import { lineNetAmount, resolvePurchasePrice } from "./pricing";
+import { lineNetAmount, resolvePurchasePrice, enforceApprovedVendorGate } from "./pricing";
+import { findContractById } from "../../crm/infrastructure/crm.store";
 
 /**
  * Purchase requests + orders (PHASE-011 T2; DOCUMENT_LIFECYCLE §3; BR-010/
@@ -216,6 +217,8 @@ export class PurchaseOrderService {
     actorId: string | null;
     requestId?: string | null;
     revisionOfId?: string | null;
+    /** PHASE-038 (P-06): the optional CRM contract linkage. */
+    contractId?: string | null;
     lines: readonly {
       itemId: string;
       qty: string;
@@ -227,6 +230,19 @@ export class PurchaseOrderService {
   }): Promise<store.PurchaseOrderRow> {
     if (input.lines.length === 0) throw new EmptyDocumentError("purchase order");
     await requireSupplier(input.supplierId);
+    // PHASE-038 (P-06): a contract-linked PO must resolve a LIVE contract
+    // (foreign/unknown ids are typed 404s; non-ACTIVE contracts reject).
+    if (input.contractId !== undefined && input.contractId !== null) {
+      const contract = await findContractById(input.contractId);
+      if (contract === undefined) {
+        throw new OrderLineInvalidError(`contract ${input.contractId} does not exist in this tenant`);
+      }
+      if (contract.status !== "ACTIVE") {
+        throw new OrderLineInvalidError(
+          `contract ${input.contractId} is ${contract.status} — contract-linked purchasing requires an ACTIVE contract (P-06)`,
+        );
+      }
+    }
     const base = await ownTenantBaseCurrency();
     if (input.currencyCode !== base && (input.exchangeRate === null || Number(input.exchangeRate) <= 0)) {
       throw new OrderLineInvalidError(
@@ -252,6 +268,13 @@ export class PurchaseOrderService {
     }
 
     let totalNet = new Decimal(0);
+    // PHASE-038 (P-04): the approved-vendor gate evaluates once per
+    // create (the vendor is the document's, not the line's); the mode
+    // decides FLAG (proceed + audited flag) vs BLOCK (typed rejection).
+    // The FLAG audit lands AFTER the PO exists (audit entity_id is a
+    // uuid — the document is the auditable subject).
+    const gateResults = new Map<string, { approved: boolean; mode: string }>();
+    const flaggedItems: { itemId: string; mode: string }[] = [];
     type PoStoreLine = Parameters<typeof store.insertPurchaseOrder>[0]["lines"][number];
     const storeLines: PoStoreLine[] = [];
     for (const line of input.lines) {
@@ -277,6 +300,14 @@ export class PurchaseOrderService {
       }
       const netAmount = lineNetAmount(line.qty, unitPrice);
       totalNet = totalNet.plus(new Decimal(netAmount));
+      let gate = gateResults.get(line.itemId);
+      if (gate === undefined) {
+        gate = await enforceApprovedVendorGate({ supplierId: input.supplierId, itemId: line.itemId });
+        gateResults.set(line.itemId, gate);
+      }
+      if (!gate.approved) {
+        flaggedItems.push({ itemId: line.itemId, mode: gate.mode });
+      }
       storeLines.push({
         itemId: line.itemId,
         qty: new Decimal(line.qty).toFixed(6),
@@ -299,6 +330,7 @@ export class PurchaseOrderService {
       exchangeRate: input.exchangeRate,
       revisionOfId,
       revisionNo,
+      contractId: input.contractId ?? null,
       note: input.note,
       noteAr: input.noteAr,
       actorId: input.actorId,
@@ -308,6 +340,16 @@ export class PurchaseOrderService {
       taxSummary: null,
       lines: storeLines,
     });
+
+    if (flaggedItems.length > 0) {
+      await this.audit.record({
+        action: "purchasing.approved_vendor_flagged",
+        entityType: "purchase_order",
+        entityId: created.id,
+        actorId: input.actorId ?? undefined,
+        after: { supplierId: input.supplierId, flags: flaggedItems },
+      });
+    }
 
     // Convert the source request (audit trail only — the PR was already approved).
     if (input.requestId !== undefined && input.requestId !== null) {
@@ -338,6 +380,7 @@ export class PurchaseOrderService {
         revisionOfId,
         revisionNo,
         requestId: input.requestId ?? null,
+        contractId: input.contractId ?? null,
       },
     });
     return created;

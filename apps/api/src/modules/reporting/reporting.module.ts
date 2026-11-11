@@ -119,6 +119,10 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "budgeting.reports.view",
   // PHASE-029 (0004 pre-seeded §3.14): the payroll report key
   "payroll.reports.view",
+  // PHASE-038 (0051 §9 seed): the sourcing report keys ride the RFQ read
+  // permission (the §12 module-register convention — both contracts gate on
+  // the same `purchasing.rfqs.read` key as the /purchasing/rfq routes).
+  "purchasing.rfqs.read",
 ]);
 
 @Module({

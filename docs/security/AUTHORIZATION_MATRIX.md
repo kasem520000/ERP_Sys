@@ -369,6 +369,25 @@ default), and runs keep the three-way SoD split — create ≠ approve ≠ post.
 | `consolidation.runs.execute` | Execute a consolidation run — read-only over member books, zero cross-tenant writes (ADR-0018, INV-026) / تنفيذ التوحيد (قراءة فقط) | accountant, owner | tenant | no (audited) |
 | `consolidation.reports.view` | View/run consolidated statement keys ([../reporting/REPORT_CATALOG.md](../reporting/REPORT_CATALOG.md) §10) / تشغيل التقارير الموحدة | viewer, accountant, owner | tenant | no |
 
+### 3.16 `purchasing` sourcing & supplier collaboration (PHASE-038)
+
+The negotiation loop in front of the purchase order (H-11): RFQ rounds,
+quotes, the award matrix, blanket agreements, supplier scorecards, CAPEX,
+advances/discounts, tender intake. The supplier-portal route (P-05) is
+PUBLIC — the invitation token IS the credential (the enrollment pattern);
+every portal submission is audited + rate-limited and scoped to exactly
+(one RFQ × one supplier).
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `purchasing.rfqs.read` | View RFQs, quotes, comparisons, blanket orders, supplier collaboration / عرض طلبات عروض الأسعار والمقارنات والاتفاقيات الإطارية وتعاون الموردين | accountant, purchasing, owner | tenant | no |
+| `purchasing.rfqs.manage` | Manage RFQs, quotes, blanket agreements, advances and tenders / إدارة طلبات عروض الأسعار وعروض الموردين والاتفاقيات الإطارية والسلف والمناقصات | purchasing, owner | tenant | no (audited) |
+| `purchasing.rfqs.award` | Award RFQ rounds and generate orders/releases (BR-062/BR-063) / ترسية دورات المنافسة الشرائية وتوليد أوامر الشراء | purchasing, owner | tenant | **yes** (audited; the award closes the round) |
+| `purchasing.suppliers.rate` | Compute and review supplier scorecards (P-04) / احتساب ومراجعة بطاقات تقييم الموردين | purchasing, owner | tenant | no (audited) |
+| `purchasing.capex.read` | View CAPEX requests / عرض طلبات الشراء الرأسمالي | accountant, purchasing, owner | tenant | no |
+| `purchasing.capex.manage` | Create and submit CAPEX requests (the 028 budget guard) / إنشاء وإرسال طلبات الشراء الرأسمالي | purchasing, owner | tenant | no (audited) |
+| `purchasing.capex.approve` | Approve or reject CAPEX requests — creator ≠ approver / اعتماد أو رفض طلبات الشراء الرأسمالي (الفصل: المنشئ ≠ المعتمد) | owner | tenant | **yes** (SoD §4) |
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

@@ -1,6 +1,6 @@
 # Navigation Model
 
-> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-10 (PHASE-035 / PHASE-036)
+> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-10 (PHASE-035 / PHASE-036 / PHASE-038)
 
 How users move through the platform: the information architecture, the entitlement-driven
 navigation registry, the command menu as universal navigation, back/deep-link behavior,
@@ -87,6 +87,24 @@ plan grant rides migration `0049`). The per-entity form designer and the shared
 | id | Group | Label (AR / EN) | featureKey | permission | archetype |
 |----|-------|-----------------|------------|------------|-----------|
 | `settings.custom_fields` | 9 الإعدادات | الحقول المخصصة / Custom fields | `platform.custom_fields` | `configuration.custom_fields.read` | Settings (§8) — route `/settings/custom-fields`: the definitions + picklists manager (definitions / قوائم القيم), with the per-entity form designer (مصمم النماذج) opening from it; create/update/archive actions run under `configuration.custom_fields.manage` / `configuration.form_layouts.manage` |
+
+### 1.4 PHASE-038 registry additions (Blueprint v3.0 — procurement sourcing)
+
+The sourcing cluster (CR-08; [../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md)
+§9): four purchasing items in group 3 المشتريات — the RFQ negotiation loop, the blanket
+agreements, the supplier scorecards, and the CAPEX worklist. Same resolution rule as
+every item — `entitlement(featureKey)` AND `permission(user, branch)`; the portal
+skeleton has no sidebar item by design (the supplier submits through the scoped public
+endpoint, never through the app shell). Visibility is **server-resolved**
+(`resolveNavigation`) per BR-039 — entitlement and permission are evaluated on the API
+side, never inferred in the client.
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `purchasing.rfqs` | 3 المشتريات | طلبات عروض الأسعار / RFQs & sourcing | `purchasing.rfqs` | `purchasing.rfqs.read` | List + Search (§2) — route `/purchasing/rfq`; the comparison/award matrix and the award→PO generation run inside the detail surface under `purchasing.rfqs.award` |
+| `purchasing.blanket_orders` | 3 المشتريات | الاتفاقيات الإطارية / Blanket agreements | `purchasing.blanket_orders` | `purchasing.rfqs.read` | List + Search (§2) — route `/purchasing/blanket-orders`; releases generate the executable PO in-document |
+| `purchasing.supplier_scorecards` | 3 المشتريات | تقييم الموردين / Supplier scorecards | `purchasing.supplier_scorecards` | `purchasing.rfqs.read` | Dashboard (§1) — route `/purchasing/supplier-scorecards`; the rolling scorecard + the approved-vendor-per-item list; recompute/review under `purchasing.suppliers.rate` |
+| `purchasing.capex` | 3 المشتريات | طلبات الشراء الرأسمالي / CAPEX requests | `purchasing.capex_requests` | `purchasing.capex.read` | List + Search (§2) — route `/purchasing/capex-requests`; the budget guard runs at submit (advisory default), approve/reject under `purchasing.capex.approve` (SoD creator ≠ approver) |
 
 ## 2. Navigation registry (data model, normative)
 

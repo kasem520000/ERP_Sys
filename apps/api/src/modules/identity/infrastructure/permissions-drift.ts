@@ -133,6 +133,9 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // PHASE-037 (Blueprint v3.0 · CR-07): 0050 seeds the one ZATCA device
   // key (tax.einvoicing.devices.manage — matrix §3.7; 248 → 249).
   "apps/api/migrations/0050_zatca_phase1.sql",
+  // PHASE-038 (Blueprint v3.0 · CR-08): 0051 seeds the SEVEN sourcing
+  // keys (matrix §3.16; 249 → 256).
+  "apps/api/migrations/0051_rfq_quotes.sql",
 ];
 
 export async function main(): Promise<void> {

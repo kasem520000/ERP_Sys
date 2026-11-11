@@ -111,6 +111,15 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "purchasing.payments": ["treasury.accounts"],
   "purchasing.three_way_matching": ["purchasing.supplier_invoices"],
   "purchasing.landed_costs": ["purchasing.goods_receipts"],
+  // PHASE-038 sourcing keys (migration 0051 §10 — business + enterprise,
+  // the tier-4 precedent): the negotiation loop rides the purchasing
+  // chain; scorecards read the receiving/invoicing truth; the portal
+  // shares the RFQ substrate (P-05 → 060).
+  "purchasing.rfqs": ["purchasing.orders"],
+  "purchasing.blanket_orders": ["purchasing.orders"],
+  "purchasing.supplier_scorecards": ["purchasing.goods_receipts"],
+  "purchasing.capex_requests": ["purchasing.requests"],
+  "purchasing.supplier_portal": ["purchasing.rfqs"],
   // treasury
   "treasury.accounts": ["accounting.chart_of_accounts"],
   "treasury.receipts_disbursements": ["treasury.accounts"],

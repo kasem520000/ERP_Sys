@@ -350,6 +350,27 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   // path covers offboarding). One table — the auto-generated A-suite
   // extends by +6.
   { table: "zatca_devices" },
+  // PHASE-038 (Blueprint v3.0 · CR-08, migrations 0051–0054): the
+  // procurement sourcing & supplier-collaboration cluster. The two line
+  // tables carry the DELETE grant (the replace-on-DRAFT-edit /
+  // re-submission paths — the services never delete a non-DRAFT
+  // parent's lines); everything else is archive-not-delete (sourcing
+  // history, the append-only release ledger, the workflow states). The
+  // award snapshot (quote_comparisons) is evidence — no deletes. Thirteen
+  // tables — the auto-generated A-suite extends by +78.
+  { table: "rfqs" },
+  { table: "rfq_lines", deleteGranted: true },
+  { table: "supplier_quotes" },
+  { table: "supplier_quotes_lines", deleteGranted: true },
+  { table: "quote_comparisons" },
+  { table: "blanket_orders" },
+  { table: "blanket_releases" },
+  { table: "supplier_ratings" },
+  { table: "approved_supplier_items" },
+  { table: "supplier_advances" },
+  { table: "early_payment_discount_terms" },
+  { table: "capex_requests" },
+  { table: "tender_intakes" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

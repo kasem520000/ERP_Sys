@@ -206,6 +206,16 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "payroll/loans": { group: "navHr", label: "navPayrollLoans" },
   "payroll/loans/new": { group: "navHr", label: "payLoanNew" },
   "payroll/reports": { group: "navHr", label: "payReportsTitle" },
+  // -- WEB-038 (PHASE-038): the procurement sourcing surfaces (matrix §3.16).
+  // The registry rows `purchasing.rfqs` / `purchasing.blanket_orders` /
+  // `purchasing.supplier_scorecards` / `purchasing.capex` (contracts
+  // NAV_ITEMS) drive the sidebar; these fallbacks cover nav-fetch failure
+  // for the module's sub-surfaces (the support-sessions rule — crumbs only;
+  // the sidebar stays registry-driven).
+  "purchasing/rfq": { group: "navPurchasing", label: "sourcingRfqsNav" },
+  "purchasing/blanket-orders": { group: "navPurchasing", label: "sourcingBlanketNav" },
+  "purchasing/supplier-scorecards": { group: "navPurchasing", label: "sourcingScorecardsNav" },
+  "purchasing/capex-requests": { group: "navPurchasing", label: "sourcingCapexNav" },
 };
 
 /**

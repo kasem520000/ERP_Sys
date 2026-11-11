@@ -109,7 +109,17 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // Phase-1 GENERATION substrate: the additive NULLABLE invoice chain
     // columns + the RLS'd zatca_devices registry (one permission seed,
     // drift 248 → 249; NOT ledger documents — zero journal rules).
-    expect(files.at(-1)?.tag).toBe("0050_zatca_phase1");
+    // PHASE-038 (Blueprint v3.0 · CR-08): 0051_rfq_quotes … 0054_capex_tenders
+    // — the procurement sourcing & supplier-collaboration cluster (13 RLS'd
+    // tables across the four-migration split: the RFQ/quotes/comparison
+    // loop, blanket orders/releases + the additive contract_id, the
+    // collaboration cluster (ratings/approved items/advances/discount
+    // terms), and capex/tender intake). Seven permission seeds move the
+    // drift count 249 → 256 (matrix §3.16); the five sourcing feature keys
+    // grant to business + enterprise. NOT ledger documents — awards/
+    // releases generate purchase orders whose own lifecycles post; G-33/
+    // G-34 post through the purchasing advances service (0053 tables).
+    expect(files.at(-1)?.tag).toBe("0054_capex_tenders");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

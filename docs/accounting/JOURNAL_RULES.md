@@ -106,6 +106,8 @@ mandatory failure pack ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_T
 | G-30 | Payroll payout — `payroll` | DR `SALARIES_PAYABLE` · CR CASH/BANK | PHASE-029 |
 | G-31 | EOS settlement at termination — `payroll` | DR `EOS_PROVISION` (provision balance) · CR `CASH` (settled) — residual to `EOS_PROVISION_EXPENSE` | PHASE-029 |
 | G-32 | Consolidation elimination (intercompany AR/AP) — `consolidation` | DR `AP_CONTROL` (entity B intercompany) · CR `AR_CONTROL` (entity A intercompany) — posted in the parent's consolidation books only | PHASE-034 |
+| G-33 | Supplier advance disbursement + application — `purchasing` | DISBURSE: DR `ADVANCES_TO_SUPPLIERS` (the tenant-mapped control — `purchasing.supplier_advance_control_account`; fail-closed when unmapped) · CR CASH/BANK (the treasury movement, base at rate 1 — the G-30 pattern) · APPLY: DR `AP_CONTROL` (partner-stamped) · CR `ADVANCES_TO_SUPPLIERS` | PHASE-038 |
+| G-34 | Early-payment discount capture — `purchasing` | DR `AP_CONTROL` (the discount share, partner-stamped — paid net early) · CR the tenant-mapped discount-income account (`purchasing.early_discount_income_account`; fail-closed when unmapped) — within the approved terms' window only (SoD: terms creator ≠ approver) | PHASE-038 |
 
 Notes:
 
@@ -156,4 +158,17 @@ Notes:
     RC-11 (the notes register↔GL reconciliation, kind `NOTES`) are enforced and tested
     ([ACCOUNTING_INVARIANTS.md](ACCOUNTING_INVARIANTS.md) INV-024;
     [RECONCILIATION.md](RECONCILIATION.md) §1 row 11).
+11. **G-33/G-34 delivered mechanics (PHASE-038, migrations 0053).** The advance control
+    account and the discount income account are tenant-mapped SETTINGS (not engine
+    purposes): unmapped → typed `SUPPLIER_ADVANCE_ACCOUNT_UNMAPPED` /
+    `EARLY_DISCOUNT_INCOME_ACCOUNT_UNMAPPED`, zero partial writes (the payroll G-29
+    loan-account precedent). The G-33 disbursement journal is BASE-denominated at rate 1
+    with the treasury movement recorded through the treasury store API (INV-019 exact —
+    base == the cash line); the application leg posts under source operation `apply` and
+    nets the supplier's subledger. G-34 captures once per invoice (INV-013 source key
+    (invoiceId, capture)); the capture verifies the treasury payment is POSTED, allocated
+    onto the invoice's open item, inside the window, and ≥ the net-after-discount amount —
+    the honesty floor: pay net early, then capture. SoD: an advance approves only by
+    someone other than its creator; discount terms must be APPROVED (creator ≠ approver)
+    before any capture posts.
 

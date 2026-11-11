@@ -70,6 +70,36 @@ export async function resolvePurchasePrice(input: {
   return { unitPrice: "0", source: "MANUAL", priceListId: null };
 }
 
+/**
+ * PHASE-038 (T-06; P-04, the item-vendor mapping leg of P-09): the
+ * approved-vendor gate on vendor suggestions. The tenant policy
+ * `purchasing.approved_vendor_list.mode` decides the posture:
+ *   OFF   — the list is not consulted (the default; zero reads).
+ *   FLAG  — an unapproved vendor suggestion still resolves, but the
+ *           provenance carries approvedVendor:false (the UI/report
+ *           surface flags it).
+ *   BLOCK — an unapproved vendor suggestion is a typed rejection
+ *           (APPROVED_VENDOR_REQUIRED).
+ * A supplier approved for the item (APPROVED + not expired) passes in
+ * every mode.
+ */
+export async function enforceApprovedVendorGate(input: {
+  supplierId: string;
+  itemId: string;
+}): Promise<{ approved: boolean; mode: string }> {
+  const { isSupplierApprovedForItem } = await import("../infrastructure/collaboration.store");
+  const { ApprovedVendorRequiredError } = await import("../domain/sourcing-errors");
+  const { readEffectiveSetting } = await import("../../../infra/settings/setting-reader");
+  const mode = (await readEffectiveSetting<string>("purchasing.approved_vendor_list.mode")) ?? "OFF";
+  if (mode === "OFF") return { approved: true, mode };
+  const approved = await isSupplierApprovedForItem(input.supplierId, input.itemId);
+  if (approved) return { approved: true, mode };
+  if (mode === "BLOCK") {
+    throw new ApprovedVendorRequiredError({ supplierId: input.supplierId, itemId: input.itemId });
+  }
+  return { approved: false, mode };
+}
+
 function today(): string {
   return new Date().toISOString().slice(0, 10);
 }

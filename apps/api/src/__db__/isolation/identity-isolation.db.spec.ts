@@ -2275,6 +2275,157 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-038 (Blueprint v3.0 · CR-08, migrations 0051–0054): one row per
+  // sourcing table per tenant, FK-consistent over the EXISTING isolation
+  // parents (branch abababab, partner b5b5b5b5, item babababa, PO
+  // 5c5c5c5c, contract 94949494, account b0b0b0b0). All rows are the
+  // least-committed lifecycle state (DRAFT drafts, PREPARED comparison,
+  // SUBMITTED quote, ACTIVE agreement, PENDING intake) — no stamps, no
+  // numbers beyond the per-tenant uniques (which the mismatched attack
+  // shapes intentionally reuse — the RLS WITH CHECK fires first).
+  await superuser.query(
+    `INSERT INTO rfqs (id, tenant_id, branch_id, title, mode, status, currency_code,
+                       invited_suppliers, portal_invites)
+     VALUES
+       ('a0388038-0000-4000-8000-000000000001', $1, 'abababab-0000-4000-8000-000000000001',
+        'Isolation round', 'INVITED', 'DRAFT', 'SAR', '[]'::jsonb, '[]'::jsonb),
+       ('a0388038-0000-4000-8000-000000000002', $2, 'abababab-0000-4000-8000-000000000002',
+        'Isolation round', 'INVITED', 'DRAFT', 'SAR', '[]'::jsonb, '[]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO rfq_lines (id, tenant_id, rfq_id, line_no, item_id, qty)
+     VALUES
+       ('b0388038-0000-4000-8000-000000000001', $1, 'a0388038-0000-4000-8000-000000000001', 1,
+        'babababa-0000-4000-8000-000000000001', 5),
+       ('b0388038-0000-4000-8000-000000000002', $2, 'a0388038-0000-4000-8000-000000000002', 1,
+        'babababa-0000-4000-8000-000000000002', 5)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_quotes (id, tenant_id, rfq_id, supplier_id, status, submitted_via,
+                                  currency_code)
+     VALUES
+       ('c0388038-0000-4000-8000-000000000001', $1, 'a0388038-0000-4000-8000-000000000001',
+        'b5b5b5b5-0000-4000-8000-000000000001', 'SUBMITTED', 'BACK_OFFICE', 'SAR'),
+       ('c0388038-0000-4000-8000-000000000002', $2, 'a0388038-0000-4000-8000-000000000002',
+        'b5b5b5b5-0000-4000-8000-000000000002', 'SUBMITTED', 'BACK_OFFICE', 'SAR')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_quotes_lines (id, tenant_id, quote_id, rfq_line_id, line_no, qty, unit_price)
+     VALUES
+       ('d0388038-0000-4000-8000-000000000001', $1, 'c0388038-0000-4000-8000-000000000001',
+        'b0388038-0000-4000-8000-000000000001', 1, 5, 10),
+       ('d0388038-0000-4000-8000-000000000002', $2, 'c0388038-0000-4000-8000-000000000002',
+        'b0388038-0000-4000-8000-000000000002', 1, 5, 10)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO quote_comparisons (id, tenant_id, rfq_id, snapshot, status)
+     VALUES
+       ('e0388038-0000-4000-8000-000000000001', $1, 'a0388038-0000-4000-8000-000000000001',
+        '{}'::jsonb, 'PREPARED'),
+       ('e0388038-0000-4000-8000-000000000002', $2, 'a0388038-0000-4000-8000-000000000002',
+        '{}'::jsonb, 'PREPARED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO blanket_orders (id, tenant_id, branch_id, blanket_no, supplier_id, title,
+                                 currency_code, status, valid_from, valid_to,
+                                 min_commitment, max_commitment, released_amount, price_lock)
+     VALUES
+       ('f0388038-0000-4000-8000-000000000001', $1, 'abababab-0000-4000-8000-000000000001',
+        'ISO-BLK', 'b5b5b5b5-0000-4000-8000-000000000001', 'Isolation agreement', 'SAR',
+        'ACTIVE', '2027-01-01', '2027-12-31', 0, 1000, 0, '[]'::jsonb),
+       ('f0388038-0000-4000-8000-000000000002', $2, 'abababab-0000-4000-8000-000000000002',
+        'ISO-BLK', 'b5b5b5b5-0000-4000-8000-000000000002', 'Isolation agreement', 'SAR',
+        'ACTIVE', '2027-01-01', '2027-12-31', 0, 1000, 0, '[]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO blanket_releases (id, tenant_id, blanket_id, release_no, release_date,
+                                   lines, amount, purchase_order_id)
+     VALUES
+       ('a1388038-0000-4000-8000-000000000001', $1, 'f0388038-0000-4000-8000-000000000001',
+        'ISO-BLR', '2027-02-01', '[]'::jsonb, 10, '5c5c5c5c-0000-4000-8000-000000000001'),
+       ('a1388038-0000-4000-8000-000000000002', $2, 'f0388038-0000-4000-8000-000000000002',
+        'ISO-BLR', '2027-02-01', '[]'::jsonb, 10, '5c5c5c5c-0000-4000-8000-000000000002')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_ratings (id, tenant_id, supplier_id, window_start, window_end,
+                                   delivery_score, quality_score, price_score, overall_score,
+                                   sample_size, detail)
+     VALUES
+       ('b1388038-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        '2027-01-01', '2027-12-31', 50, 50, 50, 50, 0, '{}'::jsonb),
+       ('b1388038-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        '2027-01-01', '2027-12-31', 50, 50, 50, 50, 0, '{}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO approved_supplier_items (id, tenant_id, supplier_id, item_id, status)
+     VALUES
+       ('c1388038-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', 'APPROVED'),
+       ('c1388038-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', 'APPROVED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_advances (id, tenant_id, supplier_id, currency_code, amount, status)
+     VALUES
+       ('d1388038-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        'SAR', 100, 'DRAFT'),
+       ('d1388038-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        'SAR', 100, 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO early_payment_discount_terms (id, tenant_id, supplier_id, discount_pct,
+                                               discount_days, min_invoice_amount, status)
+     VALUES
+       ('e1388038-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        2, 10, 0, 'ACTIVE'),
+       ('e1388038-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        2, 10, 0, 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO capex_requests (id, tenant_id, branch_id, title, account_id,
+                                 estimated_amount, currency_code, status)
+     VALUES
+       ('f1388038-0000-4000-8000-000000000001', $1, 'abababab-0000-4000-8000-000000000001',
+        'Isolation capex', 'b0b0b0b0-0000-4000-8000-000000000001', 500, 'SAR', 'DRAFT'),
+       ('f1388038-0000-4000-8000-000000000002', $2, 'abababab-0000-4000-8000-000000000002',
+        'Isolation capex', 'b0b0b0b0-0000-4000-8000-000000000002', 500, 'SAR', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO tender_intakes (id, tenant_id, intake_no, title, announcing_authority,
+                                 our_decision, status)
+     VALUES
+       ('a2388038-0000-4000-8000-000000000001', $1, 'ISO-TND', 'Isolation tender',
+        'Isolation authority', 'PENDING', 'OPEN'),
+       ('a2388038-0000-4000-8000-000000000002', $2, 'ISO-TND', 'Isolation tender',
+        'Isolation authority', 'PENDING', 'OPEN')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -2723,6 +2874,21 @@ const OWN_ROW: Record<string, [string, string]> = {
   // PHASE-037 (0050): the ZATCA device registry — the B row doubles as
   // the A4/A7 foreign probe target (the consolidation/036 pattern).
   zatca_devices: ["a0370370-0000-4000-8000-000000000001", "a0370370-0000-4000-8000-000000000002"],
+  // PHASE-038 (0051–0054): the sourcing cluster — the B rows double as
+  // the A4/A7 foreign probe targets (the same pattern).
+  rfqs: ["a0388038-0000-4000-8000-000000000001", "a0388038-0000-4000-8000-000000000002"],
+  rfq_lines: ["b0388038-0000-4000-8000-000000000001", "b0388038-0000-4000-8000-000000000002"],
+  supplier_quotes: ["c0388038-0000-4000-8000-000000000001", "c0388038-0000-4000-8000-000000000002"],
+  supplier_quotes_lines: ["d0388038-0000-4000-8000-000000000001", "d0388038-0000-4000-8000-000000000002"],
+  quote_comparisons: ["e0388038-0000-4000-8000-000000000001", "e0388038-0000-4000-8000-000000000002"],
+  blanket_orders: ["f0388038-0000-4000-8000-000000000001", "f0388038-0000-4000-8000-000000000002"],
+  blanket_releases: ["a1388038-0000-4000-8000-000000000001", "a1388038-0000-4000-8000-000000000002"],
+  supplier_ratings: ["b1388038-0000-4000-8000-000000000001", "b1388038-0000-4000-8000-000000000002"],
+  approved_supplier_items: ["c1388038-0000-4000-8000-000000000001", "c1388038-0000-4000-8000-000000000002"],
+  supplier_advances: ["d1388038-0000-4000-8000-000000000001", "d1388038-0000-4000-8000-000000000002"],
+  early_payment_discount_terms: ["e1388038-0000-4000-8000-000000000001", "e1388038-0000-4000-8000-000000000002"],
+  capex_requests: ["f1388038-0000-4000-8000-000000000001", "f1388038-0000-4000-8000-000000000002"],
+  tender_intakes: ["a2388038-0000-4000-8000-000000000001", "a2388038-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3380,6 +3546,54 @@ const MISMATCHED_INSERT: Record<string, string> = {
   // tenant A's GUC and the RLS WITH CHECK is the isolated rejection.
   zatca_devices: `INSERT INTO zatca_devices (id, tenant_id, name, name_ar, registration_status, icv_counter)
      VALUES ('a0370370-3000-4000-8000-000000000003', $1, 'Isolation EIAS', 'جهاز العزل', 'NOT_REGISTERED', 0)`,
+  // PHASE-038 (0051–0054): the sourcing attacks — every shape reuses
+  // tenant B's OWN composite-FK parents (branch/item/partner/rfq/quote/
+  // blanket/PO/account rows seeded above), so the ONLY violated policy is
+  // the RLS WITH CHECK (tenant_id = $1 under tenant A's GUC) — never an
+  // incidental FK or unique failure. The uniques that WOULD collide
+  // (blanket_no ISO-BLK, release_no ISO-BLR, intake_no ISO-TND, the
+  // (rfq,supplier) quote pair, the (supplier,item) approval) fire only
+  // AFTER the policy passes — the policy rejection is the proof.
+  rfqs: `INSERT INTO rfqs (id, tenant_id, branch_id, title, mode, status, currency_code, invited_suppliers, portal_invites)
+     VALUES ('a0388038-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+             'Isolation round', 'INVITED', 'DRAFT', 'SAR', '[]'::jsonb, '[]'::jsonb)`,
+  rfq_lines: `INSERT INTO rfq_lines (id, tenant_id, rfq_id, line_no, item_id, qty)
+     VALUES ('b0388038-3000-4000-8000-000000000003', $1, 'a0388038-0000-4000-8000-000000000002', 2,
+             'babababa-0000-4000-8000-000000000002', 5)`,
+  supplier_quotes: `INSERT INTO supplier_quotes (id, tenant_id, rfq_id, supplier_id, status, submitted_via, currency_code)
+     VALUES ('c0388038-3000-4000-8000-000000000003', $1, 'a0388038-0000-4000-8000-000000000002',
+             'b5b5b5b5-0000-4000-8000-000000000002', 'SUBMITTED', 'BACK_OFFICE', 'SAR')`,
+  supplier_quotes_lines: `INSERT INTO supplier_quotes_lines (id, tenant_id, quote_id, rfq_line_id, line_no, qty, unit_price)
+     VALUES ('d0388038-3000-4000-8000-000000000003', $1, 'c0388038-0000-4000-8000-000000000002',
+             'b0388038-0000-4000-8000-000000000002', 2, 5, 10)`,
+  quote_comparisons: `INSERT INTO quote_comparisons (id, tenant_id, rfq_id, snapshot, status)
+     VALUES ('e0388038-3000-4000-8000-000000000003', $1, 'a0388038-0000-4000-8000-000000000002',
+             '{}'::jsonb, 'PREPARED')`,
+  blanket_orders: `INSERT INTO blanket_orders (id, tenant_id, branch_id, blanket_no, supplier_id, title, currency_code, status, valid_from, valid_to, min_commitment, max_commitment, released_amount, price_lock)
+     VALUES ('f0388038-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+             'ISO-BLK', 'b5b5b5b5-0000-4000-8000-000000000002', 'Isolation agreement', 'SAR',
+             'ACTIVE', '2027-01-01', '2027-12-31', 0, 1000, 0, '[]'::jsonb)`,
+  blanket_releases: `INSERT INTO blanket_releases (id, tenant_id, blanket_id, release_no, release_date, lines, amount, purchase_order_id)
+     VALUES ('a1388038-3000-4000-8000-000000000003', $1, 'f0388038-0000-4000-8000-000000000002',
+             'ISO-BLR', '2027-02-01', '[]'::jsonb, 10, '5c5c5c5c-0000-4000-8000-000000000002')`,
+  supplier_ratings: `INSERT INTO supplier_ratings (id, tenant_id, supplier_id, window_start, window_end, delivery_score, quality_score, price_score, overall_score, sample_size, detail)
+     VALUES ('b1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             '2027-01-01', '2027-12-31', 50, 50, 50, 50, 0, '{}'::jsonb)`,
+  approved_supplier_items: `INSERT INTO approved_supplier_items (id, tenant_id, supplier_id, item_id, status)
+     VALUES ('c1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', 'APPROVED')`,
+  supplier_advances: `INSERT INTO supplier_advances (id, tenant_id, supplier_id, currency_code, amount, status)
+     VALUES ('d1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             'SAR', 100, 'DRAFT')`,
+  early_payment_discount_terms: `INSERT INTO early_payment_discount_terms (id, tenant_id, supplier_id, discount_pct, discount_days, min_invoice_amount, status)
+     VALUES ('e1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             2, 10, 0, 'ACTIVE')`,
+  capex_requests: `INSERT INTO capex_requests (id, tenant_id, branch_id, title, account_id, estimated_amount, currency_code, status)
+     VALUES ('f1388038-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+             'Isolation capex', 'b0b0b0b0-0000-4000-8000-000000000002', 500, 'SAR', 'DRAFT')`,
+  tender_intakes: `INSERT INTO tender_intakes (id, tenant_id, intake_no, title, announcing_authority, our_decision, status)
+     VALUES ('a2388038-3000-4000-8000-000000000003', $1, 'ISO-TND', 'Isolation tender',
+             'Isolation authority', 'PENDING', 'OPEN')`,
 };
 
 beforeAll(async () => {
@@ -3585,6 +3799,17 @@ describe("generated attack suite A1–A10 — as erp_app", () => {
         // (created + deleted_at/gc_after horizons only) — probe gc_after.
         const touched = await app.query(
           `UPDATE tombstones SET gc_after = gc_after WHERE id = $1`,
+          [foreignRow],
+        );
+        expect(touched.rowCount).toBe(0);
+      } else if (table === "rfq_lines" || table === "supplier_quotes_lines" || table === "blanket_releases") {
+        // PHASE-038 (migrations 0051/0052): the replace-semantics line
+        // tables carry created_at only (no updated_at — the parent
+        // carries the lifecycle stamps) and the append-only release
+        // ledger is created_at-only by design — probe a real column.
+        const column = table === "blanket_releases" ? "amount" : "qty";
+        const touched = await app.query(
+          `UPDATE ${table} SET ${column} = ${column} WHERE id = $1`,
           [foreignRow],
         );
         expect(touched.rowCount).toBe(0);

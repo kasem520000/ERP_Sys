@@ -235,6 +235,8 @@ export interface ReportParams {
   readonly runStatus?: string;
   readonly entryType?: string;
   readonly matchResult?: string;
+  /** PHASE-038 (sourcing): the RFQ of `purchasing.rfq-award-matrix`. */
+  readonly rfqId?: string;
   [key: string]: unknown;
 }
 

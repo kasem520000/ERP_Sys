@@ -42,8 +42,8 @@ import { REPORT_CONTRACTS } from "../registry";
 describe("report-pack wiring (industries/reports/README v2.0 mapping; register §J closed)", () => {
   const liveKeys = new Set(REPORT_CONTRACTS.map((contract) => contract.id));
 
-  it("the live registry carries the 86 contracts (76 base + the 028/029 budgeting/payroll rows from the restored lineage + the 034 consolidation rows + the 035 tax.e-invoicing-log activation row; no new report keys introduced by PHASE-030/031)", () => {
-    expect(REPORT_CONTRACTS).toHaveLength(86);
+  it("the live registry carries the 88 contracts (76 base + the 028/029 budgeting/payroll rows from the restored lineage + the 034 consolidation rows + the 035 tax.e-invoicing-log activation row + the 038 sourcing rows; no other new report keys since PHASE-031)", () => {
+    expect(REPORT_CONTRACTS).toHaveLength(88); // PHASE-038: 86 → 88
   });
 
   it("every wholesale report pin resolves in the live registry", () => {

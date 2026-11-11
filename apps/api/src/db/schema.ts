@@ -2588,6 +2588,9 @@ export const purchaseOrders = pgTable(
     exchangeRate: numeric("exchange_rate", { precision: 19, scale: 8 }),
     revisionOfId: uuid("revision_of_id"),
     revisionNo: integer("revision_no").notNull().default(1),
+    // PHASE-038 (migration 0052, P-06): the linked CRM service contract —
+    // contract-linked purchasing; NULLABLE additive column.
+    contractId: uuid("contract_id"),
     status: text("status").notNull().default("DRAFT"),
     totalNet: numeric("total_net", { precision: 19, scale: 4 }).notNull().default("0"),
     totalTax: numeric("total_tax", { precision: 19, scale: 4 }).notNull().default("0"),
@@ -6277,5 +6280,486 @@ export const formLayouts = pgTable(
   (table) => [
     uniqueIndex("uq_form_layouts_id_tenant").on(table.id, table.tenantId),
     index("ix_form_layouts_tenant_entity").on(table.tenantId, table.entityType),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-038 (migrations 0051–0054 · CR-08): procurement sourcing &
+// supplier collaboration — the negotiation loop in front of the purchase
+// order (H-11/P-01..P-15). Thirteen RLS'd tenant tables across the
+// four-migration split; column mirrors of the hand-written SQL per the
+// sync rule (schema.ts mirrors each migration; RLS/roles stay SQL-owned).
+// ---------------------------------------------------------------------------
+
+/** PHASE-038 (0051): the RFQ sourcing round — open/invited competition
+ * (H-11/P-01); lifecycle DRAFT→ISSUED→QUOTED→AWARDED→CLOSED with DB-level
+ * stamp shapes; portal_invites carries sha256-hashed scoped supplier
+ * tokens (P-05). NO deletes (sourcing history). */
+export const rfqs = pgTable(
+  "rfqs",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    branchId: uuid("branch_id").notNull(),
+    rfqNo: text("rfq_no"),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    mode: text("mode").notNull().default("INVITED"),
+    status: text("status").notNull().default("DRAFT"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    dueAt: timestamp("due_at", { withTimezone: true, mode: "string" }),
+    invitedSuppliers: jsonb("invited_suppliers").notNull().default(sql`'[]'::jsonb`),
+    portalInvites: jsonb("portal_invites").notNull().default(sql`'[]'::jsonb`),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }),
+    issuedBy: uuid("issued_by"),
+    quotedAt: timestamp("quoted_at", { withTimezone: true, mode: "string" }),
+    awardedAt: timestamp("awarded_at", { withTimezone: true, mode: "string" }),
+    awardedBy: uuid("awarded_by"),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    closedBy: uuid("closed_by"),
+    cancelReason: text("cancel_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_rfqs_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_rfqs_tenant_no")
+      .on(table.tenantId, table.rfqNo)
+      .where(sql`${table.rfqNo} IS NOT NULL`),
+    index("ix_rfqs_tenant_status").on(table.tenantId, table.status, table.dueAt),
+    index("ix_rfqs_tenant_branch").on(table.tenantId, table.branchId),
+  ],
+);
+
+/** PHASE-038 (0051): the RFQ requested items — replace-on-DRAFT-edit
+ * (DELETE granted). */
+export const rfqLines = pgTable(
+  "rfq_lines",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    rfqId: uuid("rfq_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    itemId: uuid("item_id").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    targetPrice: numeric("target_price", { precision: 19, scale: 4 }),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_rfq_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_rfq_lines_tenant_rfq_line").on(table.tenantId, table.rfqId, table.lineNo),
+  ],
+);
+
+/** PHASE-038 (0051): the supplier quote header — ONE per supplier per RFQ;
+ * portal or back-office entry (P-02); re-submission while the round is
+ * open replaces the lines. */
+export const supplierQuotes = pgTable(
+  "supplier_quotes",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    rfqId: uuid("rfq_id").notNull(),
+    supplierId: uuid("supplier_id").notNull(),
+    quoteRef: text("quote_ref"),
+    status: text("status").notNull().default("SUBMITTED"),
+    submittedVia: text("submitted_via").notNull().default("BACK_OFFICE"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    leadTimeDays: integer("lead_time_days"),
+    validUntil: date("valid_until"),
+    paymentTerms: text("payment_terms"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    submittedBy: uuid("submitted_by"),
+    portalContact: text("portal_contact"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_quotes_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_quotes_tenant_rfq_supplier").on(
+      table.tenantId,
+      table.rfqId,
+      table.supplierId,
+    ),
+    index("ix_supplier_quotes_tenant_rfq").on(table.tenantId, table.rfqId, table.status),
+    index("ix_supplier_quotes_tenant_supplier").on(table.tenantId, table.supplierId, table.submittedAt),
+  ],
+);
+
+/** PHASE-038 (0051): the offered line prices/lead times — replaced
+ * wholesale on re-submission (DELETE granted). */
+export const supplierQuotesLines = pgTable(
+  "supplier_quotes_lines",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    quoteId: uuid("quote_id").notNull(),
+    rfqLineId: uuid("rfq_line_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    unitPrice: numeric("unit_price", { precision: 19, scale: 4 }).notNull(),
+    leadTimeDays: integer("lead_time_days"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_quotes_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_quotes_lines_tenant_quote_line").on(
+      table.tenantId,
+      table.quoteId,
+      table.lineNo,
+    ),
+    index("ix_supplier_quotes_lines_tenant_quote").on(table.tenantId, table.quoteId, table.lineNo),
+  ],
+);
+
+/** PHASE-038 (0051): the frozen comparison snapshot + the award decision
+ * (P-02/P-08) — evidence written once, never recomputed; generated_docs
+ * traces the award to its POs/releases; ONE live comparison per RFQ
+ * (BR-063's DB floor). */
+export const quoteComparisons = pgTable(
+  "quote_comparisons",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    rfqId: uuid("rfq_id").notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    status: text("status").notNull().default("PREPARED"),
+    award: jsonb("award"),
+    awardedBy: uuid("awarded_by"),
+    awardedAt: timestamp("awarded_at", { withTimezone: true, mode: "string" }),
+    awardNote: text("award_note"),
+    awardNoteAr: text("award_note_ar"),
+    generatedDocs: jsonb("generated_docs"),
+  },
+  (table) => [
+    uniqueIndex("uq_quote_comparisons_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_quote_comparisons_tenant_rfq_live").on(table.tenantId, table.rfqId),
+    index("ix_quote_comparisons_tenant_rfq").on(table.tenantId, table.rfqId),
+  ],
+);
+
+/** PHASE-038 (0052): the standing supplier agreement (P-03) — validity
+ * window, min/max commitment, price-locked lines, the transactional
+ * released_amount accumulator; contract_id links P-06 contract
+ * purchasing. */
+export const blanketOrders = pgTable(
+  "blanket_orders",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    branchId: uuid("branch_id").notNull(),
+    blanketNo: text("blanket_no").notNull(),
+    supplierId: uuid("supplier_id").notNull(),
+    contractId: uuid("contract_id"),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    status: text("status").notNull().default("ACTIVE"),
+    validFrom: date("valid_from").notNull(),
+    validTo: date("valid_to").notNull(),
+    minCommitment: numeric("min_commitment", { precision: 19, scale: 4 }).notNull().default("0"),
+    maxCommitment: numeric("max_commitment", { precision: 19, scale: 4 }).notNull(),
+    releasedAmount: numeric("released_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    priceLock: jsonb("price_lock").notNull().default(sql`'[]'::jsonb`),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    closedBy: uuid("closed_by"),
+    cancelReason: text("cancel_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_blanket_orders_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_blanket_orders_tenant_no").on(table.tenantId, table.blanketNo),
+    index("ix_blanket_orders_tenant_status").on(table.tenantId, table.status, table.validTo),
+    index("ix_blanket_orders_tenant_supplier").on(table.tenantId, table.supplierId),
+  ],
+);
+
+/** PHASE-038 (0052): the append-only release ledger — each release
+ * decrements the blanket's remaining commitment and carries its generated
+ * purchase order; NO DELETE. */
+export const blanketReleases = pgTable(
+  "blanket_releases",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    blanketId: uuid("blanket_id").notNull(),
+    releaseNo: text("release_no").notNull(),
+    releaseDate: date("release_date").notNull(),
+    lines: jsonb("lines").notNull(),
+    amount: numeric("amount", { precision: 19, scale: 4 }).notNull(),
+    purchaseOrderId: uuid("purchase_order_id").notNull(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_blanket_releases_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_blanket_releases_tenant_no").on(table.tenantId, table.releaseNo),
+    index("ix_blanket_releases_tenant_blanket").on(table.tenantId, table.blanketId, table.releaseDate),
+  ],
+);
+
+/** PHASE-038 (0053): the supplier scorecard (P-04) — delivery/quality/
+ * price scores computed from live documents over the rolling window; one
+ * row per supplier, recompute overwrites. */
+export const supplierRatings = pgTable(
+  "supplier_ratings",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    supplierId: uuid("supplier_id").notNull(),
+    windowStart: date("window_start").notNull(),
+    windowEnd: date("window_end").notNull(),
+    deliveryScore: numeric("delivery_score", { precision: 5, scale: 2 }).notNull(),
+    qualityScore: numeric("quality_score", { precision: 5, scale: 2 }).notNull(),
+    priceScore: numeric("price_score", { precision: 5, scale: 2 }).notNull(),
+    overallScore: numeric("overall_score", { precision: 5, scale: 2 }).notNull(),
+    sampleSize: integer("sample_size").notNull().default(0),
+    detail: jsonb("detail").notNull().default(sql`'{}'::jsonb`),
+    computedBy: uuid("computed_by"),
+    computedAt: timestamp("computed_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_ratings_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_ratings_tenant_supplier").on(table.tenantId, table.supplierId),
+    index("ix_supplier_ratings_tenant_window").on(table.tenantId, table.windowEnd),
+  ],
+);
+
+/** PHASE-038 (0053): the approved-vendor-per-item list — gates vendor
+ * suggestions per the approved_vendor_list.mode policy (OFF|FLAG|BLOCK);
+ * SUSPENDED vendors keep history but stop suggesting. */
+export const approvedSupplierItems = pgTable(
+  "approved_supplier_items",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    tenantId: uuid("tenant_id").notNull(),
+    supplierId: uuid("supplier_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    status: text("status").notNull().default("APPROVED"),
+    approvedBy: uuid("approved_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    expiresAt: date("expires_at"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_approved_supplier_items_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_approved_supplier_items_tenant_supplier_item").on(
+      table.tenantId,
+      table.supplierId,
+      table.itemId,
+    ),
+    index("ix_approved_supplier_items_tenant_item").on(table.tenantId, table.itemId, table.status),
+  ],
+);
+
+/** PHASE-038 (0053): supplier advance disbursement tracking (P-12/G-33) —
+ * DRAFT→APPROVED (SoD)→DISBURSED→CLOSED; the control account is
+ * tenant-mapped by setting, fail-closed when unmapped. */
+export const supplierAdvances = pgTable(
+  "supplier_advances",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    supplierId: uuid("supplier_id").notNull(),
+    advanceNo: text("advance_no"),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    amount: numeric("amount", { precision: 19, scale: 4 }).notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    appliedAmount: numeric("applied_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    approvedBy: uuid("approved_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    cashAccountId: uuid("cash_account_id"),
+    entryDate: date("entry_date"),
+    postedJournalId: uuid("posted_journal_id"),
+    entryNo: text("entry_no"),
+    disbursedAt: timestamp("disbursed_at", { withTimezone: true, mode: "string" }),
+    disbursedBy: uuid("disbursed_by"),
+    cancelReason: text("cancel_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_advances_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_advances_tenant_no")
+      .on(table.tenantId, table.advanceNo)
+      .where(sql`${table.advanceNo} IS NOT NULL`),
+    index("ix_supplier_advances_tenant_supplier").on(table.tenantId, table.supplierId, table.status),
+    index("ix_supplier_advances_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** PHASE-038 (0053): per-supplier early-payment discount terms (P-13) —
+ * capture posts G-34 only while the terms are ACTIVE + approved (SoD) and
+ * the payment lands inside the window. */
+export const earlyPaymentDiscountTerms = pgTable(
+  "early_payment_discount_terms",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    supplierId: uuid("supplier_id").notNull(),
+    discountPct: numeric("discount_pct", { precision: 5, scale: 2 }).notNull(),
+    discountDays: integer("discount_days").notNull(),
+    minInvoiceAmount: numeric("min_invoice_amount", { precision: 19, scale: 4 }).notNull().default("0"),
+    status: text("status").notNull().default("ACTIVE"),
+    approvedBy: uuid("approved_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_early_payment_discount_terms_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_early_payment_discount_terms_tenant_supplier").on(
+      table.tenantId,
+      table.supplierId,
+    ),
+    index("ix_early_payment_discount_terms_tenant_supplier").on(
+      table.tenantId,
+      table.supplierId,
+      table.status,
+    ),
+  ],
+);
+
+/** PHASE-038 (0054): the capital purchase request (P-10/P-15) — workflow
+ * with SoD creator ≠ approver and the PHASE-028 budget control guard at
+ * submit (ADVISORY default / ENFORCE_DRAFT per policy; the evaluation
+ * snapshot persists as budget_evaluation). */
+export const capexRequests = pgTable(
+  "capex_requests",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    branchId: uuid("branch_id").notNull(),
+    requestNo: text("request_no"),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    description: text("description"),
+    accountId: uuid("account_id").notNull(),
+    costCenterId: uuid("cost_center_id"),
+    projectId: uuid("project_id"),
+    estimatedAmount: numeric("estimated_amount", { precision: 19, scale: 4 }).notNull(),
+    currencyCode: varchar("currency_code", { length: 3 }).notNull(),
+    neededBy: date("needed_by"),
+    status: text("status").notNull().default("DRAFT"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    submittedBy: uuid("submitted_by"),
+    approvedBy: uuid("approved_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    rejectionReason: text("rejection_reason"),
+    cancelReason: text("cancel_reason"),
+    convertedOrderId: uuid("converted_order_id"),
+    budgetEvaluation: jsonb("budget_evaluation"),
+  },
+  (table) => [
+    uniqueIndex("uq_capex_requests_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_capex_requests_tenant_no")
+      .on(table.tenantId, table.requestNo)
+      .where(sql`${table.requestNo} IS NOT NULL`),
+    index("ix_capex_requests_tenant_status").on(table.tenantId, table.status, table.createdAt),
+    index("ix_capex_requests_tenant_account").on(table.tenantId, table.accountId),
+  ],
+);
+
+/** PHASE-038 (0054): public-tender intake records (P-14/DF-52/53) —
+ * intake records ONLY, no bidding-platform claims (the honesty
+ * discipline). */
+export const tenderIntakes = pgTable(
+  "tender_intakes",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    version: integer("version").notNull().default(1),
+    createdBy: uuid("created_by"),
+    tenantId: uuid("tenant_id").notNull(),
+    intakeNo: text("intake_no").notNull(),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    announcingAuthority: text("announcing_authority").notNull(),
+    tenderRefNo: text("tender_ref_no"),
+    publishedAt: date("published_at"),
+    submissionDeadline: timestamp("submission_deadline", { withTimezone: true, mode: "string" }),
+    estimatedValue: numeric("estimated_value", { precision: 19, scale: 4 }),
+    currencyCode: varchar("currency_code", { length: 3 }),
+    ourDecision: text("our_decision").notNull().default("PENDING"),
+    decidedAt: timestamp("decided_at", { withTimezone: true, mode: "string" }),
+    decisionNote: text("decision_note"),
+    govRegistrationNo: text("gov_registration_no"),
+    govRegistrationExpiry: date("gov_registration_expiry"),
+    classificationCode: text("classification_code"),
+    sourceUrl: text("source_url"),
+    status: text("status").notNull().default("OPEN"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_tender_intakes_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_tender_intakes_tenant_no").on(table.tenantId, table.intakeNo),
+    index("ix_tender_intakes_tenant_status").on(table.tenantId, table.status, table.submissionDeadline),
   ],
 );

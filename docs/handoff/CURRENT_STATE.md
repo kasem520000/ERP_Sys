@@ -1,10 +1,61 @@
 # Current State
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-037 — ZATCA Phase-1 & QR compliance delivered)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-10 (PHASE-038 — Procurement Sourcing & Supplier Collaboration delivered)
 
 What actually exists in this repository right now. Paired with
 [../planning/IMPLEMENTATION_STATUS.md](../planning/IMPLEMENTATION_STATUS.md) (phase
 table) and [NEXT_ACTION.md](NEXT_ACTION.md).
+
+> **PHASE-038 (2026-11-10) — Procurement Sourcing & Supplier Collaboration — COMPLETE**
+> (Blueprint v3.0 wave 1 / CR-08 — the audit's H-11 verdict resolved: the negotiation
+> loop in front of the purchase order now exists): migrations `0051`–`0054`
+> (schema_version 54) — thirteen RLS'd tenant tables with composite tenant FKs and
+> stamp-shape CHECKs: the RFQ round (`rfqs`/`rfq_lines`, OPEN or INVITED, `rfq_no`
+> reserved at ISSUE), supplier quotes (`supplier_quotes`/`supplier_quotes_lines`, one
+> per supplier per RFQ, re-submit replaces lines while open), the frozen award matrix
+> (`quote_comparisons` — written once at prepare, never recomputed; the
+> one-live-comparison unique is the BR-063 DB floor), blanket agreements
+> (`blanket_orders`/`blanket_releases` — the transactional `released_amount`
+> accumulator; releases generate the executable PO in-transaction; the additive
+> NULLABLE `purchase_orders.contract_id` links crm.service_contracts), the
+> collaboration cluster (`supplier_ratings`, `approved_supplier_items`,
+> `supplier_advances`, `early_payment_discount_terms`) and CAPEX + tenders
+> (`capex_requests` with the 028 budget guard advisory/enforced + the persisted
+> evaluation snapshot, `tender_intakes` — intake records only, the honesty
+> discipline). Two NEW journal goldens continue the numbering: **G-33** (supplier
+> advance disbursement + application — the tenant-mapped
+> `purchasing.supplier_advance_control_account`, fail-closed when unmapped; BASE at
+> rate 1 with the treasury movement through the treasury store API INV-019 exact; the
+> apply leg nets the supplier's subledger at supplier level) and **G-34**
+> (early-payment discount capture — once per invoice, only while the APPROVED terms'
+> window holds and the treasury payment is POSTED, allocated, ≥ net-after-discount).
+> The supplier-portal skeleton (P-05): ONE public endpoint
+> (`POST /api/v1/portal/rfqs/:rfqId/quotes` in PUBLIC_ROUTES) — the scoped token IS
+> the credential (sha256 hashes at rest, plaintext shown once), the read-only SECURITY
+> DEFINER `erp.portal_resolve_rfq_token` resolves (rfq, token-hash) → (tenant,
+> supplier, expiry) BEFORE any tenant GUC exists, and the service re-validates the
+> same invite under RLS; audited + rate-limited. BR-062 (the 3-bid rule as tenant
+> policy: ENFORCED typed rejection / ADVISORY one inbox note + audit / OFF default)
+> and BR-063 (one award per round; awarding closes the RFQ) enforced in the award
+> service with traceability through `quote_comparisons.generated_docs` + PO line
+> notes. Scorecards fold delivery 40 / quality 40 / price 20 over a rolling window
+> from LIVE documents (`purchasing.scorecard-sweep` pg-boss queue); the
+> approved-vendor list gates pricing suggestions per
+> `purchasing.approved_vendor_list.mode` (OFF/FLAG/BLOCK). Matching gains the
+> `purchasing.match.tolerance_bands` refinement (flat keys stay default). Web: the
+> four sourcing screens (`/purchasing/rfq` with the comparison/award matrix,
+> `/purchasing/blanket-orders`, `/purchasing/supplier-scorecards`,
+> `/purchasing/capex-requests`) + NAV_ITEMS §1.4 + command-palette entries (OA-04).
+> Reports +2 (`purchasing.rfq-award-matrix`, `purchasing.supplier-scorecard` —
+> registry 86 → 88, the RunService single-flight coalescing repair recorded);
+> permissions 249 → 256 (seven sourcing keys, 0051 §9); feature keys +5 (business +
+> enterprise); i18n 4,699=4,699 (+163); ENTITY_CATALOG 204 → 217; isolation registry
+> +13 tables (A1–A10); docs wave (BR-062/063 · G-33/G-34 + JOURNAL_RULES note 11 ·
+> DATA_DICTIONARY §17 · ENTITY_CATALOG 217 · FEATURE_CATALOG +5 · REPORT_CATALOG +2 ·
+> NAVIGATION_MODEL §1.4). Five recorded gate repairs + one environmental item; DB
+> full suite 2,555/2,555 green (176 files); typecheck/lint/build 8/8. Next:
+> PHASE-039 — evidence:
+> [../implementation/phases/reports/PHASE-038-COMPLETION.md](../implementation/phases/reports/PHASE-038-COMPLETION.md).
 
 > **PHASE-037 (2026-11-10) — ZATCA Phase-1 & QR Compliance — COMPLETE** (Blueprint
 > v3.0 wave 1 / CR-07 — the audit's H-01 verdict resolved: Phase-1 is pure

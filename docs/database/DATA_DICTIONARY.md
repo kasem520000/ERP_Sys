@@ -358,3 +358,236 @@ equality would break the DRAFT lifecycle.
 | `branch_id` | `uuid` | NULL; composite tenant FK RESTRICT | Optional branch binding (a device may serve one branch's terminals) |
 | `note` | `text` | NULL | Free text — user-entered, never machine-parsed (§10 discipline) |
 | `created_at` / `updated_at` / `version` / `created_by` | — | house standard | [DATABASE_CONVENTIONS.md](DATABASE_CONVENTIONS.md) standard columns |
+
+## 17. Procurement sourcing & supplier collaboration (PHASE-038)
+
+Migrations `0051_rfq_quotes.sql` → `0054_capex_tenders.sql` (schema_version 54) add the
+sourcing cluster: thirteen RLS'd tenant tables (composite tenant FKs throughout — both
+sides' `tenant_id` must agree; stamp-shape CHECKs pin the lifecycles per the 0050
+discipline) plus the one additive `purchase_orders.contract_id` column. Same rules as
+every dictionary term — no table may redefine them. House standard columns
+(`created_at`/`updated_at`/`version`/`created_by`) apply where present and are not
+repeated per row; all tables carry the `erp.apply_tenant_policy` RLS macro and the
+purge-path policies. DELETE grants: only `rfq_lines` + `supplier_quotes_lines` (the
+replace paths) — every other table is archive-not-delete.
+
+**Migration `0051` — the RFQ negotiation loop:**
+
+`rfqs` (the sourcing round header):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE (composite-FK target) |
+| `branch_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → branches |
+| `rfq_no` | `text` | NULL until ISSUE — reserved at the BR-029 boundary transition; UNIQUE per tenant |
+| `title` / `title_ar` | `text` | title NOT NULL (CHECK 1..200); title_ar NULL (§3) |
+| `mode` | `text` | NOT NULL DEFAULT `'INVITED'`; CHECK IN (OPEN, INVITED) |
+| `status` | `text` | NOT NULL DEFAULT `'DRAFT'`; CHECK IN (DRAFT, ISSUED, QUOTED, AWARDED, CLOSED, CANCELLED) |
+| `currency_code` | `varchar(3)` | NOT NULL; CHECK `^[A-Z]{3}$` |
+| `due_at` | `timestamptz` | NULL = no stated due date |
+| `invited_suppliers` | `jsonb` | NOT NULL DEFAULT `'[]'`; CHECK jsonb array — the INVITED allow-list (supplier uuid strings) |
+| `portal_invites` | `jsonb` | NOT NULL DEFAULT `'[]'`; CHECK jsonb array — P-05 scoped tokens as **sha256 hashes only** (the plaintext is shown once at mint, never stored) |
+| `issued_at` / `issued_by` | `timestamptz` / `uuid` | the ISSUE stamps (NULL in DRAFT — stamp-shape CHECK) |
+| `quoted_at` | `timestamptz` | first quote arrival stamp (informational) |
+| `awarded_at` / `awarded_by` | `timestamptz` / `uuid` | the award stamps (NULL until AWARDED) |
+| `closed_at` / `closed_by` | `timestamptz` / `uuid` | the close stamps |
+| `cancel_reason` | `text` | NULL unless CANCELLED |
+| `note` / `note_ar` | `text` | §10 discipline |
+
+`rfq_lines` (requested items; **DELETE grant** — replace-on-DRAFT-edit):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `rfq_id` | `uuid` | NOT NULL; composite tenant FK **CASCADE** → rfqs |
+| `line_no` | `integer` | NOT NULL; UNIQUE per (tenant, rfq) |
+| `item_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → items |
+| `qty` | `numeric(19,6)` | NOT NULL; CHECK > 0 (§6) |
+| `target_price` | `numeric(19,4)` | NULL or CHECK ≥ 0 — the buyer's ceiling (never a commitment) |
+| `note` | `text` | NULL |
+
+`supplier_quotes` (one quote per supplier per RFQ):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `rfq_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → rfqs |
+| `supplier_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → partners; UNIQUE per (tenant, rfq, supplier) — one quote per supplier per round |
+| `quote_ref` | `text` | the supplier's own reference, verbatim (never guessed) |
+| `status` | `text` | NOT NULL DEFAULT `'SUBMITTED'`; CHECK IN (SUBMITTED, WITHDRAWN) |
+| `submitted_via` | `text` | NOT NULL DEFAULT `'BACK_OFFICE'`; CHECK IN (PORTAL, BACK_OFFICE) |
+| `currency_code` | `varchar(3)` | NOT NULL; CHECK `^[A-Z]{3}$` |
+| `lead_time_days` | `integer` | NULL or CHECK ≥ 0 |
+| `valid_until` | `date` | NULL — the offer's validity day (§11) |
+| `payment_terms` | `text` | verbatim text, not a foreign key |
+| `submitted_at` / `submitted_by` | `timestamptz` / `uuid` | submitted_at NOT NULL DEFAULT now(); back-office entry stamps the actor |
+| `portal_contact` | `text` | portal submissions stamp the contact — **the token itself is never recorded** |
+| `note` | `text` | NULL |
+
+`supplier_quotes_lines` (offered prices; **DELETE grant** — the re-submit replace path):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `quote_id` | `uuid` | NOT NULL; composite tenant FK **CASCADE** → supplier_quotes |
+| `rfq_line_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → rfq_lines |
+| `line_no` | `integer` | NOT NULL; UNIQUE per (tenant, quote) |
+| `qty` | `numeric(19,6)` | NOT NULL; CHECK > 0 |
+| `unit_price` | `numeric(19,4)` | NOT NULL; CHECK ≥ 0 |
+| `lead_time_days` | `integer` | NULL or CHECK ≥ 0 |
+| `note` | `text` | NULL |
+
+`quote_comparisons` (the frozen snapshot + award decision — no-delete evidence):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `rfq_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → rfqs; UNIQUE per (tenant, rfq) — the ONE-live-comparison BR-063 floor |
+| `snapshot` | `jsonb` | NOT NULL; CHECK jsonb object — per-line offers + scores + supplier totals, frozen at prepare (the award never re-scores) |
+| `status` | `text` | NOT NULL DEFAULT `'PREPARED'`; CHECK IN (PREPARED, AWARDED, CANCELLED) with award-stamp coherence (AWARDED ⇔ award + awarded_at NOT NULL) |
+| `award` | `jsonb` | NULL until awarded; `{decisions: [{rfqLineId, quoteId, supplierId, qty, unitPrice}], note?, awardedAt}` — written once |
+| `awarded_by` / `awarded_at` | `uuid` / `timestamptz` | the award actor/stamp |
+| `award_note` / `award_note_ar` | `text` | §10 discipline |
+| `generated_docs` | `jsonb` | traceability of generated documents: `[{kind: PURCHASE_ORDER\|BLANKET_RELEASE, id, supplierId, documentNo?, lineRefs}]` |
+
+**Migration `0052` — blanket agreements + the contract linkage:**
+
+`blanket_orders` (the standing supplier agreement):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `branch_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → branches |
+| `blanket_no` | `text` | NOT NULL; UNIQUE per tenant (§12) |
+| `supplier_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → partners |
+| `contract_id` | `uuid` | NULL; composite tenant FK RESTRICT → crm.service_contracts (P-06) |
+| `title` / `title_ar` | `text` | title NOT NULL (CHECK 1..200) |
+| `currency_code` | `varchar(3)` | NOT NULL; CHECK `^[A-Z]{3}$` |
+| `status` | `text` | NOT NULL DEFAULT `'ACTIVE'`; CHECK IN (ACTIVE, EXPIRED, CLOSED, CANCELLED); closed-stamp coherence CHECK (CLOSED/CANCELLED ⇒ closed_at NOT NULL) |
+| `valid_from` / `valid_to` | `date` | NOT NULL; CHECK from ≤ to |
+| `min_commitment` | `numeric(19,4)` | NOT NULL DEFAULT 0; CHECK ≥ 0 |
+| `max_commitment` | `numeric(19,4)` | NOT NULL; CHECK ≥ 0 |
+| `released_amount` | `numeric(19,4)` | NOT NULL DEFAULT 0; CHECK `0 ≤ released_amount ≤ max_commitment` — advanced transactionally in the same statement as the release (the service owns the typed over-release rejection; the CHECK is the DB floor) |
+| `price_lock` | `jsonb` | NOT NULL DEFAULT `'[]'`; CHECK jsonb array — `[{itemId, unitPrice, note?}]` |
+| `closed_at` / `closed_by` | `timestamptz` / `uuid` | the close stamps |
+| `cancel_reason` | `text` | NULL unless CANCELLED |
+| `note` / `note_ar` | `text` | §10 discipline |
+
+`blanket_releases` (append-only ledger — **NO DELETE**):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `blanket_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → blanket_orders |
+| `release_no` | `text` | NOT NULL; UNIQUE per tenant (§12) |
+| `release_date` | `date` | NOT NULL (§11) |
+| `lines` | `jsonb` | NOT NULL; CHECK jsonb array — `[{itemId, qty, unitPrice}]` (prices from the blanket lock or explicit per-line quotes) |
+| `amount` | `numeric(19,4)` | NOT NULL; CHECK > 0 (§6) |
+| `purchase_order_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → purchase_orders — the generated executable PO, created in the same transaction |
+| `note` | `text` | NULL |
+
+`purchase_orders.contract_id` (addendum): NULLABLE `uuid`; composite tenant FK RESTRICT →
+`service_contracts (id, tenant_id)` — contract-linked purchasing (P-06); zero reshape of
+existing rows.
+
+**Migration `0053` — supplier collaboration:**
+
+`supplier_ratings` (the scorecard store — recompute overwrites):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `supplier_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → partners; UNIQUE per tenant — ONE row per supplier (the window moves) |
+| `window_start` / `window_end` | `date` | NOT NULL; CHECK start ≤ end — the rolling window |
+| `delivery_score` / `quality_score` / `price_score` / `overall_score` | `numeric(5,2)` | NOT NULL; CHECK 0..100 each; the overall is the documented weighted fold (40/40/20 — the P-04 baseline) |
+| `sample_size` | `integer` | NOT NULL DEFAULT 0; CHECK ≥ 0 |
+| `detail` | `jsonb` | NOT NULL DEFAULT `'{}'`; CHECK jsonb object — `{grns, onTime, invoices, debitNotes, priceVariancePct, notes}` (the evidence) |
+| `computed_by` / `computed_at` | `uuid` / `timestamptz` | computed_at NOT NULL DEFAULT now() |
+
+`approved_supplier_items` (the approved-vendor-per-item list):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `supplier_id` / `item_id` | `uuid` | NOT NULL; composite tenant FKs RESTRICT → partners/items; UNIQUE per (tenant, supplier, item) |
+| `status` | `text` | NOT NULL DEFAULT `'APPROVED'`; CHECK IN (APPROVED, SUSPENDED) — suspension, not deletion |
+| `approved_by` / `approved_at` | `uuid` / `timestamptz` | approved_at NOT NULL DEFAULT now() |
+| `expires_at` | `date` | NULL = no expiry (§13 — enforced by the service at use time) |
+| `note` | `text` | NULL |
+
+`supplier_advances` (P-12, golden G-33):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `supplier_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → partners |
+| `advance_no` | `text` | NULL until DISBURSE (the posting stamp, the payroll PR- pattern); UNIQUE per tenant |
+| `currency_code` | `varchar(3)` | NOT NULL; CHECK `^[A-Z]{3}$` |
+| `amount` | `numeric(19,4)` | NOT NULL; CHECK > 0 |
+| `status` | `text` | NOT NULL DEFAULT `'DRAFT'`; CHECK IN (DRAFT, APPROVED, DISBURSED, CLOSED, CANCELLED) with the lifecycle stamp-shape CHECK (DISBURSED ⇔ approved_at + disbursed_at + posted_journal_id NOT NULL) |
+| `applied_amount` | `numeric(19,4)` | NOT NULL DEFAULT 0; CHECK `0 ≤ applied_amount ≤ amount` |
+| `approved_by` / `approved_at` | `uuid` / `timestamptz` | SoD: the approver ≠ the creator (service-enforced) |
+| `cash_account_id` | `uuid` | NULL until disbursement; composite tenant FK RESTRICT → cash_accounts |
+| `entry_date` | `date` | NULL until DISBURSE (§11) |
+| `posted_journal_id` / `entry_no` | `uuid` / `text` | the G-33 disbursement journal's back-refs |
+| `disbursed_at` / `disbursed_by` | `timestamptz` / `uuid` | the disbursement stamps |
+| `cancel_reason` | `text` | NULL unless CANCELLED |
+| `note` / `note_ar` | `text` | §10 discipline |
+
+`early_payment_discount_terms` (P-13, golden G-34):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `supplier_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → partners; UNIQUE per tenant — one terms row per supplier |
+| `discount_pct` | `numeric(5,2)` | NOT NULL; CHECK `0 < pct ≤ 100` |
+| `discount_days` | `integer` | NOT NULL; CHECK > 0 |
+| `min_invoice_amount` | `numeric(19,4)` | NOT NULL DEFAULT 0; CHECK ≥ 0 |
+| `status` | `text` | NOT NULL DEFAULT `'ACTIVE'`; CHECK IN (ACTIVE, INACTIVE) |
+| `approved_by` / `approved_at` | `uuid` / `timestamptz` | SoD: terms must be APPROVED (creator ≠ approver) before any capture posts; approval-coherence CHECK (approved_by set ⇒ approved_at set) |
+| `note` | `text` | NULL |
+
+**Migration `0054` — CAPEX + tender intake:**
+
+`capex_requests` (budget-checked capital requests):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `branch_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → branches |
+| `request_no` | `text` | NULL until APPROVED (the PR discipline — drafts are scratch); UNIQUE per tenant; stamp-shape CHECK (APPROVED ⇒ request_no NOT NULL) |
+| `title` / `title_ar` | `text` | title NOT NULL (CHECK 1..200) |
+| `description` | `text` | NULL |
+| `account_id` | `uuid` | NOT NULL; composite tenant FK RESTRICT → accounts — the budget guard's dimension key |
+| `cost_center_id` / `project_id` | `uuid` | NULL; composite tenant FKs RESTRICT → cost_centers/projects (§6 dimension splits) |
+| `estimated_amount` | `numeric(19,4)` | NOT NULL; CHECK > 0 |
+| `currency_code` | `varchar(3)` | NOT NULL; CHECK `^[A-Z]{3}$` |
+| `needed_by` | `date` | NULL (§11) |
+| `status` | `text` | NOT NULL DEFAULT `'DRAFT'`; CHECK IN (DRAFT, PENDING_APPROVAL, APPROVED, CONVERTED, REJECTED, CANCELLED) with the lifecycle stamp-shape CHECK |
+| `submitted_at` / `submitted_by` | `timestamptz` / `uuid` | the submit stamps (NULL in DRAFT) |
+| `approved_by` / `approved_at` | `uuid` / `timestamptz` | SoD: creator ≠ approver (service-enforced) |
+| `rejection_reason` / `cancel_reason` | `text` | typed reasons (BR-046 lineage — required when rejecting/cancelling by the service) |
+| `converted_order_id` | `uuid` | NULL until CONVERT; composite tenant FK RESTRICT → purchase_orders |
+| `budget_evaluation` | `jsonb` | NULL; the PHASE-028 guard's evaluation snapshot at submit (mode + warnings — the evidence the audit surfaces) |
+
+`tender_intakes` (intake records ONLY — no bidding-platform claims):
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` / `tenant_id` | `uuid` | PK; `(id, tenant_id)` UNIQUE |
+| `intake_no` | `text` | NOT NULL; UNIQUE per tenant (§12) |
+| `title` / `title_ar` | `text` | title NOT NULL (CHECK 1..200) |
+| `announcing_authority` | `text` | NOT NULL (CHECK 1..200) |
+| `tender_ref_no` | `text` | the authority's reference, verbatim |
+| `published_at` | `date` | NULL |
+| `submission_deadline` | `timestamptz` | NULL |
+| `estimated_value` | `numeric(19,4)` | NULL or CHECK ≥ 0 |
+| `currency_code` | `varchar(3)` | NULL; shape-checked when set |
+| `our_decision` | `text` | NOT NULL DEFAULT `'PENDING'`; CHECK IN (PENDING, WILL_BID, DECLINED, WON, LOST) — recorded, nothing auto-bids |
+| `decided_at` / `decision_note` | `timestamptz` / `text` | the decision stamps |
+| `gov_registration_no` | `text` | DF-52 — stored verbatim, never guessed |
+| `gov_registration_expiry` | `date` | DF-52 |
+| `classification_code` | `text` | DF-53 |
+| `source_url` | `text` | the announcement's source link |
+| `status` | `text` | NOT NULL DEFAULT `'OPEN'`; CHECK IN (OPEN, CLOSED) |
+| `note` / `note_ar` | `text` | §10 discipline |

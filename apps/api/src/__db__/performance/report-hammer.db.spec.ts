@@ -48,6 +48,23 @@ import { AppModule } from "../../app.module";
  *
  * The production-class hammer is the infra-gated GA obligation; the
  * `[report-hammer]` lines are the recorded local-tier evidence.
+ *
+ * ## PHASE-038 gate repair (recorded)
+ *
+ * The within-wave identical-params shape exposed a structural thundering
+ * herd: `report_runs` UNIQUE (tenant, report_key, params_hash) + the
+ * withTenant unit-of-work serialize N identical concurrent runs behind the
+ * first lane's WHOLE compute (the ON CONFLICT tuple lock lives until its
+ * transaction commits), pinning the last waiter past the pool's 15 s
+ * `statement_timeout` (pg 57014, "while locking tuple") once the 100k TB
+ * compute under 4-way 2-vCPU contention crossed ~15 s (the GA-recorded
+ * 17.9 s wave wall was already the borderline). Repair: single-flight
+ * coalescing in RunService.run() (run-service.ts — keyed like the cache
+ * key, self-cleaning; the store's ON CONFLICT REPLACE already collapses
+ * identical runs into one row). The spec shape is UNCHANGED — the
+ * identical-storm lanes now ride one compute, every outcome stays
+ * SUCCEEDED, and the witness isolation evidence (the point of T4b) is
+ * unaffected: the witness still samples DURING a heavy compute.
  */
 
 const SMALL_OWNER_EMAIL = "ga-small-owner@fixture.test";

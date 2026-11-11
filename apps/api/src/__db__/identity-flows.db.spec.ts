@@ -156,8 +156,10 @@ describe("seeds (acceptance 9)", () => {
     // the ZATCA Phase-1 EIAS device registry manager, matrix §3.7).
     // (233 after 0025 + 8 = 241; 241 + 2 = 243 after 0027; 243 + 1 = 244
     // after 0035; 244 + 1 = 245 after 0038-phase; 245 + 3 = 248 after 0049;
-    // 248 + 1 = 249 after 0050; the drift CLI agrees: matrix 249 = seed 249.)
-    expect(result.rows[0]?.n).toBe(249);
+    // 248 + 1 = 249 after 0050; 249 + 7 = 256 after 0051 — the seven
+    // PHASE-038 sourcing keys (§9); the drift CLI agrees: matrix 256 = seed
+    // 256.)
+    expect(result.rows[0]?.n).toBe(256);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

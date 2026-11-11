@@ -4866,3 +4866,263 @@ export interface ZatcaBackfillResult {
   skipped: number;
   results: readonly { invoiceId: string; icv: number }[];
 }
+
+// ---------------------------------------------------------------------------
+// WEB-038 (PHASE-038) — Procurement sourcing & supplier collaboration rows.
+// Mirrors the sourcing selects (apps/api purchasing/infrastructure/
+// sourcing.store.ts + collaboration.store.ts); money stays canonical decimal
+// strings (ADR-0009), ids are UUIDv7 strings, timestamps ISO text. The
+// negotiation loop: RFQ → quotes → the FROZEN comparison snapshot → award
+// (BR-062 3-bid floor, BR-063 one-award-per-round); collaboration: blanket
+// agreements, scorecards, approved items, advances, CAPEX, tender intake.
+// ---------------------------------------------------------------------------
+
+/** GET/POST purchasing/rfqs → one RFQ round (H-11/P-01). */
+export interface RfqRow {
+  id: string;
+  branchId: string;
+  rfqNo: string | null;
+  title: string;
+  titleAr: string | null;
+  mode: "OPEN" | "INVITED";
+  status: "DRAFT" | "ISSUED" | "QUOTED" | "AWARDED" | "CLOSED" | "CANCELLED";
+  currencyCode: string;
+  dueAt: string | null;
+  invitedSuppliers: string[];
+  issuedAt: string | null;
+  quotedAt: string | null;
+  awardedAt: string | null;
+  closedAt: string | null;
+  cancelReason: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** One RFQ line (the demand leg the offers quote against). */
+export interface RfqLineRow {
+  id: string;
+  rfqId: string;
+  lineNo: number;
+  itemId: string;
+  qty: string;
+  targetPrice: string | null;
+  note: string | null;
+}
+
+/** GET purchasing/rfqs/:id → the RFQ with its lines (findWithLines). */
+export interface RfqWithLines extends RfqRow {
+  lines: readonly RfqLineRow[];
+}
+
+/** GET/POST purchasing/rfqs/:id/quotes → one supplier quote (P-02/P-05). */
+export interface SupplierQuoteRow {
+  id: string;
+  rfqId: string;
+  supplierId: string;
+  quoteRef: string | null;
+  status: "SUBMITTED" | "WITHDRAWN";
+  submittedVia: "PORTAL" | "BACK_OFFICE";
+  currencyCode: string;
+  leadTimeDays: number | null;
+  validUntil: string | null;
+  paymentTerms: string | null;
+  submittedAt: string;
+  portalContact: string | null;
+  note: string | null;
+}
+
+/** One quoted line inside a supplier quote. */
+export interface SupplierQuoteLineRow {
+  id: string;
+  quoteId: string;
+  rfqLineId: string;
+  lineNo: number;
+  qty: string;
+  unitPrice: string;
+  leadTimeDays: number | null;
+  note: string | null;
+}
+
+/** One scored offer inside the frozen comparison snapshot (sourcing-math). */
+export interface ComparisonOffer {
+  quoteId: string;
+  supplierId: string;
+  unitPrice: string;
+  lineTotal: string;
+  leadTimeDays: number | null;
+  validUntil: string | null;
+  priceScore: string;
+  deliveryScore: string;
+  termsScore: string;
+  weightedScore: string;
+}
+
+/** The FROZEN snapshot body (written once at prepare — the matrix is evidence). */
+export interface ComparisonSnapshot {
+  preparedAt: string;
+  preparedBy: string | null;
+  weights: { price: number; delivery: number; terms: number };
+  currency: string;
+  lines: readonly {
+    rfqLineId: string;
+    lineNo: number;
+    itemId: string;
+    qty: string;
+    targetPrice: string | null;
+    offers: readonly ComparisonOffer[];
+  }[];
+  summary: {
+    quotesReceived: number;
+    suppliers: number;
+    supplierTotals: readonly { supplierId: string; total: string }[];
+  };
+}
+
+/** GET/POST purchasing/rfqs/:id/comparison → one award round (P-08; BR-063). */
+export interface QuoteComparisonRow {
+  id: string;
+  rfqId: string;
+  snapshot: Record<string, unknown>;
+  status: "PREPARED" | "AWARDED" | "CANCELLED";
+  award: Record<string, unknown> | null;
+  awardedBy: string | null;
+  awardedAt: string | null;
+  awardNote: string | null;
+  generatedDocs: { kind: string; id: string; supplierId: string; documentNo?: string | null }[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET/POST purchasing/blanket-orders → one standing agreement (P-03). */
+export interface BlanketOrderRow {
+  id: string;
+  branchId: string;
+  blanketNo: string;
+  supplierId: string;
+  contractId: string | null;
+  title: string;
+  titleAr: string | null;
+  currencyCode: string;
+  status: "ACTIVE" | "EXPIRED" | "CLOSED" | "CANCELLED";
+  validFrom: string;
+  validTo: string;
+  minCommitment: string;
+  maxCommitment: string;
+  releasedAmount: string;
+  priceLock: { itemId: string; unitPrice: string }[];
+  closedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** POST purchasing/blanket-orders/:id/releases → one release (draws a PO). */
+export interface BlanketReleaseRow {
+  id: string;
+  blanketId: string;
+  releaseNo: string;
+  releaseDate: string;
+  lines: { itemId: string; qty: string; unitPrice: string }[];
+  amount: string;
+  purchaseOrderId: string;
+  note: string | null;
+  createdAt: string;
+}
+
+/** GET purchasing/supplier-ratings → one scorecard window (P-04). */
+export interface SupplierRatingRow {
+  id: string;
+  supplierId: string;
+  windowStart: string;
+  windowEnd: string;
+  deliveryScore: string;
+  qualityScore: string;
+  priceScore: string;
+  overallScore: string;
+  sampleSize: number;
+  detail: Record<string, unknown>;
+  computedAt: string;
+}
+
+/** GET/POST purchasing/approved-supplier-items → one AVL entry (P-04). */
+export interface ApprovedSupplierItemRow {
+  id: string;
+  supplierId: string;
+  itemId: string;
+  status: "APPROVED" | "SUSPENDED";
+  approvedAt: string;
+  expiresAt: string | null;
+  note: string | null;
+}
+
+/** GET/POST purchasing/supplier-advances → one advance (G-33). */
+export interface SupplierAdvanceRow {
+  id: string;
+  supplierId: string;
+  advanceNo: string | null;
+  currencyCode: string;
+  amount: string;
+  status: "DRAFT" | "APPROVED" | "DISBURSED" | "CLOSED" | "CANCELLED";
+  appliedAmount: string;
+  approvedAt: string | null;
+  entryDate: string | null;
+  entryNo: string | null;
+  disbursedAt: string | null;
+  note: string | null;
+}
+
+/** GET/POST purchasing/early-payment-discount-terms → one terms row (G-34). */
+export interface DiscountTermsRow {
+  id: string;
+  supplierId: string;
+  discountPct: string;
+  discountDays: number;
+  minInvoiceAmount: string;
+  status: "ACTIVE" | "INACTIVE";
+  approvedBy: string | null;
+  approvedAt: string | null;
+}
+
+/** GET/POST purchasing/capex-requests → one CAPEX request (P-10/P-15). */
+export interface CapexRequestRow {
+  id: string;
+  branchId: string;
+  requestNo: string | null;
+  title: string;
+  titleAr: string | null;
+  description: string | null;
+  accountId: string;
+  costCenterId: string | null;
+  projectId: string | null;
+  estimatedAmount: string;
+  currencyCode: string;
+  neededBy: string | null;
+  status: "DRAFT" | "PENDING_APPROVAL" | "APPROVED" | "CONVERTED" | "REJECTED" | "CANCELLED";
+  budgetEvaluation: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET/POST purchasing/tenders → one tender intake row (P-14). */
+export interface TenderIntakeRow {
+  id: string;
+  intakeNo: string;
+  title: string;
+  titleAr: string | null;
+  announcingAuthority: string;
+  tenderRefNo: string | null;
+  publishedAt: string | null;
+  submissionDeadline: string | null;
+  estimatedValue: string | null;
+  currencyCode: string | null;
+  ourDecision: "PENDING" | "WILL_BID" | "DECLINED" | "WON" | "LOST";
+  decidedAt: string | null;
+  govRegistrationNo: string | null;
+  govRegistrationExpiry: string | null;
+  classificationCode: string | null;
+  sourceUrl: string | null;
+  status: "OPEN" | "CLOSED";
+  createdAt: string;
+}

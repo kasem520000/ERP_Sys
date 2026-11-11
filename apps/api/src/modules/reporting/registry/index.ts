@@ -123,6 +123,13 @@ import { consolidationConsolidatedTbContract } from "./consolidation/consolidate
 import { consolidationConsolidatedIsContract } from "./consolidation/consolidated-is.contract";
 import { consolidationConsolidatedBsContract } from "./consolidation/consolidated-bs.contract";
 import { consolidationEliminationsLogContract } from "./consolidation/eliminations-log.contract";
+// PHASE-038 · the sourcing set (REPORT_CATALOG §3 additions — the award
+// matrix rendered verbatim from the frozen snapshot and the supplier
+// scorecard list).
+import {
+  purchasingRfqAwardMatrixContract,
+  purchasingSupplierScorecardContract,
+} from "./operational/sourcing";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -259,6 +266,12 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   consolidationConsolidatedIsContract,
   consolidationConsolidatedBsContract,
   consolidationEliminationsLogContract,
+  // §purchasing sourcing (REPORT_CATALOG §3 PHASE-038 rows): the frozen
+  // award matrix (the evidence contract — the stored snapshot renders
+  // verbatim, never recomputed) and the supplier scorecard (P-04's
+  // rolling-window scores with the sample decomposition).
+  purchasingRfqAwardMatrixContract,
+  purchasingSupplierScorecardContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

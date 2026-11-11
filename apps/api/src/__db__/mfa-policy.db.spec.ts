@@ -228,8 +228,16 @@ describe("MFA enforcement matrix (PHASE-024 T4; ADR-0015 §4)", () => {
     expect(gated.mfaGatePassed).toBe(false);
 
     // Enroll + confirm with a real TOTP code (service level).
+    // PHASE-038 gate repair: PIN the verify timestep — `Date.now() + 31_000`
+    // for the login code landed TWO steps ahead whenever this call ran in
+    // the last second of a period (~7% of runs: 31 s crosses T+1 and T+2
+    // when the offset r ≥ 29 s), outside the ±TOTP_DRIFT_STEPS window →
+    // deterministic MfaRequiredError. Anchoring both codes to the same
+    // base timestep makes the login code exactly one step ahead of the
+    // verify code — inside the drift window at any real test speed.
+    const verifyTimestep = currentTimestep(Date.now());
     const enrollment = await mfa.enroll(accountantUserId);
-    const code = hotp(base32Decode(enrollment.secret), currentTimestep(Date.now()));
+    const code = hotp(base32Decode(enrollment.secret), verifyTimestep);
     await mfa.verify(accountantUserId, code);
 
     // The gate flipped for the live bootstrap session.
@@ -244,11 +252,8 @@ describe("MFA enforcement matrix (PHASE-024 T4; ADR-0015 §4)", () => {
     expect(refused).toBeInstanceOf(MfaRequiredError);
     expect((refused as MfaRequiredError).enrollmentRequired).toBe(false);
 
-    // A fresh code completes the login.
-    const freshCode = hotp(
-      base32Decode(enrollment.secret),
-      currentTimestep(Date.now() + 31_000),
-    );
+    // A fresh code completes the login (one step past the verify code).
+    const freshCode = hotp(base32Decode(enrollment.secret), verifyTimestep + 1);
     const completed = await login.login({
       email: accountantEmail,
       password: PASSWORD,

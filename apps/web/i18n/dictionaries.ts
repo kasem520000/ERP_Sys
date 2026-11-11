@@ -4899,6 +4899,175 @@ export interface Dictionary {
   customFieldsSelectEmpty: string;
   customFieldsMultiselectEmpty: string;
   customFieldsReferenceHint: string;
+  // -- WEB-038 (PHASE-038): procurement sourcing & supplier collaboration ------
+  // the back-office sourcing screens (/purchasing/rfq, /purchasing/
+  // blanket-orders, /purchasing/supplier-scorecards, /purchasing/capex-
+  // requests) over the purchasing sourcing routes (matrix §3.16; the
+  // seeded keys purchasing.rfqs.* / purchasing.suppliers.rate /
+  // purchasing.capex.*). The supplier-facing portal needs NO screen.
+  navPurchasing: string;
+  sourcingRfqsNav: string;
+  sourcingBlanketNav: string;
+  sourcingScorecardsNav: string;
+  sourcingCapexNav: string;
+  sourcingRfqTitle: string;
+  sourcingRfqSubtitle: string;
+  sourcingBlanketTitle: string;
+  sourcingBlanketSubtitle: string;
+  sourcingScorecardsTitle: string;
+  sourcingScorecardsSubtitle: string;
+  sourcingCapexTitle: string;
+  sourcingCapexSubtitle: string;
+  sourcingRfqsTab: string;
+  sourcingQuotesTab: string;
+  sourcingComparisonTab: string;
+  sourcingColRfqNo: string;
+  sourcingColTitle: string;
+  sourcingColMode: string;
+  sourcingColStatus: string;
+  sourcingColDue: string;
+  sourcingColQuotes: string;
+  sourcingColQuoteRef: string;
+  sourcingColSubmitted: string;
+  sourcingColSubmittedVia: string;
+  sourcingColExpires: string;
+  sourcingColBlanketNo: string;
+  sourcingColValidity: string;
+  sourcingColReleased: string;
+  sourcingColProgress: string;
+  sourcingColWindow: string;
+  sourcingColDelivery: string;
+  sourcingColQuality: string;
+  sourcingColPrice: string;
+  sourcingColOverall: string;
+  sourcingColSample: string;
+  sourcingColRequestNo: string;
+  sourcingColAmount: string;
+  sourcingColBudgetEval: string;
+  sourcingColLine: string;
+  sourcingColOfferSupplier: string;
+  sourcingColOfferPrice: string;
+  sourcingColLineTotal: string;
+  sourcingColLeadTime: string;
+  sourcingColWeighted: string;
+  sourcingColWinner: string;
+  sourcingModeOpen: string;
+  sourcingModeInvited: string;
+  sourcingStatusRfqDraft: string;
+  sourcingStatusRfqIssued: string;
+  sourcingStatusRfqQuoted: string;
+  sourcingStatusRfqAwarded: string;
+  sourcingStatusRfqClosed: string;
+  sourcingStatusRfqCancelled: string;
+  sourcingStatusQuoteSubmitted: string;
+  sourcingStatusQuoteWithdrawn: string;
+  sourcingViaPortal: string;
+  sourcingViaBackOffice: string;
+  sourcingStatusComparisonPrepared: string;
+  sourcingStatusComparisonAwarded: string;
+  sourcingStatusComparisonCancelled: string;
+  sourcingStatusBlanketActive: string;
+  sourcingStatusBlanketExpired: string;
+  sourcingStatusBlanketClosed: string;
+  sourcingStatusBlanketCancelled: string;
+  sourcingStatusApproved: string;
+  sourcingStatusSuspended: string;
+  sourcingStatusCapexDraft: string;
+  sourcingStatusCapexPending: string;
+  sourcingStatusCapexApproved: string;
+  sourcingStatusCapexConverted: string;
+  sourcingStatusCapexRejected: string;
+  sourcingStatusCapexCancelled: string;
+  sourcingBudgetModeOff: string;
+  sourcingBudgetModeAdvisory: string;
+  sourcingBudgetModeEnforce: string;
+  sourcingFormTitle: string;
+  sourcingFormTitleAr: string;
+  sourcingFormMode: string;
+  sourcingFormCurrency: string;
+  sourcingFormDue: string;
+  sourcingFormInvitedSuppliers: string;
+  sourcingFormTargetPrice: string;
+  sourcingFormOptional: string;
+  sourcingFormQuoteRef: string;
+  sourcingFormLeadTime: string;
+  sourcingFormValidUntil: string;
+  sourcingFormRfqLine: string;
+  sourcingFormExpiresAt: string;
+  sourcingFormBranch: string;
+  sourcingFormAccount: string;
+  sourcingFormDescription: string;
+  sourcingFormEstimatedAmount: string;
+  sourcingFormNeededBy: string;
+  sourcingFormContractId: string;
+  sourcingFormValidFrom: string;
+  sourcingFormValidTo: string;
+  sourcingFormMinCommitment: string;
+  sourcingFormMaxCommitment: string;
+  sourcingFormPriceLock: string;
+  sourcingFormWindowDays: string;
+  sourcingFormStatus: string;
+  sourcingFormExpires: string;
+  sourcingFormReason: string;
+  sourcingActionCreate: string;
+  sourcingActionEdit: string;
+  sourcingActionIssue: string;
+  sourcingActionCancel: string;
+  sourcingActionClose: string;
+  sourcingActionCompare: string;
+  sourcingActionAward: string;
+  sourcingActionCancelComparison: string;
+  sourcingActionMintInvite: string;
+  sourcingActionRecompute: string;
+  sourcingActionRelease: string;
+  sourcingActionSubmit: string;
+  sourcingActionApprove: string;
+  sourcingActionReject: string;
+  sourcingActionBack: string;
+  sourcingActionCopy: string;
+  sourcingActionCopyDone: string;
+  sourcingActionDismiss: string;
+  sourcingActionViewQuotes: string;
+  sourcingQuotesFor: string;
+  sourcingQuotesEmpty: string;
+  sourcingQuotesPickFirst: string;
+  sourcingQuoteFormTitle: string;
+  sourcingLeadTimeDays: string;
+  sourcingInviteTitle: string;
+  sourcingInviteExpiresHint: string;
+  sourcingInviteTokenTitle: string;
+  sourcingInviteTokenOnce: string;
+  sourcingComparisonNone: string;
+  sourcingComparisonPrepareHint: string;
+  sourcingComparisonPreparedAt: string;
+  sourcingComparisonAwardHint: string;
+  sourcingComparisonAwardedDocs: string;
+  sourcingDocKindPo: string;
+  sourcingDocKindRelease: string;
+  sourcingReleaseTitle: string;
+  sourcingReleasedOf: string;
+  sourcingApprovedItemsTitle: string;
+  sourcingApprovedItemsEmpty: string;
+  sourcingRfqsEmpty: string;
+  sourcingBlanketEmpty: string;
+  sourcingScorecardsEmpty: string;
+  sourcingCapexEmpty: string;
+  sourcingConfirmIssue: string;
+  sourcingConfirmCancel: string;
+  sourcingConfirmClose: string;
+  sourcingConfirmAward: string;
+  sourcingConfirmRelease: string;
+  sourcingConfirmRecompute: string;
+  sourcingToastCreated: string;
+  sourcingToastDone: string;
+  sourcingToastCopied: string;
+  sourcingErrState: string;
+  sourcingErrThreeBid: string;
+  sourcingErrOverRelease: string;
+  sourcingErrDuePassed: string;
+  sourcingErrNotInvited: string;
+  sourcingErrCurrencyMismatch: string;
+  sourcingErrNoQuotes: string;
 }
 
 const ar: Dictionary = {
@@ -9800,6 +9969,177 @@ const ar: Dictionary = {
   customFieldsSelectEmpty: "—",
   customFieldsMultiselectEmpty: "لا خيارات متاحة",
   customFieldsReferenceHint: "معرّف UUID لسجل في: {entity}",
+  // WEB-038 (PHASE-038) — المصادر والمشتريات والتعاون مع الموردين (عربي أولًا).
+  navPurchasing: "المشتريات",
+  sourcingRfqsNav: "طلبات عروض الأسعار",
+  sourcingBlanketNav: "الاتفاقيات الإطارية",
+  sourcingScorecardsNav: "تقييم الموردين",
+  sourcingCapexNav: "الشراء الرأسمالي",
+  sourcingRfqTitle: "المشتريات — طلبات عروض الأسعار",
+  sourcingRfqSubtitle:
+    "حلقة التفاوض كاملة: إصدار طلب عرض الأسعار، استلام العروض، مقارنة العروض، ثم الترسية.",
+  sourcingBlanketTitle: "المشتريات — الاتفاقيات الإطارية",
+  sourcingBlanketSubtitle:
+    "الاتفاقيات الإطارية مع الموردين والصرف منها ضمن سقف الالتزام.",
+  sourcingScorecardsTitle: "المشتريات — تقييم الموردين",
+  sourcingScorecardsSubtitle:
+    "بطاقات تقييم الموردين وقائمة الموردين المعتمدين للأصناف.",
+  sourcingCapexTitle: "المشتريات — طلبات الشراء الرأسمالي",
+  sourcingCapexSubtitle:
+    "طلبات الشراء الرأسمالي مع تقييم الموازنة لحظة الإرسال.",
+  sourcingRfqsTab: "طلبات عروض الأسعار",
+  sourcingQuotesTab: "العروض",
+  sourcingComparisonTab: "المقارنة والترسية",
+  sourcingColRfqNo: "رقم الطلب",
+  sourcingColTitle: "العنوان",
+  sourcingColMode: "النمط",
+  sourcingColStatus: "الحالة",
+  sourcingColDue: "موعد الاستحقاق",
+  sourcingColQuotes: "العروض",
+  sourcingColQuoteRef: "مرجع العرض",
+  sourcingColSubmitted: "تاريخ التقديم",
+  sourcingColSubmittedVia: "قناة التقديم",
+  sourcingColExpires: "ينتهي في",
+  sourcingColBlanketNo: "رقم الاتفاقية",
+  sourcingColValidity: "مدة السريان",
+  sourcingColReleased: "المصروف من السقف",
+  sourcingColProgress: "نسبة الصرف",
+  sourcingColWindow: "نافذة التقييم",
+  sourcingColDelivery: "الالتزام بالتسليم",
+  sourcingColQuality: "الجودة",
+  sourcingColPrice: "السعر",
+  sourcingColOverall: "التقييم العام",
+  sourcingColSample: "حجم العينة",
+  sourcingColRequestNo: "رقم الطلب",
+  sourcingColAmount: "المبلغ",
+  sourcingColBudgetEval: "تقييم الموازنة",
+  sourcingColLine: "السطر",
+  sourcingColOfferSupplier: "المورد",
+  sourcingColOfferPrice: "سعر الوحدة",
+  sourcingColLineTotal: "الإجمالي",
+  sourcingColLeadTime: "مدة التوريد",
+  sourcingColWeighted: "النتيجة المرجحة",
+  sourcingColWinner: "مُرسَّى عليه",
+  sourcingModeOpen: "مفتوح",
+  sourcingModeInvited: "بدعوة",
+  sourcingStatusRfqDraft: "مسودة",
+  sourcingStatusRfqIssued: "مُصدر",
+  sourcingStatusRfqQuoted: "عروض مستلمة",
+  sourcingStatusRfqAwarded: "مُرسَّى",
+  sourcingStatusRfqClosed: "مغلق",
+  sourcingStatusRfqCancelled: "ملغى",
+  sourcingStatusQuoteSubmitted: "مقدَّم",
+  sourcingStatusQuoteWithdrawn: "مسحوب",
+  sourcingViaPortal: "بوابة الموردين",
+  sourcingViaBackOffice: "الإدارة الخلفية",
+  sourcingStatusComparisonPrepared: "مُعدَّة",
+  sourcingStatusComparisonAwarded: "مُرسَّاة",
+  sourcingStatusComparisonCancelled: "ملغاة",
+  sourcingStatusBlanketActive: "نشطة",
+  sourcingStatusBlanketExpired: "منتهية",
+  sourcingStatusBlanketClosed: "مغلقة",
+  sourcingStatusBlanketCancelled: "ملغاة",
+  sourcingStatusApproved: "معتمد",
+  sourcingStatusSuspended: "موقوف",
+  sourcingStatusCapexDraft: "مسودة",
+  sourcingStatusCapexPending: "بانتظار الاعتماد",
+  sourcingStatusCapexApproved: "معتمد",
+  sourcingStatusCapexConverted: "محوَّل",
+  sourcingStatusCapexRejected: "مرفوض",
+  sourcingStatusCapexCancelled: "ملغى",
+  sourcingBudgetModeOff: "بدون رقابة",
+  sourcingBudgetModeAdvisory: "استشاري",
+  sourcingBudgetModeEnforce: "رقابة صارمة",
+  sourcingFormTitle: "العنوان",
+  sourcingFormTitleAr: "العنوان (عربي)",
+  sourcingFormMode: "نمط الطلب",
+  sourcingFormCurrency: "العملة",
+  sourcingFormDue: "موعد الاستحقاق",
+  sourcingFormInvitedSuppliers: "الموردون المدعوون",
+  sourcingFormTargetPrice: "السعر المستهدف",
+  sourcingFormOptional: "اختياري",
+  sourcingFormQuoteRef: "مرجع العرض",
+  sourcingFormLeadTime: "مدة التوريد (أيام)",
+  sourcingFormValidUntil: "صالح حتى",
+  sourcingFormRfqLine: "سطر الطلب",
+  sourcingFormExpiresAt: "ينتهي في",
+  sourcingFormBranch: "الفرع",
+  sourcingFormAccount: "الحساب",
+  sourcingFormDescription: "الوصف",
+  sourcingFormEstimatedAmount: "المبلغ التقديري",
+  sourcingFormNeededBy: "مطلوب بحلول",
+  sourcingFormContractId: "معرّف العقد (اختياري)",
+  sourcingFormValidFrom: "يبدأ في",
+  sourcingFormValidTo: "ينتهي في",
+  sourcingFormMinCommitment: "الحد الأدنى للالتزام",
+  sourcingFormMaxCommitment: "الحد الأقصى للالتزام",
+  sourcingFormPriceLock: "الأسعار المثبتة",
+  sourcingFormWindowDays: "نافذة التقييم (أيام)",
+  sourcingFormStatus: "الحالة",
+  sourcingFormExpires: "تاريخ الانتهاء (اختياري)",
+  sourcingFormReason: "السبب",
+  sourcingActionCreate: "إنشاء",
+  sourcingActionEdit: "تعديل",
+  sourcingActionIssue: "إصدار",
+  sourcingActionCancel: "إلغاء",
+  sourcingActionClose: "إغلاق",
+  sourcingActionCompare: "تجهيز المقارنة",
+  sourcingActionAward: "ترسية",
+  sourcingActionCancelComparison: "إلغاء المقارنة",
+  sourcingActionMintInvite: "دعوة عبر البوابة",
+  sourcingActionRecompute: "إعادة الاحتساب",
+  sourcingActionRelease: "صرف من الاتفاقية",
+  sourcingActionSubmit: "إرسال للاعتماد",
+  sourcingActionApprove: "اعتماد",
+  sourcingActionReject: "رفض",
+  sourcingActionBack: "رجوع",
+  sourcingActionCopy: "نسخ",
+  sourcingActionCopyDone: "تم النسخ",
+  sourcingActionDismiss: "إخفاء",
+  sourcingActionViewQuotes: "العروض",
+  sourcingQuotesFor: "عروض الطلب {no}",
+  sourcingQuotesEmpty: "لا عروض مستلمة لهذا الطلب بعد.",
+  sourcingQuotesPickFirst: "اختر طلب عرض أسعار أولًا لعرض عروضه.",
+  sourcingQuoteFormTitle: "تسجيل عرض مورد (من الإدارة)",
+  sourcingLeadTimeDays: "{days} يوم",
+  sourcingInviteTitle: "دعوة مورد إلى البوابة",
+  sourcingInviteExpiresHint: "رابط الدعوة ينتهي في التاريخ المحدد ويمكن سحبه في أي وقت.",
+  sourcingInviteTokenTitle: "رمز الدعوة (يُعرض مرة واحدة)",
+  sourcingInviteTokenOnce:
+    "انسخ هذا الرمز الآن وشاركه مع المورد — لا يُخزَّن نصه أبدًا (الهاش فقط) ولن يُعرض مرة أخرى.",
+  sourcingComparisonNone: "لا توجد مقارنة حية لهذا الطلب.",
+  sourcingComparisonPrepareHint:
+    "تُجمَّد لقطة المقارنة عند التجهيز (السعر 60٪ · التسليم 30٪ · الشروط 10٪) ولا تُعاد احتسابها أبدًا.",
+  sourcingComparisonPreparedAt: "جُهِّزت في",
+  sourcingComparisonAwardHint:
+    "اختر العرض الفائز لكل سطر ثم رسِّي الجولة (قاعدة العروض الثلاثة BR-062 تُفحص على الخادم).",
+  sourcingComparisonAwardedDocs: "المستندات المتولدة من الترسية",
+  sourcingDocKindPo: "أمر شراء",
+  sourcingDocKindRelease: "صرف من اتفاقية إطارية",
+  sourcingReleaseTitle: "صرف من الاتفاقية الإطارية",
+  sourcingReleasedOf: "{released} من {max}",
+  sourcingApprovedItemsTitle: "الموردون المعتمدون للأصناف",
+  sourcingApprovedItemsEmpty: "لا أصناف معتمدة للموردين بعد.",
+  sourcingRfqsEmpty: "لا طلبات عروض أسعار بعد.",
+  sourcingBlanketEmpty: "لا اتفاقيات إطارية بعد.",
+  sourcingScorecardsEmpty: "لا بطاقات تقييم بعد — أعد الاحتساب لتوليدها.",
+  sourcingCapexEmpty: "لا طلبات شراء رأسمالي بعد.",
+  sourcingConfirmIssue: "إصدار الطلب يرسله إلى الموردين المدعوين. متابعة؟",
+  sourcingConfirmCancel: "إلغاء الطلب لا يمكن التراجع عنه. متابعة؟",
+  sourcingConfirmClose: "إغلاق الطلب ينهي جولة التفاوض. متابعة؟",
+  sourcingConfirmAward: "الترسية تولّد أوامر الشراء حسب الموردين الفائزين. متابعة؟",
+  sourcingConfirmRelease: "الصرف ينشئ أمر شراء من الاتفاقية. متابعة؟",
+  sourcingConfirmRecompute: "إعادة الاحتساب تعيد بناء البطاقة من حركات النافذة. متابعة؟",
+  sourcingToastCreated: "تم الإنشاء بنجاح.",
+  sourcingToastDone: "تم تنفيذ الإجراء بنجاح.",
+  sourcingToastCopied: "تم النسخ إلى الحافظة.",
+  sourcingErrState: "حالة المستند لا تسمح بهذا الإجراء.",
+  sourcingErrThreeBid: "قاعدة العروض الثلاثة (BR-062) غير مستوفاة لهذا السطر.",
+  sourcingErrOverRelease: "الصرف يتجاوز سقف الالتزام المتبقي للاتفاقية.",
+  sourcingErrDuePassed: "انقضى موعد استحقاق الطلب — لا مزيد من العروض.",
+  sourcingErrNotInvited: "المورد غير مدرج في قائمة المدعوين لهذا الطلب.",
+  sourcingErrCurrencyMismatch: "عملة العرض لا تطابق عملة الطلب.",
+  sourcingErrNoQuotes: "لا عروض مقدَّمة لمقارنتها — جهّز المقارنة بعد استلام العروض.",
 };
 
 const en: Dictionary = {
@@ -14712,6 +15052,180 @@ const en: Dictionary = {
   customFieldsSelectEmpty: "—",
   customFieldsMultiselectEmpty: "No options available",
   customFieldsReferenceHint: "UUID of a record in: {entity}",
+  // WEB-038 (PHASE-038) — procurement sourcing & supplier collaboration (EN mirror).
+  navPurchasing: "Purchasing",
+  sourcingRfqsNav: "RFQs & sourcing",
+  sourcingBlanketNav: "Blanket agreements",
+  sourcingScorecardsNav: "Supplier scorecards",
+  sourcingCapexNav: "CAPEX requests",
+  sourcingRfqTitle: "Purchasing — RFQs & sourcing",
+  sourcingRfqSubtitle:
+    "The full negotiation loop: issue the RFQ, collect quotes, compare offers, then award.",
+  sourcingBlanketTitle: "Purchasing — Blanket agreements",
+  sourcingBlanketSubtitle:
+    "Standing blanket agreements with suppliers and releases within the commitment ceiling.",
+  sourcingScorecardsTitle: "Purchasing — Supplier scorecards",
+  sourcingScorecardsSubtitle:
+    "Supplier scorecard windows and the approved-vendor item list.",
+  sourcingCapexTitle: "Purchasing — CAPEX requests",
+  sourcingCapexSubtitle:
+    "Capital-expenditure requests with the budget evaluation taken at submit.",
+  sourcingRfqsTab: "RFQs",
+  sourcingQuotesTab: "Quotes",
+  sourcingComparisonTab: "Comparison & award",
+  sourcingColRfqNo: "RFQ no.",
+  sourcingColTitle: "Title",
+  sourcingColMode: "Mode",
+  sourcingColStatus: "Status",
+  sourcingColDue: "Due at",
+  sourcingColQuotes: "Quotes",
+  sourcingColQuoteRef: "Quote ref.",
+  sourcingColSubmitted: "Submitted at",
+  sourcingColSubmittedVia: "Channel",
+  sourcingColExpires: "Expires at",
+  sourcingColBlanketNo: "Blanket no.",
+  sourcingColValidity: "Validity",
+  sourcingColReleased: "Released of ceiling",
+  sourcingColProgress: "Release ratio",
+  sourcingColWindow: "Window",
+  sourcingColDelivery: "Delivery",
+  sourcingColQuality: "Quality",
+  sourcingColPrice: "Price",
+  sourcingColOverall: "Overall",
+  sourcingColSample: "Sample size",
+  sourcingColRequestNo: "Request no.",
+  sourcingColAmount: "Amount",
+  sourcingColBudgetEval: "Budget evaluation",
+  sourcingColLine: "Line",
+  sourcingColOfferSupplier: "Supplier",
+  sourcingColOfferPrice: "Unit price",
+  sourcingColLineTotal: "Line total",
+  sourcingColLeadTime: "Lead time",
+  sourcingColWeighted: "Weighted score",
+  sourcingColWinner: "Winner",
+  sourcingModeOpen: "Open",
+  sourcingModeInvited: "Invited",
+  sourcingStatusRfqDraft: "Draft",
+  sourcingStatusRfqIssued: "Issued",
+  sourcingStatusRfqQuoted: "Quotes received",
+  sourcingStatusRfqAwarded: "Awarded",
+  sourcingStatusRfqClosed: "Closed",
+  sourcingStatusRfqCancelled: "Cancelled",
+  sourcingStatusQuoteSubmitted: "Submitted",
+  sourcingStatusQuoteWithdrawn: "Withdrawn",
+  sourcingViaPortal: "Supplier portal",
+  sourcingViaBackOffice: "Back office",
+  sourcingStatusComparisonPrepared: "Prepared",
+  sourcingStatusComparisonAwarded: "Awarded",
+  sourcingStatusComparisonCancelled: "Cancelled",
+  sourcingStatusBlanketActive: "Active",
+  sourcingStatusBlanketExpired: "Expired",
+  sourcingStatusBlanketClosed: "Closed",
+  sourcingStatusBlanketCancelled: "Cancelled",
+  sourcingStatusApproved: "Approved",
+  sourcingStatusSuspended: "Suspended",
+  sourcingStatusCapexDraft: "Draft",
+  sourcingStatusCapexPending: "Pending approval",
+  sourcingStatusCapexApproved: "Approved",
+  sourcingStatusCapexConverted: "Converted",
+  sourcingStatusCapexRejected: "Rejected",
+  sourcingStatusCapexCancelled: "Cancelled",
+  sourcingBudgetModeOff: "No control",
+  sourcingBudgetModeAdvisory: "Advisory",
+  sourcingBudgetModeEnforce: "Enforced",
+  sourcingFormTitle: "Title",
+  sourcingFormTitleAr: "Title (Arabic)",
+  sourcingFormMode: "RFQ mode",
+  sourcingFormCurrency: "Currency",
+  sourcingFormDue: "Due at",
+  sourcingFormInvitedSuppliers: "Invited suppliers",
+  sourcingFormTargetPrice: "Target price",
+  sourcingFormOptional: "optional",
+  sourcingFormQuoteRef: "Quote ref.",
+  sourcingFormLeadTime: "Lead time (days)",
+  sourcingFormValidUntil: "Valid until",
+  sourcingFormRfqLine: "RFQ line",
+  sourcingFormExpiresAt: "Expires at",
+  sourcingFormBranch: "Branch",
+  sourcingFormAccount: "Account",
+  sourcingFormDescription: "Description",
+  sourcingFormEstimatedAmount: "Estimated amount",
+  sourcingFormNeededBy: "Needed by",
+  sourcingFormContractId: "Contract id (optional)",
+  sourcingFormValidFrom: "Valid from",
+  sourcingFormValidTo: "Valid to",
+  sourcingFormMinCommitment: "Minimum commitment",
+  sourcingFormMaxCommitment: "Maximum commitment",
+  sourcingFormPriceLock: "Price locks",
+  sourcingFormWindowDays: "Window (days)",
+  sourcingFormStatus: "Status",
+  sourcingFormExpires: "Expires (optional)",
+  sourcingFormReason: "Reason",
+  sourcingActionCreate: "Create",
+  sourcingActionEdit: "Edit",
+  sourcingActionIssue: "Issue",
+  sourcingActionCancel: "Cancel",
+  sourcingActionClose: "Close",
+  sourcingActionCompare: "Prepare comparison",
+  sourcingActionAward: "Award",
+  sourcingActionCancelComparison: "Cancel comparison",
+  sourcingActionMintInvite: "Portal invite",
+  sourcingActionRecompute: "Recompute",
+  sourcingActionRelease: "Release",
+  sourcingActionSubmit: "Submit for approval",
+  sourcingActionApprove: "Approve",
+  sourcingActionReject: "Reject",
+  sourcingActionBack: "Back",
+  sourcingActionCopy: "Copy",
+  sourcingActionCopyDone: "Copied",
+  sourcingActionDismiss: "Dismiss",
+  sourcingActionViewQuotes: "Quotes",
+  sourcingQuotesFor: "Quotes for {no}",
+  sourcingQuotesEmpty: "No quotes received for this RFQ yet.",
+  sourcingQuotesPickFirst: "Select an RFQ first to see its quotes.",
+  sourcingQuoteFormTitle: "Record a supplier quote (back office)",
+  sourcingLeadTimeDays: "{days} days",
+  sourcingInviteTitle: "Invite a supplier to the portal",
+  sourcingInviteExpiresHint:
+    "The invite link expires on the chosen date and can be revoked at any time.",
+  sourcingInviteTokenTitle: "Invite token (shown once)",
+  sourcingInviteTokenOnce:
+    "Copy this token now and share it with the supplier — the plaintext is never stored (hash only) and will not be shown again.",
+  sourcingComparisonNone: "No live comparison for this RFQ.",
+  sourcingComparisonPrepareHint:
+    "The comparison snapshot freezes at prepare (price 60% · delivery 30% · terms 10%) and is never recomputed.",
+  sourcingComparisonPreparedAt: "Prepared at",
+  sourcingComparisonAwardHint:
+    "Pick the winning offer per line, then award the round (the BR-062 three-bid floor is enforced server-side).",
+  sourcingComparisonAwardedDocs: "Documents generated by the award",
+  sourcingDocKindPo: "Purchase order",
+  sourcingDocKindRelease: "Blanket release",
+  sourcingReleaseTitle: "Release from blanket agreement",
+  sourcingReleasedOf: "{released} of {max}",
+  sourcingApprovedItemsTitle: "Approved supplier items",
+  sourcingApprovedItemsEmpty: "No approved supplier items yet.",
+  sourcingRfqsEmpty: "No RFQs yet.",
+  sourcingBlanketEmpty: "No blanket agreements yet.",
+  sourcingScorecardsEmpty: "No scorecards yet — recompute to generate them.",
+  sourcingCapexEmpty: "No CAPEX requests yet.",
+  sourcingConfirmIssue: "Issuing sends the RFQ to the invited suppliers. Continue?",
+  sourcingConfirmCancel: "Cancelling the RFQ cannot be undone. Continue?",
+  sourcingConfirmClose: "Closing ends the negotiation round. Continue?",
+  sourcingConfirmAward: "The award generates purchase orders per winning supplier. Continue?",
+  sourcingConfirmRelease: "A release creates a purchase order from the agreement. Continue?",
+  sourcingConfirmRecompute:
+    "Recomputing rebuilds the scorecard from the window's movements. Continue?",
+  sourcingToastCreated: "Created successfully.",
+  sourcingToastDone: "Action completed successfully.",
+  sourcingToastCopied: "Copied to the clipboard.",
+  sourcingErrState: "The document state does not allow this action.",
+  sourcingErrThreeBid: "The three-bid floor (BR-062) is not met for this line.",
+  sourcingErrOverRelease: "The release exceeds the agreement's remaining commitment.",
+  sourcingErrDuePassed: "The RFQ due date has passed — no further quotes.",
+  sourcingErrNotInvited: "The supplier is not on this RFQ's invited list.",
+  sourcingErrCurrencyMismatch: "The quote currency does not match the RFQ currency.",
+  sourcingErrNoQuotes:
+    "No submitted quotes to compare — prepare the comparison after quotes arrive.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

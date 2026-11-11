@@ -62,6 +62,24 @@ export interface ReportJobEnqueuer {
 export class RunService {
   readonly cache = new ReportCache();
 
+  /**
+   * PHASE-038 gate repair (report-hammer): single-flight coalescing for
+   * identical concurrent runs. The `report_runs` unique (tenant, report_key,
+   * params_hash) + the withTenant unit-of-work mean N concurrent identical
+   * requests otherwise serialize behind the first lane's WHOLE compute (the
+   * ON CONFLICT tuple lock is held until its transaction commits) — the
+   * classic dashboard-refresh thundering herd pinned a waiter past the
+   * 15 s `statement_timeout` (pg 57014, "while locking tuple") and failed
+   * the run. Coalescing matches the store's own semantics (a re-run of the
+   * same params REPLACES the same row — one logical run) and the cache's
+   * (sequential identical requests already share the envelope): concurrent
+   * identical requests now share the one in-flight compute instead of
+   * stampeding the row. Keyed exactly like the cache key (tenant + contract
+   * version + params hash) so tenants never share flights; the entry lives
+   * only as long as the compute (self-cleaning in `finally`).
+   */
+  private readonly inFlight = new Map<string, Promise<RunOutcome>>();
+
   constructor(@Inject(REPORT_JOB_ENQUEUER_TOKEN) private readonly enqueueJob: ReportJobEnqueuer) {
     // Posting/lock events drop the tenant's cache entries
     // (REPORTING_ARCHITECTURE §6.3 — no stale financial data).
@@ -111,6 +129,31 @@ export class RunService {
       return { runId: cached.result.runId, result: cached.result, status: "SUCCEEDED" };
     }
 
+    const inFlight = this.inFlight.get(cacheKey);
+    if (inFlight !== undefined) {
+      // A same-shape compute is already running — ride it (the coalesced
+      // waiters return the leader's runId + envelope; the store's
+      // ON CONFLICT REPLACE collapses these into one run row anyway).
+      return inFlight;
+    }
+    const flight = this.runNew({ contract, params, ctx: request.ctx, cacheKey, paramsHash });
+    this.inFlight.set(cacheKey, flight);
+    // Self-cleaning: the entry lives only as long as the compute; `.finally`
+    // propagates the leader's outcome (rejections included) to every rider.
+    return flight.finally(() => {
+      this.inFlight.delete(cacheKey);
+    });
+  }
+
+  /** The uncached run path (run() after the cache + coalescing checks). */
+  private async runNew(input: {
+    contract: ReportContract;
+    params: ReportParams;
+    ctx: RunContext;
+    cacheKey: string;
+    paramsHash: string;
+  }): Promise<RunOutcome> {
+    const { contract, params, ctx, paramsHash } = input;
     const runId = generateUuidV7();
     await store.upsertRun({
       id: runId,
@@ -119,8 +162,8 @@ export class RunService {
       params: params as Record<string, unknown>,
       paramsHash,
       executionClass: contract.executionClass,
-      requestedBy: request.ctx.userId,
-      correlationId: request.ctx.correlationId ?? null,
+      requestedBy: ctx.userId,
+      correlationId: ctx.correlationId ?? null,
     });
 
     if (contract.executionClass === "job") {
@@ -128,17 +171,17 @@ export class RunService {
         queue: REPORT_JOB_QUEUE,
         jobId: `report-run:${runId}`,
         payload: {
-          tenantId: request.ctx.tenantId,
+          tenantId: ctx.tenantId,
           runId,
           reportKey: contract.id,
-          userId: request.ctx.userId,
-          correlationId: request.ctx.correlationId ?? null,
+          userId: ctx.userId,
+          correlationId: ctx.correlationId ?? null,
         },
       });
       return { runId, queued: true, status: "QUEUED" };
     }
 
-    return this.executeInline({ runId, contract, params, ctx: request.ctx, cacheKey });
+    return this.executeInline({ runId, contract, params, ctx, cacheKey: input.cacheKey });
   }
 
   /** The inline path (T3): query → aggregate → assert → envelope → store.

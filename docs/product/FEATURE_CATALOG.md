@@ -1,6 +1,6 @@
 # Feature Catalog
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-035 truth restoration — DR-035-01/02/03 · PHASE-036 `platform.custom_fields`)
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-10 (PHASE-035 truth restoration — DR-035-01/02/03 · PHASE-036 `platform.custom_fields` · PHASE-038 +5 purchasing sourcing features)
 
 The canonical, exhaustive registry of product features. Every feature has exactly one
 **feature key** (`module.feature_name`). This file is the single source of truth referenced by:
@@ -216,6 +216,11 @@ Procure-to-pay documents and payables.
 | `purchasing.payments` | Payments · سندات الصرف | Supplier/payee payments with allocation to supplier invoices (mirror of receipts) | MVP | 011 | `purchasing.payments.post` | `treasury.accounts` |
 | `purchasing.three_way_matching` | Three-way matching · المطابقة الثلاثية | Order ↔ receipt ↔ invoice consistency with tolerance rules and match outcomes recorded before approval (BR-009) | MVP | 011 | `purchasing.matching.review` | `purchasing.supplier_invoices` |
 | `purchasing.landed_costs` | Landed costs · تكاليف الوصول | Freight/customs/insurance allocation by value or quantity into item cost; revalues layers before issue where possible (baseline allocation shipped 011; full workflow — UI + entitlement activation — 015) | 1 | 011 (baseline) / 015 (full workflow) | `purchasing.landed_costs.manage` | `purchasing.goods_receipts` |
+| `purchasing.rfqs` | RFQs & sourcing · طلبات عروض الأسعار | The negotiation loop: RFQ rounds (open/invited), supplier quotes, the award matrix with the 3-bid rule (BR-062), award → PO/release | 1 (tier 4 depth) | 038 | `purchasing.rfqs.read` | `purchasing.orders` |
+| `purchasing.blanket_orders` | Blanket agreements · الاتفاقيات الإطارية | Standing supplier agreements: validity windows, min/max commitments, price locks, releases with the generated PO | 1 | 038 | `purchasing.rfqs.read` | `purchasing.orders` |
+| `purchasing.supplier_scorecards` | Supplier scorecards · تقييم الموردين | Rolling-window delivery/quality/price scorecards + the approved-vendor-per-item list | 1 | 038 | `purchasing.rfqs.read` | `purchasing.goods_receipts` |
+| `purchasing.capex_requests` | CAPEX requests · طلبات الشراء الرأسمالي | Budget-checked capital requests with the 028 guard (advisory default) and SoD approval | 1 | 038 | `purchasing.capex.read` | `purchasing.requests` |
+| `purchasing.supplier_portal` | Supplier portal (skeleton) · بوابة الموردين | The scoped quote-submission endpoint (the token IS the credential; audited, rate-limited) — the full portal lands in 060 | 1 | 038 | `purchasing.rfqs.manage` | `purchasing.rfqs` |
 
 ## 10. Module: treasury
 

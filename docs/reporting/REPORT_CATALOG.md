@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-10 (PHASE-037 — tax.e-invoicing-log v2: the ZATCA device/ICV/PIH/QR-presence columns + the deviceId filter; registry unchanged at 86)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-10 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -91,6 +91,8 @@ accounts via INV-009 assertion displayed as a footer badge.
 | `purchasing.grni` | GRNI Register / سجل المستلم غير المفوتر | purchasing · `matchingQueries.grniRegister` · goods_receipts vs supplier_invoices | asOf, branches, suppliers | `reports.purchasing.grni.read` | XLSX · CSV | PHASE-011 |
 | `purchasing.po-status` | Purchase Order Status / حالة أوامر الشراء | purchasing · `poQueries.statusBoard` · purchase_orders, goods_receipts, supplier_invoices | dateFrom/To, branches, suppliers, open-only | `purchasing.po.read` | XLSX · CSV | PHASE-011 |
 | `purchasing.matching-exceptions` | Three-Way Match Exceptions / استثناءات المطابقة الثلاثية | purchasing · `matchingQueries.exceptions` · order/receipt/invoice comparison results | dateFrom/To, branches, exception type (price/qty/missing) | `reports.purchasing.matching.read` | XLSX · CSV | PHASE-011 |
+| `purchasing.rfq-award-matrix` | RFQ Award Matrix / مصفوفة ترسية عروض الأسعار | purchasing · `sourcing.awardMatrix` · rfqs, supplier_quotes(+lines), quote_comparisons | rfqId | `purchasing.rfqs.read` | XLSX · CSV | PHASE-038 |
+| `purchasing.supplier-scorecard` | Supplier Scorecard / بطاقة تقييم المورد | purchasing · `sourcing.scorecards` · supplier_ratings (+ goods_receipts/supplier_invoices/debit_notes provenance) | dateFrom/To, supplierId | `purchasing.rfqs.read` | XLSX · CSV | PHASE-038 |
 
 Operational revenue reports carry a `sales-gl-tie` assertion (net+tax vs GL revenue/VAT
 movements for the same scope) — see worked example in
@@ -386,6 +388,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-034 | consolidation reports (consolidated TB/IS/BS, eliminations log) — **delivered 2026-11-09, registry 80** |
 | PHASE-035 | tax.e-invoicing-log delivered — registry 85 → 86; catalog reconciled 79 → 86 rows (7 unlisted added, 1 duplicate removed) |
 | PHASE-037 | tax.e-invoicing-log **v2** — the ZATCA device/ICV/PIH/QR-presence columns + the deviceId filter (§6); registry unchanged at 86 |
+| PHASE-038 | purchasing.rfq-award-matrix + purchasing.supplier-scorecard added; registry 86 → 88 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 
