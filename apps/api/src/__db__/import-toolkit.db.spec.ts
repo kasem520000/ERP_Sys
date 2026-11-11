@@ -34,7 +34,7 @@ import { AppModule } from "../app.module";
 import { withTenant } from "../infra/db/tenant-context";
 import { closeDb } from "../infra/db/client";
 import { stopBoss } from "../infra/jobs/boss";
-import { RegistrationService } from "../modules/tenancy/application/registration-service";
+import { RegistrationService, __resetRegistrationLimitersForTests } from "../modules/tenancy/application/registration-service";
 import { OnboardingService as TenancyOnboardingService } from "../modules/tenancy/application/onboarding-service";
 import { PeriodService } from "../modules/accounting/application/period-service";
 import { OpeningBalancesPostingService as AccountingOpeningService } from "../modules/accounting/application/opening-balances-service";
@@ -187,6 +187,7 @@ function reportOfJob(job: JobRow): ReportShape {
 
 beforeAll(async () => {
   ensureTestDb();
+  __resetRegistrationLimitersForTests();
   reloadEnv();
   const created = await NestFactory.create(AppModule, { logger: ["error", "warn"] });
   app = created;
@@ -338,6 +339,7 @@ beforeAll(async () => {
 }, 240_000);
 
 afterAll(async () => {
+  __resetRegistrationLimitersForTests();
   if (app !== undefined) {
     await app.close();
   }

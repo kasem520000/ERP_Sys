@@ -123,6 +123,26 @@ Entry workspaces under matrix §3.17's keys).
 | `sales.dunning` | 2 المبيعات | التحصيل والمطالبات / Collections & dunning | `sales.dunning` | `sales.dunning.manage` | Transaction Entry (§4) — route `/sales/dunning`, order 80: the collections worklist — policies ladder, letters register + sweep, late-fee charge/waive, actions log, credit reviews, and the agencies/referrals layer (`sales.late-fees.manage` / `sales.collection-agencies.manage`) |
 | `purchasing.returns` | 3 المشتريات | مرتجعات الموردين / Supplier returns | `purchasing.rma` | `purchasing.rma.read` | Transaction Entry (§4) — route `/purchasing/returns`, order 45: the RTV lifecycle (approve SoD, ship, credit — the G-38 debit note) under `purchasing.rma.manage` |
 
+### 1.6 PHASE-040 registry additions (Blueprint v3.0 — data onboarding & migration toolkit)
+
+The imports hub (CR-10; [../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md)
+§3): one settings-plane item — the `/settings/imports` surface (the seven-kind wizard
+with the BR-066 dry-run → acknowledged-atomic-commit discipline, the saved-mapping
+manager, the jobs history, and the IN-26 QuickBooks/Odoo/Excel-generic adapter
+templates). Same resolution rule as every item — `entitlement(featureKey)` AND
+`permission(user, branch)`; a starter tenant sees no imports navigation (the
+`platform.data_migration` plan grant rides migration 0060 §8 — business + enterprise,
+the 0051 tier-4 precedent). The one-click demo-data surface deliberately has NO
+sidebar item: it lives on the onboarding home (`platform.demo_data` is granted to ALL
+plans — the trial-enablement decision — and the onboarding wizard's step-3 result
+screen links to the hub). The command palette inherits the entry through
+`resolveNavigation` (OA-04). Mirrors `packages/contracts/src/navigation.ts`
+(`settings.imports`, order 80).
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `settings.imports` | 9 الإعدادات | استيراد البيانات والترحيل / Data import & migration | `platform.data_migration` | `configuration.imports.manage` | Wizard (§9) — route `/settings/imports`, order 80: four tabs (the import wizard — kind → upload → column mapping with auto-detect + saved-mapping reuse → dry-run report (bilingual AR+EN per-row issues) → ack-gated commit with polling; the jobs history; the saved mappings; the migration adapters with the documented-mapping template downloads); writes gate in-screen on `configuration.imports.manage` |
+
 ## 2. Navigation registry (data model, normative)
 
 Navigation is **data**, not code — a single registry resolved per session:

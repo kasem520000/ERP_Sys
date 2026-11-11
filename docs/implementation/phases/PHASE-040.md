@@ -1,6 +1,6 @@
 # PHASE-040 — Data Onboarding & Migration Toolkit
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 1 / Stage 12 · **Register:** [CR-10](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE (delivered 2026-11-11 — evidence: [reports/PHASE-040-COMPLETION.md](reports/PHASE-040-COMPLETION.md); migrations 0060–0063, schema_version 63) · **Wave:** 1 / Stage 12 · **Register:** [CR-10](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-17) · §26.4 (IN-26) · §27.2 (TB-19/TB-20) · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-21 export-templates half — the v3.1 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §7 (OA-05)
 
 ## 1. Phase Overview

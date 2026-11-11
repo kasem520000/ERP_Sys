@@ -1,23 +1,48 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-039 COMPLETE — next eligible: PHASE-040; STOPPED awaiting the owner's go per the standing rule)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-040 COMPLETE — next eligible: PHASE-041; STOPPED awaiting the owner's go per the standing rule)
 
 ## The single next action
 
-**PHASE-039 is COMPLETE and pushed** — the triple flip is done (the phase doc
+**PHASE-040 is COMPLETE and pushed** — the triple flip is done (the phase doc
 header, the IMPLEMENTATION_STATUS row + header, and
-[the completion report](../implementation/phases/reports/PHASE-039-COMPLETION.md)
+[the completion report](../implementation/phases/reports/PHASE-040-COMPLETION.md)
 with the CR-48 code-evidence checklist). **Execution is stopped here per the
 owner's standing rule** — the next phase awaits the owner's go.
 
-**Start PHASE-040 (Data Onboarding & Migration Toolkit, CR-10)** — «ابدأ تنفيذ
-المرحلة PHASE-040» — when the owner gives the go. Wave-1 sibling (parallel-safe);
-prerequisites all satisfied (035 ✓; the import-toolkit substrate shipped with
-the 34-phase baseline). Read [PHASE-040.md](../implementation/phases/PHASE-040.md)
-first: the import-kind families (COA, opening balances, fixed assets, employees,
-price lists, contracts, budgets — H-17), the Excel/QuickBooks/Odoo-shaped
-migration adapters (IN-26), the demo-data loader per industry template
-(TB-19/20 + OA-05), and the L1-21 export-templates half (v3.1/CR-46).
+**Start PHASE-041 (Communications Hub — WhatsApp/SMS/Email, CR-11)** — «ابدأ تنفيذ
+المرحلة PHASE-041» — when the owner gives the go. Wave-1 sibling (parallel-safe);
+prerequisites all satisfied (035 ✓). Read [PHASE-041.md](../implementation/phases/PHASE-041.md)
+first: the channel adapters (the notifications module's port family — the
+deferred WHATSAPP/SMS dunning letters land here), the templated bilingual
+messages, and the per-tenant quotas. The PHASE-040 demo-data loader and sandbox
+tenants become the default substrate for its sales demos.
+
+## Post-PHASE-040 context for the next author (2026-11-11)
+
+PHASE-040 (Data Onboarding & Migration Toolkit) is COMPLETE — H-17, IN-26,
+TB-19/TB-20, L1-21's export half and OA-05 all closed: migrations `0060`–`0063`
+(schema_version 63; the RLS'd `import_mappings` + the seven-kind `import_jobs`
+widening + the tenants SANDBOX/demo columns + the `user_membership_options`
+SANDBOX plane + the BR-066 mapping snapshot + the `erp.tenant_kind` probe), the
+BR-066 dry-run → acknowledged-atomic-commit engine, the saved-mapping wizard,
+the QuickBooks/Odoo/Excel-generic adapters
+([MIGRATION_ADAPTERS.md](../migration/MIGRATION_ADAPTERS.md) is the contract),
+the 13-template one-click demo loader, the SANDBOX provisioning, and the
+`/settings/imports` hub. CURRENT_SHIPPED_PHASE = "PHASE-040" (permissions
+265 → **267**; feature keys +2; rules +BR-066; web i18n **5,109=5,109** (+90);
+ENTITY_CATALOG 227 → **228**; the three new spec files **34/34**).
+
+Key handoffs from 040 (read the
+[completion report](../implementation/phases/reports/PHASE-040-COMPLETION.md)
+first): the **spec-caught product fixes** (the opening-post zero-residual guard,
+the COA nameAr fallback, the mapping snapshot, the tenant_kind probe — four
+would-be production bugs the DB specs caught in-phase); the **@Inject
+precedent** now covers OpeningBalancesPostingService/BudgetGridService/
+BudgetVersionService (container resolution under vitest/esbuild); the
+**enterprise-plan showcase posture** for anything that must light up ALL
+templates (the sandbox precedent); the demo loader's ensureDemoActorUsers pair
+(the SoD synthetic approvers) is reusable for future demo surfaces.
 
 ## Post-PHASE-039 context for the next author (2026-11-11)
 

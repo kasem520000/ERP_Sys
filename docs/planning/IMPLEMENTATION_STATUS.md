@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-039 COMPLETE — the v3.0 program's fifth phase delivered; roadmap v3.1 + v3.2 applied)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-040 COMPLETE — the v3.0 program's sixth phase delivered; roadmap v3.1 + v3.2 applied)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -111,10 +111,10 @@ recorded here with evidence.
 | Compliance | NONE — no jurisdiction pack data verified against official sources | — |
 | Deployment | NONE — dev compose + CI files (incl. new ci-db.yml); first hosted runs waived pending infra | `docker-compose.yml`, `.github/workflows/` |
 
-## Blueprint v3.0 phases (2026-11-11 — PHASE-039 delivered; roadmap v3.1 + v3.2 applied; the rest planned)
+## Blueprint v3.0 phases (2026-11-11 — PHASE-040 delivered; roadmap v3.1 + v3.2 applied; the rest planned)
 
-29 of 34 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035…PHASE-039
-COMPLETE (035–038 on 2026-11-10; 039 on 2026-11-11).
+28 of 34 phases **NOT_STARTED — PLANNED** per CR-03; PHASE-035…PHASE-040
+COMPLETE (035–038 on 2026-11-10; 039/040 on 2026-11-11).
 **PHASE-039 (2026-11-11 — CR-09/CR-46/CR-50):** Returns & Collections delivered —
 migrations `0055`–`0059` (schema_version 59; ten RLS'd tables + the additive
 partner credit-risk columns), the RMA workflow auto-generating credit notes
@@ -124,6 +124,22 @@ reviews (L1-10), and the supplier-RMA mirror (R-03, G-38). Permissions
 256 → **265**; feature keys +4; report registry 88 → **90**; i18n 4,699 →
 **5,019**; the full DB suite 173 files / 2,577 green. Evidence:
 [the completion report](../implementation/phases/reports/PHASE-039-COMPLETION.md).
+**PHASE-040 (2026-11-11 — CR-10 + L1-21's export half):** the Data Onboarding
+& Migration Toolkit delivered — migrations `0060`–`0063` (schema_version 63; the
+RLS'd `import_mappings` table, the seven-kind `import_jobs` widening, the tenants
+SANDBOX/demo-marker columns, the `user_membership_options` SANDBOX-plane widening,
+the `import_jobs.mapping` BR-066 snapshot, the `erp.tenant_kind` definer probe),
+the BR-066 dry-run → acknowledged-atomic-commit engine applying through the OWNING
+modules' real services, the saved-mapping wizard (both directions), the
+QuickBooks/Odoo/Excel-generic adapters with DOCUMENTED mappings + template
+downloads, the 13-template one-click demo loader (journals through the posting
+engine, idempotent), the platform-plane SANDBOX provisioning (time-boxed,
+quota-capped, one-time credential, never a consolidation member), and the
+`/settings/imports` hub + onboarding integration. Permissions 265 → **267**;
+feature keys +2 (`platform.data_migration` business+enterprise,
+`platform.demo_data` ALL plans); rules +BR-066; i18n 5,019 → **5,109**; the
+spec wave 34 tests incl. the seven-kind round-trips and the atomicity probe.
+Evidence: [the completion report](../implementation/phases/reports/PHASE-040-COMPLETION.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -151,7 +167,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-037](../implementation/phases/PHASE-037.md) | ZATCA Phase-1 & QR Compliance | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-037-COMPLETION.md) |
 | [PHASE-038](../implementation/phases/PHASE-038.md) | Procurement Sourcing & Supplier Collaboration | 1 / 12 | 035 | **COMPLETE 2026-11-10** — [report](../implementation/phases/reports/PHASE-038-COMPLETION.md) |
 | [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies + supplier RMA — v3.1/CR-46 + v3.2/CR-50) | 1 / 12 | 035 | **COMPLETE 2026-11-11** — [report](../implementation/phases/reports/PHASE-039-COMPLETION.md) |
-| [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit | 1 / 12 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit (imports + adapters + demo data + sandboxes — L1-21 export half) | 1 / 12 | 035 | **COMPLETE 2026-11-11** — [report](../implementation/phases/reports/PHASE-040-COMPLETION.md) |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email) | 1 / 12 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers | 2 / 13 | 036 | NOT_STARTED — PLANNED |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | NOT_STARTED — PLANNED |

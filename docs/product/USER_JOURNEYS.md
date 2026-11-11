@@ -33,6 +33,15 @@ pack for the selected country seeded (PHASE-009 packs; general template at MVP).
 - A2 · country pack incomplete for the chosen activity → proceed with the **general**
   template + banner "بعض إعدادات الصناعة غير متاحة بعد" (some industry defaults not yet
   available) — never fabricate defaults.
+- A4b · migrating from a previous system (PHASE-040): the step-3 result screen links
+  to the `/settings/imports` hub — the seven-kind wizard (COA, opening balances, fixed
+  assets, employees, price lists, contracts, budget grids) with the QuickBooks/Odoo/
+  Excel-generic adapter templates; the dry-run shows typed bilingual per-row errors and
+  writes NOTHING until the acknowledged atomic commit (BR-066); a mapping saved for one
+  file reuses on the next file of the same shape with zero re-mapping. A trial tenant
+  may instead tap the demo-data card on the onboarding home: one click seeds realistic
+  partners/items/posted invoices/receipts per its industry template (all plans — the
+  trial-enablement decision).
 - A8 · tenant not VAT-registered → engine computes `NOT_SUBJECT`; invoice prints without VAT
   lines and the books stay consistent ([../localization/TAX_ENGINE.md](../localization/TAX_ENGINE.md) §1).
 - A8 · credit customer instead of cash → credit policy applies first (BR-001: block/warn).

@@ -28,7 +28,7 @@ import { AppModule } from "../app.module";
 import { withTenant, withPlatformScope } from "../infra/db/tenant-context";
 import { closeDb } from "../infra/db/client";
 import { stopBoss } from "../infra/jobs/boss";
-import { RegistrationService } from "../modules/tenancy/application/registration-service";
+import { RegistrationService, __resetRegistrationLimitersForTests } from "../modules/tenancy/application/registration-service";
 import { SandboxService } from "../modules/onboarding/application/sandbox-service";
 import { InvitationService } from "../modules/identity/application/invitation-service";
 import { PasswordService } from "../modules/identity/application/password-service";
@@ -62,6 +62,7 @@ let oneTimePassword = "";
 
 beforeAll(async () => {
   ensureTestDb();
+  __resetRegistrationLimitersForTests();
   reloadEnv();
   const created = await NestFactory.create(AppModule, { logger: ["error", "warn"] });
   app = created;
@@ -101,6 +102,7 @@ beforeAll(async () => {
 }, 240_000);
 
 afterAll(async () => {
+  __resetRegistrationLimitersForTests();
   if (app !== undefined) {
     await app.close();
   }

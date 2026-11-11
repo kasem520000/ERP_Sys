@@ -24,7 +24,7 @@ import { AppModule } from "../app.module";
 import { withTenant, withPlatformScope } from "../infra/db/tenant-context";
 import { closeDb } from "../infra/db/client";
 import { stopBoss } from "../infra/jobs/boss";
-import { RegistrationService } from "../modules/tenancy/application/registration-service";
+import { RegistrationService, __resetRegistrationLimitersForTests } from "../modules/tenancy/application/registration-service";
 import { DemoDataService } from "../modules/onboarding/application/demo-data-service";
 import { DemoSeedRefusedError } from "../modules/onboarding/domain/onboarding-errors";
 import * as tenancyStore from "../modules/tenancy/infrastructure/tenancy.store";
@@ -83,6 +83,7 @@ async function registerShowcaseTenant(): Promise<{ tenantId: string; ownerId: st
 
 beforeAll(async () => {
   ensureTestDb();
+  __resetRegistrationLimitersForTests();
   reloadEnv();
   const created = await NestFactory.create(AppModule, { logger: ["error", "warn"] });
   app = created;
@@ -92,6 +93,7 @@ beforeAll(async () => {
 }, 240_000);
 
 afterAll(async () => {
+  __resetRegistrationLimitersForTests();
   if (app !== undefined) {
     await app.close();
   }

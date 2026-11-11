@@ -688,3 +688,56 @@ deliberately NOT widened for a new source type (the 0059 no-widening note); the 
 leg rides the G-38 ship journal (DR the mapped returns account · CR INVENTORY at issue
 cost). Cross-link: [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md)
 §7/note 12.
+
+## 19. Data onboarding & migration toolkit (PHASE-040)
+
+**The import-kind widening (0060, additive).** `import_jobs.kind` — the enum registry's
+`import_kind` — widens from the PHASE-006 baseline (`PARTNERS`, `ITEMS`,
+`OPENING_BALANCES`) with the seven toolkit kinds: `COA`, `ACCOUNT_OPENING_BALANCES`,
+`FIXED_ASSETS`, `EMPLOYEES`, `PRICE_LISTS`, `CONTRACTS`, `BUDGETS` (the CHECK swap in
+0060 §2 keeps every legacy value valid — zero reshape of existing rows). Two enum
+registry rows update with it:
+
+| Enum | Values | Used by (tables) | Phase |
+|------|--------|-------------------|-------|
+| `import_kind` | PARTNERS, ITEMS, OPENING_BALANCES (baseline) + COA, ACCOUNT_OPENING_BALANCES, FIXED_ASSETS, EMPLOYEES, PRICE_LISTS, CONTRACTS, BUDGETS (the toolkit's seven) | import_jobs | 006 (baseline) / 040 (widened) |
+| `tenant_kind` | STANDARD, SANDBOX — STANDARD rows carry NULL `sandbox_expires_at`/`sandbox_max_users`/`sandbox_owner_email` (the CHECK in 0060 §3); a SANDBOX tenant is time-boxed, quota-capped, never a consolidation member (OA-05) | tenants | 040 |
+
+**The canonical column vocabulary (the mapping contract).** Each kind's columns are
+canonical snake_case names with EN + AR header aliases (the auto-detect contract —
+`normalizeHeader` lowercases and strips `[\s_-]` before alias comparison; the AR aliases
+match the normalized Arabic). Every kind declares `required` flags, types
+(`text`/`enum`/`decimal`/`integer`/`date`/`boolean`), enum value vocabularies (the
+account-type and contract/fee-model translators accept QuickBooks/Odoo source
+spellings — [../migration/MIGRATION_ADAPTERS.md](../migration/MIGRATION_ADAPTERS.md)
+§2/§3 tables), and PII marks (the EMPLOYEES national-id/bank columns — the error
+report renders them but the export carries them under the same tenant-only artifact
+URLs as every files object, A11). `BUDGETS` is the grid exception: it maps no columns
+(the PHASE-028 three-identity-column + period-grid contract rides
+`options.budgetId`, drafts only).
+
+**The mapping shape (`import_jobs.mapping` + `import_mappings.column_map`).** A mapping
+is `Record<canonical, header>` — canonical column name → the file's verbatim header
+text. The job's `mapping` (migration 0062) is the PREVIEW-TIME SNAPSHOT of the
+effective map (explicit wizard map > the saved mapping's current shape > auto-detect):
+the BR-066 worker re-validates against exactly what the preview promised, so a mapping
+edited between preview and commit cannot silently diverge. The saved
+`import_mappings` rows (both directions: `IMPORT` for the wizard, `EXPORT` for the
+v3.1/CR-46 recurring-extract shapes) are tenant-scoped, unique per
+(direction, kind, name), and carry optional `options` jsonb (the EXPORT column
+selection/format/filter shape).
+
+**The dry-run report (jsonb on `import_jobs.report`).** `{ kind, headers, mapping,
+unmappedColumns, summary { total, valid, invalid, duplicates, warnings }, issues[] }`
+— every issue is `{ row, field, en, ar, duplicate }` (row 0 + field `"file"` for
+file-level checks: the balanced-by-nature Σdebit = Σcredit law of
+ACCOUNT_OPENING_BALANCES, the COA homogeneous-tree/acyclicity checks). The stored
+report caps at the first 200 issues (bounded memory); the full bilingual pack exports
+as a CSV artifact (BOM; row,field,en,ar,duplicate) through the files module's signed
+URLs.
+
+**The demo-seed markers (0060 §3, additive on `tenants`).** `demo_seeded_at`,
+`demo_template`, `demo_seed_hash` — the one-click loader's idempotence + status
+surface: a re-run with the same template is a zero-write no-op, a different template
+refuses (typed), and a tenant with posted real documents (journal count > 0, no
+markers) refuses (typed) — the demo never masks real books.

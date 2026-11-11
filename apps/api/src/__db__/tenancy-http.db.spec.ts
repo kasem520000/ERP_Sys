@@ -383,7 +383,9 @@ describe("platform console (S-07 at the HTTP plane)", () => {
       withToken(platformAdmin.token),
     );
     expect(assigned.status).toBe(200);
-    expect((assigned.body.data as { grantedKeys: number }).grantedKeys).toBe(57);
+    // 57 → 58 (PHASE-040, migration 0060 §8): platform.demo_data rides EVERY
+    // plan — the recorded trial-enablement decision (a trial must light up).
+    expect((assigned.body.data as { grantedKeys: number }).grantedKeys).toBe(58);
   });
 
   it("entitlement edit: MANUAL grant + revoke through the console (audited)", async () => {

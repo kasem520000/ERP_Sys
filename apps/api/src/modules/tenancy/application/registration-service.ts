@@ -52,6 +52,19 @@ const TRIAL_DAYS = 14;
 const IP_LIMITER = new RateLimiter(systemClock, 5, 60 * 60 * 1000);
 const GLOBAL_LIMITER = new RateLimiter(systemClock, 60, 60 * 60 * 1000);
 
+/**
+ * @internal TEST-ONLY: the DB suite's single-fork process shares the public
+ * route's in-memory budgets across every spec file — PHASE-040's fixture
+ * waves (the 13-template demo coverage) register more tenants than the
+ * 60/hour global window holds, so the heavy fixtures reset the counters
+ * around their files (the limiter protects the PUBLIC route, never the
+ * test harness).
+ */
+export function __resetRegistrationLimitersForTests(): void {
+  IP_LIMITER.resetAll();
+  GLOBAL_LIMITER.resetAll();
+}
+
 export interface RegistrationInput {
   businessName: string;
   businessNameAr: string | null;

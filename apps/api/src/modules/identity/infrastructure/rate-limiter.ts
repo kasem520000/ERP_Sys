@@ -89,6 +89,19 @@ export class RateLimiter {
     }
   }
 
+  /**
+   * @internal TEST-ONLY: zero EVERY window (the per-key reset(key) above is
+   * the login surface's). The DB suite runs sequentially in ONE process, so
+   * fixture registrations across spec files share the same in-memory budgets
+   * (the public route's protection); phases with many-tenant fixtures
+   * (PHASE-040's 13-template demo coverage) reset the counters around their
+   * files so later suites inherit a fresh budget. Never called outside the
+   * test harness.
+   */
+  resetAll(): void {
+    this.windows.clear();
+  }
+
   /** Successful logins clear the IP window (fresh budget, no penalty carry). */
   reset(key: string): void {
     this.windows.delete(key);

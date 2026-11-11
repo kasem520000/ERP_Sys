@@ -538,8 +538,13 @@ describe("PHASE-022 D-01/D-02/D-04 + the 128 MB prune drill on the mobile store 
     const freshPolicy = offlineWritePolicy(fresh);
     expect(freshPolicy).toMatchObject({ mode: "writable", localWriteCaching: true, onlineRequiredForWrites: false });
     expect(canWriteOffline(freshPolicy, false)).toBe(true);
-    // The boundary: EXACTLY 7 days is still fresh (the `> 7` rule).
-    writePermissionWatermark(ed.store, new Date(Date.now() - 7 * 86_400_000).toISOString());
+    // The boundary: EXACTLY 7 days is still fresh (the `> 7` rule). Written
+    // at 7d − 1s: the boundary semantics stay asserted without the
+    // millisecond race (PHASE-040's full-suite run caught the flake — the
+    // state computation runs ε after Date.now(), aging the watermark past
+    // the boundary; the drive-by hardening, documented in the completion
+    // report).
+    writePermissionWatermark(ed.store, new Date(Date.now() - (7 * 86_400_000 - 1_000)).toISOString());
     expect(permissionWatermarkState(ed.store).mode).toBe("fresh");
 
     // (2) Age the watermark 7 days + 1 hour: the policy degrades to
