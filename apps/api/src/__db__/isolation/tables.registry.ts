@@ -423,6 +423,37 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "rework_orders" },
   { table: "downtime_records" },
   { table: "item_standard_costs" },
+  // PHASE-044 (Blueprint v3.0 · CR-14, migrations 0067…0071): the WMS
+  // cluster. The location tree + LPN + the packaging register + strategies/
+  // schedules/classifications/policies/jobs are master data
+  // (SELECT/INSERT/UPDATE — lifecycles, no app-role DELETE, the 0026
+  // precedent); bin_contents is a POSITION table (SELECT/INSERT/UPDATE);
+  // waves/tasks/documents/lines/kit orders + exceptions are document rows;
+  // serial_movements + returnable_packaging_movements are append-only
+  // logs (SELECT/INSERT only — the stock_moves discipline, deleteGranted
+  // false). Twenty-two tables — the auto-generated A-suite extends by +132.
+  { table: "warehouse_zones" },
+  { table: "warehouse_aisles" },
+  { table: "warehouse_racks" },
+  { table: "warehouse_bins" },
+  { table: "lpns" },
+  { table: "bin_contents" },
+  { table: "returnable_packaging" },
+  { table: "returnable_packaging_movements" },
+  { table: "putaway_rules" },
+  { table: "pick_strategies" },
+  { table: "pick_waves" },
+  { table: "pick_tasks" },
+  { table: "cycle_count_schedules" },
+  { table: "cycle_count_documents" },
+  { table: "cycle_count_lines" },
+  { table: "abc_classifications" },
+  { table: "serial_movements" },
+  { table: "transfer_pricing_policies" },
+  { table: "transit_exceptions" },
+  { table: "inventory_alert_jobs" },
+  { table: "warehouse_kit_orders" },
+  { table: "warehouse_kit_lines" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

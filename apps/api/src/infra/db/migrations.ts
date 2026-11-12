@@ -365,6 +365,37 @@ export const MIGRATIONS: readonly string[] = [
   // precedent).
   "0065_routing_work_centers",
   "0066_standard_costing",
+  // PHASE-044 (Blueprint v3.0 · CR-14, scope extended by v3.1/CR-46 —
+  // L1-20 returnable packaging): 0067_wms_locations — the WMS location
+  // substrate: warehouse_zones/aisles/racks/bins (the location tree with
+  // barcodes + pick sequence + one DEFAULT bin per warehouse), lpns,
+  // bin_contents (the per-bin position — INV-029's subject; consignment
+  // owner rows excluded from item_stock), the stock_moves bin/LPN
+  // references, and returnable_packaging(+movements) with the 4895
+  // DEPOSIT_FORFEITURE marker (the deposit liability reuses the EXISTING
+  // DEPOSITS_RECEIVED purpose — D-2). 0068_wms_directed_ops — putaway_rules
+  // + pick_strategies + pick_waves + pick_tasks (the unified PICK/PUTAWAY
+  // task board — the single sync surface, D-3). 0069_wms_counts_tracking —
+  // cycle_count_schedules/documents/lines (the G-13/G-14 reuse with
+  // CYCLE_COUNT reasons), abc_classifications, serial_movements (the
+  // append-only per-serial ledger). 0070_wms_policies_jobs —
+  // transfer_pricing_policies (G-46), transit_exceptions (I-22),
+  // inventory_alert_jobs (the shelf-life/slow-movement registration),
+  // warehouse_kit_orders(+lines) (G-45), CoA markers 1290/2135/4990.
+  // 0071_wms_seeds — DATA-ONLY: the EIGHT permission keys (matrix §3.21;
+  // 279 → 287), role grants, the eight feature plan grants (business+
+  // enterprise), the distribution/wholesale manifest enablement (the
+  // jsonb append — contracts + docs mirrors move together), and the
+  // default location tree + FIFO strategy per existing warehouse (BR-073's
+  // backfill anchor). Numbering note: the phase doc planned ≈0073…0081 —
+  // written before implementation; PHASE-043 has NOT run (it requires THIS
+  // phase), so 0067…0071 are the honest next slots (the 0064/0065 D-1
+  // precedent).
+  "0067_wms_locations",
+  "0068_wms_directed_ops",
+  "0069_wms_counts_tracking",
+  "0070_wms_policies_jobs",
+  "0071_wms_seeds",
 ];
 
 /**

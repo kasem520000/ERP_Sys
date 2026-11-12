@@ -160,7 +160,17 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // std_unit_cost/yield_variance columns + CoA markers 5990/5995 + the
     // standard_costs key (278 → 279) + the six feature plan grants + the
     // food_manufacturing manifest enablement.
-    expect(files.at(-1)?.tag).toBe("0066_standard_costing");
+    // PHASE-044 (0067…0071) — the WMS & Inventory Intelligence cluster:
+    // 0067 the location substrate (zones/aisles/racks/bins + lpns +
+    // bin_contents + stock_moves bin refs + returnable packaging ×2 + the
+    // 4895 marker), 0068 the directed-ops family (putaway_rules +
+    // pick_strategies/waves/tasks), 0069 counts/tracking (cycle counts ×3 +
+    // abc_classifications + serial_movements), 0070 policies/jobs
+    // (transfer pricing + transit exceptions + the alert jobs + kitting
+    // ×2 + markers 1290/2135/4990), 0071 the DATA-ONLY seed (EIGHT keys —
+    // 279 → 287, matrix §3.21; plan grants; the distribution/wholesale
+    // manifest enablement; the default location tree per warehouse).
+    expect(files.at(-1)?.tag).toBe("0071_wms_seeds");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

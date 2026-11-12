@@ -2440,9 +2440,17 @@ export const stockMoves = pgTable(
     memo: text("memo"),
     memoAr: text("memo_ar"),
     postedJournalId: uuid("posted_journal_id"),
+    // PHASE-044 (0067 §7): the bin/LPN endpoints — additive nullable (the
+    // 0065 §4 precedent; pre-WMS history keeps NULL).
+    sourceBinId: uuid("source_bin_id"),
+    targetBinId: uuid("target_bin_id"),
+    lpnId: uuid("lpn_id"),
   },
   (table) => [
     uniqueIndex("uq_stock_moves_id_tenant").on(table.id, table.tenantId),
+    index("ix_stock_moves_tenant_source_bin").on(table.tenantId, table.sourceBinId),
+    index("ix_stock_moves_tenant_target_bin").on(table.tenantId, table.targetBinId),
+    index("ix_stock_moves_tenant_lpn").on(table.tenantId, table.lpnId),
     index("ix_stock_moves_tenant_item_wh_date").on(
       table.tenantId,
       table.itemId,
@@ -7753,5 +7761,758 @@ export const supplierReturnAuthorizationLines = pgTable(
       table.tenantId,
       table.poLineId,
     ),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-044 (Blueprint v3.0 · CR-14, scope extended by v3.1/CR-46): the WMS
+// & Inventory Intelligence cluster — migrations 0067…0071 (schema_version
+// 71). The location tree (zones/aisles/racks/bins with barcodes + pick
+// sequence + the DEFAULT bin per warehouse), bin_contents (INV-029's
+// subject — Σ tenant-owned rows = item_stock per warehouse/item, same
+// transaction), LPNs, the directed-ops family (putaway rules + the unified
+// PICK/PUTAWAY task board + strategies + waves), cycle counts + ABC, the
+// append-only serial_movements ledger, transfer pricing + transit
+// exceptions + the alert jobs + warehouse kitting, and the returnable
+// packaging register (L1-20). Numbering note: the phase doc planned
+// ≈0073…0081 — PHASE-043 has not run (it requires this phase), so
+// 0067…0071 are the honest slots (the 0064/0065 D-1 precedent).
+// ---------------------------------------------------------------------------
+
+/** WMS zones (H-07/I-01): the location-tree root under a warehouse. */
+export const warehouseZones = pgTable(
+  "warehouse_zones",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    zoneType: text("zone_type").notNull().default("PICKING"),
+    isDefault: boolean("is_default").notNull().default(false),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_warehouse_zones_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_warehouse_zones_tenant_wh_code").on(
+      table.tenantId,
+      table.warehouseId,
+      table.code,
+    ),
+    uniqueIndex("uq_warehouse_zones_default_wh")
+      .on(table.tenantId, table.warehouseId)
+      .where(sql`${table.isDefault}`),
+    index("ix_warehouse_zones_tenant_wh_type").on(
+      table.tenantId,
+      table.warehouseId,
+      table.zoneType,
+    ),
+  ],
+);
+
+/** WMS aisles: zones contain aisles. */
+export const warehouseAisles = pgTable(
+  "warehouse_aisles",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    zoneId: uuid("zone_id").notNull(),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_warehouse_aisles_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_warehouse_aisles_tenant_zone_code").on(
+      table.tenantId,
+      table.zoneId,
+      table.code,
+    ),
+    index("ix_warehouse_aisles_tenant_zone").on(table.tenantId, table.zoneId),
+  ],
+);
+
+/** WMS racks: aisles contain racks. */
+export const warehouseRacks = pgTable(
+  "warehouse_racks",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    aisleId: uuid("aisle_id").notNull(),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_warehouse_racks_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_warehouse_racks_tenant_aisle_code").on(
+      table.tenantId,
+      table.aisleId,
+      table.code,
+    ),
+    index("ix_warehouse_racks_tenant_aisle").on(table.tenantId, table.aisleId),
+  ],
+);
+
+/** WMS bins (I-01/I-02, DF-12): the leaf — barcode (the scan target,
+ * PP-11/DF-17), pick_sequence (NEAREST routing), capacity, the mixed-batch
+ * rule, and the one-DEFAULT-per-warehouse floor (BR-073's backfill anchor). */
+export const warehouseBins = pgTable(
+  "warehouse_bins",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    rackId: uuid("rack_id").notNull(),
+    code: text("code").notNull(),
+    barcode: text("barcode").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    pickSequence: integer("pick_sequence"),
+    capacity: numeric("capacity", { precision: 19, scale: 6 }),
+    allowMixedBatches: boolean("allow_mixed_batches").notNull().default(true),
+    isDefault: boolean("is_default").notNull().default(false),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_warehouse_bins_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_warehouse_bins_tenant_wh_code").on(
+      table.tenantId,
+      table.warehouseId,
+      table.code,
+    ),
+    uniqueIndex("uq_warehouse_bins_tenant_barcode").on(table.tenantId, table.barcode),
+    uniqueIndex("uq_warehouse_bins_default_wh")
+      .on(table.tenantId, table.warehouseId)
+      .where(sql`${table.isDefault}`),
+    index("ix_warehouse_bins_tenant_wh_seq").on(
+      table.tenantId,
+      table.warehouseId,
+      table.pickSequence,
+    ),
+    index("ix_warehouse_bins_tenant_rack").on(table.tenantId, table.rackId),
+  ],
+);
+
+/** LPNs (I-05): license plates / pallets — the movable grouping over
+ * bin_contents rows; CLOSED carries its timestamp (the evidence floor). */
+export const lpns = pgTable(
+  "lpns",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    lpnCode: text("lpn_code").notNull(),
+    status: text("status").notNull().default("ACTIVE"),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_lpns_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_lpns_tenant_code").on(table.tenantId, table.lpnCode),
+    index("ix_lpns_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** bin_contents (I-01/I-19/I-24, INV-029): the per-bin position — one row
+ * per (bin, item, batch, serial, LPN, owner, status) slot (NULLS NOT
+ * DISTINCT); item_stock stays the valuation authority; consignment rows
+ * (owner_partner_id set) are the EXCLUDED set — never in item_stock,
+ * valuation, or ATP (BR-076). */
+export const binContents = pgTable(
+  "bin_contents",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    binId: uuid("bin_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    batchId: uuid("batch_id"),
+    serialId: uuid("serial_id"),
+    lpnId: uuid("lpn_id"),
+    ownerPartnerId: uuid("owner_partner_id"),
+    status: text("status").notNull().default("AVAILABLE"),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id"),
+    receivedAt: timestamp("received_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_bin_contents_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_bin_contents_slot").on(
+      table.tenantId,
+      table.binId,
+      table.itemId,
+      table.batchId,
+      table.serialId,
+      table.lpnId,
+      table.ownerPartnerId,
+      table.status,
+    ),
+    index("ix_bin_contents_tenant_bin").on(table.tenantId, table.binId),
+    index("ix_bin_contents_tenant_item_status").on(
+      table.tenantId,
+      table.itemId,
+      table.status,
+    ),
+    index("ix_bin_contents_tenant_wh_item_owner").on(
+      table.tenantId,
+      table.warehouseId,
+      table.itemId,
+      table.ownerPartnerId,
+    ),
+    index("ix_bin_contents_tenant_batch").on(table.tenantId, table.batchId),
+    index("ix_bin_contents_tenant_serial").on(table.tenantId, table.serialId),
+    index("ix_bin_contents_pick_fefo").on(
+      table.tenantId,
+      table.itemId,
+      table.status,
+      table.receivedAt,
+    ),
+  ],
+);
+
+/** Returnable packaging (L1-20, v3.1/CR-46): the container-TYPE register —
+ * pallets/crates/containers with a deposit per unit; movements ride
+ * returnable_packaging_movements (the append-only log). */
+export const returnablePackaging = pgTable(
+  "returnable_packaging",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    code: text("code").notNull(),
+    packagingType: text("packaging_type").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    depositAmount: numeric("deposit_amount", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    itemId: uuid("item_id"),
+    status: text("status").notNull().default("ACTIVE"),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_returnable_packaging_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_returnable_packaging_tenant_code").on(table.tenantId, table.code),
+    index("ix_returnable_packaging_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** Returnable-packaging movements (L1-20): the append-only ISSUE / RETURN /
+ * WRITE_OFF log — issue posts the deposit liability (the EXISTING
+ * DEPOSITS_RECEIVED purpose, D-2), return releases it, write-off posts the
+ * 4895 DEPOSIT_FORFEITURE income leg. */
+export const returnablePackagingMovements = pgTable(
+  "returnable_packaging_movements",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    packagingId: uuid("packaging_id").notNull(),
+    kind: text("kind").notNull(),
+    qty: integer("qty").notNull(),
+    depositPerUnit: numeric("deposit_per_unit", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    partnerId: uuid("partner_id"),
+    deliveryId: uuid("delivery_id"),
+    receiptId: uuid("receipt_id"),
+    journalId: uuid("journal_id"),
+    movedAt: date("moved_at").notNull(),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_returnable_packaging_movements_id_tenant").on(
+      table.id,
+      table.tenantId,
+    ),
+    index("ix_returnable_packaging_movements_tenant_packaging").on(
+      table.tenantId,
+      table.packagingId,
+    ),
+    index("ix_returnable_packaging_movements_tenant_partner").on(
+      table.tenantId,
+      table.partnerId,
+    ),
+    index("ix_returnable_packaging_movements_tenant_delivery").on(
+      table.tenantId,
+      table.deliveryId,
+    ),
+  ],
+);
+
+/** Putaway rules (I-03, PP-12): priority-ordered condition → target zone
+ * type or exact bin; first active match wins on goods receipt. */
+export const putawayRules = pgTable(
+  "putaway_rules",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    priority: integer("priority").notNull().default(100),
+    name: text("name").notNull(),
+    condition: jsonb("condition").notNull().default({}),
+    targetZoneType: text("target_zone_type"),
+    targetBinId: uuid("target_bin_id"),
+    isActive: boolean("is_active").notNull().default(true),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_putaway_rules_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_putaway_rules_tenant_priority").on(table.tenantId, table.priority),
+    index("ix_putaway_rules_tenant_active").on(
+      table.tenantId,
+      table.isActive,
+      table.priority,
+    ),
+  ],
+);
+
+/** Pick strategies (I-04): per-warehouse directed-pick method + the
+ * partial-pick rule. */
+export const pickStrategies = pgTable(
+  "pick_strategies",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    method: text("method").notNull().default("FIFO"),
+    allowPartial: boolean("allow_partial").notNull().default(true),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_pick_strategies_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_pick_strategies_tenant_wh").on(table.tenantId, table.warehouseId),
+  ],
+);
+
+/** Pick waves (I-06): deliveries grouped into one picking route; release
+ * snapshots the strategy (the frozen-method column). */
+export const pickWaves = pgTable(
+  "pick_waves",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    waveNo: text("wave_no"),
+    warehouseId: uuid("warehouse_id").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    method: text("method"),
+    routeNote: text("route_note"),
+    releasedAt: timestamp("released_at", { withTimezone: true, mode: "string" }),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    createdBy: uuid("created_by"),
+    releasedBy: uuid("released_by"),
+    completedBy: uuid("completed_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_pick_waves_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_pick_waves_tenant_wave_no")
+      .on(table.tenantId, table.waveNo)
+      .where(sql`${table.waveNo} IS NOT NULL`),
+    index("ix_pick_waves_tenant_wh_status").on(
+      table.tenantId,
+      table.warehouseId,
+      table.status,
+    ),
+  ],
+);
+
+/** Pick tasks (I-07, PP-11/DF-17, OA-02): the unified PICK/PUTAWAY task
+ * board — assignee, scan verification, progressive qty, and the version
+ * column the field-sync conflict checks read (BR-074). */
+export const pickTasks = pgTable(
+  "pick_tasks",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    taskNo: text("task_no"),
+    waveId: uuid("wave_id"),
+    taskKind: text("task_kind").notNull(),
+    status: text("status").notNull().default("PENDING"),
+    assigneeUserId: uuid("assignee_user_id"),
+    itemId: uuid("item_id").notNull(),
+    batchId: uuid("batch_id"),
+    serialId: uuid("serial_id"),
+    lpnId: uuid("lpn_id"),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    qtyDone: numeric("qty_done", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    fromBinId: uuid("from_bin_id"),
+    toBinId: uuid("to_bin_id"),
+    sourceType: text("source_type").notNull(),
+    sourceId: uuid("source_id").notNull(),
+    sourceLineNo: integer("source_line_no"),
+    scanVerified: boolean("scan_verified").notNull().default(false),
+    sequenceNo: integer("sequence_no"),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    completedBy: uuid("completed_by"),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_pick_tasks_id_tenant").on(table.id, table.tenantId),
+    index("ix_pick_tasks_tenant_wave_status").on(
+      table.tenantId,
+      table.waveId,
+      table.status,
+    ),
+    index("ix_pick_tasks_tenant_kind_status").on(
+      table.tenantId,
+      table.taskKind,
+      table.status,
+    ),
+    index("ix_pick_tasks_tenant_assignee_status").on(
+      table.tenantId,
+      table.assigneeUserId,
+      table.status,
+    ),
+    index("ix_pick_tasks_tenant_source").on(
+      table.tenantId,
+      table.sourceType,
+      table.sourceId,
+    ),
+  ],
+);
+
+/** Cycle-count schedules (I-08/I-20): per-warehouse ABC frequency + the
+ * variance approval threshold (BR-075) + blind counting. */
+export const cycleCountSchedules = pgTable(
+  "cycle_count_schedules",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    name: text("name").notNull(),
+    classADays: integer("class_a_days").notNull().default(30),
+    classBDays: integer("class_b_days").notNull().default(90),
+    classCDays: integer("class_c_days").notNull().default(180),
+    approvalThreshold: numeric("approval_threshold", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    blind: boolean("blind").notNull().default(false),
+    isActive: boolean("is_active").notNull().default(true),
+    lastRunAt: timestamp("last_run_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_cycle_count_schedules_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_cycle_count_schedules_tenant_wh_name").on(
+      table.tenantId,
+      table.warehouseId,
+      table.name,
+    ),
+    index("ix_cycle_count_schedules_tenant_wh_active").on(
+      table.tenantId,
+      table.warehouseId,
+      table.isActive,
+    ),
+  ],
+);
+
+/** Cycle-count documents (I-08): the count session — the stock_counts
+ * shape, bin-aware; CC- number at POST. */
+export const cycleCountDocuments = pgTable(
+  "cycle_count_documents",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    countNo: text("count_no"),
+    scheduleId: uuid("schedule_id"),
+    warehouseId: uuid("warehouse_id").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    snapshotAt: timestamp("snapshot_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    countDate: date("count_date"),
+    blind: boolean("blind").notNull().default(false),
+    varianceLossValue: numeric("variance_loss_value", { precision: 19, scale: 4 }),
+    varianceGainValue: numeric("variance_gain_value", { precision: 19, scale: 4 }),
+    supervisorOverride: boolean("supervisor_override").notNull().default(false),
+    countedBy: uuid("counted_by"),
+    approvedBy: uuid("approved_by"),
+    postedJournalId: uuid("posted_journal_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_cycle_count_documents_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_cycle_count_documents_tenant_count_no")
+      .on(table.tenantId, table.countNo)
+      .where(sql`${table.countNo} IS NOT NULL`),
+    index("ix_cycle_count_documents_tenant_wh_status").on(
+      table.tenantId,
+      table.warehouseId,
+      table.status,
+    ),
+    index("ix_cycle_count_documents_tenant_schedule").on(
+      table.tenantId,
+      table.scheduleId,
+    ),
+  ],
+);
+
+/** Cycle-count lines: per (item, bin) with the frozen system-qty snapshot. */
+export const cycleCountLines = pgTable(
+  "cycle_count_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    documentId: uuid("document_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    itemId: uuid("item_id").notNull(),
+    binId: uuid("bin_id"),
+    batchId: uuid("batch_id"),
+    systemQty: numeric("system_qty", { precision: 19, scale: 6 }).notNull(),
+    countedQty: numeric("counted_qty", { precision: 19, scale: 6 }),
+    recounted: boolean("recounted").notNull().default(false),
+    recountNote: text("recount_note"),
+    valueImpact: numeric("value_impact", { precision: 19, scale: 4 }),
+    reason: text("reason"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_cycle_count_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_cycle_count_lines_doc_line").on(
+      table.tenantId,
+      table.documentId,
+      table.lineNo,
+    ),
+    index("ix_cycle_count_lines_tenant_doc").on(table.tenantId, table.documentId),
+    index("ix_cycle_count_lines_tenant_item").on(table.tenantId, table.itemId),
+  ],
+);
+
+/** ABC classifications (I-09): computed per item from consumption value +
+ * velocity over a lookback window; is_latest is the one-row floor. */
+export const abcClassifications = pgTable(
+  "abc_classifications",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    computedAt: timestamp("computed_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    windowDays: integer("window_days").notNull(),
+    class: text("class").notNull(),
+    consumptionValue: numeric("consumption_value", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    totalQtyOut: numeric("total_qty_out", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    velocity: numeric("velocity", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    rankNo: integer("rank_no").notNull(),
+    isLatest: boolean("is_latest").notNull().default(true),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_abc_classifications_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_abc_classifications_latest_item")
+      .on(table.tenantId, table.itemId)
+      .where(sql`${table.isLatest}`),
+    index("ix_abc_classifications_tenant_latest").on(
+      table.tenantId,
+      table.isLatest,
+      table.class,
+    ),
+  ],
+);
+
+/** serial_movements (I-16/I-18): the append-only per-serial ledger — one
+ * row per serial per movement event with document + bin references. */
+export const serialMovements = pgTable(
+  "serial_movements",
+  {
+    id: uuid("id").primaryKey(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    tenantId: uuid("tenant_id").notNull(),
+    serialId: uuid("serial_id").notNull(),
+    event: text("event").notNull(),
+    moveId: uuid("move_id"),
+    sourceType: text("source_type").notNull(),
+    sourceId: uuid("source_id").notNull(),
+    fromBinId: uuid("from_bin_id"),
+    toBinId: uuid("to_bin_id"),
+    movedAt: timestamp("moved_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_serial_movements_id_tenant").on(table.id, table.tenantId),
+    index("ix_serial_movements_tenant_serial_time").on(
+      table.tenantId,
+      table.serialId,
+      table.movedAt,
+    ),
+    index("ix_serial_movements_tenant_source").on(
+      table.tenantId,
+      table.sourceType,
+      table.sourceId,
+    ),
+    index("ix_serial_movements_tenant_move").on(table.tenantId, table.moveId),
+  ],
+);
+
+/** Transfer pricing policies (I-23): per warehouse PAIR — MARKUP % or a
+ * FIXED unit price; absent = the cost-carrying default. */
+export const transferPricingPolicies = pgTable(
+  "transfer_pricing_policies",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    fromWarehouseId: uuid("from_warehouse_id").notNull(),
+    toWarehouseId: uuid("to_warehouse_id").notNull(),
+    mode: text("mode").notNull(),
+    markupPct: numeric("markup_pct", { precision: 7, scale: 4 }),
+    fixedPrice: numeric("fixed_price", { precision: 19, scale: 6 }),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_transfer_pricing_policies_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_transfer_pricing_policies_pair").on(
+      table.tenantId,
+      table.fromWarehouseId,
+      table.toWarehouseId,
+    ),
+  ],
+);
+
+/** Transit exceptions (I-22): damaged / missing stock on an IN_TRANSIT
+ * transfer line — the shrinkage posting refs prove the leg. */
+export const transitExceptions = pgTable(
+  "transit_exceptions",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    transferId: uuid("transfer_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    exceptionKind: text("exception_kind").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    journalId: uuid("journal_id"),
+    moveId: uuid("move_id"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true, mode: "string" }),
+    resolvedBy: uuid("resolved_by"),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_transit_exceptions_id_tenant").on(table.id, table.tenantId),
+    index("ix_transit_exceptions_tenant_transfer").on(
+      table.tenantId,
+      table.transferId,
+    ),
+  ],
+);
+
+/** Inventory alert jobs (I-17/I-21/I-25): the shelf-life + slow-movement
+ * registration — thresholds + the last-run stats. */
+export const inventoryAlertJobs = pgTable(
+  "inventory_alert_jobs",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    jobKind: text("job_kind").notNull(),
+    shelfLifeDays: integer("shelf_life_days").notNull().default(14),
+    slowMovementDays: integer("slow_movement_days").notNull().default(90),
+    isActive: boolean("is_active").notNull().default(true),
+    lastRunAt: timestamp("last_run_at", { withTimezone: true, mode: "string" }),
+    lastFlagged: integer("last_flagged").notNull().default(0),
+    note: text("note"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_inventory_alert_jobs_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_inventory_alert_jobs_tenant_kind").on(
+      table.tenantId,
+      table.jobKind,
+    ),
+    index("ix_inventory_alert_jobs_tenant_active").on(
+      table.tenantId,
+      table.isActive,
+    ),
+  ],
+);
+
+/** Warehouse kit orders (I-13): light kit assembly — WK- at POST;
+ * total_component_cost is the G-45 Σ roll-up (kit = Σ components exactly). */
+export const warehouseKitOrders = pgTable(
+  "warehouse_kit_orders",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    kitNo: text("kit_no"),
+    warehouseId: uuid("warehouse_id").notNull(),
+    kitItemId: uuid("kit_item_id").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id"),
+    status: text("status").notNull().default("DRAFT"),
+    totalComponentCost: numeric("total_component_cost", { precision: 19, scale: 4 }),
+    postedJournalId: uuid("posted_journal_id"),
+    postedAt: timestamp("posted_at", { withTimezone: true, mode: "string" }),
+    postedBy: uuid("posted_by"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_warehouse_kit_orders_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_warehouse_kit_orders_tenant_kit_no")
+      .on(table.tenantId, table.kitNo)
+      .where(sql`${table.kitNo} IS NOT NULL`),
+    index("ix_warehouse_kit_orders_tenant_wh_status").on(
+      table.tenantId,
+      table.warehouseId,
+      table.status,
+    ),
+  ],
+);
+
+/** Warehouse kit lines: the component consumption with its bin + cost. */
+export const warehouseKitLines = pgTable(
+  "warehouse_kit_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    orderId: uuid("order_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    componentItemId: uuid("component_item_id").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    unitCost: numeric("unit_cost", { precision: 19, scale: 6 }),
+    valueAmount: numeric("value_amount", { precision: 19, scale: 4 }),
+    fromBinId: uuid("from_bin_id"),
+    createdBy: uuid("created_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_warehouse_kit_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_warehouse_kit_lines_doc_line").on(
+      table.tenantId,
+      table.orderId,
+      table.lineNo,
+    ),
+    index("ix_warehouse_kit_lines_tenant_doc").on(table.tenantId, table.orderId),
   ],
 );

@@ -462,6 +462,41 @@
       "when": 1795950400000,
       "tag": "0066_standard_costing",
       "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1796036800000,
+      "tag": "0067_wms_locations",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1796123200000,
+      "tag": "0068_wms_directed_ops",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1796209600000,
+      "tag": "0069_wms_counts_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1796296000000,
+      "tag": "0070_wms_policies_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1796382400000,
+      "tag": "0071_wms_seeds",
+      "breakpoints": true
     }
   ],
   "version": "7"

@@ -93,6 +93,12 @@ const NO_UPDATE_GRANT = new Set([
   // is grant-CAPABLE but policy-owned by the erp.note_events_guard trigger
   // (custody history is immutable — DELETE passes only under purge_mode).
   "note_events",
+  // PHASE-044 (migrations 0067/0069): the append-only ledgers — the
+  // per-serial movement ledger (T-11's completeness subject — a movement
+  // row is history, never rewritten) and the returnable-packaging deposit
+  // log (the stock_moves discipline): UPDATE is grant-denied outright.
+  "serial_movements",
+  "returnable_packaging_movements",
 ]);
 
 /** Fixture rows seeded per tenant (A2's total-count expectation). The
@@ -2713,6 +2719,211 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+
+  // -- PHASE-044 WMS fixtures (0067…0071) --------------------------------
+  // The location chain: zone → aisle → rack → bin (barcode + pick sequence,
+  // the DEFAULT flag), then the position/log rows on top of the 010 fixtures
+  // (warehouse f0f0f0f0-1000, item babababa, batch f2f2f2f2, serial f3f3f3f3,
+  // partner b5b5b5b5, transfer f7f7f7f7, stock_move f4f4f4f4).
+  await superuser.query(
+    `INSERT INTO warehouse_zones (id, tenant_id, warehouse_id, code, name, zone_type, is_default)
+     VALUES
+       ('51515151-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001', 'Z-ISO', 'Zone A', 'PICKING', true),
+       ('51515151-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002', 'Z-ISO', 'Zone B', 'PICKING', true)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO warehouse_aisles (id, tenant_id, zone_id, code, name)
+     VALUES
+       ('52525252-0000-4000-8000-000000000001', $1, '51515151-0000-4000-8000-000000000001', 'A-ISO', 'Aisle A'),
+       ('52525252-0000-4000-8000-000000000002', $2, '51515151-0000-4000-8000-000000000002', 'A-ISO', 'Aisle B')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO warehouse_racks (id, tenant_id, aisle_id, code, name)
+     VALUES
+       ('53535353-0000-4000-8000-000000000001', $1, '52525252-0000-4000-8000-000000000001', 'R-ISO', 'Rack A'),
+       ('53535353-0000-4000-8000-000000000002', $2, '52525252-0000-4000-8000-000000000002', 'R-ISO', 'Rack B')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO warehouse_bins (id, tenant_id, warehouse_id, rack_id, code, barcode, name, pick_sequence, is_default)
+     VALUES
+       ('54545454-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001',
+        '53535353-0000-4000-8000-000000000001', 'B-ISO', 'BIN-ISO-A', 'Bin A', 1, true),
+       ('54545454-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002',
+        '53535353-0000-4000-8000-000000000002', 'B-ISO', 'BIN-ISO-B', 'Bin B', 1, true)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO lpns (id, tenant_id, lpn_code, status)
+     VALUES
+       ('55555555-0000-4000-8000-000000000001', $1, 'LPN-ISO-A', 'ACTIVE'),
+       ('55555555-0000-4000-8000-000000000002', $2, 'LPN-ISO-B', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO bin_contents (id, tenant_id, bin_id, warehouse_id, item_id, batch_id, status, qty)
+     VALUES
+       ('56565656-0000-4000-8000-000000000001', $1, '54545454-0000-4000-8000-000000000001',
+        'f0f0f0f0-1000-4000-8000-000000000001', 'babababa-0000-4000-8000-000000000001',
+        'f2f2f2f2-0000-4000-8000-000000000001', 'AVAILABLE', 6),
+       ('56565656-0000-4000-8000-000000000002', $2, '54545454-0000-4000-8000-000000000002',
+        'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+        'f2f2f2f2-0000-4000-8000-000000000002', 'AVAILABLE', 6)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO returnable_packaging (id, tenant_id, code, packaging_type, name, deposit_amount)
+     VALUES
+       ('57575757-0000-4000-8000-000000000001', $1, 'PLT-ISO', 'PALLET', 'Pallet A', 25),
+       ('57575757-0000-4000-8000-000000000002', $2, 'PLT-ISO', 'PALLET', 'Pallet B', 25)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO returnable_packaging_movements (id, tenant_id, packaging_id, kind, qty, deposit_per_unit, partner_id, moved_at)
+     VALUES
+       ('58585858-0000-4000-8000-000000000001', $1, '57575757-0000-4000-8000-000000000001', 'ISSUE', 2, 25,
+        'b5b5b5b5-0000-4000-8000-000000000001', '2027-01-10'),
+       ('58585858-0000-4000-8000-000000000002', $2, '57575757-0000-4000-8000-000000000002', 'ISSUE', 2, 25,
+        'b5b5b5b5-0000-4000-8000-000000000002', '2027-01-10')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO putaway_rules (id, tenant_id, priority, name, condition, target_zone_type)
+     VALUES
+       ('59595959-0000-4000-8000-000000000001', $1, 10, 'ISO rule A', '{}', 'PICKING'),
+       ('59595959-0000-4000-8000-000000000002', $2, 10, 'ISO rule B', '{}', 'PICKING')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO pick_strategies (id, tenant_id, warehouse_id, method, allow_partial)
+     VALUES
+       ('5a5a5a5a-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001', 'FIFO', true),
+       ('5a5a5a5a-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002', 'FIFO', true)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO pick_waves (id, tenant_id, warehouse_id, status)
+     VALUES
+       ('5b5b5b5b-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001', 'DRAFT'),
+       ('5b5b5b5b-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO pick_tasks (id, tenant_id, wave_id, task_kind, status, item_id, qty, from_bin_id, source_type, source_id)
+     VALUES
+       ('5c5c5c5c-0000-4000-8000-000000000001', $1, '5b5b5b5b-0000-4000-8000-000000000001', 'PICK', 'PENDING',
+        'babababa-0000-4000-8000-000000000001', 2, '54545454-0000-4000-8000-000000000001',
+        'pick_wave', '5b5b5b5b-0000-4000-8000-000000000001'),
+       ('5c5c5c5c-0000-4000-8000-000000000002', $2, '5b5b5b5b-0000-4000-8000-000000000002', 'PICK', 'PENDING',
+        'babababa-0000-4000-8000-000000000002', 2, '54545454-0000-4000-8000-000000000002',
+        'pick_wave', '5b5b5b5b-0000-4000-8000-000000000002')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO cycle_count_schedules (id, tenant_id, warehouse_id, name)
+     VALUES
+       ('5d5d5d5d-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001', 'ISO schedule'),
+       ('5d5d5d5d-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002', 'ISO schedule')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO cycle_count_documents (id, tenant_id, warehouse_id, status, snapshot_at)
+     VALUES
+       ('5e5e5e5e-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001', 'DRAFT', now()),
+       ('5e5e5e5e-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT', now())
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO cycle_count_lines (id, tenant_id, document_id, line_no, item_id, bin_id, system_qty)
+     VALUES
+       ('5f5f5f5f-0000-4000-8000-000000000001', $1, '5e5e5e5e-0000-4000-8000-000000000001', 1,
+        'babababa-0000-4000-8000-000000000001', '54545454-0000-4000-8000-000000000001', 6),
+       ('5f5f5f5f-0000-4000-8000-000000000002', $2, '5e5e5e5e-0000-4000-8000-000000000002', 1,
+        'babababa-0000-4000-8000-000000000002', '54545454-0000-4000-8000-000000000002', 6)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO abc_classifications (id, tenant_id, item_id, computed_at, window_days, class, rank_no)
+     VALUES
+       ('60606060-0000-4000-8000-000000000001', $1, 'babababa-0000-4000-8000-000000000001', now(), 90, 'A', 1),
+       ('60606060-0000-4000-8000-000000000002', $2, 'babababa-0000-4000-8000-000000000002', now(), 90, 'A', 1)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO serial_movements (id, tenant_id, serial_id, event, source_type, source_id, moved_at)
+     VALUES
+       ('61616161-0000-4000-8000-000000000001', $1, 'f3f3f3f3-0000-4000-8000-000000000001', 'RECEIVE',
+        'stock_move', 'f4f4f4f4-0000-4000-8000-000000000001', now()),
+       ('61616161-0000-4000-8000-000000000002', $2, 'f3f3f3f3-0000-4000-8000-000000000002', 'RECEIVE',
+        'stock_move', 'f4f4f4f4-0000-4000-8000-000000000002', now())
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO transfer_pricing_policies (id, tenant_id, from_warehouse_id, to_warehouse_id, mode, markup_pct)
+     VALUES
+       ('62626262-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001',
+        'f0f0f0f0-2000-4000-8000-000000000001', 'MARKUP', 10),
+       ('62626262-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002',
+        'f0f0f0f0-2000-4000-8000-000000000002', 'MARKUP', 10)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO transit_exceptions (id, tenant_id, transfer_id, line_no, exception_kind, qty)
+     VALUES
+       ('63636363-0000-4000-8000-000000000001', $1, 'f7f7f7f7-0000-4000-8000-000000000001', 1, 'DAMAGE', 1),
+       ('63636363-0000-4000-8000-000000000002', $2, 'f7f7f7f7-0000-4000-8000-000000000002', 1, 'DAMAGE', 1)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO inventory_alert_jobs (id, tenant_id, job_kind)
+     VALUES
+       ('64646464-0000-4000-8000-000000000001', $1, 'SHELF_LIFE'),
+       ('64646464-0000-4000-8000-000000000002', $2, 'SHELF_LIFE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO warehouse_kit_orders (id, tenant_id, warehouse_id, kit_item_id, qty, status)
+     VALUES
+       ('65656565-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', 1, 'DRAFT'),
+       ('65656565-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', 1, 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO warehouse_kit_lines (id, tenant_id, order_id, line_no, component_item_id, qty)
+     VALUES
+       ('66666666-0000-4000-8000-000000000001', $1, '65656565-0000-4000-8000-000000000001', 1,
+        'babababa-0000-4000-8000-000000000001', 2),
+       ('66666666-0000-4000-8000-000000000002', $2, '65656565-0000-4000-8000-000000000002', 1,
+        'babababa-0000-4000-8000-000000000002', 2)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3207,6 +3418,28 @@ const OWN_ROW: Record<string, [string, string]> = {
   rework_orders: ["4d4d4d42-0000-4000-8000-000000000001", "4d4d4d42-0000-4000-8000-000000000002"],
   downtime_records: ["4e4e4e42-0000-4000-8000-000000000001", "4e4e4e42-0000-4000-8000-000000000002"],
   item_standard_costs: ["4f4f4f42-0000-4000-8000-000000000001", "4f4f4f42-0000-4000-8000-000000000002"],
+  warehouse_zones: ["51515151-0000-4000-8000-000000000001", "51515151-0000-4000-8000-000000000002"],
+  warehouse_aisles: ["52525252-0000-4000-8000-000000000001", "52525252-0000-4000-8000-000000000002"],
+  warehouse_racks: ["53535353-0000-4000-8000-000000000001", "53535353-0000-4000-8000-000000000002"],
+  warehouse_bins: ["54545454-0000-4000-8000-000000000001", "54545454-0000-4000-8000-000000000002"],
+  lpns: ["55555555-0000-4000-8000-000000000001", "55555555-0000-4000-8000-000000000002"],
+  bin_contents: ["56565656-0000-4000-8000-000000000001", "56565656-0000-4000-8000-000000000002"],
+  returnable_packaging: ["57575757-0000-4000-8000-000000000001", "57575757-0000-4000-8000-000000000002"],
+  returnable_packaging_movements: ["58585858-0000-4000-8000-000000000001", "58585858-0000-4000-8000-000000000002"],
+  putaway_rules: ["59595959-0000-4000-8000-000000000001", "59595959-0000-4000-8000-000000000002"],
+  pick_strategies: ["5a5a5a5a-0000-4000-8000-000000000001", "5a5a5a5a-0000-4000-8000-000000000002"],
+  pick_waves: ["5b5b5b5b-0000-4000-8000-000000000001", "5b5b5b5b-0000-4000-8000-000000000002"],
+  pick_tasks: ["5c5c5c5c-0000-4000-8000-000000000001", "5c5c5c5c-0000-4000-8000-000000000002"],
+  cycle_count_schedules: ["5d5d5d5d-0000-4000-8000-000000000001", "5d5d5d5d-0000-4000-8000-000000000002"],
+  cycle_count_documents: ["5e5e5e5e-0000-4000-8000-000000000001", "5e5e5e5e-0000-4000-8000-000000000002"],
+  cycle_count_lines: ["5f5f5f5f-0000-4000-8000-000000000001", "5f5f5f5f-0000-4000-8000-000000000002"],
+  abc_classifications: ["60606060-0000-4000-8000-000000000001", "60606060-0000-4000-8000-000000000002"],
+  serial_movements: ["61616161-0000-4000-8000-000000000001", "61616161-0000-4000-8000-000000000002"],
+  transfer_pricing_policies: ["62626262-0000-4000-8000-000000000001", "62626262-0000-4000-8000-000000000002"],
+  transit_exceptions: ["63636363-0000-4000-8000-000000000001", "63636363-0000-4000-8000-000000000002"],
+  inventory_alert_jobs: ["64646464-0000-4000-8000-000000000001", "64646464-0000-4000-8000-000000000002"],
+  warehouse_kit_orders: ["65656565-0000-4000-8000-000000000001", "65656565-0000-4000-8000-000000000002"],
+  warehouse_kit_lines: ["66666666-0000-4000-8000-000000000001", "66666666-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3998,6 +4231,60 @@ const MISMATCHED_INSERT: Record<string, string> = {
                                           material_cost, labor_cost, overhead_cost, total_cost, source)
      VALUES ('4f4f4f42-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
              9, 'DRAFT', 1, 1, 1, 3, 'MANUAL')`,
+  // PHASE-044 WMS probes (0067…0071) — valid rows under the OTHER tenant's
+  // GUC: the RLS WITH CHECK must reject every one (A3).
+  warehouse_zones: `INSERT INTO warehouse_zones (id, tenant_id, warehouse_id, code, name, zone_type)
+     VALUES ('51515151-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'Z-ATK', 'Attack zone', 'PICKING')`,
+  warehouse_aisles: `INSERT INTO warehouse_aisles (id, tenant_id, zone_id, code, name)
+     VALUES ('52525252-3000-4000-8000-000000000003', $1, '51515151-0000-4000-8000-000000000002', 'A-ATK', 'Attack aisle')`,
+  warehouse_racks: `INSERT INTO warehouse_racks (id, tenant_id, aisle_id, code, name)
+     VALUES ('53535353-3000-4000-8000-000000000003', $1, '52525252-0000-4000-8000-000000000002', 'R-ATK', 'Attack rack')`,
+  warehouse_bins: `INSERT INTO warehouse_bins (id, tenant_id, warehouse_id, rack_id, code, barcode, name)
+     VALUES ('54545454-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+             '53535353-0000-4000-8000-000000000002', 'B-ATK', 'BIN-ATK', 'Attack bin')`,
+  lpns: `INSERT INTO lpns (id, tenant_id, lpn_code)
+     VALUES ('55555555-3000-4000-8000-000000000003', $1, 'LPN-ATK')`,
+  bin_contents: `INSERT INTO bin_contents (id, tenant_id, bin_id, warehouse_id, item_id, status, qty)
+     VALUES ('56565656-3000-4000-8000-000000000003', $1, '54545454-0000-4000-8000-000000000002',
+             'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002', 'AVAILABLE', 1)`,
+  returnable_packaging: `INSERT INTO returnable_packaging (id, tenant_id, code, packaging_type, name, deposit_amount)
+     VALUES ('57575757-3000-4000-8000-000000000003', $1, 'PLT-ATK', 'PALLET', 'Attack pallet', 10)`,
+  returnable_packaging_movements: `INSERT INTO returnable_packaging_movements (id, tenant_id, packaging_id, kind, qty, deposit_per_unit, moved_at)
+     VALUES ('58585858-3000-4000-8000-000000000003', $1, '57575757-0000-4000-8000-000000000002', 'ISSUE', 1, 10, '2027-01-15')`,
+  putaway_rules: `INSERT INTO putaway_rules (id, tenant_id, priority, name, target_zone_type)
+     VALUES ('59595959-3000-4000-8000-000000000003', $1, 900, 'Attack rule', 'PICKING')`,
+  pick_strategies: `INSERT INTO pick_strategies (id, tenant_id, warehouse_id, method)
+     VALUES ('5a5a5a5a-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'FIFO')`,
+  pick_waves: `INSERT INTO pick_waves (id, tenant_id, warehouse_id, status)
+     VALUES ('5b5b5b5b-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT')`,
+  pick_tasks: `INSERT INTO pick_tasks (id, tenant_id, task_kind, item_id, qty, from_bin_id, source_type, source_id)
+     VALUES ('5c5c5c5c-3000-4000-8000-000000000003', $1, 'PICK', 'babababa-0000-4000-8000-000000000002', 1,
+             '54545454-0000-4000-8000-000000000002', 'pick_wave', '5b5b5b5b-0000-4000-8000-000000000002')`,
+  cycle_count_schedules: `INSERT INTO cycle_count_schedules (id, tenant_id, warehouse_id, name)
+     VALUES ('5d5d5d5d-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'Attack schedule')`,
+  cycle_count_documents: `INSERT INTO cycle_count_documents (id, tenant_id, warehouse_id, status, snapshot_at)
+     VALUES ('5e5e5e5e-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT', now())`,
+  cycle_count_lines: `INSERT INTO cycle_count_lines (id, tenant_id, document_id, line_no, item_id, system_qty)
+     VALUES ('5f5f5f5f-3000-4000-8000-000000000003', $1, '5e5e5e5e-0000-4000-8000-000000000002', 1,
+             'babababa-0000-4000-8000-000000000002', 1)`,
+  abc_classifications: `INSERT INTO abc_classifications (id, tenant_id, item_id, computed_at, window_days, class, rank_no)
+     VALUES ('60606060-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002', now(), 90, 'C', 9)`,
+  serial_movements: `INSERT INTO serial_movements (id, tenant_id, serial_id, event, source_type, source_id, moved_at)
+     VALUES ('61616161-3000-4000-8000-000000000003', $1, 'f3f3f3f3-0000-4000-8000-000000000002', 'RECEIVE',
+             'stock_move', 'f4f4f4f4-0000-4000-8000-000000000002', now())`,
+  transfer_pricing_policies: `INSERT INTO transfer_pricing_policies (id, tenant_id, from_warehouse_id, to_warehouse_id, mode, markup_pct)
+     VALUES ('62626262-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+             'f0f0f0f0-2000-4000-8000-000000000002', 'MARKUP', 5)`,
+  transit_exceptions: `INSERT INTO transit_exceptions (id, tenant_id, transfer_id, line_no, exception_kind, qty)
+     VALUES ('63636363-3000-4000-8000-000000000003', $1, 'f7f7f7f7-0000-4000-8000-000000000002', 1, 'DAMAGE', 1)`,
+  inventory_alert_jobs: `INSERT INTO inventory_alert_jobs (id, tenant_id, job_kind)
+     VALUES ('64646464-3000-4000-8000-000000000003', $1, 'SHELF_LIFE')`,
+  warehouse_kit_orders: `INSERT INTO warehouse_kit_orders (id, tenant_id, warehouse_id, kit_item_id, qty, status)
+     VALUES ('65656565-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', 1, 'DRAFT')`,
+  warehouse_kit_lines: `INSERT INTO warehouse_kit_lines (id, tenant_id, order_id, line_no, component_item_id, qty)
+     VALUES ('66666666-3000-4000-8000-000000000003', $1, '65656565-0000-4000-8000-000000000002', 1,
+             'babababa-0000-4000-8000-000000000002', 1)`,
 };
 
 beforeAll(async () => {
@@ -4174,7 +4461,14 @@ describe("generated attack suite A1–A10 — as erp_app", () => {
                                     // grant-denied outright.
                                     : table === "note_events"
                                       ? "updated_at"
-                                      : "updated_at";
+                                      // PHASE-044 (0067/0069): the append-only
+                                      // ledgers carry no updated_at by design —
+                                      // probe the note column (both have it).
+                                      : table === "serial_movements"
+                                        ? "note"
+                                        : table === "returnable_packaging_movements"
+                                          ? "note"
+                                          : "updated_at";
         await expect(
           app.query(`UPDATE ${table} SET ${column} = ${column} WHERE ${idColumn} = $1`, [
             foreignRow,

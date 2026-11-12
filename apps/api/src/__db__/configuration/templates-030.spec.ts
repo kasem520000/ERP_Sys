@@ -87,9 +87,15 @@ import {
 /** KNOWN hashes — `pnpm validate:manifests` on the nine-template set (the
  *  constants are byte-identical to the migration 0041 registry seeds and the
  *  docs mirrors docs/industries/templates/manifests/
- *  manifest.wholesale.json / manifest.electronics.json). */
+ *  manifest.wholesale.json / manifest.electronics.json).
+ *
+ *  PHASE-044 (0071 §4): the wholesale pin re-pinned — the manifest's
+ *  required_feature_keys gains the eight WMS keys (the distribution-bearing
+ *  manifest enablement, CR-36 (f)); the migration seed, the docs mirror,
+ *  and the contracts verbatim copy moved together (the 039 re-pin
+ *  procedure). */
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
-  "industry.wholesale": "sha256:0fe7aa4c8e0892a1451dd3cc623b886a5dd51ab6c3a78066a26e259fd85a7522",
+  "industry.wholesale": "sha256:013c35ad9626cb58e1acb4d9115eebae47880badd36f10e4da82d0abfaa28f1f",
   "industry.electronics": "sha256:216f1e981ae4c457173c18ead7c1263780f8082c6d18807fb9308a507e6f51a9",
 });
 

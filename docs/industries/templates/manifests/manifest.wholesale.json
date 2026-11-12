@@ -16,7 +16,15 @@
     "sales.credit_limits",
     "purchasing.goods_receipts",
     "inventory.multi_warehouse",
-    "notes.received"
+    "notes.received",
+    "inventory.wms",
+    "inventory.putaway",
+    "inventory.picking",
+    "inventory.cycle_counts",
+    "inventory.abc",
+    "inventory.serial_ledger",
+    "inventory.quarantine",
+    "inventory.consignment"
   ],
   "default_modules_enabled": [
     "accounting",

@@ -53,10 +53,16 @@ import {
  */
 
 /** KNOWN hashes — `pnpm validate:manifests` on the five-template set (the
- *  constants are byte-identical to the migration 0025 registry seeds). */
+ *  constants are byte-identical to the migration 0025 registry seeds).
+ *
+ *  PHASE-044 (0071 §4): the distribution pin re-pinned — the manifest's
+ *  required_feature_keys gains the eight WMS keys (the distribution-bearing
+ *  manifest enablement, CR-36 (f)); the migration seed, the docs mirror,
+ *  and the contracts verbatim copy moved together (the 039 re-pin
+ *  procedure). */
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   "industry.automotive": "sha256:047d5671387ae1872ca8dd2bb6f7235758caa392b7c4441429fc0aadef734172",
-  "industry.distribution": "sha256:d31597032af69990560e4041cc6fb566b8c2159ee36d47f6b95b2cdf94be995d",
+  "industry.distribution": "sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d",
 });
 
 // -- tenant A: automotive apply -------------------------------------------

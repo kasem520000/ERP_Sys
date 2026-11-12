@@ -82,6 +82,18 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "inventory.stock_transfers": ["inventory.stock_ledger"],
   "inventory.reservations": ["inventory.stock_ledger", "sales.orders"],
   "inventory.reorder_levels": ["inventory.stock_ledger", "platform.notifications"],
+  // PHASE-044 (Blueprint v3.0 · CR-14): the WMS cluster — the location tree
+  // rides multi-warehouse; directed ops + the quarantine/consignment boards
+  // ride the location tree; cycle counts compose the 010 counting surface;
+  // the serial ledger rides serial tracking.
+  "inventory.wms": ["inventory.multi_warehouse"],
+  "inventory.putaway": ["inventory.wms"],
+  "inventory.picking": ["inventory.wms"],
+  "inventory.cycle_counts": ["inventory.wms", "inventory.stock_counts"],
+  "inventory.abc": ["inventory.wms"],
+  "inventory.serial_ledger": ["inventory.serial_tracking"],
+  "inventory.quarantine": ["inventory.wms"],
+  "inventory.consignment": ["inventory.wms"],
   // sales
   "sales.quotations": ["items.price_lists", "partners.directory"],
   "sales.orders": ["sales.quotations", "inventory.stock_ledger"],

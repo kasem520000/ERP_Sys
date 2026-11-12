@@ -1,6 +1,6 @@
 # Entity Catalog
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-12 (PHASE-042 — the manufacturing-execution cluster, 232 → 239 domain rows)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-12 (PHASE-044 — the WMS & Inventory Intelligence cluster, 239 → 261 domain rows)
 
 All planned entities grouped by owning module, with the phase that introduces them and
 key relationships. This is the catalog-level map; column-level specifications for core
@@ -522,6 +522,52 @@ app-role DELETE, the 0026 manufacturing precedent).
 | `item_standard_costs` | The frozen per-item standard cost (L2-12/CR-45): versioned by cost-type totals, one ACTIVE per item (the BOM discipline) | tenant_id, item_id (composite FK), version_no (tenant+item+version unique), status (DRAFT/ACTIVE/ARCHIVED), material_cost/labor_cost/overhead_cost/total_cost numeric(19,6) per unit (CHECK: total = the typed sum; costs ≥ 0), overhead_sub_splits jsonb `[{key, amount}]` (shape CHECK array; per-element validated at the service), source (MANUAL/ROLLED_UP — ROLLED_UP ⇒ rolled_up_at), effective_from?, activated_at?/archived_at?; partial unique one ACTIVE per item; grants SELECT/INSERT/UPDATE | 042 | no |
 | `v_work_center_oee_daily` | Derived OEE facts per work center per day (M-16) — security_invoker (RLS rides through), NOT a source-of-truth table | tenant_id, work_center_id, day, planned_hours/actual_hours (std vs actual op times), scrap_qty, completed/skipped/total operations, downtime_minutes (the day's LATERAL fold) | 042 | n/a (view) |
 | `v_work_center_oee_period` | Derived monthly OEE rollup (M-16) — the month's downtime derived INDEPENDENTLY from downtime_records (days without operations still count their downtime) | tenant_id, work_center_id, period_start, planned/actual hours, scrap, completed/skipped/total, downtime_minutes | 042 | n/a (view) |
+
+## warehouse management — WMS (PHASE-044 — DELIVERED by migrations `0067_wms_locations.sql` … `0071_wms_seeds.sql`, schema_version 71)
+
+WMS & Inventory Intelligence (CR-14, scope extended by v3.1/CR-46 — L1-20 returnable packaging): the
+location substrate — zones/aisles/racks/bins with barcodes and pick sequence (one DEFAULT bin per
+warehouse, BR-073), bin-level contents with AVAILABLE/QUARANTINE/HOLD status and the consignment owner
+column (INV-029: Σ tenant-owned `bin_contents` = `item_stock` per warehouse/item, same-transaction
+writes; `item_stock` stays the valuation authority — INV-010 untouched), license plates (LPNs), the
+directed-operations family (putaway rules + the unified PICK/PUTAWAY task board + per-warehouse
+strategies + waves), ABC-classified cycle counts, the append-only serial-movement ledger, transfer
+pricing + transit exceptions + the shelf-life/slow-movement alert registration + warehouse kitting,
+and the returnable-packaging container register with its deposit movement log. +22 tables — the
+catalog count moves 239 → 261 (the RLS-suite parity gate checks the number). +4 CoA purposes
+(4895 DEPOSIT_FORFEITURE · 1290 QUARANTINE_INVENTORY · 2135 CONSIGNATION_PAYABLE · 4990
+TRANSFER_PRICING_ADJUSTMENT — the 0026/0065 additive-marker pattern; the deposit liability leg reuses
+the EXISTING DEPOSITS_RECEIVED purpose, 2140 — D-2). Numbering note: the phase doc planned ≈0073…0081 —
+written before implementation; PHASE-043 has NOT run (it requires THIS phase), so 0067…0071 are the
+honest next slots (the 0064/0065 D-1 precedent). Grants: master data / document rows
+(SELECT/INSERT/UPDATE — lifecycles, no app-role DELETE, the 0026 precedent); `bin_contents` is a
+POSITION table; `serial_movements` + `returnable_packaging_movements` are append-only logs
+(SELECT/INSERT only — the stock_moves discipline).
+
+| Entity | Purpose | Key fields | Phase | OC |
+|--------|---------|-----------|-------|----|
+| `warehouse_zones` | WMS zones (H-07/I-01): the location-tree root — zone types (PICKING/BULK/QUARANTINE/DOCK/STAGE) are the putaway-rule vocabulary; one DEFAULT zone per warehouse | tenant_id, warehouse_id (composite FK), code (tenant+wh unique, shape CHECK), name/name_ar, zone_type, is_default (partial unique one per wh), note | 044 | no |
+| `warehouse_aisles` | WMS aisles: zones contain aisles | tenant_id, zone_id (composite FK, CASCADE), code (tenant+zone unique), name/name_ar | 044 | no |
+| `warehouse_racks` | WMS racks: aisles contain racks | tenant_id, aisle_id (composite FK, CASCADE), code (tenant+aisle unique), name/name_ar | 044 | no |
+| `warehouse_bins` | WMS bins (I-01/I-02, DF-12): the leaf — the scan target (PP-11/DF-17) + NEAREST routing + the backfill anchor | tenant_id, warehouse_id (denormalized), rack_id (composite FK), code (tenant+wh unique), barcode (tenant-unique, shape CHECK), name/name_ar, pick_sequence (1..10⁶, nullable), capacity?, allow_mixed_batches, is_default (partial unique one per wh — BR-073), note | 044 | no |
+| `lpns` | License plates / pallets (I-05): the movable grouping over bin_contents rows | tenant_id, lpn_code (tenant-unique), status (ACTIVE/CLOSED — CLOSED ⇒ closed_at, the state-evidence floor), closed_at?, note | 044 | no |
+| `bin_contents` | The per-bin position (I-01/I-19/I-24, INV-029): one row per (bin, item, batch, serial, LPN, owner, status) slot — NULLS NOT DISTINCT; consignment rows (owner set) are the EXCLUDED set (never in item_stock/valuation/ATP, BR-076) | tenant_id, bin_id/warehouse_id/item_id (composite FKs), batch_id?/serial_id?/lpn_id?/owner_partner_id? (FKs), status (AVAILABLE/QUARANTINE/HOLD), qty ≥ 0, uom_id?, received_at, note; the pick/FEFO + INV-029 probe indexes (OA-06) | 044 | no |
+| `returnable_packaging` | The container-TYPE register (L1-20, v3.1/CR-46): pallets/crates/containers with a deposit per unit | tenant_id, code (tenant-unique), packaging_type (PALLET/CRATE/CONTAINER/OTHER), name/name_ar, deposit_amount ≥ 0, item_id? (asset-item link, SET NULL), status (ACTIVE/RETIRED), note | 044 | no |
+| `returnable_packaging_movements` 🔒 | The append-only packaging log (L1-20): ISSUE posts the deposit liability (the EXISTING DEPOSITS_RECEIVED purpose), RETURN releases it, WRITE_OFF posts the 4895 income leg | tenant_id, packaging_id (composite FK), kind (ISSUE/RETURN/WRITE_OFF), qty > 0, deposit_per_unit ≥ 0, partner_id?/delivery_id?/receipt_id?/journal_id?, moved_at, note | 044 | no |
+| `putaway_rules` | The putaway condition engine (I-03, PP-12): priority-ordered condition → target zone type or exact bin; first active match wins on goods receipt | tenant_id, priority (1..1000, tenant-unique), name, condition jsonb (closed shape, service-validated), target_zone_type ⊕ target_bin_id (pair-or-neither CHECK), is_active, note | 044 | no |
+| `pick_strategies` | Per-warehouse directed-pick method (I-04) | tenant_id, warehouse_id (unique per tenant), method (FIFO/FEFO/NEAREST), allow_partial, note | 044 | no |
+| `pick_waves` | Pick waves grouping deliveries into routes (I-06): release snapshots the strategy | tenant_id, wave_no? (PW- at release, unique), warehouse_id, status (DRAFT/RELEASED/COMPLETED/CANCELLED — the state-evidence CHECKs), method? (the frozen snapshot), route_note, released_at?/completed_at? + the by stamps | 044 | no |
+| `pick_tasks` | The unified PICK/PUTAWAY task board (I-07, PP-11/DF-17, OA-02 — the single sync surface, D-3): assignee, scan verification, progressive qty, the version column the field-sync conflict checks read (BR-074) | tenant_id, wave_id?, task_kind (PICK/PUTAWAY), status (PENDING/ASSIGNED/IN_PROGRESS/COMPLETED/CANCELLED), assignee_user_id?, item_id (FK), batch_id?/serial_id?/lpn_id?, qty > 0, qty_done ≤ qty, from_bin_id (PICK) / to_bin_id (PUTAWAY — the direction CHECK), source_type/source_id/source_line_no?, scan_verified, sequence_no?, completed_at?/completed_by? (COMPLETED ⇒ completed_at), note | 044 | no |
+| `cycle_count_schedules` | ABC-frequency count schedules (I-08/I-20) | tenant_id, warehouse_id, name, class_a_days/class_b_days/class_c_days (1..N, ascending CHECK), approval_threshold ≥ 0 (BR-075), blind, is_active, last_run_at?, note | 044 | no |
+| `cycle_count_documents` | The generated/manual count session (I-08 — the stock_counts shape, bin-aware); variances post through G-13/G-14 with CYCLE_COUNT reasons | tenant_id, count_no? (CC- at POST, unique), schedule_id?, warehouse_id, status (DRAFT/COUNTED/VARIANCE_REVIEW/POSTED/CANCELLED), snapshot_at, count_date?, blind, variance_loss_value?/variance_gain_value?, supervisor_override, counted_by?/approved_by?, posted_journal_id?, note/note_ar | 044 | no |
+| `cycle_count_lines` | Per (item, bin) count lines with the frozen system-qty snapshot | tenant_id, document_id (composite FK, CASCADE), line_no, item_id (FK), bin_id?/batch_id? (FKs), system_qty ≥ 0, counted_qty?, recounted, recount_note?, value_impact?, reason (CYCLE_COUNT_LOSS/CYCLE_COUNT_GAIN at post) | 044 | no |
+| `abc_classifications` | ABC classes computed from consumption value + velocity (I-09); is_latest is the one-row floor | tenant_id, item_id (composite FK), computed_at, window_days ≥ 1, class (A/B/C), consumption_value/total_qty_out/velocity ≥ 0, rank_no, is_latest (partial unique per item) | 044 | no |
+| `serial_movements` 🔒 | The append-only per-serial ledger (I-16/I-18 — the audit's "serials without movements" gap closed): one row per serial per movement event | tenant_id, serial_id (composite FK), event (RECEIVE/PUTAWAY/PICK/TRANSFER_OUT/TRANSFER_IN/ADJUST_OUT/ADJUST_IN/RETURN/QUARANTINE/RELEASE/SCRAP/CONSIGNMENT_IN/CONSIGNMENT_OUT/KIT_IN/KIT_OUT/SETTLE), move_id? (stock_moves FK), source_type/source_id, from_bin_id?/to_bin_id?, moved_at, note; the serial-walk + source indexes (OA-06) | 044 | no |
+| `transfer_pricing_policies` | Internal transfer pricing (I-23): per warehouse PAIR — MARKUP % or FIXED price; absent = the cost-carrying default | tenant_id, from_warehouse_id/to_warehouse_id (unique pair), mode (MARKUP/FIXED — the operand CHECK), markup_pct? (0..1000)/fixed_price? (≥ 0), note | 044 | no |
+| `transit_exceptions` | Damaged/missing stock on an IN_TRANSIT transfer line (I-22): the exception + the shrinkage posting refs | tenant_id, transfer_id (composite FK, CASCADE), line_no, exception_kind (DAMAGE/MISSING), qty > 0, journal_id?/move_id? (resolved ⇒ journal — the state-evidence CHECK), resolved_at?/resolved_by?, note | 044 | no |
+| `inventory_alert_jobs` | The shelf-life + slow-movement job registration (I-17/I-21/I-25): thresholds + the last-run stats | tenant_id, job_kind (SHELF_LIFE/SLOW_MOVEMENT — unique per tenant), shelf_life_days/slow_movement_days ≥ 1, is_active, last_run_at?, last_flagged, note | 044 | no |
+| `warehouse_kit_orders` | Light kit assembly from bins without a production order (I-13): WK- at POST; the G-45 roll-up (kit = Σ components exactly) | tenant_id, kit_no? (unique), warehouse_id (FK), kit_item_id (FK), qty > 0, uom_id?, status (DRAFT/POSTED/CANCELLED — POSTED ⇒ kit_no+posted_at), total_component_cost?, posted_journal_id?/posted_at?/posted_by?, note/note_ar | 044 | no |
+| `warehouse_kit_lines` | The kit component consumption with its bin + cost | tenant_id, order_id (composite FK, CASCADE), line_no, component_item_id (FK), qty > 0, unit_cost?/value_amount?, from_bin_id? (FK) | 044 | no |
 
 ## Diagrams
 
