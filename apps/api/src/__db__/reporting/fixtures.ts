@@ -166,6 +166,10 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   // utilization + downtime-analysis contracts' read permission — the same
   // key the /manufacturing/oee route rides).
   "manufacturing.oee.read",
+  // PHASE-044 (0071 seed, matrix §3.21): the WMS intelligence report keys.
+  "inventory.wms.locations",
+  "inventory.cycle_counts",
+  "inventory.abc",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

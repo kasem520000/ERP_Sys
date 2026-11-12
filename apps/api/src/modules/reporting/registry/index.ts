@@ -147,6 +147,15 @@ import { manufacturingWorkCenterUtilizationContract } from "./manufacturing/work
 import { manufacturingDowntimeAnalysisContract } from "./manufacturing/downtime-analysis.contract";
 import { manufacturingReworkCostContract } from "./manufacturing/rework-cost.contract";
 import { manufacturingCostVarianceContract } from "./manufacturing/cost-variance.contract";
+// PHASE-044 · the WMS intelligence set (REPORT_CATALOG §4 additions — the
+// bin-contents register, the cycle-count variance register, the ABC
+// classification, the slow-movement intelligence view).
+import {
+  inventoryAbcClassificationContract,
+  inventoryBinContentsContract,
+  inventoryCycleCountVarianceContract,
+  inventorySlowMovementContract,
+} from "./operational/wms";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -187,6 +196,11 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   inventoryTransferLogContract,
   inventorySerialTrackingContract,
   inventorySlowMovingContract,
+  // PHASE-044 · the WMS intelligence set
+  inventoryBinContentsContract,
+  inventoryCycleCountVarianceContract,
+  inventoryAbcClassificationContract,
+  inventorySlowMovementContract,
   // §3+§4 dashboard-binding additions (PHASE-014 §2.7; REPORT_CATALOG §14)
   salesDailyRevenueContract,
   inventoryReorderAlertsContract,

@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-12 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-12 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -120,6 +120,10 @@ movements for the same scope) — see worked example in
 | `inventory.transfer-log` | Stock Transfer Log / سجل التحويلات | inventory · `stockQueries.transferLog` · stock_transfers, stock_moves | dateFrom/To, from/to warehouses, status (in-transit/posted) | `inventory.moves.read` | PDF · XLSX · CSV | PHASE-010 |
 | `inventory.serial-tracking` | Serial / IMEI Tracking / تتبع المسلسلات و IMEI | inventory · `serialQueries.tracking` · item_serials (+ sale/purchase provenance) | serial/IMEI exact match or item+date range | `inventory.serials.read` | XLSX · CSV | PHASE-010 |
 | `inventory.reorder-alerts` | Reorder Alerts / تنبيهات إعادة الطلب | inventory · `inventoryQueries.reorderCandidates` · item_warehouse_settings, item_stock, items, warehouses (the PHASE-014 "stock alerts" dashboard-widget binding — §14; alert only, never autopilot — BR-019) | — (no filters; live per-warehouse snapshot) | `inventory.stock.read` | XLSX · CSV | PHASE-014 |
+| `inventory.bin-contents` | Bin Contents / محتويات الصناديق | inventory · `wmsQueries.binContents` · bin_contents, warehouse_bins, warehouse_zones (+ the INV-029 fold probe) | warehouse, status (AVAILABLE/QUARANTINE/HOLD) | `inventory.wms.locations` | XLSX · CSV | PHASE-044 |
+| `inventory.cycle-count-variance` | Cycle-Count Variance / فروقات الجرد الدوري | inventory · `wmsQueries.cycleCountVariance` · cycle_count_documents(+lines) — the §2.6 WMS family (the PHASE-010 count-variance report stays for stock_counts sessions) | warehouse, postedOnly | `inventory.cycle_counts` | XLSX · CSV | PHASE-044 |
+| `inventory.abc-classification` | ABC Classification / تصنيف ABC | inventory · `wmsQueries.abcClassification` · abc_classifications (is_latest) | class (A/B/C) | `inventory.abc` | XLSX · CSV | PHASE-044 |
+| `inventory.slow-movement` | Slow Movement — Intelligence View / بطء الحركة — منظور الذكاء المخزني | inventory · `wmsQueries.slowMovement` · item_stock, stock_moves, bin_contents, abc_classifications (the ABC + bin-spread slotting fold; the PHASE-013 item-level slow-moving stays) | window days (default 90) | `inventory.stock.read` | XLSX · CSV | PHASE-044 |
 
 Valuation and stock-on-hand reports assert INV-010 (Σ qty×valuation = inventory account)
 and display the check result in the footer ([REPORT_RECONCILIATION.md](REPORT_RECONCILIATION.md)).
@@ -433,6 +437,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-039 | sales.rma_register + sales.dunning_status added (the unified RMA register over both families — disposition mix, completion documents, cycle days — and the collections worklist: ladder step, days overdue, policy, fees charged/waived, referral state); `ar.aging` gains the additive `dunningStep` column (no new key); registry 88 → 90 |
 | PHASE-041 | communication.outbound_delivery_log added (the outbound send ledger as a report — status, provider, provider ref, cost amount/currency, attempts/max, the source that produced the send; the outbox-cost-shape + outbox-status-vocabulary block-on-fail assertions); registry 90 → 91 |
 | PHASE-042 | the four manufacturing-execution contracts added (§8: work-center-utilization over the OEE daily view, downtime-analysis by work center × reason, the rework-cost register, and the cost-variance rollup over the frozen operation variances + yield variance); registry 91 → 95 |
+| PHASE-044 | the four WMS intelligence contracts added (§4: the bin-contents register with BR-076's owner visibility + the INV-029 fold tie, the cycle-count variance register over the §2.6 document family, the ABC classification over the latest generation, and the slow-movement intelligence view with the ABC class + bin spread — the slotting-hint angle); registry 95 → 99 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 

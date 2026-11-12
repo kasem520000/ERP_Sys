@@ -120,6 +120,13 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   // PHASE-042 (0065 seed): the manufacturing-execution OEE report key (the
   // utilization + downtime-analysis contracts' read permission).
   "manufacturing.oee.read",
+  // PHASE-044 (0071 seed, matrix §3.21): the WMS intelligence report keys
+  // (bin-contents rides the locations key, the cycle-count variance the
+  // cycle_counts key, the ABC classification the analysis-tier abc key;
+  // slow-movement rides the existing stock read).
+  "inventory.wms.locations",
+  "inventory.cycle_counts",
+  "inventory.abc",
 ]);
 
 /** A minimal but type-complete stored envelope for cache/CSV/XLSX tests. */
@@ -167,16 +174,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 95 frozen contracts validate against the known-permission catalog", () => { // PHASE-042: 91 → 95 (+4 manufacturing-execution)
+  it("the 99 frozen contracts validate against the known-permission catalog", () => { // PHASE-044: 95 → 99 (+4 WMS intelligence)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(95); // PHASE-042: 91 → 95 (+4 manufacturing-execution)
+    expect(result.count).toBe(99); // PHASE-044: 95 → 99 (+4 WMS intelligence)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(95); // PHASE-042: 91 → 95 (+4 manufacturing-execution)
+    expect(snapshot).toHaveLength(99); // PHASE-044: 95 → 99 (+4 WMS intelligence)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

@@ -22,6 +22,7 @@ import { SourcingQueriesService } from "./sourcing/sourcing-queries";
 import { ReturnsDunningQueriesService } from "./sales/returns-dunning-queries";
 import { CommunicationQueriesService } from "./communication/outbound-delivery-queries";
 import { ManufacturingExecutionQueriesService } from "./manufacturing/queries";
+import { WmsQueriesService } from "./operational/wms-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -78,6 +79,10 @@ export interface ReportingServices {
    * utilization/OEE, the downtime analysis, the rework cost register, the
    * cost-variance rollup). */
   manufacturingExecution: ManufacturingExecutionQueriesService;
+  /** PHASE-044 · the WMS intelligence query surface (the bin-contents
+   * register + the INV-029 fold, the cycle-count variance register, the
+   * ABC classification, the slow-movement intelligence view). */
+  wmsQueries: WmsQueriesService;
   treasury: TreasuryQueriesService;
   partners: PartnerQueriesService;
   tax: TaxQueriesService;
@@ -113,6 +118,7 @@ export function reportingServices(): ReportingServices {
       returnsDunning: new ReturnsDunningQueriesService(),
       communication: new CommunicationQueriesService(),
       manufacturingExecution: new ManufacturingExecutionQueriesService(),
+      wmsQueries: new WmsQueriesService(),
       treasury: new TreasuryQueriesService(),
       partners: new PartnerQueriesService(),
       tax: new TaxQueriesService(),
