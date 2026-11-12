@@ -361,3 +361,63 @@ export async function ensureInventoryItem(
     return created.id;
   });
 }
+
+/**
+ * PHASE-044 (T-04+): the posting-backed EXPLICIT-BIN receipt — the
+ * stock-service plan → post → apply pipeline with the bin endpoint. A
+ * bare applyReceipt(null) mints an orphan move (an INV-018 violation the
+ * sibling suites' reconciliation checks catch); every WMS suite that
+ * needs a receipt into a SPECIFIC bin goes through HERE.
+ */
+export async function wmsBinReceipt(input: {
+  itemId: string;
+  warehouseId: string;
+  qty: string;
+  unitCost: string;
+  movedAt: string;
+  targetBinId: string;
+  batchNo?: string | null;
+  batchExpiry?: string | null;
+  actorId?: string | null;
+}): Promise<{ moveId: string; journalEntryId: string }> {
+  const {
+    planReceipt,
+    applyReceipt,
+    inventoryJournalLines,
+    resolveInventoryAccount,
+  } = await import("../../modules/inventory/application/movement-core");
+  const { ownTenantBaseCurrency } = await import("../../infra/settings/setting-reader");
+  return withTenant(TENANT_I, async () => {
+    const plan = await planReceipt({
+      itemId: input.itemId,
+      warehouseId: input.warehouseId,
+      qty: input.qty,
+      unitCost: input.unitCost,
+      movedAt: input.movedAt,
+      moveKind: "receipt",
+      sourceType: "manual_receipt",
+      sourceId: input.itemId,
+      batchNo: input.batchNo ?? null,
+      batchExpiry: input.batchExpiry ?? null,
+      targetBinId: input.targetBinId,
+    });
+    const lines = inventoryJournalLines({
+      inventoryAccountId: await resolveInventoryAccount(input.warehouseId),
+      direction: "IN",
+      value: plan.valueAmount,
+      counterPurpose: "INVENTORY_APPRECIATION",
+      memoEn: "WMS suite bin receipt",
+      memoAr: "إدخال صندوق — مجموعة WMS",
+    });
+    const spec = {
+      source: { docType: "stock_move", docId: plan.anchorId, operation: "post" },
+      entryDate: input.movedAt,
+      description: { en: "WMS suite bin receipt", ar: "إدخال صندوق — مجموعة WMS" },
+      currency: await ownTenantBaseCurrency(),
+      lines,
+    };
+    const result = await iPosting.post(spec, { postedBy: input.actorId ?? I_ACTOR });
+    const moveId = await applyReceipt(plan, result.journalEntryId);
+    return { moveId, journalEntryId: result.journalEntryId };
+  });
+}

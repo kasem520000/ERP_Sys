@@ -433,10 +433,15 @@ describe("capability classification (industries/README §4)", () => {
     // The OPTIONAL livestock posture: a business plan minus serial tracking
     // (the pre-PHASE-010 lineage, or a tenant category opt-out posture)
     // hides the OPTIONAL entries that need it while the REQUIRED season
-    // chain stays fully INCLUDED — serial tracking is a leaf key (nothing
-    // depends on it, FEATURE_DEPS §7), so the tenant-set closure stays
-    // intact and nothing blocks.
-    const keys = business().filter((key) => key !== "inventory.serial_tracking");
+    // chain stays fully INCLUDED. PHASE-044 note: serial tracking STOPPED
+    // being a pure leaf — the WMS serial-movement ledger key
+    // (inventory.serial_ledger, granted with the 0071 §3 WMS block)
+    // depends on it (FEATURE_DEPS §7) — so the coherent no-serial-tracking
+    // posture drops BOTH keys (no serial ledger surface without serials);
+    // the tenant-set closure stays intact and nothing blocks.
+    const keys = business().filter(
+      (key) => key !== "inventory.serial_tracking" && key !== "inventory.serial_ledger",
+    );
     const check = checkPrerequisites(AGRICULTURE_TEMPLATE_MANIFEST, keys);
     expect(check.status).toBe("ok");
     expect(check.missingChain).toEqual([]);

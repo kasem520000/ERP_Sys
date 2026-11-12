@@ -17,6 +17,7 @@ import { MethodSwitchService } from "./application/method-switch-service";
 import { OpeningStockService } from "./application/opening-stock-service";
 import { RevaluationService } from "./application/revaluation-service";
 import { WmsService } from "./application/wms.service";
+import { PutawayService } from "./application/putaway-service";
 import { InventoryController } from "./presentation/inventory.controller";
 
 /**
@@ -82,6 +83,7 @@ export interface BinReconcileJobPayload {
     OpeningStockService,
     RevaluationService,
     WmsService,
+    PutawayService,
   ],
   exports: [
     WarehouseService,
@@ -96,6 +98,7 @@ export interface BinReconcileJobPayload {
     OpeningStockService,
     RevaluationService,
     WmsService,
+    PutawayService,
   ],
 })
 export class InventoryModule implements OnModuleInit {

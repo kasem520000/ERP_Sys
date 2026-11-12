@@ -1503,7 +1503,12 @@ describe("PHASE-038 acceptance 10 — the matching tolerance bands", () => {
   it("small lines follow the band; large lines keep the flat keys (the S-tenant chain)", async () => {
     const goodsReceipts = new (
       await import("../../modules/purchasing/application/goods-receipts")
-    ).GoodsReceiptService(audit, posting, numbering);
+    ).GoodsReceiptService(
+      audit,
+      posting,
+      numbering,
+      new (await import("../../modules/inventory/application/putaway-service")).PutawayService(audit),
+    );
     await setTenantSetting(S_TENANT, "purchasing.match.qty_tolerance_pct", "0");
     await setTenantSetting(S_TENANT, "purchasing.match.price_tolerance_pct", "0");
     await setTenantSetting(S_TENANT, "purchasing.match.tolerance_bands", [

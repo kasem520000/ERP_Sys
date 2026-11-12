@@ -20,6 +20,7 @@ import { WarehouseService } from "../../modules/inventory/application/warehouse-
 import { ReservationService } from "../../modules/inventory/application/reservation-service";
 import { TransferService } from "../../modules/inventory/application/transfer-service";
 import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 import { SalesInvoiceService } from "../../modules/sales/application/invoices";
 import { CreditNoteService } from "../../modules/sales/application/credit-notes";
 import { SalesRepService } from "../../modules/sales/application/reps";
@@ -82,7 +83,12 @@ const periods = new PeriodService(audit);
 const coa = new CoaService(audit);
 const resolver = new TaxResolverService();
 const warehouses = new WarehouseService(audit);
-const goodsReceipts = new GoodsReceiptService(audit, posting, numbering);
+const goodsReceipts = new GoodsReceiptService(
+  audit,
+  posting,
+  numbering,
+  new PutawayService(audit),
+);
 const salesInvoices = new SalesInvoiceService(audit, posting, numbering, resolver);
 const creditNotes = new CreditNoteService(audit, posting, numbering, resolver);
 const salesReps = new SalesRepService(audit);

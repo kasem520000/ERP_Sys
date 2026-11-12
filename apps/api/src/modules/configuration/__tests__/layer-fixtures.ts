@@ -242,6 +242,14 @@ const BUSINESS_KEYS: readonly string[] = [
   "notes.dishonor", "notes.discounting", "notes.reports",
   "installments.plans", "installments.schedules", "installments.collections",
   "installments.late_fees", "installments.reports",
+  // PHASE-044 transcription of the 0071 §3 plan grants (the eight WMS
+  // feature keys → business + enterprise, the 0026/0066 precedent; starter
+  // does NOT get them): the distribution-bearing templates'
+  // (industry.distribution + industry.wholesale) REQUIRED chains resolve
+  // through exactly these grants — the manifest enablement (0071 §4).
+  "inventory.wms", "inventory.putaway", "inventory.picking",
+  "inventory.cycle_counts", "inventory.abc", "inventory.serial_ledger",
+  "inventory.quarantine", "inventory.consignment",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

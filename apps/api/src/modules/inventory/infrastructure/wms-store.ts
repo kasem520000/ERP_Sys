@@ -939,3 +939,258 @@ export async function findUomConversion(
   }
   return null;
 }
+
+// -- putaway rules (T-04, §2.3; I-03/PP-12) ----------------------------------------
+
+export interface PutawayRuleRow {
+  id: string;
+  priority: number;
+  name: string;
+  condition: Record<string, unknown>;
+  targetZoneType: string | null;
+  targetBinId: string | null;
+  targetBinCode: string | null;
+  isActive: boolean;
+  note: string | null;
+}
+
+export async function listPutawayRules(filter: {
+  activeOnly?: boolean;
+}): Promise<PutawayRuleRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT r.id, r.priority, r.name, r.condition, r.target_zone_type AS "targetZoneType",
+           r.target_bin_id AS "targetBinId", b.code AS "targetBinCode",
+           r.is_active AS "isActive", r.note
+    FROM putaway_rules r
+    LEFT JOIN warehouse_bins b ON b.id = r.target_bin_id AND b.tenant_id = r.tenant_id
+    WHERE (${filter.activeOnly ?? false} = false OR r.is_active)
+    ORDER BY r.priority
+  `);
+  return rows.rows as unknown as PutawayRuleRow[];
+}
+
+export async function findPutawayRuleById(id: string): Promise<PutawayRuleRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT r.id, r.priority, r.name, r.condition, r.target_zone_type AS "targetZoneType",
+           r.target_bin_id AS "targetBinId", b.code AS "targetBinCode",
+           r.is_active AS "isActive", r.note
+    FROM putaway_rules r
+    LEFT JOIN warehouse_bins b ON b.id = r.target_bin_id AND b.tenant_id = r.tenant_id
+    WHERE r.id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as PutawayRuleRow[])[0];
+}
+
+export async function insertPutawayRule(input: {
+  priority: number;
+  name: string;
+  condition: Record<string, unknown>;
+  targetZoneType: string | null;
+  targetBinId: string | null;
+  note: string | null;
+  createdBy: string | null;
+}): Promise<PutawayRuleRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO putaway_rules (id, tenant_id, priority, name, condition,
+                               target_zone_type, target_bin_id, note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.priority}, ${input.name},
+            ${JSON.stringify(input.condition)}::jsonb, ${input.targetZoneType},
+            ${input.targetBinId}, ${input.note}, ${input.createdBy})
+  `);
+  return (await findPutawayRuleById(id))!;
+}
+
+export async function updatePutawayRule(
+  id: string,
+  patch: {
+    name?: string;
+    condition?: Record<string, unknown>;
+    targetZoneType?: string | null;
+    targetBinId?: string | null;
+    isActive?: boolean;
+    note?: string | null;
+  },
+): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE putaway_rules SET
+      name = COALESCE(${patch.name ?? null}, name),
+      condition = COALESCE(${patch.condition === undefined ? null : JSON.stringify(patch.condition)}::jsonb, condition),
+      target_zone_type = COALESCE(${patch.targetZoneType ?? null}, target_zone_type),
+      target_bin_id = COALESCE(${patch.targetBinId ?? null}, target_bin_id),
+      is_active = COALESCE(${patch.isActive ?? null}, is_active),
+      note = COALESCE(${patch.note ?? null}, note),
+      updated_at = now(), version = version + 1
+    WHERE id = ${id}
+  `);
+}
+
+/**
+ * The zone-type suggestion source (§2.3): every bin of the warehouse whose
+ * zone carries the requested type, EMPTIEST first (Σ contents qty asc,
+ * never-bused NULLs first), then pick_sequence — the "prefer empty faces"
+ * heuristic. Capacity stays advisory (never a hard gate on directed ops).
+ */
+export async function listBinsByZoneType(
+  warehouseId: string,
+  zoneType: string,
+): Promise<(BinRow & { contentsQty: string })[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${BIN_COLUMNS}, COALESCE(c.contents_qty, 0)::text AS "contentsQty"
+    FROM ${BIN_FROM}
+    LEFT JOIN LATERAL (
+      SELECT sum(qty) AS contents_qty FROM bin_contents
+      WHERE bin_id = b.id AND tenant_id = b.tenant_id
+    ) c ON true
+    WHERE b.warehouse_id = ${warehouseId} AND z.zone_type = ${zoneType}
+    ORDER BY COALESCE(c.contents_qty, 0) ASC, b.pick_sequence NULLS LAST, b.code
+  `);
+  return rows.rows as unknown as (BinRow & { contentsQty: string })[];
+}
+
+// -- pick tasks (T-04 putaway + T-05 picking; §2.4; PP-11/OA-02) ---------------------
+
+export interface PickTaskRow {
+  id: string;
+  waveId: string | null;
+  waveNo: string | null;
+  taskKind: "PICK" | "PUTAWAY";
+  status: string;
+  assigneeUserId: string | null;
+  itemId: string;
+  itemSku: string | null;
+  itemName: string | null;
+  batchId: string | null;
+  batchNo: string | null;
+  serialId: string | null;
+  serialNo: string | null;
+  lpnId: string | null;
+  lpnCode: string | null;
+  qty: string;
+  qtyDone: string;
+  fromBinId: string | null;
+  fromBinCode: string | null;
+  toBinId: string | null;
+  toBinCode: string | null;
+  sourceType: string;
+  sourceId: string;
+  sourceLineNo: number | null;
+  scanVerified: boolean;
+  sequenceNo: number | null;
+  completedAt: string | null;
+  completedBy: string | null;
+  note: string | null;
+  createdAt: string;
+  version: number;
+}
+
+const TASK_COLUMNS = sql`t.id, t.wave_id AS "waveId", w.wave_no AS "waveNo",
+  t.task_kind AS "taskKind", t.status, t.assignee_user_id AS "assigneeUserId",
+  t.item_id AS "itemId", i.sku AS "itemSku", i.name AS "itemName",
+  t.batch_id AS "batchId", bt.batch_no AS "batchNo", t.serial_id AS "serialId",
+  s.serial_no AS "serialNo", t.lpn_id AS "lpnId", l.lpn_code AS "lpnCode",
+  t.qty::text AS qty, t.qty_done::text AS "qtyDone",
+  t.from_bin_id AS "fromBinId", fb.code AS "fromBinCode",
+  t.to_bin_id AS "toBinId", tb.code AS "toBinCode",
+  t.source_type AS "sourceType", t.source_id AS "sourceId",
+  t.source_line_no AS "sourceLineNo", t.scan_verified AS "scanVerified",
+  t.sequence_no AS "sequenceNo", t.completed_at AS "completedAt",
+  t.completed_by AS "completedBy", t.note, t.created_at AS "createdAt", t.version`;
+const TASK_FROM = sql`pick_tasks t
+  LEFT JOIN pick_waves w ON w.id = t.wave_id AND w.tenant_id = t.tenant_id
+  JOIN items i ON i.id = t.item_id AND i.tenant_id = t.tenant_id
+  LEFT JOIN item_batches bt ON bt.id = t.batch_id AND bt.tenant_id = t.tenant_id
+  LEFT JOIN item_serials s ON s.id = t.serial_id AND s.tenant_id = t.tenant_id
+  LEFT JOIN lpns l ON l.id = t.lpn_id AND l.tenant_id = t.tenant_id
+  LEFT JOIN warehouse_bins fb ON fb.id = t.from_bin_id AND fb.tenant_id = t.tenant_id
+  LEFT JOIN warehouse_bins tb ON tb.id = t.to_bin_id AND tb.tenant_id = t.tenant_id`;
+
+export async function listPickTasks(filter: {
+  taskKind?: string;
+  status?: string;
+  waveId?: string;
+  assigneeUserId?: string;
+  sourceType?: string;
+  sourceId?: string;
+  limit?: number;
+}): Promise<PickTaskRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${TASK_COLUMNS} FROM ${TASK_FROM}
+    WHERE (${filter.taskKind ?? null}::text IS NULL OR t.task_kind = ${filter.taskKind ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR t.status = ${filter.status ?? null})
+      AND (${filter.waveId ?? null}::uuid IS NULL OR t.wave_id = ${filter.waveId ?? null})
+      AND (${filter.assigneeUserId ?? null}::uuid IS NULL OR t.assignee_user_id = ${filter.assigneeUserId ?? null})
+      AND (${filter.sourceType ?? null}::text IS NULL OR t.source_type = ${filter.sourceType ?? null})
+      AND (${filter.sourceId ?? null}::uuid IS NULL OR t.source_id = ${filter.sourceId ?? null})
+    ORDER BY t.sequence_no NULLS LAST, t.created_at, t.id
+    LIMIT ${Math.min(filter.limit ?? 200, 500)}
+  `);
+  return rows.rows as unknown as PickTaskRow[];
+}
+
+export async function findPickTaskById(id: string): Promise<PickTaskRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${TASK_COLUMNS} FROM ${TASK_FROM} WHERE t.id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as PickTaskRow[])[0];
+}
+
+export async function insertPickTask(input: {
+  taskKind: "PICK" | "PUTAWAY";
+  itemId: string;
+  qty: string;
+  fromBinId: string | null;
+  toBinId: string | null;
+  sourceType: string;
+  sourceId: string;
+  sourceLineNo: number | null;
+  batchId?: string | null;
+  serialId?: string | null;
+  lpnId?: string | null;
+  waveId?: string | null;
+  sequenceNo?: number | null;
+  note?: string | null;
+  createdBy: string | null;
+}): Promise<PickTaskRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO pick_tasks (id, tenant_id, task_kind, item_id, batch_id, serial_id, lpn_id,
+                            qty, from_bin_id, to_bin_id, source_type, source_id,
+                            source_line_no, wave_id, sequence_no, note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.taskKind}, ${input.itemId},
+            ${input.batchId ?? null}, ${input.serialId ?? null}, ${input.lpnId ?? null},
+            ${input.qty}, ${input.fromBinId}, ${input.toBinId}, ${input.sourceType},
+            ${input.sourceId}, ${input.sourceLineNo}, ${input.waveId ?? null},
+            ${input.sequenceNo ?? null}, ${input.note ?? null}, ${input.createdBy})
+  `);
+  return (await findPickTaskById(id))!;
+}
+
+/** Task transition + evidence stamps (the ck_pick_tasks_state_evidence floor). */
+export async function updatePickTask(
+  id: string,
+  patch: {
+    status?: string;
+    assigneeUserId?: string | null;
+    qtyDone?: string;
+    scanVerified?: boolean;
+    completedAt?: string | null;
+    completedBy?: string | null;
+    sequenceNo?: number | null;
+    note?: string | null;
+  },
+): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE pick_tasks SET
+      status = COALESCE(${patch.status ?? null}, status),
+      assignee_user_id = COALESCE(${patch.assigneeUserId ?? null}, assignee_user_id),
+      qty_done = COALESCE(${patch.qtyDone ?? null}, qty_done),
+      scan_verified = COALESCE(${patch.scanVerified ?? null}, scan_verified),
+      completed_at = COALESCE(${patch.completedAt ?? null}, completed_at),
+      completed_by = COALESCE(${patch.completedBy ?? null}, completed_by),
+      sequence_no = COALESCE(${patch.sequenceNo ?? null}, sequence_no),
+      note = COALESCE(${patch.note ?? null}, note),
+      updated_at = now(), version = version + 1
+    WHERE id = ${id}
+  `);
+}

@@ -19,6 +19,7 @@ import { WarehouseService } from "../../modules/inventory/application/warehouse-
 import { StockService } from "../../modules/inventory/application/stock-service";
 import { TrackingService } from "../../modules/inventory/application/tracking-service";
 import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 import { SalesInvoiceService } from "../../modules/sales/application/invoices";
 import { CreditNoteService } from "../../modules/sales/application/credit-notes";
 import type { ReportResult } from "../../modules/reporting/application/contract";
@@ -51,7 +52,12 @@ const periods = new PeriodService(audit);
 const warehouses = new WarehouseService(audit);
 const stock = new StockService(audit, posting);
 const tracking = new TrackingService(audit, stock);
-const goodsReceipts = new GoodsReceiptService(audit, posting, numbering);
+const goodsReceipts = new GoodsReceiptService(
+  audit,
+  posting,
+  numbering,
+  new PutawayService(audit),
+);
 const salesInvoices = new SalesInvoiceService(audit, posting, numbering, new TaxResolverService());
 const creditNotes = new CreditNoteService(audit, posting, numbering, new TaxResolverService());
 

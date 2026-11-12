@@ -245,6 +245,8 @@ export interface ItemReadRow {
   trackSerial: boolean;
   trackImei: boolean;
   hasExpiry: boolean;
+  /** PHASE-044 (T-04): the putaway-rule condition source. */
+  categoryId: string | null;
   /** PHASE-018 (migration 0026): FG batch expiry = completion + shelf life. */
   shelfLifeDays: number | null;
   /** PHASE-044 (migration 0067): the stock UOM — bin_contents rows ride it. */
@@ -256,7 +258,7 @@ export async function findItemForInventory(id: string): Promise<ItemReadRow | un
     SELECT id, sku, name, name_ar AS "nameAr", kind, status,
       costing_method AS "costingMethod", track_batch AS "trackBatch",
       track_serial AS "trackSerial", track_imei AS "trackImei", has_expiry AS "hasExpiry",
-      shelf_life_days AS "shelfLifeDays", uom_id AS "uomId"
+      shelf_life_days AS "shelfLifeDays", uom_id AS "uomId", category_id AS "categoryId"
     FROM items WHERE id = ${id} LIMIT 1
   `);
   return (rows.rows as unknown as ItemReadRow[])[0];

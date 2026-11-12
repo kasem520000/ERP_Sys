@@ -13,6 +13,7 @@ import {
   stagePendingOverlay,
   type ReceiptPlan,
 } from "../../inventory/application/movement-core";
+import { PutawayService } from "../../inventory/application/putaway-service";
 import * as store from "../infrastructure/purchasing.store";
 import {
   EmptyDocumentError,
@@ -77,8 +78,12 @@ export interface GrnLineInput {
 export class GoodsReceiptService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
-    private readonly numbering: NumberingService,
+    // PHASE-041 T-13's boot lesson: EVERY constructor param carries its
+    // explicit @Inject — a mixed decorated/undecorated signature breaks
+    // the full-AppModule resolution.
+    @Inject(PostingService) private readonly posting: PostingService,
+    @Inject(NumberingService) private readonly numbering: NumberingService,
+    @Inject(PutawayService) private readonly putaway: PutawayService,
   ) {}
 
   async list(filter: { status?: string; supplierId?: string; poId?: string; limit: number }) {
@@ -381,6 +386,32 @@ export class GoodsReceiptService {
       await applyReceipt(plan, result.journalEntryId);
     }
 
+    // (3b) PHASE-044 (T-04, §2.3/PP-12): the directed-putaway suggestions —
+    // one PUTAWAY task per line whose rule suggestion differs from the
+    // landing (DEFAULT) bin; the labels ride the response for the
+    // immediate bin-label print (PP-12 — the web layer renders them).
+    let putawayTasks: Awaited<ReturnType<PutawayService["generateTasksForReceipt"]>> = [];
+    try {
+      putawayTasks = await this.putaway.generateTasksForReceipt({
+        warehouseId: receipt.warehouseId,
+        lines: plans.map(({ line, plan }) => ({
+          itemId: plan.itemId,
+          qty: plan.qty,
+          batchId: plan.batchId,
+          lpnId: null,
+          sourceType: "goods_receipt",
+          sourceId: id,
+          sourceLineNo: line.lineNo,
+        })),
+        actorId,
+      });
+    } catch {
+      // The suggestions NEVER block the posted receipt (the tasks are an
+      // operational aid, not an economic leg) — a rule-engine failure is
+      // surfaced by the task board, not by the GRN post.
+      putawayTasks = [];
+    }
+
     // (4) Official number + status flip.
     const year = receipt.receiptDate.slice(0, 4);
     const acquired = await this.numbering.reserve({
@@ -418,6 +449,7 @@ export class GoodsReceiptService {
       journalEntryId: result.journalEntryId,
       receiptNo: acquired.number,
       idempotentReplay: false,
+      putawayTasks,
     };
   }
 

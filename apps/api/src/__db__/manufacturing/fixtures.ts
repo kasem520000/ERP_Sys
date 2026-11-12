@@ -28,6 +28,7 @@ import { ReworkService } from "../../modules/manufacturing/application/rework-se
 import { DowntimeService } from "../../modules/manufacturing/application/downtime-service";
 import { StandardCostService } from "../../modules/manufacturing/application/standard-cost-service";
 import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 import { ConfigRepository } from "../../modules/configuration/infrastructure/config-repository";
 import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
 import { InboxService } from "../../modules/notifications/application/inbox-service";
@@ -96,7 +97,7 @@ export const downtime = new DowntimeService(
   new ResolveEffectiveConfigService(new ConfigRepository()),
 );
 export const standardCosts = new StandardCostService(audit, posting);
-export const goodsReceipts = new GoodsReceiptService(audit, posting, numbering);
+export const goodsReceipts = new GoodsReceiptService(audit, posting, numbering, new PutawayService(audit));
 // T38b-ii: the WIP↔GL check (INV-010 extension) — read-only analysis
 // recording into the PHASE-007 reconciliation framework.
 export const wipReconciliation = new ManufacturingReconciliationService(audit, new InboxService());

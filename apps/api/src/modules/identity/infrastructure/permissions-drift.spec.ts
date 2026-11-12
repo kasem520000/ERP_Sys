@@ -34,6 +34,16 @@ const SEED_PATHS = [
   join(process.cwd(), "migrations", "0056_dunning_collections.sql"), // PHASE-039 returns & collections keys (256 → 265)
   join(process.cwd(), "migrations", "0060_import_toolkit.sql"), // PHASE-040 data onboarding keys (265 → 267)
   join(process.cwd(), "migrations", "0064_communications_hub.sql"), // PHASE-041 communications keys (267 → 272)
+  // PHASE-044 repair: the 042 manufacturing-execution seed pair was never
+  // added here — the matrix §3.20 rows existed while the checker stayed
+  // blind to the seed migrations, so the drift-free contract silently
+  // missed its own negative (caught by the PHASE-044 gate re-run).
+  join(process.cwd(), "migrations", "0065_routing_work_centers.sql"), // PHASE-042 routing/work-center keys
+  join(process.cwd(), "migrations", "0066_standard_costing.sql"), // PHASE-042 standard-costing key
+  // NOT YET LISTED: 0071_wms_seeds.sql — its eight inventory WMS keys
+  // join this contract together with their AUTHORIZATION_MATRIX §3.21
+  // rows (the route wiring lands with the PHASE-044 web tasks; adding
+  // the seed path before the matrix rows would fail unknownInSeed).
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

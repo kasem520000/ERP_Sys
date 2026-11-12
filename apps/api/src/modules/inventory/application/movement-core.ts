@@ -29,6 +29,7 @@ import {
   WarehouseInactiveError,
   WarehouseNotFoundError,
 } from "../domain/inventory-errors";
+import { requireTenantContext } from "../../../infra/db/tenant-context";
 import { fifoConsume } from "../domain/valuation/fifo";
 import { wacIssue, wacReceive } from "../domain/valuation/wac";
 
@@ -184,34 +185,58 @@ function commitOverlay(
 }
 
 /**
- * Per-transaction pending BIN-TAKE overlay (PHASE-044, INV-029's sibling
+ * Per-TRANSACTION pending BIN-TAKE overlay (PHASE-044, INV-029's sibling
  * of the position overlay): multi-line documents plan every issue up
  * front — a later line's plan must see the earlier lines' pending bin
  * takes or two lines would allocate the SAME bin_contents row and the
- * apply's decrement would floor at the qty>=0 CHECK. Keyed contentId →
- * qty already spoken for; discarded with the transaction handle.
+ * apply's decrement would floor at the qty>=0 CHECK.
+ *
+ * KEYING (the R17 lesson): the drizzle tx handle is STABLE across
+ * sequential withTenant units-of-work, so a WeakMap keyed on the handle
+ * would ACCUMULATE takes across transactions (a poison — the position
+ * overlay survives the same staleness only because its committed values
+ * converge with the DB). This overlay keys on the TenantContext OBJECT —
+ * a fresh allocation per withTenant call — so the takes die with their
+ * transaction, by construction.
  */
-const binTakesByTx = new WeakMap<object, Map<string, string>>();
+const binTakesByContext = new WeakMap<object, Map<string, string>>();
 
-function pendingBinTakes(tx: object): Map<string, string> {
-  let map = binTakesByTx.get(tx);
+function pendingBinTakes(): Map<string, string> {
+  const context = requireTenantContext();
+  let map = binTakesByContext.get(context);
   if (map === undefined) {
     map = new Map();
-    binTakesByTx.set(tx, map);
+    binTakesByContext.set(context, map);
   }
   return map;
 }
 
 function stageBinTake(contentId: string, qty: string): void {
-  const tx = store.inventoryTx();
-  const map = pendingBinTakes(tx);
+  const map = pendingBinTakes();
   map.set(contentId, addExact(map.get(contentId) ?? "0", qty));
+}
+
+/**
+ * Release an APPLIED take: the DB decrement now carries it, so the staged
+ * amount must stop shadowing the row (the R17 lesson — a single-UoW
+ * fixture with multiple documents would otherwise double-count every
+ * applied take against the already-decremented row).
+ */
+function releaseBinTake(contentId: string, qty: string): void {
+  const map = pendingBinTakes();
+  const current = map.get(contentId);
+  if (current === undefined) return;
+  const next = subExact(current, qty);
+  if (Number(next) <= 0) {
+    map.delete(contentId);
+  } else {
+    map.set(contentId, next);
+  }
 }
 
 /** The row's qty net of this transaction's pending takes. */
 function netOfPendingTakes(row: { id: string; qty: string }): string {
-  const tx = store.inventoryTx();
-  const pending = pendingBinTakes(tx).get(row.id);
+  const pending = pendingBinTakes().get(row.id);
   return pending === undefined ? row.qty : subExact(row.qty, pending);
 }
 
@@ -880,9 +905,12 @@ export async function applyIssue(plan: IssuePlan, journalEntryId: string | null)
       lpnId: null,
     });
     // PHASE-044 (INV-029): the bin decrements ride THIS transaction — the
-    // same-transaction law (Σ bins moves with item_stock, atomically).
+    // same-transaction law (Σ bins moves with item_stock, atomically) —
+    // and each applied take releases from the pending overlay (the DB now
+    // carries it; a lingering staged take would double-count).
     for (const take of slice.binTakes) {
       await wms.decrementBinContent(take.contentId, take.qty);
+      releaseBinTake(take.contentId, take.qty);
     }
     for (const decrement of slice.layerDecrements) {
       await store.decrementLayer(decrement.layerId, decrement.qty);

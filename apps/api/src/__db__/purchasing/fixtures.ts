@@ -26,6 +26,7 @@ import { AllocationService } from "../../modules/treasury/application/allocation
 import { RevaluationService } from "../../modules/inventory/application/revaluation-service";
 import { PurchaseRequestService, PurchaseOrderService } from "../../modules/purchasing/application/orders";
 import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 import { SupplierInvoiceService } from "../../modules/purchasing/application/supplier-invoices";
 import { DebitNoteService } from "../../modules/purchasing/application/debit-notes";
 import { ReallocationService } from "../../modules/purchasing/application/reallocations";
@@ -62,7 +63,7 @@ const matching = new MatchingService();
 
 export const purchaseRequests = new PurchaseRequestService(audit, numbering);
 export const purchaseOrders = new PurchaseOrderService(audit, numbering);
-export const goodsReceipts = new GoodsReceiptService(audit, posting, numbering);
+export const goodsReceipts = new GoodsReceiptService(audit, posting, numbering, new PutawayService(audit));
 export const supplierInvoices = new SupplierInvoiceService(audit, posting, numbering, resolver, matching);
 export const debitNotes = new DebitNoteService(audit, posting, numbering, resolver);
 export const reallocations = new ReallocationService(audit, numbering);

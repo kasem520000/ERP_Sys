@@ -380,3 +380,36 @@ export class LpnClosedError extends DomainError {
     super("LPN_CLOSED", `LPN ${id} is CLOSED — bind or move its contents first`);
   }
 }
+
+// -- directed putaway (PHASE-044 T-04; §2.3; I-03/PP-12) -------------------------------
+
+export class PutawayRuleInvalidError extends DomainError {
+  constructor(message: string) {
+    super("PUTAWAY_RULE_INVALID", message);
+  }
+}
+export class PutawayRuleNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("PUTAWAY_RULE_NOT_FOUND", `putaway rule ${id} does not exist in this tenant`);
+  }
+}
+export class PutawayTaskNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("PUTAWAY_TASK_NOT_FOUND", `task ${id} does not exist in this tenant`);
+  }
+}
+export class PutawayTaskStateError extends DomainError {
+  constructor(message: string) {
+    super("PUTAWAY_TASK_STATE_INVALID", message);
+  }
+}
+/** PP-12/§6.3: the scanned bin is not the task's directed target. */
+export class WrongBinPutawayError extends DomainError {
+  constructor(scanned: string, expectedBinCode: string) {
+    super(
+      "WRONG_BIN_PUTAWAY",
+      `scanned bin ${scanned} is not the directed target ${expectedBinCode}`,
+      { scanned, expectedBinCode },
+    );
+  }
+}
