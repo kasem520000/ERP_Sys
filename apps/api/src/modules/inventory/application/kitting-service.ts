@@ -150,9 +150,19 @@ export class KittingService {
    * kit receipts at Σ component costs EXACTLY — NO journal (same-account
    * by construction, the D-4 law). INV-029 holds: every leg rides the
    * movement core, so bin_contents move in the same transactions as
-   * item_stock.
+   * item_stock. Serialized components/kits name their units AT POST (the
+   * operator scans at assembly — the lines table stores no serials).
    */
-  async postKitOrder(input: { id: string; actorId: string | null }) {
+  async postKitOrder(input: {
+    id: string;
+    actorId: string | null;
+    /** Scan-at-post: the serialized component units per line (required
+     * for serial-tracked components — one id per unit of the line qty). */
+    componentSerials?: { lineNo: number; serialIds: string[] }[];
+    /** The serialized kit's units (required when the kit item tracks
+     * serials — one id per kit unit). */
+    kitSerialIds?: string[];
+  }) {
     const order = await this.findKitOrder(input.id);
     if (order.status !== "DRAFT") {
       throw new WarehouseKitStateError(`kit order ${input.id} is ${order.status} — only DRAFT posts`);
@@ -166,6 +176,7 @@ export class KittingService {
     // PLAN every component issue (no writes).
     const issuePlans: { line: kit.WarehouseKitLineRow; plan: Awaited<ReturnType<typeof planIssue>> }[] = [];
     for (const line of lines) {
+      const serialInput = (input.componentSerials ?? []).find((row) => row.lineNo === line.lineNo);
       let directedTakes: { contentId: string; qty: string }[] | undefined;
       if (line.fromBinId !== null) {
         // The directed allocation over the named bin's rows exactly.
@@ -201,6 +212,7 @@ export class KittingService {
         sourceId: input.id,
         reason: "KIT_CONSUMPTION",
         directedTakes,
+        serialIds: serialInput?.serialIds,
         serialEvent: "KIT_OUT",
       });
       issuePlans.push({ line, plan });
@@ -228,6 +240,7 @@ export class KittingService {
       sourceId: input.id,
       reason: "KIT_ASSEMBLY",
       targetBinId: null, // the warehouse DEFAULT bin (a putaway task can move it on)
+      serialIds: input.kitSerialIds ?? [],
       serialEvent: "KIT_IN",
     });
 
