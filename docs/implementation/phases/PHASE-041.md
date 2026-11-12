@@ -1,6 +1,6 @@
 # PHASE-041 — Communications Hub
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 1 / Stage 12 · **Register:** [CR-11](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE 2026-11-12 (Blueprint v3.0 · Wave 1 closed) · **Wave:** 1 / Stage 12 · **Register:** [CR-11](../../planning/COMPLETENESS_REGISTER.md) · **Report:** [reports/PHASE-041-COMPLETION.md](reports/PHASE-041-COMPLETION.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-22) · §26.3 (IN-13…IN-18, N-06/N-07/N-08) · §25.3 (FD-30) · §27.2 (TB-23) · UX-14 · PP-13/PP-15
 
 ## 1. Phase Overview
