@@ -1,6 +1,6 @@
 # PHASE-042 — Manufacturing I — Routing, Work Centers & Costing
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-45) · **Wave:** 2 / Stage 13 · **Register:** [CR-12](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE — DELIVERED 2026-11-12 (migrations 0065/0066, schema_version 66; the [completion report](reports/PHASE-042-COMPLETION.md) carries the evidence) · **Wave:** 2 / Stage 13 · **Register:** [CR-12](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-04 · §7 M-02…M-04, M-12…M-19 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 1: التصنيع» · [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-12 standard costing — the v3.1 scope extension, decided pre-042 per the owner mandate)
 
 ## 1. Phase Overview

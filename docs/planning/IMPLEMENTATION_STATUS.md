@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-12 (PHASE-041 COMPLETE — **Wave 1 closed**: 035…041 all delivered; roadmap v3.1 + v3.2 applied)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-12 (PHASE-042 COMPLETE — Wave 2 opens: 035…042 delivered; roadmap v3.1 + v3.2 applied)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -160,6 +160,21 @@ EXPLAIN budgets, the `/settings/communication` hub + unified-inbox web surfaces
 rules register. Permissions 267 → **272**; feature keys +6; i18n 5,108 →
 **5,247**; the full-AppModule HTTP smoke caught + fixed a real DI regression.
 Evidence: [the completion report](../implementation/phases/reports/PHASE-041-COMPLETION.md).
+**PHASE-042 (2026-11-12 — CR-12, extended by v3.1/CR-45 L2-12):** Manufacturing I — Routing, Work
+Centers & Costing delivered — Wave 2's opener. Migrations `0065`/`0066` (schema_version 66; seven
+RLS'd tables — `work_centers`, `routings`, `routing_operations`, `production_order_operations`,
+`rework_orders`, `downtime_records`, `item_standard_costs` — + the two security_invoker OEE views
++ the production_orders extension columns), the versioned-routing discipline (one ACTIVE per item,
+the BOM pattern), the INV-028 operation machine (sequence gate, skip SoD, G-40 conversion posting
+at work-center rates × actual times, idempotent `op_<seq>` replay), rework orders (G-41 →
+REWORK_EXPENSE — never the parent FG layer, BR-069), reason-coded downtime (record-only by
+default — BR-070; G-42 on the explicit opt-in), the L2-12 standard-cost layer (roll-up over BOM +
+routing, freeze/activate, PPV at receipt, stock revaluation), the touch-first shop-floor terminal
+with the OP-scan endpoint (M-17), 4 report contracts (registry 91 → 95), and the five web surfaces
++ the Operations tab. Permissions 272 → **279** (matrix §3.20); feature keys +6 (business+
+enterprise + the food_manufacturing enablement); i18n 5,247 → **5,422** (+175, the operative
+count); ENTITY_CATALOG 232 → **239**; isolation suite 1,332/1,332 (+42).
+Evidence: [the completion report](../implementation/phases/reports/PHASE-042-COMPLETION.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -189,7 +204,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-039](../implementation/phases/PHASE-039.md) | Returns & Collections (RMA + Dunning + late fees + agencies + supplier RMA — v3.1/CR-46 + v3.2/CR-50) | 1 / 12 | 035 | **COMPLETE 2026-11-11** — [report](../implementation/phases/reports/PHASE-039-COMPLETION.md) |
 | [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit (imports + adapters + demo data + sandboxes — L1-21 export half) | 1 / 12 | 035 | **COMPLETE 2026-11-11** — [report](../implementation/phases/reports/PHASE-040-COMPLETION.md) |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email — Wave 1 closer) | 1 / 12 | 035 | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-041-COMPLETION.md) |
-| [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers | 2 / 13 | 036 | NOT_STARTED — PLANNED |
+| [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | NOT_STARTED — PLANNED |
 | [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | NOT_STARTED — PLANNED |
