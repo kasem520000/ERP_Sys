@@ -23,6 +23,7 @@ import { CycleCountService } from "./application/cycle-count-service";
 import { QuarantineService } from "./application/quarantine-service";
 import { ConsignmentService } from "./application/consignment-service";
 import { KittingService } from "./application/kitting-service";
+import { AlertsService } from "./application/alerts-service";
 import { InventoryController } from "./presentation/inventory.controller";
 
 /**
@@ -61,6 +62,20 @@ export const CYCLE_COUNT_GENERATE_QUEUE = "inventory.cycle-count-generate";
 export const CYCLE_COUNT_GENERATE_CRON = "15 2 * * *";
 
 export interface CycleCountGenerateJobPayload {
+  system: true;
+}
+
+/**
+ * PHASE-044 (§2.13, I-17/I-21/I-25): the two alert sweeps — the
+ * shelf-life probe at 02:30 UTC and the slow-movement probe at 03:00 UTC
+ * (after the bin-reconcile + generation passes).
+ */
+export const SHELF_LIFE_ALERTS_QUEUE = "inventory.shelf-life-alerts";
+export const SHELF_LIFE_ALERTS_CRON = "30 2 * * *";
+export const SLOW_MOVEMENT_ALERTS_QUEUE = "inventory.slow-movement-alerts";
+export const SLOW_MOVEMENT_ALERTS_CRON = "0 3 * * *";
+
+export interface InventoryAlertsJobPayload {
   system: true;
 }
 
@@ -106,6 +121,7 @@ export interface CycleCountGenerateJobPayload {
     QuarantineService,
     ConsignmentService,
     KittingService,
+    AlertsService,
   ],
   exports: [
     WarehouseService,
@@ -126,6 +142,7 @@ export interface CycleCountGenerateJobPayload {
     QuarantineService,
     ConsignmentService,
     KittingService,
+    AlertsService,
   ],
 })
 export class InventoryModule implements OnModuleInit {
@@ -133,6 +150,7 @@ export class InventoryModule implements OnModuleInit {
     @Inject(ReservationService) private readonly reservations: ReservationService,
     @Inject(WmsService) private readonly wms: WmsService,
     @Inject(CycleCountService) private readonly cycleCounts: CycleCountService,
+    @Inject(AlertsService) private readonly alerts: AlertsService,
   ) {}
 
   /**
@@ -203,5 +221,31 @@ export class InventoryModule implements OnModuleInit {
         system: true,
       } satisfies CycleCountGenerateJobPayload)
       .catch(() => undefined);
+
+    for (const [queue, cron] of [
+      [SHELF_LIFE_ALERTS_QUEUE, SHELF_LIFE_ALERTS_CRON],
+      [SLOW_MOVEMENT_ALERTS_QUEUE, SLOW_MOVEMENT_ALERTS_CRON],
+    ] as const) {
+      await boss
+        .createQueue(queue)
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!/exist/i.test(message)) throw error;
+        });
+      await boss.work<InventoryAlertsJobPayload>(queue, async (jobs) => {
+        // Idempotent full pass per delivery — the dedupe key makes re-runs
+        // notification-free inside the day window.
+        for (let index = 0; index < jobs.length; index += 1) {
+          if (queue === SHELF_LIFE_ALERTS_QUEUE) {
+            await this.alerts.runShelfLifeAlerts();
+          } else {
+            await this.alerts.runSlowMovementAlerts();
+          }
+        }
+      });
+      await boss
+        .schedule(queue, cron, { system: true } satisfies InventoryAlertsJobPayload)
+        .catch(() => undefined);
+    }
   }
 }

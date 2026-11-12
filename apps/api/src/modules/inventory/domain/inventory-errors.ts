@@ -558,3 +558,16 @@ export class CrossDockQtyExceededError extends DomainError {
     );
   }
 }
+
+// -- transfer pricing + transit exceptions (PHASE-044 T-12; §2.13; I-22/I-23) -----------
+
+export class StockTransferPricingStateError extends DomainError {
+  constructor(message: string) {
+    super("STOCK_TRANSFER_PRICING_INVALID", message);
+  }
+}
+export class TransitExceptionStateError extends DomainError {
+  constructor(message: string) {
+    super("TRANSIT_EXCEPTION_INVALID", message);
+  }
+}
