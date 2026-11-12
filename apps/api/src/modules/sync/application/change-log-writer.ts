@@ -142,6 +142,32 @@ async function projectSource(
       `);
       return (rows.rows as unknown as Record<string, unknown>[]).map(mapRow);
     }
+    case "pick_tasks":
+    case "putaway_tasks": {
+      // PHASE-044 · OA-02: the field workforce's task list — the
+      // pick_tasks table filtered by task_kind (the putaway board rides
+      // the same table). Watermarked by updated_at like every generic
+      // feed; the confirm handlers' in-tx markers keep the push-side
+      // current too.
+      const kind = entityType === "pick_tasks" ? "PICK" : "PUTAWAY";
+      const rows = await tx.execute(sql`
+        SELECT t.id, t.updated_at AS "changedAt", t.version, t.task_kind AS "taskKind",
+               t.status, t.item_id AS "itemId", t.qty::text AS qty, t.qty_done::text AS "qtyDone",
+               t.from_bin_id AS "fromBinId", fb.code AS "fromBinCode",
+               t.to_bin_id AS "toBinId", tb.code AS "toBinCode",
+               t.batch_id AS "batchId", t.wave_id AS "waveId", t.sequence_no AS "sequenceNo",
+               t.source_type AS "sourceType", t.source_id AS "sourceId",
+               t.source_line_no AS "sourceLineNo", t.assignee_user_id AS "assigneeUserId",
+               t.scan_verified AS "scanVerified", t.completed_at AS "completedAt"
+        FROM pick_tasks t
+        LEFT JOIN warehouse_bins fb ON fb.id = t.from_bin_id AND fb.tenant_id = t.tenant_id
+        LEFT JOIN warehouse_bins tb ON tb.id = t.to_bin_id AND tb.tenant_id = t.tenant_id
+        WHERE t.task_kind = ${kind}
+          AND ((${sinceFallback}::boolean AND t.updated_at IS NOT NULL) OR t.updated_at ${sinceClause})
+        ORDER BY t.updated_at NULLS FIRST, t.id LIMIT ${limit}
+      `);
+      return (rows.rows as unknown as Record<string, unknown>[]).map(mapRow);
+    }
     case "barcodes": {
       const rows = await tx.execute(sql`
         SELECT b.id, b.updated_at AS "changedAt", b.version, b.code, b.item_id AS "itemId", b.uom_id AS "uomId"

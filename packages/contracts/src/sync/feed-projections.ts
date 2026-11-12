@@ -22,6 +22,37 @@
  * `notifications` (the per-user notification cache).
  */
 
+/** `pick_tasks` + `putaway_tasks` — PHASE-044 · OA-02: the field
+ * workforce's synced task list (both projections of the pick_tasks table
+ * filtered by task_kind; `id` is the task row's uuid). The device's
+ * offline board renders the OPEN slice (status PENDING/ASSIGNED) and
+ * drives the scan confirmations through the wms_task write intents; state
+ * transitions re-feed by last-writer-wins per id. */
+export interface WmsTaskLite {
+  readonly id: string;
+  readonly version: number;
+  readonly changedAt: string;
+  readonly taskKind: "PICK" | "PUTAWAY";
+  readonly status: string;
+  readonly itemId: string;
+  /** TEXT decimal string, 6-dp (numeric(19,6) at rest). */
+  readonly qty: string;
+  readonly qtyDone: string | null;
+  readonly fromBinId: string | null;
+  readonly fromBinCode: string | null;
+  readonly toBinId: string | null;
+  readonly toBinCode: string | null;
+  readonly batchId: string | null;
+  readonly waveId: string | null;
+  readonly sequenceNo: number;
+  readonly sourceType: string | null;
+  readonly sourceId: string | null;
+  readonly sourceLineNo: number | null;
+  readonly assigneeUserId: string | null;
+  readonly scanVerified: boolean;
+  readonly completedAt: string | null;
+}
+
 /** `van_stocks` — the van stock snapshot row (the PHASE-017 mirror,
  * refreshed from stock_moves inside the owning transaction). `id` is the
  * mirror row's uuid; the natural key is (warehouseId, itemId, batchId).

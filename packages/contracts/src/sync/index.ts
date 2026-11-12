@@ -280,6 +280,11 @@ const FIELD_FEED_GROUP = [
   "routes",
   "settlement_templates",
   "statements",
+  // PHASE-044 · OA-02: the field workforce's synced task lists (the
+  // directed-ops board — pick_tasks + putaway_tasks, both projections of
+  // the pick_tasks table filtered by task_kind).
+  "pick_tasks",
+  "putaway_tasks",
 ] as const;
 
 /** PHASE-022 · DR-P22-05 — the personal feed group (MASTER-PLAN §0 golden
@@ -590,10 +595,14 @@ export {
   receiptCreateFieldCollectionPayloadSchema,
   vanConfirmLoadPayloadSchema,
   vanConfirmUnloadPayloadSchema,
+  wmsTaskConfirmPickPayloadSchema,
+  wmsTaskConfirmPutawayPayloadSchema,
   type CreditNoteCreateDraftPayload,
   type ReceiptCreateFieldCollectionPayload,
   type VanConfirmLoadPayload,
   type VanConfirmUnloadPayload,
+  type WmsTaskConfirmPickPayload,
+  type WmsTaskConfirmPutawayPayload,
 } from "./field-intents";
 
 // -- PHASE-022 · DR-P22-05 · the mobile feed LITE payload shapes -----------------
@@ -611,6 +620,7 @@ export type {
   StatementEntryLite,
   StatementLite,
   VanStockLite,
+  WmsTaskLite,
 } from "./feed-projections";
 
 // -- PHASE-020 · the machine capabilities fixture (MASTER-PLAN §15, T17) --------

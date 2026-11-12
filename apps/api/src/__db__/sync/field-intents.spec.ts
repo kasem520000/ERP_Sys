@@ -46,6 +46,7 @@ import {
   type PosWorld,
 } from "./_oracle";
 import { PickingService } from "../../modules/inventory/application/picking-service";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 
 /**
  * PHASE-022 T-P22-2c · DR-P22-06 — the three field write intents
@@ -112,6 +113,8 @@ const settlement = new SettlementCore(audit, posting, numbering);
 const receipts = new ReceiptService(audit, settlement);
 const allocations = new AllocationService(audit);
 const vanStock = new VanStockService(audit, inventoryTransfers);
+const putaway = new PutawayService(audit);
+const picking = new PickingService(audit, numbering);
 const push = new PushService(
   posSales,
   shiftFlow,
@@ -128,6 +131,8 @@ const push = new PushService(
   allocations,
   vanStock,
   creditNotes,
+putaway,
+picking,
 );
 
 /** Narrow an item to its REJECTED variant (typed access to reason/action). */
@@ -1015,7 +1020,8 @@ describe("PHASE-022 DR-P22-06 · field write intents (T-P22-2c)", () => {
         "credit_note:create_draft",
       ]),
     );
-    expect(handlerRegistryKeys()).toHaveLength(17);
+    // PHASE-044 · OA-02: the two WMS task confirmations join (17 → 19).
+    expect(handlerRegistryKeys()).toHaveLength(19);
 
     // The final composite oracle sweep over everything this spec posted.
     await ledgerOraclesHold(TENANT);

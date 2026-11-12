@@ -178,3 +178,40 @@ export const creditNoteCreateDraftPayloadSchema = z.object({
 });
 
 export type CreditNoteCreateDraftPayload = z.infer<typeof creditNoteCreateDraftPayloadSchema>;
+
+// -- wms_task:confirm_putaway + wms_task:confirm_pick (PHASE-044 · OA-02) ------------
+
+/**
+ * PHASE-044 · OA-02 (the field workforce's synced task list): the two
+ * scan-confirmation write intents over the inventory module's WMS
+ * services — `wms_task:confirm_putaway` (PutawayService.confirm: the scan
+ * MUST resolve to the task's directed bin; PP-12) and
+ * `wms_task:confirm_pick` (PickingService.confirmPick: the scan MUST
+ * resolve to the allocated source bin, an optional short qty under the
+ * warehouse's allow_partial; PP-11/DF-17). Both are SERVER_DECIDES at
+ * sync, idempotent on replay (the owning services return the stored row
+ * for an already-COMPLETED task — C-01 duplicate delivery is a no-op), and
+ * reject wrong-bin scans with the typed service errors (mapped to the
+ * VALIDATION_ERROR item rejection with the machine-readable details).
+ */
+export const wmsTaskConfirmPutawayPayloadSchema = z.object({
+  taskId: z.string().uuid(),
+  /** The scanned BIN BARCODE (the scan-stable key; the bin code and id are
+   * accepted as typed fallbacks server-side). */
+  scannedBarcode: z.string().min(1).max(120),
+  confirmedAt: advisoryTimestamp,
+});
+
+export type WmsTaskConfirmPutawayPayload = z.infer<typeof wmsTaskConfirmPutawayPayloadSchema>;
+
+export const wmsTaskConfirmPickPayloadSchema = z.object({
+  taskId: z.string().uuid(),
+  /** The scanned BIN BARCODE (the allocated source face). */
+  scannedBarcode: z.string().min(1).max(120),
+  /** The confirmed qty — omitted = the full task qty; a short qty confirms
+   * only under the warehouse strategy's allow_partial. */
+  qty: qty.nullable().optional(),
+  confirmedAt: advisoryTimestamp,
+});
+
+export type WmsTaskConfirmPickPayload = z.infer<typeof wmsTaskConfirmPickPayloadSchema>;

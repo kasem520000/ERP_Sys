@@ -54,6 +54,7 @@ import {
 } from "./ga-fixtures";
 import { AppModule } from "../../app.module";
 import { PickingService } from "../../modules/inventory/application/picking-service";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 
 /**
  * PHASE-025 T2 · the GA full-load local harness — LOCAL HARNESS TIER: the
@@ -115,6 +116,8 @@ const settlement = new SettlementCore(audit, posting, numbering);
 const receipts = new ReceiptService(audit, settlement);
 const allocations = new AllocationService(audit);
 const vanStock = new VanStockService(audit, inventoryTransfers);
+const putaway = new PutawayService(audit);
+const picking = new PickingService(audit, numbering);
 const push = new PushService(
   posSales,
   shiftFlow,
@@ -131,6 +134,8 @@ const push = new PushService(
   allocations,
   vanStock,
   creditNotes,
+putaway,
+picking,
 );
 
 let httpBase = "";

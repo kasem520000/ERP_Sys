@@ -152,6 +152,8 @@ export {
   syncCommandSchema,
   vanConfirmLoadPayloadSchema,
   vanConfirmUnloadPayloadSchema,
+  wmsTaskConfirmPickPayloadSchema,
+  wmsTaskConfirmPutawayPayloadSchema,
   type CapabilityClass,
   type CashTransferCreateDraftPayload,
   type CashierShiftCommand,
@@ -196,4 +198,7 @@ export {
   type VanConfirmLoadPayload,
   type VanConfirmUnloadPayload,
   type VanStockLite,
+  type WmsTaskConfirmPickPayload,
+  type WmsTaskConfirmPutawayPayload,
+  type WmsTaskLite,
 } from "./sync";

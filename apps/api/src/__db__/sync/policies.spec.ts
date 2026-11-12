@@ -39,6 +39,7 @@ import { CountService } from "../../modules/inventory/application/count-service"
 import { PosShiftFlowService } from "../../modules/pos/application/shift-flow-service";
 import { PushService } from "../../modules/sync/application/push-service";
 import { PickingService } from "../../modules/inventory/application/picking-service";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
 
 /**
  * PHASE-020 T-P20-2b · push policy evidence (MASTER-PLAN §7 conflict-policy
@@ -95,6 +96,8 @@ const settlement = new SettlementCore(audit, posting, numbering);
 const receipts = new ReceiptService(audit, settlement);
 const allocations = new AllocationService(audit);
 const vanStock = new VanStockService(audit, inventoryTransfers);
+const putaway = new PutawayService(audit);
+const picking = new PickingService(audit, numbering);
 const push = new PushService(
   posSales,
   shiftFlow,
@@ -111,6 +114,8 @@ const push = new PushService(
   allocations,
   vanStock,
   creditNotes,
+putaway,
+picking,
 );
 
 /** Narrow an item to its REJECTED variant (typed access to reason/action). */

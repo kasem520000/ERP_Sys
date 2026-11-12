@@ -11,6 +11,8 @@ import { TransferService as InventoryTransferService } from "../../inventory/app
 import { PartnerService } from "../../partners/application/partner-service";
 import { PosSaleService } from "../../sales/application/pos-channel/pos-sale-service";
 import { CreditNoteService } from "../../sales/application/credit-notes";
+import { PutawayService } from "../../inventory/application/putaway-service";
+import { PickingService } from "../../inventory/application/picking-service";
 import { DeliveryNoteService } from "../../sales/application/deliveries";
 import { SalesInvoiceService } from "../../sales/application/invoices";
 import { QuotationService } from "../../sales/application/quotations";
@@ -447,6 +449,9 @@ export class PushService {
     @Inject(AllocationService) allocations: AllocationService,
     @Inject(VanStockService) vanStock: VanStockService,
     @Inject(CreditNoteService) creditNotes: CreditNoteService,
+    // PHASE-044 · OA-02: the WMS task confirmations' owning services.
+    @Inject(PutawayService) putaway: PutawayService,
+    @Inject(PickingService) picking: PickingService,
   ) {
     // The handlers call the DI'd owning-module services (single source of
     // instances; specs instantiate this class directly, which wires the
@@ -467,6 +472,8 @@ export class PushService {
       allocations,
       vanStock,
       creditNotes,
+      putaway,
+      picking,
     });
   }
 

@@ -50,6 +50,8 @@ import {
 import { receiptFieldCollectionHandler } from "./field-receipt";
 import { vanConfirmLoadHandler, vanConfirmUnloadHandler } from "./van-confirm";
 import { creditNoteCreateDraftHandler } from "./credit-note-draft";
+// PHASE-044 · OA-02: the WMS task scan confirmations.
+import { wmsTaskConfirmPickHandler, wmsTaskConfirmPutawayHandler } from "./wms-task";
 import type { SyncCommandHandler } from "./contract";
 
 /** key: `${entityType}:${intent}` — the ONLINE_ONLY entities never
@@ -90,6 +92,9 @@ export const HANDLER_REGISTRY: ReadonlyMap<string, SyncCommandHandler> = new Map
   ["van:confirm_load", vanConfirmLoadHandler],
   ["van:confirm_unload", vanConfirmUnloadHandler],
   ["credit_note:create_draft", creditNoteCreateDraftHandler],
+  // -- PHASE-044 · OA-02: the WMS task scan confirmations (16 → 18) ------
+  ["wms_task:confirm_putaway", wmsTaskConfirmPutawayHandler],
+  ["wms_task:confirm_pick", wmsTaskConfirmPickHandler],
 ]);
 
 /** Handler lookup by (entityType, intent). */

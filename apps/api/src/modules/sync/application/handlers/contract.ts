@@ -2,6 +2,8 @@ import { DomainError } from "@erp/domain-core";
 
 import type { AuditService } from "../../../audit/api/audit";
 import type { CountService } from "../../../inventory/application/count-service";
+import type { PutawayService } from "../../../inventory/application/putaway-service";
+import type { PickingService } from "../../../inventory/application/picking-service";
 import type { TransferService as InventoryTransferService } from "../../../inventory/application/transfer-service";
 import type { PartnerService } from "../../../partners/application/partner-service";
 import type { PosShiftFlowService } from "../../../pos/application/shift-flow-service";
@@ -113,6 +115,12 @@ export interface HandlerServices {
   readonly vanStock: VanStockService;
   /** `credit_note:create_draft` — the sales credit-note DRAFT path. */
   readonly creditNotes: CreditNoteService;
+  // PHASE-044 · OA-02: the WMS task confirmations' owning services —
+  // additive slots, wired by the same PushService constructor call.
+  /** `wms_task:confirm_putaway` — the directed putaway scan confirm. */
+  readonly putaway: PutawayService;
+  /** `wms_task:confirm_pick` — the directed pick scan confirm. */
+  readonly picking: PickingService;
 }
 
 let services: HandlerServices | undefined;
