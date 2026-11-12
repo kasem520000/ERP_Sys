@@ -433,6 +433,8 @@ export async function listBinContents(filter: {
   itemId?: string;
   status?: string;
   ownerPartnerId?: string | null;
+  /** T-06 (§2.5): the LPN-bound contents view — every row riding a plate. */
+  lpnId?: string;
   limit: number;
 }): Promise<BinContentRow[]> {
   const ownerFilter =
@@ -447,6 +449,7 @@ export async function listBinContents(filter: {
       AND (${filter.warehouseId ?? null}::uuid IS NULL OR bc.warehouse_id = ${filter.warehouseId ?? null})
       AND (${filter.itemId ?? null}::uuid IS NULL OR bc.item_id = ${filter.itemId ?? null})
       AND (${filter.status ?? null}::text IS NULL OR bc.status = ${filter.status ?? null})
+      AND (${filter.lpnId ?? null}::uuid IS NULL OR bc.lpn_id = ${filter.lpnId ?? null})
       AND ${ownerFilter}
     ORDER BY bc.bin_id, bc.item_id, bc.received_at
     LIMIT ${Math.min(filter.limit, 1000)}
@@ -804,21 +807,26 @@ export async function bindContentToLpn(contentId: string, lpnId: string): Promis
   `);
 }
 
-/** Move every row of an LPN into a target bin (move-by-LPN). */
+/**
+ * Move every row of an LPN into a target bin (move-by-LPN, T-06 §2.5):
+ * each row KEEPS ITS OWN STATUS — a QUARANTINE pallet stays quarantined
+ * at the new slot (the structural move never changes the control state;
+ * only the T-08 board's dispositions release it).
+ */
 export async function moveLpnContents(input: {
   lpnId: string;
   toBinId: string;
   note: string | null;
 }): Promise<number> {
-  const contents = await tenantTx().execute<{ id: string; qty: string }>(sql`
-    SELECT id, qty::text FROM bin_contents WHERE lpn_id = ${input.lpnId} AND qty > 0
+  const contents = await tenantTx().execute<{ id: string; qty: string; status: string }>(sql`
+    SELECT id, qty::text, status FROM bin_contents WHERE lpn_id = ${input.lpnId} AND qty > 0
   `);
-  for (const row of contents.rows as unknown as { id: string; qty: string }[]) {
+  for (const row of contents.rows as unknown as { id: string; qty: string; status: string }[]) {
     await moveBetweenSlots({
       fromContentId: row.id,
       qty: row.qty,
       toBinId: input.toBinId,
-      toStatus: "AVAILABLE",
+      toStatus: row.status,
       note: input.note,
     });
   }

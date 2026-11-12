@@ -81,6 +81,11 @@ const manualReceiptSchema = z.object({
   batchId: UUID.nullable().optional(),
   batchNo: z.string().min(1).max(60).nullable().optional(),
   batchExpiry: DATE.nullable().optional(),
+  // PHASE-044 T-06: the LPN-level receipt + the explicit bin endpoint +
+  // quarantine-on-receipt (the §2.5/§2.8 flows riding planReceipt).
+  lpnId: UUID.nullable().optional(),
+  targetBinId: UUID.nullable().optional(),
+  binStatus: z.enum(["AVAILABLE", "QUARANTINE"]).optional(),
   note: z.string().min(1).max(500).nullable().optional(),
   noteAr: z.string().min(1).max(500).nullable().optional(),
 });

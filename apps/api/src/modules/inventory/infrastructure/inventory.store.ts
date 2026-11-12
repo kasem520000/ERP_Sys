@@ -459,6 +459,28 @@ export async function countStockMoves(): Promise<number> {
   return (rows.rows as unknown as { n: number }[])[0]!.n;
 }
 
+/** One stock_moves row by id (the WMS evidence lookups — T-06's LPN ref). */
+export async function findMoveById(id: string): Promise<StockMoveRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT m.id, m.item_id AS "itemId", i.sku, m.warehouse_id AS "warehouseId",
+      w.code AS "warehouseCode", m.direction, m.move_kind AS "moveKind", m.qty,
+      m.unit_cost AS "unitCost", m.value_amount AS "valueAmount",
+      m.batch_id AS "batchId", b.batch_no AS "batchNo", m.serial_id AS "serialId",
+      s.serial_no AS "serialNo", m.source_type AS "sourceType", m.source_id AS "sourceId",
+      m.moved_at AS "movedAt", m.reason, m.memo, m.memo_ar AS "memoAr",
+      m.posted_journal_id AS "postedJournalId", m.created_at AS "createdAt",
+      m.source_bin_id AS "sourceBinId", m.target_bin_id AS "targetBinId", m.lpn_id AS "lpnId"
+    FROM stock_moves m
+    JOIN items i ON i.id = m.item_id AND i.tenant_id = m.tenant_id
+    JOIN warehouses w ON w.id = m.warehouse_id AND w.tenant_id = m.tenant_id
+    LEFT JOIN item_batches b ON b.id = m.batch_id AND b.tenant_id = m.tenant_id
+    LEFT JOIN item_serials s ON s.id = m.serial_id AND s.tenant_id = m.tenant_id
+    WHERE m.id = ${id}
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as StockMoveRow[])[0];
+}
+
 /**
  * Lock the position row (CC-04): SELECT … FOR UPDATE inside the ambient
  * transaction so concurrent issues of the last units serialize — the

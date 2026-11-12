@@ -362,6 +362,7 @@ export class WmsService {
     itemId?: string;
     status?: string;
     ownerPartnerId?: string | null;
+    lpnId?: string;
     limit?: number;
   }) {
     return wms.listBinContents({
@@ -370,8 +371,18 @@ export class WmsService {
       itemId: filter.itemId,
       status: filter.status,
       ownerPartnerId: filter.ownerPartnerId,
+      lpnId: filter.lpnId,
       limit: filter.limit ?? 500,
     });
+  }
+
+  /** T-06 (§2.5): the LPN-bound contents view — every live row riding the
+   * plate (the pallet manifest), newest receipts first. */
+  async lpnContents(lpnId: string) {
+    const lpn = await wms.findLpnById(lpnId);
+    if (lpn === undefined) throw new LpnNotFoundError(lpnId);
+    const rows = await wms.listBinContents({ lpnId, limit: 500 });
+    return { lpn, contents: rows.filter((row) => Number(row.qty) > 0) };
   }
 
   /** Bin-level ATP (AVAILABLE, tenant-owned rows only — BR-076's exclusion). */
@@ -495,12 +506,17 @@ export class WmsService {
   }
 
   /**
-   * Move-by-LPN (§2.5): every qty>0 row of the LPN moves into the target
-   * bin (same status — the structural move; item_stock never moves).
+   * Move-by-LPN (§2.5, T-06): every qty>0 row of the LPN moves into the
+   * target bin KEEPING ITS OWN STATUS (a QUARANTINE pallet stays
+   * quarantined at the new slot) — the structural move; item_stock never
+   * moves. A CLOSED plate never moves again (LpnClosedError).
    */
   async moveLpn(input: { lpnId: string; toBinId: string; note: string | null; actorId: string | null }) {
     const lpn = await wms.findLpnById(input.lpnId);
     if (lpn === undefined) throw new LpnNotFoundError(input.lpnId);
+    if (lpn.status !== "ACTIVE") {
+      throw new LpnClosedError(input.lpnId);
+    }
     const bin = await wms.findBinById(input.toBinId);
     if (bin === undefined) throw new BinNotFoundError(input.toBinId);
     const moved = await wms.moveLpnContents({

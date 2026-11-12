@@ -1,7 +1,12 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { withTenant } from "../../infra/db/tenant-context";
-import { BinMixedBatchBlockedError, UomConversionMissingError } from "../../modules/inventory/domain/inventory-errors";
+import {
+  BinMixedBatchBlockedError,
+  LpnClosedError,
+  LpnNotFoundError,
+  UomConversionMissingError,
+} from "../../modules/inventory/domain/inventory-errors";
 import * as wmsStore from "../../modules/inventory/infrastructure/wms-store";
 import { WmsService } from "../../modules/inventory/application/wms.service";
 import {
@@ -783,5 +788,177 @@ describe("the nightly probe (pg-boss inventory.bin-reconcile)", () => {
     // the probe counts it; nothing was repaired.
     expect(result.mismatches).toBeGreaterThanOrEqual(1);
     expect(result.mismatchedTenants).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("T-06 — the LPN service: plate receipt, the closed-plate law, status-preserving moves", () => {
+  /** A one-off bin under a dedicated T-06 rack (idempotent per code). */
+  async function ensureT06Bin(code: string, barcode: string, wh: string): Promise<string> {
+    return withTenant(TENANT_I, async () => {
+      const existing = await wmsStore.listBins({ warehouseId: wh, limit: 1000 });
+      const found = existing.find((b) => b.code === code);
+      if (found !== undefined) return found.id;
+      const zones = await wmsStore.listZones({ warehouseId: wh, limit: 200 });
+      let zone = zones.find((z) => z.code === "T06-Z");
+      if (zone === undefined) {
+        zone = await wms.createZone({
+          warehouseId: wh,
+          code: "T06-Z",
+          name: "T-06 LPN zone",
+          nameAr: null,
+          zoneType: "BULK",
+          isDefault: false,
+          note: null,
+          actorId: I_ACTOR,
+        });
+      }
+      const aisles = await wmsStore.listAisles(zone.id);
+      let aisle = aisles.find((a) => a.code === "T06-A");
+      if (aisle === undefined) {
+        aisle = await wms.createAisle({ zoneId: zone.id, code: "T06-A", name: "T06-A", nameAr: null, actorId: I_ACTOR });
+      }
+      const racks = await wmsStore.listRacks(aisle.id);
+      let rack = racks.find((r) => r.code === "T06-R");
+      if (rack === undefined) {
+        rack = await wms.createRack({ aisleId: aisle.id, code: "T06-R", name: "T06-R", nameAr: null, actorId: I_ACTOR });
+      }
+      const bin = await wms.createBin({
+        warehouseId: wh,
+        rackId: rack.id,
+        code,
+        barcode,
+        name: code,
+        nameAr: null,
+        pickSequence: null,
+        capacity: null,
+        allowMixedBatches: true,
+        isDefault: false,
+        note: null,
+        actorId: I_ACTOR,
+      });
+      return bin.id;
+    });
+  }
+
+  it("an LPN-level receipt binds the received rows straight onto the plate (I-05)", async () => {
+    const item = await ensureInventoryItem("INV-WMS-12", "WMS lpn receipt item");
+    const wh = fixture.warehouseMain;
+    const lpn = await withTenant(TENANT_I, () =>
+      wms.createLpn({ lpnCode: "LPN-T06-RCPT", note: "pallet at receipt", actorId: I_ACTOR }),
+    );
+    const binId = await ensureT06Bin("T06-B1", "BIN-T06-B1", wh);
+
+    const receipt = await withTenant(TENANT_I, () =>
+      stock.manualReceipt({
+        itemId: item,
+        warehouseId: wh,
+        qty: "7",
+        unitCost: "3.000000",
+        reason: "COUNT_GAIN",
+        counterAccountId: null,
+        valueDate: I_JAN,
+        lpnId: lpn.id,
+        targetBinId: binId,
+        actorId: I_ACTOR,
+      }),
+    );
+    expect(receipt.moveId).toBeTruthy();
+
+    const manifest = await withTenant(TENANT_I, () => wms.lpnContents(lpn.id));
+    expect(manifest.lpn.lpnCode).toBe("LPN-T06-RCPT");
+    expect(manifest.contents).toHaveLength(1);
+    expect(manifest.contents[0]!.lpnId).toBe(lpn.id);
+    expect(manifest.contents[0]!.binId).toBe(binId);
+    expect(manifest.contents[0]!.qty).toBe("7.000000");
+    // The stock_moves row carries the plate reference (§2.5).
+    const move = await withTenant(TENANT_I, () => store.findMoveById(receipt.moveId));
+    expect(move?.lpnId).toBe(lpn.id);
+    // INV-029 stays exact through the plate-bound receipt.
+    expect(await binSum(wh, item)).toBe("7.000000");
+    expect(await stockQty(wh, item)).toBe("7.000000");
+
+    // A receipt onto a CLOSED plate is the typed rejection (plan-time,
+    // zero residue).
+    await withTenant(TENANT_I, () => wms.closeLpn(lpn.id, I_ACTOR));
+    await expect(
+      withTenant(TENANT_I, () =>
+        stock.manualReceipt({
+          itemId: item,
+          warehouseId: wh,
+          qty: "1",
+          unitCost: "3.000000",
+          reason: "COUNT_GAIN",
+          counterAccountId: null,
+          valueDate: I_JAN,
+          lpnId: lpn.id,
+          actorId: I_ACTOR,
+        }),
+      ),
+    ).rejects.toThrow(LpnClosedError);
+  });
+
+  it("a QUARANTINE pallet keeps its status across a move-by-LPN; a CLOSED plate never moves", async () => {
+    const item = await ensureInventoryItem("INV-WMS-13", "WMS lpn quarantine item");
+    const wh = fixture.warehouseMain;
+    const binA = await ensureT06Bin("T06-B2", "BIN-T06-B2", wh);
+    const binB = await ensureT06Bin("T06-B3", "BIN-T06-B3", wh);
+    await withTenant(TENANT_I, () =>
+      stock.manualReceipt({
+        itemId: item,
+        warehouseId: wh,
+        qty: "9",
+        unitCost: "1.000000",
+        reason: "COUNT_GAIN",
+        counterAccountId: null,
+        valueDate: I_JAN,
+        targetBinId: binA,
+        actorId: I_ACTOR,
+      }),
+    );
+    const rows = await withTenant(TENANT_I, () =>
+      wmsStore.listBinContents({ binId: binA, itemId: item, limit: 5 }),
+    );
+    await withTenant(TENANT_I, () =>
+      wms.transitionStatus(rows[0]!.id, "QUARANTINE", { note: "QC hold on the pallet", actorId: I_ACTOR }),
+    );
+
+    const lpn = await withTenant(TENANT_I, () =>
+      wms.createLpn({ lpnCode: "LPN-T06-Q", note: null, actorId: I_ACTOR }),
+    );
+    const quarantinedRow = await withTenant(TENANT_I, () =>
+      wmsStore.listBinContents({ binId: binA, itemId: item, status: "QUARANTINE", limit: 5 }),
+    );
+    await withTenant(TENANT_I, () => wms.bindContentToLpn(quarantinedRow[0]!.id, lpn.id, I_ACTOR));
+
+    const moved = await withTenant(TENANT_I, () =>
+      wms.moveLpn({ lpnId: lpn.id, toBinId: binB, note: "move the held pallet", actorId: I_ACTOR }),
+    );
+    expect(moved.movedRows).toBe(1);
+    const atB = await withTenant(TENANT_I, () =>
+      wmsStore.listBinContents({ binId: binB, itemId: item, limit: 5 }),
+    );
+    expect(atB[0]!.status).toBe("QUARANTINE");
+    expect(atB[0]!.lpnCode).toBe("LPN-T06-Q");
+    // The control state never touched the valuation (INV-029 spans statuses).
+    expect(await binSum(wh, item)).toBe("9.000000");
+    expect(await stockQty(wh, item)).toBe("9.000000");
+
+    // The closed-plate law: close, then the move is the typed rejection.
+    await withTenant(TENANT_I, () => wms.closeLpn(lpn.id, I_ACTOR));
+    await expect(
+      withTenant(TENANT_I, () =>
+        wms.moveLpn({ lpnId: lpn.id, toBinId: binA, note: null, actorId: I_ACTOR }),
+      ),
+    ).rejects.toThrow(LpnClosedError);
+    // Binding NEW rows onto the closed plate is equally closed.
+    await expect(
+      withTenant(TENANT_I, () => wms.bindContentToLpn(atB[0]!.id, lpn.id, I_ACTOR)),
+    ).rejects.toThrow(LpnClosedError);
+  });
+
+  it("the manifest of an unknown plate is the typed 404-shape", async () => {
+    await expect(withTenant(TENANT_I, () => wms.lpnContents("00000000-0000-4000-8000-0000000000b6"))).rejects.toThrow(
+      LpnNotFoundError,
+    );
   });
 });

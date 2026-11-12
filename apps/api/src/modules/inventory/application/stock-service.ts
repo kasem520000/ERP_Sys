@@ -112,6 +112,14 @@ export class StockService {
     batchId?: string | null;
     batchNo?: string | null;
     batchExpiry?: string | null;
+    /** T-06 (§2.5, I-05): the LPN-level receipt — the received rows bind
+     * straight onto the plate (validated at plan time; ACTIVE only). */
+    lpnId?: string | null;
+    /** T-06: the explicit bin endpoint (NULL = the lazy DEFAULT-bin anchor). */
+    targetBinId?: string | null;
+    /** T-06: quarantine-on-receipt (AVAILABLE by default — the Q-board owns
+     * later transitions; the §2.8 flow). */
+    binStatus?: "AVAILABLE" | "QUARANTINE";
     note?: string | null;
     noteAr?: string | null;
     actorId: string | null;
@@ -165,6 +173,9 @@ export class StockService {
         (input.serialId !== null && input.serialId !== undefined ? [input.serialId] : undefined),
       memo: input.note ?? null,
       memoAr: input.noteAr ?? null,
+      lpnId: input.lpnId ?? null,
+      targetBinId: input.targetBinId ?? null,
+      binStatus: input.binStatus ?? "AVAILABLE",
     });
 
     // POST: the economic effect first (ADR-0007) — idempotency on the
