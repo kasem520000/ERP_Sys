@@ -16,7 +16,6 @@ import {
   TENANT_I,
   ensureInventoryItem,
   setupInventoryFixture,
-  stock,
   type InventoryFixture,
 } from "./fixtures";
 
