@@ -741,3 +741,75 @@ URLs.
 surface: a re-run with the same template is a zero-write no-op, a different template
 refuses (typed), and a tenant with posted real documents (journal count > 0, no
 markers) refuses (typed) — the demo never masks real books.
+
+## 20. Communications hub vocabulary (PHASE-041)
+
+The four tables of migration `0064` (message_templates, outbound_messages,
+notification_preferences, communication_log) share the module's channel/locale
+vocabulary and the send ledger's status law; the builtin template catalog is
+code (the tenant table only ever holds overrides).
+
+**Channel & locale enums.** `outbound_channel` = EMAIL, WHATSAPP, SMS — the
+ONLY channel vocabulary (BR-067's port kinds). EMAIL templates carry a
+subject (CHECK: subject required on EMAIL, forbidden on the body-only
+channels — WhatsApp template messages and SMS bodies have no subject line);
+`locale` = ar, en (the dictionary's two locales, no neutral rows — a missing
+locale renders the tenant's default-language template, never a mixed one).
+
+**The send-status law (`outbound_messages.status`).** QUEUED → SENT →
+DELIVERED, or QUEUED → FAILED — the `ck_outbound_messages_status_evidence`
+CHECK pins the evidence coherence: SENT implies `sent_at` (never
+`delivered_at`), DELIVERED implies both, FAILED implies `last_error`. The
+retry ladder is bounded (`attempts ≤ max_attempts ≤ 10`, `next_attempt_at`
+set on a retryable failure) — a FAILED row is terminal evidence, never
+silently resurrected. Cost fields travel together
+(`ck_outbound_messages_cost_shape`: amount ⇔ currency, amount ≥ 0) — the
+paid-channel drain guard feeds the `communication.outbound_delivery_log`
+report's cost column.
+
+**Template variables (`message_templates.variables` jsonb).** The typed
+declarations `[{ name, required, description? }]` — `name` matches
+`^[a-z][a-z0-9_]{0,40}$` (the print-template variable convention), the
+render substitutes `{{name}}` in subject/body. Rendering is FAIL-CLOSED: a
+missing required variable throws the typed error at preview time with the
+exact send-time message (the preview = the send, no second implementation).
+The builtin catalog's variables (the documented set):
+
+| Variable | Required | Consumed by (builtin keys) |
+|----------|----------|---------------------------|
+| `customer_name` | yes | every dunning step, the digest header |
+| `invoice_number` | yes | dunning step letters, invoice-due nudges |
+| `amount_due` | yes | dunning step letters, invoice-due nudges |
+| `due_date` | yes | dunning step letters, invoice-due nudges |
+| `days_overdue` | dunning letters only | the step ladder's day counts |
+| `step_no` | dunning letters only | the letter's ladder position |
+| `company_name` | yes | the signature block (tenant's legal name) |
+| `overdue_count` / `overdue_total` | digest only | the digest's needs-attention roll-up |
+| `task_title` / `task_due_date` | task nudges only | CRM task lead-time reminders |
+| `contract_number` / `contract_end_date` | contract nudges only | renewal lead-time reminders |
+
+**The preference matrix (`notification_preferences`).** `module` ∈ the
+15-category vocabulary (limits, subscription, reconciliation, invoice_overdue,
+stock, templates, crm, einvoicing, notes, installments, budgeting, purchasing,
+collections, warranties, digest — ONE vocabulary with the in-app inbox
+categories; `digest` is email-only by resolution), `channel` ∈ IN_APP, EMAIL,
+SMS, WHATSAPP (the send channels + the inbox). Resolution order: user row →
+tenant default (user_id NULL) → code default (IN_APP/EMAIL on, SMS/WHATSAPP
+off — the paid-channel off-by-default law). UNIQUE (tenant_id, user_id,
+module, channel) with NULLS NOT DISTINCT so the default row and user rows
+coexist.
+
+**The communication log (`communication_log`).** `kind` = MESSAGE, CALL;
+`direction` = INBOUND, OUTBOUND; `channel` repeats the send vocabulary plus
+CALL for logged calls. A CALL row implies `outcome` + `summary`
+(`ck_communication_log_call_shape`); outcomes = COMPLETED, NO_ANSWER, BUSY,
+VOICEMAIL, FAILED, SCHEDULED (the IN-16 manual vocabulary). The log is
+append-mostly: call rows are editable only by their logger (log semantics —
+no deletes, the audit-events precedent), message rows are the send ledger's
+read-side mirror.
+
+**The source linkage.** `outbound_messages.source_type` ∈ DUNNING_LETTER,
+DIGEST, NUDGE, MANUAL, CALENDAR, NOTIFICATION — the producing surface; the
+036/039 handoff rides DUNNING_LETTER + `source_id` (the dunning letter row),
+and every source-linked send is reproducible from its `body_snapshot` (the
+deterministic rendered record).
