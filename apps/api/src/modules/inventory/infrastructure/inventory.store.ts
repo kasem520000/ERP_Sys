@@ -247,6 +247,8 @@ export interface ItemReadRow {
   hasExpiry: boolean;
   /** PHASE-018 (migration 0026): FG batch expiry = completion + shelf life. */
   shelfLifeDays: number | null;
+  /** PHASE-044 (migration 0067): the stock UOM — bin_contents rows ride it. */
+  uomId: string;
 }
 
 export async function findItemForInventory(id: string): Promise<ItemReadRow | undefined> {
@@ -254,7 +256,7 @@ export async function findItemForInventory(id: string): Promise<ItemReadRow | un
     SELECT id, sku, name, name_ar AS "nameAr", kind, status,
       costing_method AS "costingMethod", track_batch AS "trackBatch",
       track_serial AS "trackSerial", track_imei AS "trackImei", has_expiry AS "hasExpiry",
-      shelf_life_days AS "shelfLifeDays"
+      shelf_life_days AS "shelfLifeDays", uom_id AS "uomId"
     FROM items WHERE id = ${id} LIMIT 1
   `);
   return (rows.rows as unknown as ItemReadRow[])[0];
@@ -367,6 +369,10 @@ export interface StockMoveRow {
   memoAr: string | null;
   postedJournalId: string | null;
   createdAt: string;
+  /** PHASE-044 (migration 0067): the bin/LPN endpoints (nullable). */
+  sourceBinId: string | null;
+  targetBinId: string | null;
+  lpnId: string | null;
 }
 
 export async function insertStockMove(input: {
@@ -387,16 +393,22 @@ export async function insertStockMove(input: {
   memo: string | null;
   memoAr: string | null;
   postedJournalId: string | null;
+  /** PHASE-044 (0067 §7): the bin/LPN endpoints — nullable, additive. */
+  sourceBinId?: string | null;
+  targetBinId?: string | null;
+  lpnId?: string | null;
 }): Promise<string> {
   await tenantTx().execute(sql`
     INSERT INTO stock_moves (id, tenant_id, item_id, warehouse_id, direction, move_kind,
                              qty, unit_cost, value_amount, batch_id, serial_id, source_type,
-                             source_id, moved_at, reason, memo, memo_ar, posted_journal_id)
+                             source_id, moved_at, reason, memo, memo_ar, posted_journal_id,
+                             source_bin_id, target_bin_id, lpn_id)
     VALUES (${input.id}, erp.current_tenant_id(), ${input.itemId}, ${input.warehouseId},
             ${input.direction}, ${input.moveKind}, ${input.qty}, ${input.unitCost},
             ${input.valueAmount}, ${input.batchId}, ${input.serialId}, ${input.sourceType},
             ${input.sourceId}, ${input.movedAt}, ${input.reason}, ${input.memo},
-            ${input.memoAr}, ${input.postedJournalId})
+            ${input.memoAr}, ${input.postedJournalId},
+            ${input.sourceBinId ?? null}, ${input.targetBinId ?? null}, ${input.lpnId ?? null})
   `);
   return input.id;
 }
@@ -419,7 +431,8 @@ export async function listStockMoves(filter: {
       m.value_amount AS "valueAmount", m.batch_id AS "batchId", b.batch_no AS "batchNo",
       m.serial_id AS "serialId", s.serial_no AS "serialNo", m.source_type AS "sourceType",
       m.source_id AS "sourceId", m.moved_at AS "movedAt", m.reason, m.memo, m.memo_ar AS "memoAr",
-      m.posted_journal_id AS "postedJournalId", m.created_at AS "createdAt"
+      m.posted_journal_id AS "postedJournalId", m.created_at AS "createdAt",
+      m.source_bin_id AS "sourceBinId", m.target_bin_id AS "targetBinId", m.lpn_id AS "lpnId"
     FROM stock_moves m
     JOIN items i ON i.id = m.item_id AND i.tenant_id = m.tenant_id
     JOIN warehouses w ON w.id = m.warehouse_id AND w.tenant_id = m.tenant_id

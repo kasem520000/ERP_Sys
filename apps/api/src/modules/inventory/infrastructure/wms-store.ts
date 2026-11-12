@@ -1,0 +1,941 @@
+import { sql } from "drizzle-orm";
+
+import { Decimal, generateUuidV7 } from "@erp/domain-core";
+
+import { type TenantDb } from "../../../infra/db/client";
+import { requireTenantContext } from "../../../infra/db/tenant-context";
+import { UomConversionMissingError } from "../domain/inventory-errors";
+
+/**
+ * WMS store (PHASE-044, migrations 0067…0071): the ONLY writer of the
+ * location tree, bin_contents, LPNs, the directed-ops family, cycle
+ * counts, ABC, serial_movements, and the policy/job tables. Every
+ * statement runs in the caller's ambient tenant UoW — the bin writes
+ * ride the SAME transaction as the movement-core item_stock writes
+ * (INV-029's same-transaction discipline; the movement core reaches
+ * these helpers from its apply* steps).
+ *
+ * INV-029 (the reconciliation law): Σ bin_contents WHERE owner_partner_id
+ * IS NULL = item_stock.qty per (tenant, warehouse, item) at all times.
+ * Consignment rows (owner set) are the EXCLUDED set — they never touch
+ * item_stock, valuation, or ATP (BR-076).
+ */
+
+function tenantTx(): TenantDb {
+  const context = requireTenantContext();
+  if (context.tx === undefined) {
+    throw new Error("wms access requires an ambient tenant scope");
+  }
+  return context.tx;
+}
+
+// -- the location tree -----------------------------------------------------------
+
+export interface ZoneRow {
+  id: string;
+  warehouseId: string;
+  warehouseCode: string | null;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  zoneType: string;
+  isDefault: boolean;
+  note: string | null;
+}
+
+const ZONE_COLUMNS = sql`z.id, z.warehouse_id AS "warehouseId", w.code AS "warehouseCode",
+  z.code, z.name, z.name_ar AS "nameAr", z.zone_type AS "zoneType",
+  z.is_default AS "isDefault", z.note`;
+
+export async function listZones(filter: {
+  warehouseId?: string;
+  limit: number;
+}): Promise<ZoneRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ZONE_COLUMNS} FROM warehouse_zones z
+    JOIN warehouses w ON w.id = z.warehouse_id AND w.tenant_id = z.tenant_id
+    WHERE (${filter.warehouseId ?? null}::uuid IS NULL OR z.warehouse_id = ${filter.warehouseId ?? null})
+    ORDER BY z.warehouse_id, z.code
+    LIMIT ${Math.min(filter.limit, 500)}
+  `);
+  return rows.rows as unknown as ZoneRow[];
+}
+
+export async function findZoneById(id: string): Promise<ZoneRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ZONE_COLUMNS} FROM warehouse_zones z
+    JOIN warehouses w ON w.id = z.warehouse_id AND w.tenant_id = z.tenant_id
+    WHERE z.id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as ZoneRow[])[0];
+}
+
+export async function findDefaultZone(warehouseId: string): Promise<ZoneRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ZONE_COLUMNS} FROM warehouse_zones z
+    JOIN warehouses w ON w.id = z.warehouse_id AND w.tenant_id = z.tenant_id
+    WHERE z.warehouse_id = ${warehouseId} AND z.is_default
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as ZoneRow[])[0];
+}
+
+export async function insertZone(input: {
+  warehouseId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  zoneType: string;
+  isDefault: boolean;
+  note: string | null;
+  createdBy: string | null;
+}): Promise<ZoneRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO warehouse_zones (id, tenant_id, warehouse_id, code, name, name_ar,
+                                 zone_type, is_default, note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.warehouseId}, ${input.code},
+            ${input.name}, ${input.nameAr}, ${input.zoneType}, ${input.isDefault},
+            ${input.note}, ${input.createdBy})
+  `);
+  return (await findZoneById(id))!;
+}
+
+export interface AisleRow {
+  id: string;
+  zoneId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+}
+
+export async function listAisles(zoneId: string): Promise<AisleRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, zone_id AS "zoneId", code, name, name_ar AS "nameAr"
+    FROM warehouse_aisles WHERE zone_id = ${zoneId} ORDER BY code
+  `);
+  return rows.rows as unknown as AisleRow[];
+}
+
+export async function findAisleById(id: string): Promise<AisleRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, zone_id AS "zoneId", code, name, name_ar AS "nameAr"
+    FROM warehouse_aisles WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as AisleRow[])[0];
+}
+
+export async function insertAisle(input: {
+  zoneId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  createdBy: string | null;
+}): Promise<AisleRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO warehouse_aisles (id, tenant_id, zone_id, code, name, name_ar, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.zoneId}, ${input.code}, ${input.name},
+            ${input.nameAr}, ${input.createdBy})
+  `);
+  return (await findAisleById(id))!;
+}
+
+export interface RackRow {
+  id: string;
+  aisleId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+}
+
+export async function listRacks(aisleId: string): Promise<RackRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, aisle_id AS "aisleId", code, name, name_ar AS "nameAr"
+    FROM warehouse_racks WHERE aisle_id = ${aisleId} ORDER BY code
+  `);
+  return rows.rows as unknown as RackRow[];
+}
+
+export async function findRackById(id: string): Promise<RackRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, aisle_id AS "aisleId", code, name, name_ar AS "nameAr"
+    FROM warehouse_racks WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as RackRow[])[0];
+}
+
+export async function insertRack(input: {
+  aisleId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  createdBy: string | null;
+}): Promise<RackRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO warehouse_racks (id, tenant_id, aisle_id, code, name, name_ar, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.aisleId}, ${input.code}, ${input.name},
+            ${input.nameAr}, ${input.createdBy})
+  `);
+  return (await findRackById(id))!;
+}
+
+export interface BinRow {
+  id: string;
+  warehouseId: string;
+  warehouseCode: string | null;
+  rackId: string;
+  code: string;
+  barcode: string;
+  name: string;
+  nameAr: string | null;
+  pickSequence: number | null;
+  capacity: string | null;
+  allowMixedBatches: boolean;
+  isDefault: boolean;
+  zoneId: string | null;
+  zoneCode: string | null;
+  zoneType: string | null;
+  note: string | null;
+}
+
+const BIN_COLUMNS = sql`b.id, b.warehouse_id AS "warehouseId", w.code AS "warehouseCode",
+  b.rack_id AS "rackId", b.code, b.barcode, b.name, b.name_ar AS "nameAr",
+  b.pick_sequence AS "pickSequence", b.capacity, b.allow_mixed_batches AS "allowMixedBatches",
+  b.is_default AS "isDefault", z.id AS "zoneId", z.code AS "zoneCode", z.zone_type AS "zoneType",
+  b.note`;
+const BIN_FROM = sql`warehouse_bins b
+  JOIN warehouses w ON w.id = b.warehouse_id AND w.tenant_id = b.tenant_id
+  LEFT JOIN warehouse_aisles a ON a.id = b.rack_id AND a.tenant_id = b.tenant_id
+  LEFT JOIN warehouse_racks r ON r.id = b.rack_id AND r.tenant_id = b.tenant_id
+  LEFT JOIN warehouse_aisles a2 ON a2.id = r.aisle_id AND a2.tenant_id = r.tenant_id
+  LEFT JOIN warehouse_zones z ON z.id = a2.zone_id AND z.tenant_id = a2.tenant_id`;
+
+export async function listBins(filter: {
+  warehouseId?: string;
+  zoneId?: string;
+  limit: number;
+}): Promise<BinRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${BIN_COLUMNS} FROM ${BIN_FROM}
+    WHERE (${filter.warehouseId ?? null}::uuid IS NULL OR b.warehouse_id = ${filter.warehouseId ?? null})
+      AND (${filter.zoneId ?? null}::uuid IS NULL OR z.id = ${filter.zoneId ?? null})
+    ORDER BY b.warehouse_id, b.pick_sequence NULLS LAST, b.code
+    LIMIT ${Math.min(filter.limit, 1000)}
+  `);
+  return rows.rows as unknown as BinRow[];
+}
+
+export async function findBinById(id: string): Promise<BinRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${BIN_COLUMNS} FROM ${BIN_FROM} WHERE b.id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as BinRow[])[0];
+}
+
+export async function findBinByBarcode(barcode: string): Promise<BinRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${BIN_COLUMNS} FROM ${BIN_FROM} WHERE b.barcode = ${barcode} LIMIT 1
+  `);
+  return (rows.rows as unknown as BinRow[])[0];
+}
+
+export async function findDefaultBin(warehouseId: string): Promise<BinRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${BIN_COLUMNS} FROM ${BIN_FROM}
+    WHERE b.warehouse_id = ${warehouseId} AND b.is_default LIMIT 1
+  `);
+  return (rows.rows as unknown as BinRow[])[0];
+}
+
+export async function insertBin(input: {
+  warehouseId: string;
+  rackId: string;
+  code: string;
+  barcode: string;
+  name: string;
+  nameAr: string | null;
+  pickSequence: number | null;
+  capacity: string | null;
+  allowMixedBatches: boolean;
+  isDefault: boolean;
+  note: string | null;
+  createdBy: string | null;
+}): Promise<BinRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO warehouse_bins (id, tenant_id, warehouse_id, rack_id, code, barcode, name,
+                                name_ar, pick_sequence, capacity, allow_mixed_batches,
+                                is_default, note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.warehouseId}, ${input.rackId},
+            ${input.code}, ${input.barcode}, ${input.name}, ${input.nameAr},
+            ${input.pickSequence}, ${input.capacity}, ${input.allowMixedBatches},
+            ${input.isDefault}, ${input.note}, ${input.createdBy})
+  `);
+  return (await findBinById(id))!;
+}
+
+/** Zone patch (name/type/default flag/note — code stays the scan-stable key). */
+export async function updateZone(
+  id: string,
+  patch: {
+    name?: string;
+    nameAr?: string | null;
+    zoneType?: string;
+    isDefault?: boolean;
+    note?: string | null;
+  },
+): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE warehouse_zones SET
+      name = COALESCE(${patch.name ?? null}, name),
+      name_ar = COALESCE(${patch.nameAr ?? null}, name_ar),
+      zone_type = COALESCE(${patch.zoneType ?? null}, zone_type),
+      is_default = COALESCE(${patch.isDefault ?? null}, is_default),
+      note = COALESCE(${patch.note ?? null}, note),
+      updated_at = now(), version = version + 1
+    WHERE id = ${id}
+  `);
+}
+
+/** Bin patch (display/sequence/capacity/mixed-batch rule — code + barcode
+ * stay the scan-stable keys; capacity stays advisory for the putaway
+ * engine, never a hard gate on explicit directed writes). */
+export async function updateBin(
+  id: string,
+  patch: {
+    name?: string;
+    nameAr?: string | null;
+    pickSequence?: number | null;
+    capacity?: string | null;
+    allowMixedBatches?: boolean;
+    note?: string | null;
+  },
+): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE warehouse_bins SET
+      name = COALESCE(${patch.name ?? null}, name),
+      name_ar = COALESCE(${patch.nameAr ?? null}, name_ar),
+      pick_sequence = COALESCE(${patch.pickSequence ?? null}, pick_sequence),
+      capacity = COALESCE(${patch.capacity ?? null}, capacity),
+      allow_mixed_batches = COALESCE(${patch.allowMixedBatches ?? null}, allow_mixed_batches),
+      note = COALESCE(${patch.note ?? null}, note),
+      updated_at = now(), version = version + 1
+    WHERE id = ${id}
+  `);
+}
+
+/**
+ * The lazy default-bin anchor (D-5): warehouses created after 0071 get
+ * their DEFAULT zone/aisle/rack/bin on the first bin-aware write — the
+ * exact shape the migration seeded for existing warehouses.
+ */
+export async function ensureDefaultBin(warehouseId: string): Promise<BinRow> {
+  const existing = await findDefaultBin(warehouseId);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const warehouse = await tenantTx().execute<{ code: string }>(sql`
+    SELECT code FROM warehouses WHERE id = ${warehouseId} LIMIT 1
+  `);
+  const whCode = warehouse.rows[0]?.code ?? "WH";
+  let zone = await findDefaultZone(warehouseId);
+  if (zone === undefined) {
+    zone = await insertZone({
+      warehouseId,
+      code: "DEFAULT",
+      name: "Default zone",
+      nameAr: "المنطقة الافتراضية",
+      zoneType: "PICKING",
+      isDefault: true,
+      note: null,
+      createdBy: null,
+    });
+  }
+  let aisle = (await listAisles(zone.id))[0];
+  if (aisle === undefined) {
+    aisle = await insertAisle({
+      zoneId: zone.id,
+      code: "A1",
+      name: "Default aisle",
+      nameAr: "الممر الافتراضي",
+      createdBy: null,
+    });
+  }
+  let rack = (await listRacks(aisle.id))[0];
+  if (rack === undefined) {
+    rack = await insertRack({
+      aisleId: aisle.id,
+      code: "R1",
+      name: "Default rack",
+      nameAr: "الرف الافتراضي",
+      createdBy: null,
+    });
+  }
+  return insertBin({
+    warehouseId,
+    rackId: rack.id,
+    code: "DEFAULT",
+    barcode: `BIN-${whCode.toUpperCase()}-DEFAULT`,
+    name: "Default bin",
+    nameAr: "الصندوق الافتراضي",
+    pickSequence: 1,
+    capacity: null,
+    allowMixedBatches: true,
+    isDefault: true,
+    note: null,
+    createdBy: null,
+  });
+}
+
+// -- bin_contents (INV-029's subject) ---------------------------------------------
+
+export interface BinContentRow {
+  id: string;
+  binId: string;
+  binCode: string | null;
+  warehouseId: string;
+  itemId: string;
+  itemSku: string | null;
+  batchId: string | null;
+  batchNo: string | null;
+  serialId: string | null;
+  serialNo: string | null;
+  lpnId: string | null;
+  lpnCode: string | null;
+  ownerPartnerId: string | null;
+  ownerPartnerName: string | null;
+  status: string;
+  qty: string;
+  uomId: string | null;
+  receivedAt: string;
+  note: string | null;
+}
+
+const CONTENT_COLUMNS = sql`bc.id, bc.bin_id AS "binId", b.code AS "binCode",
+  bc.warehouse_id AS "warehouseId", bc.item_id AS "itemId", i.sku AS "itemSku",
+  bc.batch_id AS "batchId", bt.batch_no AS "batchNo", bc.serial_id AS "serialId",
+  s.serial_no AS "serialNo", bc.lpn_id AS "lpnId", l.lpn_code AS "lpnCode",
+  bc.owner_partner_id AS "ownerPartnerId", p.name AS "ownerPartnerName",
+  bc.status, bc.qty, bc.uom_id AS "uomId", bc.received_at AS "receivedAt", bc.note`;
+const CONTENT_FROM = sql`bin_contents bc
+  JOIN warehouse_bins b ON b.id = bc.bin_id AND b.tenant_id = bc.tenant_id
+  LEFT JOIN items i ON i.id = bc.item_id AND i.tenant_id = bc.tenant_id
+  LEFT JOIN item_batches bt ON bt.id = bc.batch_id AND bt.tenant_id = bc.tenant_id
+  LEFT JOIN item_serials s ON s.id = bc.serial_id AND s.tenant_id = bc.tenant_id
+  LEFT JOIN lpns l ON l.id = bc.lpn_id AND l.tenant_id = bc.tenant_id
+  LEFT JOIN partners p ON p.id = bc.owner_partner_id AND p.tenant_id = bc.tenant_id`;
+
+export async function listBinContents(filter: {
+  binId?: string;
+  warehouseId?: string;
+  itemId?: string;
+  status?: string;
+  ownerPartnerId?: string | null;
+  limit: number;
+}): Promise<BinContentRow[]> {
+  const ownerFilter =
+    filter.ownerPartnerId === undefined
+      ? sql`TRUE`
+      : filter.ownerPartnerId === null
+        ? sql`bc.owner_partner_id IS NULL`
+        : sql`bc.owner_partner_id = ${filter.ownerPartnerId}`;
+  const rows = await tenantTx().execute(sql`
+    SELECT ${CONTENT_COLUMNS} FROM ${CONTENT_FROM}
+    WHERE (${filter.binId ?? null}::uuid IS NULL OR bc.bin_id = ${filter.binId ?? null})
+      AND (${filter.warehouseId ?? null}::uuid IS NULL OR bc.warehouse_id = ${filter.warehouseId ?? null})
+      AND (${filter.itemId ?? null}::uuid IS NULL OR bc.item_id = ${filter.itemId ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR bc.status = ${filter.status ?? null})
+      AND ${ownerFilter}
+    ORDER BY bc.bin_id, bc.item_id, bc.received_at
+    LIMIT ${Math.min(filter.limit, 1000)}
+  `);
+  return rows.rows as unknown as BinContentRow[];
+}
+
+/** The movement-core allocation source: matching rows for a slice. The
+ * statuses filter defaults to AVAILABLE (the pickable floor — BR-072's
+ * availability law); the quarantine board passes its own set. */
+export async function listAllocatableBinContents(input: {
+  warehouseId: string;
+  itemId: string;
+  batchId: string | null;
+  serialId: string | null;
+  statuses?: string[];
+}): Promise<
+  { id: string; binId: string; qty: string; status: string; lpnId: string | null; uomId: string | null }[]
+> {
+  const statuses = input.statuses ?? ["AVAILABLE"];
+  // drizzle binds a raw JS array as ONE flattened param — the ARRAY[]
+  // constructor with individually-bound literals is the injection-safe
+  // shape (the custom-fields.store precedent).
+  const statusArray = sql`ARRAY[${sql.join(
+    statuses.map((s) => sql`${s}`),
+    sql`, `,
+  )}]::text[]`;
+  const rows = await tenantTx().execute(sql`
+    SELECT id, bin_id AS "binId", qty::text AS qty, status, lpn_id AS "lpnId", uom_id AS "uomId"
+    FROM bin_contents
+    WHERE warehouse_id = ${input.warehouseId}
+      AND item_id = ${input.itemId}
+      AND owner_partner_id IS NULL
+      AND status = ANY(${statusArray})
+      AND batch_id IS NOT DISTINCT FROM ${input.batchId}::uuid
+      AND serial_id IS NOT DISTINCT FROM ${input.serialId}::uuid
+    ORDER BY received_at, id
+  `);
+  return rows.rows as unknown as {
+    id: string;
+    binId: string;
+    qty: string;
+    status: string;
+    lpnId: string | null;
+    uomId: string | null;
+  }[];
+}
+
+/** Does the item have ANY tenant-owned bin row in the warehouse? */
+export async function hasAnyBinContent(warehouseId: string, itemId: string): Promise<boolean> {
+  const rows = await tenantTx().execute<{ n: number }>(sql`
+    SELECT count(*)::int AS n FROM bin_contents
+    WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId} AND owner_partner_id IS NULL
+  `);
+  return (rows.rows[0]?.n ?? 0) > 0;
+}
+
+/** The tenant-owned batch already sitting in a bin (the mixed-batch guard,
+ * BR-072's §2.1 rule — one batch per no-mixed-batches bin). */
+export async function findDistinctBatchInBin(binId: string): Promise<string | null> {
+  const rows = await tenantTx().execute<{ batch_id: string | null }>(sql`
+    SELECT batch_id FROM bin_contents
+    WHERE bin_id = ${binId} AND batch_id IS NOT NULL AND owner_partner_id IS NULL
+    LIMIT 1
+  `);
+  return rows.rows[0]?.batch_id ?? null;
+}
+
+/** One bin_contents row by id (the board + the transition paths). */
+export async function findBinContentById(id: string): Promise<BinContentRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${CONTENT_COLUMNS} FROM ${CONTENT_FROM} WHERE bc.id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as BinContentRow[])[0];
+}
+
+/**
+ * The slot's current UOM (NULLS NOT DISTINCT over the full slot key) —
+ * the conversion anchor for addToBinSlot: an existing slot keeps its UOM
+ * (the single-UOM-slot law, I-15); a new slot takes the incoming one.
+ */
+async function slotUomId(key: {
+  binId: string;
+  itemId: string;
+  batchId: string | null;
+  serialId: string | null;
+  lpnId: string | null;
+  ownerPartnerId: string | null;
+  status: string;
+}): Promise<string | null> {
+  const rows = await tenantTx().execute<{ uom_id: string | null }>(sql`
+    SELECT uom_id FROM bin_contents
+    WHERE bin_id = ${key.binId}
+      AND item_id = ${key.itemId}
+      AND batch_id IS NOT DISTINCT FROM ${key.batchId}::uuid
+      AND serial_id IS NOT DISTINCT FROM ${key.serialId}::uuid
+      AND lpn_id IS NOT DISTINCT FROM ${key.lpnId}::uuid
+      AND owner_partner_id IS NOT DISTINCT FROM ${key.ownerPartnerId}::uuid
+      AND status = ${key.status}
+    LIMIT 1
+  `);
+  return rows.rows[0]?.uom_id ?? null;
+}
+
+/**
+ * Add qty to a bin slot (the receipt/settlement path): upserts the exact
+ * (bin, item, batch, serial, LPN, owner, status) slot — NULLS NOT DISTINCT
+ * makes the ON CONFLICT see NULL dimensions. UOM discipline (I-15): the
+ * incoming qty converts into the SLOT's uom when the slot exists and the
+ * uoms differ (the direct factor or the mirrored 1/factor through
+ * uom_conversions; the slot stays single-UOM — the caller surfaces the
+ * typed UomConversionMissingError before any write lands).
+ */
+export async function addToBinSlot(input: {
+  binId: string;
+  warehouseId: string;
+  itemId: string;
+  batchId: string | null;
+  serialId: string | null;
+  lpnId: string | null;
+  ownerPartnerId: string | null;
+  status: string;
+  qty: string;
+  uomId: string | null;
+  receivedAt: string | null;
+  note: string | null;
+  createdBy: string | null;
+}): Promise<{ qtyAdded: string; uomId: string | null; contentId: string }> {
+  const slotUom = await slotUomId({
+    binId: input.binId,
+    itemId: input.itemId,
+    batchId: input.batchId,
+    serialId: input.serialId,
+    lpnId: input.lpnId,
+    ownerPartnerId: input.ownerPartnerId,
+    status: input.status,
+  });
+  let qty = input.qty;
+  let uomId = input.uomId;
+  if (slotUom !== null && input.uomId !== null && slotUom !== input.uomId) {
+    const conversion = await findUomConversion(input.uomId, slotUom);
+    if (conversion === null) {
+      throw new UomConversionMissingError(input.uomId, slotUom);
+    }
+    const factor = conversion.reverse
+      ? new Decimal(1).div(new Decimal(conversion.factor))
+      : new Decimal(conversion.factor);
+    qty = new Decimal(input.qty)
+      .times(factor)
+      .toDecimalPlaces(6, Decimal.ROUND_HALF_UP)
+      .toFixed(6);
+    uomId = slotUom;
+  }
+  const upserted = await tenantTx().execute<{ id: string }>(sql`
+    INSERT INTO bin_contents (id, tenant_id, bin_id, warehouse_id, item_id, batch_id,
+                              serial_id, lpn_id, owner_partner_id, status, qty, uom_id,
+                              received_at, note, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.binId}, ${input.warehouseId},
+            ${input.itemId}, ${input.batchId}, ${input.serialId}, ${input.lpnId},
+            ${input.ownerPartnerId}, ${input.status}, ${qty}, ${uomId},
+            COALESCE(${input.receivedAt}::timestamptz, now()), ${input.note}, ${input.createdBy})
+    ON CONFLICT (tenant_id, bin_id, item_id, batch_id, serial_id, lpn_id, owner_partner_id, status)
+    DO UPDATE SET qty = bin_contents.qty + EXCLUDED.qty,
+                  uom_id = COALESCE(bin_contents.uom_id, EXCLUDED.uom_id),
+                  updated_at = now(),
+                  version = bin_contents.version + 1
+    RETURNING id
+  `);
+  return { qtyAdded: qty, uomId, contentId: upserted.rows[0]!.id };
+}
+
+/** Decrement a specific bin_contents row (the issue path — rows reaching 0
+ * stay as the honest history floor). */
+export async function decrementBinContent(id: string, qty: string): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE bin_contents
+    SET qty = qty - ${qty}::numeric, updated_at = now(), version = version + 1
+    WHERE id = ${id}
+  `);
+}
+
+/** Move qty between slots of the same item (the status/board + LPN paths):
+ * decrements the source row, adds to the target slot — returns the TARGET
+ * row's id (the board's new state). */
+export async function moveBetweenSlots(input: {
+  fromContentId: string;
+  qty: string;
+  toBinId: string;
+  toStatus: string;
+  note: string | null;
+}): Promise<string> {
+  await tenantTx().execute(sql`
+    UPDATE bin_contents
+    SET qty = qty - ${input.qty}::numeric, updated_at = now(), version = version + 1
+    WHERE id = ${input.fromContentId}
+  `);
+  const source = await tenantTx().execute<{
+    warehouse_id: string;
+    item_id: string;
+    batch_id: string | null;
+    serial_id: string | null;
+    lpn_id: string | null;
+    owner_partner_id: string | null;
+    uom_id: string | null;
+  }>(sql`
+    SELECT warehouse_id, item_id, batch_id, serial_id, lpn_id, owner_partner_id, uom_id
+    FROM bin_contents WHERE id = ${input.fromContentId}
+  `);
+  const row = source.rows[0];
+  if (row === undefined) {
+    throw new Error(`bin_contents row ${input.fromContentId} vanished mid-move`);
+  }
+  const added = await addToBinSlot({
+    binId: input.toBinId,
+    warehouseId: row.warehouse_id,
+    itemId: row.item_id,
+    batchId: row.batch_id,
+    serialId: row.serial_id,
+    lpnId: row.lpn_id,
+    ownerPartnerId: row.owner_partner_id,
+    status: input.toStatus,
+    qty: input.qty,
+    uomId: row.uom_id,
+    receivedAt: null,
+    note: input.note,
+    createdBy: null,
+  });
+  return added.contentId;
+}
+
+/** The INV-029 probe: per (warehouse, item) folds — bins vs item_stock. */
+export interface BinReconciliationRow {
+  warehouseId: string;
+  warehouseCode: string | null;
+  itemId: string;
+  itemSku: string | null;
+  binQty: string;
+  stockQty: string;
+  difference: string;
+}
+
+export async function reconcileBins(filter: {
+  warehouseId?: string;
+}): Promise<BinReconciliationRow[]> {
+  const rows = await tenantTx().execute(sql`
+    WITH bins AS (
+      SELECT warehouse_id, item_id, sum(qty) AS bin_qty
+      FROM bin_contents
+      WHERE owner_partner_id IS NULL
+      GROUP BY warehouse_id, item_id
+    ), stock AS (
+      SELECT warehouse_id, item_id, qty AS stock_qty
+      FROM item_stock
+    )
+    SELECT COALESCE(b.warehouse_id, s.warehouse_id) AS "warehouseId",
+           w.code AS "warehouseCode",
+           COALESCE(b.item_id, s.item_id) AS "itemId",
+           i.sku AS "itemSku",
+           COALESCE(b.bin_qty, 0)::text AS "binQty",
+           COALESCE(s.stock_qty, 0)::text AS "stockQty",
+           (COALESCE(b.bin_qty, 0) - COALESCE(s.stock_qty, 0))::text AS "difference"
+    FROM bins b
+    FULL OUTER JOIN stock s ON s.warehouse_id = b.warehouse_id AND s.item_id = b.item_id
+    LEFT JOIN warehouses w ON w.id = COALESCE(b.warehouse_id, s.warehouse_id) AND w.tenant_id = erp.current_tenant_id()
+    LEFT JOIN items i ON i.id = COALESCE(b.item_id, s.item_id) AND i.tenant_id = erp.current_tenant_id()
+    WHERE (${filter.warehouseId ?? null}::uuid IS NULL
+             OR COALESCE(b.warehouse_id, s.warehouse_id) = ${filter.warehouseId ?? null}::uuid)
+      AND COALESCE(b.bin_qty, 0) <> COALESCE(s.stock_qty, 0)
+    ORDER BY "difference" DESC
+  `);
+  return rows.rows as unknown as BinReconciliationRow[];
+}
+
+/** Available-to-promise at bin level: AVAILABLE, tenant-owned rows only. */
+export async function availableQtyByBin(filter: {
+  warehouseId: string;
+  itemId: string;
+}): Promise<{ binId: string; qty: string }[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT bin_id AS "binId", sum(qty)::text AS qty
+    FROM bin_contents
+    WHERE warehouse_id = ${filter.warehouseId}
+      AND item_id = ${filter.itemId}
+      AND status = 'AVAILABLE'
+      AND owner_partner_id IS NULL
+    GROUP BY bin_id
+    ORDER BY sum(qty) DESC
+  `);
+  return rows.rows as unknown as { binId: string; qty: string }[];
+}
+
+// -- LPNs -------------------------------------------------------------------------
+
+export interface LpnRow {
+  id: string;
+  lpnCode: string;
+  status: string;
+  closedAt: string | null;
+  note: string | null;
+}
+
+export async function listLpns(filter: { status?: string; limit: number }): Promise<LpnRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, lpn_code AS "lpnCode", status, closed_at AS "closedAt", note
+    FROM lpns
+    WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY created_at DESC
+    LIMIT ${Math.min(filter.limit, 200)}
+  `);
+  return rows.rows as unknown as LpnRow[];
+}
+
+export async function findLpnById(id: string): Promise<LpnRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, lpn_code AS "lpnCode", status, closed_at AS "closedAt", note
+    FROM lpns WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as LpnRow[])[0];
+}
+
+export async function findLpnByCode(code: string): Promise<LpnRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, lpn_code AS "lpnCode", status, closed_at AS "closedAt", note
+    FROM lpns WHERE lpn_code = ${code} LIMIT 1
+  `);
+  return (rows.rows as unknown as LpnRow[])[0];
+}
+
+export async function insertLpn(input: {
+  lpnCode: string;
+  note: string | null;
+  createdBy: string | null;
+}): Promise<LpnRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO lpns (id, tenant_id, lpn_code, note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.lpnCode}, ${input.note}, ${input.createdBy})
+  `);
+  return (await findLpnById(id))!;
+}
+
+export async function closeLpn(id: string): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE lpns SET status = 'CLOSED', closed_at = now(), updated_at = now(),
+                    version = version + 1
+    WHERE id = ${id} AND status = 'ACTIVE'
+  `);
+}
+
+/** Bind a bin_contents row to an LPN (the move-by-LPN substrate). */
+export async function bindContentToLpn(contentId: string, lpnId: string): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE bin_contents SET lpn_id = ${lpnId}, updated_at = now(), version = version + 1
+    WHERE id = ${contentId}
+  `);
+}
+
+/** Move every row of an LPN into a target bin (move-by-LPN). */
+export async function moveLpnContents(input: {
+  lpnId: string;
+  toBinId: string;
+  note: string | null;
+}): Promise<number> {
+  const contents = await tenantTx().execute<{ id: string; qty: string }>(sql`
+    SELECT id, qty::text FROM bin_contents WHERE lpn_id = ${input.lpnId} AND qty > 0
+  `);
+  for (const row of contents.rows as unknown as { id: string; qty: string }[]) {
+    await moveBetweenSlots({
+      fromContentId: row.id,
+      qty: row.qty,
+      toBinId: input.toBinId,
+      toStatus: "AVAILABLE",
+      note: input.note,
+    });
+  }
+  return (contents.rows as unknown as unknown[]).length;
+}
+
+// -- serial_movements (T-11's ledger) ----------------------------------------------
+
+export type SerialMovementEvent =
+  | "RECEIVE"
+  | "PUTAWAY"
+  | "PICK"
+  | "TRANSFER_OUT"
+  | "TRANSFER_IN"
+  | "ADJUST_OUT"
+  | "ADJUST_IN"
+  | "RETURN"
+  | "QUARANTINE"
+  | "RELEASE"
+  | "SCRAP"
+  | "CONSIGNMENT_IN"
+  | "CONSIGNMENT_OUT"
+  | "KIT_IN"
+  | "KIT_OUT"
+  | "SETTLE";
+
+export async function appendSerialMovement(input: {
+  serialId: string;
+  event: SerialMovementEvent;
+  moveId: string | null;
+  sourceType: string;
+  sourceId: string;
+  fromBinId: string | null;
+  toBinId: string | null;
+  movedAt: string;
+  note: string | null;
+  createdBy: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    INSERT INTO serial_movements (id, tenant_id, serial_id, event, move_id, source_type,
+                                  source_id, from_bin_id, to_bin_id, moved_at, note, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.serialId}, ${input.event},
+            ${input.moveId}, ${input.sourceType}, ${input.sourceId}, ${input.fromBinId},
+            ${input.toBinId}, ${input.movedAt}::timestamptz, ${input.note}, ${input.createdBy})
+  `);
+}
+
+export interface SerialLedgerRow {
+  id: string;
+  serialId: string;
+  serialNo: string | null;
+  itemSku: string | null;
+  event: string;
+  moveId: string | null;
+  sourceType: string;
+  sourceId: string;
+  fromBinId: string | null;
+  fromBinCode: string | null;
+  toBinId: string | null;
+  toBinCode: string | null;
+  movedAt: string;
+  note: string | null;
+}
+
+export async function listSerialMovements(filter: {
+  serialId?: string;
+  itemId?: string;
+  limit: number;
+}): Promise<SerialLedgerRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT sm.id, sm.serial_id AS "serialId", s.serial_no AS "serialNo", i.sku AS "itemSku",
+           sm.event, sm.move_id AS "moveId", sm.source_type AS "sourceType",
+           sm.source_id AS "sourceId", sm.from_bin_id AS "fromBinId",
+           fb.code AS "fromBinCode", sm.to_bin_id AS "toBinId", tb.code AS "toBinCode",
+           sm.moved_at AS "movedAt", sm.note
+    FROM serial_movements sm
+    LEFT JOIN item_serials s ON s.id = sm.serial_id AND s.tenant_id = sm.tenant_id
+    LEFT JOIN items i ON i.id = s.item_id AND i.tenant_id = s.tenant_id
+    LEFT JOIN warehouse_bins fb ON fb.id = sm.from_bin_id AND fb.tenant_id = sm.tenant_id
+    LEFT JOIN warehouse_bins tb ON tb.id = sm.to_bin_id AND tb.tenant_id = sm.tenant_id
+    WHERE (${filter.serialId ?? null}::uuid IS NULL OR sm.serial_id = ${filter.serialId ?? null})
+      AND (${filter.itemId ?? null}::uuid IS NULL OR s.item_id = ${filter.itemId ?? null})
+    ORDER BY sm.moved_at DESC, sm.id
+    LIMIT ${Math.min(filter.limit, 500)}
+  `);
+  return rows.rows as unknown as SerialLedgerRow[];
+}
+
+// -- UOM conversion (I-15) ----------------------------------------------------------
+
+/**
+ * The I-15 auto-conversion source: the DIRECT factor from→to (identical
+ * uoms = "1"); the REVERSE factor when only the mirror row exists
+ * (returned as { reverse: true } — the service does the 1/x with the
+ * Decimal type per ADR-0009); null when no conversion row exists either
+ * way (the typed UomConversionMissingError is the caller's).
+ */
+export async function findUomConversion(
+  fromUomId: string,
+  toUomId: string,
+): Promise<{ factor: string; reverse: boolean } | null> {
+  if (fromUomId === toUomId) {
+    return { factor: "1", reverse: false };
+  }
+  const direct = await tenantTx().execute<{ factor: string }>(sql`
+    SELECT factor::text FROM uom_conversions
+    WHERE from_uom_id = ${fromUomId} AND to_uom_id = ${toUomId} LIMIT 1
+  `);
+  if (direct.rows[0] !== undefined) {
+    return { factor: direct.rows[0].factor, reverse: false };
+  }
+  const mirror = await tenantTx().execute<{ factor: string }>(sql`
+    SELECT factor::text FROM uom_conversions
+    WHERE from_uom_id = ${toUomId} AND to_uom_id = ${fromUomId} LIMIT 1
+  `);
+  if (mirror.rows[0] !== undefined) {
+    return { factor: mirror.rows[0].factor, reverse: true };
+  }
+  return null;
+}

@@ -267,3 +267,116 @@ export class ReservationStateError extends DomainError {
     super("RESERVATION_STATE_INVALID", message);
   }
 }
+
+// -- WMS (PHASE-044 T-03; INV-029/BR-072, I-01…I-25) ------------------------------------
+//
+// The WMS surface's typed failures. INV-029's discipline is fail-closed:
+// a bin-level shortfall on an issue is a reconciliation violation, never
+// a silent deepening of the drift (the nightly probe reports the rest).
+
+export class ZoneNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("ZONE_NOT_FOUND", `warehouse zone ${id} does not exist in this tenant`);
+  }
+}
+export class ZoneCodeExistsError extends DomainError {
+  constructor(code: string) {
+    super("ZONE_CODE_EXISTS", `zone code ${code} already exists for this warehouse`);
+  }
+}
+export class AisleNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("AISLE_NOT_FOUND", `warehouse aisle ${id} does not exist in this tenant`);
+  }
+}
+export class RackNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("RACK_NOT_FOUND", `warehouse rack ${id} does not exist in this tenant`);
+  }
+}
+export class BinNotFoundError extends DomainError {
+  constructor(ref: string) {
+    // A7: unknown-vs-foreign render identically (no existence disclosure).
+    super("BIN_NOT_FOUND", `warehouse bin ${ref} does not exist in this tenant`);
+  }
+}
+export class BinCodeExistsError extends DomainError {
+  constructor(code: string) {
+    super("BIN_CODE_EXISTS", `bin code ${code} already exists for this warehouse`);
+  }
+}
+export class BinBarcodeExistsError extends DomainError {
+  constructor(barcode: string) {
+    super("BIN_BARCODE_EXISTS", `bin barcode ${barcode} already exists in this tenant`);
+  }
+}
+export class BinWarehouseMismatchError extends DomainError {
+  constructor(binId: string, warehouseId: string) {
+    super(
+      "BIN_WAREHOUSE_MISMATCH",
+      `bin ${binId} does not belong to warehouse ${warehouseId}`,
+    );
+  }
+}
+/** BR-072 (§2.1 mixed-batch rule): a no-mixed-batches bin rejects a second batch. */
+export class BinMixedBatchBlockedError extends DomainError {
+  constructor(binId: string, existingBatchId: string) {
+    super(
+      "BIN_MIXED_BATCH_BLOCKED",
+      `bin ${binId} disallows mixed batches and already holds batch ${existingBatchId}`,
+    );
+  }
+}
+export class BinContentNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("BIN_CONTENT_NOT_FOUND", `bin_contents row ${id} does not exist in this tenant`);
+  }
+}
+export class BinContentStateError extends DomainError {
+  constructor(message: string) {
+    super("BIN_CONTENT_STATE_INVALID", message);
+  }
+}
+/**
+ * INV-029 fail-closed floor: tenant-owned bin rows exist for the item but
+ * cannot cover the issue (short, wrong status, or wrong bin) — the move is
+ * refused rather than deepening the bins-vs-stock drift.
+ */
+export class BinContentsShortError extends DomainError {
+  constructor(details: {
+    itemId: string;
+    warehouseId: string;
+    binQty: string;
+    requested: string;
+  }) {
+    super(
+      "BIN_CONTENTS_SHORT",
+      `bin contents hold ${details.binQty} of the item in this warehouse but ${details.requested} were requested (INV-029)`,
+      details,
+    );
+  }
+}
+/** I-15: no uom_conversions row exists either way between the two units. */
+export class UomConversionMissingError extends DomainError {
+  constructor(fromUomId: string, toUomId: string) {
+    super(
+      "UOM_CONVERSION_MISSING",
+      `no uom conversion exists between ${fromUomId} and ${toUomId} (I-15)`,
+    );
+  }
+}
+export class LpnNotFoundError extends DomainError {
+  constructor(ref: string) {
+    super("LPN_NOT_FOUND", `LPN ${ref} does not exist in this tenant`);
+  }
+}
+export class LpnCodeExistsError extends DomainError {
+  constructor(code: string) {
+    super("LPN_CODE_EXISTS", `LPN code ${code} already exists in this tenant`);
+  }
+}
+export class LpnClosedError extends DomainError {
+  constructor(id: string) {
+    super("LPN_CLOSED", `LPN ${id} is CLOSED — bind or move its contents first`);
+  }
+}

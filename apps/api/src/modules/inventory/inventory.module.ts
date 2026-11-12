@@ -16,6 +16,7 @@ import { InventoryReconciliationService } from "./application/reconciliation-ser
 import { MethodSwitchService } from "./application/method-switch-service";
 import { OpeningStockService } from "./application/opening-stock-service";
 import { RevaluationService } from "./application/revaluation-service";
+import { WmsService } from "./application/wms.service";
 import { InventoryController } from "./presentation/inventory.controller";
 
 /**
@@ -31,6 +32,17 @@ export const RESERVATION_SWEEP_CRON = "15 1 * * *";
 
 /** The system sweep job's payload: no tenant id — the handler iterates ACTIVE tenants itself. */
 export interface ReservationSweepJobPayload {
+  system: true;
+}
+
+/**
+ * PHASE-044 (INV-029): the bin-contents reconciliation probe's queue —
+ * nightly at 01:45 UTC, after the reservation sweep, before 02:00.
+ */
+export const BIN_RECONCILE_QUEUE = "inventory.bin-reconcile";
+export const BIN_RECONCILE_CRON = "45 1 * * *";
+
+export interface BinReconcileJobPayload {
   system: true;
 }
 
@@ -69,6 +81,7 @@ export interface ReservationSweepJobPayload {
     MethodSwitchService,
     OpeningStockService,
     RevaluationService,
+    WmsService,
   ],
   exports: [
     WarehouseService,
@@ -82,10 +95,14 @@ export interface ReservationSweepJobPayload {
     MethodSwitchService,
     OpeningStockService,
     RevaluationService,
+    WmsService,
   ],
 })
 export class InventoryModule implements OnModuleInit {
-  constructor(@Inject(ReservationService) private readonly reservations: ReservationService) {}
+  constructor(
+    @Inject(ReservationService) private readonly reservations: ReservationService,
+    @Inject(WmsService) private readonly wms: WmsService,
+  ) {}
 
   /**
    * Register the reservation-expiry sweep: the worker subscription (both
@@ -94,6 +111,9 @@ export class InventoryModule implements OnModuleInit {
    * the app (or running API + worker side by side) replaces, never
    * duplicates. Failures never block module init (a down queue at boot
    * must not kill the HTTP plane); the next boot re-registers.
+   *
+   * PHASE-044 (INV-029): the same shape registers the bin-contents
+   * reconciliation probe (`inventory.bin-reconcile`, nightly 01:45 UTC).
    */
   async onModuleInit(): Promise<void> {
     const boss = getBoss();
@@ -114,6 +134,24 @@ export class InventoryModule implements OnModuleInit {
       .schedule(RESERVATION_SWEEP_QUEUE, RESERVATION_SWEEP_CRON, {
         system: true,
       } satisfies ReservationSweepJobPayload)
+      .catch(() => undefined);
+
+    await boss
+      .createQueue(BIN_RECONCILE_QUEUE)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (!/exist/i.test(message)) throw error;
+      });
+    await boss.work<BinReconcileJobPayload>(BIN_RECONCILE_QUEUE, async (jobs) => {
+      // Idempotent full pass per delivery — the probe is read-only.
+      for (let index = 0; index < jobs.length; index += 1) {
+        await this.wms.reconcileAllTenants();
+      }
+    });
+    await boss
+      .schedule(BIN_RECONCILE_QUEUE, BIN_RECONCILE_CRON, {
+        system: true,
+      } satisfies BinReconcileJobPayload)
       .catch(() => undefined);
   }
 }

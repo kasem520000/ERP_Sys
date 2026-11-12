@@ -6,7 +6,14 @@ import { findActivePurpose } from "../../accounting/infrastructure/accounting.st
 import { purposeNotMapped } from "../../accounting/domain/posting-engine/posting-errors";
 import type { JournalLineSpec } from "../../accounting/domain/posting-engine/journal-spec";
 import * as store from "../infrastructure/inventory.store";
+import * as wms from "../infrastructure/wms-store";
 import {
+  BinMixedBatchBlockedError,
+  BinNotFoundError,
+  BinWarehouseMismatchError,
+  BinContentsShortError,
+  LpnClosedError,
+  LpnNotFoundError,
   BatchNotFoundError,
   BatchNotOnHandError,
   BatchQuarantinedError,
@@ -177,6 +184,38 @@ function commitOverlay(
 }
 
 /**
+ * Per-transaction pending BIN-TAKE overlay (PHASE-044, INV-029's sibling
+ * of the position overlay): multi-line documents plan every issue up
+ * front — a later line's plan must see the earlier lines' pending bin
+ * takes or two lines would allocate the SAME bin_contents row and the
+ * apply's decrement would floor at the qty>=0 CHECK. Keyed contentId →
+ * qty already spoken for; discarded with the transaction handle.
+ */
+const binTakesByTx = new WeakMap<object, Map<string, string>>();
+
+function pendingBinTakes(tx: object): Map<string, string> {
+  let map = binTakesByTx.get(tx);
+  if (map === undefined) {
+    map = new Map();
+    binTakesByTx.set(tx, map);
+  }
+  return map;
+}
+
+function stageBinTake(contentId: string, qty: string): void {
+  const tx = store.inventoryTx();
+  const map = pendingBinTakes(tx);
+  map.set(contentId, addExact(map.get(contentId) ?? "0", qty));
+}
+
+/** The row's qty net of this transaction's pending takes. */
+function netOfPendingTakes(row: { id: string; qty: string }): string {
+  const tx = store.inventoryTx();
+  const pending = pendingBinTakes(tx).get(row.id);
+  return pending === undefined ? row.qty : subExact(row.qty, pending);
+}
+
+/**
  * Stage a plan's pending position into the per-transaction overlay BEFORE
  * its apply (PHASE-011): multi-line same-item documents (goods receipts)
  * plan every line up front — a later line's plan must see the earlier
@@ -222,6 +261,14 @@ export interface ReceiptPlan {
   /** FIFO layer to create at apply (unit_cost = the receipt cost). */
   createLayer: boolean;
   /** Batch slices for tracked multi-batch receipts (single here). */
+  /** PHASE-044 (INV-029): the bin/LPN endpoints — targetBinId NULL means
+   * the lazy DEFAULT-bin anchor at apply (D-5); binStatus rides the
+   * quarantine-on-receipt flows (AVAILABLE by default). */
+  targetBinId: string | null;
+  lpnId: string | null;
+  binStatus: string;
+  /** The item's stock UOM — bin_contents rows ride it (I-15's anchor). */
+  itemUomId: string;
 }
 
 /**
@@ -245,6 +292,15 @@ export async function planReceipt(input: {
   serialIds?: string[];
   memo?: string | null;
   memoAr?: string | null;
+  /** PHASE-044 (INV-029, §2.2): the receipt's bin endpoint — validated at
+   * plan time (exists, warehouse match, the mixed-batch rule); NULL opts
+   * into the lazy DEFAULT-bin anchor (D-5, resolved at apply). */
+  targetBinId?: string | null;
+  /** PHASE-044 (§2.5): bind the received rows to an LPN (I-05). */
+  lpnId?: string | null;
+  /** PHASE-044 (§2.8): AVAILABLE (default) or QUARANTINE (the
+   * quarantine-on-receipt flow — the Q-board owns later transitions). */
+  binStatus?: string;
 }): Promise<ReceiptPlan> {
   const item = await requireStockItem(input.itemId);
   await requireActiveWarehouse(input.warehouseId);
@@ -307,6 +363,39 @@ export async function planReceipt(input: {
     input.warehouseId,
   );
 
+  // PHASE-044 (INV-029 §2.2): the explicit bin endpoint validates at PLAN
+  // time — a wrong-bin rejection leaves zero residue (the plan-then-write
+  // law). NULL stays lazy: apply resolves the warehouse's DEFAULT bin.
+  if (input.targetBinId != null) {
+    const bin = await wms.findBinById(input.targetBinId);
+    if (bin === undefined) {
+      throw new BinNotFoundError(input.targetBinId);
+    }
+    if (bin.warehouseId !== input.warehouseId) {
+      throw new BinWarehouseMismatchError(input.targetBinId, input.warehouseId);
+    }
+    // §2.1 mixed-batch rule: a no-mixed-batches bin takes ONE batch.
+    if (item.trackBatch && !bin.allowMixedBatches && batchId !== null) {
+      const existingBatch = await wms.findDistinctBatchInBin(bin.id);
+      if (existingBatch !== null && existingBatch !== batchId) {
+        throw new BinMixedBatchBlockedError(bin.id, existingBatch);
+      }
+    }
+  }
+  if (input.lpnId != null) {
+    const lpn = await wms.findLpnById(input.lpnId);
+    if (lpn === undefined) {
+      throw new LpnNotFoundError(input.lpnId);
+    }
+    if (lpn.status !== "ACTIVE") {
+      throw new LpnClosedError(input.lpnId);
+    }
+  }
+  const binStatus = input.binStatus ?? "AVAILABLE";
+  if (binStatus !== "AVAILABLE" && binStatus !== "QUARANTINE" && binStatus !== "HOLD") {
+    throw new InvalidQuantityError(`binStatus must be AVAILABLE/QUARANTINE/HOLD: ${binStatus}`);
+  }
+
   let nextAvgCost: string;
   let createLayer = false;
   if (item.costingMethod === "WAC") {
@@ -344,6 +433,10 @@ export async function planReceipt(input: {
     nextQty: addExact(onHand, qty),
     nextAvgCost,
     createLayer,
+    targetBinId: input.targetBinId ?? null,
+    lpnId: input.lpnId ?? null,
+    binStatus,
+    itemUomId: item.uomId,
   };
 }
 
@@ -357,6 +450,47 @@ export async function applyReceipt(plan: ReceiptPlan, journalEntryId: string | n
       batchNo: plan.createdBatch.batchNo,
       expiryDate: plan.createdBatch.expiryDate,
       sourceRef: plan.sourceType,
+      createdBy: null,
+    });
+  }
+  // PHASE-044 (INV-029, D-5): the receipt's bin endpoint — explicit or the
+  // warehouse's lazy DEFAULT anchor; the bin_contents write rides THIS
+  // transaction (the same-transaction law — Σ bins moves with item_stock).
+  const binId = plan.targetBinId ?? (await wms.ensureDefaultBin(plan.warehouseId)).id;
+  // Serialized units: one bin_contents row PER serial (the slot key carries
+  // serial_id — Σ rows = qty, the serial stays individually placed).
+  if (plan.serialIds.length > 0) {
+    for (const serialId of plan.serialIds) {
+      await wms.addToBinSlot({
+        binId,
+        warehouseId: plan.warehouseId,
+        itemId: plan.itemId,
+        batchId: plan.batchId,
+        serialId,
+        lpnId: plan.lpnId,
+        ownerPartnerId: null,
+        status: plan.binStatus,
+        qty: "1.000000",
+        uomId: plan.itemUomId,
+        receivedAt: plan.movedAt,
+        note: null,
+        createdBy: null,
+      });
+    }
+  } else {
+    await wms.addToBinSlot({
+      binId,
+      warehouseId: plan.warehouseId,
+      itemId: plan.itemId,
+      batchId: plan.batchId,
+      serialId: null,
+      lpnId: plan.lpnId,
+      ownerPartnerId: null,
+      status: plan.binStatus,
+      qty: plan.qty,
+      uomId: plan.itemUomId,
+      receivedAt: plan.movedAt,
+      note: null,
       createdBy: null,
     });
   }
@@ -378,6 +512,9 @@ export async function applyReceipt(plan: ReceiptPlan, journalEntryId: string | n
     memo: plan.memo,
     memoAr: plan.memoAr,
     postedJournalId: journalEntryId,
+    sourceBinId: null,
+    targetBinId: binId,
+    lpnId: plan.lpnId,
   });
   if (plan.createLayer) {
     await store.insertLayer({
@@ -390,11 +527,26 @@ export async function applyReceipt(plan: ReceiptPlan, journalEntryId: string | n
       receivedAt: plan.movedAt,
     });
   }
+  // PHASE-044 (T-11, I-16/I-18): the serial ledger — exactly one
+  // serial_movements row per serial per movement, with the document refs.
+  const receiptEvent = receiptEventOf(plan.moveKind);
   for (const serialId of plan.serialIds) {
     const serial = await store.findSerialById(serialId);
     if (serial !== undefined && serial.status === "returned") {
       await store.markSerialInStock(serialId);
     }
+    await wms.appendSerialMovement({
+      serialId,
+      event: receiptEvent,
+      moveId,
+      sourceType: plan.sourceType,
+      sourceId: plan.sourceId,
+      fromBinId: null,
+      toBinId: binId,
+      movedAt: plan.movedAt,
+      note: plan.memo,
+      createdBy: null,
+    });
   }
   await store.upsertItemStock({
     itemId: plan.itemId,
@@ -404,6 +556,20 @@ export async function applyReceipt(plan: ReceiptPlan, journalEntryId: string | n
   });
   commitOverlay(plan.itemId, plan.warehouseId, plan.nextQty, plan.nextAvgCost);
   return moveId;
+}
+
+/** The serial-ledger event for an inbound move kind (T-11's map). */
+function receiptEventOf(moveKind: "receipt" | "adjust" | "transfer_in") {
+  if (moveKind === "adjust") return "ADJUST_IN" as const;
+  if (moveKind === "transfer_in") return "TRANSFER_IN" as const;
+  return "RECEIVE" as const;
+}
+
+/** The serial-ledger event for an outbound move kind (T-11's map). */
+function issueEventOf(moveKind: "issue" | "adjust" | "transfer_out") {
+  if (moveKind === "adjust") return "ADJUST_OUT" as const;
+  if (moveKind === "transfer_out") return "TRANSFER_OUT" as const;
+  return "PICK" as const;
 }
 
 // ---------------------------------------------------------------------------
@@ -434,9 +600,18 @@ export interface IssuePlan {
     serialId: string | null;
     /** FIFO decrements (layerId → qty) — applied at apply. */
     layerDecrements: { layerId: string; qty: string }[];
+    /** PHASE-044 (INV-029): the bin_contents rows this slice decrements —
+     * allocated at plan (FIFO by received_at, status-filtered); the apply
+     * decrements them in the SAME transaction as the item_stock write. */
+    binTakes: { contentId: string; binId: string; qty: string }[];
   }[];
   nextQty: string;
   nextAvgCost: string;
+  /** PHASE-044 (INV-029): TRUE when the item holds NO tenant-owned bin row
+   * in the warehouse — the pre-backfill legacy mode (the 0071 grace): the
+   * issue proceeds bin-less; the reconciliation probe reports the drift
+   * until the T-20 backfill materializes the default-bin rows. */
+  binless: boolean;
 }
 
 /**
@@ -464,6 +639,17 @@ export async function planIssue(input: {
   allowQuarantinedBatch?: boolean;
   memo?: string | null;
   memoAr?: string | null;
+  /** PHASE-044 (INV-029, directed picking §2.4): restrict the bin
+   * allocation to ONE bin (the scan-verified pick target). */
+  sourceBinId?: string | null;
+  /** PHASE-044 (§2.4/§2.6): the strategy/count-directed allocation — the
+   * caller (pick engine, count variance) names the exact bin_contents rows
+   * and quantities; dims must map onto the computed slices and cover the
+   * full qty (typed BinContentsShortError otherwise). */
+  directedTakes?: { contentId: string; qty: string }[];
+  /** PHASE-044 (§2.8): which bin statuses may serve the issue — AVAILABLE
+   * by default; the quarantine dispositions pass their own set. */
+  binStatuses?: string[];
 }): Promise<IssuePlan> {
   const item = await requireStockItem(input.itemId);
   await requireActiveWarehouse(input.warehouseId);
@@ -532,6 +718,7 @@ export async function planIssue(input: {
       batchId: raw.batchId,
       serialId: raw.serialId,
       layerDecrements,
+      binTakes: [],
     });
     totalValue = totalValue.plus(dec(value));
   }
@@ -558,6 +745,93 @@ export async function planIssue(input: {
     nextAvgCost = layersAverage(remainingLayers, "0.000000");
   }
 
+  // PHASE-044 (INV-029): the bin allocation. Legacy grace — an item with
+  // NO tenant-owned bin row in the warehouse issues bin-less (the T-20
+  // backfill materializes the default-bin rows); once ANY row exists the
+  // allocation must cover the full qty or the plan fails CLOSED
+  // (BinContentsShortError — blocking, never a silent drift deepening).
+  // The one exemption: an explicit negative-stock policy position — the
+  // bins floor at zero while item_stock goes negative by policy; the
+  // reconciliation note documents the exclusion.
+  const binless = !(await wms.hasAnyBinContent(input.warehouseId, item.id));
+  const policyNegative = compareExact(after, "0") < 0 && allowNegative;
+  if (!binless) {
+    const statuses = input.binStatuses ?? ["AVAILABLE"];
+    const directed = input.directedTakes ?? null;
+    const directedRows = directed === null ? [] : await Promise.all(
+      directed.map(async (take) => {
+        const row = await wms.findBinContentById(take.contentId);
+        if (
+          row === undefined ||
+          row.itemId !== item.id ||
+          row.warehouseId !== input.warehouseId ||
+          !statuses.includes(row.status)
+        ) {
+          throw new BinContentsShortError({
+            itemId: item.id,
+            warehouseId: input.warehouseId,
+            binQty: "0.000000",
+            requested: take.qty,
+          });
+        }
+        return { row, qty: take.qty };
+      }),
+    );
+    let binShortfall = new Decimal(0);
+    let binTotal = new Decimal(0);
+    for (const slice of slices) {
+      let remaining = dec(slice.qty);
+      const takes: { contentId: string; binId: string; qty: string }[] = [];
+      if (directed !== null) {
+        for (const { row, qty } of directedRows) {
+          if (remaining.lte(0)) break;
+          if (
+            (row.batchId ?? null) !== slice.batchId ||
+            (row.serialId ?? null) !== slice.serialId
+          ) {
+            continue;
+          }
+          const available = dec(netOfPendingTakes({ id: row.id, qty: row.qty }));
+          if (available.lte(0)) continue;
+          const take = Decimal.min(available, remaining, dec(qty));
+          takes.push({ contentId: row.id, binId: row.binId, qty: take.toFixed(6) });
+          remaining = remaining.minus(take);
+        }
+      } else {
+        const rows = await wms.listAllocatableBinContents({
+          warehouseId: input.warehouseId,
+          itemId: item.id,
+          batchId: slice.batchId,
+          serialId: slice.serialId,
+          statuses,
+        });
+        for (const row of rows) {
+          if (remaining.lte(0)) break;
+          if (input.sourceBinId != null && row.binId !== input.sourceBinId) continue;
+          const available = dec(netOfPendingTakes(row));
+          if (available.lte(0)) continue;
+          const take = Decimal.min(available, remaining);
+          takes.push({ contentId: row.id, binId: row.binId, qty: take.toFixed(6) });
+          remaining = remaining.minus(take);
+        }
+      }
+      for (const take of takes) {
+        stageBinTake(take.contentId, take.qty);
+      }
+      binTotal = binTotal.plus(dec(slice.qty)).minus(remaining);
+      binShortfall = binShortfall.plus(remaining);
+      slice.binTakes = takes;
+    }
+    if (binShortfall.gt(0) && !policyNegative) {
+      throw new BinContentsShortError({
+        itemId: item.id,
+        warehouseId: input.warehouseId,
+        binQty: binTotal.toFixed(6),
+        requested: qty,
+      });
+    }
+  }
+
   return {
     kind: "ISSUE",
     anchorId: anchorIdOfIssuePlan,
@@ -575,11 +849,13 @@ export async function planIssue(input: {
     slices,
     nextQty: after,
     nextAvgCost,
+    binless,
   };
 }
 
 /** Apply an issue AFTER its journal posted (or policy-none: NULL id). */
 export async function applyIssue(plan: IssuePlan, journalEntryId: string | null): Promise<string[]> {
+  const issueEvent = issueEventOf(plan.moveKind);
   for (const slice of plan.slices) {
     await store.insertStockMove({
       id: slice.moveId,
@@ -599,12 +875,33 @@ export async function applyIssue(plan: IssuePlan, journalEntryId: string | null)
       memo: plan.memo,
       memoAr: plan.memoAr,
       postedJournalId: journalEntryId,
+      sourceBinId: slice.binTakes[0]?.binId ?? null,
+      targetBinId: null,
+      lpnId: null,
     });
+    // PHASE-044 (INV-029): the bin decrements ride THIS transaction — the
+    // same-transaction law (Σ bins moves with item_stock, atomically).
+    for (const take of slice.binTakes) {
+      await wms.decrementBinContent(take.contentId, take.qty);
+    }
     for (const decrement of slice.layerDecrements) {
       await store.decrementLayer(decrement.layerId, decrement.qty);
     }
     if (slice.serialId !== null) {
       await store.markSerialSold({ id: slice.serialId, soldAt: plan.movedAt, owner: null });
+      // PHASE-044 (T-11): the serial ledger — one row per serial per move.
+      await wms.appendSerialMovement({
+        serialId: slice.serialId,
+        event: issueEvent,
+        moveId: slice.moveId,
+        sourceType: plan.sourceType,
+        sourceId: plan.sourceId,
+        fromBinId: slice.binTakes[0]?.binId ?? null,
+        toBinId: null,
+        movedAt: plan.movedAt,
+        note: plan.memo,
+        createdBy: null,
+      });
     }
   }
   await store.upsertItemStock({
@@ -622,12 +919,29 @@ export async function applySerialFlips(
   serialIds: readonly string[],
   action: "SOLD" | "RETURN",
   date: string,
+  /** PHASE-044 (T-11): the document behind the flip — the ledger row's
+   * source refs; omitting it keeps the historical no-ledger behavior. */
+  source?: { type: string; id: string },
 ): Promise<void> {
   for (const serialId of serialIds) {
     if (action === "SOLD") {
       await store.markSerialSold({ id: serialId, soldAt: date, owner: null });
     } else {
       await store.markSerialReturned({ id: serialId, returnedAt: date, owner: null });
+    }
+    if (source !== undefined) {
+      await wms.appendSerialMovement({
+        serialId,
+        event: action === "SOLD" ? "PICK" : "RETURN",
+        moveId: null,
+        sourceType: source.type,
+        sourceId: source.id,
+        fromBinId: null,
+        toBinId: null,
+        movedAt: date,
+        note: null,
+        createdBy: null,
+      });
     }
   }
 }
