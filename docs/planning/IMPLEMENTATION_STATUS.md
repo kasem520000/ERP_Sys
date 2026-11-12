@@ -138,7 +138,7 @@ engine, idempotent), the platform-plane SANDBOX provisioning (time-boxed,
 quota-capped, one-time credential, never a consolidation member), and the
 `/settings/imports` hub + onboarding integration. Permissions 265 → **267**;
 feature keys +2 (`platform.data_migration` business+enterprise,
-`platform.demo_data` ALL plans); rules +BR-066; i18n 5,019 → **5,109**; the
+`platform.demo_data` ALL plans); rules +BR-066; i18n 5,019 → **5,108**; the
 spec wave 34 tests incl. the seven-kind round-trips and the atomicity probe.
 Evidence: [the completion report](../implementation/phases/reports/PHASE-040-COMPLETION.md).
 **PHASE-041 (2026-11-12 — CR-11):** the Communications Hub delivered — Wave 1's
@@ -157,8 +157,8 @@ review-only contacts sync (never auto-merge), the
 `communication.outbound_delivery_log` report (registry 90 → 91) with the OA-06
 EXPLAIN budgets, the `/settings/communication` hub + unified-inbox web surfaces
 (+139 i18n pairs), the DKIM/SPF/DMARC deliverability guide, and BR-067 in the
-rules register. Permissions 267 → **272**; feature keys +6; i18n 5,109 →
-**5,248**; the full-AppModule HTTP smoke caught + fixed a real DI regression.
+rules register. Permissions 267 → **272**; feature keys +6; i18n 5,108 →
+**5,247**; the full-AppModule HTTP smoke caught + fixed a real DI regression.
 Evidence: [the completion report](../implementation/phases/reports/PHASE-041-COMPLETION.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in

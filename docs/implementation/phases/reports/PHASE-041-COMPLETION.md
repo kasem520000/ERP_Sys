@@ -80,7 +80,7 @@ calendar_integration business+enterprise — the 0051 tier-4 precedent).
   candidates (Levenshtein ≥ 0.72, best-first, capped 3), a bounded review queue
   (cap 200), identity-aware dedupe (decisions never re-proposed), idempotent
   accept (no duplicate contact insert) — NEVER an auto-merge.
-- Presentation: providers/templates/preferences/inbox/calendar controllers — 20
+- Presentation: providers/templates/preferences/inbox/calendar controllers — 21
   route-permission rows (matrix §3.19).
 
 **The two documented handoffs (the phase doc's pre-flagged attention points):**
@@ -105,7 +105,7 @@ inbox/page.tsx` (82) + `components/communication-inbox-workspace.tsx` (503 — t
 filtered timeline, the call logger, my-preferences). NAV: `settings.communication`
 (order 85) + `communication.inbox` (home, order 30 — the notifications-inbox
 precedent, no feature key); command palette inherits (OA-04);
-NAVIGATION_MODEL §1.7; i18n **+139 AR/EN pairs** (5,109 → 5,248 = 5,248, parity
+NAVIGATION_MODEL §1.7; i18n **+139 AR/EN pairs** (5,108 → 5,247 = 5,247, parity
 gate green).
 
 **Reports (T-11):** `communication.outbound_delivery_log` (REPORT_CATALOG §7 row;
@@ -122,12 +122,12 @@ checklist, the credential rotation + revoke-first discipline); BR-067 in
 BUSINESS_RULES.md; DATA_DICTIONARY §20 (the send-status law, the template-variable
 registry, the preference resolution, the call vocabulary, the source linkage).
 
-**Specs (the 041 wave, 61 tests):**
-- `__tests__/adapter-contract.spec.ts` (27) — every adapter's wire shape behind
+**Specs (the 041 wave, 85 tests):**
+- `__tests__/adapter-contract.spec.ts` (26) — every adapter's wire shape behind
   fake transports, the network-blocked SANDBOX proof (a poisoned fetch stays
   untouched through a full sandbox send), the provider registry gates, and the
   TWO grep proofs (provider wire markers + `await fetch(` outside the seam).
-- `__tests__/{provider-config,template-service,calendar-matching}.spec.ts` (25) —
+- `__tests__/{provider-config,template-service,calendar-matching}.spec.ts` (26) —
   BR-067 resolution, the sealed write, catalog shapes, template rendering
   fail-closed, the matching rules (exact/ambiguous/fuzzy/short-name).
 - `src/__db__/communication/*` (27) — outbox 8 (the SANDBOX end-to-end with
@@ -147,7 +147,7 @@ registry, the preference resolution, the call vocabulary, the source linkage).
 | # | Criterion | Evidence |
 |---|---|---|
 | 1 | Migration applies cleanly; 4 tables RLS'd; Drizzle + catalog parity (228); defaults seed idempotently | 0064 in the 64-entry chain (migrations.db.spec 7/7); catalog 228 → 232; the A-suite triple; the §8 seed is `ON CONFLICT DO NOTHING` (re-run no-op, spec-verified in preferences.db.spec) |
-| 2 | Adapter honesty (BR-067): suite behind fake transports + network-blocked SANDBOX zero-call proof + the no-provider-outside-the-port grep | adapter-contract.spec 27/27 — the poisoned-fetch sandbox send + BOTH grep gates (wire markers + fetch seam) |
+| 2 | Adapter honesty (BR-067): suite behind fake transports + network-blocked SANDBOX zero-call proof + the no-provider-outside-the-port grep | adapter-contract.spec 26/26 — the poisoned-fetch sandbox send + BOTH grep gates (wire markers + fetch seam) |
 | 3 | A WhatsApp send flows end-to-end in the SANDBOX: row + transitions + provider ref + cost; a FAILED injection drives the retry/backoff exactly per policy | outbox.db.spec 8/8 (the status-evidence CHECKs are the DB floor; attempts/max/next_attempt_at exercised) |
 | 4 | The dispatch resolver honors the matrix: opt-out blocks the module×channel while identical events deliver on opted-in channels | preferences.db.spec 4/4 (the end-to-end fixture) |
 | 5 | Daily digest renders the needs-attention set in AR and EN from templates | digest-nudges.db.spec (the four-bucket render, template-sourced) |
@@ -211,7 +211,7 @@ registry, the preference resolution, the call vocabulary, the source linkage).
 - **communication DB specs:** 27/27 · **reporting:** delivery-log 6/6 + golden
   6/6 + consolidation 50/50 + reporting-unit 42/42 · **dunning regression:**
   16/16.
-- **docs:validate:** 33/33. **i18n parity:** 5,248 = 5,248 (AR = EN; +139).
+- **docs:validate:** 33/33. **i18n parity:** 5,247 = 5,247 (AR = EN; +139).
 - **permissions drift:** 272 = 272 (seed = matrix; the drift checker's
   SEED_PATHS + the identity-flows count re-pinned).
 - **report registry:** 91 contracts (the unit meta-test + wiring + golden +
@@ -224,3 +224,26 @@ report; the tree is at commit `9f47f16` (+ this report's flip commit). Wave 1
 (035–041) is now COMPLETE — the next phase is PHASE-042 (Manufacturing I —
 Routing & Work Centers), the Wave 2 opener, pending the owner's review of this
 closing wave.
+
+## Errata (owner audit 2026-11-12)
+
+The owner's independent audit (fresh clone + line-by-line evidence verification +
+live gate runs) confirmed the phase as delivered and complete, and re-measured
+five counting numbers in this report — every one re-verified operatively on this
+lineage and corrected in place (code and dictionaries untouched; the parity gate
+was green throughout — only the numbers transcribed into the report were wrong):
+
+| Where | Was | Now | How re-measured |
+|---|---|---|---|
+| §2 "Specs (the 041 wave, …)" | 61 tests | **85** | operative count: 26 (adapter-contract) + 26 (provider-config 10 + template-service 10 + calendar-matching 6) + 27 (`src/__db__/communication/*` — outbox 8, preferences 4, digest-nudges 4, inbox 3, calendar 4, explain-budgets 4) + 6 (reporting/outbound-delivery-log) |
+| §2 adapter-contract.spec.ts | (27) / §3 "27/27" | **(26)** / **26/26** | `rg -c "^\s*(it|test)\("` over the spec file |
+| §2 {provider-config,template-service,calendar-matching}.spec.ts | (25) | **(26)** | same operative count: 10 + 10 + 6 |
+| §2 Web + §5 i18n parity | 5,109 → 5,248 = 5,248 / 5,248 = 5,248 | **5,108 → 5,247 = 5,247** / **5,247 = 5,247** | operative count — loading `apps/web/i18n/dictionaries.ts` and flattening leaf keys exactly as `assertDictionaryParity`/`check-i18n-parity.ts` measure (AR = EN = 5,247 at HEAD; 5,108 at `ad12a89`, the 040 flip) |
+| §2 "route-permission rows" | 20 | **21** | `rg` over `apps/api/src/infra/auth/route-permissions.ts`: 19 rows in the §3.19 block + 2 `preferences/me` self-plane rows |
+
+Likely cause: counting via git-diff lines instead of the operative count. **Rule
+adopted from this audit forward:** the authoritative i18n count in any completion
+report is the OPERATIVE count (Object.keys-style flatten over the loaded module —
+what `assertDictionaryParity` itself measures), never a diff-line tally; test and
+row counts are likewise re-measured operatively (rg over the files) before being
+written down. The +139 delta itself was correct and stands.

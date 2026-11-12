@@ -1,48 +1,81 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-11 (PHASE-040 COMPLETE — next eligible: PHASE-041; STOPPED awaiting the owner's go per the standing rule)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-12 (PHASE-041 COMPLETE — Wave 1 closed: 035…041 all delivered; next eligible: PHASE-042)
 
 ## The single next action
 
-**PHASE-040 is COMPLETE and pushed** — the triple flip is done (the phase doc
-header, the IMPLEMENTATION_STATUS row + header, and
-[the completion report](../implementation/phases/reports/PHASE-040-COMPLETION.md)
-with the CR-48 code-evidence checklist). **Execution is stopped here per the
-owner's standing rule** — the next phase awaits the owner's go.
+**PHASE-041 is COMPLETE and pushed, and the owner's independent audit (2026-11-12)
+has verified Wave 1 end-to-end — Wave 1 (035–041) is officially CLOSED.** The
+triple flip is done (the phase doc header, the IMPLEMENTATION_STATUS row + header,
+and [the completion report](../implementation/phases/reports/PHASE-041-COMPLETION.md)
+with the CR-48 code-evidence checklist + the audit errata). **The owner has given
+the go for the Wave 2 opener in this round.**
 
-**Start PHASE-041 (Communications Hub — WhatsApp/SMS/Email, CR-11)** — «ابدأ تنفيذ
-المرحلة PHASE-041» — when the owner gives the go. Wave-1 sibling (parallel-safe);
-prerequisites all satisfied (035 ✓). Read [PHASE-041.md](../implementation/phases/PHASE-041.md)
-first: the channel adapters (the notifications module's port family — the
-deferred WHATSAPP/SMS dunning letters land here), the templated bilingual
-messages, and the per-tenant quotas. The PHASE-040 demo-data loader and sandbox
-tenants become the default substrate for its sales demos.
+**Start PHASE-042 (Manufacturing I — Routing & Work Centers, CR-12)** — «ابدأ تنفيذ
+المرحلة PHASE-042» — the Wave 2 opener (Stage 13). Prerequisites all satisfied:
+the hard ordering **036-before-042 is met on this lineage** (PHASE-036 Extensibility
+Core COMPLETE 2026-11-10 — its entity registry is the surface custom fields attach
+to). Read [PHASE-042.md](../implementation/phases/PHASE-042.md) first: work centers
+with per-shift capacity + fixed/var cost rates (M-03/H-04), versioned routings +
+routing operations with setup/run times (M-02), the production-order operation
+state machine with barcode scan points (M-17, INV-027 sequence discipline), actual
+operation costing at work-center rates (M-18), standard-vs-actual variance records
+(M-13/M-19) + statistical scrap (M-12), rework orders (M-14), downtime records
+(M-15), OEE views (M-16), and the v3.1/CR-45 **standard-costing layer** (L2-12:
+item standard costs, cost roll-up over BOM + routing, freeze/activate with
+effective dates, purchase-price variance at receipt, stock revaluation). Budget:
++7 tables + 2 views · +7 permission keys (the 245-discipline zero-drift extends) ·
+~160 i18n keys · 4 report contracts · new manufacturing goldens + INV-027 +
+BR-057…060 · migrations continue from `0064` (exact numbers taken at
+implementation time per the phase doc's convention).
 
-## Post-PHASE-040 context for the next author (2026-11-11)
+## Post-PHASE-041 context for the next author (2026-11-12)
 
-PHASE-040 (Data Onboarding & Migration Toolkit) is COMPLETE — H-17, IN-26,
-TB-19/TB-20, L1-21's export half and OA-05 all closed: migrations `0060`–`0063`
-(schema_version 63; the RLS'd `import_mappings` + the seven-kind `import_jobs`
-widening + the tenants SANDBOX/demo columns + the `user_membership_options`
-SANDBOX plane + the BR-066 mapping snapshot + the `erp.tenant_kind` probe), the
-BR-066 dry-run → acknowledged-atomic-commit engine, the saved-mapping wizard,
-the QuickBooks/Odoo/Excel-generic adapters
-([MIGRATION_ADAPTERS.md](../migration/MIGRATION_ADAPTERS.md) is the contract),
-the 13-template one-click demo loader, the SANDBOX provisioning, and the
-`/settings/imports` hub. CURRENT_SHIPPED_PHASE = "PHASE-040" (permissions
-265 → **267**; feature keys +2; rules +BR-066; web i18n **5,109=5,109** (+90);
-ENTITY_CATALOG 227 → **228**; the three new spec files **34/34**).
+**Wave 1 (Stage 12 — "Sellable") is CLOSED:** 035 Activation & Truth Restoration ·
+036 Extensibility Core · 037 ZATCA Phase-1 & QR · 038 Procurement Sourcing ·
+039 Returns & Collections · 040 Data Onboarding · 041 Communications Hub — all
+COMPLETE with reports, and the owner's independent audit (fresh clone, line-by-line
+evidence verification, live gate runs: typecheck 0 errors · unit 576/576 ·
+docs:validate 33/33 · i18n parity green) confirmed both closing phases as real and
+complete. The audit's counting corrections are recorded as errata in the 040/041
+reports — including the adopted rule that i18n counts are always OPERATIVE counts
+(Object.keys-style flatten over the loaded module, what `assertDictionaryParity`
+measures), never git-diff tallies.
 
-Key handoffs from 040 (read the
-[completion report](../implementation/phases/reports/PHASE-040-COMPLETION.md)
-first): the **spec-caught product fixes** (the opening-post zero-residual guard,
-the COA nameAr fallback, the mapping snapshot, the tenant_kind probe — four
-would-be production bugs the DB specs caught in-phase); the **@Inject
-precedent** now covers OpeningBalancesPostingService/BudgetGridService/
-BudgetVersionService (container resolution under vitest/esbuild); the
-**enterprise-plan showcase posture** for anything that must light up ALL
-templates (the sandbox precedent); the demo loader's ensureDemoActorUsers pair
-(the SoD synthetic approvers) is reusable for future demo surfaces.
+**The Wave 1 release gate per CR-38 ("sellable" — Stage 12):** ZATCA-1 shipped
+with PHASE-037 ✓ · OQ-002 resolved as the owner pricing decision ✓ · the
+payments-ready path staged for PHASE-056 ✓ (recorded in
+[PHASE-041.md](../implementation/phases/PHASE-041.md) §8's handoff note; the
+register row [CR-38](../planning/COMPLETENESS_REGISTER.md) is the authority, and
+RELEASE_STRATEGY.md carries the tier table).
+
+**PHASE-041 (Communications Hub) delivery in one paragraph:** migration `0064`
+(schema_version 64; four RLS'd tables — `message_templates`, `outbound_messages`,
+`notification_preferences`, `communication_log`), the BR-067 channel port (eight
+providers behind fake-transported contract tests + the SANDBOX default with ZERO
+external calls until selected AND credentialed), the tenant template service
+(fail-closed rendering), the outbound pipeline (status transitions + provider ref +
+cost + bounded backoff retries), the TB-23 preference matrix end-to-end, the PP-13
+digest + PP-15 nudges, the UX-14 unified inbox + IN-16 call logging, the IN-17
+calendar connect + IN-18 review-only contacts sync, the delivery-log report
+(registry 90 → 91), and the `/settings/communication` + inbox web surfaces.
+CURRENT_SHIPPED_PHASE = "PHASE-041" (permissions 267 → **272**; feature keys +6;
+rules +BR-067; web i18n **5,247=5,247** (+139, from 5,108 — the audited operative
+count); ENTITY_CATALOG 228 → **232**; report registry 90 → **91**; isolation suite
+**1,290/1,290** (+24); the archive `ERP_PLATFORM_PHASE041.zip`).
+
+Key handoffs from 041 (read the
+[completion report](../implementation/phases/reports/PHASE-041-COMPLETION.md)
+first): **the two pre-documented letter handoffs are live consumers now** — the
+PHASE-039 dunning/collection EMAIL messages ride a real ledger row (the register's
+SENT stamp backed by the outbox transition), and the PHASE-036 QUEUED
+WHATSAPP/SMS letters enqueue + deliver + flip SENT through the pipeline; **the
+PHASE-040 demo tenants are the first realistic audience for the configured
+channels** (the demo loader seeds the tenants the channel demos run against). For
+042 specifically: the `@Inject` explicit-token discipline (the boot-regression
+lesson — manually-constructed specs cannot see container resolution gaps), the
+fail-closed rendering pattern for anything template-shaped, and the OA-06 EXPLAIN
+budget discipline on every new hot path.
 
 ## Post-PHASE-039 context for the next author (2026-11-11)
 

@@ -23,7 +23,7 @@ one-click demo loader seeds ALL 13 industry templates with realistic GL-posted d
 the platform-plane sandbox wraps it in a time-boxed, quota-capped, one-time-credential
 tenant that is never a consolidation member. **Migrations 0060–0063 · schema_version
 63 · 1 new RLS'd table · permissions 265 → 267 · feature keys +2 · rules BR-066 ·
-i18n +90 keys/locale.**
+i18n +89 keys/locale.**
 
 ## 2. Mandatory code-evidence checklist (CR-48)
 
@@ -94,7 +94,7 @@ mappings manager, adapter templates) + `components/demo-data-card.tsx` (the
 onboarding home card); the onboarding wizard's step-3 result screen links to the
 hub; NAV `settings.imports` (order 80, `platform.data_migration` +
 `configuration.imports.manage`, the `file-up` icon registry entry) +
-FALLBACK_CRUMBS; i18n **+90 AR/EN keys** (parity gate green); the
+FALLBACK_CRUMBS; i18n **+89 AR/EN keys** (parity gate green); the
 `localizedOnboardingError` mapper; web/contracts/ui typecheck + lint + unit green
 (73/56/42) and a clean `next build` with the new route.
 
@@ -128,7 +128,7 @@ FALLBACK_CRUMBS; i18n **+90 AR/EN keys** (parity gate green); the
 | 6 | BR-066 atomicity: interrupted commit → zero partial state → re-run converges | acceptance-6 test: the patched applier throws at row 2 of 3 → PREVIEW_READY + recorded failure + employee count unchanged → re-commit applies all 3 |
 | 7 | Demo loader: 13 templates, journals through the engine, idempotent | demo-data.db.spec: 13/13 templates (each a fresh tenant), journals ≥ 9 with Σdebit = Σcredit, re-run zero-write no-op, refusals typed |
 | 8 | Sandbox: flagged, quota-capped, time-boxed, never a consolidation member, RLS-invisible | sandbox-isolation.db.spec 7/7 (provisioning, projection, time box, quota, consolidation refusal, the A-probe shape) |
-| 9 | House gates: RLS A1–A10 · typecheck · lint · unit · docs:validate · i18n parity · permissions drift · EXPLAIN budgets | All green (§5 below); drift 267=267; i18n parity +90=+90; A1–A10 via the registered triple; **EXPLAIN captures: deviation D-4** |
+| 9 | House gates: RLS A1–A10 · typecheck · lint · unit · docs:validate · i18n parity · permissions drift · EXPLAIN budgets | All green (§5 below); drift 267=267; i18n parity +89=+89; A1–A10 via the registered triple; **EXPLAIN captures: deviation D-4** |
 | 10 | Completion report + status flip + archive | This report + the triple flip + `ERP_PLATFORM_PHASE040.zip` (OA-07) |
 
 ## 4. Deviations & decisions (documented)
@@ -203,7 +203,7 @@ FALLBACK_CRUMBS; i18n **+90 AR/EN keys** (parity gate green); the
 - **Web/contracts/ui:** typecheck ✓ · lint ✓ · unit **73/56/42** ✓ ·
   `next build` clean (the `/[locale]/settings/imports` route)
 - **Permissions drift:** **267 = 267** (CLI + the unit pins; §3.18 rows)
-- **i18n parity:** 5,019 + 90 = **5,109 = 5,109** (AR = EN; the runtime assert)
+- **i18n parity:** 5,019 + 89 = **5,108 = 5,108** (AR = EN; the runtime assert)
 - **RLS:** `import_mappings` through the A-suite (OWN_ROW + MISMATCHED_INSERT +
   the registry); `check:rls` exit 0 (230 catalog tables)
 - **docs:validate:** **33/33** green (this report's links + the wave's five docs)
@@ -215,3 +215,25 @@ Repository state at commit (this report's flip commit) archived as
 `ERP_PLATFORM_PHASE040.zip` (OA-07). The owner continues with «ابدأ تنفيذ
 المرحلة PHASE-041» (Communications Hub — the demo-data loader and sandbox tenants
 become the default substrate for its sales demos).
+
+## Errata (owner audit 2026-11-12)
+
+The owner's independent audit re-measured this report's i18n numbers operatively
+(loading the dictionary module and flattening leaf keys exactly as
+`assertDictionaryParity` measures) at the two reference commits: **5,019** at
+`769e0da` (the 039 flip) and **5,108** at `ad12a89` (this phase's flip) — the real
+delta is **+89**, not +90; re-verified the same way on this lineage and corrected
+in place (code and dictionaries untouched; parity was green throughout):
+
+| Where | Was | Now | How re-measured |
+|---|---|---|---|
+| §1 executive summary | i18n +90 keys/locale | **+89** | operative count at the two reference commits (5,108 − 5,019) |
+| §2 Web | i18n +90 AR/EN keys | **+89** | same |
+| §3 criterion 9 | i18n parity +90=+90 | **+89=+89** | same |
+| §5 gate evidence | 5,019 + 90 = 5,109 = 5,109 | **5,019 + 89 = 5,108 = 5,108** | same |
+
+Likely cause: counting via git-diff lines instead of the operative count. **Rule
+adopted from this audit forward (recorded in the 041 report's errata too):** the
+authoritative i18n count in any completion report is the OPERATIVE count
+(Object.keys-style flatten over the loaded module — what `assertDictionaryParity`
+itself measures), never a diff-line tally.
