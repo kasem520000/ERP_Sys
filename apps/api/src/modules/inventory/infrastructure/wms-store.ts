@@ -1194,3 +1194,179 @@ export async function updatePickTask(
     WHERE id = ${id}
   `);
 }
+
+// -- pick waves + strategies (T-05, §2.4; I-04/I-06/I-07) ----------------------------
+
+export interface PickWaveRow {
+  id: string;
+  waveNo: string | null;
+  warehouseId: string;
+  warehouseCode: string | null;
+  status: string;
+  method: string | null;
+  routeNote: string | null;
+  releasedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+}
+
+export async function listPickWaves(filter: {
+  warehouseId?: string;
+  status?: string;
+  limit?: number;
+}): Promise<PickWaveRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT w.id, w.wave_no AS "waveNo", w.warehouse_id AS "warehouseId",
+           wh.code AS "warehouseCode", w.status, w.method, w.route_note AS "routeNote",
+           w.released_at AS "releasedAt", w.completed_at AS "completedAt", w.created_at AS "createdAt"
+    FROM pick_waves w
+    JOIN warehouses wh ON wh.id = w.warehouse_id AND wh.tenant_id = w.tenant_id
+    WHERE (${filter.warehouseId ?? null}::uuid IS NULL OR w.warehouse_id = ${filter.warehouseId ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR w.status = ${filter.status ?? null})
+    ORDER BY w.created_at DESC, w.id
+    LIMIT ${Math.min(filter.limit ?? 100, 300)}
+  `);
+  return rows.rows as unknown as PickWaveRow[];
+}
+
+export async function findPickWaveById(id: string): Promise<PickWaveRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT w.id, w.wave_no AS "waveNo", w.warehouse_id AS "warehouseId",
+           wh.code AS "warehouseCode", w.status, w.method, w.route_note AS "routeNote",
+           w.released_at AS "releasedAt", w.completed_at AS "completedAt", w.created_at AS "createdAt"
+    FROM pick_waves w
+    JOIN warehouses wh ON wh.id = w.warehouse_id AND wh.tenant_id = w.tenant_id
+    WHERE w.id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as PickWaveRow[])[0];
+}
+
+export async function insertPickWave(input: {
+  warehouseId: string;
+  method: string | null;
+  routeNote: string | null;
+  createdBy: string | null;
+}): Promise<PickWaveRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO pick_waves (id, tenant_id, warehouse_id, method, route_note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.warehouseId}, ${input.method},
+            ${input.routeNote}, ${input.createdBy})
+  `);
+  return (await findPickWaveById(id))!;
+}
+
+/** The state-evidence stamp flip (the ck_pick_waves_state_evidence floor). */
+export async function updatePickWave(
+  id: string,
+  patch: {
+    status?: string;
+    waveNo?: string | null;
+    method?: string | null;
+    routeNote?: string | null;
+    releasedAt?: string | null;
+    releasedBy?: string | null;
+    completedAt?: string | null;
+    completedBy?: string | null;
+  },
+): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE pick_waves SET
+      status = COALESCE(${patch.status ?? null}, status),
+      wave_no = COALESCE(${patch.waveNo ?? null}, wave_no),
+      method = COALESCE(${patch.method ?? null}, method),
+      route_note = COALESCE(${patch.routeNote ?? null}, route_note),
+      released_at = COALESCE(${patch.releasedAt ?? null}, released_at),
+      released_by = COALESCE(${patch.releasedBy ?? null}, released_by),
+      completed_at = COALESCE(${patch.completedAt ?? null}, completed_at),
+      completed_by = COALESCE(${patch.completedBy ?? null}, completed_by),
+      updated_at = now(), version = version + 1
+    WHERE id = ${id}
+  `);
+}
+
+export interface PickStrategyRow {
+  id: string;
+  warehouseId: string;
+  method: "FIFO" | "FEFO" | "NEAREST";
+  allowPartial: boolean;
+}
+
+export async function findPickStrategy(warehouseId: string): Promise<PickStrategyRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, warehouse_id AS "warehouseId", method, allow_partial AS "allowPartial"
+    FROM pick_strategies WHERE warehouse_id = ${warehouseId} LIMIT 1
+  `);
+  return (rows.rows as unknown as PickStrategyRow[])[0];
+}
+
+export async function upsertPickStrategyRow(input: {
+  warehouseId: string;
+  method: "FIFO" | "FEFO" | "NEAREST";
+  allowPartial: boolean;
+  createdBy: string | null;
+}): Promise<PickStrategyRow> {
+  await tenantTx().execute(sql`
+    INSERT INTO pick_strategies (id, tenant_id, warehouse_id, method, allow_partial, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.warehouseId},
+            ${input.method}, ${input.allowPartial}, ${input.createdBy})
+    ON CONFLICT (tenant_id, warehouse_id)
+    DO UPDATE SET method = EXCLUDED.method, allow_partial = EXCLUDED.allow_partial,
+                  updated_at = now(), version = pick_strategies.version + 1
+  `);
+  return (await findPickStrategy(input.warehouseId))!;
+}
+
+/**
+ * The strategy-ordered allocation source (§2.4): the item's AVAILABLE,
+ * tenant-owned rows with the batch dims — FIFO (received_at), FEFO (batch
+ * expiry, earliest first — NULL expiries LAST, they never expire), or
+ * NEAREST (the bin's pick_sequence, then received_at).
+ */
+export async function listPickableRows(input: {
+  warehouseId: string;
+  itemId: string;
+  method: "FIFO" | "FEFO" | "NEAREST";
+}): Promise<
+  { id: string; binId: string; binCode: string | null; qty: string; batchId: string | null; expiryDate: string | null }[]
+> {
+  const order =
+    input.method === "FEFO"
+      ? sql`bt.expiry_date NULLS LAST, bc.received_at, bc.id`
+      : input.method === "NEAREST"
+        ? sql`b.pick_sequence NULLS LAST, b.code, bc.received_at, bc.id`
+        : sql`bc.received_at, bc.id`;
+  const rows = await tenantTx().execute(sql`
+    SELECT bc.id, bc.bin_id AS "binId", b.code AS "binCode", bc.qty::text AS qty,
+           bc.batch_id AS "batchId", bt.expiry_date::text AS "expiryDate"
+    FROM bin_contents bc
+    JOIN warehouse_bins b ON b.id = bc.bin_id AND b.tenant_id = bc.tenant_id
+    LEFT JOIN item_batches bt ON bt.id = bc.batch_id AND bt.tenant_id = bc.tenant_id
+    WHERE bc.warehouse_id = ${input.warehouseId}
+      AND bc.item_id = ${input.itemId}
+      AND bc.owner_partner_id IS NULL
+      AND bc.status = 'AVAILABLE'
+      AND bc.qty > 0
+    ORDER BY ${order}
+  `);
+  return rows.rows as unknown as {
+    id: string;
+    binId: string;
+    binCode: string | null;
+    qty: string;
+    batchId: string | null;
+    expiryDate: string | null;
+  }[];
+}
+
+/** The cluster route: the wave's open tasks ordered by the from-bin's pick
+ * sequence (one walk, every order — the multi-order cluster discipline). */
+export async function listWaveRouteTasks(waveId: string): Promise<PickTaskRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${TASK_COLUMNS} FROM ${TASK_FROM}
+    JOIN warehouse_bins rb ON rb.id = t.from_bin_id AND rb.tenant_id = t.tenant_id
+    WHERE t.wave_id = ${waveId}
+    ORDER BY rb.pick_sequence NULLS LAST, rb.code, t.source_id, t.source_line_no, t.id
+  `);
+  return rows.rows as unknown as PickTaskRow[];
+}

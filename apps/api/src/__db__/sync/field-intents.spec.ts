@@ -45,6 +45,7 @@ import {
   v2Command,
   type PosWorld,
 } from "./_oracle";
+import { PickingService } from "../../modules/inventory/application/picking-service";
 
 /**
  * PHASE-022 T-P22-2c · DR-P22-06 — the three field write intents
@@ -96,7 +97,12 @@ const repService = new SalesRepService(audit);
 const vans = new VanStockService(audit, inventoryTransfers);
 const partners = new PartnerService(audit);
 const quotations = new QuotationService(audit, numbering);
-const deliveries = new DeliveryNoteService(audit, posting, numbering);
+const deliveries = new DeliveryNoteService(
+      audit,
+      posting,
+      numbering,
+      new PickingService(audit, numbering),
+    );
 const pettyCash = new PettyCashGuard(audit);
 const expenses = new ExpenseService(audit, posting, numbering, pettyCash, resolver);
 const treasuryTransfers = new TreasuryTransferService(audit, posting, numbering, pettyCash);

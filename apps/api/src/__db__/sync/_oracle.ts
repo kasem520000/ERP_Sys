@@ -43,6 +43,7 @@ import { pull } from "../../modules/sync/application/pull-service";
 import { loadDevice } from "../../modules/sync/application/feed-groups";
 import { ReconciliationService } from "../../modules/sync/application/reconciliation-service";
 import type { SyncTransport } from "../../../../../packages/sync-core/src/client";
+import { PickingService } from "../../modules/inventory/application/picking-service";
 
 /**
  * PHASE-020 T-P20-3b · the chaos-matrix shared substrate (MASTER-PLAN §14;
@@ -409,7 +410,12 @@ export function makeSyncServices(): SyncServices {
   const reconciliation = new ReconciliationService(audit);
   const partners = new PartnerService(audit);
   const quotations = new QuotationService(audit, numbering);
-  const deliveries = new DeliveryNoteService(audit, posting, numbering);
+  const deliveries = new DeliveryNoteService(
+      audit,
+      posting,
+      numbering,
+      new PickingService(audit, numbering),
+    );
   const pettyCash = new PettyCashGuard(audit);
   const expenses = new ExpenseService(audit, posting, numbering, pettyCash, resolver);
   const treasuryTransfers = new TreasuryTransferService(audit, posting, numbering, pettyCash);

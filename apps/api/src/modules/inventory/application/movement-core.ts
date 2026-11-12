@@ -808,6 +808,10 @@ export async function planIssue(input: {
       let remaining = dec(slice.qty);
       const takes: { contentId: string; binId: string; qty: string }[] = [];
       if (directed !== null) {
+        // The directed allocation first (the confirmed physical picks);
+        // a shortfall falls through to the default walk — the take overlay
+        // already nets the directed takes, so the fallback never
+        // double-allocates a row.
         for (const { row, qty } of directedRows) {
           if (remaining.lte(0)) break;
           if (
@@ -822,7 +826,8 @@ export async function planIssue(input: {
           takes.push({ contentId: row.id, binId: row.binId, qty: take.toFixed(6) });
           remaining = remaining.minus(take);
         }
-      } else {
+      }
+      {
         const rows = await wms.listAllocatableBinContents({
           warehouseId: input.warehouseId,
           itemId: item.id,

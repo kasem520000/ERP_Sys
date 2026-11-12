@@ -12,6 +12,7 @@ import {
   stagePendingOverlay,
   type IssuePlan,
 } from "../../inventory/application/movement-core";
+import { PickingService } from "../../inventory/application/picking-service";
 import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
 import * as store from "../infrastructure/sales.store";
 import {
@@ -57,8 +58,9 @@ export interface DeliveryLineInput {
 export class DeliveryNoteService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
-    private readonly numbering: NumberingService,
+    @Inject(PostingService) private readonly posting: PostingService,
+    @Inject(NumberingService) private readonly numbering: NumberingService,
+    @Inject(PickingService) private readonly picking: PickingService,
   ) {}
 
   async list(filter: { status?: string; customerId?: string; orderId?: string; limit: number }) {
@@ -211,6 +213,11 @@ export class DeliveryNoteService {
     if (lines.length === 0) throw new EmptyDocumentError("delivery note");
 
     // (1) Plan every issue (locks positions, CC-04, FEFO/serial binding) — NO writes.
+    // PHASE-044 (T-05): when a released WAVE's tasks were scan-confirmed
+    // for this delivery, the confirmed physical picks drive the issue's
+    // bin allocation (directedTakes) — the economic decrements land on
+    // the bins the picker actually walked.
+    const waveTakes = await this.picking.directedTakesForDelivery(id);
     const plans: { line: store.DeliveryNoteLineRow; plan: IssuePlan }[] = [];
     for (const line of lines) {
       const plan = await planIssue({
@@ -223,6 +230,7 @@ export class DeliveryNoteService {
         sourceId: id,
         batchId: line.batchId,
         serialIds: line.serialIds ?? [],
+        directedTakes: waveTakes.get(line.lineNo),
         memo: `Delivery ${delivery.deliveryNo ?? id}`,
         memoAr: `سند تسليم ${delivery.deliveryNo ?? id}`,
       });

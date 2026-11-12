@@ -169,8 +169,10 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // (transfer pricing + transit exceptions + the alert jobs + kitting
     // ×2 + markers 1290/2135/4990), 0071 the DATA-ONLY seed (EIGHT keys —
     // 279 → 287, matrix §3.21; plan grants; the distribution/wholesale
-    // manifest enablement; the default location tree per warehouse).
-    expect(files.at(-1)?.tag).toBe("0071_wms_seeds");
+    // manifest enablement; the default location tree per warehouse),
+    // 0072 the pick-wave CANCEL evidence repair (the 0068 CHECK fix — a
+    // wave cancelled before release carries no release stamps).
+    expect(files.at(-1)?.tag).toBe("0072_wms_wave_cancel_evidence");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

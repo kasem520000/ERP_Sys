@@ -396,6 +396,11 @@ export const MIGRATIONS: readonly string[] = [
   "0069_wms_counts_tracking",
   "0070_wms_policies_jobs",
   "0071_wms_seeds",
+  // 0072_wms_wave_cancel_evidence — the 0068 evidence CHECK repair: a
+  // wave cancelled BEFORE release carries no release stamps (the 0068
+  // law made DRAFT→CANCELLED impossible — caught by the T-05 wave
+  // lifecycle spec). Constraint replaced in place; zero data change.
+  "0072_wms_wave_cancel_evidence",
 ];
 
 /**

@@ -35,6 +35,7 @@ import { PosShiftFlowService } from "../../modules/pos/application/shift-flow-se
 import { PushService } from "../../modules/sync/application/push-service";
 import { pull } from "../../modules/sync/application/pull-service";
 import { handlerRegistryKeys } from "../../modules/sync/application/handlers";
+import { PickingService } from "../../modules/inventory/application/picking-service";
 
 /**
  * PHASE-021 T-P21-2d · DR-P21-08 — the seven desktop write intents
@@ -72,7 +73,12 @@ const warehouses = new WarehouseService(audit);
 // DR-P21-08: the seven desktop write intents' owning services.
 const partners = new PartnerService(audit);
 const quotations = new QuotationService(audit, numbering);
-const deliveries = new DeliveryNoteService(audit, posting, numbering);
+const deliveries = new DeliveryNoteService(
+      audit,
+      posting,
+      numbering,
+      new PickingService(audit, numbering),
+    );
 const pettyCash = new PettyCashGuard(audit);
 const expenses = new ExpenseService(audit, posting, numbering, pettyCash, resolver);
 const treasuryTransfers = new TreasuryTransferService(audit, posting, numbering, pettyCash);

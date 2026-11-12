@@ -413,3 +413,50 @@ export class WrongBinPutawayError extends DomainError {
     );
   }
 }
+
+// -- directed picking (PHASE-044 T-05; §2.4; I-04/I-06/I-07/PP-11) ---------------------
+
+export class PickWaveNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("PICK_WAVE_NOT_FOUND", `pick wave ${id} does not exist in this tenant`);
+  }
+}
+export class PickWaveStateError extends DomainError {
+  constructor(message: string) {
+    super("PICK_WAVE_STATE_INVALID", message);
+  }
+}
+export class PickWaveEmptyError extends DomainError {
+  constructor(warehouseId: string) {
+    super("PICK_WAVE_EMPTY", `no open deliverable lines found for the wave in warehouse ${warehouseId}`);
+  }
+}
+export class PickTaskNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("PICK_TASK_NOT_FOUND", `pick task ${id} does not exist in this tenant`);
+  }
+}
+export class PickTaskStateError extends DomainError {
+  constructor(message: string) {
+    super("PICK_TASK_STATE_INVALID", message);
+  }
+}
+/** PP-11/§6.4: the scanned bin is not the task's allocated source. */
+export class WrongBinPickError extends DomainError {
+  constructor(scanned: string, expectedBinCode: string) {
+    super(
+      "WRONG_BIN_PICK",
+      `scanned bin ${scanned} is not the allocated source ${expectedBinCode}`,
+      { scanned, expectedBinCode },
+    );
+  }
+}
+/** §2.4: the warehouse strategy disallows short picks. */
+export class PartialPickNotAllowedError extends DomainError {
+  constructor(warehouseId: string) {
+    super(
+      "PARTIAL_PICK_NOT_ALLOWED",
+      `warehouse ${warehouseId}'s pick strategy disallows partial picks — confirm the full qty`,
+    );
+  }
+}

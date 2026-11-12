@@ -38,6 +38,7 @@ import { TransferService as InventoryTransferService } from "../../modules/inven
 import { CountService } from "../../modules/inventory/application/count-service";
 import { PosShiftFlowService } from "../../modules/pos/application/shift-flow-service";
 import { PushService } from "../../modules/sync/application/push-service";
+import { PickingService } from "../../modules/inventory/application/picking-service";
 
 /**
  * PHASE-020 T-P20-2b · push-side db evidence (MASTER-PLAN §6/§14; SYNC
@@ -77,7 +78,12 @@ const openingStock = new OpeningStockService(audit, posting);
 // (the additive PushService constructor slots — same instances, same graph).
 const partners = new PartnerService(audit);
 const quotations = new QuotationService(audit, numbering);
-const deliveries = new DeliveryNoteService(audit, posting, numbering);
+const deliveries = new DeliveryNoteService(
+      audit,
+      posting,
+      numbering,
+      new PickingService(audit, numbering),
+    );
 const pettyCash = new PettyCashGuard(audit);
 const expenses = new ExpenseService(audit, posting, numbering, pettyCash, resolver);
 const treasuryTransfers = new TreasuryTransferService(audit, posting, numbering, pettyCash);

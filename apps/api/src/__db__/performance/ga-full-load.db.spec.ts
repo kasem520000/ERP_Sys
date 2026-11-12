@@ -53,6 +53,7 @@ import {
   seedGALoadVolume,
 } from "./ga-fixtures";
 import { AppModule } from "../../app.module";
+import { PickingService } from "../../modules/inventory/application/picking-service";
 
 /**
  * PHASE-025 T2 · the GA full-load local harness — LOCAL HARNESS TIER: the
@@ -99,7 +100,12 @@ const posSales = new PosSaleService(audit, invoices, creditNotes);
 const shiftFlow = new PosShiftFlowService(audit, new ShiftService(audit, posting));
 const partners = new PartnerService(audit);
 const quotations = new QuotationService(audit, numbering);
-const deliveries = new DeliveryNoteService(audit, posting, numbering);
+const deliveries = new DeliveryNoteService(
+      audit,
+      posting,
+      numbering,
+      new PickingService(audit, numbering),
+    );
 const pettyCash = new PettyCashGuard(audit);
 const expenses = new ExpenseService(audit, posting, numbering, pettyCash, resolver);
 const treasuryTransfers = new TreasuryTransferService(audit, posting, numbering, pettyCash);

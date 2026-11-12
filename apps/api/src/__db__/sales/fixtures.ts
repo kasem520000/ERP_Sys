@@ -29,6 +29,7 @@ import { SalesInvoiceService } from "../../modules/sales/application/invoices";
 import { CreditNoteService } from "../../modules/sales/application/credit-notes";
 import { SalesReallocationService } from "../../modules/sales/application/reallocations";
 import { ArQueriesService } from "../../modules/sales/application/ar-queries";
+import { PickingService } from "../../modules/inventory/application/picking-service";
 
 /**
  * PHASE-012 sales db-suite fixtures (ACCOUNTING_TESTS §1): real PostgreSQL
@@ -56,7 +57,12 @@ const resolver = new TaxResolverService();
 
 export const quotations = new QuotationService(audit, numbering);
 export const salesOrders = new SalesOrderService(audit, numbering);
-export const deliveries = new DeliveryNoteService(audit, posting, numbering);
+export const deliveries = new DeliveryNoteService(
+      audit,
+      posting,
+      numbering,
+      new PickingService(audit, numbering),
+    );
 export const salesInvoices = new SalesInvoiceService(audit, posting, numbering, resolver);
 export const creditNotes = new CreditNoteService(audit, posting, numbering, resolver);
 export const salesReallocations = new SalesReallocationService(audit, numbering);
