@@ -79,6 +79,7 @@ export default async function SalesDeliveriesPage({
         branches={branches.ok ? branches.data : []}
         baseCurrency={profile.ok ? profile.data.baseCurrency : ""}
         canCreate={permissions.includes("sales.deliveries.create")}
+        canWave={permissions.includes("inventory.wms.picking")}
       />
     );
   }

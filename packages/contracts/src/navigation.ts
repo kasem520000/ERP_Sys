@@ -659,6 +659,72 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 110,
   },
+  // PHASE-044 (T-16): the WMS surfaces (§2.17) — the location tree, the
+  // pick waves, the cycle-count workspace, ABC, and the quarantine board.
+  // Feature keys = the exact FEATURE_CATALOG strings seeded in 0071 §3
+  // (business + enterprise; the distribution/wholesale templates require
+  // them by default); permissions = the exact seeded matrix keys the wms
+  // controller enforces on every route (0071 §1).
+  {
+    id: "inventory.locations",
+    parentGroup: "inventory",
+    label: { ar: "مواقع المستودع", en: "Warehouse locations" },
+    icon: "map-pin",
+    route: "/inventory/locations",
+    featureKey: "inventory.wms",
+    permission: "inventory.wms.locations",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 120,
+  },
+  {
+    id: "inventory.pick_waves",
+    parentGroup: "inventory",
+    label: { ar: "موجات الانتقاء", en: "Pick waves" },
+    icon: "route",
+    route: "/inventory/pick-waves",
+    featureKey: "inventory.picking",
+    permission: "inventory.wms.picking",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 130,
+  },
+  {
+    id: "inventory.cycle_counts",
+    parentGroup: "inventory",
+    label: { ar: "الجرد الدوري", en: "Cycle counts" },
+    icon: "calendar-check",
+    route: "/inventory/cycle-counts",
+    featureKey: "inventory.cycle_counts",
+    permission: "inventory.cycle_counts",
+    branchScoped: false,
+    archetype: "wizard",
+    order: 140,
+  },
+  {
+    id: "inventory.abc",
+    parentGroup: "inventory",
+    label: { ar: "تصنيف ABC", en: "ABC classification" },
+    icon: "bar-chart",
+    route: "/inventory/abc",
+    featureKey: "inventory.abc",
+    permission: "inventory.abc",
+    branchScoped: false,
+    archetype: "report",
+    order: 150,
+  },
+  {
+    id: "inventory.quarantine",
+    parentGroup: "inventory",
+    label: { ar: "لوحة الحجر الصحي", en: "Quarantine board" },
+    icon: "shield",
+    route: "/inventory/quarantine",
+    featureKey: "inventory.quarantine",
+    permission: "inventory.quarantine",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 160,
+  },
   // accounting group — PHASE-007 surfaces (matrix §3.1; archetype ids per
   // PAGE_ARCHETYPES; permission = the exact seeded keys).
   {

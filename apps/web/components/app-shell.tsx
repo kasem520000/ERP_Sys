@@ -80,6 +80,16 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "inventory/batches": { group: "navInventory", label: "navBatches" },
   "inventory/serials": { group: "navInventory", label: "navSerials" },
   "inventory/adjustments": { group: "navInventory", label: "navAdjustments" },
+  // -- PHASE-044 (T-16): the WMS surfaces. The registry rows
+  // `inventory.locations` / `inventory.pick_waves` /
+  // `inventory.cycle_counts` / `inventory.abc` / `inventory.quarantine`
+  // (contracts NAV_ITEMS) drive the sidebar; these fallbacks cover
+  // nav-fetch failure (crumbs only, the support-sessions rule).
+  "inventory/locations": { group: "navInventory", label: "navWmsLocations" },
+  "inventory/pick-waves": { group: "navInventory", label: "navPickWaves" },
+  "inventory/cycle-counts": { group: "navInventory", label: "navCycleCounts" },
+  "inventory/abc": { group: "navInventory", label: "navAbc" },
+  "inventory/quarantine": { group: "navInventory", label: "navQuarantine" },
   // -- T14-UI treasury list routes (registry-driven when resolved; the new/
   // detail subroutes resolve via the dynamic-prefix rule below) ------------
   "treasury/accounts": { group: "navTreasury", label: "navTreasuryAccounts" },

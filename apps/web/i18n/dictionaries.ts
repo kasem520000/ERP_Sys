@@ -5804,6 +5804,268 @@ export interface Dictionary {
   mfgErrStdVersionConflict: string;
   mfgErrStdMissing: string;
   mfgErrStdRevaluationZero: string;
+
+  // -- PHASE-044 (T-14…T-16): WMS — locations, waves, cycle counts, ABC,
+  // quarantine, and the PP-11 scan embeds -------------------------------------
+  // navigation
+  navWmsLocations: string;
+  navPickWaves: string;
+  navCycleCounts: string;
+  navAbc: string;
+  navQuarantine: string;
+  // shared
+  wmsStatusAvailable: string;
+  wmsStatusQuarantine: string;
+  wmsStatusHold: string;
+  wmsMethodFifo: string;
+  wmsMethodFefo: string;
+  wmsMethodNearest: string;
+  wmsScanLabel: string;
+  wmsScanPlaceholder: string;
+  wmsScanSubmit: string;
+  wmsScanWrongBin: string;
+  wmsTaskStatusPending: string;
+  wmsTaskStatusAssigned: string;
+  wmsTaskStatusInProgress: string;
+  wmsTaskStatusCompleted: string;
+  wmsTaskStatusCancelled: string;
+  // locations board
+  wmsLocationsTitle: string;
+  wmsLocationsEmpty: string;
+  wmsLocationsFilterWarehouse: string;
+  wmsLocationsTreeTitle: string;
+  wmsLocationsZone: string;
+  wmsLocationsAisle: string;
+  wmsLocationsRack: string;
+  wmsLocationsBin: string;
+  wmsLocationsZoneType: string;
+  wmsLocationsDefault: string;
+  wmsLocationsColBarcode: string;
+  wmsLocationsColPickSeq: string;
+  wmsLocationsColCapacity: string;
+  wmsLocationsColMixed: string;
+  wmsLocationsMixedYes: string;
+  wmsLocationsMixedNo: string;
+  wmsLocationsNoAisles: string;
+  wmsLocationsNoRacks: string;
+  wmsLocationsNoBins: string;
+  wmsLocationsCreateZoneTitle: string;
+  wmsLocationsZoneCodeLabel: string;
+  wmsLocationsZoneNameLabel: string;
+  wmsLocationsZoneNameArLabel: string;
+  wmsLocationsZoneTypeLabel: string;
+  wmsLocationsZoneDefaultLabel: string;
+  wmsLocationsZoneNoteLabel: string;
+  wmsLocationsZoneCreatedToast: string;
+  wmsLocationsAddAisle: string;
+  wmsLocationsAisleCodeLabel: string;
+  wmsLocationsAisleNameLabel: string;
+  wmsLocationsAisleCreatedToast: string;
+  wmsLocationsAddRack: string;
+  wmsLocationsRackCodeLabel: string;
+  wmsLocationsRackNameLabel: string;
+  wmsLocationsRackCreatedToast: string;
+  wmsLocationsCreateBinTitle: string;
+  wmsLocationsBinCodeLabel: string;
+  wmsLocationsBinBarcodeLabel: string;
+  wmsLocationsBinNameLabel: string;
+  wmsLocationsBinPickSeqLabel: string;
+  wmsLocationsBinCapacityLabel: string;
+  wmsLocationsBinMixedLabel: string;
+  wmsLocationsBinDefaultLabel: string;
+  wmsLocationsBinCreatedToast: string;
+  wmsLocationsContentsTitle: string;
+  wmsLocationsContentsEmpty: string;
+  wmsLocationsContentsColItem: string;
+  wmsLocationsContentsColBatch: string;
+  wmsLocationsContentsColSerial: string;
+  wmsLocationsContentsColStatus: string;
+  wmsLocationsContentsColQty: string;
+  wmsLocationsContentsColLpn: string;
+  wmsLocationsContentsColOwner: string;
+  wmsLocationsReconcileTitle: string;
+  wmsLocationsReconcileOk: string;
+  wmsLocationsReconcileColWarehouse: string;
+  wmsLocationsReconcileColItem: string;
+  wmsLocationsReconcileColBins: string;
+  wmsLocationsReconcileColStock: string;
+  wmsLocationsReconcileColDiff: string;
+  wmsLpnTitle: string;
+  wmsLpnEmpty: string;
+  wmsLpnColCode: string;
+  wmsLpnColStatus: string;
+  wmsLpnColNote: string;
+  wmsLpnCreateTitle: string;
+  wmsLpnCodeLabel: string;
+  wmsLpnNoteLabel: string;
+  wmsLpnCreatedToast: string;
+  wmsLpnClose: string;
+  wmsLpnClosedToast: string;
+  wmsLpnMoveTitle: string;
+  wmsLpnMoveTargetLabel: string;
+  wmsLpnMoveBtn: string;
+  wmsLpnMovedToast: string;
+  wmsLpnActive: string;
+  wmsLpnClosed: string;
+  // pick waves
+  wmsWavesTitle: string;
+  wmsWavesEmpty: string;
+  wmsWavesFilterWarehouse: string;
+  wmsWavesColNo: string;
+  wmsWavesColStatus: string;
+  wmsWavesColMethod: string;
+  wmsWavesColCreated: string;
+  wmsWavesStatusDraft: string;
+  wmsWavesStatusReleased: string;
+  wmsWavesStatusCompleted: string;
+  wmsWavesStatusCancelled: string;
+  wmsWavesRelease: string;
+  wmsWavesReleasedToast: string;
+  wmsWavesComplete: string;
+  wmsWavesCompletedToast: string;
+  wmsWavesCancel: string;
+  wmsWavesCancelReasonLabel: string;
+  wmsWavesCancelledToast: string;
+  wmsWavesTasksTitle: string;
+  wmsWavesTasksEmpty: string;
+  wmsWavesColTask: string;
+  wmsWavesColItem: string;
+  wmsWavesColQty: string;
+  wmsWavesColFromBin: string;
+  wmsWavesColToBin: string;
+  wmsWavesConfirmQtyLabel: string;
+  wmsWavesConfirmBtn: string;
+  wmsWavesConfirmedToast: string;
+  wmsWavesStartTask: string;
+  wmsWavesClusterTitle: string;
+  wmsWavesClusterHint: string;
+  wmsStrategyTitle: string;
+  wmsStrategyMethodLabel: string;
+  wmsStrategyPartialLabel: string;
+  wmsStrategySavedToast: string;
+  // cycle counts
+  wmsCcTitle: string;
+  wmsCcSchedulesTitle: string;
+  wmsCcSchedulesEmpty: string;
+  wmsCcColWarehouse: string;
+  wmsCcColName: string;
+  wmsCcColIntervals: string;
+  wmsCcColThreshold: string;
+  wmsCcColBlind: string;
+  wmsCcColActive: string;
+  wmsCcColLastRun: string;
+  wmsCcCreateTitle: string;
+  wmsCcNameLabel: string;
+  wmsCcClassALabel: string;
+  wmsCcClassBLabel: string;
+  wmsCcClassCLabel: string;
+  wmsCcThresholdLabel: string;
+  wmsCcBlindLabel: string;
+  wmsCcCreatedToast: string;
+  wmsCcRunNow: string;
+  wmsCcRunToast: string;
+  wmsCcDocumentsTitle: string;
+  wmsCcDocumentsEmpty: string;
+  wmsCcColNo: string;
+  wmsCcColStatus: string;
+  wmsCcColSnapshot: string;
+  wmsCcColVariance: string;
+  wmsCcStatusDraft: string;
+  wmsCcStatusCounted: string;
+  wmsCcStatusReview: string;
+  wmsCcStatusPosted: string;
+  wmsCcStatusCancelled: string;
+  wmsCcCreateDocTitle: string;
+  wmsCcDocNoteLabel: string;
+  wmsCcDocCreatedToast: string;
+  wmsCcLinesTitle: string;
+  wmsCcLinesEmpty: string;
+  wmsCcColLine: string;
+  wmsCcColBin: string;
+  wmsCcColSystem: string;
+  wmsCcColCounted: string;
+  wmsCcColImpact: string;
+  wmsCcEnterHint: string;
+  wmsCcEnterSave: string;
+  wmsCcEnteredToast: string;
+  wmsCcSubmit: string;
+  wmsCcSubmittedToast: string;
+  wmsCcReview: string;
+  wmsCcReviewedToast: string;
+  wmsCcApprove: string;
+  wmsCcApproveSupervisor: string;
+  wmsCcApprovedToast: string;
+  wmsCcCancel: string;
+  wmsCcCancelledToast: string;
+  wmsCcReasonLoss: string;
+  wmsCcReasonGain: string;
+  // ABC
+  wmsAbcTitle: string;
+  wmsAbcEmpty: string;
+  wmsAbcRecomputeTitle: string;
+  wmsAbcWindowLabel: string;
+  wmsAbcRecomputeBtn: string;
+  wmsAbcRecomputedToast: string;
+  wmsAbcColRank: string;
+  wmsAbcColItem: string;
+  wmsAbcColClass: string;
+  wmsAbcColValue: string;
+  wmsAbcColQty: string;
+  wmsAbcColVelocity: string;
+  wmsAbcSummaryA: string;
+  wmsAbcSummaryB: string;
+  wmsAbcSummaryC: string;
+  wmsAbcHint: string;
+  // quarantine board
+  wmsQTitle: string;
+  wmsQEmpty: string;
+  wmsQFilterStatus: string;
+  wmsQColBin: string;
+  wmsQColItem: string;
+  wmsQColQty: string;
+  wmsQColReceived: string;
+  wmsQTransitionTitle: string;
+  wmsQToStatusLabel: string;
+  wmsQNoteLabel: string;
+  wmsQTransitionBtn: string;
+  wmsQTransitionedToast: string;
+  wmsQJournalToast: string;
+  wmsQDisposeTitle: string;
+  wmsQDispositionLabel: string;
+  wmsQDispositionRelease: string;
+  wmsQDispositionRtv: string;
+  wmsQDispositionScrap: string;
+  wmsQCounterAccountLabel: string;
+  wmsQDisposeBtn: string;
+  wmsQDisposedToast: string;
+  // PP-11 embeds (receipt / delivery / transfer / count screens)
+  wmsPutawayQueueTitle: string;
+  wmsPutawayQueueEmpty: string;
+  wmsPutawayColTarget: string;
+  wmsPutawayConfirmBtn: string;
+  wmsPutawayPrintLabel: string;
+  wmsPutawayConfirmedToast: string;
+  wmsDeliveryWaveBtn: string;
+  wmsDeliveryWaveToast: string;
+  wmsCountScanBin: string;
+  wmsCountScanBinHint: string;
+  wmsCountScanLoaded: string;
+  // WMS errors
+  wmsErrZoneCodeTaken: string;
+  wmsErrBinCodeTaken: string;
+  wmsErrBinBarcodeTaken: string;
+  wmsErrLpnCodeTaken: string;
+  wmsErrLpnClosed: string;
+  wmsErrWrongBin: string;
+  wmsErrPartialPick: string;
+  wmsErrBinContentState: string;
+  wmsErrBinContentsShort: string;
+  wmsErrRuleInvalid: string;
+  wmsErrWaveState: string;
+  wmsErrTaskState: string;
+  wmsErrCcState: string;
+  wmsErrCcThreshold: string;
+  wmsErrAbcThreshold: string;
 }
 
 const ar: Dictionary = {
@@ -11637,6 +11899,258 @@ const ar: Dictionary = {
   mfgErrStdMissing:
     "التجميع يتطلب تكلفة معيارية نشطة لكل مكوّن في قائمة المواد — أكملها أولاً.",
   mfgErrStdRevaluationZero: "قيمة إعادة التقييم صفر — لا يمكن ترحيل قيد فارغ.",
+
+  // PHASE-044: WMS (AR)
+  navWmsLocations: "مواقع المستودع",
+  navPickWaves: "موجات الانتقاء",
+  navCycleCounts: "الجرد الدوري",
+  navAbc: "تصنيف ABC",
+  navQuarantine: "لوحة الحجر الصحي",
+  wmsStatusAvailable: "متاح",
+  wmsStatusQuarantine: "حجر صحي",
+  wmsStatusHold: "تعليق",
+  wmsMethodFifo: "الأقدم أولاً (FIFO)",
+  wmsMethodFefo: "الأقرب انتهاءً (FEFO)",
+  wmsMethodNearest: "الأقرب (NEAREST)",
+  wmsScanLabel: "امسح الباركود",
+  wmsScanPlaceholder: "باركود الصندوق…",
+  wmsScanSubmit: "تأكيد المسح",
+  wmsScanWrongBin: "الباركود الممسوح لا يطابق الصندوق المطلوب.",
+  wmsTaskStatusPending: "بالانتظار",
+  wmsTaskStatusAssigned: "مُسندة",
+  wmsTaskStatusInProgress: "قيد التنفيذ",
+  wmsTaskStatusCompleted: "مكتملة",
+  wmsTaskStatusCancelled: "ملغاة",
+  wmsLocationsTitle: "شجرة مواقع المستودع",
+  wmsLocationsEmpty: "لا توجد مناطق بعد لهذا المستودع.",
+  wmsLocationsFilterWarehouse: "المستودع",
+  wmsLocationsTreeTitle: "المناطق والممرات والأرفف والصناديق",
+  wmsLocationsZone: "منطقة",
+  wmsLocationsAisle: "ممر",
+  wmsLocationsRack: "رف",
+  wmsLocationsBin: "صندوق",
+  wmsLocationsZoneType: "نوع المنطقة",
+  wmsLocationsDefault: "افتراضي",
+  wmsLocationsColBarcode: "الباركود",
+  wmsLocationsColPickSeq: "تسلسل الانتقاء",
+  wmsLocationsColCapacity: "السعة",
+  wmsLocationsColMixed: "دفعات مختلطة",
+  wmsLocationsMixedYes: "مسموح",
+  wmsLocationsMixedNo: "ممنوع",
+  wmsLocationsNoAisles: "لا ممرات في هذه المنطقة.",
+  wmsLocationsNoRacks: "لا أرفف في هذا الممر.",
+  wmsLocationsNoBins: "لا صناديق في هذا الرف.",
+  wmsLocationsCreateZoneTitle: "منطقة جديدة",
+  wmsLocationsZoneCodeLabel: "رمز المنطقة",
+  wmsLocationsZoneNameLabel: "الاسم (إنجليزي)",
+  wmsLocationsZoneNameArLabel: "الاسم (عربي)",
+  wmsLocationsZoneTypeLabel: "نوع المنطقة",
+  wmsLocationsZoneDefaultLabel: "منطقة افتراضية",
+  wmsLocationsZoneNoteLabel: "ملاحظة",
+  wmsLocationsZoneCreatedToast: "أُنشئت المنطقة.",
+  wmsLocationsAddAisle: "أضف ممراً",
+  wmsLocationsAisleCodeLabel: "رمز الممر",
+  wmsLocationsAisleNameLabel: "اسم الممر",
+  wmsLocationsAisleCreatedToast: "أُنشئ الممر.",
+  wmsLocationsAddRack: "أضف رفاً",
+  wmsLocationsRackCodeLabel: "رمز الرف",
+  wmsLocationsRackNameLabel: "اسم الرف",
+  wmsLocationsRackCreatedToast: "أُنشئ الرف.",
+  wmsLocationsCreateBinTitle: "صندوق جديد",
+  wmsLocationsBinCodeLabel: "رمز الصندوق",
+  wmsLocationsBinBarcodeLabel: "باركود الصندوق",
+  wmsLocationsBinNameLabel: "اسم الصندوق",
+  wmsLocationsBinPickSeqLabel: "تسلسل الانتقاء",
+  wmsLocationsBinCapacityLabel: "السعة",
+  wmsLocationsBinMixedLabel: "السماح بدفعات مختلطة",
+  wmsLocationsBinDefaultLabel: "صندوق افتراضي",
+  wmsLocationsBinCreatedToast: "أُنشئ الصندوق.",
+  wmsLocationsContentsTitle: "محتويات الصناديق",
+  wmsLocationsContentsEmpty: "لا محتويات مطابقة.",
+  wmsLocationsContentsColItem: "الصنف",
+  wmsLocationsContentsColBatch: "الدفعة",
+  wmsLocationsContentsColSerial: "التسلسلي",
+  wmsLocationsContentsColStatus: "الحالة",
+  wmsLocationsContentsColQty: "الكمية",
+  wmsLocationsContentsColLpn: "لوحة الترخيص",
+  wmsLocationsContentsColOwner: "المالك",
+  wmsLocationsReconcileTitle: "تقرير مطابقة الصناديق (INV-029)",
+  wmsLocationsReconcileOk: "لا انحرافات — مجموع محتويات الصناديق يطابق الأرصدة.",
+  wmsLocationsReconcileColWarehouse: "المستودع",
+  wmsLocationsReconcileColItem: "الصنف",
+  wmsLocationsReconcileColBins: "مجموع الصناديق",
+  wmsLocationsReconcileColStock: "الرصيد الدفتري",
+  wmsLocationsReconcileColDiff: "الفرق",
+  wmsLpnTitle: "لوحات الترخيص (LPN)",
+  wmsLpnEmpty: "لا لوحات ترخيص بعد.",
+  wmsLpnColCode: "الرمز",
+  wmsLpnColStatus: "الحالة",
+  wmsLpnColNote: "ملاحظة",
+  wmsLpnCreateTitle: "لوحة ترخيص جديدة",
+  wmsLpnCodeLabel: "رمز اللوحة",
+  wmsLpnNoteLabel: "ملاحظة",
+  wmsLpnCreatedToast: "أُنشئت لوحة الترخيص.",
+  wmsLpnClose: "إغلاق اللوحة",
+  wmsLpnClosedToast: "أُغلقت اللوحة.",
+  wmsLpnMoveTitle: "نقل بلوحة ترخيص",
+  wmsLpnMoveTargetLabel: "الصندوق الهدف",
+  wmsLpnMoveBtn: "انقل اللوحة",
+  wmsLpnMovedToast: "نُقلت اللوحة بكل محتوياتها.",
+  wmsLpnActive: "نشطة",
+  wmsLpnClosed: "مغلقة",
+  wmsWavesTitle: "موجات الانتقاء",
+  wmsWavesEmpty: "لا موجات بعد.",
+  wmsWavesFilterWarehouse: "المستودع",
+  wmsWavesColNo: "رقم الموجة",
+  wmsWavesColStatus: "الحالة",
+  wmsWavesColMethod: "الاستراتيجية",
+  wmsWavesColCreated: "أُنشئت",
+  wmsWavesStatusDraft: "مسودة",
+  wmsWavesStatusReleased: "مُطلقة",
+  wmsWavesStatusCompleted: "مكتملة",
+  wmsWavesStatusCancelled: "ملغاة",
+  wmsWavesRelease: "إطلاق الموجة",
+  wmsWavesReleasedToast: "أُطلقت الموجة وحُجز رقمها.",
+  wmsWavesComplete: "إغلاق الموجة",
+  wmsWavesCompletedToast: "أُغلقت الموجة.",
+  wmsWavesCancel: "إلغاء الموجة",
+  wmsWavesCancelReasonLabel: "سبب الإلغاء",
+  wmsWavesCancelledToast: "أُلغيت الموجة.",
+  wmsWavesTasksTitle: "مهام الانتقاء",
+  wmsWavesTasksEmpty: "لا مهام في هذه الموجة.",
+  wmsWavesColTask: "المهمة",
+  wmsWavesColItem: "الصنف",
+  wmsWavesColQty: "الكمية",
+  wmsWavesColFromBin: "من صندوق",
+  wmsWavesColToBin: "إلى صندوق",
+  wmsWavesConfirmQtyLabel: "الكمية الملتقطة",
+  wmsWavesConfirmBtn: "تأكيد بالمسح",
+  wmsWavesConfirmedToast: "تم تأكيد الالتقاط.",
+  wmsWavesStartTask: "ابدأ المهمة",
+  wmsWavesClusterTitle: "مسار العنقود",
+  wmsWavesClusterHint: "مسار واحد مرتب بتسلسل الانتقاء يخدم كل مهام الموجة المفتوحة.",
+  wmsStrategyTitle: "استراتيجية الانتقاء",
+  wmsStrategyMethodLabel: "الطريقة",
+  wmsStrategyPartialLabel: "السماح بالالتقاط الجزئي",
+  wmsStrategySavedToast: "حُفظت الاستراتيجية.",
+  wmsCcTitle: "الجرد الدوري",
+  wmsCcSchedulesTitle: "جداول الجرد",
+  wmsCcSchedulesEmpty: "لا جداول بعد.",
+  wmsCcColWarehouse: "المستودع",
+  wmsCcColName: "الاسم",
+  wmsCcColIntervals: "الفترات (أ/ب/ج)",
+  wmsCcColThreshold: "عتبة الاعتماد",
+  wmsCcColBlind: "أعمى",
+  wmsCcColActive: "نشط",
+  wmsCcColLastRun: "آخر تشغيل",
+  wmsCcCreateTitle: "جدول جديد",
+  wmsCcNameLabel: "اسم الجدول",
+  wmsCcClassALabel: "فترة الفئة أ (يوم)",
+  wmsCcClassBLabel: "فترة الفئة ب (يوم)",
+  wmsCcClassCLabel: "فترة الفئة ج (يوم)",
+  wmsCcThresholdLabel: "عتبة اعتماد الفرق",
+  wmsCcBlindLabel: "جرد أعمى (إخفاء الكمية الدفترية)",
+  wmsCcCreatedToast: "أُنشئ الجدول.",
+  wmsCcRunNow: "شغّل الآن",
+  wmsCcRunToast: "نُفّذ التشغيل ووُلّدت مستندات الجرد المستحقة.",
+  wmsCcDocumentsTitle: "مستندات الجرد",
+  wmsCcDocumentsEmpty: "لا مستندات بعد.",
+  wmsCcColNo: "الرقم",
+  wmsCcColStatus: "الحالة",
+  wmsCcColSnapshot: "لحظة اللقطة",
+  wmsCcColVariance: "الفروقات (خسارة/زيادة)",
+  wmsCcStatusDraft: "مسودة",
+  wmsCcStatusCounted: "معدود",
+  wmsCcStatusReview: "مراجعة الفروقات",
+  wmsCcStatusPosted: "مُرحّل",
+  wmsCcStatusCancelled: "ملغى",
+  wmsCcCreateDocTitle: "مستند جرد يدوي",
+  wmsCcDocNoteLabel: "ملاحظة",
+  wmsCcDocCreatedToast: "أُنشئ مستند الجرد.",
+  wmsCcLinesTitle: "بنود المستند",
+  wmsCcLinesEmpty: "لا بنود.",
+  wmsCcColLine: "البند",
+  wmsCcColBin: "الصندوق",
+  wmsCcColSystem: "الكمية الدفترية",
+  wmsCcColCounted: "المعدودة",
+  wmsCcColImpact: "الأثر (قيمة)",
+  wmsCcEnterHint: "أدخل الكميات المعدودة لكل بند ثم احفظ.",
+  wmsCcEnterSave: "حفظ الكميات",
+  wmsCcEnteredToast: "حُفظت الكميات المعدودة.",
+  wmsCcSubmit: "تقديم",
+  wmsCcSubmittedToast: "قُدّم المستند.",
+  wmsCcReview: "مراجعة الفروقات",
+  wmsCcReviewedToast: "حُسبت الفروقات ودخل المستند المراجعة.",
+  wmsCcApprove: "اعتماد وترحيل",
+  wmsCcApproveSupervisor: "اعتماد مشرف (تجاوز العتبة)",
+  wmsCcApprovedToast: "اعتُمد المستند ورُحّلت تسويته.",
+  wmsCcCancel: "إلغاء",
+  wmsCcCancelledToast: "أُلغي المستند.",
+  wmsCcReasonLoss: "هالك جرد دوري",
+  wmsCcReasonGain: "زيادة جرد دوري",
+  wmsAbcTitle: "تصنيف ABC",
+  wmsAbcEmpty: "لا تصنيفات محسوبة بعد — شغّل إعادة الاحتساب.",
+  wmsAbcRecomputeTitle: "إعادة الاحتساب",
+  wmsAbcWindowLabel: "نافذة الاستهلاك (يوم)",
+  wmsAbcRecomputeBtn: "أعد الاحتساب",
+  wmsAbcRecomputedToast: "أُعيد احتساب التصنيفات.",
+  wmsAbcColRank: "الترتيب",
+  wmsAbcColItem: "الصنف",
+  wmsAbcColClass: "الفئة",
+  wmsAbcColValue: "قيمة الاستهلاك",
+  wmsAbcColQty: "الكمية المنصرفة",
+  wmsAbcColVelocity: "السرعة (يومياً)",
+  wmsAbcSummaryA: "الفئة أ",
+  wmsAbcSummaryB: "الفئة ب",
+  wmsAbcSummaryC: "الفئة ج",
+  wmsAbcHint: "تصنيف باريتو على قيمة الاستهلاك خلال النافذة؛ الصنف بلا حركة يقع في الفئة ج.",
+  wmsQTitle: "لوحة الحجر الصحي والتعليق",
+  wmsQEmpty: "لا بنود محجوزة.",
+  wmsQFilterStatus: "الحالة",
+  wmsQColBin: "الصندوق",
+  wmsQColItem: "الصنف",
+  wmsQColQty: "الكمية",
+  wmsQColReceived: "اُستلمت",
+  wmsQTransitionTitle: "تغيير الحالة",
+  wmsQToStatusLabel: "الحالة الجديدة",
+  wmsQNoteLabel: "ملاحظة",
+  wmsQTransitionBtn: "نفّذ التحويل",
+  wmsQTransitionedToast: "حُوّلت الحالة.",
+  wmsQJournalToast: "حُوّلت الحالة مع قيد G-43 (السياسة: حساب مميز).",
+  wmsQDisposeTitle: "التصرف",
+  wmsQDispositionLabel: "نوع التصرف",
+  wmsQDispositionRelease: "إخلاء سبيل",
+  wmsQDispositionRtv: "إرجاع للمورد",
+  wmsQDispositionScrap: "إتلاف",
+  wmsQCounterAccountLabel: "الحجم المقابل (للإرجاع)",
+  wmsQDisposeBtn: "نفّذ التصرف",
+  wmsQDisposedToast: "نُفّذ التصرف.",
+  wmsPutawayQueueTitle: "طابور التخزين الموجّه",
+  wmsPutawayQueueEmpty: "لا مهام تخزين مفتوحة.",
+  wmsPutawayColTarget: "الصندوق الموجه",
+  wmsPutawayConfirmBtn: "تأكيد التخزين",
+  wmsPutawayPrintLabel: "طبع البطاقة",
+  wmsPutawayConfirmedToast: "أُكد التخزين وحُركت الكمية إلى الصندوق.",
+  wmsDeliveryWaveBtn: "أنشئ موجة انتقاء",
+  wmsDeliveryWaveToast: "أُنشئت الموجة وخصصت مهامها من الصناديق.",
+  wmsCountScanBin: "امسح صندوقاً",
+  wmsCountScanBinHint: "امسح باركود الصندوق لعرض محتوياته الحالية أثناء الجرد.",
+  wmsCountScanLoaded: "عُرضت محتويات الصندوق.",
+  wmsErrZoneCodeTaken: "رمز المنطقة مستخدم مسبقاً في هذا المستودع.",
+  wmsErrBinCodeTaken: "رمز الصندوق مستخدم مسبقاً في هذا المستودع.",
+  wmsErrBinBarcodeTaken: "باركود الصندوق مستخدم مسبقاً في هذا المستودع.",
+  wmsErrLpnCodeTaken: "رمز لوحة الترخيص مستخدم مسبقاً.",
+  wmsErrLpnClosed: "لوحة الترخيص مغلقة — لا حركات عليها بعد الآن.",
+  wmsErrWrongBin: "الصندوق الممسوح ليس الصندوق الموجه لهذه المهمة.",
+  wmsErrPartialPick: "الالتقاط الجزئي غير مسموح في استراتيجية هذا المستودع.",
+  wmsErrBinContentState: "حالة محتوى الصندوق لا تسمح بهذا الإجراء.",
+  wmsErrBinContentsShort: "كميات الصناديق المتاحة لا تكفي — راجع لوحة المواقع.",
+  wmsErrRuleInvalid: "قاعدة التخزين غير صالحة (شرط أو هدف غير مسموح).",
+  wmsErrWaveState: "حالة الموجة لا تسمح بهذا الإجراء.",
+  wmsErrTaskState: "حالة المهمة لا تسمح بهذا الإجراء.",
+  wmsErrCcState: "حالة مستند الجرد لا تسمح بهذا الإجراء.",
+  wmsErrCcThreshold: "الفروق تتجاوز عتبة الاعتماد — يلزم اعتماد المشرف.",
+  wmsErrAbcThreshold: "حدود ABC غير صالحة (يجب 0 < أ < ب ≤ 1).",
 };
 
 const en: Dictionary = {
@@ -17484,6 +17998,258 @@ const en: Dictionary = {
   mfgErrStdMissing:
     "The roll-up needs an active standard for every BOM component — complete those first.",
   mfgErrStdRevaluationZero: "The revaluation value is zero — an empty journal cannot post.",
+
+  // PHASE-044: WMS (EN)
+  navWmsLocations: "Warehouse locations",
+  navPickWaves: "Pick waves",
+  navCycleCounts: "Cycle counts",
+  navAbc: "ABC classification",
+  navQuarantine: "Quarantine board",
+  wmsStatusAvailable: "Available",
+  wmsStatusQuarantine: "Quarantine",
+  wmsStatusHold: "Hold",
+  wmsMethodFifo: "FIFO",
+  wmsMethodFefo: "FEFO",
+  wmsMethodNearest: "Nearest",
+  wmsScanLabel: "Scan the barcode",
+  wmsScanPlaceholder: "Bin barcode…",
+  wmsScanSubmit: "Confirm scan",
+  wmsScanWrongBin: "The scanned barcode does not match the expected bin.",
+  wmsTaskStatusPending: "Pending",
+  wmsTaskStatusAssigned: "Assigned",
+  wmsTaskStatusInProgress: "In progress",
+  wmsTaskStatusCompleted: "Completed",
+  wmsTaskStatusCancelled: "Cancelled",
+  wmsLocationsTitle: "Warehouse location tree",
+  wmsLocationsEmpty: "No zones yet for this warehouse.",
+  wmsLocationsFilterWarehouse: "Warehouse",
+  wmsLocationsTreeTitle: "Zones, aisles, racks & bins",
+  wmsLocationsZone: "Zone",
+  wmsLocationsAisle: "Aisle",
+  wmsLocationsRack: "Rack",
+  wmsLocationsBin: "Bin",
+  wmsLocationsZoneType: "Zone type",
+  wmsLocationsDefault: "Default",
+  wmsLocationsColBarcode: "Barcode",
+  wmsLocationsColPickSeq: "Pick sequence",
+  wmsLocationsColCapacity: "Capacity",
+  wmsLocationsColMixed: "Mixed batches",
+  wmsLocationsMixedYes: "Allowed",
+  wmsLocationsMixedNo: "Blocked",
+  wmsLocationsNoAisles: "No aisles in this zone.",
+  wmsLocationsNoRacks: "No racks in this aisle.",
+  wmsLocationsNoBins: "No bins on this rack.",
+  wmsLocationsCreateZoneTitle: "New zone",
+  wmsLocationsZoneCodeLabel: "Zone code",
+  wmsLocationsZoneNameLabel: "Name (EN)",
+  wmsLocationsZoneNameArLabel: "Name (AR)",
+  wmsLocationsZoneTypeLabel: "Zone type",
+  wmsLocationsZoneDefaultLabel: "Default zone",
+  wmsLocationsZoneNoteLabel: "Note",
+  wmsLocationsZoneCreatedToast: "Zone created.",
+  wmsLocationsAddAisle: "Add aisle",
+  wmsLocationsAisleCodeLabel: "Aisle code",
+  wmsLocationsAisleNameLabel: "Aisle name",
+  wmsLocationsAisleCreatedToast: "Aisle created.",
+  wmsLocationsAddRack: "Add rack",
+  wmsLocationsRackCodeLabel: "Rack code",
+  wmsLocationsRackNameLabel: "Rack name",
+  wmsLocationsRackCreatedToast: "Rack created.",
+  wmsLocationsCreateBinTitle: "New bin",
+  wmsLocationsBinCodeLabel: "Bin code",
+  wmsLocationsBinBarcodeLabel: "Bin barcode",
+  wmsLocationsBinNameLabel: "Bin name",
+  wmsLocationsBinPickSeqLabel: "Pick sequence",
+  wmsLocationsBinCapacityLabel: "Capacity",
+  wmsLocationsBinMixedLabel: "Allow mixed batches",
+  wmsLocationsBinDefaultLabel: "Default bin",
+  wmsLocationsBinCreatedToast: "Bin created.",
+  wmsLocationsContentsTitle: "Bin contents",
+  wmsLocationsContentsEmpty: "No matching contents.",
+  wmsLocationsContentsColItem: "Item",
+  wmsLocationsContentsColBatch: "Batch",
+  wmsLocationsContentsColSerial: "Serial",
+  wmsLocationsContentsColStatus: "Status",
+  wmsLocationsContentsColQty: "Qty",
+  wmsLocationsContentsColLpn: "LPN",
+  wmsLocationsContentsColOwner: "Owner",
+  wmsLocationsReconcileTitle: "Bin reconciliation report (INV-029)",
+  wmsLocationsReconcileOk: "No drift — Σ bin contents matches item stock everywhere.",
+  wmsLocationsReconcileColWarehouse: "Warehouse",
+  wmsLocationsReconcileColItem: "Item",
+  wmsLocationsReconcileColBins: "Σ bins",
+  wmsLocationsReconcileColStock: "Book qty",
+  wmsLocationsReconcileColDiff: "Difference",
+  wmsLpnTitle: "License plates (LPN)",
+  wmsLpnEmpty: "No license plates yet.",
+  wmsLpnColCode: "Code",
+  wmsLpnColStatus: "Status",
+  wmsLpnColNote: "Note",
+  wmsLpnCreateTitle: "New license plate",
+  wmsLpnCodeLabel: "LPN code",
+  wmsLpnNoteLabel: "Note",
+  wmsLpnCreatedToast: "License plate created.",
+  wmsLpnClose: "Close plate",
+  wmsLpnClosedToast: "Plate closed.",
+  wmsLpnMoveTitle: "Move by license plate",
+  wmsLpnMoveTargetLabel: "Target bin",
+  wmsLpnMoveBtn: "Move plate",
+  wmsLpnMovedToast: "The plate and all its contents moved.",
+  wmsLpnActive: "Active",
+  wmsLpnClosed: "Closed",
+  wmsWavesTitle: "Pick waves",
+  wmsWavesEmpty: "No waves yet.",
+  wmsWavesFilterWarehouse: "Warehouse",
+  wmsWavesColNo: "Wave no.",
+  wmsWavesColStatus: "Status",
+  wmsWavesColMethod: "Strategy",
+  wmsWavesColCreated: "Created",
+  wmsWavesStatusDraft: "Draft",
+  wmsWavesStatusReleased: "Released",
+  wmsWavesStatusCompleted: "Completed",
+  wmsWavesStatusCancelled: "Cancelled",
+  wmsWavesRelease: "Release wave",
+  wmsWavesReleasedToast: "Wave released with its number.",
+  wmsWavesComplete: "Complete wave",
+  wmsWavesCompletedToast: "Wave completed.",
+  wmsWavesCancel: "Cancel wave",
+  wmsWavesCancelReasonLabel: "Cancellation reason",
+  wmsWavesCancelledToast: "Wave cancelled.",
+  wmsWavesTasksTitle: "Pick tasks",
+  wmsWavesTasksEmpty: "No tasks in this wave.",
+  wmsWavesColTask: "Task",
+  wmsWavesColItem: "Item",
+  wmsWavesColQty: "Qty",
+  wmsWavesColFromBin: "From bin",
+  wmsWavesColToBin: "To bin",
+  wmsWavesConfirmQtyLabel: "Picked qty",
+  wmsWavesConfirmBtn: "Confirm by scan",
+  wmsWavesConfirmedToast: "Pick confirmed.",
+  wmsWavesStartTask: "Start task",
+  wmsWavesClusterTitle: "Cluster route",
+  wmsWavesClusterHint: "One pick-sequence-ordered walk serving every open task of the wave.",
+  wmsStrategyTitle: "Pick strategy",
+  wmsStrategyMethodLabel: "Method",
+  wmsStrategyPartialLabel: "Allow partial picks",
+  wmsStrategySavedToast: "Strategy saved.",
+  wmsCcTitle: "Cycle counting",
+  wmsCcSchedulesTitle: "Count schedules",
+  wmsCcSchedulesEmpty: "No schedules yet.",
+  wmsCcColWarehouse: "Warehouse",
+  wmsCcColName: "Name",
+  wmsCcColIntervals: "Intervals (A/B/C)",
+  wmsCcColThreshold: "Approval threshold",
+  wmsCcColBlind: "Blind",
+  wmsCcColActive: "Active",
+  wmsCcColLastRun: "Last run",
+  wmsCcCreateTitle: "New schedule",
+  wmsCcNameLabel: "Schedule name",
+  wmsCcClassALabel: "Class A interval (days)",
+  wmsCcClassBLabel: "Class B interval (days)",
+  wmsCcClassCLabel: "Class C interval (days)",
+  wmsCcThresholdLabel: "Variance approval threshold",
+  wmsCcBlindLabel: "Blind counts (hide system qty)",
+  wmsCcCreatedToast: "Schedule created.",
+  wmsCcRunNow: "Run now",
+  wmsCcRunToast: "Run executed — due count documents were generated.",
+  wmsCcDocumentsTitle: "Count documents",
+  wmsCcDocumentsEmpty: "No documents yet.",
+  wmsCcColNo: "No.",
+  wmsCcColStatus: "Status",
+  wmsCcColSnapshot: "Snapshot at",
+  wmsCcColVariance: "Variance (loss/gain)",
+  wmsCcStatusDraft: "Draft",
+  wmsCcStatusCounted: "Counted",
+  wmsCcStatusReview: "Variance review",
+  wmsCcStatusPosted: "Posted",
+  wmsCcStatusCancelled: "Cancelled",
+  wmsCcCreateDocTitle: "Manual count document",
+  wmsCcDocNoteLabel: "Note",
+  wmsCcDocCreatedToast: "Count document created.",
+  wmsCcLinesTitle: "Document lines",
+  wmsCcLinesEmpty: "No lines.",
+  wmsCcColLine: "Line",
+  wmsCcColBin: "Bin",
+  wmsCcColSystem: "System qty",
+  wmsCcColCounted: "Counted",
+  wmsCcColImpact: "Value impact",
+  wmsCcEnterHint: "Enter the counted quantity per line, then save.",
+  wmsCcEnterSave: "Save counts",
+  wmsCcEnteredToast: "Counted quantities saved.",
+  wmsCcSubmit: "Submit",
+  wmsCcSubmittedToast: "Document submitted.",
+  wmsCcReview: "Review variances",
+  wmsCcReviewedToast: "Variances computed — the document is under review.",
+  wmsCcApprove: "Approve & post",
+  wmsCcApproveSupervisor: "Supervisor approve (override)",
+  wmsCcApprovedToast: "Approved — the adjustment journal posted.",
+  wmsCcCancel: "Cancel",
+  wmsCcCancelledToast: "Document cancelled.",
+  wmsCcReasonLoss: "Cycle-count loss",
+  wmsCcReasonGain: "Cycle-count gain",
+  wmsAbcTitle: "ABC classification",
+  wmsAbcEmpty: "No classifications computed yet — run the recompute.",
+  wmsAbcRecomputeTitle: "Recompute",
+  wmsAbcWindowLabel: "Consumption window (days)",
+  wmsAbcRecomputeBtn: "Recompute",
+  wmsAbcRecomputedToast: "Classifications recomputed.",
+  wmsAbcColRank: "Rank",
+  wmsAbcColItem: "Item",
+  wmsAbcColClass: "Class",
+  wmsAbcColValue: "Consumption value",
+  wmsAbcColQty: "Qty out",
+  wmsAbcColVelocity: "Velocity (per day)",
+  wmsAbcSummaryA: "Class A",
+  wmsAbcSummaryB: "Class B",
+  wmsAbcSummaryC: "Class C",
+  wmsAbcHint: "A Pareto walk over consumption value in the window; zero-consumption items land in C.",
+  wmsQTitle: "Quarantine & hold board",
+  wmsQEmpty: "No held rows.",
+  wmsQFilterStatus: "Status",
+  wmsQColBin: "Bin",
+  wmsQColItem: "Item",
+  wmsQColQty: "Qty",
+  wmsQColReceived: "Received",
+  wmsQTransitionTitle: "Transition status",
+  wmsQToStatusLabel: "New status",
+  wmsQNoteLabel: "Note",
+  wmsQTransitionBtn: "Apply transition",
+  wmsQTransitionedToast: "Status transitioned.",
+  wmsQJournalToast: "Status transitioned with the G-43 journal (policy: distinct).",
+  wmsQDisposeTitle: "Disposition",
+  wmsQDispositionLabel: "Disposition",
+  wmsQDispositionRelease: "Release",
+  wmsQDispositionRtv: "Return to vendor",
+  wmsQDispositionScrap: "Scrap",
+  wmsQCounterAccountLabel: "Counter account (RTV)",
+  wmsQDisposeBtn: "Apply disposition",
+  wmsQDisposedToast: "Disposition applied.",
+  wmsPutawayQueueTitle: "Directed putaway queue",
+  wmsPutawayQueueEmpty: "No open putaway tasks.",
+  wmsPutawayColTarget: "Directed bin",
+  wmsPutawayConfirmBtn: "Confirm putaway",
+  wmsPutawayPrintLabel: "Print label",
+  wmsPutawayConfirmedToast: "Putaway confirmed — the qty moved into the bin.",
+  wmsDeliveryWaveBtn: "Create pick wave",
+  wmsDeliveryWaveToast: "Wave created — its tasks were allocated from the bins.",
+  wmsCountScanBin: "Scan a bin",
+  wmsCountScanBinHint: "Scan a bin barcode to view its live contents while counting.",
+  wmsCountScanLoaded: "Bin contents loaded.",
+  wmsErrZoneCodeTaken: "That zone code already exists in this warehouse.",
+  wmsErrBinCodeTaken: "That bin code already exists in this warehouse.",
+  wmsErrBinBarcodeTaken: "That bin barcode already exists in this warehouse.",
+  wmsErrLpnCodeTaken: "That LPN code already exists.",
+  wmsErrLpnClosed: "The license plate is closed — it no longer moves.",
+  wmsErrWrongBin: "The scanned bin is not the bin this task is directed to.",
+  wmsErrPartialPick: "Partial picks are not allowed under this warehouse's strategy.",
+  wmsErrBinContentState: "The bin-content state does not allow this action.",
+  wmsErrBinContentsShort: "The available bin quantities fall short — review the locations board.",
+  wmsErrRuleInvalid: "The putaway rule is invalid (condition or target).",
+  wmsErrWaveState: "The wave's state does not allow this action.",
+  wmsErrTaskState: "The task's state does not allow this action.",
+  wmsErrCcState: "The cycle-count document's state does not allow this action.",
+  wmsErrCcThreshold: "Variances exceed the approval threshold — a supervisor approval is required.",
+  wmsErrAbcThreshold: "Invalid ABC thresholds (must satisfy 0 < aPct < bPct ≤ 1).",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

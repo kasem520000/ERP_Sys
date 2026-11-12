@@ -871,6 +871,56 @@ export function localizedInventoryError(
       return d.inventoryErrMethodSwitchInvalid;
     case "METHOD_SWITCH_SAME":
       return d.inventoryErrMethodSwitchSame;
+    // PHASE-044: the WMS error family (the typed rejections of the
+    // location tree, LPN, putaway, picking, cycle-count, and quarantine
+    // surfaces; A7-sensitive not-founds fold into errorsNotFound above).
+    case "ZONE_NOT_FOUND":
+    case "AISLE_NOT_FOUND":
+    case "RACK_NOT_FOUND":
+    case "BIN_NOT_FOUND":
+    case "BIN_CONTENT_NOT_FOUND":
+    case "LPN_NOT_FOUND":
+    case "PUTAWAY_RULE_NOT_FOUND":
+    case "PUTAWAY_TASK_NOT_FOUND":
+    case "PICK_WAVE_NOT_FOUND":
+    case "PICK_TASK_NOT_FOUND":
+    case "CYCLE_COUNT_SCHEDULE_NOT_FOUND":
+    case "CYCLE_COUNT_DOCUMENT_NOT_FOUND":
+    case "CYCLE_COUNT_LINE_NOT_FOUND":
+      return d.errorsNotFound;
+    case "ZONE_CODE_EXISTS":
+      return d.wmsErrZoneCodeTaken;
+    case "BIN_CODE_EXISTS":
+      return d.wmsErrBinCodeTaken;
+    case "BIN_BARCODE_EXISTS":
+      return d.wmsErrBinBarcodeTaken;
+    case "LPN_CODE_EXISTS":
+      return d.wmsErrLpnCodeTaken;
+    case "LPN_CLOSED":
+      return d.wmsErrLpnClosed;
+    case "WRONG_BIN_PUTAWAY":
+    case "WRONG_BIN_PICK":
+      return d.wmsErrWrongBin;
+    case "PARTIAL_PICK_NOT_ALLOWED":
+      return d.wmsErrPartialPick;
+    case "BIN_CONTENT_STATE_INVALID":
+      return d.wmsErrBinContentState;
+    case "BIN_CONTENTS_SHORT":
+      return d.wmsErrBinContentsShort;
+    case "PUTAWAY_RULE_INVALID":
+      return d.wmsErrRuleInvalid;
+    case "PICK_WAVE_STATE_INVALID":
+      return d.wmsErrWaveState;
+    case "PICK_TASK_STATE_INVALID":
+    case "PUTAWAY_TASK_STATE_INVALID":
+      return d.wmsErrTaskState;
+    case "CYCLE_COUNT_SCHEDULE_STATE_INVALID":
+    case "CYCLE_COUNT_DOCUMENT_STATE_INVALID":
+      return d.wmsErrCcState;
+    case "CYCLE_COUNT_THRESHOLD_EXCEEDED":
+      return d.wmsErrCcThreshold;
+    case "ABC_THRESHOLD_INVALID":
+      return d.wmsErrAbcThreshold;
     default:
       return error.message !== "" ? error.message : d.errorsGeneric;
   }

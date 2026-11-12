@@ -5,6 +5,7 @@ import { z } from "zod";
 import { identityOf, type SessionContext } from "../../../infra/context/session-context";
 import { UnauthenticatedError } from "../../identity/api/identity";
 import { RequirePermissions } from "../../../infra/auth/require-permissions.decorator";
+import { RequireFeature } from "../../../infra/auth/require-feature.decorator";
 import { envelope } from "../../../infra/http/envelope";
 import { QuotationService } from "../application/quotations";
 import { SalesOrderService } from "../application/orders";
@@ -499,6 +500,31 @@ export class SalesController {
   postDelivery(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
     return envelope(this.deliveries.post(id, identity.userId));
+  }
+
+  /**
+   * PHASE-044 (T-15/PP-11): create the directed-pick wave for a DRAFT
+   * delivery — the pickers' scan-confirmed tasks then drive the post's
+   * bin allocation (directedTakes). Rides the picking WMS key.
+   */
+  @Post("delivery-notes/:id/pick-wave")
+  @RequirePermissions("inventory.wms.picking")
+  @RequireFeature("inventory.picking")
+  createDeliveryPickWave(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = z
+      .object({
+        method: z.enum(["FIFO", "FEFO", "NEAREST"]).nullable().optional(),
+        routeNote: z.string().min(1).max(500).nullable().optional(),
+      })
+      .parse(body ?? {});
+    return envelope(
+      this.deliveries.createPickWave(
+        id,
+        { method: input.method ?? null, routeNote: input.routeNote ?? null },
+        identity.userId,
+      ),
+    );
   }
 
   @Post("delivery-notes/:id/convert-to-invoice")

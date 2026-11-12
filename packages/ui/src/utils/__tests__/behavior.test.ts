@@ -144,15 +144,17 @@ describe("navigation resolution (NAVIGATION_MODEL §2 — server-only)", () => {
     // PHASE-008: the treasury group (الخزينة) went live; PHASE-009: the
     // reports group (التقارير) gained its first item (the VAT return);
     // PHASE-011: the purchasing group (المشتريات); PHASE-012: the sales
-    // group (المبيعات); PHASE-029: the hr group (الموظفون والرواتب) —
-    // the shipped-item set is now home, sales, purchasing, inventory,
-    // accounting, treasury, reports, partners, settings, hr (binding
-    // group order — hr ships last by NAVIGATION_MODEL §1).
+    // group (المبيعات); PHASE-029: the hr group (الموظفون والرواتب);
+    // PHASE-042: the manufacturing group (الإنتاج والتصنيع) — the
+    // shipped-item set is now home, sales, purchasing, inventory,
+    // manufacturing, accounting, treasury, reports, partners, settings,
+    // hr (binding group order — hr ships last by NAVIGATION_MODEL §1).
     expect(resolved.groups.map((g) => g.id)).toEqual([
       "home",
       "sales",
       "purchasing",
       "inventory",
+      "manufacturing",
       "accounting",
       "treasury",
       "reports",
@@ -191,7 +193,7 @@ describe("navigation resolution (NAVIGATION_MODEL §2 — server-only)", () => {
     expect(resolved.shortcuts["g h"]?.id).toBe("home.dashboard");
   });
 
-  it("a fully-entitled future registry renders all 10 groups in binding order (structural proof)", () => {
+  it("a fully-entitled future registry renders all 11 groups in binding order (structural proof)", () => {
     const synthetic: NavItem[] = [...NAV_ITEMS];
     for (const group of NAV_GROUPS) {
       if (group.id === "home" || group.id === "settings") continue;
@@ -211,7 +213,7 @@ describe("navigation resolution (NAVIGATION_MODEL §2 — server-only)", () => {
       featureKeys: new Set(["platform.registration", ...allKeys]),
       permissions: allPerms,
     });
-    expect(resolved.groups).toHaveLength(10);
+    expect(resolved.groups).toHaveLength(11);
     expect(resolved.groups.map((g) => g.id)).toEqual(NAV_GROUPS.map((g) => g.id));
   });
 });

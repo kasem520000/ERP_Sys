@@ -1725,6 +1725,344 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/inventory/opening-stock/post",
     permission: "inventory.adjustments.post",
   },
+  // PHASE-044 (T-14): the WMS surface (matrix §3.21 — the eight 0071-seeded
+  // keys; one per board). Locations/LPN + the bin-contents + INV-029
+  // reconciliation reads ride inventory.wms.locations.
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/zones",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/zones",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/inventory/wms/zones/:id",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/zones/:id/aisles",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/zones/:id/aisles",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/aisles/:id/racks",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/aisles/:id/racks",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/bins",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/bins/barcode/:barcode",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/bins/:id",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/bins",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/inventory/wms/bins/:id",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/locations/tree",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/bin-contents",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/availability-by-bin",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/reconcile",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/lpns",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/lpns/:id/contents",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/lpns",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/lpns/:id/close",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/lpns/:id/bind",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/lpns/:id/move",
+    permission: "inventory.wms.locations",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/serial-movements",
+    permission: "inventory.tracking.serial_ledger",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/putaway/rules",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/putaway/rules",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/inventory/wms/putaway/rules/:id",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/putaway/tasks",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/putaway/tasks/:id/label",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/putaway/labels",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/putaway/tasks/:id/assign",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/putaway/tasks/:id/confirm",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/putaway/tasks/:id/cancel",
+    permission: "inventory.wms.putaway",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/pick-strategy/:warehouseId",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/inventory/wms/pick-strategy",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/pick-waves",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-waves",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/pick-waves/:id",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/pick-waves/:id/tasks",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/pick-waves/:id/cluster-route",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-waves/:id/release",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-waves/:id/complete",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-waves/:id/cancel",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/pick-tasks",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-tasks/:id/assign",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-tasks/:id/start",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-tasks/:id/confirm",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/pick-tasks/:id/cancel",
+    permission: "inventory.wms.picking",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/bin-contents/:id/transition",
+    permission: "inventory.quarantine",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/cycle-count-schedules",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-schedules",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/inventory/wms/cycle-count-schedules/:id",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-schedules/:id/run",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/cycle-count-documents",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/lines",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/enter",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/recount",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/submit",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/review",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/approve",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/cycle-count-documents/:id/cancel",
+    permission: "inventory.cycle_counts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/abc",
+    permission: "inventory.abc",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/abc/recompute",
+    permission: "inventory.abc",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/inventory/wms/quarantine-board",
+    permission: "inventory.quarantine",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/quarantine-board/:contentId/transition",
+    permission: "inventory.quarantine",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/inventory/wms/quarantine-board/:contentId/dispose",
+    permission: "inventory.quarantine",
+  },
   // PHASE-011 purchasing routes (matrix §3.3 exact keys). Payments' money
   // movement rides the PHASE-008 treasury routes (already keyed
   // purchasing.payments.*); this surface adds the AP-specific endpoints.
@@ -2083,6 +2421,13 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     method: "POST",
     path: "/api/v1/sales/delivery-notes/:id/post",
     permission: "sales.deliveries.create",
+  },
+  // PHASE-044 (T-15): the delivery's directed-pick wave (PP-11) — the
+  // picking WMS key, not the sales create key (the 0071 §1 matrix row).
+  {
+    method: "POST",
+    path: "/api/v1/sales/delivery-notes/:id/pick-wave",
+    permission: "inventory.wms.picking",
   },
   {
     method: "POST",

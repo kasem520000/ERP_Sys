@@ -190,6 +190,42 @@ export class DeliveryNoteService {
   }
 
   /**
+   * PHASE-044 (T-15/PP-11): create the directed-pick wave for a DRAFT
+   * delivery — the delivery screen's wave button. The wave allocates its
+   * PICK tasks from the warehouse's bins NOW (the strategy-ordered walk);
+   * the pickers scan-confirm them, and the POST consumes the confirmed
+   * takes as its directedTakes (see post). Only DRAFT deliveries wave —
+   * a posted delivery's stock already left.
+   */
+  async createPickWave(
+    id: string,
+    input: { method?: "FIFO" | "FEFO" | "NEAREST" | null; routeNote: string | null },
+    actorId: string | null,
+  ) {
+    const delivery = await this.find(id);
+    if (delivery.status !== "DRAFT") {
+      throw new SalesDocumentStateError(
+        `delivery note ${id} is ${delivery.status} — only DRAFT deliveries wave`,
+      );
+    }
+    const lines = await store.listDeliveryNoteLines(id);
+    if (lines.length === 0) throw new EmptyDocumentError("delivery note");
+    return this.picking.createWave({
+      warehouseId: delivery.warehouseId,
+      lines: lines.map((line) => ({
+        deliveryNoteId: id,
+        lineNo: line.lineNo,
+        itemId: line.itemId,
+        qty: line.qty,
+        batchId: line.batchId,
+      })),
+      method: input.method ?? null,
+      routeNote: input.routeNote,
+      actorId,
+    });
+  }
+
+  /**
    * Post (G-03): plan all issues → COGS journal → apply with the journal id
    * → per-line issue snapshots → DEL- number + status flip. ONE transaction,
    * idempotent (INV-013).

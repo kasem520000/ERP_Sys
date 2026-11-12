@@ -12,12 +12,14 @@ import { ErrorState } from "../../../../components/client-ui";
 import { AppShell } from "../../../../components/app-shell";
 import { RetryButton } from "../../../../components/retry-button";
 import { InventoryTransfers } from "../../../../components/inventory-transfers";
+import { WmsLpnMover } from "../../../../components/wms-lpn-mover";
 import { getDictionary, isLocale, type Locale } from "../../../../i18n/dictionaries";
 import type {
   CurrentSession,
   ItemRow,
   StockTransferRow,
   WarehouseRow,
+  WmsLpnRow,
 } from "../../../../lib/api-types";
 import { localizedApiError } from "../../../../lib/messages";
 import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
@@ -64,15 +66,24 @@ export default async function InventoryTransfersPage({
     );
   } else {
     const permissions = session.ok ? session.data.permissions : [];
+    // PHASE-044 (T-15): the LPN move-by-scan card rides the transfer screen
+    // — best-effort (members without the WMS key keep the plain wizard).
+    const canWms = permissions.includes("inventory.wms.locations");
+    const lpns = canWms
+      ? await fetchApi<readonly WmsLpnRow[]>("inventory/wms/lpns?limit=100")
+      : null;
     content = (
-      <InventoryTransfers
-        locale={localeValue}
-        initialRows={transfers.data}
-        warehouses={warehouses.ok ? warehouses.data : []}
-        items={items.ok ? items.data : []}
-        canCreate={permissions.includes("inventory.transfers.create")}
-        canApprove={permissions.includes("inventory.transfers.approve")}
-      />
+      <div className="flex flex-col gap-6">
+        <InventoryTransfers
+          locale={localeValue}
+          initialRows={transfers.data}
+          warehouses={warehouses.ok ? warehouses.data : []}
+          items={items.ok ? items.data : []}
+          canCreate={permissions.includes("inventory.transfers.create")}
+          canApprove={permissions.includes("inventory.transfers.approve")}
+        />
+        {lpns !== null && lpns.ok && <WmsLpnMover locale={localeValue} lpns={lpns.data} />}
+      </div>
     );
   }
 

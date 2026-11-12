@@ -10,6 +10,7 @@ import { ErrorState } from "../../../../components/client-ui";
 import { AppShell } from "../../../../components/app-shell";
 import { RetryButton } from "../../../../components/retry-button";
 import { PurchasingReceipts } from "../../../../components/purchasing-receipts";
+import { WmsPutawayQueue } from "../../../../components/wms-putaway-queue";
 import { getDictionary, isLocale, type Locale } from "../../../../i18n/dictionaries";
 import type {
   CurrentSession,
@@ -18,6 +19,7 @@ import type {
   PartnerRow,
   PurchaseOrderRow,
   WarehouseRow,
+  WmsTaskRow,
 } from "../../../../lib/api-types";
 import { localizedApiError } from "../../../../lib/messages";
 import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
@@ -63,17 +65,33 @@ export default async function PurchasingReceiptsPage({
     );
   } else {
     const permissions = session.ok ? session.data.permissions : [];
+    // PHASE-044 (T-15/PP-12): the directed-putaway queue rides the receipt
+    // screen — best-effort (members without the WMS keys keep the plain
+    // GRN workspace; a 403 renders nothing extra).
+    const canPutaway = permissions.includes("inventory.wms.putaway");
+    const putawayTasks = canPutaway
+      ? await fetchApi<readonly WmsTaskRow[]>("inventory/wms/putaway/tasks?limit=50")
+      : null;
     content = (
-      <PurchasingReceipts
-        locale={localeValue}
-        initialReceipts={receipts.data}
-        orders={orders.ok ? orders.data : []}
-        suppliers={suppliers.ok ? suppliers.data : []}
-        items={items.ok ? items.data : []}
-        warehouses={warehouses.ok ? warehouses.data : []}
-        canCreate={permissions.includes("purchasing.goods_receipts.create")}
-        canPost={permissions.includes("purchasing.goods_receipts.approve")}
-      />
+      <div className="flex flex-col gap-6">
+        <PurchasingReceipts
+          locale={localeValue}
+          initialReceipts={receipts.data}
+          orders={orders.ok ? orders.data : []}
+          suppliers={suppliers.ok ? suppliers.data : []}
+          items={items.ok ? items.data : []}
+          warehouses={warehouses.ok ? warehouses.data : []}
+          canCreate={permissions.includes("purchasing.goods_receipts.create")}
+          canPost={permissions.includes("purchasing.goods_receipts.approve")}
+        />
+        {putawayTasks !== null && putawayTasks.ok && (
+          <WmsPutawayQueue
+            locale={localeValue}
+            initialTasks={putawayTasks.data}
+            canConfirm={canPutaway}
+          />
+        )}
+      </div>
     );
   }
 

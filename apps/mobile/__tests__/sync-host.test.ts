@@ -761,10 +761,12 @@ describe("MobileSyncHost — one-in-flight mutex (SYNC_PROTOCOL §8)", () => {
 
     // Exactly one cycle ran: one status call, one pull round, one ack.
     expect(transport.counts.status).toBe(1);
-    // Pull math: permissions(1, empty) + the 12-entity field group with
+    // Pull math: permissions(1, empty) + the 14-entity field group with
     // items(3 changes @pageSize 2 → 2 calls) + van_stocks(3 → 2 calls) +
-    // the other 10 entities (1 empty call each) = 1 + 2 + 2 + 10 = 15.
-    expect(transport.counts.pull).toBe(15);
+    // the other 12 entities (1 empty call each) = 1 + 2 + 2 + 12 = 17.
+    // PHASE-044 T-13 (OA-02): pick_tasks + putaway_tasks joined the field
+    // group — the 12→14 entity move re-pins this count 15→17.
+    expect(transport.counts.pull).toBe(17);
     expect(transport.counts.pullAck).toBe(1);
 
     // After completion the mutex releases — a third call runs a fresh cycle.

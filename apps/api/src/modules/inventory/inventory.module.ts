@@ -25,6 +25,7 @@ import { ConsignmentService } from "./application/consignment-service";
 import { KittingService } from "./application/kitting-service";
 import { AlertsService } from "./application/alerts-service";
 import { InventoryController } from "./presentation/inventory.controller";
+import { WmsController } from "./presentation/wms.controller";
 
 /**
  * The reservation-expiry sweep's queue name (ADR-0008): the pg-boss
@@ -100,7 +101,7 @@ export interface InventoryAlertsJobPayload {
  */
 @Module({
   imports: [AccountingModule, AuditModule, NotificationsModule],
-  controllers: [InventoryController],
+  controllers: [InventoryController, WmsController],
   providers: [
     WarehouseService,
     StockService,

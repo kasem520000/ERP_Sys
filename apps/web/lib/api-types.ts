@@ -5923,3 +5923,333 @@ export interface SupplierRmaLineRow {
 export interface SupplierRmaWithLines extends SupplierRmaRow {
   lines: readonly SupplierRmaLineRow[];
 }
+
+// -- PHASE-044 (T-14): the WMS wire types -----------------------------------------
+// Mirrors of the inventory module's WMS rows (wms.controller.ts envelopes).
+
+/** GET inventory/wms/zones → warehouse_zones row. */
+export interface WmsZoneRow {
+  id: string;
+  warehouseId: string;
+  warehouseCode: string | null;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  zoneType: "PICKING" | "BULK" | "QUARANTINE" | "DOCK" | "STAGE";
+  isDefault: boolean;
+  note: string | null;
+}
+
+/** GET inventory/wms/zones/:id/aisles → warehouse_aisles row. */
+export interface WmsAisleRow {
+  id: string;
+  zoneId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+}
+
+/** GET inventory/wms/aisles/:id/racks → warehouse_racks row. */
+export interface WmsRackRow {
+  id: string;
+  aisleId: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+}
+
+/** GET inventory/wms/bins → warehouse_bins row. */
+export interface WmsBinRow {
+  id: string;
+  warehouseId: string;
+  warehouseCode: string | null;
+  rackId: string;
+  code: string;
+  barcode: string;
+  name: string;
+  nameAr: string | null;
+  pickSequence: number | null;
+  capacity: string | null;
+  allowMixedBatches: boolean;
+  isDefault: boolean;
+  zoneId: string | null;
+  zoneCode: string | null;
+  zoneType: string | null;
+  note: string | null;
+}
+
+/** GET inventory/wms/locations/tree → the zone→aisle→rack→bin tree node. */
+export interface WmsLocationTreeNode {
+  id: string;
+  code: string;
+  name: string;
+  zoneType: string;
+  isDefault: boolean;
+  aisles: {
+    id: string;
+    code: string;
+    name: string;
+    racks: { id: string; code: string; name: string; bins: readonly WmsBinRow[] }[];
+  }[];
+}
+
+/** GET inventory/wms/bin-contents → bin_contents row. */
+export interface WmsBinContentRow {
+  id: string;
+  binId: string;
+  binCode: string | null;
+  warehouseId: string;
+  itemId: string;
+  itemSku: string | null;
+  batchId: string | null;
+  batchNo: string | null;
+  serialId: string | null;
+  serialNo: string | null;
+  lpnId: string | null;
+  lpnCode: string | null;
+  ownerPartnerId: string | null;
+  ownerPartnerName: string | null;
+  status: "AVAILABLE" | "QUARANTINE" | "HOLD";
+  qty: string;
+  uomId: string | null;
+  receivedAt: string;
+  note: string | null;
+}
+
+/** GET inventory/wms/reconcile → the INV-029 probe's mismatch row. */
+export interface WmsReconcileRow {
+  warehouseId: string;
+  warehouseCode: string | null;
+  itemId: string;
+  itemSku: string | null;
+  binQty: string;
+  stockQty: string;
+  difference: string;
+}
+
+/** GET inventory/wms/lpns → lpns row. */
+export interface WmsLpnRow {
+  id: string;
+  lpnCode: string;
+  status: "ACTIVE" | "CLOSED";
+  closedAt: string | null;
+  note: string | null;
+}
+
+/** GET inventory/wms/serial-movements → serial_movements row. */
+export interface WmsSerialLedgerRow {
+  id: string;
+  serialId: string;
+  serialNo: string | null;
+  itemSku: string | null;
+  event: string;
+  moveId: string | null;
+  sourceType: string;
+  sourceId: string;
+  fromBinId: string | null;
+  fromBinCode: string | null;
+  toBinId: string | null;
+  toBinCode: string | null;
+  movedAt: string;
+  note: string | null;
+}
+
+/** GET inventory/wms/putaway/rules → putaway_rules row. */
+export interface WmsPutawayRuleRow {
+  id: string;
+  priority: number;
+  name: string;
+  condition: Record<string, unknown>;
+  targetZoneType: string | null;
+  targetBinId: string | null;
+  targetBinCode: string | null;
+  isActive: boolean;
+  note: string | null;
+}
+
+/** pick_tasks row (both kinds — PUTAWAY via /putaway/tasks, PICK via /pick-tasks). */
+export interface WmsTaskRow {
+  id: string;
+  waveId: string | null;
+  waveNo: string | null;
+  taskKind: "PICK" | "PUTAWAY";
+  status: "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  assigneeUserId: string | null;
+  itemId: string;
+  itemSku: string | null;
+  itemName: string | null;
+  batchId: string | null;
+  batchNo: string | null;
+  serialId: string | null;
+  serialNo: string | null;
+  lpnId: string | null;
+  lpnCode: string | null;
+  qty: string;
+  qtyDone: string;
+  fromBinId: string | null;
+  fromBinCode: string | null;
+  toBinId: string | null;
+  toBinCode: string | null;
+  sourceType: string;
+  sourceId: string;
+  sourceLineNo: number | null;
+  scanVerified: boolean;
+  sequenceNo: number | null;
+  completedAt: string | null;
+  completedBy: string | null;
+  note: string | null;
+  createdAt: string;
+  version: number;
+}
+
+/** GET inventory/wms/pick-waves → pick_waves row. */
+export interface WmsPickWaveRow {
+  id: string;
+  waveNo: string | null;
+  warehouseId: string;
+  warehouseCode: string | null;
+  status: "DRAFT" | "RELEASED" | "COMPLETED" | "CANCELLED";
+  method: string | null;
+  routeNote: string | null;
+  releasedAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+}
+
+/** GET inventory/wms/pick-strategy/:warehouseId → pick_strategies row. */
+export interface WmsPickStrategyRow {
+  id: string;
+  warehouseId: string;
+  method: "FIFO" | "FEFO" | "NEAREST";
+  allowPartial: boolean;
+}
+
+/** PP-12's fixed bin-label payload (BIN-LABEL-V1). */
+export interface WmsBinLabelPayload {
+  labelFormat: "BIN-LABEL-V1";
+  taskId: string;
+  bin: { id: string; code: string; barcode: string };
+  item: { id: string; sku: string | null; name: string | null };
+  qty: string;
+  batch: { id: string | null; batchNo: string | null; expiryDate: string | null };
+  lpn: { id: string | null; lpnCode: string | null };
+  generatedAt: string;
+}
+
+/** POST inventory/wms/putaway/tasks/:id/confirm → the task + its label. */
+export interface WmsPutawayConfirmResult {
+  task: WmsTaskRow;
+  label: WmsBinLabelPayload;
+}
+
+/** POST inventory/wms/quarantine-board/:id/transition → the G-43 wrapper. */
+export interface WmsQuarantineTransitionResult {
+  content: WmsBinContentRow;
+  journalEntryId: string | null;
+  policy: "off" | "distinct";
+}
+
+/** POST inventory/wms/quarantine-board/:id/dispose → the disposition result. */
+export interface WmsQuarantineDisposeResult {
+  disposition: "RELEASE" | "RETURN_TO_VENDOR" | "SCRAP";
+  contentId: string;
+  journalEntryId: string | null;
+  entryNo: string | null;
+  valueAmount: string | null;
+  moveIds: string[];
+  policy: "off" | "distinct";
+}
+
+/** GET inventory/wms/cycle-count-schedules → cycle_count_schedules row. */
+export interface WmsCycleCountScheduleRow {
+  id: string;
+  warehouseId: string;
+  warehouseCode: string | null;
+  name: string;
+  classADays: number;
+  classBDays: number;
+  classCDays: number;
+  approvalThreshold: string;
+  blind: boolean;
+  isActive: boolean;
+  lastRunAt: string | null;
+  note: string | null;
+}
+
+/** GET inventory/wms/cycle-count-documents → cycle_count_documents row. */
+export interface WmsCycleCountDocumentRow {
+  id: string;
+  countNo: string | null;
+  scheduleId: string | null;
+  warehouseId: string;
+  warehouseCode: string | null;
+  status: "DRAFT" | "COUNTED" | "VARIANCE_REVIEW" | "POSTED" | "CANCELLED";
+  snapshotAt: string;
+  countDate: string | null;
+  blind: boolean;
+  varianceLossValue: string | null;
+  varianceGainValue: string | null;
+  supervisorOverride: boolean;
+  countedBy: string | null;
+  approvedBy: string | null;
+  postedJournalId: string | null;
+  note: string | null;
+}
+
+/** GET inventory/wms/cycle-count-documents/:id/lines → cycle_count_lines row. */
+export interface WmsCycleCountLineRow {
+  id: string;
+  documentId: string;
+  lineNo: number;
+  itemId: string;
+  itemSku: string | null;
+  binId: string | null;
+  binCode: string | null;
+  batchId: string | null;
+  batchNo: string | null;
+  systemQty: string;
+  countedQty: string | null;
+  recounted: boolean;
+  recountNote: string | null;
+  valueImpact: string | null;
+  reason: string | null;
+}
+
+/** POST cycle-count-documents/:id/approve → the G-13/G-14 posting result. */
+export interface WmsCycleCountApproveResult {
+  countNo: string;
+  journalEntryId: string | null;
+  entryNo: string | null;
+  lossValue: string;
+  gainValue: string;
+}
+
+/** POST inventory/wms/cycle-count-schedules/:id/run → the run stats. */
+export interface WmsCycleCountRunResult {
+  documentId: string | null;
+  dueItems: number;
+  lines: number;
+}
+
+/** GET inventory/wms/abc → abc_classifications (is_latest) row. */
+export interface WmsAbcRow {
+  id: string;
+  itemId: string;
+  itemSku: string | null;
+  windowDays: number;
+  cls: "A" | "B" | "C";
+  consumptionValue: string;
+  totalQtyOut: string;
+  velocity: string;
+  rankNo: number;
+  computedAt: string;
+}
+
+/** POST inventory/wms/abc/recompute → the generation stats. */
+export interface WmsAbcRecomputeResult {
+  windowDays: number;
+  a: number;
+  b: number;
+  c: number;
+  totalConsumption: string;
+}

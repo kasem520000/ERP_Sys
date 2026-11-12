@@ -13,6 +13,7 @@ import { ErrorState } from "../../../../components/client-ui";
 import { AppShell } from "../../../../components/app-shell";
 import { RetryButton } from "../../../../components/retry-button";
 import { InventoryCounting } from "../../../../components/inventory-counting";
+import { WmsBinScan } from "../../../../components/wms-bin-scan";
 import { getDictionary, isLocale, type Locale } from "../../../../i18n/dictionaries";
 import type {
   CountRow,
@@ -62,15 +63,21 @@ export default async function InventoryCountingPage({
     );
   } else {
     const permissions = session.ok ? session.data.permissions : [];
+    // PHASE-044 (T-15/PP-11): the bin-scan helper rides the count screen —
+    // best-effort (members without the WMS key keep the plain wizard).
+    const canWms = permissions.includes("inventory.wms.locations");
     content = (
-      <InventoryCounting
-        locale={localeValue}
-        initialRows={counts.data}
-        warehouses={warehouses.ok ? warehouses.data : []}
-        items={items.ok ? items.data : []}
-        canCreate={permissions.includes("inventory.counts.create")}
-        canApprove={permissions.includes("inventory.counts.approve")}
-      />
+      <div className="flex flex-col gap-6">
+        <InventoryCounting
+          locale={localeValue}
+          initialRows={counts.data}
+          warehouses={warehouses.ok ? warehouses.data : []}
+          items={items.ok ? items.data : []}
+          canCreate={permissions.includes("inventory.counts.create")}
+          canApprove={permissions.includes("inventory.counts.approve")}
+        />
+        {canWms && <WmsBinScan locale={localeValue} />}
+      </div>
     );
   }
 

@@ -88,6 +88,11 @@ import {
   X,
   Layers,
   FileUp,
+  // PHASE-044 (T-16) nav icons (one-line registry review entry each;
+  // non-directional — a map pin, a pick route, a count calendar).
+  MapPin,
+  Route,
+  CalendarCheck,
 } from "lucide-react";
 
 import { cn } from "./cn";
@@ -229,6 +234,11 @@ export const ICON_REGISTRY = {
   "qr-code": QrCode,
   "barcode": Barcode,
   "languages": Languages,
+  // PHASE-044 (T-16): the WMS nav icons — the location tree, the pick
+  // waves, the cycle-count calendar (non-directional registry additions).
+  "map-pin": MapPin,
+  "route": Route,
+  "calendar-check": CalendarCheck,
 } as const;
 
 export type IconName = keyof typeof ICON_REGISTRY;

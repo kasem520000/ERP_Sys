@@ -21,6 +21,7 @@ import type {
   PartnerRow,
   SalesOrderRow,
   WarehouseRow,
+  WmsPickWaveRow,
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedName, localizedSalesError, salesStatusLabel } from "../lib/messages";
@@ -50,6 +51,7 @@ export function SalesDeliveries({
   branches,
   baseCurrency,
   canCreate,
+  canWave,
 }: {
   locale: Locale;
   initialDeliveries: readonly DeliveryNoteRow[];
@@ -60,6 +62,8 @@ export function SalesDeliveries({
   branches: readonly BranchRow[];
   baseCurrency: string;
   canCreate: boolean;
+  /** PHASE-044 (T-15): the directed-pick wave action (inventory.wms.picking). */
+  canWave: boolean;
 }): JSX.Element {
   const d = getDictionary(locale);
   const router = useRouter();
@@ -159,6 +163,21 @@ export function SalesDeliveries({
     if (updated !== undefined) {
       setDeliveries((rows) => rows.map((row) => (row.id === id ? updated : row)));
       setNotice(d.salesNoticePosted);
+    }
+  }
+
+  /** PHASE-044 (T-15/PP-11): create the directed-pick wave for a DRAFT
+   * delivery — the pickers' scan-confirmed tasks then drive the post's
+   * bin allocation. */
+  async function createWave(id: string): Promise<void> {
+    const created = await call<WmsPickWaveRow>(`wave-${id}`, () =>
+      bffFetch<WmsPickWaveRow>(`sales/delivery-notes/${id}/pick-wave`, {
+        method: "POST",
+        body: {},
+      }),
+    );
+    if (created !== undefined) {
+      setNotice(d.wmsDeliveryWaveToast);
     }
   }
 
@@ -338,8 +357,8 @@ export function SalesDeliveries({
           ]}
           rows={[...deliveries]}
           rowKey={(row) => row.id}
-          rowActions={
-            canCreate
+          rowActions={[
+            ...(canCreate
               ? [
                   {
                     id: "post",
@@ -349,6 +368,22 @@ export function SalesDeliveries({
                       void post(row.id);
                     },
                   },
+                ]
+              : []),
+            ...(canWave
+              ? [
+                  {
+                    id: "pick-wave",
+                    label: d.wmsDeliveryWaveBtn,
+                    onSelect: (row: DeliveryNoteRow) => {
+                      if (row.status !== "DRAFT") return;
+                      void createWave(row.id);
+                    },
+                  },
+                ]
+              : []),
+            ...(canCreate
+              ? [
                   {
                     id: "cancel",
                     label: d.salesCancel,
@@ -361,8 +396,8 @@ export function SalesDeliveries({
                     },
                   },
                 ]
-              : []
-          }
+              : []),
+          ]}
           empty={{ title: d.salesEmpty }}
         />
       </Card>
