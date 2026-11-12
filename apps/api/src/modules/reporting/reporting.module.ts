@@ -129,6 +129,10 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // status worklist on sales.dunning.manage like the dunning routes).
   "sales.rma.read",
   "sales.dunning.manage",
+  // PHASE-041 (0064 seed): the communications report key — the delivery
+  // log gates on communication.outbox.read (the same §12 convention —
+  // the key the outbox ledger's read surface rides).
+  "communication.outbox.read",
 ]);
 
 @Module({

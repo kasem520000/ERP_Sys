@@ -137,6 +137,9 @@ import {
   salesRmaRegisterContract,
   salesDunningStatusContract,
 } from "./operational/returns-dunning";
+// PHASE-041 · the communications set (REPORT_CATALOG §7 addition — the
+// outbound delivery log over the send ledger).
+import { communicationOutboundDeliveryLogContract } from "./communication/outbound-delivery-log.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -285,6 +288,9 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // worklist (overdue items × ladder step × fee register × referrals).
   salesRmaRegisterContract,
   salesDunningStatusContract,
+  // §7 platform additions — PHASE-041 (REPORT_CATALOG §7 row): the outbound
+  // delivery log (every send a row: status, provider, ref, cost, attempts).
+  communicationOutboundDeliveryLogContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

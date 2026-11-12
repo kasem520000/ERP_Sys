@@ -20,6 +20,7 @@ import { ConsolidationQueriesService } from "./consolidation/consolidation-queri
 import { TreasuryQueriesService } from "../../treasury/application/treasury-queries";
 import { SourcingQueriesService } from "./sourcing/sourcing-queries";
 import { ReturnsDunningQueriesService } from "./sales/returns-dunning-queries";
+import { CommunicationQueriesService } from "./communication/outbound-delivery-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -70,6 +71,8 @@ export interface ReportingServices {
   sourcing: SourcingQueriesService;
   /** PHASE-039 · the returns + collections query surface (the unified customer+supplier RMA register, the dunning status worklist). */
   returnsDunning: ReturnsDunningQueriesService;
+  /** PHASE-041 · the communication query surface (the outbound delivery log over the send ledger). */
+  communication: CommunicationQueriesService;
   treasury: TreasuryQueriesService;
   partners: PartnerQueriesService;
   tax: TaxQueriesService;
@@ -103,6 +106,7 @@ export function reportingServices(): ReportingServices {
       consolidation: new ConsolidationQueriesService(),
       sourcing: new SourcingQueriesService(),
       returnsDunning: new ReturnsDunningQueriesService(),
+      communication: new CommunicationQueriesService(),
       treasury: new TreasuryQueriesService(),
       partners: new PartnerQueriesService(),
       tax: new TaxQueriesService(),

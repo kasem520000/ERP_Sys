@@ -43,6 +43,7 @@ export type DataSourceModule =
   | "installments" // PHASE-027: the installments query surface (schedule / aging)
   | "budgeting" // PHASE-028: the budgeting query surface (budget vs actual / variance analysis)
   | "payroll" // PHASE-029: the payroll query surface (register / cost summary / EOS provision)
+  | "communication" // PHASE-041: the communication query surface (the outbound delivery log)
   | "consolidation"; // PHASE-034: the consolidation query surface (consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots)
 
 export interface DataSourceDecl {

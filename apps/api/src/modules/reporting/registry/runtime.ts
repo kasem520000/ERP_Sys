@@ -64,6 +64,7 @@ const SOURCE_MODULES: readonly DataSourceModule[] = [
   "budgeting", // PHASE-028: the budgeting query surface (budget vs actual / variance analysis)
   "payroll", // PHASE-029: the payroll query surface (register / cost summary / EOS provision)
   "consolidation", // PHASE-034: the consolidation query surface (consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots)
+  "communication", // PHASE-041: the communication query surface (the outbound delivery log)
 ];
 
 const dataSourceSchema = z.object({
@@ -196,14 +197,16 @@ const MODULE_DATA_PHASE: Readonly<Record<DataSourceModule, number>> = Object.fre
   budgeting: 28, // PHASE-028: budget vs actual / variance analysis query surfaces
   payroll: 29, // PHASE-029: register / cost-summary / eos-provision query surfaces
   consolidation: 34, // PHASE-034: consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots
+  communication: 41, // PHASE-041: the outbound delivery log over the send ledger
 });
 
-const REGISTERED_PHASE_WINDOW = 34; // PHASE-013 window, widened by the
+const REGISTERED_PHASE_WINDOW = 41; // PHASE-013 window, widened by the
 // delivering phases that registered contracts over real query surfaces:
 // 15 (industry reports) + 16 (the POS set) + 17 (distribution) + 18
 // (manufacturing) + 19 (CRM) + 26 (fixed assets) + 27 (notes/installments) +
 // 28 (budgeting — see MODULE_DATA_PHASE) + 29 (payroll — see
-// MODULE_DATA_PHASE) + 34 (consolidation — see MODULE_DATA_PHASE).
+// MODULE_DATA_PHASE) + 34 (consolidation — see MODULE_DATA_PHASE) + 41
+// (communication — see MODULE_DATA_PHASE).
 
 /** Financial reports must carry the §11 minimum assertion set (§16 checklist). */
 const FINANCIAL_MINIMUM_ASSERTIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({

@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-11 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-12 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -179,6 +179,7 @@ contract re-validate on open (governance §17.3).
 | `platform.user-activity` | User Activity / نشاط المستخدمين | identity+audit · `userQueries.activity` · sessions, audit_events | period, users, branch | `platform.users.read` | XLSX · CSV | PHASE-003 |
 | `platform.report-runs` | Report Runs History / سجل تشغيل التقارير | reporting · `runQueries.history` · report_runs | period, user, report, status | `platform.reporting.read` | XLSX · CSV | PHASE-013 |
 | `platform.subscription-usage` | Subscription Usage / استخدام الاشتراك | tenancy · `subscriptionQueries.usage` · subscriptions, entitlements | period, tenant (platform admin scope) | `platform.tenants.read` | XLSX · CSV | PHASE-004/014 |
+| `communication.outbound_delivery_log` | Outbound Delivery Log / سجل الإرسال الخارجي | communication · `communication.outboundDeliveryLog` · outbound_messages (+ partners link) | dateFrom/To, channel (EMAIL/WHATSAPP/SMS), status (QUEUED/SENT/DELIVERED/FAILED) | `communication.outbox.read` | XLSX · CSV | PHASE-041 |
 
 ## 8. Industry reports (extension point)
 
@@ -399,6 +400,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-037 | tax.e-invoicing-log **v2** — the ZATCA device/ICV/PIH/QR-presence columns + the deviceId filter (§6); registry unchanged at 86 |
 | PHASE-038 | purchasing.rfq-award-matrix + purchasing.supplier-scorecard added; registry 86 → 88 |
 | PHASE-039 | sales.rma_register + sales.dunning_status added (the unified RMA register over both families — disposition mix, completion documents, cycle days — and the collections worklist: ladder step, days overdue, policy, fees charged/waived, referral state); `ar.aging` gains the additive `dunningStep` column (no new key); registry 88 → 90 |
+| PHASE-041 | communication.outbound_delivery_log added (the outbound send ledger as a report — status, provider, provider ref, cost amount/currency, attempts/max, the source that produced the send; the outbox-cost-shape + outbox-status-vocabulary block-on-fail assertions); registry 90 → 91 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 
