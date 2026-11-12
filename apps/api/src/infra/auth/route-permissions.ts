@@ -1414,6 +1414,17 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
   { method: "GET", path: "/api/v1/communication/inbox", permission: "communication.inbox.read" },
   { method: "POST", path: "/api/v1/communication/inbox/calls", permission: "communication.inbox.read" },
   { method: "PATCH", path: "/api/v1/communication/inbox/calls/:id", permission: "communication.inbox.read" },
+  // PHASE-041 T-09 (IN-17/IN-18): the calendar connect — OAuth flow with
+  // the anti-CSRF state + sealed tokens, task-event writes, and the
+  // opt-in contacts sync with review-only proposals (never auto-merge).
+  { method: "GET", path: "/api/v1/communication/calendar/status", permission: "communication.calendar.connect" },
+  { method: "GET", path: "/api/v1/communication/calendar/connect/:provider", permission: "communication.calendar.connect" },
+  { method: "POST", path: "/api/v1/communication/calendar/callback", permission: "communication.calendar.connect" },
+  { method: "POST", path: "/api/v1/communication/calendar/events/task/:taskId", permission: "communication.calendar.connect" },
+  { method: "POST", path: "/api/v1/communication/calendar/contacts/sync", permission: "communication.calendar.connect" },
+  { method: "GET", path: "/api/v1/communication/calendar/contacts/proposals", permission: "communication.calendar.connect" },
+  { method: "POST", path: "/api/v1/communication/calendar/contacts/proposals/:id/accept", permission: "communication.calendar.connect" },
+  { method: "POST", path: "/api/v1/communication/calendar/contacts/proposals/:id/reject", permission: "communication.calendar.connect" },
   // PHASE-040 T-06 (matrix §3.18): the demo-data loader — the 13-template
   // catalog + status + the one-click seed (feature-gated platform.demo_data,
   // ALL plans — the recorded trial-enablement decision).

@@ -49,6 +49,15 @@ const envSchema = z.object({
   /** SMTP transport (PHASE-003 notifications adapter; mailpit in dev).
    * Unset host → emails disabled with a warning (documented dev shape). */
   SMTP_HOST: z.string().optional(),
+  /**
+   * PHASE-041 (IN-17/IN-18): the calendar OAuth app credentials (Google/
+   * Outlook) — optional; unset → the STUB calendar providers (zero
+   * external calls; the flows complete against deterministic shapes).
+   */
+  GOOGLE_OAUTH_CLIENT_ID: z.string().optional(),
+  GOOGLE_OAUTH_CLIENT_SECRET: z.string().optional(),
+  OUTLOOK_OAUTH_CLIENT_ID: z.string().optional(),
+  OUTLOOK_OAUTH_CLIENT_SECRET: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),

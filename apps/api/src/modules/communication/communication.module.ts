@@ -18,10 +18,12 @@ import { OutboxService } from "./application/outbox/outbox-service";
 import { PreferencesService } from "./application/preferences-service";
 import { DigestService, NudgeService } from "./application/digest-service";
 import { UnifiedInboxService } from "./application/inbox-service";
+import { CalendarService } from "./application/calendar-service";
 import { ProvidersController } from "./presentation/providers.controller";
 import { TemplatesController } from "./presentation/templates.controller";
 import { PreferencesController } from "./presentation/preferences.controller";
 import { InboxController } from "./presentation/inbox.controller";
+import { CalendarController } from "./presentation/calendar.controller";
 
 const log = childLogger({ module: "communication" });
 
@@ -55,6 +57,7 @@ export const NUDGE_CRON = "0 4 * * *";
     TemplatesController,
     PreferencesController,
     InboxController,
+    CalendarController,
   ],
   providers: [
     ProviderConfigService,
@@ -64,6 +67,7 @@ export const NUDGE_CRON = "0 4 * * *";
     DigestService,
     NudgeService,
     UnifiedInboxService,
+    CalendarService,
   ],
   exports: [
     ProviderConfigService,
@@ -73,6 +77,7 @@ export const NUDGE_CRON = "0 4 * * *";
     DigestService,
     NudgeService,
     UnifiedInboxService,
+    CalendarService,
   ],
 })
 export class CommunicationModule implements OnModuleInit {
