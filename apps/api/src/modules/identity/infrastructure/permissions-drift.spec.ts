@@ -33,6 +33,7 @@ const SEED_PATHS = [
   join(process.cwd(), "migrations", "0051_rfq_quotes.sql"), // PHASE-038 sourcing keys (249 → 256)
   join(process.cwd(), "migrations", "0056_dunning_collections.sql"), // PHASE-039 returns & collections keys (256 → 265)
   join(process.cwd(), "migrations", "0060_import_toolkit.sql"), // PHASE-040 data onboarding keys (265 → 267)
+  join(process.cwd(), "migrations", "0064_communications_hub.sql"), // PHASE-041 communications keys (267 → 272)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

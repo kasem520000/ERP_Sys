@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Optional } from "@nestjs/common";
 import { createHash, randomBytes } from "node:crypto";
 
 import { sql } from "drizzle-orm";
@@ -9,7 +9,7 @@ import { AuditService } from "../../audit/api/audit";
 import { PostingService } from "../../accounting/application/posting-service";
 import type { JournalSpec } from "../../accounting/domain/posting-engine/journal-spec";
 import { InboxService } from "../../notifications/application/inbox-service";
-import type { OutboxService } from "../../communication/application/outbox/outbox-service";
+import { OutboxService } from "../../communication/application/outbox/outbox-service";
 import type { RenderedTemplate } from "../../communication/application/template-service";
 import { TemplateService } from "../../communication/application/template-service";
 import { ambientTx } from "../../../infra/db/tenant-context";
@@ -297,7 +297,12 @@ export class DunningService {
      * (the registered source handler below flips them SENT); EMAIL
      * letters enqueue + mark SENT in the same step (the 039
      * register-as-evidence semantics, now backed by a REAL ledger row).
+     * @Optional: legacy specs construct the service without the pipeline
+     * (the register-only paths still work); the real module graph always
+     * provides it (CommunicationModule).
      */
+    @Optional()
+    @Inject(OutboxService)
     private readonly outbox?: OutboxService | null,
     @Inject(TemplateService) private readonly templates?: TemplateService | null,
   ) {

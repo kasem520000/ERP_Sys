@@ -168,7 +168,12 @@ describe("seeds (acceptance 9)", () => {
     // toolkit surface; zero platform.* additions per the identity-flows
     // platform rule, the deviation note in PHASE-040 §2.5 records the
     // rename from the phase doc's platform.imports.* spelling).
-    expect(result.rows[0]?.n).toBe(267);
+    // 267 + 5 = 272 after 0064 — the five PHASE-041 communications keys
+    // (communication.templates.manage, communication.outbox.read,
+    // communication.preferences.manage, communication.inbox.read,
+    // communication.calendar.connect; the drift checker agrees: matrix 272
+    // = seed 272).
+    expect(result.rows[0]?.n).toBe(272);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {
