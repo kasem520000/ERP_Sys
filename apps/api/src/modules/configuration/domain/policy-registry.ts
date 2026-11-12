@@ -284,6 +284,17 @@ export const POLICY_REGISTRY: Readonly<Record<string, PolicyDefinition>> = Objec
     description:
       "PHASE-042 BR-070: work-center downtime records are record-only by default ('off' — the closed row carries ended_at + duration with cost_amount/journal_id NULL); with 'post' the close computes the idle-capacity cost (duration/60 × the center's fixed+var hourly rates) and posts the G-42 journal DR DOWNTIME_EXPENSE · CR PRODUCTION_OVERHEAD (idle capacity absorbed against applied overhead). Posting is the explicit opt-in.",
   } satisfies PolicyDefinition),
+  // --- inventory intelligence (PHASE-044) ------------------------------------
+  quarantine_posting: Object.freeze({
+    key: "quarantine_posting",
+    valueType: "enum",
+    enumValues: Object.freeze(["off", "distinct"]),
+    default: "off",
+    module: "inventory",
+    settingsKey: "inventory.quarantine_posting",
+    description:
+      "PHASE-044 BR-077 (G-43): quarantine status transitions are structural by default ('off' — no journal, the G-15 same-account mirror); 'distinct' posts the quarantine leg on every AVAILABLE ↔ QUARANTINE transition (DR 1290 QUARANTINE_INVENTORY · CR warehouse INVENTORY at qty × avg cost, mirrored on release) — fail-closed until the 1290 purpose is mapped.",
+  } satisfies PolicyDefinition),
   // --- professional services (PHASE-019) ------------------------------------
   contract_billing_mode: Object.freeze({
     key: "contract_billing_mode",

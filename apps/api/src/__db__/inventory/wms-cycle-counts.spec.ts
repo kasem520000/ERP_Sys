@@ -74,8 +74,8 @@ beforeAll(async () => {
       stock.manualReceipt({
         itemId,
         warehouseId: wh,
-        qty: "100",
-        unitCost: "10.000000",
+        qty: "1000",
+        unitCost: "20.000000",
         reason: "COUNT_GAIN",
         counterAccountId: null,
         valueDate: D_RECEIPT,
@@ -96,12 +96,16 @@ beforeAll(async () => {
       );
     }
   };
-  // Consumption over the window: 500 + 300 + 150 + 50 = 1000 (the only
-  // consumption in the last 90 days — the Pareto shares are exact).
-  await seed(itemA1, "50");
-  await seed(itemA2, "30");
-  await seed(itemB1, "15");
-  await seed(itemC1, "5");
+  // Consumption over the window: 8000 + 7000 + 3800 + 1200 = 20000 (my
+  // items dominate the window's total; the shares sit OFF the exact
+  // 0.80/0.95 boundaries so sibling specs' same-window consumption —
+  // the quarantine dispositions' ~87, later phases' settlement legs —
+  // cannot flip a class: C1 stays C while extra consumption stays under
+  // ~1000, B1 stays B unconditionally, the A pair likewise).
+  await seed(itemA1, "400");
+  await seed(itemA2, "350");
+  await seed(itemB1, "190");
+  await seed(itemC1, "60");
   await seed(itemZero, null);
 });
 
@@ -111,19 +115,19 @@ describe("§2.7 — the ABC recompute: the Pareto walk over consumption", () => 
       cycleCounts.recomputeAbc({ windowDays: 90, actorId: I_ACTOR }),
     );
     expect(result.windowDays).toBe(90);
-    expect(result.totalConsumption).toBe("1000.0000");
+    expect(Number(result.totalConsumption)).toBeGreaterThanOrEqual(20000);
 
     const rows = await withTenant(TENANT_I, () => cycleCounts.listAbc({}));
     const byItem = new Map(rows.map((row) => [row.itemId, row]));
-    expect(byItem.get(itemA1)?.cls).toBe("A"); // 500/1000 = 0.50 ≤ 0.80
-    expect(byItem.get(itemA2)?.cls).toBe("A"); // 800/1000 = 0.80 ≤ 0.80
-    expect(byItem.get(itemB1)?.cls).toBe("B"); // 950/1000 = 0.95 ≤ 0.95
-    expect(byItem.get(itemC1)?.cls).toBe("C"); // 1000/1000 > 0.95
+    expect(byItem.get(itemA1)?.cls).toBe("A"); // 8000/20000 = 0.40 ≤ 0.80
+    expect(byItem.get(itemA2)?.cls).toBe("A"); // 15000/20000 = 0.75 ≤ 0.80
+    expect(byItem.get(itemB1)?.cls).toBe("B"); // 18800/20000 = 0.94 ≤ 0.95
+    expect(byItem.get(itemC1)?.cls).toBe("C"); // 20000/20000 > 0.95
     expect(byItem.get(itemZero)?.cls).toBe("C"); // zero consumption
-    // The rank + velocity math (A1: rank 1, 50/90 per day).
+    // The rank + velocity math (A1: rank 1, 400/90 per day).
     expect(byItem.get(itemA1)?.rankNo).toBe(1);
-    expect(byItem.get(itemA1)?.velocity).toBe("0.555556");
-    expect(byItem.get(itemA1)?.consumptionValue).toBe("500.0000");
+    expect(byItem.get(itemA1)?.velocity).toBe("4.444444");
+    expect(byItem.get(itemA1)?.consumptionValue).toBe("8000.0000");
   });
 
   it("a recompute demotes the previous generation — one LATEST row per item (the partial floor)", async () => {
@@ -136,7 +140,7 @@ describe("§2.7 — the ABC recompute: the Pareto walk over consumption", () => 
     const history = await withTenant(TENANT_I, () =>
       db.consumptionByItem(90),
     );
-    expect(history.find((row) => row.itemId === itemA1)?.consumptionValue).toBe("500.0000");
+    expect(history.find((row) => row.itemId === itemA1)?.consumptionValue).toBe("8000.0000");
   });
 
   it("rejects an inverted split (AbcThresholdError, §2.7)", async () => {
@@ -203,8 +207,8 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
     expect(lineOf(itemB1)).toBeDefined();
     expect(lineOf(itemC1)).toBeDefined();
     expect(lineOf(itemZero)).toBeDefined();
-    // The system snapshot = the live slot qty (A1 has 50 left on hand).
-    expect(lineOf(itemA1)!.systemQty).toBe("50.000000");
+    // The system snapshot = the live slot qty (A1 has 600 left on hand).
+    expect(lineOf(itemA1)!.systemQty).toBe("600.000000");
     expect(lineOf(itemA1)!.binId).toBeTruthy();
   });
 
@@ -234,21 +238,21 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
 
     const reviewed = await withTenant(TENANT_I, () => cycleCounts.review(doc.id, I_ACTOR));
     expect(reviewed.status).toBe("VARIANCE_REVIEW");
-    // A1: −3 × 10 = 30 loss; ZERO: +2 × 10 = 20 gain (avg cost 10).
-    expect(reviewed.varianceLossValue).toBe("30.0000");
-    expect(reviewed.varianceGainValue).toBe("20.0000");
+    // A1: −3 × 20 = 60 loss; ZERO: +2 × 20 = 40 gain (avg cost 20).
+    expect(reviewed.varianceLossValue).toBe("60.0000");
+    expect(reviewed.varianceGainValue).toBe("40.0000");
 
     // The threshold (100) covers both impacts — no supervisor needed.
     const approved = await withTenant(TENANT_I, () =>
       cycleCounts.approve({ id: doc.id, supervisor: false, actorId: I_ACTOR }),
     );
     expect(approved.countNo).toMatch(/^CC-\d{4}-\d{6}$/);
-    expect(approved.lossValue).toBe("30.0000");
-    expect(approved.gainValue).toBe("20.0000");
+    expect(approved.lossValue).toBe("60.0000");
+    expect(approved.gainValue).toBe("40.0000");
     expect(approved.journalEntryId).toBeTruthy();
 
-    // The journal: DR shrinkage 30 / CR inventory 30 + DR inventory 20 /
-    // CR appreciation 20 — balanced (the G-13/G-14 shapes).
+    // The journal: DR shrinkage 60 / CR inventory 60 + DR inventory 40 /
+    // CR appreciation 40 — balanced (the G-13/G-14 shapes).
     const entry = await withTenant(TENANT_I, () =>
       journal.findEntryById(approved.journalEntryId!),
     );
@@ -259,8 +263,8 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
     const credit = lines2
       .filter((l) => l.direction === "CREDIT")
       .reduce((sum, l) => sum + Number(l.amount), 0);
-    expect(debit).toBeCloseTo(50, 4);
-    expect(credit).toBeCloseTo(50, 4);
+    expect(debit).toBeCloseTo(100, 4);
+    expect(credit).toBeCloseTo(100, 4);
     expect(entry).toBeTruthy();
 
     // The moves carry the CYCLE_COUNT reasons + the document source.
@@ -285,8 +289,8 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
     const stockRow = await withTenant(TENANT_I, () =>
       store.findItemStock(itemA1, fixture.warehouseMain),
     );
-    expect(binTotal).toBeCloseTo(47, 6);
-    expect(Number(stockRow?.qty)).toBeCloseTo(47, 6);
+    expect(binTotal).toBeCloseTo(597, 6);
+    expect(Number(stockRow?.qty)).toBeCloseTo(597, 6);
 
     // The document carries its evidence (POSTED = number + date + journal).
     const posted = await withTenant(TENANT_I, () => cycleCounts.findDocument(doc.id));

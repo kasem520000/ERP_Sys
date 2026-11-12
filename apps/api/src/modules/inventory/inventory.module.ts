@@ -20,6 +20,7 @@ import { WmsService } from "./application/wms.service";
 import { PutawayService } from "./application/putaway-service";
 import { PickingService } from "./application/picking-service";
 import { CycleCountService } from "./application/cycle-count-service";
+import { QuarantineService } from "./application/quarantine-service";
 import { InventoryController } from "./presentation/inventory.controller";
 
 /**
@@ -100,6 +101,7 @@ export interface CycleCountGenerateJobPayload {
     PutawayService,
     PickingService,
     CycleCountService,
+    QuarantineService,
   ],
   exports: [
     WarehouseService,
@@ -117,6 +119,7 @@ export interface CycleCountGenerateJobPayload {
     PutawayService,
     PickingService,
     CycleCountService,
+    QuarantineService,
   ],
 })
 export class InventoryModule implements OnModuleInit {

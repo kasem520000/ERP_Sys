@@ -288,6 +288,16 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "BR-017: expiry-tracked stock issues FEFO (nearest expiry first) as the default pick posture; batch/expiry capture itself is per-item tracking flags.",
   }),
+  // PHASE-044 §2.8 (BR-077): the quarantine-status posting policy — the
+  // G-43 distinct-account leg is the explicit opt-in (the G-15 mirror:
+  // the same-account default posts NOTHING on a status transition).
+  "inventory.quarantine_posting": Object.freeze({
+    key: "inventory.quarantine_posting",
+    schema: z.enum(["off", "distinct"]),
+    default: "off",
+    description:
+      "PHASE-044 §2.8 (G-43/BR-077): 'off' (default) — an AVAILABLE ↔ QUARANTINE transition is a structural slot move with NO journal (the same-account G-15 mirror); 'distinct' — each transition posts the G-43 leg (DR 1290 QUARANTINE_INVENTORY · CR the warehouse INVENTORY at qty × avg cost, the mirror on release), fail-closed PURPOSE_NOT_MAPPED until 1290 is mapped.",
+  }),
   // PHASE-011 purchasing keys (BR-009/BR-011/BR-012; the phase §2.5/§2.2
   // policy surface). Canonical decimal strings (ADR-0009).
   "purchasing.allow_po_less_grn": Object.freeze({

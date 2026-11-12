@@ -294,6 +294,9 @@ export interface ReceiptPlan {
   binStatus: string;
   /** The item's stock UOM — bin_contents rows ride it (I-15's anchor). */
   itemUomId: string;
+  /** PHASE-044 (§2.9/§2.11, T-09/T-10): the serial-ledger event override
+   * (CONSIGNMENT_IN / KIT_IN); the moveKind map stays default. */
+  serialEvent: wms.SerialMovementEvent | null;
 }
 
 /**
@@ -326,6 +329,8 @@ export async function planReceipt(input: {
   /** PHASE-044 (§2.8): AVAILABLE (default) or QUARANTINE (the
    * quarantine-on-receipt flow — the Q-board owns later transitions). */
   binStatus?: string;
+  /** PHASE-044 (§2.9/§2.11, T-09/T-10): the serial-ledger event override. */
+  serialEvent?: wms.SerialMovementEvent;
 }): Promise<ReceiptPlan> {
   const item = await requireStockItem(input.itemId);
   await requireActiveWarehouse(input.warehouseId);
@@ -462,6 +467,7 @@ export async function planReceipt(input: {
     lpnId: input.lpnId ?? null,
     binStatus,
     itemUomId: item.uomId,
+    serialEvent: input.serialEvent ?? null,
   };
 }
 
@@ -554,7 +560,7 @@ export async function applyReceipt(plan: ReceiptPlan, journalEntryId: string | n
   }
   // PHASE-044 (T-11, I-16/I-18): the serial ledger — exactly one
   // serial_movements row per serial per movement, with the document refs.
-  const receiptEvent = receiptEventOf(plan.moveKind);
+  const receiptEvent = plan.serialEvent ?? receiptEventOf(plan.moveKind);
   for (const serialId of plan.serialIds) {
     const serial = await store.findSerialById(serialId);
     if (serial !== undefined && serial.status === "returned") {
@@ -637,6 +643,10 @@ export interface IssuePlan {
    * issue proceeds bin-less; the reconciliation probe reports the drift
    * until the T-20 backfill materializes the default-bin rows. */
   binless: boolean;
+  /** PHASE-044 (§2.8, T-08): the serial-ledger event override — the Q-board
+   * dispositions (SCRAP / return-to-vendor) name their semantic event; the
+   * moveKind map stays the default. */
+  serialEvent: wms.SerialMovementEvent | null;
 }
 
 /**
@@ -675,6 +685,9 @@ export async function planIssue(input: {
   /** PHASE-044 (§2.8): which bin statuses may serve the issue — AVAILABLE
    * by default; the quarantine dispositions pass their own set. */
   binStatuses?: string[];
+  /** PHASE-044 (§2.8, T-08): the serial-ledger event override (SCRAP /
+   * RETURN for the Q-board dispositions); the moveKind map stays default. */
+  serialEvent?: wms.SerialMovementEvent;
 }): Promise<IssuePlan> {
   const item = await requireStockItem(input.itemId);
   await requireActiveWarehouse(input.warehouseId);
@@ -880,12 +893,13 @@ export async function planIssue(input: {
     nextQty: after,
     nextAvgCost,
     binless,
+    serialEvent: input.serialEvent ?? null,
   };
 }
 
 /** Apply an issue AFTER its journal posted (or policy-none: NULL id). */
 export async function applyIssue(plan: IssuePlan, journalEntryId: string | null): Promise<string[]> {
-  const issueEvent = issueEventOf(plan.moveKind);
+  const issueEvent = plan.serialEvent ?? issueEventOf(plan.moveKind);
   for (const slice of plan.slices) {
     await store.insertStockMove({
       id: slice.moveId,
