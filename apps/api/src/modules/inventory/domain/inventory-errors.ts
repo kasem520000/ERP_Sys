@@ -527,3 +527,34 @@ export class ConsignmentStateError extends DomainError {
     super("CONSIGNMENT_STATE_INVALID", message);
   }
 }
+
+// -- kitting + cross-docking (PHASE-044 T-10; §2.10/§2.11; I-12/I-13) -------------------
+
+export class WarehouseKitNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("WAREHOUSE_KIT_NOT_FOUND", `warehouse kit order ${id} does not exist in this tenant`);
+  }
+}
+export class WarehouseKitStateError extends DomainError {
+  constructor(message: string) {
+    super("WAREHOUSE_KIT_STATE_INVALID", message);
+  }
+}
+export class CrossDockBinNotDockError extends DomainError {
+  constructor(binId: string, zoneType: string) {
+    super(
+      "CROSS_DOCK_BIN_NOT_DOCK",
+      `bin ${binId} sits in a ${zoneType} zone — cross-dock receipts land ONLY in DOCK-zone bins (the putaway bypass is the dock face)`,
+      { binId, zoneType },
+    );
+  }
+}
+export class CrossDockQtyExceededError extends DomainError {
+  constructor(details: { itemId: string; linkId: string; expected: string; alreadyDocked: string; requested: string }) {
+    super(
+      "CROSS_DOCK_QTY_EXCEEDED",
+      `cross-docking ${details.requested} of the item would exceed the linked outbound line: ${details.alreadyDocked} already docked of ${details.expected} (I-12's in-transit exactness)`,
+      details,
+    );
+  }
+}
