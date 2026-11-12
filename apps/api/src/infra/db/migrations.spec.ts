@@ -171,8 +171,11 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // 279 → 287, matrix §3.21; plan grants; the distribution/wholesale
     // manifest enablement; the default location tree per warehouse),
     // 0072 the pick-wave CANCEL evidence repair (the 0068 CHECK fix — a
-    // wave cancelled before release carries no release stamps).
-    expect(files.at(-1)?.tag).toBe("0072_wms_wave_cancel_evidence");
+    // wave cancelled before release carries no release stamps),
+    // 0073 the stock_moves source-shape extension for the WMS document
+    // family (cycle_count / quarantine_disposition /
+    // consignment_settlement / warehouse_kit / cross_dock — T-07…T-10).
+    expect(files.at(-1)?.tag).toBe("0073_stock_moves_wms_sources");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

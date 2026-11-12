@@ -19,6 +19,7 @@ import { RevaluationService } from "./application/revaluation-service";
 import { WmsService } from "./application/wms.service";
 import { PutawayService } from "./application/putaway-service";
 import { PickingService } from "./application/picking-service";
+import { CycleCountService } from "./application/cycle-count-service";
 import { InventoryController } from "./presentation/inventory.controller";
 
 /**
@@ -45,6 +46,18 @@ export const BIN_RECONCILE_QUEUE = "inventory.bin-reconcile";
 export const BIN_RECONCILE_CRON = "45 1 * * *";
 
 export interface BinReconcileJobPayload {
+  system: true;
+}
+
+/**
+ * PHASE-044 (§2.6): the cycle-count generation pass's queue — nightly at
+ * 02:15 UTC, after the bin-reconcile probe; every ACTIVE schedule runs
+ * its due-items pass (the class intervals gate what is due).
+ */
+export const CYCLE_COUNT_GENERATE_QUEUE = "inventory.cycle-count-generate";
+export const CYCLE_COUNT_GENERATE_CRON = "15 2 * * *";
+
+export interface CycleCountGenerateJobPayload {
   system: true;
 }
 
@@ -86,6 +99,7 @@ export interface BinReconcileJobPayload {
     WmsService,
     PutawayService,
     PickingService,
+    CycleCountService,
   ],
   exports: [
     WarehouseService,
@@ -102,12 +116,14 @@ export interface BinReconcileJobPayload {
     WmsService,
     PutawayService,
     PickingService,
+    CycleCountService,
   ],
 })
 export class InventoryModule implements OnModuleInit {
   constructor(
     @Inject(ReservationService) private readonly reservations: ReservationService,
     @Inject(WmsService) private readonly wms: WmsService,
+    @Inject(CycleCountService) private readonly cycleCounts: CycleCountService,
   ) {}
 
   /**
@@ -158,6 +174,25 @@ export class InventoryModule implements OnModuleInit {
       .schedule(BIN_RECONCILE_QUEUE, BIN_RECONCILE_CRON, {
         system: true,
       } satisfies BinReconcileJobPayload)
+      .catch(() => undefined);
+
+    await boss
+      .createQueue(CYCLE_COUNT_GENERATE_QUEUE)
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        if (!/exist/i.test(message)) throw error;
+      });
+    await boss.work<CycleCountGenerateJobPayload>(CYCLE_COUNT_GENERATE_QUEUE, async (jobs) => {
+      // Idempotent full pass per delivery — the due check makes re-runs
+      // no-ops for freshly counted items.
+      for (let index = 0; index < jobs.length; index += 1) {
+        await this.cycleCounts.runActiveSchedules(null);
+      }
+    });
+    await boss
+      .schedule(CYCLE_COUNT_GENERATE_QUEUE, CYCLE_COUNT_GENERATE_CRON, {
+        system: true,
+      } satisfies CycleCountGenerateJobPayload)
       .catch(() => undefined);
   }
 }

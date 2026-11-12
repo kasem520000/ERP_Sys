@@ -460,3 +460,48 @@ export class PartialPickNotAllowedError extends DomainError {
     );
   }
 }
+
+// -- cycle counting + ABC (PHASE-044 T-07; §2.6/§2.7; I-08/I-09/I-20) -------------------
+
+export class CycleCountScheduleNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("CYCLE_COUNT_SCHEDULE_NOT_FOUND", `cycle-count schedule ${id} does not exist in this tenant`);
+  }
+}
+export class CycleCountScheduleStateError extends DomainError {
+  constructor(message: string) {
+    super("CYCLE_COUNT_SCHEDULE_STATE_INVALID", message);
+  }
+}
+export class CycleCountDocumentNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("CYCLE_COUNT_DOCUMENT_NOT_FOUND", `cycle-count document ${id} does not exist in this tenant`);
+  }
+}
+export class CycleCountDocumentStateError extends DomainError {
+  constructor(message: string) {
+    super("CYCLE_COUNT_DOCUMENT_STATE_INVALID", message);
+  }
+}
+export class CycleCountLineNotFoundError extends DomainError {
+  constructor(documentId: string, lineNo: number) {
+    super("CYCLE_COUNT_LINE_NOT_FOUND", `cycle-count document ${documentId} has no line ${lineNo}`);
+  }
+}
+/** BR-075: a line's |value impact| exceeds the schedule's approval
+ * threshold — a supervisor approval (or a recount) is required. */
+export class CycleCountThresholdError extends DomainError {
+  constructor(details: { documentId: string; overThreshold: number; threshold: string }) {
+    super(
+      "CYCLE_COUNT_THRESHOLD_EXCEEDED",
+      `cycle-count document ${details.documentId} has ${details.overThreshold} lines above the approval threshold ${details.threshold} — recount or supervisor approval required (BR-075)`,
+      details,
+    );
+  }
+}
+/** §2.7: the ABC split thresholds must satisfy 0 < aPct < bPct ≤ 1. */
+export class AbcThresholdError extends DomainError {
+  constructor(aPct: string, bPct: string) {
+    super("ABC_THRESHOLD_INVALID", `ABC thresholds must satisfy 0 < aPct < bPct ≤ 1: ${aPct}/${bPct}`);
+  }
+}

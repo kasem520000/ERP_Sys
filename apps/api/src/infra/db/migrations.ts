@@ -401,6 +401,11 @@ export const MIGRATIONS: readonly string[] = [
   // law made DRAFT→CANCELLED impossible — caught by the T-05 wave
   // lifecycle spec). Constraint replaced in place; zero data change.
   "0072_wms_wave_cancel_evidence",
+  // 0073_stock_moves_wms_sources — the T-07…T-10 document-source
+  // extension of the closed source list (cycle_count,
+  // quarantine_disposition, consignment_settlement, warehouse_kit,
+  // cross_dock — the 0027 replacement pattern, additive-only).
+  "0073_stock_moves_wms_sources",
 ];
 
 /**

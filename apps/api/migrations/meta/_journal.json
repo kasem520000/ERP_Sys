@@ -504,6 +504,13 @@
       "when": 1796382500000,
       "tag": "0072_wms_wave_cancel_evidence",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1796468900000,
+      "tag": "0073_stock_moves_wms_sources",
+      "breakpoints": true
     }
   ],
   "version": "7"
