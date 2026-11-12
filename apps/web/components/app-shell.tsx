@@ -119,6 +119,11 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   // PHASE-040 T-08: the imports hub (crumbs-only fallback — the sidebar is
   // registry-driven; this covers nav-fetch failure, the support-sessions rule).
   "settings/imports": { group: "navSettings", label: "toolkitTitle" },
+  // PHASE-041 T-10: the communications hub — the settings back office and
+  // the unified inbox (crumbs-only fallbacks; the sidebar is registry-driven
+  // via the settings.communication / communication.inbox NAV_ITEMS rows).
+  "settings/communication": { group: "navSettings", label: "commTitle" },
+  "communication/inbox": { group: "navHome", label: "commInboxTitle" },
   // -- WEB-037 (PHASE-037): the ZATCA Phase-1 device registry. The sidebar
   // stays registry-driven; this fallback covers nav-fetch failure (crumbs
   // only — the support-sessions rule).

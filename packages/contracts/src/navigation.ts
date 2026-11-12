@@ -425,6 +425,37 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "wizard",
     order: 80,
   },
+  // PHASE-041 T-10 (§2.2/§2.8): the communications hub — the settings back
+  // office (message templates channel×locale×module + provider selection/
+  // credentials/market senders + the tenant-default preference matrix).
+  // The route rides communication.templates.manage (matrix §3.19) under the
+  // ALL-plans communication.outbound feature (the SANDBOX defaults show
+  // honestly on every plan; paid provider selections fail closed
+  // server-side). The unified inbox is the second home item — a workspace
+  // surface (UX-14/IN-16) gated by communication.inbox.read.
+  {
+    id: "settings.communication",
+    parentGroup: "settings",
+    label: { ar: "مركز الاتصالات", en: "Communications" },
+    icon: "send",
+    route: "/settings/communication",
+    featureKey: "communication.outbound",
+    permission: "communication.templates.manage",
+    branchScoped: false,
+    archetype: "settings",
+    order: 85,
+  },
+  {
+    id: "communication.inbox",
+    parentGroup: "home",
+    label: { ar: "صندوق الاتصالات الموحد", en: "Communications inbox" },
+    icon: "inbox",
+    route: "/communication/inbox",
+    permission: "communication.inbox.read",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 30,
+  },
   // partners group — PHASE-006 master data (T11): partner directory + the
   // opening-balance DRAFT capture console. Feature keys are the exact
   // FEATURE_CATALOG strings; permissions the exact seeded matrix keys.

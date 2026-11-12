@@ -705,6 +705,108 @@ export interface ToolkitAdapterTemplate {
   url: string;
 }
 
+// -- PHASE-041 (communications hub): the T-10 wire shapes ----------------------
+
+/** GET /communication/templates → data[] — the effective template catalog. */
+export interface CommunicationTemplate {
+  id: string;
+  key: string;
+  channel: "EMAIL" | "WHATSAPP" | "SMS";
+  locale: "ar" | "en";
+  module: string;
+  subject: string | null;
+  body: string;
+  variables: readonly {
+    name: string;
+    required: boolean;
+    description?: string;
+  }[];
+  isActive: boolean;
+  /** true when a tenant override backs the row (vs the builtin fallback). */
+  overridden: boolean;
+}
+
+/** POST /communication/templates/preview → data (fail-closed render). */
+export interface CommunicationTemplatePreview {
+  subject: string | null;
+  body: string;
+  whatsappParams: readonly string[] | null;
+  templateKey: string;
+  channel: "EMAIL" | "WHATSAPP" | "SMS";
+  locale: "ar" | "en";
+}
+
+/** One masked credential field (STATE only — values never leave the API). */
+export interface CommunicationCredentialField {
+  name: string;
+  label: { ar: string; en: string };
+  secret: boolean;
+  required: boolean;
+  configured: boolean;
+}
+
+/** GET /communication/providers → data.providers[] — the masked registry. */
+export interface CommunicationProviderEntry {
+  id: string;
+  kind: "EMAIL" | "WHATSAPP" | "SMS";
+  label: { ar: string; en: string };
+  requiresVerification: boolean;
+  credentialFields: readonly CommunicationCredentialField[];
+}
+
+/** The BR-067 resolution for one channel (sandbox = the default). */
+export interface CommunicationChannelResolution {
+  providerId: string;
+  live: boolean;
+  blockedOnCredentials: boolean;
+}
+
+/** GET /communication/providers → data (the full masked catalog). */
+export interface CommunicationProviderCatalog {
+  providers: readonly CommunicationProviderEntry[];
+  channels: Readonly<
+    Record<"EMAIL" | "WHATSAPP" | "SMS", CommunicationChannelResolution>
+  >;
+  markets: Readonly<
+    Record<string, { whatsappPhoneNumberId?: string; smsSenderName?: string; emailFromAddress?: string }>
+  >;
+  sendCap: { dailyHardCap?: number };
+}
+
+/** GET /communication/preferences/me|defaults → the matrix rows. */
+export interface CommunicationPreferenceRow {
+  module: string;
+  channels: { IN_APP: boolean; EMAIL: boolean; SMS: boolean; WHATSAPP: boolean };
+  explicit: boolean;
+}
+
+/** GET /communication/preferences/defaults → data[] (tenant defaults). */
+export interface CommunicationPreferenceDefault {
+  module: string;
+  channel: "IN_APP" | "EMAIL" | "SMS" | "WHATSAPP";
+  enabled: boolean;
+}
+
+/** GET /communication/inbox → data[] — the unified timeline entry. */
+export interface CommunicationInboxEntry {
+  id: string;
+  kind: "MESSAGE" | "CALL";
+  direction: "INBOUND" | "OUTBOUND";
+  channel: string;
+  at: string;
+  partnerId: string | null;
+  userId: string | null;
+  counterparty: string | null;
+  summary: string | null;
+  body: string | null;
+  outcome: string | null;
+  durationMinutes: number | null;
+  outboundMessageId: string | null;
+  relatedType: string | null;
+  relatedId: string | null;
+  createdBy: string | null;
+}
+
 /** GET /onboarding/demo-data/status → data (13-template catalog + markers). */
 export interface DemoDataStatus {
   tenant: { demoSeededAt: string | null; demoTemplate: string | null };

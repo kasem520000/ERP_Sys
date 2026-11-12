@@ -5486,6 +5486,146 @@ export interface Dictionary {
   srmaErrState: string;
   srmaErrQtyExceeds: string;
   srmaErrUnmapped: string;
+  // -- PHASE-041 (T-10): the communications hub surfaces ---------------------
+  commTitle: string;
+  commSubtitle: string;
+  commTabTemplates: string;
+  commTabProviders: string;
+  commTabDefaults: string;
+  commTemplatesHint: string;
+  commTplColKey: string;
+  commTplColChannel: string;
+  commTplColLocale: string;
+  commTplColModule: string;
+  commTplColStatus: string;
+  commTplColAction: string;
+  commTplChannelEmail: string;
+  commTplChannelWhatsapp: string;
+  commTplChannelSms: string;
+  commTplOverrideBadge: string;
+  commTplBuiltinBadge: string;
+  commTplActive: string;
+  commTplInactive: string;
+  commTplEditBtn: string;
+  commTplPreviewBtn: string;
+  commTplDeleteBtn: string;
+  commTplDeletedToast: string;
+  commTplEditorNewTitle: string;
+  commTplEditorEditTitle: string;
+  commTplFormKey: string;
+  commTplFormModule: string;
+  commTplFormSubject: string;
+  commTplFormBody: string;
+  commTplFormVars: string;
+  commTplFormActive: string;
+  commTplSaveBtn: string;
+  commTplSavedToast: string;
+  commTplCancelBtn: string;
+  commTplPreviewTitle: string;
+  commTplPreviewVarsHint: string;
+  commTplPreviewRunBtn: string;
+  commTplPreviewSubject: string;
+  commTplPreviewBody: string;
+  commTplPreviewWhatsappParams: string;
+  commTplErrInvalid: string;
+  commProvidersHint: string;
+  commProvColProvider: string;
+  commProvColChannel: string;
+  commProvColStatus: string;
+  commProvColAction: string;
+  commProvSelectLabel: string;
+  commProvSelectSandbox: string;
+  commProvLiveBadge: string;
+  commProvSandboxBadge: string;
+  commProvBlockedBadge: string;
+  commProvRequiresVerification: string;
+  commProvCredsTitle: string;
+  commProvCredsHint: string;
+  commProvCredsConfigured: string;
+  commProvCredsNotConfigured: string;
+  commProvCredSaveBtn: string;
+  commProvCredsSavedToast: string;
+  commProvMarketsTitle: string;
+  commProvMarketsHint: string;
+  commProvMarketCodeLabel: string;
+  commProvMarketWhatsappId: string;
+  commProvMarketSmsSender: string;
+  commProvMarketEmailFrom: string;
+  commProvMarketRemoveBtn: string;
+  commProvMarketAddBtn: string;
+  commProvCapTitle: string;
+  commProvCapHint: string;
+  commProvCapLabel: string;
+  commProvCapSavedToast: string;
+  commDefaultsHint: string;
+  commPrefColModule: string;
+  commPrefChInApp: string;
+  commPrefChEmail: string;
+  commPrefChSms: string;
+  commPrefChWhatsapp: string;
+  commPrefSavedToast: string;
+  commInboxTitle: string;
+  commInboxSubtitle: string;
+  commInboxTabTimeline: string;
+  commInboxTabCall: string;
+  commInboxTabPrefs: string;
+  commInboxFilterKind: string;
+  commInboxFilterChannel: string;
+  commInboxFilterDirection: string;
+  commInboxFilterAll: string;
+  commInboxKindMessage: string;
+  commInboxKindCall: string;
+  commInboxDirInbound: string;
+  commInboxDirOutbound: string;
+  commInboxColAt: string;
+  commInboxColKind: string;
+  commInboxColChannel: string;
+  commInboxColCounterparty: string;
+  commInboxColSummary: string;
+  commInboxColOutcome: string;
+  commInboxColDuration: string;
+  commInboxColUser: string;
+  commInboxEmpty: string;
+  commInboxRefresh: string;
+  commInboxDurationValue: string;
+  commCallFormTitle: string;
+  commCallFormHint: string;
+  commCallPartnerLabel: string;
+  commCallDirectionLabel: string;
+  commCallOutcomeLabel: string;
+  commCallSummaryLabel: string;
+  commCallBodyLabel: string;
+  commCallDurationLabel: string;
+  commCallAtLabel: string;
+  commCallSubmitBtn: string;
+  commCallLoggedToast: string;
+  commCallOutcomeCompleted: string;
+  commCallOutcomeNoAnswer: string;
+  commCallOutcomeBusy: string;
+  commCallOutcomeVoicemail: string;
+  commCallOutcomeFailed: string;
+  commCallOutcomeScheduled: string;
+  commCallErrInvalid: string;
+  commMyPrefsTitle: string;
+  commMyPrefsHint: string;
+  commMyPrefsExplicitBadge: string;
+  commMyPrefsInheritNote: string;
+  commMyPrefsSavedToast: string;
+  commPrefModuleLimits: string;
+  commPrefModuleSubscription: string;
+  commPrefModuleReconciliation: string;
+  commPrefModuleInvoiceOverdue: string;
+  commPrefModuleStock: string;
+  commPrefModuleTemplates: string;
+  commPrefModuleCrm: string;
+  commPrefModuleEinvoicing: string;
+  commPrefModuleNotes: string;
+  commPrefModuleInstallments: string;
+  commPrefModuleBudgeting: string;
+  commPrefModulePurchasing: string;
+  commPrefModuleCollections: string;
+  commPrefModuleWarranties: string;
+  commPrefModuleDigest: string;
 }
 
 const ar: Dictionary = {
@@ -10980,6 +11120,157 @@ const ar: Dictionary = {
   srmaErrQtyExceeds: "الكمية المطلوب إرجاعها تتجاوز الرصيد المتاح لهذا السطر.",
   srmaErrUnmapped:
     "حساب مرتجعات المشتريات غير مربوط — اربط إعداد purchasing.supplier_return_account.",
+  // -- PHASE-041 (T-10): مركز الاتصالات ---------------------------------------
+  commTitle: "مركز الاتصالات",
+  commSubtitle:
+    "قوالب الرسائل واختيار المزوّدين ومصفوفة الإشعارات الافتراضية — كل إرسال يمر عبر منفذ القنوات، والمزوّد الافتراضي لا يجري أي اتصال خارجي قبل الإعداد.",
+  commTabTemplates: "القوالب",
+  commTabProviders: "المزوّدون",
+  commTabDefaults: "الإشعارات الافتراضية",
+  commTemplatesHint:
+    "قوالب قناة × لغة × وحدة مع متغيّرات موثّقة — التعديل ينشئ نسخة خاصة بالمستأجر، والحذف يعيد القالب المدمج. المعاينة تفشل بنفس أخطاء الإرسال (مبدأ الإغلاق عند الفشل).",
+  commTplColKey: "المفتاح",
+  commTplColChannel: "القناة",
+  commTplColLocale: "اللغة",
+  commTplColModule: "الوحدة",
+  commTplColStatus: "الحالة",
+  commTplColAction: "إجراءات",
+  commTplChannelEmail: "بريد إلكتروني",
+  commTplChannelWhatsapp: "واتساب",
+  commTplChannelSms: "رسالة نصية",
+  commTplOverrideBadge: "مخصّص",
+  commTplBuiltinBadge: "مدمج",
+  commTplActive: "مفعّل",
+  commTplInactive: "معطّل",
+  commTplEditBtn: "تعديل",
+  commTplPreviewBtn: "معاينة",
+  commTplDeleteBtn: "حذف التخصيص",
+  commTplDeletedToast: "عاد القالب المدمج.",
+  commTplEditorNewTitle: "قالب جديد",
+  commTplEditorEditTitle: "تعديل القالب",
+  commTplFormKey: "المفتاح",
+  commTplFormModule: "الوحدة",
+  commTplFormSubject: "الموضوع",
+  commTplFormBody: "النص",
+  commTplFormVars: "المتغيّرات",
+  commTplFormActive: "مفعّل",
+  commTplSaveBtn: "حفظ",
+  commTplSavedToast: "تم حفظ القالب.",
+  commTplCancelBtn: "إلغاء",
+  commTplPreviewTitle: "المعاينة",
+  commTplPreviewVarsHint:
+    "أدخل قيماً تجريبية للمتغيّرات المطلوبة — المعاينة تعرض الناتج النهائي كما سيُرسل.",
+  commTplPreviewRunBtn: "عرض النتيجة",
+  commTplPreviewSubject: "الموضوع",
+  commTplPreviewBody: "النص",
+  commTplPreviewWhatsappParams: "معاملات واتساب المرتّبة",
+  commTplErrInvalid: "قالب غير صالح — راجع الحقول المطلوبة والمتغيّرات.",
+  commProvidersHint:
+    "اختيار المزوّد لكل قناة مع بيانات الاعتماد (تُخزَّن مختومة ولا تُعرض أبداً بعد الحفظ) وأرقام الإرسال حسب السوق وسقف الإرسال اليومي. ما لم يُضبط مزوّد كامل الاعتماد تعمل القناة على الوضع الرملي بلا أي اتصال خارجي.",
+  commProvColProvider: "المزوّد",
+  commProvColChannel: "القناة",
+  commProvColStatus: "الحالة",
+  commProvColAction: "إجراءات",
+  commProvSelectLabel: "المزوّد العامل",
+  commProvSelectSandbox: "رملي (افتراضي — بلا اتصال خارجي)",
+  commProvLiveBadge: "فعلي",
+  commProvSandboxBadge: "رملي",
+  commProvBlockedBadge: "بانتظار بيانات الاعتماد",
+  commProvRequiresVerification: "يتطلب تحققاً من المزوّد",
+  commProvCredsTitle: "بيانات الاعتماد",
+  commProvCredsHint:
+    "الحقول السرية تُخزَّن مختومة ولا تُستعاد للعرض — يظهر فقط هل هي مضبوطة. اترك الحقل فارغاً للإبقاء على القيمة المحفوظة.",
+  commProvCredsConfigured: "مضبوط",
+  commProvCredsNotConfigured: "غير مضبوط",
+  commProvCredSaveBtn: "حفظ بيانات الاعتماد",
+  commProvCredsSavedToast: "تم حفظ بيانات الاعتماد (مختومة).",
+  commProvMarketsTitle: "أرقام الإرسال حسب السوق",
+  commProvMarketsHint:
+    "لكل سوق (رمز ISO من حرفين) رقم واتساب أو اسم مرسل SMS أو عنوان بريدي — الإرسال يستخدم رقم السوق عند توفره.",
+  commProvMarketCodeLabel: "السوق",
+  commProvMarketWhatsappId: "معرّف رقم واتساب",
+  commProvMarketSmsSender: "اسم مرسل SMS",
+  commProvMarketEmailFrom: "عنوان البريد المرسل",
+  commProvMarketRemoveBtn: "إزالة",
+  commProvMarketAddBtn: "إضافة سوق",
+  commProvCapTitle: "سقف الإرسال اليومي",
+  commProvCapHint:
+    "حد أقصى صارم لعدد الرسائل الصادرة يومياً على مستوى المستأجر — حماية من استنزاف قنوات مدفوعة.",
+  commProvCapLabel: "أقصى عدد رسائل يومياً",
+  commProvCapSavedToast: "تم حفظ السقف.",
+  commDefaultsHint:
+    "القيم الافتراضية للمستأجر لمصفوفة الإشعارات (وحدة × قناة) — المستخدم يرثها ما لم يضبط صفه الخاص من صندوق الاتصالات.",
+  commPrefColModule: "الوحدة",
+  commPrefChInApp: "داخل التطبيق",
+  commPrefChEmail: "بريد",
+  commPrefChSms: "SMS",
+  commPrefChWhatsapp: "واتساب",
+  commPrefSavedToast: "تم حفظ تفضيلات الإشعارات.",
+  commInboxTitle: "صندوق الاتصالات الموحد",
+  commInboxSubtitle:
+    "كل الرسائل والمكالمات في خط زمني واحد لكل جهة — مع مرشحات النوع والقناة والاتجاه، وتسجيل المكالمات يدوياً بنتيجتها ومدتها.",
+  commInboxTabTimeline: "الخط الزمني",
+  commInboxTabCall: "تسجيل مكالمة",
+  commInboxTabPrefs: "تفضيلاتي",
+  commInboxFilterKind: "النوع",
+  commInboxFilterChannel: "القناة",
+  commInboxFilterDirection: "الاتجاه",
+  commInboxFilterAll: "الكل",
+  commInboxKindMessage: "رسالة",
+  commInboxKindCall: "مكالمة",
+  commInboxDirInbound: "وارد",
+  commInboxDirOutbound: "صادر",
+  commInboxColAt: "الوقت",
+  commInboxColKind: "النوع",
+  commInboxColChannel: "القناة",
+  commInboxColCounterparty: "الطرف",
+  commInboxColSummary: "الملخص",
+  commInboxColOutcome: "النتيجة",
+  commInboxColDuration: "المدة",
+  commInboxColUser: "المستخدم",
+  commInboxEmpty: "لا توجد اتصالات بعد — ستظهر الرسائل المرسلة والمكالمات المسجلة هنا.",
+  commInboxRefresh: "تحديث",
+  commInboxDurationValue: "{minutes} دقيقة",
+  commCallFormTitle: "تسجيل مكالمة",
+  commCallFormHint:
+    "مكالمة صادرة أو واردة مرتبطة بجهة — النتيجة والمدة والملاحظات تظهر في الخط الزمني الموحد.",
+  commCallPartnerLabel: "الجهة",
+  commCallDirectionLabel: "الاتجاه",
+  commCallOutcomeLabel: "النتيجة",
+  commCallSummaryLabel: "الملخص",
+  commCallBodyLabel: "الملاحظات",
+  commCallDurationLabel: "المدة (بالدقائق)",
+  commCallAtLabel: "وقت المكالمة",
+  commCallSubmitBtn: "تسجيل",
+  commCallLoggedToast: "تم تسجيل المكالمة.",
+  commCallOutcomeCompleted: "مكتملة",
+  commCallOutcomeNoAnswer: "بلا رد",
+  commCallOutcomeBusy: "مشغول",
+  commCallOutcomeVoicemail: "بريد صوتي",
+  commCallOutcomeFailed: "فاشلة",
+  commCallOutcomeScheduled: "مجدولة",
+  commCallErrInvalid: "بيانات المكالمة غير صالحة — راجع الجهة والملخص والمدة.",
+  commMyPrefsTitle: "تفضيلات إشعاراتي",
+  commMyPrefsHint:
+    "مصفوفة الوحدة × القناة — تعطيل قناة لوحدة يمنع إرسالها إليك نهائياً (بما فيها الرسائل التحصيلية). القنوات المدفوعة مغلقة افتراضياً.",
+  commMyPrefsExplicitBadge: "مخصّص",
+  commMyPrefsInheritNote: "غير المخصّص يرث الافتراضي",
+  commMyPrefsSavedToast: "تم حفظ تفضيلاتك.",
+  commPrefModuleLimits: "حدود الاستخدام",
+  commPrefModuleSubscription: "الاشتراك",
+  commPrefModuleReconciliation: "المطابقات",
+  commPrefModuleInvoiceOverdue: "الفواتير المتأخرة",
+  commPrefModuleStock: "المخزون",
+  commPrefModuleTemplates: "قوالب القطاعات",
+  commPrefModuleCrm: "إدارة العلاقات",
+  commPrefModuleEinvoicing: "الفوترة الإلكترونية",
+  commPrefModuleNotes: "الشيكات والأوراق",
+  commPrefModuleInstallments: "الأقساط",
+  commPrefModuleBudgeting: "الموازنات",
+  commPrefModulePurchasing: "المشتريات",
+  commPrefModuleCollections: "التحصيل",
+  commPrefModuleWarranties: "الضمانات",
+  commPrefModuleDigest: "الملخص اليومي",
 };
 
 const en: Dictionary = {
@@ -16488,6 +16779,157 @@ const en: Dictionary = {
   srmaErrQtyExceeds: "The return qty exceeds the available balance on this line.",
   srmaErrUnmapped:
     "The purchase-returns account is unmapped — map the purchasing.supplier_return_account setting.",
+  // -- PHASE-041 (T-10): the communications hub -------------------------------
+  commTitle: "Communications",
+  commSubtitle:
+    "Message templates, provider selection, and the default notification matrix — every send rides the channel port, and the default provider makes zero external calls until configured.",
+  commTabTemplates: "Templates",
+  commTabProviders: "Providers",
+  commTabDefaults: "Notification defaults",
+  commTemplatesHint:
+    "Channel × locale × module templates with documented variables — edits create a tenant override; deleting restores the builtin. Previews fail with the exact send-time errors (fail-closed).",
+  commTplColKey: "Key",
+  commTplColChannel: "Channel",
+  commTplColLocale: "Locale",
+  commTplColModule: "Module",
+  commTplColStatus: "Status",
+  commTplColAction: "Actions",
+  commTplChannelEmail: "Email",
+  commTplChannelWhatsapp: "WhatsApp",
+  commTplChannelSms: "SMS",
+  commTplOverrideBadge: "Customized",
+  commTplBuiltinBadge: "Builtin",
+  commTplActive: "Active",
+  commTplInactive: "Inactive",
+  commTplEditBtn: "Edit",
+  commTplPreviewBtn: "Preview",
+  commTplDeleteBtn: "Delete override",
+  commTplDeletedToast: "The builtin template is back.",
+  commTplEditorNewTitle: "New template",
+  commTplEditorEditTitle: "Edit template",
+  commTplFormKey: "Key",
+  commTplFormModule: "Module",
+  commTplFormSubject: "Subject",
+  commTplFormBody: "Body",
+  commTplFormVars: "Variables",
+  commTplFormActive: "Active",
+  commTplSaveBtn: "Save",
+  commTplSavedToast: "Template saved.",
+  commTplCancelBtn: "Cancel",
+  commTplPreviewTitle: "Preview",
+  commTplPreviewVarsHint:
+    "Enter sample values for the required variables — the preview renders the exact outgoing output.",
+  commTplPreviewRunBtn: "Render",
+  commTplPreviewSubject: "Subject",
+  commTplPreviewBody: "Body",
+  commTplPreviewWhatsappParams: "Ordered WhatsApp parameters",
+  commTplErrInvalid: "Invalid template — check the required fields and variables.",
+  commProvidersHint:
+    "Per-channel provider selection with credentials (sealed at rest, never displayed after saving), per-market sender numbers, and the daily send cap. Until a fully-credentialed provider is set, every channel runs on the SANDBOX default with zero external calls.",
+  commProvColProvider: "Provider",
+  commProvColChannel: "Channel",
+  commProvColStatus: "Status",
+  commProvColAction: "Actions",
+  commProvSelectLabel: "Serving provider",
+  commProvSelectSandbox: "Sandbox (default — zero external calls)",
+  commProvLiveBadge: "Live",
+  commProvSandboxBadge: "Sandbox",
+  commProvBlockedBadge: "Blocked on credentials",
+  commProvRequiresVerification: "Requires provider verification",
+  commProvCredsTitle: "Credentials",
+  commProvCredsHint:
+    "Secret fields are stored sealed and never returned for display — only whether they are configured. Leave a field empty to keep the stored value.",
+  commProvCredsConfigured: "Configured",
+  commProvCredsNotConfigured: "Not configured",
+  commProvCredSaveBtn: "Save credentials",
+  commProvCredsSavedToast: "Credentials saved (sealed).",
+  commProvMarketsTitle: "Per-market senders",
+  commProvMarketsHint:
+    "Per market (two-letter ISO code): a WhatsApp phone id, an SMS sender name, or a from-address — sends use the market sender when present.",
+  commProvMarketCodeLabel: "Market",
+  commProvMarketWhatsappId: "WhatsApp phone id",
+  commProvMarketSmsSender: "SMS sender name",
+  commProvMarketEmailFrom: "Email from address",
+  commProvMarketRemoveBtn: "Remove",
+  commProvMarketAddBtn: "Add market",
+  commProvCapTitle: "Daily send cap",
+  commProvCapHint:
+    "A hard per-tenant ceiling on outbound messages per day — protection against silently draining paid channels.",
+  commProvCapLabel: "Max messages per day",
+  commProvCapSavedToast: "Cap saved.",
+  commDefaultsHint:
+    "The tenant-default notification matrix (module × channel) — users inherit these rows until they set their own from the communications inbox.",
+  commPrefColModule: "Module",
+  commPrefChInApp: "In-app",
+  commPrefChEmail: "Email",
+  commPrefChSms: "SMS",
+  commPrefChWhatsapp: "WhatsApp",
+  commPrefSavedToast: "Notification preferences saved.",
+  commInboxTitle: "Communications inbox",
+  commInboxSubtitle:
+    "Every message and call on one per-partner timeline — with kind, channel, and direction filters, plus manual call logging with outcome and duration.",
+  commInboxTabTimeline: "Timeline",
+  commInboxTabCall: "Log a call",
+  commInboxTabPrefs: "My preferences",
+  commInboxFilterKind: "Kind",
+  commInboxFilterChannel: "Channel",
+  commInboxFilterDirection: "Direction",
+  commInboxFilterAll: "All",
+  commInboxKindMessage: "Message",
+  commInboxKindCall: "Call",
+  commInboxDirInbound: "Inbound",
+  commInboxDirOutbound: "Outbound",
+  commInboxColAt: "When",
+  commInboxColKind: "Kind",
+  commInboxColChannel: "Channel",
+  commInboxColCounterparty: "Counterparty",
+  commInboxColSummary: "Summary",
+  commInboxColOutcome: "Outcome",
+  commInboxColDuration: "Duration",
+  commInboxColUser: "User",
+  commInboxEmpty: "No communications yet — sent messages and logged calls will appear here.",
+  commInboxRefresh: "Refresh",
+  commInboxDurationValue: "{minutes} min",
+  commCallFormTitle: "Log a call",
+  commCallFormHint:
+    "An inbound or outbound call linked to a partner — the outcome, duration, and notes land on the unified timeline.",
+  commCallPartnerLabel: "Partner",
+  commCallDirectionLabel: "Direction",
+  commCallOutcomeLabel: "Outcome",
+  commCallSummaryLabel: "Summary",
+  commCallBodyLabel: "Notes",
+  commCallDurationLabel: "Duration (minutes)",
+  commCallAtLabel: "Call time",
+  commCallSubmitBtn: "Log",
+  commCallLoggedToast: "Call logged.",
+  commCallOutcomeCompleted: "Completed",
+  commCallOutcomeNoAnswer: "No answer",
+  commCallOutcomeBusy: "Busy",
+  commCallOutcomeVoicemail: "Voicemail",
+  commCallOutcomeFailed: "Failed",
+  commCallOutcomeScheduled: "Scheduled",
+  commCallErrInvalid: "Invalid call entry — check the partner, summary, and duration.",
+  commMyPrefsTitle: "My notification preferences",
+  commMyPrefsHint:
+    "The module × channel matrix — opting out of a module×channel stops every send on it for you (dunning letters included). Paid channels default off.",
+  commMyPrefsExplicitBadge: "Customized",
+  commMyPrefsInheritNote: "Non-customized rows inherit the default",
+  commMyPrefsSavedToast: "Your preferences are saved.",
+  commPrefModuleLimits: "Usage limits",
+  commPrefModuleSubscription: "Subscription",
+  commPrefModuleReconciliation: "Reconciliations",
+  commPrefModuleInvoiceOverdue: "Overdue invoices",
+  commPrefModuleStock: "Stock",
+  commPrefModuleTemplates: "Industry templates",
+  commPrefModuleCrm: "CRM",
+  commPrefModuleEinvoicing: "E-invoicing",
+  commPrefModuleNotes: "Cheques & notes",
+  commPrefModuleInstallments: "Installments",
+  commPrefModuleBudgeting: "Budgeting",
+  commPrefModulePurchasing: "Purchasing",
+  commPrefModuleCollections: "Collections",
+  commPrefModuleWarranties: "Warranties",
+  commPrefModuleDigest: "Daily digest",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

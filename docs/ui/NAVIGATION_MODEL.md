@@ -143,6 +143,31 @@ screen links to the hub). The command palette inherits the entry through
 |----|-------|-----------------|------------|------------|-----------|
 | `settings.imports` | 9 الإعدادات | استيراد البيانات والترحيل / Data import & migration | `platform.data_migration` | `configuration.imports.manage` | Wizard (§9) — route `/settings/imports`, order 80: four tabs (the import wizard — kind → upload → column mapping with auto-detect + saved-mapping reuse → dry-run report (bilingual AR+EN per-row issues) → ack-gated commit with polling; the jobs history; the saved mappings; the migration adapters with the documented-mapping template downloads); writes gate in-screen on `configuration.imports.manage` |
 
+### 1.7 PHASE-041 registry additions (Blueprint v3.0 — communications hub)
+
+The communications hub (H-22; [../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md)
+§3): two items — the settings-plane back office (message templates channel × locale ×
+module with the fail-closed preview, the BR-067 provider selection with sealed
+credentials + per-market senders + the daily hard cap, and the tenant-default
+notification matrix) and the home-plane unified inbox (the per-partner message+call
+timeline, the IN-16 call logger, and the caller's own TB-23 preference matrix). Same
+resolution rule as every item — `entitlement(featureKey)` AND `permission(user,
+branch)`; the settings hub rides the ALL-plans `communication.outbound` grant (the
+SANDBOX defaults render honestly on every plan — paid provider selections fail
+closed server-side at save time), while the inbox carries NO feature key
+(`communication.inbox.read` is granted to every role template — a workspace surface,
+the notifications-inbox precedent). The calendar connect (IN-17/IN-18) deliberately
+has NO sidebar item: the OAuth flows + the review-only contacts-sync queue surface
+from task screens and the inbox (the `communication.calendar.connect` API routes
+serve them). The command palette inherits both entries through `resolveNavigation`
+(OA-04). Mirrors `packages/contracts/src/navigation.ts` (`settings.communication`
+order 85, `communication.inbox` order 30).
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `settings.communication` | 9 الإعدادات | مركز الاتصالات / Communications | `communication.outbound` | `communication.templates.manage` | Settings (§8) — route `/settings/communication`, order 85: three tabs (templates — the effective catalog with override/builtin badges, the override editor, the fail-closed preview; providers — the per-channel selection with the live/sandbox/blocked resolution, the sealed-credential editor (state-only display), per-market senders, the daily send cap; defaults — the tenant-default module × channel matrix); the defaults tab writes gate on `communication.preferences.manage` |
+| `communication.inbox` | 1 الرئيسية | صندوق الاتصالات الموحد / Communications inbox | — | `communication.inbox.read` | List + Search (§2) — route `/communication/inbox`, order 30: the unified timeline (kind/channel/direction/partner filters), the call logger (outcome + duration + notes linked to partner + user), and my-preferences (the self-plane matrix — `POST /communication/preferences/me`); the logger edits their own entries (log semantics — no deletes) |
+
 ## 2. Navigation registry (data model, normative)
 
 Navigation is **data**, not code — a single registry resolved per session:
