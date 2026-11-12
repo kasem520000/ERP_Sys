@@ -11,11 +11,22 @@ import { ProductionOrderService } from "./application/production-order-service";
 import { ManufacturingReconciliationService } from "./application/wip-reconciliation-service";
 import { InspectionService } from "./application/inspection-service";
 import { GenealogyService } from "./application/genealogy-service";
+import { WorkCenterService } from "./application/work-center-service";
+import { RoutingService } from "./application/routing-service";
+import { OperationExecutionService } from "./application/operation-execution-service";
+import { ReworkService } from "./application/rework-service";
+import { DowntimeService } from "./application/downtime-service";
+import { StandardCostService } from "./application/standard-cost-service";
 import { BomsController } from "./presentation/boms.controller";
 import { ProductionOrdersController } from "./presentation/production-orders.controller";
 import { ReconciliationController } from "./presentation/reconciliation.controller";
 import { InspectionsController } from "./presentation/inspections.controller";
 import { GenealogyController } from "./presentation/genealogy.controller";
+import { WorkCentersController } from "./presentation/work-centers.controller";
+import { RoutingsController } from "./presentation/routings.controller";
+import { ShopfloorController } from "./presentation/shopfloor.controller";
+import { ReworkOrdersController } from "./presentation/rework-orders.controller";
+import { StandardCostsController } from "./presentation/standard-costs.controller";
 
 /**
  * Manufacturing module (PHASE-018 T38a — the BOM slice; T38b appends the
@@ -47,6 +58,16 @@ import { GenealogyController } from "./presentation/genealogy.controller";
  * inspections routes under manufacturing.qc.manage / manufacturing.qc, and
  * the read-only GenealogyService with the recall-walk routes under
  * manufacturing.genealogy.read / manufacturing.batch_genealogy.
+ *
+ * PHASE-042 (CR-12, migrations 0065/0066) appends the manufacturing-
+ * execution slice: WorkCenterService + RoutingService (master data — the
+ * capacity/rates + the versioned routings, no journals),
+ * OperationExecutionService (the INV-028 shop-floor machine + the G-40
+ * operation postings; ProductionOrderService depends on it for the
+ * release-time freeze), ReworkService (G-41), DowntimeService (the
+ * policy-gated G-42), and StandardCostService (L2-12 — roll-ups, activation
+ * revaluations). PPV at receipt lives in the purchasing module's GRN path
+ * (shape A — the documented integration point).
  */
 @Module({
   imports: [AccountingModule, AuditModule, InventoryModule, ItemsModule, ConfigurationModule, NotificationsModule],
@@ -56,6 +77,11 @@ import { GenealogyController } from "./presentation/genealogy.controller";
     ReconciliationController,
     InspectionsController,
     GenealogyController,
+    WorkCentersController,
+    RoutingsController,
+    ShopfloorController,
+    ReworkOrdersController,
+    StandardCostsController,
   ],
   providers: [
     BomService,
@@ -63,6 +89,12 @@ import { GenealogyController } from "./presentation/genealogy.controller";
     ManufacturingReconciliationService,
     InspectionService,
     GenealogyService,
+    WorkCenterService,
+    RoutingService,
+    OperationExecutionService,
+    ReworkService,
+    DowntimeService,
+    StandardCostService,
   ],
   exports: [
     BomService,
@@ -70,6 +102,12 @@ import { GenealogyController } from "./presentation/genealogy.controller";
     ManufacturingReconciliationService,
     InspectionService,
     GenealogyService,
+    WorkCenterService,
+    RoutingService,
+    OperationExecutionService,
+    ReworkService,
+    DowntimeService,
+    StandardCostService,
   ],
 })
 export class ManufacturingModule {}

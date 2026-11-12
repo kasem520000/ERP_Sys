@@ -155,6 +155,14 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "manufacturing/orders": { group: "manufacturingNavSection", label: "mfgOrdersTitle" },
   "manufacturing/qc": { group: "manufacturingNavSection", label: "mfgQcTitle" },
   "manufacturing/genealogy": { group: "manufacturingNavSection", label: "mfgGenealogyTitle" },
+  // PHASE-042 (T-10…T-13): the manufacturing-execution surfaces — the new
+  // contracts NAV_ITEMS rows (manufacturing.* group) drive the sidebar;
+  // these fallbacks cover nav-fetch failure (crumbs only, the rule above).
+  "manufacturing/work-centers": { group: "manufacturingNavSection", label: "mfgWcTitle" },
+  "manufacturing/routings": { group: "manufacturingNavSection", label: "mfgRoutingsTitle" },
+  "manufacturing/shopfloor": { group: "manufacturingNavSection", label: "mfgShopfloorTitle" },
+  "manufacturing/downtime": { group: "manufacturingNavSection", label: "mfgDowntimeTitle" },
+  "manufacturing/standard-costs": { group: "manufacturingNavSection", label: "mfgStdCostsTitle" },
   // -- PHASE-021 (T2-b): the Offline Console entry — always visible
   // (DR-P21-06; browser opens the honest ONLINE-ONLY console).
   offline: { group: "offlineNavSection", label: "offlineConsoleTitle" },

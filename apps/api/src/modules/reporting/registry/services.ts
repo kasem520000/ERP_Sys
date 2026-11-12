@@ -21,6 +21,7 @@ import { TreasuryQueriesService } from "../../treasury/application/treasury-quer
 import { SourcingQueriesService } from "./sourcing/sourcing-queries";
 import { ReturnsDunningQueriesService } from "./sales/returns-dunning-queries";
 import { CommunicationQueriesService } from "./communication/outbound-delivery-queries";
+import { ManufacturingExecutionQueriesService } from "./manufacturing/queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -73,6 +74,10 @@ export interface ReportingServices {
   returnsDunning: ReturnsDunningQueriesService;
   /** PHASE-041 · the communication query surface (the outbound delivery log over the send ledger). */
   communication: CommunicationQueriesService;
+  /** PHASE-042 · the manufacturing-execution query surface (work-center
+   * utilization/OEE, the downtime analysis, the rework cost register, the
+   * cost-variance rollup). */
+  manufacturingExecution: ManufacturingExecutionQueriesService;
   treasury: TreasuryQueriesService;
   partners: PartnerQueriesService;
   tax: TaxQueriesService;
@@ -107,6 +112,7 @@ export function reportingServices(): ReportingServices {
       sourcing: new SourcingQueriesService(),
       returnsDunning: new ReturnsDunningQueriesService(),
       communication: new CommunicationQueriesService(),
+      manufacturingExecution: new ManufacturingExecutionQueriesService(),
       treasury: new TreasuryQueriesService(),
       partners: new PartnerQueriesService(),
       tax: new TaxQueriesService(),

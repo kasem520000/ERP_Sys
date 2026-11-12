@@ -1,6 +1,6 @@
 # Chart of Accounts
 
-> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-10-28
+> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-10-28 · 2026-11-12 (PHASE-042 — purposes REWORK_EXPENSE/DOWNTIME_EXPENSE/PURCHASE_PRICE_VARIANCE/STANDARD_REVALUATION)
 
 ## 1. Structure
 
@@ -65,6 +65,10 @@ the tenant's accounts via `account_purposes` (1 active account per purpose per t
 | `EOS_PROVISION` | End-of-service provision / مخصص نهاية الخدمة | Payroll module (PHASE-029) |
 | `EOS_PROVISION_EXPENSE` | End-of-service provision expense / مصروف مخصص نهاية الخدمة | Payroll module (PHASE-029) |
 | `CONSOLIDATION_ADJUSTMENT` | Consolidation adjustments / تسويات التوحيد | Consolidation module (PHASE-034) |
+| `REWORK_EXPENSE` | Rework expense / مصروف إعادة التشغيل | Manufacturing (PHASE-042; template 5125, migration 0065 — required when a rework order completes; fails closed `PURPOSE_NOT_MAPPED` — rework cost is a period expense, never capitalized into the parent FG layer, BR-069) |
+| `DOWNTIME_EXPENSE` | Downtime (idle capacity) expense / مصروف التوقف (الطاقة المعطّلة) | Manufacturing (PHASE-042; template 5430, migration 0065 — required only when `manufacturing.downtime_posting = 'post'` and a record closes; fails closed `PURPOSE_NOT_MAPPED` — the G-42 policy-gated posting, BR-070) |
+| `PURCHASE_PRICE_VARIANCE` | Purchase price variance / انحراف سعر الشراء | Manufacturing standard costing (PHASE-042 L2-12/CR-45; template 5990, migration 0066 — the GRN variance leg when the received item carries an ACTIVE standard; standard-less receipts keep the legacy two-line shape) |
+| `STANDARD_REVALUATION` | Standard cost revaluation / إعادة تقييم التكلفة المعيارية | Manufacturing standard costing (PHASE-042 L2-12/CR-45; template 5995, migration 0066 — the contra on standard activate with `revaluateStock` over on-hand qty) |
 
 **Rules:** required purposes must be mapped before any module that uses them can post
 (the engine fails closed with `PURPOSE_NOT_MAPPED`, never posts to a fallback). Purposes

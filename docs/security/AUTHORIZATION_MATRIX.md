@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272 · PHASE-042 — §3.20 manufacturing execution; permission catalog 272 → 279)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -237,6 +237,8 @@ sit on the pre-018 rows above (they predate the phase), while
 checker reads the union (0004 + 0024 + 0025 + 0026). The RISKY pair stays
 `.approve`/`.post` (release/start/cancel vs the posting surface); releasing a
 quarantined FG batch has no journal, and the qc_scrap stock issue rides the post keys.
+PHASE-042 extends the family again: the seven manufacturing-execution keys live in §3.20
+(migrations 0065/0066 — the drift union grows to 279).
 
 CRM note (PHASE-019): the `crm.*` family splits the same way — the five base keys
 (`crm.leads.manage`, `crm.tasks.manage`, `crm.activities.manage`,
@@ -473,6 +475,54 @@ DEFAULT rows only.
 | `communication.preferences.manage` | Manage the TENANT DEFAULT notification-preference rows (module × channel matrix); users self-manage their own rows / إدارة صفوف الافتراضات لتفضيلات الإشعار للمستأجر (مصفوفة الوحدة × القناة)؛ ويدير كل مستخدم صفوفه بنفسه | owner | tenant | no (preferences suppress only — they never fabricate events) |
 | `communication.inbox.read` | Read the unified inbox (per-partner interaction timeline with filters) and log calls (outcome/duration linked to partner + user) / قراءة الصندوق الموحّد (خط تفاعلات كل شريك مع المرشحات) وتسجيل المكالمات (النتيجة والمدة مربوطة بالشريك والمستخدم) | owner, accountant, sales | tenant | no (audited; call entries are editable by their logger — log semantics, no delete) |
 | `communication.calendar.connect` | Connect Google/Outlook calendars via OAuth (minimal scopes), write task/appointment events, opt into two-way contacts sync with match review (never auto-merge) / ربط تقويمات Google/Outlook عبر OAuth بأدنى الصلاحيات وكتابة أحداث المهام والمواعيد وتفعيل مزامنة جهات الاتصال ثنائية الاتجاه مع مراجعة المطابقة (لا دمج تلقائي أبداً) | owner | tenant | **yes** (OAuth tokens sealed in the secret store — never logged, masked in settings; rotation documented; contacts sync is per-tenant opt-in with review-only merging) |
+
+### 3.20 `manufacturing` manufacturing execution (PHASE-042)
+
+The PHASE-042 manufacturing execution cluster (CR-12, scope extended by v3.1/CR-45
+L2-12 · H-04 · M-02…M-19): work centers (per-shift capacity + fixed/var hourly cost
+rates + the cost-center analytics link), versioned routings and their sequenced
+operations, the release-frozen `production_order_operations` rows with the INV-028
+sequence machine, the shop-floor scan terminal (`OP:<order>:<seq>:<action>` — the
+touch-first execution surface), rework orders to their G-41 completion (BR-069), the
+reason-coded downtime log with the policy-gated G-42 posting (BR-070), the OEE
+security_invoker views, and the item standard costs (L2-12: roll-up over BOM +
+routing, freeze/activate, PPV at receipt, stock revaluation). **All seven keys seed in
+migrations `0065` §13 + `0066` §7 — the permission catalog extends 272 → 279 (seed =
+mirror, zero drift).** Numbering note (the 0064 D-1 precedent, recorded in 0065 §13):
+the phase doc planned a `manufacturing.costing` key — already live as
+`manufacturing.costing.read` (0026, §3.8) — so the delivered set is the seven below;
+the phase doc's planned migration numbers (≈0060…0066) likewise landed as 0065/0066
+(039/040/041 consumed 0055…0064). The production order's own lifecycle keys stay in
+§3.8 (`.view`/`.create`/`.approve`/`.post`); the operations read endpoint rides
+`manufacturing.production_orders.view`.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `manufacturing.work_centers.manage` | Manage work centers (capacity, rates, status, cost-center link) / إدارة مراكز العمل (السعة والمعدلات والوضع وربط مركز التكلفة) | owner, accountant | tenant | no (audited; master data — rate changes never move a live order's frozen standard, BR-068) |
+| `manufacturing.routings.manage` | Manage versioned routings and their operations / إدارة مسارات التشغيل المرقّمة وعملياتها | owner, accountant | tenant | no (audited; one ACTIVE per item — the BOM discipline) |
+| `manufacturing.shopfloor.execute` | Execute shop-floor operations (scan start/pause/complete, log scrap and downtime) / تنفيذ عمليات أرضية المصنع (بدء/إيقاف/إكمال بالمسح وتسجيل الهالك والتوقف) | owner, warehouse | tenant | no (audited; the G-40 completion posts engine-gated exactly-once under the `op_<seq>` key — INV-013/INV-028; the skip hop carries its own SoD approver, never this key alone) |
+| `manufacturing.rework_orders.manage` | Manage rework orders (create from defect, release, complete) / إدارة أوامر إعادة التشغيل | owner, accountant | tenant | no (audited; the G-41 completion posts engine-gated exactly-once — rework expense, never the parent FG layer, BR-069) |
+| `manufacturing.downtime.log` | Log and close downtime records with reason codes / تسجيل وإغلاق حالات التوقف بأكواد الأسباب | owner, warehouse | tenant | no (audited; record-only by default — the G-42 cost leg is the `manufacturing.downtime_posting='post'` opt-in, BR-070) |
+| `manufacturing.oee.read` | Read OEE views and work-center utilization / قراءة مؤشرات OEE واستغلال مراكز العمل | owner, accountant, warehouse, viewer | tenant | no (read-only over the derived security_invoker views — RLS applies through them) |
+| `manufacturing.standard_costs.manage` | Manage item standard costs (roll-up, freeze/activate, revaluation) / إدارة التكاليف المعيارية للأصناف (التجميع والتجميد والتفعيل وإعادة التقييم) | owner, accountant | tenant | no (audited; the stock revaluation on activate posts one batch journal engine-gated exactly-once — the STANDARD_REVALUATION contra, never a silent layer rewrite) |
+
+**Guarded routes** (ROUTE_PERMISSIONS, PHASE-042): `/api/v1/manufacturing/work-centers`
+(GET/POST, `/:id` PATCH, `/:id/status` — `manufacturing.work_centers.manage`);
+`/api/v1/manufacturing/routings` (GET/POST, `/:id` PATCH + `/activate|copy` —
+`manufacturing.routings.manage`); the order operations endpoint
+`/api/v1/manufacturing/production-orders/:id/operations` (GET —
+`manufacturing.production_orders.view`) plus
+`/:seq/start|pause|resume|complete|skip` and `/api/v1/manufacturing/shopfloor/scan`
+(`manufacturing.shopfloor.execute`); `/api/v1/manufacturing/downtime` (GET/POST,
+`/:id/close` — `manufacturing.downtime.log`); `/api/v1/manufacturing/oee` (GET —
+`manufacturing.oee.read`); `/api/v1/manufacturing/rework-orders` (GET/POST,
+`/:id/release|start|complete|cancel` — `manufacturing.rework_orders.manage`);
+`/api/v1/manufacturing/standard-costs` (GET/POST, `/roll-up`, `/:id/activate` —
+`manufacturing.standard_costs.manage`). Role grants per 0065 §13 + 0066 §7: owner
+holds all seven; accountant gains `work_centers.manage`, `routings.manage`,
+`rework_orders.manage`, `oee.read` + `standard_costs.manage`; warehouse gains
+`shopfloor.execute` + `downtime.log` + `oee.read` (the operational tier — the 0026
+`qc.manage` precedent); viewer gains `oee.read` only.
 
 ## 4. Segregation of duties & approval limits
 

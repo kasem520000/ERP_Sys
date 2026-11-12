@@ -1490,3 +1490,22 @@ export async function openingApItems(): Promise<
     currencyCode: string;
   }[];
 }
+
+// -- PHASE-042 standard costing (L2-12) ------------------------------------------------------
+
+/**
+ * The item's ACTIVE standard total (item_standard_costs is manufacturing-
+ * owned; read-only here — the §6 cross-module read precedent). The
+ * goods-receipt posting path reads this for the PPV shape-A decision:
+ * receipts of standard items post inventory at the ACTIVE standard total,
+ * the variance leg carrying the difference against the actual unit cost.
+ */
+export async function findActiveItemStandardCost(itemId: string): Promise<{ totalCost: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT total_cost::text AS "totalCost" FROM item_standard_costs
+    WHERE item_id = ${itemId} AND status = 'ACTIVE'
+    ORDER BY version_no DESC
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as { totalCost: string }[])[0];
+}

@@ -4944,6 +4944,18 @@ export const productionOrders = pgTable(
     overheadRate: numeric("overhead_rate", { precision: 19, scale: 6 }).notNull().default("0"),
     costCenterId: uuid("cost_center_id"),
     yieldSnapshot: numeric("yield_snapshot", { precision: 7, scale: 4 }),
+    // PHASE-042 (0065): the routing binding + the live operation pointer —
+    // routing_id NULL = the legacy flat-rate dual mode; current_operation is
+    // the routing sequence of the active operation (NULL = not started).
+    routingId: uuid("routing_id"),
+    currentOperation: integer("current_operation"),
+    // PHASE-042 (0066, L2-12): the frozen per-unit standard at release
+    // (NULL = no ACTIVE standard — dual mode) + the order-level yield
+    // variance computed at completion.
+    stdUnitCost: numeric("std_unit_cost", { precision: 19, scale: 6 }),
+    yieldVariance: numeric("yield_variance", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
     fgBatchId: uuid("fg_batch_id"),
     fgJournalId: uuid("fg_journal_id"),
     fgValue: numeric("fg_value", { precision: 19, scale: 4 }).notNull().default("0"),
@@ -5087,6 +5099,342 @@ export const inspections = pgTable(
     index("ix_inspections_tenant_grn")
       .on(table.tenantId, table.grnId)
       .where(sql`${table.grnId} IS NOT NULL`),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-042 manufacturing extension cluster (migrations 0065/0066; CR-12,
+// extended by v3.1/CR-45 L2-12): work centers, versioned routings +
+// operations, the per-order operation rows (state machine + variance
+// columns), rework orders, downtime records, the per-item frozen standard
+// costs, and the additive production_orders columns (routing binding +
+// current operation + std_unit_cost/yield_variance). Master-data tables
+// (SELECT/INSERT/UPDATE; version lifecycles — no tombstone deletes). The
+// two OEE views are SQL-only (security_invoker, no Drizzle mirror — derived
+// facts, not source-of-truth rows). Cost math per ADR-0009: times/rates/
+// unit costs 19,6; money quanta 19,4; capacity 7,2.
+
+/** Work centers (M-03/H-04): per-shift capacity in HOURS + fixed/var hourly
+ * cost rates + status + the cost-center analytics link. */
+export const workCenters = pgTable(
+  "work_centers",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    description: text("description"),
+    capacityPerShift: numeric("capacity_per_shift", { precision: 7, scale: 2 })
+      .notNull()
+      .default("8"),
+    shiftsPerDay: integer("shifts_per_day").notNull().default(1),
+    fixedCostRate: numeric("fixed_cost_rate", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    varCostRate: numeric("var_cost_rate", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    status: text("status").notNull().default("ACTIVE"),
+    costCenterId: uuid("cost_center_id"),
+  },
+  (table) => [
+    uniqueIndex("uq_work_centers_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_work_centers_tenant_code").on(table.tenantId, table.code),
+    index("ix_work_centers_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** Versioned routings per item (M-02): DRAFT → ACTIVE → ARCHIVED with
+ * exactly one ACTIVE version per item (the BOM discipline). */
+export const routings = pgTable(
+  "routings",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    itemId: uuid("item_id").notNull(),
+    versionNo: integer("version_no").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    outputUomId: uuid("output_uom_id").notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+    activatedAt: timestamp("activated_at", { withTimezone: true, mode: "string" }),
+    archivedAt: timestamp("archived_at", { withTimezone: true, mode: "string" }),
+  },
+  (table) => [
+    uniqueIndex("uq_routings_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_routings_tenant_item_version").on(
+      table.tenantId,
+      table.itemId,
+      table.versionNo,
+    ),
+    uniqueIndex("uq_routings_active_item")
+      .on(table.tenantId, table.itemId)
+      .where(sql`${table.status} = 'ACTIVE'`),
+    index("ix_routings_tenant_status").on(table.tenantId, table.status),
+    index("ix_routings_tenant_item").on(table.tenantId, table.itemId, table.status),
+  ],
+);
+
+/** Sequenced routing operations (M-02): setup_time hours per batch, run_time
+ * hours per unit; the rate overrides are NULL = inherit the work center. */
+export const routingOperations = pgTable(
+  "routing_operations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    routingId: uuid("routing_id").notNull(),
+    sequence: integer("sequence").notNull(),
+    workCenterId: uuid("work_center_id").notNull(),
+    setupTime: numeric("setup_time", { precision: 19, scale: 6 }).notNull().default("0"),
+    runTime: numeric("run_time", { precision: 19, scale: 6 }).notNull().default("0"),
+    fixedCostRate: numeric("fixed_cost_rate", { precision: 19, scale: 6 }),
+    varCostRate: numeric("var_cost_rate", { precision: 19, scale: 6 }),
+    description: text("description"),
+    descriptionAr: text("description_ar"),
+    inspectionHook: boolean("inspection_hook").notNull().default(false),
+  },
+  (table) => [
+    uniqueIndex("uq_routing_operations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_routing_operations_routing_sequence").on(
+      table.tenantId,
+      table.routingId,
+      table.sequence,
+    ),
+    index("ix_routing_operations_tenant_work_center").on(
+      table.tenantId,
+      table.workCenterId,
+    ),
+  ],
+);
+
+/** Per-order frozen operation rows (M-02/M-17/M-18/M-13/M-19): the
+ * PENDING/SETUP/RUNNING/PAUSED/COMPLETED/SKIPPED machine, the frozen
+ * standard columns (routing + work-center rates at release), the actual
+ * times, and the per-operation variance columns computed at completion. */
+export const productionOrderOperations = pgTable(
+  "production_order_operations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    orderId: uuid("order_id").notNull(),
+    routingId: uuid("routing_id").notNull(),
+    sequence: integer("sequence").notNull(),
+    workCenterId: uuid("work_center_id").notNull(),
+    status: text("status").notNull().default("PENDING"),
+    stdSetupTime: numeric("std_setup_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    stdRunTime: numeric("std_run_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    stdFixedRate: numeric("std_fixed_rate", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    stdVarRate: numeric("std_var_rate", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    actualSetupTime: numeric("actual_setup_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    actualRunTime: numeric("actual_run_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    setupVariance: numeric("setup_variance", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    usageVariance: numeric("usage_variance", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    rateVariance: numeric("rate_variance", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    operatorUserId: uuid("operator_user_id"),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }),
+    finishedAt: timestamp("finished_at", { withTimezone: true, mode: "string" }),
+    scrapQty: numeric("scrap_qty", { precision: 19, scale: 6 }).notNull().default("0"),
+    scrapReasonCode: text("scrap_reason_code"),
+    skipReason: text("skip_reason"),
+    skipApprovedBy: uuid("skip_approved_by"),
+    journalId: uuid("journal_id"),
+  },
+  (table) => [
+    uniqueIndex("uq_production_order_operations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_production_order_operations_order_sequence").on(
+      table.tenantId,
+      table.orderId,
+      table.sequence,
+    ),
+    index("ix_production_order_operations_order").on(
+      table.tenantId,
+      table.orderId,
+      table.status,
+    ),
+    index("ix_production_order_operations_work_center").on(
+      table.tenantId,
+      table.workCenterId,
+      table.startedAt,
+    ),
+    index("ix_production_order_operations_variance").on(
+      table.tenantId,
+      table.sequence,
+      table.setupVariance,
+    ),
+  ],
+);
+
+/** Rework orders (M-14): reference the defective batch/serial + parent
+ * production order, carry their own routing; the completion posts the
+ * conversion roll-up to REWORK_EXPENSE (G-41) — never capitalized into the
+ * parent FG layer (BR-069). */
+export const reworkOrders = pgTable(
+  "rework_orders",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    reworkNo: text("rework_no"),
+    parentOrderId: uuid("parent_order_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    batchId: uuid("batch_id"),
+    defectRef: text("defect_ref").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id").notNull(),
+    routingId: uuid("routing_id"),
+    status: text("status").notNull().default("DRAFT"),
+    stdSetupTime: numeric("std_setup_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    stdRunTime: numeric("std_run_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    stdFixedRate: numeric("std_fixed_rate", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    stdVarRate: numeric("std_var_rate", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    actualSetupTime: numeric("actual_setup_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    actualRunTime: numeric("actual_run_time", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    laborValue: numeric("labor_value", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    overheadValue: numeric("overhead_value", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    reworkValue: numeric("rework_value", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    journalId: uuid("journal_id"),
+    defectReasonCode: text("defect_reason_code"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+    releasedAt: timestamp("released_at", { withTimezone: true, mode: "string" }),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true, mode: "string" }),
+    cancelReason: text("cancel_reason"),
+  },
+  (table) => [
+    uniqueIndex("uq_rework_orders_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_rework_orders_tenant_no")
+      .on(table.tenantId, table.reworkNo)
+      .where(sql`${table.reworkNo} IS NOT NULL`),
+    index("ix_rework_orders_tenant_status").on(table.tenantId, table.status),
+    index("ix_rework_orders_tenant_parent").on(table.tenantId, table.parentOrderId),
+  ],
+);
+
+/** Downtime records (M-15): the reason-coded availability input of OEE and
+ * the non-value-added cost source (posting policy-gated — BR-070, default
+ * OFF = record-only). */
+export const downtimeRecords = pgTable(
+  "downtime_records",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    workCenterId: uuid("work_center_id").notNull(),
+    orderId: uuid("order_id"),
+    operationSequence: integer("operation_sequence"),
+    reasonCode: text("reason_code").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }).notNull(),
+    endedAt: timestamp("ended_at", { withTimezone: true, mode: "string" }),
+    durationMinutes: integer("duration_minutes").notNull(),
+    costAmount: numeric("cost_amount", { precision: 19, scale: 4 }),
+    journalId: uuid("journal_id"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_downtime_records_id_tenant").on(table.id, table.tenantId),
+    index("ix_downtime_records_work_center").on(
+      table.tenantId,
+      table.workCenterId,
+      table.startedAt,
+    ),
+    index("ix_downtime_records_order")
+      .on(table.tenantId, table.orderId)
+      .where(sql`${table.orderId} IS NOT NULL`),
+  ],
+);
+
+/** The frozen per-item standard cost (L2-12/CR-45): versioned by cost type
+ * totals (material/labor/overhead + jsonb sub-splits), exactly one ACTIVE
+ * per item (the BOM discipline); source MANUAL or ROLLED_UP (the low-level
+ * roll-up over BOM + routing writes a new version). */
+export const itemStandardCosts = pgTable(
+  "item_standard_costs",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    itemId: uuid("item_id").notNull(),
+    versionNo: integer("version_no").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    materialCost: numeric("material_cost", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    laborCost: numeric("labor_cost", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    overheadCost: numeric("overhead_cost", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    totalCost: numeric("total_cost", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    overheadSubSplits: jsonb("overhead_sub_splits").notNull().default([]),
+    source: text("source").notNull().default("MANUAL"),
+    effectiveFrom: date("effective_from"),
+    rolledUpAt: timestamp("rolled_up_at", { withTimezone: true, mode: "string" }),
+    activatedAt: timestamp("activated_at", { withTimezone: true, mode: "string" }),
+    archivedAt: timestamp("archived_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_item_standard_costs_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_item_standard_costs_tenant_item_version").on(
+      table.tenantId,
+      table.itemId,
+      table.versionNo,
+    ),
+    uniqueIndex("uq_item_standard_costs_active_item")
+      .on(table.tenantId, table.itemId)
+      .where(sql`${table.status} = 'ACTIVE'`),
+    index("ix_item_standard_costs_tenant_status").on(table.tenantId, table.status),
+    index("ix_item_standard_costs_tenant_item").on(
+      table.tenantId,
+      table.itemId,
+      table.status,
+    ),
   ],
 );
 

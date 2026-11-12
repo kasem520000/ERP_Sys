@@ -162,6 +162,10 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   // PHASE-041 (0064 seed): the communications report key (the delivery
   // log's read permission).
   "communication.outbox.read",
+  // PHASE-042 (0065 seed): the manufacturing-execution OEE report key (the
+  // utilization + downtime-analysis contracts' read permission — the same
+  // key the /manufacturing/oee route rides).
+  "manufacturing.oee.read",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

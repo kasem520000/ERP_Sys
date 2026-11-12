@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-12 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-12 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -281,6 +281,37 @@ contract-invoice journals) and `schedule-reconciliation` (per contract, Σ contr
 Σ invoiced + Σ draft + Σ backlog); `services.time_billing_summary` is operational — no
 standalone GL tie-out (industry-reports rule 2).
 
+**Shipped (PHASE-042, category `industry`)** — the four manufacturing-execution
+contracts over the PHASE-013 engine (registry 91 → 95; permissions reuse existing seed
+keys — the two OEE-family rows ride the 0065 `manufacturing.oee.read`, the two costing
+rows ride the 0026 `manufacturing.costing.read` (§3.8 / §3.20) — no new report
+permissions; the food_manufacturing template's manufacturing defaults already pin the
+module's reports):
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `manufacturing.work-center-utilization` | Work-Center Utilization & OEE / استغلال مراكز العمل ومؤشر OEE | manufacturing · `manufacturingExecution.workCenterUtilization` · v_work_center_oee_daily, work_centers (the derived OEE view — availability × performance × quality rendered at 4dp, values above 100 legitimate, never clamped) | dateFrom/To, workCenterId | `manufacturing.oee.read` | PDF · XLSX · CSV | PHASE-042 |
+| `manufacturing.downtime-analysis` | Downtime Analysis by Reason / تحليل التوقف حسب السبب | manufacturing · `manufacturingExecution.downtimeAnalysis` · downtime_records, work_centers, production_orders (grouped work center × reason code) | dateFrom/To, workCenterId | `manufacturing.oee.read` | PDF · XLSX · CSV | PHASE-042 |
+| `manufacturing.rework-cost` | Rework Cost Register / سجل تكلفة إعادة التشغيل | manufacturing · `manufacturingExecution.reworkCost` · rework_orders, production_orders (the parent order number), items | dateFrom/To | `manufacturing.costing.read` | PDF · XLSX · CSV | PHASE-042 |
+| `manufacturing.cost-variance` | Manufacturing Cost Variances / انحرافات التكلفة التصنيعية | manufacturing · `manufacturingExecution.costVariance` · production_orders, production_order_operations (the frozen per-operation variance folds), items | dateFrom/To, itemId | `manufacturing.costing.read` | PDF · XLSX · CSV | PHASE-042 |
+
+Notes: `manufacturing.work-center-utilization` carries the `oee-availability-window`
+assertion (every availability leg within 0..100 — a leg outside the window is a
+master-data anomaly worth blocking) and documents the leg formulas (the view holds the
+raw folds, the contract the ratio semantics; the operation-scrap quality leg lands with
+PHASE-050's inspection hook — skipped operations count as resolved, not quality loss);
+`manufacturing.downtime-analysis` carries `downtime-window-shape` and renders the
+BR-070 policy honestly (records closed under the default `off` contribute minutes but
+no posted cost — the cost column shows the G-42 policy's footprint);
+`manufacturing.rework-cost` carries `rework-value-shape` (every COMPLETED row's
+reworkValue = laborValue + overheadValue exactly at 4dp — the G-41 typed-sum rule) and
+is the BR-069 evidence surface (rework conversion cost stays in its expense, never the
+parent FG layer); `manufacturing.cost-variance` carries `variance-decimal-shape` and
+documents the v1 rate-variance zero (the frozen std rates ARE the applied rates) + the
+dual mode (routing-less orders show zeros). Numbering note (the 0064 D-1 precedent):
+the PHASE-042 document planned these four contracts over migrations ≈0060…0066 — they
+land as migrations 0065/0066 with the contracts at registry 91 → 95.
+
 ## 9. Financial depth (v2.0 — fixed assets, notes, installments, budgeting, payroll)
 
 Added by Blueprint v2.0 ([../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) §J —
@@ -401,6 +432,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-038 | purchasing.rfq-award-matrix + purchasing.supplier-scorecard added; registry 86 → 88 |
 | PHASE-039 | sales.rma_register + sales.dunning_status added (the unified RMA register over both families — disposition mix, completion documents, cycle days — and the collections worklist: ladder step, days overdue, policy, fees charged/waived, referral state); `ar.aging` gains the additive `dunningStep` column (no new key); registry 88 → 90 |
 | PHASE-041 | communication.outbound_delivery_log added (the outbound send ledger as a report — status, provider, provider ref, cost amount/currency, attempts/max, the source that produced the send; the outbox-cost-shape + outbox-status-vocabulary block-on-fail assertions); registry 90 → 91 |
+| PHASE-042 | the four manufacturing-execution contracts added (§8: work-center-utilization over the OEE daily view, downtime-analysis by work center × reason, the rework-cost register, and the cost-variance rollup over the frozen operation variances + yield variance); registry 91 → 95 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 

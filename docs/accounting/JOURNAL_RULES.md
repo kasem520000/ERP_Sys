@@ -1,6 +1,6 @@
 # Journal Rules
 
-> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-11 (PHASE-039 — goldens G-35…G-39, migrations 0055–0059)
+> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-12 (PHASE-039 — goldens G-35…G-39, migrations 0055–0059 · PHASE-042 — goldens G-40…G-42, migrations 0065–0066)
 
 Rules governing manual journals, recurring entries, approvals, FX entries, and rounding
 entries. Posted-entry mechanics (immutability, reversal) are defined in
@@ -113,6 +113,9 @@ mandatory failure pack ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_T
 | G-37 | RMA refund — the cash-out leg — `sales` | DR `AR_CONTROL` (partner — reversing the CN's credit) · CR the refund cash account (source `return_authorization:{id}:refund`, at the CN's gross; the cash account is required at completion — fail-closed) + the treasury money movement OUT (`cash_movements.source_type = 'return_authorization'`, base at rate 1 — the G-33 disbursement pattern); the CN still re-enters stock exactly like G-35 (a refund puts the goods back) | PHASE-039 |
 | G-38 | Supplier-return credit — the AP debit note — `purchasing` | SHIP (source `supplier_return_authorization:{id}:ship`): ONE inventory journal DR the tenant-mapped purchase-returns account (`purchasing.supplier_return_account`; fail-closed when unmapped) · CR `INVENTORY` at issue cost — the goods leave through the movement engine (no-negative-stock applies), the stock-move issues riding the generic `manual_issue` source with reason `SUPPLIER_RETURN` and source_id = the SRMA (the documented CHECK-domain deviation — 0059 did not widen the stock_moves source CHECK). CREDIT (source `supplier_return_authorization:{id}:credit`): DR `AP_CONTROL` (supplier, net) · CR the same mapped returns account (net — no VAT legs on a return credit); at cost == price the two journals net the returns account to zero, any cost/value difference stays in it (its documented purpose). The DN document is created + stamped POSTED against this journal in the same transaction — 0059's lifecycle CHECK requires `debit_note_id` at CREDITED (`debit_notes.ref_invoice_id` anchors it to the PO's earliest POSTED supplier invoice) | PHASE-039 |
 | G-39 | Collection-agency commission at settlement — `sales` | DR the tenant-mapped collection-commission expense (`sales.collection_commission_account`; fail-closed `COMMISSION_ACCOUNT_UNMAPPED` — zero partial writes) · CR `AP_CONTROL` on the AGENCY's partner (source `collection_referral:{id}:commission`, posted exactly once at settlement); commission = PCT_OF_COLLECTED ? settled × pct/100 (4dp) : the flat fee — over the referral's snapshotted terms, never the register's live ones | PHASE-039 |
+| G-40 | Operation completion — the conversion roll-up into WIP — `manufacturing` | Source `production_order`, operation `op_<seq>` (one journal per routing sequence, migration 0065): DR `WIP` (the conversion total — the typed sum of the two credit legs) · CR `PRODUCTION_LABOR` ((actual setup + run hours) × the FROZEN var rate) · CR `PRODUCTION_OVERHEAD` ((actual setup + run hours) × the FROZEN fixed rate) — the rates snapshot at release from the routing's per-operation overrides ?? the work center (later routing/work-center edits never move a live order, BR-068); a zero leg is skipped, an entirely uncosted operation (both legs 0) records its times WITHOUT a journal, and the credit sum MUST equal the debit at 4dp (typed `OPERATION_COST_ROUNDING` — rounding residuals explicit, never absorbed); the completion also stamps the per-operation setup/usage/rate variance columns (BR-071) | PHASE-042 |
+| G-41 | Rework completion — the rework conversion roll-up — `manufacturing` | Source `rework_order`, operation `complete`: DR `REWORK_EXPENSE` (the rework roll-up = labor + overhead at the rework's frozen rates × actual setup + run hours) · CR `PRODUCTION_LABOR` · CR `PRODUCTION_OVERHEAD` — NEVER the parent FG layer (BR-069: the parent order's fg/wip/labor/overhead columns stay byte-identical before/after — pinned by the rework-costing db spec); a zero-conversion completion is the typed `REWORK_COST_ZERO` rejection (a rework that cost nothing did not happen); the COMPLETED row carries `rework_value > 0` + its `journal_id` (the `ck_rework_orders_completion` floor) | PHASE-042 |
+| G-42 | Downtime close — the policy-gated non-value posting — `manufacturing` | Source `downtime_record`, operation `close` — GATED by the `manufacturing.downtime_posting` policy (enum `off`/`post`, default **off** — BR-070): with `post`, DR `DOWNTIME_EXPENSE` · CR `PRODUCTION_OVERHEAD` (idle capacity absorbed against applied overhead) at the work center's FULL hourly rate (fixed + var) × idle hours (duration_minutes/60, 4dp); under the default `off` the close is record-only — `cost_amount`/`journal_id` stay NULL (the `ck_downtime_records_window` floor), and an uncosted center (rate sum 0) never posts (the honest zero-value floor) | PHASE-042 |
 
 Notes:
 
@@ -211,4 +214,44 @@ Notes:
     ship leg's inventory issues ride the generic `manual_issue` source with reason
     `SUPPLIER_RETURN` — documented in [../database/DATA_DICTIONARY.md](../database/DATA_DICTIONARY.md)
     §18 (the deviation 0059 chose over widening the source CHECK).
+13. **G-40…G-42 delivered mechanics (PHASE-042, migrations 0065–0066).** Numbering: the
+    PHASE-042 document planned G-38/G-39/G-40 and migrations ≈0060…0066 — those numbers
+    predate the 039/040/041 waves (G-35…G-39 shipped with PHASE-039; migrations
+    0060…0064 with 040/041), so the honest slots are G-40…G-42 over migrations 0065/0066
+    (the 0064 D-1 precedent — recorded per golden here and in
+    [ACCOUNTING_INVARIANTS.md](ACCOUNTING_INVARIANTS.md) INV-028 and
+    [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) BR-068…071). Purpose
+    mapping stays fail-closed: the four new purposes land as CoA template markers
+    (0065: `5125 REWORK_EXPENSE`, `5430 DOWNTIME_EXPENSE`; 0066: `5990
+    PURCHASE_PRICE_VARIANCE`, `5995 STANDARD_REVALUATION` — the 0026 additive pattern);
+    existing tenants map once and stay `PURPOSE_NOT_MAPPED`-closed until then (the
+    CARD_RECEIVABLE precedent, DR-016-02) — an unmapped rework/downtime close rejects
+    typed BEFORE any ledger work, zero partial writes. Worked examples as pinned by the
+    DB suites (`__db__/manufacturing/routing-execution.db.spec.ts`,
+    `rework-costing.db.spec.ts`, `downtime-oee.db.spec.ts`): **G-40** 3h conversion ×
+    (var 25 / fixed 15) → DR `WIP` 120.0000 · CR labor 75.0000 · CR overhead 45.0000,
+    with setup_variance (1 − 0.5) × 40 = 20.0000 and usage_variance (2 − 0.1 × 100) × 25
+    = −200.0000 (the qty basis is the running actual qty mid-order, planned when none
+    produced yet; rate_variance 0.0000 in v1 — BR-071); **G-41** 3h × (var 30 / fixed
+    10) → DR `REWORK_EXPENSE` 120.0000 · CR labor 90.0000 · CR overhead 30.0000;
+    **G-42** 90 min = 1.5h × (fixed 30 + var 30) = 90.0000 → DR `DOWNTIME_EXPENSE` · CR
+    `PRODUCTION_OVERHEAD`. The v3.1/CR-45 standard-costing legs (L2-12) ride TWO
+    existing surfaces rather than new golden rows: (a) **PPV at receipt** — when the
+    received item carries an ACTIVE standard (`item_standard_costs`), the G-07 GRN
+    journal's inventory debit + stock plan ride the STANDARD total (WAC layers absorb
+    at standard) and the SAME journal carries the `PURCHASE_PRICE_VARIANCE` leg for
+    (actual − std) × qty (DR when actual > std, CR when below — one net purpose leg per
+    receipt, the GRNI precedent), while the GRNI credit always rides the ACTUAL total so
+    the journal balances by construction (std debits + PPV = actual); standard-less
+    items keep the legacy two-line shape byte-identical (the dual mode — pinned by
+    `__db__/manufacturing/standard-costing.db.spec.ts`: receive 100 @ 12 over std 10 →
+    inventory 1,000.0000 · PPV 200.0000 · GRNI 1,200.0000, the layers at 10.000000).
+    (b) **Stock revaluation on standard activate** — `activate(id, {revaluateStock})`
+    posts source `item_standard_cost`, operation `revaluate`: ONE batch journal over
+    every warehouse holding the item with qty > 0 — new > old: DR inventory ×
+    (new − old) × qty · CR `STANDARD_REVALUATION`; new < old: the mirror (DR
+    `STANDARD_REVALUATION` · CR inventory); a zero delta (new == the previous ACTIVE
+    standard) is the typed `STANDARD_REVALUATION_ZERO` rejection and a no-stock
+    activation is the documented no-op (no journal). Worked: (12 − 10) × 100 = 200.0000
+    up → DR inventory · CR `STANDARD_REVALUATION` (the same spec).
 

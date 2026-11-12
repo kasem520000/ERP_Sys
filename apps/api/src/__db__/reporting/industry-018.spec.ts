@@ -24,6 +24,7 @@ import { TrackingService } from "../../modules/inventory/application/tracking-se
 import { SalesInvoiceService } from "../../modules/sales/application/invoices";
 import { BomService } from "../../modules/manufacturing/application/bom-service";
 import { ProductionOrderService } from "../../modules/manufacturing/application/production-order-service";
+import { OperationExecutionService } from "../../modules/manufacturing/application/operation-execution-service";
 import { InspectionService } from "../../modules/manufacturing/application/inspection-service";
 import { ConfigRepository } from "../../modules/configuration/infrastructure/config-repository";
 import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
@@ -86,6 +87,9 @@ const registrations = new RegistrationService(audit);
 const stock = new StockService(audit, posting);
 const tracking = new TrackingService(audit, stock);
 const boms = new BomService(audit);
+// PHASE-042: the release-time operation freeze rides the execution service
+// (the 8th constructor param — direct construction keeps this spec live).
+const shopFloor = new OperationExecutionService(audit, posting);
 const orders = new ProductionOrderService(
   audit,
   numbering,
@@ -94,6 +98,7 @@ const orders = new ProductionOrderService(
   tracking,
   new InboxService(),
   new ResolveEffectiveConfigService(new ConfigRepository()),
+  shopFloor,
 );
 const inspections = new InspectionService(audit, posting, tracking);
 const salesInvoices = new SalesInvoiceService(audit, posting, numbering, resolver);
@@ -1098,7 +1103,7 @@ describe("registry integration (the shared contract)", () => {
       expect(contract!.executionClass).toBe("inline");
       expect(ALL_KNOWN_PERMISSIONS.has(permission), permission).toBe(true);
     }
-    expect(snapshot).toHaveLength(91); // PHASE-028: +2 budgeting; PHASE-029: +3 payroll; PHASE-034: +4 consolidation; PHASE-035: +1 tax.e-invoicing-log; PHASE-038: +2 sourcing; PHASE-039: +2 returns/collections; PHASE-041: +1 delivery log
+    expect(snapshot).toHaveLength(95); // PHASE-028: +2 budgeting; PHASE-029: +3 payroll; PHASE-034: +4 consolidation; PHASE-035: +1 tax.e-invoicing-log; PHASE-038: +2 sourcing; PHASE-039: +2 returns/collections; PHASE-041: +1 delivery log; PHASE-042: +4 manufacturing
   });
 
   it("exports flow through the shared contract (CSV renderer over the stored envelope)", async () => {

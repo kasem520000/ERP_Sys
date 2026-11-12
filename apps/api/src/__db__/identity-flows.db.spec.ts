@@ -173,7 +173,15 @@ describe("seeds (acceptance 9)", () => {
     // communication.preferences.manage, communication.inbox.read,
     // communication.calendar.connect; the drift checker agrees: matrix 272
     // = seed 272).
-    expect(result.rows[0]?.n).toBe(272);
+    // 272 + 7 = 279 after 0065/0066 — the seven PHASE-042 manufacturing
+    // keys (manufacturing.work_centers.manage, manufacturing.routings.manage,
+    // manufacturing.shopfloor.execute, manufacturing.rework_orders.manage,
+    // manufacturing.downtime.log, manufacturing.oee.read,
+    // manufacturing.standard_costs.manage; the doc's planned
+    // "manufacturing.costing" is already live as manufacturing.costing.read
+    // since 0026 — recorded deviation; the drift checker agrees: matrix 279
+    // = seed 279).
+    expect(result.rows[0]?.n).toBe(279);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {
@@ -201,8 +209,9 @@ describe("seeds (acceptance 9)", () => {
     // 19 view-class keys + the 24 PHASE-013 viewer-tier reports.*.read /
     // reporting.reports.run grants (0005 seed §2) + the 3 PHASE-018 read
     // keys (0026 seed §3.8: production_orders.view, genealogy.read,
-    // costing.read) = 46.
-    expect(viewer.grants).toBe(46); // view-class + reports read tier + manufacturing reads
+    // costing.read) + the PHASE-042 OEE read key (0065 seed, matrix §3.20)
+    // = 47.
+    expect(viewer.grants).toBe(47); // view-class + reports read tier + manufacturing reads
   });
 });
 
@@ -732,6 +741,9 @@ describe("route × role permission checklist (acceptance 5)", () => {
       "manufacturing.production_orders.view",
       "manufacturing.genealogy.read",
       "manufacturing.costing.read",
+      // PHASE-042 (matrix §3.20): the viewer-tier OEE read key (the
+      // utilization + downtime-analysis report surface).
+      "manufacturing.oee.read",
     ]);
     for (const rule of ROUTE_PERMISSIONS) {
       const isPlatformRoute = rule.permission.startsWith("platform.");

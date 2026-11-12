@@ -28,12 +28,14 @@ import * as store from "../infrastructure/manufacturing.store";
 import type { BomRow } from "../infrastructure/manufacturing.store";
 import type { ProductionOrderRow } from "../infrastructure/manufacturing.store";
 import { BomService } from "./bom-service";
+import { OperationExecutionService } from "./operation-execution-service";
 import {
   BomNotFoundError,
   BomRequiredError,
   CompleteWithoutConsumptionError,
   ConsumptionNotPlannedError,
   FgShelfLifeRequiredError,
+  OperationsIncompleteError,
   OrderNotCancelableError,
   ProductionCostRoundingError,
   ProductionOrderInputInvalidError,
@@ -79,6 +81,20 @@ import {
  * second journal/batch). Policies come from the resolved effective config's
  * `config.policies` map — the four manufacturing keys are ALWAYS present
  * (T37's proof: SETTINGS_REGISTRY defaults ride into every tenant).
+ *
+ * PHASE-042 extension (M-02/M-17/M-19/L2-12): release accepts an optional
+ * routing input ({ routingId }) — an explicit routing binds (any version of
+ * the item, the BOM precedent), null opts out (the flat-rate dual mode),
+ * undefined auto-binds the item's ACTIVE routing when one exists — and
+ * delegates the operation freeze + std_unit_cost stamp to
+ * OperationExecutionService.freezeOrderOperations. Completion of a
+ * routing-BOUND order skips the flat labor/overhead legs (their conversion
+ * already sits in WIP via the G-40 op postings — fgValue = the WIP
+ * balance), refuses while any operation is PENDING/SETUP/RUNNING/PAUSED
+ * (OperationsIncompleteError; SKIPPED counts as resolved), and stamps
+ * yield_variance = (planned_qty − actual_qty) × std_unit_cost at 4dp when
+ * std_unit_cost IS NOT NULL (positive = produced-less-than-planned =
+ * unfavorable). Routing-less orders keep the exact legacy G-17/G-18 path.
  */
 
 const QTY_RE = /^\d+(\.\d{1,6})?$/;
@@ -178,6 +194,8 @@ export class ProductionOrderService {
     @Inject(InboxService) private readonly inbox: InboxService,
     @Inject(RESOLVE_EFFECTIVE_CONFIG_SERVICE)
     private readonly resolveConfig: ResolveEffectiveConfigService,
+    @Inject(OperationExecutionService)
+    private readonly ops: OperationExecutionService,
   ) {}
 
   // -- reads -------------------------------------------------------------------
@@ -312,7 +330,11 @@ export class ProductionOrderService {
 
   // -- release (DRAFT → RELEASED: number + BOM bind + level-1 snapshot) -----------
 
-  async release(id: string, actorId: string | null): Promise<ProductionOrderRow> {
+  async release(
+    id: string,
+    actorId: string | null,
+    routing?: { routingId?: string | null },
+  ): Promise<ProductionOrderRow> {
     const order = await this.requireOrder(id);
     if (order.status === "RELEASED") {
       return order; // INV-013 idempotent replay — no second number
@@ -387,6 +409,11 @@ export class ProductionOrderService {
       bomId: bom.id,
       yieldSnapshot: bom.yieldPct,
     });
+    // PHASE-042 (M-02/L2-12): routing binding + the operation freeze + the
+    // std_unit_cost stamp — after the legacy release steps so routing-less
+    // orders (no routing input, no ACTIVE routing, no ACTIVE standard) keep
+    // the exact pre-042 order shape.
+    const frozen = await this.ops.freezeOrderOperations(order, routing?.routingId, actorId);
     await this.audit.record({
       action: "manufacturing.production_order.released",
       entityType: "production_order",
@@ -401,6 +428,8 @@ export class ProductionOrderService {
         yieldPct: bom.yieldPct,
         lines: snapshot.length,
         lineQuantities: snapshot.map((line) => line.plannedQty),
+        routingId: frozen.routingId,
+        stdUnitCost: frozen.stdUnitCost,
       },
     });
     return this.requireOrder(id);
@@ -743,6 +772,13 @@ export class ProductionOrderService {
     }
     const consumptionCount = await store.countProductionConsumptions(id);
     if (consumptionCount === 0) throw new CompleteWithoutConsumptionError(id);
+    // PHASE-042 (M-17): a routing-bound order cannot complete while any
+    // operation is still live (PENDING/SETUP/RUNNING/PAUSED — SKIPPED counts
+    // as resolved).
+    if (order.routingId !== null) {
+      const liveOperations = await store.countLiveOrderOperations(id);
+      if (liveOperations > 0) throw new OperationsIncompleteError(id, liveOperations);
+    }
     const actualQty = this.canonicalPositiveQty(input.actualQty, "actualQty");
     const completedAt = input.completedAt ?? today();
     this.assertDate(completedAt, "completedAt");
@@ -751,9 +787,17 @@ export class ProductionOrderService {
 
     // The cost stack: WIP balance (materials net of scrap) + absorbed labor
     // + absorbed overhead — per-order WIP nets to EXACTLY zero at completion.
+    // PHASE-042 (M-02): routing-BOUND orders skip the flat labor/overhead
+    // legs — their conversion cost already sits in WIP via the per-operation
+    // G-40 postings, so fgValue = the WIP balance alone.
     const wipBalance = await store.sumOrderWip(id);
-    const laborValue = round4(new Decimal(actualQty).times(new Decimal(order.laborRate))).toFixed(4);
-    const overheadValue = round4(new Decimal(actualQty).times(new Decimal(order.overheadRate))).toFixed(4);
+    const flatRates = order.routingId === null;
+    const laborValue = flatRates
+      ? round4(new Decimal(actualQty).times(new Decimal(order.laborRate))).toFixed(4)
+      : "0.0000";
+    const overheadValue = flatRates
+      ? round4(new Decimal(actualQty).times(new Decimal(order.overheadRate))).toFixed(4)
+      : "0.0000";
     const fgValue = round4(
       new Decimal(wipBalance).plus(new Decimal(laborValue)).plus(new Decimal(overheadValue)),
     ).toFixed(4);
@@ -770,6 +814,19 @@ export class ProductionOrderService {
       // value at 4dp would strand a rounding residue in WIP.
       throw new ProductionCostRoundingError({ fgValue, unitCost, qty: actualQty });
     }
+
+    // PHASE-042 (M-19): the order-level yield variance against the frozen
+    // per-unit standard — (planned − actual) × std at 4dp, positive =
+    // produced-less-than-planned (unfavorable). NULL std (dual mode) leaves
+    // the column at its 0 default.
+    const yieldVariance =
+      order.stdUnitCost !== null
+        ? round4(
+            new Decimal(order.plannedQty)
+              .minus(new Decimal(actualQty))
+              .times(new Decimal(order.stdUnitCost)),
+          ).toFixed(4)
+        : undefined;
 
     // FG batch + expiry: the batch number defaults to the order number; the
     // expiry derives from shelf life when the policy is on (an expiry-tracked
@@ -873,6 +930,7 @@ export class ProductionOrderService {
       wipCreditValue: wipBalance,
       laborValue,
       overheadValue,
+      ...(yieldVariance === undefined ? {} : { yieldVariance }),
     });
     await this.audit.record({
       action: "manufacturing.production_order.completed",
@@ -894,6 +952,7 @@ export class ProductionOrderService {
         expiry,
         qcGate: policies.qcGate,
         journalEntryId: posted.journalEntryId,
+        ...(yieldVariance === undefined ? {} : { yieldVariance }),
       },
     });
     order = await this.requireOrder(id);

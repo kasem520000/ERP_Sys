@@ -58,8 +58,13 @@ import {
 /** KNOWN hash — `pnpm validate:manifests` on the six-template set (the
  *  constant is byte-identical to the migration 0026 registry seed and the
  *  docs mirror docs/industries/templates/manifests/
- *  manifest.food_manufacturing.json). */
-const KNOWN_HASH = "sha256:e62f1bf2d709e226f203702259f1e51a1829df3d8e9be7031f658c026659a5da";
+ *  manifest.food_manufacturing.json).
+ *
+ *  PHASE-042 (0066 §9): re-pinned — the manifest's required_feature_keys
+ *  gains the six manufacturing-execution keys (the manifest enablement);
+ *  the migration seed, the docs mirror, and the contracts verbatim copy
+ *  moved together (the 039 re-pin procedure). */
+const KNOWN_HASH = "sha256:e4deacf39de5ed835a9da66400b49d2faa216f34fe7bfa49264fd58095253ca0";
 
 /** The 0026 plan-grant manufacturing set (the "manufacturing add-on"). */
 const MANUFACTURING_KEYS: readonly string[] = [
@@ -70,6 +75,15 @@ const MANUFACTURING_KEYS: readonly string[] = [
   "manufacturing.scrap",
   "manufacturing.batch_genealogy",
   "manufacturing.qc",
+  // PHASE-042 (0066): the manufacturing-execution set joins the add-on —
+  // the clean removal revokes ALL thirteen (leaving the six active with
+  // their deps revoked would break the BR-040 closure at apply time).
+  "manufacturing.work_centers",
+  "manufacturing.routing",
+  "manufacturing.shopfloor",
+  "manufacturing.rework",
+  "manufacturing.downtime",
+  "manufacturing.standard_costs",
 ];
 
 // -- tenant A: food_manufacturing apply ------------------------------------
@@ -671,8 +685,14 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
         "inventory.stock_counts",
         "manufacturing.batch_genealogy",
         "manufacturing.bom",
+        "manufacturing.downtime",
         "manufacturing.production_orders",
         "manufacturing.qc",
+        "manufacturing.rework",
+        "manufacturing.routing",
+        "manufacturing.shopfloor",
+        "manufacturing.standard_costs",
+        "manufacturing.work_centers",
         "purchasing.landed_costs",
       ],
       guidance: {

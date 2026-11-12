@@ -21,6 +21,13 @@ import { ProductionOrderService } from "../../modules/manufacturing/application/
 import { ManufacturingReconciliationService } from "../../modules/manufacturing/application/wip-reconciliation-service";
 import { InspectionService } from "../../modules/manufacturing/application/inspection-service";
 import { GenealogyService } from "../../modules/manufacturing/application/genealogy-service";
+import { WorkCenterService } from "../../modules/manufacturing/application/work-center-service";
+import { RoutingService } from "../../modules/manufacturing/application/routing-service";
+import { OperationExecutionService } from "../../modules/manufacturing/application/operation-execution-service";
+import { ReworkService } from "../../modules/manufacturing/application/rework-service";
+import { DowntimeService } from "../../modules/manufacturing/application/downtime-service";
+import { StandardCostService } from "../../modules/manufacturing/application/standard-cost-service";
+import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
 import { ConfigRepository } from "../../modules/configuration/infrastructure/config-repository";
 import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
 import { InboxService } from "../../modules/notifications/application/inbox-service";
@@ -66,6 +73,10 @@ export const boms = new BomService(audit);
 export const warehouses = new WarehouseService(audit);
 export const stock = new StockService(audit, posting);
 export const tracking = new TrackingService(audit, stock);
+// PHASE-042 (0065/0066): the manufacturing-execution surfaces — the
+// operation-freeze collaborator joins the order service's constructor (8th
+// param), then the five new services on the same module-local instances.
+export const shopFloor = new OperationExecutionService(audit, posting);
 export const orders = new ProductionOrderService(
   audit,
   numbering,
@@ -74,7 +85,18 @@ export const orders = new ProductionOrderService(
   tracking,
   new InboxService(),
   new ResolveEffectiveConfigService(new ConfigRepository()),
+  shopFloor,
 );
+export const workCenters = new WorkCenterService(audit);
+export const routingsSrv = new RoutingService(audit);
+export const rework = new ReworkService(audit, numbering, posting);
+export const downtime = new DowntimeService(
+  audit,
+  posting,
+  new ResolveEffectiveConfigService(new ConfigRepository()),
+);
+export const standardCosts = new StandardCostService(audit, posting);
+export const goodsReceipts = new GoodsReceiptService(audit, posting, numbering);
 // T38b-ii: the WIP↔GL check (INV-010 extension) — read-only analysis
 // recording into the PHASE-007 reconciliation framework.
 export const wipReconciliation = new ManufacturingReconciliationService(audit, new InboxService());
@@ -160,6 +182,8 @@ export interface MfgFixture {
   warehouseFg: string;
   customerId: string;
   creditTermId: string;
+  /** PHASE-042: the PO-less GRN supplier (the PPV-at-receipt path). */
+  supplierId: string;
   /** GL accounts for the posting legs (purpose-mapped, template + explicit). */
   gl: {
     inventory: string;
@@ -176,6 +200,11 @@ export interface MfgFixture {
     inventoryAppreciation: string;
     cashGl: string;
     serviceAccount: string;
+    /** PHASE-042 (0065/0066 CoA markers): the four execution purposes. */
+    reworkExpense: string;
+    downtimeExpense: string;
+    purchasePriceVariance: string;
+    standardRevaluation: string;
   };
   taxCodeIds: { standard: string; notSubject: string };
   items: { flour: string; yeast: string; pack: string; dough: string; bread: string };
@@ -225,12 +254,17 @@ export async function setupMfgFixture(): Promise<MfgFixture> {
     inventoryAppreciation: "",
     cashGl: "",
     serviceAccount: "",
+    reworkExpense: "",
+    downtimeExpense: "",
+    purchasePriceVariance: "",
+    standardRevaluation: "",
   };
   let fiscalYearId = "";
   let branchId = "";
   let warehouseRaw = "";
   let warehouseFg = "";
   let customerId = "";
+  let supplierId = "";
   let creditTermId = "";
   const taxCodeIds = { standard: "", notSubject: "" };
   const items = { flour: "", yeast: "", pack: "", dough: "", bread: "" };
@@ -301,6 +335,13 @@ export async function setupMfgFixture(): Promise<MfgFixture> {
       });
     }
     gl.inventoryAppreciation = appreciation.id;
+    // PHASE-042 (0065/0066 template markers): the four execution purposes —
+    // REWORK_EXPENSE 5125, DOWNTIME_EXPENSE 5430, PURCHASE_PRICE_VARIANCE
+    // 5990, STANDARD_REVALUATION 5995 (the 0026 additive belt-and-braces).
+    gl.reworkExpense = await mapPurpose("REWORK_EXPENSE", "5125");
+    gl.downtimeExpense = await mapPurpose("DOWNTIME_EXPENSE", "5430");
+    gl.purchasePriceVariance = await mapPurpose("PURCHASE_PRICE_VARIANCE", "5990");
+    gl.standardRevaluation = await mapPurpose("STANDARD_REVALUATION", "5995");
 
     // Fiscal year spanning the whole manufacturing timeline.
     const existingYear = await findFiscalYearByName("FY2026");
@@ -389,6 +430,23 @@ export async function setupMfgFixture(): Promise<MfgFixture> {
     const terms = await partnersStore.listCreditTerms();
     const net30 = terms.find((t) => t.days === 30) ?? terms[0]!;
     creditTermId = net30.id;
+    // PHASE-042: the GRN supplier (the PPV spec's PO-less receipts).
+    const existingSupplier = await partnersStore.findPartnerByCode("M-S1");
+    if (existingSupplier === undefined) {
+      const createdSupplier = await partnersStore.insertPartner({
+        kind: "SUPPLIER",
+        code: "M-S1",
+        name: "مصنع التوريد المركزي",
+        nameAr: null,
+        taxNumber: null,
+        creditLimit: null,
+        creditTermsId: net30.id,
+        priceListId: null,
+      });
+      supplierId = createdSupplier.id;
+    } else {
+      supplierId = existingSupplier.id;
+    }
     const existingCustomer = await partnersStore.findPartnerByCode("M-C1");
     if (existingCustomer === undefined) {
       const created = await partnersStore.insertPartner({
@@ -685,6 +743,7 @@ export async function setupMfgFixture(): Promise<MfgFixture> {
     warehouseRaw,
     warehouseFg,
     customerId,
+    supplierId,
     creditTermId,
     gl,
     taxCodeIds,

@@ -410,6 +410,19 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "outbound_messages" },
   { table: "notification_preferences", deleteGranted: true },
   { table: "communication_log" },
+  // PHASE-042 (Blueprint v3.0 · CR-12, migrations 0065/0066): the
+  // manufacturing-execution cluster. work_centers/routings/routing_operations/
+  // production_order_operations/rework_orders/downtime_records/item_standard_
+  // costs are master-data/document rows (SELECT/INSERT/UPDATE — version
+  // lifecycles, no app-role DELETE, the 0026 manufacturing precedent).
+  // Seven tables — the auto-generated A-suite extends by +42.
+  { table: "work_centers" },
+  { table: "routings" },
+  { table: "routing_operations" },
+  { table: "production_order_operations" },
+  { table: "rework_orders" },
+  { table: "downtime_records" },
+  { table: "item_standard_costs" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

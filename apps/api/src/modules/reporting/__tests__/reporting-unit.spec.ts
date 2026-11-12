@@ -117,6 +117,9 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "sales.dunning.manage",
   // PHASE-041 (0064 seed): the communications report key.
   "communication.outbox.read",
+  // PHASE-042 (0065 seed): the manufacturing-execution OEE report key (the
+  // utilization + downtime-analysis contracts' read permission).
+  "manufacturing.oee.read",
 ]);
 
 /** A minimal but type-complete stored envelope for cache/CSV/XLSX tests. */
@@ -164,16 +167,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 91 frozen contracts validate against the known-permission catalog", () => { // PHASE-041: 90 → 91
+  it("the 95 frozen contracts validate against the known-permission catalog", () => { // PHASE-042: 91 → 95 (+4 manufacturing-execution)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(91); // PHASE-041: 90 → 91
+    expect(result.count).toBe(95); // PHASE-042: 91 → 95 (+4 manufacturing-execution)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(91); // PHASE-041: 90 → 91
+    expect(snapshot).toHaveLength(95); // PHASE-042: 91 → 95 (+4 manufacturing-execution)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

@@ -3518,6 +3518,10 @@ export interface ProductionOrderRow {
   wipCreditValue: string;
   laborValue: string;
   overheadValue: string;
+  /** PHASE-042: the routing version bound at release (null = flat-rate mode). */
+  routingId: string | null;
+  /** PHASE-042: the next non-terminal operation sequence (null before release). */
+  currentOperation: number | null;
   note: string | null;
   noteAr: string | null;
   cancelReason: string | null;
@@ -3596,6 +3600,201 @@ export interface ConsumeResult {
   order: ProductionOrderRow;
   journalEntryId: string;
   consumptions: readonly ProductionConsumptionRow[];
+}
+
+// -- PHASE-042 (T-10…T-13): routing, work centers & costing -----------------------
+
+/** GET /manufacturing/work-centers → rows (work_centers). */
+export interface WorkCenterRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  /** Hours per shift — numeric(7,2) as a canonical string. */
+  capacityPerShift: string;
+  shiftsPerDay: number;
+  /** Base-currency cost per hour — numeric(19,6) strings. */
+  fixedCostRate: string;
+  varCostRate: string;
+  status: "ACTIVE" | "INACTIVE" | string;
+  costCenterId: string | null;
+  createdBy: string | null;
+}
+
+/** GET /manufacturing/routings → version headers (routings). */
+export interface RoutingRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  itemId: string;
+  versionNo: number;
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED" | string;
+  outputUomId: string;
+  note: string | null;
+  noteAr: string | null;
+  activatedAt: string | null;
+  archivedAt: string | null;
+}
+
+/** One routing operation (routing_operations). */
+export interface RoutingOperationRow {
+  id: string;
+  routingId: string;
+  sequence: number;
+  workCenterId: string;
+  /** Hours per batch / per unit — numeric(19,6) strings. */
+  setupTime: string;
+  runTime: string;
+  /** NULL = inherit the work center's rates. */
+  fixedCostRate: string | null;
+  varCostRate: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  inspectionHook: boolean;
+}
+
+/** GET /manufacturing/routings/:id → the version with its operations. */
+export interface RoutingDetail extends RoutingRow {
+  operations: readonly RoutingOperationRow[];
+}
+
+/** One release-frozen order operation (production_order_operations). */
+export interface ProductionOrderOperationRow {
+  id: string;
+  orderId: string;
+  routingId: string;
+  sequence: number;
+  workCenterId: string;
+  status: "PENDING" | "SETUP" | "RUNNING" | "PAUSED" | "COMPLETED" | "SKIPPED" | string;
+  /** Times/rates/variances — canonical decimal strings. */
+  stdSetupTime: string;
+  stdRunTime: string;
+  stdFixedRate: string;
+  stdVarRate: string;
+  actualSetupTime: string;
+  actualRunTime: string;
+  setupVariance: string;
+  usageVariance: string;
+  rateVariance: string;
+  operatorUserId: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  scrapQty: string;
+  scrapReasonCode: string | null;
+  skipReason: string | null;
+  skipApprovedBy: string | null;
+  journalId: string | null;
+}
+
+/** GET /manufacturing/production-orders/:id/operations (the terminal read). */
+export interface OrderOperationsResult {
+  order: ProductionOrderRow;
+  operations: readonly ProductionOrderOperationRow[];
+}
+
+/** POST /manufacturing/shopfloor/scan result (the op row + the action taken). */
+export interface ScanResult {
+  operation: ProductionOrderOperationRow;
+  journalEntryId: string | null;
+  action: string;
+}
+
+/** One downtime record (downtime_records). */
+export interface DowntimeRecordRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  workCenterId: string;
+  orderId: string | null;
+  operationSequence: number | null;
+  reasonCode: string;
+  startedAt: string;
+  endedAt: string | null;
+  durationMinutes: number;
+  /** NULL while record-only (the default posting-off policy). */
+  costAmount: string | null;
+  journalId: string | null;
+  note: string | null;
+}
+
+/** One rework order (rework_orders — the RW- lifecycle). */
+export interface ReworkOrderRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  reworkNo: string | null;
+  parentOrderId: string;
+  itemId: string;
+  batchId: string | null;
+  defectRef: string;
+  qty: string;
+  uomId: string;
+  routingId: string | null;
+  status: "DRAFT" | "RELEASED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | string;
+  stdSetupTime: string;
+  stdRunTime: string;
+  stdFixedRate: string;
+  stdVarRate: string;
+  actualSetupTime: string;
+  actualRunTime: string;
+  laborValue: string;
+  overheadValue: string;
+  reworkValue: string;
+  journalId: string | null;
+  defectReasonCode: string | null;
+  note: string | null;
+  noteAr: string | null;
+  releasedAt: string | null;
+  completedAt: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+}
+
+/** One item standard-cost version (item_standard_costs). */
+export interface ItemStandardCostRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  itemId: string;
+  versionNo: number;
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED" | string;
+  materialCost: string;
+  laborCost: string;
+  overheadCost: string;
+  totalCost: string;
+  /** Parsed jsonb array of [{key, amount}]. */
+  overheadSubSplits: { key: string; amount: string }[];
+  source: "MANUAL" | "ROLLED_UP" | string;
+  effectiveFrom: string | null;
+  rolledUpAt: string | null;
+  activatedAt: string | null;
+  archivedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+}
+
+/** GET /manufacturing/oee (daily granularity) — v_work_center_oee_daily. */
+export interface OeeDailyRow {
+  tenantId: string;
+  workCenterId: string;
+  day: string;
+  plannedHours: string;
+  actualHours: string;
+  scrapQty: string;
+  completedOperations: number;
+  skippedOperations: number;
+  totalOperations: number;
+  downtimeMinutes: number;
+}
+
+/** GET /manufacturing/oee?granularity=period — v_work_center_oee_period. */
+export interface OeePeriodRow extends Omit<OeeDailyRow, "day"> {
+  periodStart: string;
 }
 
 /** POST /manufacturing/production-orders/:id/scrap result (DR scrap · CR WIP). */

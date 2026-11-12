@@ -339,6 +339,18 @@ export interface ProductionOrderRow {
   startedAt: string | null;
   completedAt: string | null;
   cancelledAt: string | null;
+  /** PHASE-042 (M-02): the bound routing — NULL = the legacy flat-rate dual
+   * mode (routing-less orders keep the G-17/G-18 path byte-identical). */
+  routingId: string | null;
+  /** PHASE-042 (M-17): the routing sequence of the active operation; NULL =
+   * not started or routing-less. */
+  currentOperation: number | null;
+  /** PHASE-042 (L2-12): the frozen per-unit standard at release (NULL = no
+   * ACTIVE standard existed — dual mode). */
+  stdUnitCost: string | null;
+  /** PHASE-042 (M-19): (planned_qty − actual_qty) × std_unit_cost at
+   * completion, 4dp — positive = produced-less-than-planned (unfavorable). */
+  yieldVariance: string;
 }
 
 const ORDER_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
@@ -353,7 +365,9 @@ const ORDER_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text 
   overhead_value::text AS "overheadValue", note, note_ar AS "noteAr",
   cancel_reason AS "cancelReason", released_at::text AS "releasedAt",
   started_at::text AS "startedAt", completed_at::text AS "completedAt",
-  cancelled_at::text AS "cancelledAt"`;
+  cancelled_at::text AS "cancelledAt",
+  routing_id AS "routingId", current_operation AS "currentOperation",
+  std_unit_cost::text AS "stdUnitCost", yield_variance::text AS "yieldVariance"`;
 
 export async function insertProductionOrder(input: {
   branchId: string;
@@ -442,6 +456,14 @@ export async function patchProductionOrder(input: {
   noteAr?: string | null;
   /** Explicit timestamptz override (ISO date) — wins over the CASE stamp. */
   completedAt?: string | null;
+  /** PHASE-042 (M-02): the bound routing — null = the routing-less dual mode. */
+  routingId?: string | null;
+  /** PHASE-042 (M-17): the active operation's sequence — null = not started. */
+  currentOperation?: number | null;
+  /** PHASE-042 (L2-12): the frozen per-unit standard — null = dual mode. */
+  stdUnitCost?: string | null;
+  /** PHASE-042 (M-19): order-level yield variance (4dp, set at completion). */
+  yieldVariance?: string;
 }): Promise<void> {
   await tenantTx().execute(sql`
     UPDATE production_orders SET
@@ -475,6 +497,12 @@ export async function patchProductionOrder(input: {
                           WHEN ${input.status ?? null} = 'COMPLETED' THEN now()
                           ELSE completed_at END,
       cancelled_at = CASE WHEN ${input.status ?? null} = 'CANCELLED' THEN now() ELSE cancelled_at END,
+      routing_id = CASE WHEN ${input.routingId === undefined} THEN routing_id ELSE ${input.routingId ?? null} END,
+      current_operation = CASE WHEN ${input.currentOperation === undefined} THEN current_operation
+                               ELSE ${input.currentOperation ?? null} END,
+      std_unit_cost = CASE WHEN ${input.stdUnitCost === undefined} THEN std_unit_cost
+                           ELSE ${input.stdUnitCost ?? null} END,
+      yield_variance = COALESCE(${input.yieldVariance ?? null}, yield_variance),
       version = version + 1, updated_at = now()
     WHERE id = ${input.id}
   `);
@@ -1045,4 +1073,897 @@ export async function listBatchSalesEdges(
     ORDER BY moved_at, id
   `);
   return rows.rows as unknown as { batchId: string; sourceType: string; sourceId: string; movedAt: string; qty: string }[];
+}
+
+// ---------------------------------------------------------------------------
+// PHASE-042 (CR-12; migrations 0065/0066): the manufacturing-execution slice
+// — work centers, versioned routings + operations, per-order frozen
+// operation rows, rework orders, downtime records, item standard costs, the
+// two OEE views, and the cross-module reads the new services need. Same
+// discipline as the sections above: the ONLY writer of the manufacturing-
+// owned tables, everything in the caller's ambient tenant UoW, decimal
+// strings canonicalized by the services first (ADR-0009).
+// ---------------------------------------------------------------------------
+
+// -- work centers (M-03/H-04) ---------------------------------------------------------
+
+export interface WorkCenterRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  /** Hours per shift — numeric(7,2). */
+  capacityPerShift: string;
+  shiftsPerDay: number;
+  /** Base-currency cost per hour — numeric(19,6). */
+  fixedCostRate: string;
+  varCostRate: string;
+  status: string;
+  costCenterId: string | null;
+  createdBy: string | null;
+}
+
+const WORK_CENTER_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
+  code, name, name_ar AS "nameAr", description, capacity_per_shift::text AS "capacityPerShift",
+  shifts_per_day AS "shiftsPerDay", fixed_cost_rate::text AS "fixedCostRate",
+  var_cost_rate::text AS "varCostRate", status, cost_center_id AS "costCenterId",
+  created_by AS "createdBy"`;
+
+export async function insertWorkCenter(input: {
+  code: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  capacityPerShift: string;
+  shiftsPerDay: number;
+  fixedCostRate: string;
+  varCostRate: string;
+  costCenterId: string | null;
+  actorId: string | null;
+}): Promise<WorkCenterRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO work_centers (id, tenant_id, created_by, code, name, name_ar, description,
+                              capacity_per_shift, shifts_per_day, fixed_cost_rate, var_cost_rate,
+                              status, cost_center_id)
+    VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.code}, ${input.name},
+            ${input.nameAr}, ${input.description}, ${input.capacityPerShift}, ${input.shiftsPerDay},
+            ${input.fixedCostRate}, ${input.varCostRate}, 'ACTIVE', ${input.costCenterId})
+  `);
+  return (await findWorkCenterById(id))!;
+}
+
+export async function findWorkCenterById(id: string): Promise<WorkCenterRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${WORK_CENTER_COLUMNS} FROM work_centers WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as WorkCenterRow[])[0];
+}
+
+export async function listWorkCenters(filter: { status?: string; limit: number }): Promise<WorkCenterRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${WORK_CENTER_COLUMNS} FROM work_centers
+    WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY code
+    LIMIT ${filter.limit}
+  `);
+  return rows.rows as unknown as WorkCenterRow[];
+}
+
+/** The single work-center mutation point (COALESCE semantics — the patchBom
+ * pattern; status flips ride setStatus, not this patch). */
+export async function patchWorkCenter(input: {
+  id: string;
+  name?: string;
+  nameAr?: string | null;
+  description?: string | null;
+  capacityPerShift?: string;
+  shiftsPerDay?: number;
+  fixedCostRate?: string;
+  varCostRate?: string;
+  costCenterId?: string | null;
+  status?: string;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE work_centers SET
+      name = COALESCE(${input.name ?? null}, name),
+      capacity_per_shift = COALESCE(${input.capacityPerShift ?? null}, capacity_per_shift),
+      shifts_per_day = COALESCE(${input.shiftsPerDay ?? null}, shifts_per_day),
+      fixed_cost_rate = COALESCE(${input.fixedCostRate ?? null}, fixed_cost_rate),
+      var_cost_rate = COALESCE(${input.varCostRate ?? null}, var_cost_rate),
+      cost_center_id = CASE WHEN ${input.costCenterId === undefined} THEN cost_center_id
+                            ELSE ${input.costCenterId ?? null} END,
+      description = CASE WHEN ${input.description === undefined} THEN description
+                         ELSE ${input.description ?? null} END,
+      name_ar = CASE WHEN ${input.nameAr === undefined} THEN name_ar ELSE ${input.nameAr ?? null} END,
+      status = COALESCE(${input.status ?? null}, status),
+      version = version + 1, updated_at = now()
+    WHERE id = ${input.id}
+  `);
+}
+
+/** INACTIVE guard 1: the center is referenced by an ACTIVE routing's
+ * operations (master-data dependency — the routing would dangle). */
+export async function countActiveRoutingOperationsByWorkCenter(workCenterId: string): Promise<number> {
+  const rows = await tenantTx().execute(sql`
+    SELECT count(*)::int AS n
+    FROM routing_operations ro
+    JOIN routings r ON r.id = ro.routing_id AND r.tenant_id = ro.tenant_id
+    WHERE ro.work_center_id = ${workCenterId} AND r.status = 'ACTIVE'
+  `);
+  return (rows.rows as unknown as { n: number }[])[0]!.n;
+}
+
+/** INACTIVE guard 2: live (non-terminal) frozen operation rows still point
+ * at the center — the shop floor is mid-flight on it. */
+export async function countLiveOperationsByWorkCenter(workCenterId: string): Promise<number> {
+  const rows = await tenantTx().execute(sql`
+    SELECT count(*)::int AS n
+    FROM production_order_operations
+    WHERE work_center_id = ${workCenterId}
+      AND status IN ('PENDING', 'SETUP', 'RUNNING', 'PAUSED')
+  `);
+  return (rows.rows as unknown as { n: number }[])[0]!.n;
+}
+
+// -- routings + routing operations (M-02) ---------------------------------------------
+
+export interface RoutingRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  itemId: string;
+  versionNo: number;
+  status: string;
+  outputUomId: string;
+  note: string | null;
+  noteAr: string | null;
+  activatedAt: string | null;
+  archivedAt: string | null;
+}
+
+const ROUTING_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
+  created_by AS "createdBy", item_id AS "itemId", version_no AS "versionNo", status,
+  output_uom_id AS "outputUomId", note, note_ar AS "noteAr",
+  activated_at::text AS "activatedAt", archived_at::text AS "archivedAt"`;
+
+export interface RoutingOperationRow {
+  id: string;
+  routingId: string;
+  sequence: number;
+  workCenterId: string;
+  /** Hours per batch / per unit — numeric(19,6). */
+  setupTime: string;
+  runTime: string;
+  /** NULL = inherit the work center's rates. */
+  fixedCostRate: string | null;
+  varCostRate: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  inspectionHook: boolean;
+}
+
+const ROUTING_OPERATION_COLUMNS = sql`id, routing_id AS "routingId", sequence,
+  work_center_id AS "workCenterId", setup_time::text AS "setupTime", run_time::text AS "runTime",
+  fixed_cost_rate::text AS "fixedCostRate", var_cost_rate::text AS "varCostRate",
+  description, description_ar AS "descriptionAr", inspection_hook AS "inspectionHook"`;
+
+export async function insertRouting(input: {
+  itemId: string;
+  versionNo: number;
+  outputUomId: string;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+  operations: readonly {
+    sequence: number;
+    workCenterId: string;
+    setupTime: string;
+    runTime: string;
+    fixedCostRate: string | null;
+    varCostRate: string | null;
+    description: string | null;
+    descriptionAr: string | null;
+  }[];
+}): Promise<RoutingRow> {
+  const tx = tenantTx();
+  const id = generateUuidV7();
+  await tx.execute(sql`
+    INSERT INTO routings (id, tenant_id, created_by, item_id, version_no, status, output_uom_id,
+                          note, note_ar)
+    VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.itemId}, ${input.versionNo},
+            'DRAFT', ${input.outputUomId}, ${input.note}, ${input.noteAr})
+  `);
+  for (const op of input.operations) {
+    await tx.execute(sql`
+      INSERT INTO routing_operations (id, tenant_id, routing_id, sequence, work_center_id,
+                                      setup_time, run_time, fixed_cost_rate, var_cost_rate,
+                                      description, description_ar, created_by)
+      VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${id}, ${op.sequence}, ${op.workCenterId},
+              ${op.setupTime}, ${op.runTime}, ${op.fixedCostRate}, ${op.varCostRate},
+              ${op.description}, ${op.descriptionAr}, ${input.actorId})
+    `);
+  }
+  return (await findRoutingById(id))!;
+}
+
+export async function findRoutingById(id: string): Promise<RoutingRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ROUTING_COLUMNS} FROM routings WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as RoutingRow[])[0];
+}
+
+export async function listRoutings(filter: { itemId?: string; status?: string; limit: number }): Promise<RoutingRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ROUTING_COLUMNS} FROM routings
+    WHERE (${filter.itemId ?? null}::uuid IS NULL OR item_id = ${filter.itemId ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY item_id, version_no DESC
+    LIMIT ${filter.limit}
+  `);
+  return rows.rows as unknown as RoutingRow[];
+}
+
+/** Every version of one item's routing, oldest first (the versionNo allocator). */
+export async function listRoutingsForItem(itemId: string): Promise<RoutingRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ROUTING_COLUMNS} FROM routings WHERE item_id = ${itemId} ORDER BY version_no
+  `);
+  return rows.rows as unknown as RoutingRow[];
+}
+
+export async function findActiveRouting(itemId: string): Promise<RoutingRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ROUTING_COLUMNS} FROM routings
+    WHERE item_id = ${itemId} AND status = 'ACTIVE'
+    ORDER BY version_no DESC
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as RoutingRow[])[0];
+}
+
+/** The single routing-header mutation point (status transitions + note
+ * edits; activated_at/archived_at stamp via CASE on the target status). */
+export async function patchRouting(input: {
+  id: string;
+  status?: string;
+  note?: string | null;
+  noteAr?: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE routings SET
+      status = COALESCE(${input.status ?? null}, status),
+      note = CASE WHEN ${input.note === undefined} THEN note ELSE ${input.note ?? null} END,
+      note_ar = CASE WHEN ${input.noteAr === undefined} THEN note_ar ELSE ${input.noteAr ?? null} END,
+      activated_at = CASE WHEN ${input.status ?? null} = 'ACTIVE' THEN now() ELSE activated_at END,
+      archived_at = CASE WHEN ${input.status ?? null} = 'ARCHIVED' THEN now() ELSE archived_at END,
+      version = version + 1, updated_at = now()
+    WHERE id = ${input.id}
+  `);
+}
+
+export async function listRoutingOperations(routingId: string): Promise<RoutingOperationRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ROUTING_OPERATION_COLUMNS} FROM routing_operations
+    WHERE routing_id = ${routingId} ORDER BY sequence
+  `);
+  return rows.rows as unknown as RoutingOperationRow[];
+}
+
+/** DRAFT full-replace of a routing's operations (the bom_lines precedent —
+ * routing_operations carries the DELETE grant for exactly this). */
+export async function replaceRoutingOperations(
+  routingId: string,
+  operations: readonly {
+    sequence: number;
+    workCenterId: string;
+    setupTime: string;
+    runTime: string;
+    fixedCostRate: string | null;
+    varCostRate: string | null;
+    description: string | null;
+    descriptionAr: string | null;
+  }[],
+  actorId: string | null,
+): Promise<void> {
+  const tx = tenantTx();
+  await tx.execute(sql`DELETE FROM routing_operations WHERE routing_id = ${routingId}`);
+  for (const op of operations) {
+    await tx.execute(sql`
+      INSERT INTO routing_operations (id, tenant_id, routing_id, sequence, work_center_id,
+                                      setup_time, run_time, fixed_cost_rate, var_cost_rate,
+                                      description, description_ar, created_by)
+      VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${routingId}, ${op.sequence},
+              ${op.workCenterId}, ${op.setupTime}, ${op.runTime}, ${op.fixedCostRate},
+              ${op.varCostRate}, ${op.description}, ${op.descriptionAr}, ${actorId})
+    `);
+  }
+}
+
+// -- production order operations (M-02/M-17/M-18/M-13/M-19) ---------------------------
+
+export interface ProductionOrderOperationRow {
+  id: string;
+  orderId: string;
+  routingId: string;
+  sequence: number;
+  workCenterId: string;
+  status: string;
+  stdSetupTime: string;
+  stdRunTime: string;
+  stdFixedRate: string;
+  stdVarRate: string;
+  actualSetupTime: string;
+  actualRunTime: string;
+  setupVariance: string;
+  usageVariance: string;
+  rateVariance: string;
+  operatorUserId: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  scrapQty: string;
+  scrapReasonCode: string | null;
+  skipReason: string | null;
+  skipApprovedBy: string | null;
+  journalId: string | null;
+}
+
+const ORDER_OPERATION_COLUMNS = sql`id, order_id AS "orderId", routing_id AS "routingId", sequence,
+  work_center_id AS "workCenterId", status,
+  std_setup_time::text AS "stdSetupTime", std_run_time::text AS "stdRunTime",
+  std_fixed_rate::text AS "stdFixedRate", std_var_rate::text AS "stdVarRate",
+  actual_setup_time::text AS "actualSetupTime", actual_run_time::text AS "actualRunTime",
+  setup_variance::text AS "setupVariance", usage_variance::text AS "usageVariance",
+  rate_variance::text AS "rateVariance", operator_user_id AS "operatorUserId",
+  started_at::text AS "startedAt", finished_at::text AS "finishedAt",
+  scrap_qty::text AS "scrapQty", scrap_reason_code AS "scrapReasonCode",
+  skip_reason AS "skipReason", skip_approved_by AS "skipApprovedBy", journal_id AS "journalId"`;
+
+/** The release freeze row (service-validated decimal strings). */
+export interface ProductionOrderOperationInsert {
+  orderId: string;
+  routingId: string;
+  sequence: number;
+  workCenterId: string;
+  stdSetupTime: string;
+  stdRunTime: string;
+  stdFixedRate: string;
+  stdVarRate: string;
+  actorId: string | null;
+}
+
+/** The release freeze: one PENDING row per routing operation with the std
+ * columns frozen from the routing + work-center rates (overrides win). */
+export async function insertProductionOrderOperations(
+  rows: readonly ProductionOrderOperationInsert[],
+): Promise<void> {
+  const tx = tenantTx();
+  for (const row of rows) {
+    await tx.execute(sql`
+      INSERT INTO production_order_operations (id, tenant_id, created_by, order_id, routing_id,
+                                                sequence, work_center_id, status, std_setup_time,
+                                                std_run_time, std_fixed_rate, std_var_rate)
+      VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${row.actorId}, ${row.orderId},
+              ${row.routingId}, ${row.sequence}, ${row.workCenterId}, 'PENDING', ${row.stdSetupTime},
+              ${row.stdRunTime}, ${row.stdFixedRate}, ${row.stdVarRate})
+    `);
+  }
+}
+
+export async function listProductionOrderOperations(orderId: string): Promise<ProductionOrderOperationRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ORDER_OPERATION_COLUMNS} FROM production_order_operations
+    WHERE order_id = ${orderId} ORDER BY sequence
+  `);
+  return rows.rows as unknown as ProductionOrderOperationRow[];
+}
+
+export async function findProductionOrderOperation(
+  orderId: string,
+  sequence: number,
+): Promise<ProductionOrderOperationRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ORDER_OPERATION_COLUMNS} FROM production_order_operations
+    WHERE order_id = ${orderId} AND sequence = ${sequence} LIMIT 1
+  `);
+  return (rows.rows as unknown as ProductionOrderOperationRow[])[0];
+}
+
+/** Live (non-terminal) operations of an order — the completion gate
+ * (OperationsIncompleteError) + the order-cancel safety read. */
+export async function countLiveOrderOperations(orderId: string): Promise<number> {
+  const rows = await tenantTx().execute(sql`
+    SELECT count(*)::int AS n FROM production_order_operations
+    WHERE order_id = ${orderId} AND status IN ('PENDING', 'SETUP', 'RUNNING', 'PAUSED')
+  `);
+  return (rows.rows as unknown as { n: number }[])[0]!.n;
+}
+
+/** The single order-operation mutation point: status flips, the actual-time
+ * capture, the variances, the scrap/skip evidence, the journal link. */
+export async function patchProductionOrderOperation(input: {
+  id: string;
+  status?: string;
+  actualSetupTime?: string;
+  actualRunTime?: string;
+  setupVariance?: string;
+  usageVariance?: string;
+  rateVariance?: string;
+  operatorUserId?: string | null;
+  scrapQty?: string;
+  scrapReasonCode?: string | null;
+  skipReason?: string | null;
+  skipApprovedBy?: string | null;
+  journalId?: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE production_order_operations SET
+      status = COALESCE(${input.status ?? null}, status),
+      actual_setup_time = COALESCE(${input.actualSetupTime ?? null}, actual_setup_time),
+      actual_run_time = COALESCE(${input.actualRunTime ?? null}, actual_run_time),
+      setup_variance = COALESCE(${input.setupVariance ?? null}, setup_variance),
+      usage_variance = COALESCE(${input.usageVariance ?? null}, usage_variance),
+      rate_variance = COALESCE(${input.rateVariance ?? null}, rate_variance),
+      scrap_qty = COALESCE(${input.scrapQty ?? null}, scrap_qty),
+      started_at = CASE WHEN ${input.status ?? null} IN ('SETUP', 'RUNNING') AND started_at IS NULL
+                        THEN now() ELSE started_at END,
+      finished_at = CASE WHEN ${input.status ?? null} = 'COMPLETED' THEN now() ELSE finished_at END,
+      operator_user_id = CASE WHEN ${input.operatorUserId === undefined} THEN operator_user_id
+                              ELSE ${input.operatorUserId ?? null} END,
+      scrap_reason_code = CASE WHEN ${input.scrapReasonCode === undefined} THEN scrap_reason_code
+                               ELSE ${input.scrapReasonCode ?? null} END,
+      skip_reason = CASE WHEN ${input.skipReason === undefined} THEN skip_reason
+                         ELSE ${input.skipReason ?? null} END,
+      skip_approved_by = CASE WHEN ${input.skipApprovedBy === undefined} THEN skip_approved_by
+                              ELSE ${input.skipApprovedBy ?? null} END,
+      journal_id = CASE WHEN ${input.journalId === undefined} THEN journal_id
+                        ELSE ${input.journalId ?? null} END,
+      version = version + 1, updated_at = now()
+    WHERE id = ${input.id}
+  `);
+}
+
+// -- rework orders (M-14) --------------------------------------------------------------
+
+export interface ReworkOrderRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  reworkNo: string | null;
+  parentOrderId: string;
+  itemId: string;
+  batchId: string | null;
+  defectRef: string;
+  qty: string;
+  uomId: string;
+  routingId: string | null;
+  status: string;
+  stdSetupTime: string;
+  stdRunTime: string;
+  stdFixedRate: string;
+  stdVarRate: string;
+  actualSetupTime: string;
+  actualRunTime: string;
+  laborValue: string;
+  overheadValue: string;
+  reworkValue: string;
+  journalId: string | null;
+  defectReasonCode: string | null;
+  note: string | null;
+  noteAr: string | null;
+  releasedAt: string | null;
+  completedAt: string | null;
+  cancelledAt: string | null;
+  cancelReason: string | null;
+}
+
+const REWORK_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
+  rework_no AS "reworkNo", parent_order_id AS "parentOrderId", item_id AS "itemId",
+  batch_id AS "batchId", defect_ref AS "defectRef", qty::text AS "qty", uom_id AS "uomId",
+  routing_id AS "routingId", status,
+  std_setup_time::text AS "stdSetupTime", std_run_time::text AS "stdRunTime",
+  std_fixed_rate::text AS "stdFixedRate", std_var_rate::text AS "stdVarRate",
+  actual_setup_time::text AS "actualSetupTime", actual_run_time::text AS "actualRunTime",
+  labor_value::text AS "laborValue", overhead_value::text AS "overheadValue",
+  rework_value::text AS "reworkValue", journal_id AS "journalId",
+  defect_reason_code AS "defectReasonCode", note, note_ar AS "noteAr",
+  released_at::text AS "releasedAt", completed_at::text AS "completedAt",
+  cancelled_at::text AS "cancelledAt", cancel_reason AS "cancelReason"`;
+
+export async function insertReworkOrder(input: {
+  parentOrderId: string;
+  itemId: string;
+  batchId: string | null;
+  defectRef: string;
+  qty: string;
+  uomId: string;
+  routingId: string | null;
+  defectReasonCode: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<ReworkOrderRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO rework_orders (id, tenant_id, created_by, parent_order_id, item_id, batch_id,
+                               defect_ref, qty, uom_id, routing_id, status, defect_reason_code,
+                               note, note_ar)
+    VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.parentOrderId}, ${input.itemId},
+            ${input.batchId}, ${input.defectRef}, ${input.qty}, ${input.uomId}, ${input.routingId},
+            'DRAFT', ${input.defectReasonCode}, ${input.note}, ${input.noteAr})
+  `);
+  return (await findReworkOrderById(id))!;
+}
+
+export async function findReworkOrderById(id: string): Promise<ReworkOrderRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${REWORK_COLUMNS} FROM rework_orders WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as ReworkOrderRow[])[0];
+}
+
+export async function listReworkOrders(filter: { status?: string; limit: number }): Promise<ReworkOrderRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${REWORK_COLUMNS} FROM rework_orders
+    WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY created_at, id
+    LIMIT ${filter.limit}
+  `);
+  return rows.rows as unknown as ReworkOrderRow[];
+}
+
+/** The single rework mutation point (status transitions + the frozen/actual
+ * cost columns; the lifecycle timestamps stamp via CASE on the status). */
+export async function patchReworkOrder(input: {
+  id: string;
+  status?: string;
+  reworkNo?: string;
+  routingId?: string | null;
+  stdSetupTime?: string;
+  stdRunTime?: string;
+  stdFixedRate?: string;
+  stdVarRate?: string;
+  actualSetupTime?: string;
+  actualRunTime?: string;
+  laborValue?: string;
+  overheadValue?: string;
+  reworkValue?: string;
+  journalId?: string | null;
+  cancelReason?: string;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE rework_orders SET
+      status = COALESCE(${input.status ?? null}, status),
+      rework_no = COALESCE(${input.reworkNo ?? null}, rework_no),
+      routing_id = CASE WHEN ${input.routingId === undefined} THEN routing_id
+                        ELSE ${input.routingId ?? null} END,
+      std_setup_time = COALESCE(${input.stdSetupTime ?? null}, std_setup_time),
+      std_run_time = COALESCE(${input.stdRunTime ?? null}, std_run_time),
+      std_fixed_rate = COALESCE(${input.stdFixedRate ?? null}, std_fixed_rate),
+      std_var_rate = COALESCE(${input.stdVarRate ?? null}, std_var_rate),
+      actual_setup_time = COALESCE(${input.actualSetupTime ?? null}, actual_setup_time),
+      actual_run_time = COALESCE(${input.actualRunTime ?? null}, actual_run_time),
+      labor_value = COALESCE(${input.laborValue ?? null}, labor_value),
+      overhead_value = COALESCE(${input.overheadValue ?? null}, overhead_value),
+      rework_value = COALESCE(${input.reworkValue ?? null}, rework_value),
+      journal_id = CASE WHEN ${input.journalId === undefined} THEN journal_id
+                        ELSE ${input.journalId ?? null} END,
+      cancel_reason = COALESCE(${input.cancelReason ?? null}, cancel_reason),
+      released_at = CASE WHEN ${input.status ?? null} = 'RELEASED' THEN now() ELSE released_at END,
+      completed_at = CASE WHEN ${input.status ?? null} = 'COMPLETED' THEN now() ELSE completed_at END,
+      cancelled_at = CASE WHEN ${input.status ?? null} = 'CANCELLED' THEN now() ELSE cancelled_at END,
+      version = version + 1, updated_at = now()
+    WHERE id = ${input.id}
+  `);
+}
+
+// -- downtime records (M-15) ------------------------------------------------------------
+
+export interface DowntimeRecordRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  workCenterId: string;
+  orderId: string | null;
+  operationSequence: number | null;
+  reasonCode: string;
+  startedAt: string;
+  endedAt: string | null;
+  durationMinutes: number;
+  costAmount: string | null;
+  journalId: string | null;
+  note: string | null;
+}
+
+const DOWNTIME_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
+  work_center_id AS "workCenterId", order_id AS "orderId", operation_sequence AS "operationSequence",
+  reason_code AS "reasonCode", started_at::text AS "startedAt", ended_at::text AS "endedAt",
+  duration_minutes AS "durationMinutes", cost_amount::text AS "costAmount",
+  journal_id AS "journalId", note`;
+
+export async function insertDowntimeRecord(input: {
+  workCenterId: string;
+  orderId: string | null;
+  operationSequence: number | null;
+  reasonCode: string;
+  startedAt: string;
+  endedAt: string | null;
+  durationMinutes: number;
+  note: string | null;
+  actorId: string | null;
+}): Promise<DowntimeRecordRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO downtime_records (id, tenant_id, created_by, work_center_id, order_id,
+                                  operation_sequence, reason_code, started_at, ended_at,
+                                  duration_minutes, note)
+    VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.workCenterId}, ${input.orderId},
+            ${input.operationSequence}, ${input.reasonCode}, ${input.startedAt}::timestamptz,
+            ${input.endedAt}::timestamptz, ${input.durationMinutes}, ${input.note})
+  `);
+  return (await findDowntimeRecordById(id))!;
+}
+
+export async function findDowntimeRecordById(id: string): Promise<DowntimeRecordRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${DOWNTIME_COLUMNS} FROM downtime_records WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as DowntimeRecordRow[])[0];
+}
+
+export async function listDowntimeRecords(filter: {
+  workCenterId?: string;
+  orderId?: string;
+  from?: string;
+  to?: string;
+  limit: number;
+}): Promise<DowntimeRecordRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${DOWNTIME_COLUMNS} FROM downtime_records
+    WHERE (${filter.workCenterId ?? null}::uuid IS NULL OR work_center_id = ${filter.workCenterId ?? null})
+      AND (${filter.orderId ?? null}::uuid IS NULL OR order_id = ${filter.orderId ?? null})
+      AND (${filter.from ?? null}::date IS NULL OR started_at >= ${filter.from ?? null}::date)
+      AND (${filter.to ?? null}::date IS NULL OR started_at < (${filter.to ?? null}::date + 1))
+    ORDER BY started_at DESC, id
+    LIMIT ${filter.limit}
+  `);
+  return rows.rows as unknown as DowntimeRecordRow[];
+}
+
+/** Close-path mutation: the end stamp + duration + the policy-gated cost
+ * and journal link (both stay NULL while record-only — the CHECK floor). */
+export async function patchDowntimeRecord(input: {
+  id: string;
+  endedAt?: string | null;
+  durationMinutes?: number;
+  costAmount?: string | null;
+  journalId?: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE downtime_records SET
+      duration_minutes = COALESCE(${input.durationMinutes ?? null}, duration_minutes),
+      ended_at = CASE WHEN ${input.endedAt === undefined} THEN ended_at
+                      ELSE ${input.endedAt ?? null}::timestamptz END,
+      cost_amount = CASE WHEN ${input.costAmount === undefined} THEN cost_amount
+                         ELSE ${input.costAmount ?? null} END,
+      journal_id = CASE WHEN ${input.journalId === undefined} THEN journal_id
+                        ELSE ${input.journalId ?? null} END,
+      version = version + 1, updated_at = now()
+    WHERE id = ${input.id}
+  `);
+}
+
+// -- item standard costs (L2-12) --------------------------------------------------------
+
+export interface ItemStandardCostRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  itemId: string;
+  versionNo: number;
+  status: string;
+  materialCost: string;
+  laborCost: string;
+  overheadCost: string;
+  totalCost: string;
+  /** Parsed jsonb array of [{key, amount}] — service-validated at write. */
+  overheadSubSplits: { key: string; amount: string }[];
+  source: string;
+  effectiveFrom: string | null;
+  rolledUpAt: string | null;
+  activatedAt: string | null;
+  archivedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+}
+
+const STANDARD_COST_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
+  created_by AS "createdBy", item_id AS "itemId", version_no AS "versionNo", status,
+  material_cost::text AS "materialCost", labor_cost::text AS "laborCost",
+  overhead_cost::text AS "overheadCost", total_cost::text AS "totalCost",
+  overhead_sub_splits AS "overheadSubSplits", source,
+  effective_from::text AS "effectiveFrom", rolled_up_at::text AS "rolledUpAt",
+  activated_at::text AS "activatedAt", archived_at::text AS "archivedAt", note, note_ar AS "noteAr"`;
+
+export async function insertItemStandardCost(input: {
+  itemId: string;
+  versionNo: number;
+  materialCost: string;
+  laborCost: string;
+  overheadCost: string;
+  totalCost: string;
+  overheadSubSplits: readonly { key: string; amount: string }[];
+  source: string;
+  rolledUpAt: string | null;
+  effectiveFrom: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<ItemStandardCostRow> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO item_standard_costs (id, tenant_id, created_by, item_id, version_no, status,
+                                     material_cost, labor_cost, overhead_cost, total_cost,
+                                     overhead_sub_splits, source, rolled_up_at, effective_from,
+                                     note, note_ar)
+    VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.itemId}, ${input.versionNo},
+            'DRAFT', ${input.materialCost}, ${input.laborCost}, ${input.overheadCost},
+            ${input.totalCost}, ${JSON.stringify(input.overheadSubSplits)}::jsonb, ${input.source},
+            ${input.rolledUpAt}::timestamptz, ${input.effectiveFrom}::date, ${input.note}, ${input.noteAr})
+  `);
+  return (await findStandardCostById(id))!;
+}
+
+export async function findStandardCostById(id: string): Promise<ItemStandardCostRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${STANDARD_COST_COLUMNS} FROM item_standard_costs WHERE id = ${id} LIMIT 1
+  `);
+  return (rows.rows as unknown as ItemStandardCostRow[])[0];
+}
+
+export async function findActiveStandardCost(itemId: string): Promise<ItemStandardCostRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${STANDARD_COST_COLUMNS} FROM item_standard_costs
+    WHERE item_id = ${itemId} AND status = 'ACTIVE'
+    ORDER BY version_no DESC
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as ItemStandardCostRow[])[0];
+}
+
+export async function listStandardCosts(filter: { itemId?: string; limit: number }): Promise<ItemStandardCostRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${STANDARD_COST_COLUMNS} FROM item_standard_costs
+    WHERE (${filter.itemId ?? null}::uuid IS NULL OR item_id = ${filter.itemId ?? null})
+    ORDER BY item_id, version_no DESC
+    LIMIT ${filter.limit}
+  `);
+  return rows.rows as unknown as ItemStandardCostRow[];
+}
+
+export async function listStandardCostsForItem(itemId: string): Promise<ItemStandardCostRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${STANDARD_COST_COLUMNS} FROM item_standard_costs
+    WHERE item_id = ${itemId} ORDER BY version_no
+  `);
+  return rows.rows as unknown as ItemStandardCostRow[];
+}
+
+/** The single standard-cost mutation point (BOM-discipline status flips;
+ * activated_at/archived_at stamp via CASE on the target status). */
+export async function patchStandardCost(input: {
+  id: string;
+  status?: string;
+  effectiveFrom?: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE item_standard_costs SET
+      status = COALESCE(${input.status ?? null}, status),
+      effective_from = CASE WHEN ${input.effectiveFrom === undefined} THEN effective_from
+                            ELSE ${input.effectiveFrom ?? null}::date END,
+      activated_at = CASE WHEN ${input.status ?? null} = 'ACTIVE' THEN now() ELSE activated_at END,
+      archived_at = CASE WHEN ${input.status ?? null} = 'ARCHIVED' THEN now() ELSE archived_at END,
+      version = version + 1, updated_at = now()
+    WHERE id = ${input.id}
+  `);
+}
+
+// -- OEE view reads (M-16; security_invoker — RLS applies) ------------------------------
+
+export interface OeeDailyRow {
+  tenantId: string;
+  workCenterId: string;
+  day: string;
+  plannedHours: string;
+  actualHours: string;
+  scrapQty: string;
+  completedOperations: number;
+  skippedOperations: number;
+  totalOperations: number;
+  downtimeMinutes: number;
+}
+
+export async function listOeeDaily(filter: {
+  workCenterId?: string;
+  from?: string;
+  to?: string;
+  limit?: number;
+}): Promise<OeeDailyRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT tenant_id AS "tenantId", work_center_id AS "workCenterId", day::text AS "day",
+           planned_hours::text AS "plannedHours", actual_hours::text AS "actualHours",
+           scrap_qty::text AS "scrapQty", completed_operations AS "completedOperations",
+           skipped_operations AS "skippedOperations", total_operations AS "totalOperations",
+           downtime_minutes AS "downtimeMinutes"
+    FROM v_work_center_oee_daily
+    WHERE (${filter.workCenterId ?? null}::uuid IS NULL OR work_center_id = ${filter.workCenterId ?? null})
+      AND (${filter.from ?? null}::date IS NULL OR day >= ${filter.from ?? null}::date)
+      AND (${filter.to ?? null}::date IS NULL OR day <= ${filter.to ?? null}::date)
+    ORDER BY work_center_id, day
+    LIMIT ${filter.limit ?? 500}
+  `);
+  return rows.rows as unknown as OeeDailyRow[];
+}
+
+export interface OeePeriodRow extends Omit<OeeDailyRow, "day"> {
+  periodStart: string;
+}
+
+export async function listOeePeriod(filter: {
+  workCenterId?: string;
+  from?: string;
+  to?: string;
+  limit?: number;
+}): Promise<OeePeriodRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT tenant_id AS "tenantId", work_center_id AS "workCenterId",
+           period_start::text AS "periodStart",
+           planned_hours::text AS "plannedHours", actual_hours::text AS "actualHours",
+           scrap_qty::text AS "scrapQty", completed_operations AS "completedOperations",
+           skipped_operations AS "skippedOperations", total_operations AS "totalOperations",
+           downtime_minutes AS "downtimeMinutes"
+    FROM v_work_center_oee_period
+    WHERE (${filter.workCenterId ?? null}::uuid IS NULL OR work_center_id = ${filter.workCenterId ?? null})
+      AND (${filter.from ?? null}::date IS NULL OR period_start >= ${filter.from ?? null}::date)
+      AND (${filter.to ?? null}::date IS NULL OR period_start <= ${filter.to ?? null}::date)
+    ORDER BY work_center_id, period_start
+    LIMIT ${filter.limit ?? 500}
+  `);
+  return rows.rows as unknown as OeePeriodRow[];
+}
+
+// -- cross-module reads for the PHASE-042 services (read-only §6 precedent) -------------
+
+/** Stock positions of an item across warehouses (qty > 0 only) — the
+ * revaluation batch input. item_stock is inventory-owned; read-only here. */
+export async function listItemStockPositions(itemId: string): Promise<{ warehouseId: string; qty: string }[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT warehouse_id AS "warehouseId", qty::text AS qty FROM item_stock
+    WHERE item_id = ${itemId} AND qty > 0
+    ORDER BY warehouse_id
+  `);
+  return rows.rows as unknown as { warehouseId: string; qty: string }[];
+}
+
+/** User existence/status read for the skip-approver SoD check — users is
+ * identity-owned; read-only here. */
+export async function findUserForApproval(userId: string): Promise<{ id: string; status: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, status FROM users WHERE id = ${userId} LIMIT 1
+  `);
+  return (rows.rows as unknown as { id: string; status: string }[])[0];
+}
+
+/** Batch read for the rework defect link — item_batches is inventory-owned. */
+export async function findBatchForRework(batchId: string): Promise<{ id: string; itemId: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, item_id AS "itemId" FROM item_batches WHERE id = ${batchId} LIMIT 1
+  `);
+  return (rows.rows as unknown as { id: string; itemId: string }[])[0];
 }

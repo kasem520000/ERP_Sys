@@ -23,7 +23,10 @@ import type {
   BranchRow,
   ItemRow,
   ProductionOrderRow,
+  ReworkOrderRow,
+  RoutingRow,
   WarehouseRow,
+  WorkCenterRow,
 } from "../../../../lib/api-types";
 import { localizedApiError } from "../../../../lib/messages";
 import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
@@ -42,7 +45,7 @@ export default async function ManufacturingOrdersPage({
 
   await requireSessionToken(localeValue);
 
-  const [orders, items, warehouses, branches, boms] = await Promise.all([
+  const [orders, items, warehouses, branches, boms, routings, reworks, workCenters] = await Promise.all([
     fetchApi<readonly ProductionOrderRow[]>("manufacturing/production-orders?limit=200"),
     fetchApi<readonly ItemRow[]>("items/items?limit=100"),
     fetchApi<readonly WarehouseRow[]>("inventory/warehouses"),
@@ -51,6 +54,14 @@ export default async function ManufacturingOrdersPage({
     // by the chosen FG item); the screen works without it (the ACTIVE
     // default needs no list).
     fetchApi<readonly BomRow[]>("manufacturing/boms?limit=200"),
+    // PHASE-042 (T-12): the routing pool (the ops tab's binding display +
+    // the rework dialog's routing select — any version of the item).
+    fetchApi<readonly RoutingRow[]>("manufacturing/routings?limit=200"),
+    // PHASE-042 (T-12): the rework pool for the ops tab's rework list
+    // (rides rework_orders.manage — degrades to empty without it).
+    fetchApi<readonly ReworkOrderRow[]>("manufacturing/rework-orders?limit=200"),
+    // PHASE-042 (T-12): the work-center labels for the ops table.
+    fetchApi<readonly WorkCenterRow[]>("manufacturing/work-centers?limit=200"),
   ]);
   if (!orders.ok && orders.status === 401) {
     redirect(`/${locale}/login`);
@@ -78,6 +89,9 @@ export default async function ManufacturingOrdersPage({
         warehouses={(warehouses.ok ? warehouses.data : []).filter((warehouse) => warehouse.isActive)}
         branches={(branches.ok ? branches.data : []).filter((branch) => branch.isActive)}
         boms={boms.ok ? boms.data : []}
+        routings={routings.ok ? routings.data : []}
+        reworks={reworks.ok ? reworks.data : []}
+        workCenters={workCenters.ok ? workCenters.data : []}
         today={new Date().toISOString().slice(0, 10)}
       />
     );

@@ -305,3 +305,296 @@ export class GenealogyBatchNotFoundError extends DomainError {
     super("GENEALOGY_BATCH_NOT_FOUND", `batch ${batchId} does not exist in this tenant`);
   }
 }
+
+// -- PHASE-042: work centers (M-03/H-04) ---------------------------------------------
+
+/** Unknown or foreign work-center id (A7: no existence disclosure). */
+export class WorkCenterNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("WORK_CENTER_NOT_FOUND", `work center ${id} does not exist in this tenant`);
+  }
+}
+/** uq_work_centers_tenant_code — the code is taken (a concurrent create or a
+ * duplicate master-data code; corrections are renames, never shadow rows). */
+export class WorkCenterCodeConflictError extends DomainError {
+  constructor(code: string) {
+    super("WORK_CENTER_CODE_CONFLICT", `work center code ${code} is already in use in this tenant`, {
+      code,
+    });
+  }
+}
+/** Work-center input violations (bad code shape, capacity outside (0, 24],
+ * shifts outside 1..6, a negative rate, a malformed decimal). */
+export class WorkCenterInputInvalidError extends DomainError {
+  constructor(message: string) {
+    super("WORK_CENTER_INPUT_INVALID", message);
+  }
+}
+/** INACTIVE blocked: the center is referenced by an ACTIVE routing's
+ * operations or by live (non-terminal) frozen operation rows. */
+export class WorkCenterInUseError extends DomainError {
+  constructor(details: { workCenterId: string; activeRoutingOperations: number; liveOperations: number }) {
+    super(
+      "WORK_CENTER_IN_USE",
+      `work center ${details.workCenterId} is referenced by ${details.activeRoutingOperations} ACTIVE-routing operations and ${details.liveOperations} live order operations — deactivate the referencing routings / finish the operations first`,
+      details,
+    );
+  }
+}
+/** A routing operation names a work center that is not ACTIVE (the freeze
+ * would capture rates the floor cannot execute against). */
+export class WorkCenterNotActiveError extends DomainError {
+  constructor(workCenterId: string, status: string) {
+    super("WORK_CENTER_NOT_ACTIVE", `work center ${workCenterId} is ${status} — routing operations require an ACTIVE work center`, {
+      workCenterId,
+      status,
+    });
+  }
+}
+
+// -- PHASE-042: routings (M-02) -------------------------------------------------------
+
+/** Unknown or foreign routing id (A7: no existence disclosure). */
+export class RoutingNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("ROUTING_NOT_FOUND", `routing ${id} does not exist in this tenant`);
+  }
+}
+/** Edit/activate attempted on a non-DRAFT routing where DRAFT is required. */
+export class RoutingNotDraftError extends DomainError {
+  constructor(message: string) {
+    super("ROUTING_NOT_DRAFT", message);
+  }
+}
+/** The one-active invariant: another ACTIVE routing exists for the item
+ * (uq_routings_active_item — the 23505 race backstop). */
+export class RoutingActiveExistsError extends DomainError {
+  constructor(itemId: string, activeRoutingId: string | null) {
+    super("ROUTING_ACTIVE_EXISTS", `item ${itemId} already has another ACTIVE routing (one active per item)`, {
+      itemId,
+      activeRoutingId,
+    });
+  }
+}
+/** uq_routings_tenant_item_version — the (item, version) slot is taken. */
+export class RoutingVersionConflictError extends DomainError {
+  constructor(itemId: string, versionNo: number) {
+    super("ROUTING_VERSION_CONFLICT", `version ${versionNo} for item ${itemId} is already in use in this tenant`, {
+      itemId,
+      versionNo,
+    });
+  }
+}
+/** Routing-operation violations: duplicate/out-of-range sequences, negative
+ * times, an unpaired rate override, a dangling work center. */
+export class RoutingOperationInvalidError extends DomainError {
+  constructor(message: string) {
+    super("ROUTING_OPERATION_INVALID", message);
+  }
+}
+
+// -- PHASE-042: order operations (M-02/M-17/M-18/M-13/M-19) ----------------------------
+
+/** Unknown operation (order + sequence pair) — A7-shaped. */
+export class OperationNotFoundError extends DomainError {
+  constructor(orderId: string, sequence: number) {
+    super("OPERATION_NOT_FOUND", `operation ${sequence} of production order ${orderId} does not exist in this tenant`);
+  }
+}
+/** An off-machine operation transition (start on COMPLETED, pause on
+ * PENDING, …); the legal idempotent replays are NOT this error. */
+export class OperationStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("OPERATION_STATE", message, details);
+  }
+}
+/** INV-028: an operation starts only after every lower-sequence operation is
+ * COMPLETED or SKIPPED — the blocking sequence is in the details. */
+export class OperationSequenceError extends DomainError {
+  constructor(details: { orderId: string; sequence: number; blockedBy: number; blockedByStatus: string }) {
+    super(
+      "OPERATION_SEQUENCE",
+      `operation ${details.sequence} of production order ${details.orderId} cannot start — operation ${details.blockedBy} is still ${details.blockedByStatus} (INV-028: the sequence gate)`,
+      details,
+    );
+  }
+}
+/** A G-40 completion whose rounded credit legs cannot equal the WIP debit at
+ * 4dp — honest fail-closed (fixtures use exactly-representable numbers). */
+export class OperationCostRoundingError extends DomainError {
+  constructor(details: { debit: string; credits: string }) {
+    super(
+      "OPERATION_COST_ROUNDING",
+      `operation conversion credits ${details.credits} do not equal the WIP debit ${details.debit} at 4dp — completion refuses a rounding residue`,
+      details,
+    );
+  }
+}
+/** Skip SoD: the approver must be a real (ACTIVE) user distinct from the
+ * scanning actor — self-approval is blocked (the BR-034 house pattern). */
+export class SelfApprovalBlockedError extends DomainError {
+  constructor(approverId: string) {
+    super(
+      "SELF_APPROVAL_BLOCKED",
+      `the skip approver ${approverId} must be a distinct active user — the actor cannot approve their own skip`,
+      { approverId },
+    );
+  }
+}
+/** The approver id names no real user (unknown or foreign — A7-shaped). */
+export class ApproverNotFoundError extends DomainError {
+  constructor(approverId: string) {
+    super("APPROVER_NOT_FOUND", `the skip approver ${approverId} is not a user in this tenant`);
+  }
+}
+/** Operation scrap qty > 0 without a reason code (the service gate; the DB
+ * ck_production_order_operations_scrap CHECK is the floor). */
+export class OperationScrapReasonRequiredError extends DomainError {
+  constructor(sequence: number) {
+    super(
+      "OPERATION_SCRAP_REASON_REQUIRED",
+      `operation ${sequence} scraped units without a reason code — statistical scrap always explains itself`,
+      { sequence },
+    );
+  }
+}
+/** A routing-bound order cannot complete while any operation is
+ * PENDING/SETUP/RUNNING/PAUSED (SKIPPED counts as resolved). */
+export class OperationsIncompleteError extends DomainError {
+  constructor(orderId: string, liveOperations: number) {
+    super(
+      "OPERATIONS_INCOMPLETE",
+      `production order ${orderId} still has ${liveOperations} live operations (PENDING/SETUP/RUNNING/PAUSED) — finish or skip them before completing the order`,
+      { orderId, liveOperations },
+    );
+  }
+}
+/** The shop-floor scan code is malformed (M-17: OP:<orderId>:<seq>:<action>). */
+export class ScanCodeFormatError extends DomainError {
+  constructor(code: string) {
+    super("SCAN_CODE_FORMAT", `scan code must be OP:<orderId>:<sequence>:<start|pause|resume|complete> — got ${code}`);
+  }
+}
+
+// -- PHASE-042: rework orders (M-14) ---------------------------------------------------
+
+/** Unknown or foreign rework-order id (A7: no existence disclosure). */
+export class ReworkOrderNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("REWORK_ORDER_NOT_FOUND", `rework order ${id} does not exist in this tenant`);
+  }
+}
+/** An off-lifecycle rework transition (release on RELEASED, complete on
+ * DRAFT, cancel on COMPLETED, …); legal idempotent replays are not this. */
+export class ReworkOrderStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("REWORK_ORDER_STATE", message, details);
+  }
+}
+/** The rework item must be the parent order's item (the simple v1 rule —
+ * component rework rides stock issues, not rework orders). */
+export class ReworkItemMismatchError extends DomainError {
+  constructor(parentItemId: string, itemId: string) {
+    super(
+      "REWORK_ITEM_MISMATCH",
+      `the rework item must equal the parent order's item (${parentItemId}) — got ${itemId}`,
+      { parentItemId, itemId },
+    );
+  }
+}
+/** Completion with zero conversion value — ck_rework_orders_completion
+ * requires rework_value > 0: a rework that cost nothing did not happen. */
+export class ReworkCostZeroError extends DomainError {
+  constructor(id: string) {
+    super("REWORK_COST_ZERO", `rework order ${id} completed with a zero conversion value — a rework that cost nothing did not happen`, {
+      id,
+    });
+  }
+}
+
+// -- PHASE-042: downtime records (M-15) ------------------------------------------------
+
+/** Unknown or foreign downtime-record id (A7: no existence disclosure). */
+export class DowntimeRecordNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("DOWNTIME_RECORD_NOT_FOUND", `downtime record ${id} does not exist in this tenant`);
+  }
+}
+/** Downtime input violations (reason outside the closed vocabulary, duration
+ * outside 0..1440, ended-before-started, a malformed timestamp, an unpaired
+ * order/operation link). */
+export class DowntimeInputInvalidError extends DomainError {
+  constructor(message: string) {
+    super("DOWNTIME_INPUT_INVALID", message);
+  }
+}
+/** Close attempted on an already-closed record (the log is append-shaped —
+ * corrections are new records, never rewrites of a closed window). */
+export class DowntimeAlreadyClosedError extends DomainError {
+  constructor(id: string) {
+    super("DOWNTIME_ALREADY_CLOSED", `downtime record ${id} is already closed — corrections are a new record`);
+  }
+}
+
+// -- PHASE-042: item standard costs (L2-12) --------------------------------------------
+
+/** Unknown or foreign standard-cost id (A7: no existence disclosure). */
+export class StandardCostNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("STANDARD_COST_NOT_FOUND", `item standard cost ${id} does not exist in this tenant`);
+  }
+}
+/** Edit/activate attempted on a non-DRAFT standard where DRAFT is required. */
+export class StandardCostNotDraftError extends DomainError {
+  constructor(message: string) {
+    super("STANDARD_COST_NOT_DRAFT", message);
+  }
+}
+/** The one-active invariant: another ACTIVE standard exists for the item
+ * (uq_item_standard_costs_active_item — the 23505 race backstop). */
+export class StandardCostActiveExistsError extends DomainError {
+  constructor(itemId: string, activeId: string | null) {
+    super("STANDARD_COST_ACTIVE_EXISTS", `item ${itemId} already has another ACTIVE standard (one active per item)`, {
+      itemId,
+      activeId,
+    });
+  }
+}
+/** uq_item_standard_costs_tenant_item_version — the slot is taken. */
+export class StandardCostVersionConflictError extends DomainError {
+  constructor(itemId: string, versionNo: number) {
+    super("STANDARD_COST_VERSION_CONFLICT", `version ${versionNo} for item ${itemId} is already in use in this tenant`, {
+      itemId,
+      versionNo,
+    });
+  }
+}
+/** Standard-cost input violations (a negative cost, a malformed decimal, a
+ * sub-split shape violation, sub-splits that do not sum to the overhead). */
+export class StandardCostInvalidError extends DomainError {
+  constructor(message: string) {
+    super("STANDARD_COST_INVALID", message);
+  }
+}
+/** rollUp fail-closed: a level-1 BOM component carries no ACTIVE standard —
+ * the named components must roll first (the low-level code discipline). */
+export class StandardCostMissingError extends DomainError {
+  constructor(componentItemIds: readonly string[]) {
+    super(
+      "STANDARD_COST_MISSING",
+      `components ${componentItemIds.join(", ")} have no ACTIVE standard cost — roll them up before the parent`,
+      { componentItemIds: [...componentItemIds] },
+    );
+  }
+}
+/** An explicit revaluation over stocked warehouses whose delta nets to zero
+ * — a zero-value journal cannot post (new standard == old standard). */
+export class StandardRevaluationZeroError extends DomainError {
+  constructor(itemId: string) {
+    super(
+      "STANDARD_REVALUATION_ZERO",
+      `the revaluation of item ${itemId} nets to zero (the new standard equals the previous ACTIVE standard) — nothing to revalue`,
+      { itemId },
+    );
+  }
+}

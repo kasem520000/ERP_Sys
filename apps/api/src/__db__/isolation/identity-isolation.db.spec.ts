@@ -2612,6 +2612,107 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // -- PHASE-042 manufacturing-execution fixtures (0065/0066) --
+  // work_centers: an ACTIVE center per tenant (per-shift capacity in
+  // hours + non-negative hourly rates).
+  await superuser.query(
+    `INSERT INTO work_centers (id, tenant_id, code, name, capacity_per_shift, shifts_per_day,
+                               fixed_cost_rate, var_cost_rate, status)
+     VALUES
+       ('49494942-0000-4000-8000-000000000001', $1, 'WC-ISO', 'Isolation work center', 8, 1, 10, 5, 'ACTIVE'),
+       ('49494942-0000-4000-8000-000000000002', $2, 'WC-ISO', 'Isolation work center', 8, 1, 10, 5, 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // routings: an ACTIVE version-1 routing per tenant on the fixture FG
+  // item (exactly one ACTIVE per item — the BOM discipline).
+  await superuser.query(
+    `INSERT INTO routings (id, tenant_id, item_id, version_no, status, output_uom_id)
+     VALUES
+       ('4a4a4a42-0000-4000-8000-000000000001', $1, 'babababa-0000-4000-8000-000000000001',
+        1, 'ACTIVE', 'b2b2b2b2-0000-4000-8000-000000000001'),
+       ('4a4a4a42-0000-4000-8000-000000000002', $2, 'babababa-0000-4000-8000-000000000002',
+        1, 'ACTIVE', 'b2b2b2b2-0000-4000-8000-000000000002')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // routing_operations: sequence 10 on the own routing + work center
+  // (setup hours per batch, run hours per unit).
+  await superuser.query(
+    `INSERT INTO routing_operations (id, tenant_id, routing_id, sequence, work_center_id,
+                                     setup_time, run_time)
+     VALUES
+       ('4b4b4b42-0000-4000-8000-000000000001', $1,
+        '4a4a4a42-0000-4000-8000-000000000001', 10, '49494942-0000-4000-8000-000000000001',
+        1, 0.5),
+       ('4b4b4b42-0000-4000-8000-000000000002', $2,
+        '4a4a4a42-0000-4000-8000-000000000002', 10, '49494942-0000-4000-8000-000000000002',
+        1, 0.5)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // production_order_operations: a PENDING row on the fixture production
+  // order (PENDING = pre-evidence: no started_at/finished_at).
+  await superuser.query(
+    `INSERT INTO production_order_operations (id, tenant_id, order_id, routing_id, sequence,
+                                              work_center_id, status, std_setup_time, std_run_time,
+                                              std_fixed_rate, std_var_rate)
+     VALUES
+       ('4c4c4c42-0000-4000-8000-000000000001', $1,
+        '36363636-0000-4000-8000-000000000001', '4a4a4a42-0000-4000-8000-000000000001',
+        10, '49494942-0000-4000-8000-000000000001', 'PENDING', 1, 0.5, 10, 5),
+       ('4c4c4c42-0000-4000-8000-000000000002', $2,
+        '36363636-0000-4000-8000-000000000002', '4a4a4a42-0000-4000-8000-000000000002',
+        10, '49494942-0000-4000-8000-000000000002', 'PENDING', 1, 0.5, 10, 5)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // rework_orders: a DRAFT rework on the fixture parent order (DRAFT
+  // carries no completion evidence; defect_ref names the defective batch).
+  await superuser.query(
+    `INSERT INTO rework_orders (id, tenant_id, parent_order_id, item_id, defect_ref, qty,
+                                uom_id, routing_id, status)
+     VALUES
+       ('4d4d4d42-0000-4000-8000-000000000001', $1,
+        '36363636-0000-4000-8000-000000000001', 'babababa-0000-4000-8000-000000000001',
+        'BATCH-ISO-1', 1, 'b2b2b2b2-0000-4000-8000-000000000001',
+        '4a4a4a42-0000-4000-8000-000000000001', 'DRAFT'),
+       ('4d4d4d42-0000-4000-8000-000000000002', $2,
+        '36363636-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+        'BATCH-ISO-1', 1, 'b2b2b2b2-0000-4000-8000-000000000002',
+        '4a4a4a42-0000-4000-8000-000000000002', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // downtime_records: a CLOSED record per tenant (ended_at >= started_at,
+  // duration 30 — the availability input of the OEE fold).
+  await superuser.query(
+    `INSERT INTO downtime_records (id, tenant_id, work_center_id, reason_code, started_at,
+                                   ended_at, duration_minutes)
+     VALUES
+       ('4e4e4e42-0000-4000-8000-000000000001', $1,
+        '49494942-0000-4000-8000-000000000001', 'MAINTENANCE', now() - interval '30 minutes',
+        now(), 30),
+       ('4e4e4e42-0000-4000-8000-000000000002', $2,
+        '49494942-0000-4000-8000-000000000002', 'MAINTENANCE', now() - interval '30 minutes',
+        now(), 30)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // item_standard_costs: an ACTIVE version-1 standard per tenant (total =
+  // the typed sum per the CHECK; one ACTIVE per item).
+  await superuser.query(
+    `INSERT INTO item_standard_costs (id, tenant_id, item_id, version_no, status,
+                                      material_cost, labor_cost, overhead_cost, total_cost, source)
+     VALUES
+       ('4f4f4f42-0000-4000-8000-000000000001', $1, 'babababa-0000-4000-8000-000000000001',
+        1, 'ACTIVE', 2.5, 1, 0.5, 4, 'MANUAL'),
+       ('4f4f4f42-0000-4000-8000-000000000002', $2, 'babababa-0000-4000-8000-000000000002',
+        1, 'ACTIVE', 2.5, 1, 0.5, 4, 'MANUAL')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3095,6 +3196,17 @@ const OWN_ROW: Record<string, [string, string]> = {
   // communication_log owns FOUR fixture rows (MESSAGE + CALL per tenant);
   // the A-suite probes key on `id` — the MESSAGE rows are the OWN_ROW pair.
   communication_log: ["48484841-0000-4000-8000-000000000001", "48484841-0000-4000-8000-000000000002"],
+  // PHASE-042 manufacturing-execution cluster (0065/0066)
+  work_centers: ["49494942-0000-4000-8000-000000000001", "49494942-0000-4000-8000-000000000002"],
+  routings: ["4a4a4a42-0000-4000-8000-000000000001", "4a4a4a42-0000-4000-8000-000000000002"],
+  routing_operations: ["4b4b4b42-0000-4000-8000-000000000001", "4b4b4b42-0000-4000-8000-000000000002"],
+  production_order_operations: [
+    "4c4c4c42-0000-4000-8000-000000000001",
+    "4c4c4c42-0000-4000-8000-000000000002",
+  ],
+  rework_orders: ["4d4d4d42-0000-4000-8000-000000000001", "4d4d4d42-0000-4000-8000-000000000002"],
+  downtime_records: ["4e4e4e42-0000-4000-8000-000000000001", "4e4e4e42-0000-4000-8000-000000000002"],
+  item_standard_costs: ["4f4f4f42-0000-4000-8000-000000000001", "4f4f4f42-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -3854,6 +3966,38 @@ const MISMATCHED_INSERT: Record<string, string> = {
   communication_log: `INSERT INTO communication_log (id, tenant_id, kind, direction, channel, at, summary, body)
      VALUES ('48484841-3000-4000-8000-000000000003', $1, 'MESSAGE', 'OUTBOUND', 'EMAIL', now(),
              'رسالة هجومية', 'محتوى هجومي')`,
+  // PHASE-042 manufacturing-execution cluster (0065/0066) — FK targets at
+  // the foreign tenant's own fixtures so the RLS WITH CHECK is the
+  // isolated rejection (the composite (id, tenant_id) FKs stay valid).
+  work_centers: `INSERT INTO work_centers (id, tenant_id, code, name, capacity_per_shift, shifts_per_day,
+                                fixed_cost_rate, var_cost_rate, status)
+     VALUES ('49494942-3000-4000-8000-000000000003', $1, 'WC-ATK', 'Attack work center', 8, 1, 1, 1, 'ACTIVE')`,
+  routings: `INSERT INTO routings (id, tenant_id, item_id, version_no, status, output_uom_id)
+     VALUES ('4a4a4a42-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+             9, 'DRAFT', 'b2b2b2b2-0000-4000-8000-000000000002')`,
+  routing_operations: `INSERT INTO routing_operations (id, tenant_id, routing_id, sequence, work_center_id,
+                                          setup_time, run_time)
+     VALUES ('4b4b4b42-3000-4000-8000-000000000003', $1,
+             '4a4a4a42-0000-4000-8000-000000000002', 90, '49494942-0000-4000-8000-000000000002', 1, 1)`,
+  production_order_operations: `INSERT INTO production_order_operations (id, tenant_id, order_id, routing_id, sequence,
+                                                       work_center_id, status)
+     VALUES ('4c4c4c42-3000-4000-8000-000000000003', $1,
+             '36363636-0000-4000-8000-000000000002', '4a4a4a42-0000-4000-8000-000000000002',
+             90, '49494942-0000-4000-8000-000000000002', 'PENDING')`,
+  rework_orders: `INSERT INTO rework_orders (id, tenant_id, parent_order_id, item_id, defect_ref, qty,
+                                uom_id, routing_id, status)
+     VALUES ('4d4d4d42-3000-4000-8000-000000000003', $1,
+             '36363636-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+             'BATCH-ATK', 1, 'b2b2b2b2-0000-4000-8000-000000000002',
+             '4a4a4a42-0000-4000-8000-000000000002', 'DRAFT')`,
+  downtime_records: `INSERT INTO downtime_records (id, tenant_id, work_center_id, reason_code, started_at,
+                                    duration_minutes)
+     VALUES ('4e4e4e42-3000-4000-8000-000000000003', $1,
+             '49494942-0000-4000-8000-000000000002', 'OTHER', now(), 5)`,
+  item_standard_costs: `INSERT INTO item_standard_costs (id, tenant_id, item_id, version_no, status,
+                                          material_cost, labor_cost, overhead_cost, total_cost, source)
+     VALUES ('4f4f4f42-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+             9, 'DRAFT', 1, 1, 1, 3, 'MANUAL')`,
 };
 
 beforeAll(async () => {
@@ -3866,9 +4010,15 @@ beforeAll(async () => {
 describe("registry completeness (negative proof — new tenant table must register)", () => {
   it("every public table with a tenant_id column is registered", async () => {
     const su = await superuserClient();
+    // BASE TABLES only: PHASE-042's two OEE views (security_invoker, derived
+    // facts over RLS tables) carry a tenant_id column but are not
+    // source-of-truth rows — the registry is tables, never views.
     const tables = await su.query<{ table_name: string }>(
-      `SELECT DISTINCT table_name FROM information_schema.columns
-        WHERE table_schema = 'public' AND column_name = 'tenant_id'`,
+      `SELECT DISTINCT c.table_name FROM information_schema.columns c
+         JOIN information_schema.tables t
+           ON t.table_schema = c.table_schema AND t.table_name = c.table_name
+        WHERE c.table_schema = 'public' AND c.column_name = 'tenant_id'
+          AND t.table_type = 'BASE TABLE'`,
     );
     const inDb = tables.rows.map((row) => row.table_name).sort();
     await su.end();

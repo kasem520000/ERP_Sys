@@ -13,12 +13,16 @@
  *   rates) — NO inline edit (edits are rare; a replacement order or an
  *   adjusted consumption is the documented correction path);
  * - the selected order's detail: the header card (WIP-relevant money
- *   fields + the produced batch), the plan-lines table (over_plan badge),
- *   the lifecycle action bar per status, the consume dialog (planned
- *   components only; optional explicit batch), the scrap dialog
- *   (reason-coded, value ≤ WIP) and the complete dialog (FG receipt + the
- *   completion summary), plus the consumptions/scraps tables. Money and
- *   quantities stay canonical decimal strings (ADR-0009).
+ *   fields + the produced batch), the plan tab (the release-frozen plan
+ *   lines, the consumptions/scraps tables) and the PHASE-042 operations
+ *   tab (the routing binding, current operation, progress, the frozen op
+ *   rows with std/actual times + variances, and the order's rework list
+ *   with the RW- lifecycle); the lifecycle action bar per status carries
+ *   the consume dialog (planned components only; optional explicit
+ *   batch), the scrap dialog (reason-coded, value ≤ WIP), the complete
+ *   dialog (FG receipt + the completion summary) and — on COMPLETED
+ *   orders — the create-rework action. Money and quantities stay
+ *   canonical decimal strings (ADR-0009).
  */
 import { useMemo, useState } from "react";
 import type { JSX } from "react";
@@ -32,6 +36,7 @@ import {
   Input,
   MoneyInput,
   Select,
+  Tabs,
   formatMoneyDisplay,
 } from "@erp/ui";
 
@@ -43,17 +48,24 @@ import type {
   CompletionResult,
   ConsumeResult,
   ItemRow,
+  OrderOperationsResult,
   ProductionOrderDetail,
   ProductionOrderRow,
+  ReworkOrderRow,
+  RoutingRow,
   ScrapResult,
   WarehouseRow,
+  WorkCenterRow,
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import {
   formatMessage,
   localizedName,
   localizedManufacturingError,
+  localizedOperationStatus,
   localizedProductionOrderStatus,
+  localizedReworkStatus,
+  localizedRoutingStatus,
 } from "../lib/messages";
 import { Card } from "./card";
 import { ErrorNotice, SuccessNotice } from "./notices";
@@ -117,6 +129,9 @@ export function ManufacturingOrders({
   warehouses,
   branches,
   boms,
+  routings,
+  reworks,
+  workCenters,
   today,
 }: {
   locale: Locale;
@@ -125,6 +140,9 @@ export function ManufacturingOrders({
   warehouses: readonly WarehouseRow[];
   branches: readonly BranchRow[];
   boms: readonly BomRow[];
+  routings: readonly RoutingRow[];
+  reworks: readonly ReworkOrderRow[];
+  workCenters: readonly WorkCenterRow[];
   today: string;
 }): JSX.Element {
   const d = getDictionary(locale);
@@ -179,6 +197,22 @@ export function ManufacturingOrders({
   // Cancel dialog state.
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+
+  // PHASE-042 (T-12): the operations tab state (per-order lazy load).
+  const [detailTab, setDetailTab] = useState("plan");
+  const [opsCache, setOpsCache] = useState<ReadonlyMap<string, OrderOperationsResult>>(new Map());
+  const [opsLoading, setOpsLoading] = useState(false);
+
+  // PHASE-042 (T-12): the rework surface state.
+  const [reworkRows, setReworkRows] = useState<readonly ReworkOrderRow[]>(reworks);
+  const [reworkOpen, setReworkOpen] = useState(false);
+  const [reworkQty, setReworkQty] = useState("");
+  const [reworkDefectRef, setReworkDefectRef] = useState("");
+  const [reworkRoutingId, setReworkRoutingId] = useState("");
+  const [reworkDefectReason, setReworkDefectReason] = useState("");
+  const [rwCompleteRow, setRwCompleteRow] = useState<ReworkOrderRow | null>(null);
+  const [rwActualSetup, setRwActualSetup] = useState("");
+  const [rwActualRun, setRwActualRun] = useState("");
 
   const stockItems = useMemo(
     () => items.filter((item) => item.kind === "STOCK" && item.deletedAt === null),
@@ -239,6 +273,157 @@ export function ManufacturingOrders({
     MONEY_RE.test(scrapValue) &&
     Number(scrapValue) > 0;
   const completeReady = QTY_RE.test(actualQty) && Number(actualQty) > 0;
+
+  // PHASE-042 (T-12): the ops-tab label pools + the rework readiness.
+  const workCenterLabelById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const wc of workCenters) {
+      map.set(wc.id, `${wc.code} · ${localizedName(wc.name, wc.nameAr, locale)}`);
+    }
+    return map;
+  }, [workCenters, locale]);
+  const routingLabelById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const routing of routings) {
+      map.set(
+        routing.id,
+        `${itemLabelById.get(routing.itemId) ?? routing.itemId} · v${routing.versionNo} · ${localizedRoutingStatus(d, routing.status)}`,
+      );
+    }
+    return map;
+  }, [routings, itemLabelById, d]);
+  const detailRoutings = useMemo(
+    () => routings.filter((routing) => routing.itemId === detail?.order.itemId),
+    [routings, detail],
+  );
+  const detailReworks = useMemo(
+    () => reworkRows.filter((row) => row.parentOrderId === detail?.order.id),
+    [reworkRows, detail],
+  );
+  const boundRouting = useMemo(
+    () => routings.find((routing) => routing.id === detail?.order.routingId) ?? null,
+    [routings, detail],
+  );
+  const detailOps = detail !== null ? (opsCache.get(detail.order.id) ?? null) : null;
+  const reworkReady =
+    QTY_RE.test(reworkQty) &&
+    Number(reworkQty) > 0 &&
+    reworkDefectRef.trim() !== "" &&
+    reworkDefectRef.trim().length <= 120;
+  const rwCompleteReady = RATE_RE.test(rwActualSetup) && RATE_RE.test(rwActualRun);
+
+  // PHASE-042 (T-12): the operations-tab lazy load (cached per order).
+  async function loadOps(orderId: string): Promise<void> {
+    setOpsLoading(true);
+    setError(null);
+    const result = await bffFetch<OrderOperationsResult>(
+      `manufacturing/production-orders/${orderId}/operations`,
+    );
+    setOpsLoading(false);
+    if (!result.ok) {
+      setError(localizedManufacturingError(d, result.error, result.retryAfterSeconds));
+      return;
+    }
+    setOpsCache((current) => new Map(current).set(orderId, result.data));
+  }
+
+  function onDetailTabChange(tab: string): void {
+    setDetailTab(tab);
+    if (tab === "operations" && detail !== null && !opsCache.has(detail.order.id)) {
+      void loadOps(detail.order.id);
+    }
+  }
+
+  // PHASE-042 (T-12): the rework lifecycle.
+  async function refreshReworks(): Promise<void> {
+    const result = await bffFetch<readonly ReworkOrderRow[]>(
+      "manufacturing/rework-orders?limit=200",
+    );
+    if (result.ok) {
+      setReworkRows(result.data);
+    }
+  }
+
+  async function createRework(): Promise<void> {
+    if (detail === null || !reworkReady) {
+      setError(d.errorsValidation);
+      return;
+    }
+    setBusy("rework");
+    setError(null);
+    const result = await bffFetch<ReworkOrderRow>("manufacturing/rework-orders", {
+      method: "POST",
+      body: {
+        parentOrderId: detail.order.id,
+        defectRef: reworkDefectRef.trim(),
+        qty: reworkQty,
+        routingId: reworkRoutingId === "" ? null : reworkRoutingId,
+        defectReasonCode:
+          reworkDefectReason.trim() === "" ? null : reworkDefectReason.trim(),
+      },
+    });
+    setBusy(null);
+    if (!result.ok) {
+      setError(localizedManufacturingError(d, result.error, result.retryAfterSeconds));
+      return;
+    }
+    setReworkOpen(false);
+    setReworkQty("");
+    setReworkDefectRef("");
+    setReworkRoutingId("");
+    setReworkDefectReason("");
+    await refreshReworks();
+    setNotice(d.mfgRwCreatedToast);
+  }
+
+  async function reworkAction(
+    row: ReworkOrderRow,
+    action: "release" | "start",
+    toast: string,
+  ): Promise<void> {
+    setBusy(`rework:${action}:${row.id}`);
+    setError(null);
+    const result = await bffFetch<ReworkOrderRow>(`manufacturing/rework-orders/${row.id}/${action}`, {
+      method: "POST",
+      body: {},
+    });
+    setBusy(null);
+    if (!result.ok) {
+      setError(localizedManufacturingError(d, result.error, result.retryAfterSeconds));
+      return;
+    }
+    await refreshReworks();
+    setNotice(toast);
+  }
+
+  async function reworkComplete(): Promise<void> {
+    if (rwCompleteRow === null || !rwCompleteReady) {
+      setError(d.errorsValidation);
+      return;
+    }
+    setBusy(`rework:complete:${rwCompleteRow.id}`);
+    setError(null);
+    const result = await bffFetch<ReworkOrderRow>(
+      `manufacturing/rework-orders/${rwCompleteRow.id}/complete`,
+      {
+        method: "POST",
+        body: {
+          actualSetupTime: rwActualSetup,
+          actualRunTime: rwActualRun,
+        },
+      },
+    );
+    setBusy(null);
+    if (!result.ok) {
+      setError(localizedManufacturingError(d, result.error, result.retryAfterSeconds));
+      return;
+    }
+    setRwCompleteRow(null);
+    setRwActualSetup("");
+    setRwActualRun("");
+    await refreshReworks();
+    setNotice(d.mfgRwCompletedToast);
+  }
 
   // -- list ------------------------------------------------------------------------------
 
@@ -687,6 +872,19 @@ export function ManufacturingOrders({
               </p>
             )}
 
+            {/* PHASE-042 (T-12): the detail tabs — the plan lines + the
+                postings stay on the plan tab; the operations tab carries the
+                frozen op rows + variances + the rework list. */}
+            <Tabs
+              items={[
+                { value: "plan", label: d.mfgOrderPlanLines },
+                { value: "operations", label: d.mfgOpsTab },
+              ]}
+              value={detailTab}
+              onValueChange={onDetailTabChange}
+              className="pt-1"
+            >
+              <div data-slot="plan" className="flex flex-col gap-4 pt-4">
             <div>
               <h3 className="text-sm font-semibold text-gray-900">{d.mfgOrderPlanLines}</h3>
               {detail.lines.length === 0 ? (
@@ -721,92 +919,6 @@ export function ManufacturingOrders({
               )}
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {detail.order.status === "DRAFT" && (
-                <>
-                  <Button
-                    variant="primary"
-                    loading={busy === "release"}
-                    onClick={() =>
-                      void lifecyclePost(
-                        "release",
-                        {},
-                        formatMessage(d.mfgOrderReleasedToast, {
-                          no: detail.order.orderNo ?? shortId(detail.order.id),
-                        }),
-                      )
-                    }
-                  >
-                    {d.mfgOrderRelease}
-                  </Button>
-                  <Button variant="danger" onClick={() => setCancelOpen(true)}>
-                    {d.mfgOrderCancel}
-                  </Button>
-                </>
-              )}
-              {detail.order.status === "RELEASED" && (
-                <>
-                  <Button
-                    variant="primary"
-                    loading={busy === "start"}
-                    onClick={() =>
-                      void lifecyclePost(
-                        "start",
-                        {},
-                        formatMessage(d.mfgOrderStartedToast, {
-                          no: detail.order.orderNo ?? shortId(detail.order.id),
-                        }),
-                      )
-                    }
-                  >
-                    {d.mfgOrderStart}
-                  </Button>
-                  <Button variant="danger" onClick={() => setCancelOpen(true)}>
-                    {d.mfgOrderCancel}
-                  </Button>
-                </>
-              )}
-              {detail.order.status === "IN_PROGRESS" && (
-                <>
-                  <Button variant="primary" onClick={openConsume}>
-                    {d.mfgOrderConsume}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setScrapQty("");
-                      setScrapReason("");
-                      setScrapValue("");
-                      setScrappedAt(today);
-                      setScrapOpen(true);
-                    }}
-                  >
-                    {d.mfgOrderScrap}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      setCompletedAt(today);
-                      setCompleteOpen(true);
-                    }}
-                  >
-                    {d.mfgOrderComplete}
-                  </Button>
-                  <Button variant="danger" onClick={() => setCancelOpen(true)}>
-                    {d.mfgOrderCancel}
-                  </Button>
-                </>
-              )}
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setDetail(null);
-                  setSelectedId(null);
-                }}
-              >
-                {d.commonClear}
-              </Button>
-            </div>
 
             <div>
               <h3 className="text-sm font-semibold text-gray-900">{d.mfgConsumptions}</h3>
@@ -908,6 +1020,282 @@ export function ManufacturingOrders({
                 </table>
               )}
             </div>
+              </div>
+
+              {/* -- the operations tab (PHASE-042 T-12) ------------------------------- */}
+              <div data-slot="operations" className="flex flex-col gap-4 pt-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm text-gray-600">{d.mfgOpsRouting}:</span>
+                  {boundRouting !== null ? (
+                    <span className="text-sm text-gray-800">
+                      {routingLabelById.get(boundRouting.id) ?? boundRouting.id}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-gray-500">{d.mfgOpsRoutingNone}</span>
+                  )}
+                  <span className="text-sm text-gray-600">{d.mfgOpsCurrentOperation}:</span>
+                  <span className="font-mono text-sm" dir="ltr">
+                    {detail.order.currentOperation ?? "—"}
+                  </span>
+                  {detailOps !== null && detailOps.operations.length > 0 && (
+                    <span className="text-sm text-gray-600">
+                      {" · "}
+                      {
+                        detailOps.operations.filter(
+                          (op) => op.status === "COMPLETED" || op.status === "SKIPPED",
+                        ).length
+                      }
+                      /{detailOps.operations.length}
+                    </span>
+                  )}
+                </div>
+
+                {opsLoading && detailOps === null ? (
+                  <p className="text-sm text-gray-500">…</p>
+                ) : detailOps === null || detailOps.operations.length === 0 ? (
+                  <p className="text-sm text-gray-500">{d.mfgOpsEmpty}</p>
+                ) : (
+                  <table className="w-full text-sm" aria-label={d.mfgOpsTab}>
+                    <thead>
+                      <tr className="border-b border-subtle text-xs text-gray-600">
+                        <th scope="col" className="px-2 py-1 text-start">{d.mfgRoutingSequence}</th>
+                        <th scope="col" className="px-2 py-1 text-start">{d.mfgRoutingWorkCenter}</th>
+                        <th scope="col" className="px-2 py-1 text-start">{d.accountingColStatus}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgOpsStdSetup}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgOpsStdRun}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgSfActualSetup}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgSfActualRun}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgOpsSetupVariance}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgOpsUsageVariance}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgOpsRateVariance}</th>
+                        <th scope="col" className="px-2 py-1 text-end">{d.mfgSfScrapQty}</th>
+                        <th scope="col" className="px-2 py-1 text-start">{d.mfgOpsJournal}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detailOps.operations.map((op) => (
+                        <tr key={op.id} className="border-b border-subtle">
+                          <td className="px-2 py-1.5 font-mono" dir="ltr">
+                            {op.sequence}
+                          </td>
+                          <td className="px-2 py-1.5">
+                            {workCenterLabelById.get(op.workCenterId) ?? shortId(op.workCenterId)}
+                          </td>
+                          <td className="px-2 py-1.5">
+                            <Badge tone={op.status === "RUNNING" ? "primary" : undefined}>
+                              {localizedOperationStatus(d, op.status)}
+                            </Badge>
+                          </td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.stdSetupTime)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.stdRunTime)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.actualSetupTime)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.actualRunTime)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.setupVariance)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.usageVariance)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.rateVariance)}</td>
+                          <td className="px-2 py-1.5 text-end">{qtyCell(op.scrapQty)}</td>
+                          <td className="px-2 py-1.5">
+                            {op.journalId === null ? (
+                              <span className="text-gray-500">—</span>
+                            ) : (
+                              <span className="font-mono text-sm" dir="ltr">
+                                {shortId(op.journalId)}
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+
+                {/* -- the order's rework list (the RW- lifecycle) ---------------- */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">{d.mfgRwListTitle}</h3>
+                  {detailReworks.length === 0 ? (
+                    <p className="mt-1 text-sm text-gray-500">{d.mfgRwEmpty}</p>
+                  ) : (
+                    <table className="mt-2 w-full text-sm" aria-label={d.mfgRwListTitle}>
+                      <thead>
+                        <tr className="border-b border-subtle text-xs text-gray-600">
+                          <th scope="col" className="px-2 py-1 text-start">{d.mfgRwNo}</th>
+                          <th scope="col" className="px-2 py-1 text-start">{d.accountingColStatus}</th>
+                          <th scope="col" className="px-2 py-1 text-start">{d.mfgRwDefectRef}</th>
+                          <th scope="col" className="px-2 py-1 text-end">{d.mfgRwQty}</th>
+                          <th scope="col" className="px-2 py-1 text-start">{d.mfgRwRouting}</th>
+                          <th scope="col" className="px-2 py-1 text-end">{d.mfgRwComplete}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {detailReworks.map((row) => (
+                          <tr key={row.id} className="border-b border-subtle">
+                            <td className="px-2 py-1.5">
+                              <span className="font-mono text-sm" dir="ltr">
+                                {row.reworkNo ?? shortId(row.id)}
+                              </span>
+                            </td>
+                            <td className="px-2 py-1.5">
+                              <Badge tone={row.status === "IN_PROGRESS" ? "primary" : undefined}>
+                                {localizedReworkStatus(d, row.status)}
+                              </Badge>
+                            </td>
+                            <td className="px-2 py-1.5">{row.defectRef}</td>
+                            <td className="px-2 py-1.5 text-end">{qtyCell(row.qty)}</td>
+                            <td className="px-2 py-1.5">
+                              {row.routingId === null ? (
+                                <span className="text-gray-500">—</span>
+                              ) : (
+                                (routingLabelById.get(row.routingId) ?? shortId(row.routingId))
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-end">
+                              <span className="inline-flex flex-wrap justify-end gap-1">
+                                {row.status === "DRAFT" && (
+                                  <Button
+                                    variant="secondary"
+                                    loading={busy === `rework:release:${row.id}`}
+                                    onClick={() =>
+                                      void reworkAction(row, "release", d.mfgRwReleasedToast)
+                                    }
+                                  >
+                                    {d.mfgRwRelease}
+                                  </Button>
+                                )}
+                                {row.status === "RELEASED" && (
+                                  <Button
+                                    variant="secondary"
+                                    loading={busy === `rework:start:${row.id}`}
+                                    onClick={() => void reworkAction(row, "start", d.mfgRwStart)}
+                                  >
+                                    {d.mfgRwStart}
+                                  </Button>
+                                )}
+                                {row.status === "IN_PROGRESS" && (
+                                  <Button
+                                    variant="secondary"
+                                    onClick={() => {
+                                      setRwCompleteRow(row);
+                                      setRwActualSetup("");
+                                      setRwActualRun("");
+                                    }}
+                                  >
+                                    {d.mfgRwComplete}
+                                  </Button>
+                                )}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
+            </Tabs>
+
+            {/* -- the lifecycle action bar (outside the tabs — always visible) ----- */}
+            <div className="flex flex-wrap gap-2">
+              {detail.order.status === "DRAFT" && (
+                <>
+                  <Button
+                    variant="primary"
+                    loading={busy === "release"}
+                    onClick={() =>
+                      void lifecyclePost(
+                        "release",
+                        {},
+                        formatMessage(d.mfgOrderReleasedToast, {
+                          no: detail.order.orderNo ?? shortId(detail.order.id),
+                        }),
+                      )
+                    }
+                  >
+                    {d.mfgOrderRelease}
+                  </Button>
+                  <Button variant="danger" onClick={() => setCancelOpen(true)}>
+                    {d.mfgOrderCancel}
+                  </Button>
+                </>
+              )}
+              {detail.order.status === "RELEASED" && (
+                <>
+                  <Button
+                    variant="primary"
+                    loading={busy === "start"}
+                    onClick={() =>
+                      void lifecyclePost(
+                        "start",
+                        {},
+                        formatMessage(d.mfgOrderStartedToast, {
+                          no: detail.order.orderNo ?? shortId(detail.order.id),
+                        }),
+                      )
+                    }
+                  >
+                    {d.mfgOrderStart}
+                  </Button>
+                  <Button variant="danger" onClick={() => setCancelOpen(true)}>
+                    {d.mfgOrderCancel}
+                  </Button>
+                </>
+              )}
+              {detail.order.status === "IN_PROGRESS" && (
+                <>
+                  <Button variant="primary" onClick={openConsume}>
+                    {d.mfgOrderConsume}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setScrapQty("");
+                      setScrapReason("");
+                      setScrapValue("");
+                      setScrappedAt(today);
+                      setScrapOpen(true);
+                    }}
+                  >
+                    {d.mfgOrderScrap}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setCompletedAt(today);
+                      setCompleteOpen(true);
+                    }}
+                  >
+                    {d.mfgOrderComplete}
+                  </Button>
+                  <Button variant="danger" onClick={() => setCancelOpen(true)}>
+                    {d.mfgOrderCancel}
+                  </Button>
+                </>
+              )}
+              {/* PHASE-042 (T-12): the create-rework action (COMPLETED only). */}
+              {detail.order.status === "COMPLETED" && (
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setReworkQty("");
+                    setReworkDefectRef("");
+                    setReworkRoutingId("");
+                    setReworkDefectReason("");
+                    setReworkOpen(true);
+                  }}
+                >
+                  {d.mfgRwCreate}
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setDetail(null);
+                  setSelectedId(null);
+                }}
+              >
+                {d.commonClear}
+              </Button>
+            </div>
+
           </div>
         </Card>
       )}
@@ -917,6 +1305,119 @@ export function ManufacturingOrders({
           <p className="text-sm text-gray-500">…</p>
         </Card>
       )}
+
+      {/* -- create-rework dialog (PHASE-042 T-12 — COMPLETED orders) ------------- */}
+      <Dialog open={reworkOpen} onOpenChange={setReworkOpen} title={d.mfgRwCreate}>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Input
+            label={d.mfgRwDefectRef}
+            value={reworkDefectRef}
+            onValueChange={setReworkDefectRef}
+            required
+            error={
+              reworkDefectRef.trim() === "" || reworkDefectRef.trim().length > 120
+                ? d.errorsValidation
+                : undefined
+            }
+          />
+          <div className="w-40">
+            <Input
+              label={d.mfgRwQty}
+              value={reworkQty}
+              onValueChange={setReworkQty}
+              mono
+              required
+              error={
+                reworkQty !== "" && (!QTY_RE.test(reworkQty) || Number(reworkQty) <= 0)
+                  ? d.errorsValidation
+                  : undefined
+              }
+            />
+          </div>
+          <Select
+            label={d.mfgRwRouting}
+            value={reworkRoutingId}
+            onValueChange={setReworkRoutingId}
+            placeholder="—"
+            options={[
+              { value: "", label: d.mfgOrderBomActive },
+              ...detailRoutings.map((routing) => ({
+                value: routing.id,
+                label: `v${routing.versionNo} · ${localizedRoutingStatus(d, routing.status)}`,
+              })),
+            ]}
+          />
+          <Input
+            label={d.mfgRwDefectReason}
+            value={reworkDefectReason}
+            onValueChange={setReworkDefectReason}
+          />
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="secondary" onClick={() => setReworkOpen(false)}>
+            {d.commonCancel}
+          </Button>
+          <Button
+            variant="primary"
+            loading={busy === "rework"}
+            disabled={!reworkReady}
+            onClick={() => void createRework()}
+          >
+            {d.commonCreate}
+          </Button>
+        </div>
+      </Dialog>
+
+      {/* -- rework complete dialog (actual times → the G-39 posting) -------------- */}
+      <Dialog
+        open={rwCompleteRow !== null}
+        onOpenChange={(open) => {
+          if (!open) setRwCompleteRow(null);
+        }}
+        title={d.mfgRwCompleteTitle}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="w-40">
+            <Input
+              label={d.mfgSfActualSetup}
+              value={rwActualSetup}
+              onValueChange={setRwActualSetup}
+              mono
+              required
+              error={
+                rwActualSetup !== "" && !RATE_RE.test(rwActualSetup)
+                  ? d.errorsValidation
+                  : undefined
+              }
+            />
+          </div>
+          <div className="w-40">
+            <Input
+              label={d.mfgSfActualRun}
+              value={rwActualRun}
+              onValueChange={setRwActualRun}
+              mono
+              required
+              error={
+                rwActualRun !== "" && !RATE_RE.test(rwActualRun) ? d.errorsValidation : undefined
+              }
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="secondary" onClick={() => setRwCompleteRow(null)}>
+            {d.commonCancel}
+          </Button>
+          <Button
+            variant="primary"
+            loading={rwCompleteRow !== null && busy === `rework:complete:${rwCompleteRow.id}`}
+            disabled={!rwCompleteReady}
+            onClick={() => void reworkComplete()}
+          >
+            {d.mfgRwComplete}
+          </Button>
+        </div>
+      </Dialog>
 
       {/* -- create dialog ------------------------------------------------------------- */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen} title={d.mfgOrdersNew}>

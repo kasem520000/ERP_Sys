@@ -1526,6 +1526,59 @@ export function localizedManufacturingError(
       return d.mfgErrQcScrapEmptyBatch;
     case "GENEALOGY_BATCH_NOT_FOUND":
       return d.mfgErrGenealogyBatchNotFound;
+    // -- PHASE-042 (T-10…T-13): routing, work centers & costing -------------
+    case "WORK_CENTER_NOT_FOUND":
+    case "ROUTING_NOT_FOUND":
+    case "OPERATION_NOT_FOUND":
+    case "DOWNTIME_RECORD_NOT_FOUND":
+    case "REWORK_ORDER_NOT_FOUND":
+    case "STANDARD_COST_NOT_FOUND":
+      return d.errorsNotFound;
+    case "WORK_CENTER_INPUT_INVALID":
+    case "ROUTING_OPERATION_INVALID":
+    case "DOWNTIME_INPUT_INVALID":
+    case "STANDARD_COST_INVALID":
+    case "SCAN_CODE_FORMAT":
+      return d.errorsValidation;
+    case "WORK_CENTER_CODE_CONFLICT":
+      return d.mfgErrWcCodeConflict;
+    case "WORK_CENTER_IN_USE":
+      return d.mfgErrWcInUse;
+    case "WORK_CENTER_NOT_ACTIVE":
+      return d.mfgErrWcNotActive;
+    case "ROUTING_NOT_DRAFT":
+      return d.mfgErrRoutingNotDraft;
+    case "ROUTING_VERSION_CONFLICT":
+    case "ROUTING_ACTIVE_EXISTS":
+      return d.mfgErrRoutingVersionConflict;
+    case "OPERATION_STATE":
+      return d.mfgErrOperationState;
+    case "OPERATION_SEQUENCE":
+      return d.mfgErrOperationSequence;
+    case "OPERATION_SCRAP_REASON_REQUIRED":
+      return d.mfgErrScrapReasonRequired;
+    case "OPERATION_COST_ROUNDING":
+    case "REWORK_COST_ZERO":
+      return d.mfgErrCostRounding;
+    case "OPERATIONS_INCOMPLETE":
+      return d.mfgErrOperationsIncomplete;
+    case "APPROVER_NOT_FOUND":
+    case "SELF_APPROVAL_BLOCKED":
+      return d.mfgErrSkipApprover;
+    case "DOWNTIME_ALREADY_CLOSED":
+      return d.mfgErrDowntimeClosed;
+    case "REWORK_ORDER_STATE":
+    case "REWORK_ITEM_MISMATCH":
+      return d.mfgErrReworkState;
+    case "STANDARD_COST_NOT_DRAFT":
+      return d.mfgErrStdNotDraft;
+    case "STANDARD_COST_VERSION_CONFLICT":
+    case "STANDARD_COST_ACTIVE_EXISTS":
+      return d.mfgErrStdVersionConflict;
+    case "STANDARD_COST_MISSING":
+      return d.mfgErrStdMissing;
+    case "STANDARD_REVALUATION_ZERO":
+      return d.mfgErrStdRevaluationZero;
     case "PERIOD_LOCKED":
     case "POSTING_NOT_CONFIGURED":
     case "POSTING_REJECTED":
@@ -1556,6 +1609,73 @@ export function localizedProductionOrderStatus(d: Dictionary, status: string): s
     CANCELLED: d.mfgOrderStatusCancelled,
   };
   return map[status] ?? status;
+}
+
+// -- PHASE-042 (T-10…T-13): routing, work centers & costing status vocabularies ----
+
+/** Work-center registry statuses. */
+export function localizedWorkCenterStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    ACTIVE: d.mfgWcStatusActive,
+    INACTIVE: d.mfgWcStatusInactive,
+  };
+  return map[status] ?? status;
+}
+
+/**
+ * Routing + standard-cost version statuses — the exact BOM lifecycle
+ * (DRAFT → ACTIVE → ARCHIVED), so the versioned-editor vocabulary is
+ * shared verbatim (the one-active-per-item discipline).
+ */
+export function localizedRoutingStatus(d: Dictionary, status: string): string {
+  return localizedBomStatus(d, status);
+}
+
+/** The frozen order-operation state machine (PENDING → … → COMPLETED/SKIPPED). */
+export function localizedOperationStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    PENDING: d.mfgOpsStatusPending,
+    SETUP: d.mfgOpsStatusSetup,
+    RUNNING: d.mfgOpsStatusRunning,
+    PAUSED: d.mfgOpsStatusPaused,
+    COMPLETED: d.mfgOpsStatusCompleted,
+    SKIPPED: d.mfgOpsStatusSkipped,
+  };
+  return map[status] ?? status;
+}
+
+/**
+ * Rework-order lifecycle states — the production-order vocabulary
+ * (DRAFT → RELEASED → IN_PROGRESS → COMPLETED/CANCELLED) reused verbatim:
+ * a rework order IS a production order's repair leg.
+ */
+export function localizedReworkStatus(d: Dictionary, status: string): string {
+  return localizedProductionOrderStatus(d, status);
+}
+
+/** The nine seeded downtime reason codes (0065 §7 — bilingual labels). */
+export function localizedDowntimeReason(d: Dictionary, reasonCode: string): string {
+  const map: Record<string, string> = {
+    PLAN_SETUP: d.mfgDtReasonPlanSetup,
+    BREAKDOWN: d.mfgDtReasonBreakdown,
+    MAINTENANCE: d.mfgDtReasonMaintenance,
+    MATERIAL_SHORTAGE: d.mfgDtReasonMaterialShortage,
+    QUALITY_HOLD: d.mfgDtReasonQualityHold,
+    POWER_OUTAGE: d.mfgDtReasonPowerOutage,
+    CHANGEOVER: d.mfgDtReasonChangeover,
+    OPERATOR_ABSENT: d.mfgDtReasonOperatorAbsent,
+    OTHER: d.mfgDtReasonOther,
+  };
+  return map[reasonCode] ?? reasonCode;
+}
+
+/** Standard-cost source (MANUAL draft vs the BOM/routing roll-up). */
+export function localizedStandardCostSource(d: Dictionary, source: string): string {
+  const map: Record<string, string> = {
+    MANUAL: d.mfgScSourceManual,
+    ROLLED_UP: d.mfgScSourceRolledUp,
+  };
+  return map[source] ?? source;
 }
 
 /** Inspection results (the §4 gate decision). */

@@ -194,6 +194,19 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "manufacturing.scrap": ["manufacturing.production_orders"],
   "manufacturing.batch_genealogy": ["manufacturing.production_orders", "inventory.batch_tracking"],
   "manufacturing.qc": ["manufacturing.production_orders"],
+  // PHASE-042 (0066 plan grants + the food_manufacturing manifest intake —
+  // FEATURE_CATALOG §25 protocol): the manufacturing-execution set. Work
+  // centers are pure master data (leaf); routings are per item and their
+  // operations reference work centers; the shop floor executes routing
+  // operations at work centers; rework references parent production
+  // orders; downtime is per work center; the standard-cost layer's roll-up
+  // consumes BOMs + routings.
+  "manufacturing.work_centers": [],
+  "manufacturing.routing": ["items.item_master", "manufacturing.work_centers"],
+  "manufacturing.shopfloor": ["manufacturing.routing", "manufacturing.work_centers"],
+  "manufacturing.rework": ["manufacturing.production_orders"],
+  "manufacturing.downtime": ["manufacturing.work_centers"],
+  "manufacturing.standard_costs": ["manufacturing.bom", "manufacturing.routing"],
   // distribution
   "distribution.routes": ["partners.directory", "sales.reps"],
   "distribution.van_stock": ["inventory.multi_warehouse", "inventory.stock_transfers"],

@@ -1,6 +1,6 @@
 # Navigation Model
 
-> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-11 (PHASE-035 / PHASE-036 / PHASE-038 / PHASE-039)
+> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-11 (PHASE-035 / PHASE-036 / PHASE-038 / PHASE-039) · 2026-11-12 (PHASE-042 — the manufacturing execution group, §1.8)
 
 How users move through the platform: the information architecture, the entitlement-driven
 navigation registry, the command menu as universal navigation, back/deep-link behavior,
@@ -20,21 +20,26 @@ Arabic is canonical; English is full parity.
 | 2 | المبيعات / Sales | receipt | Quotations, sales orders, deliveries, invoices, credit notes, receipts, AR aging, statements, installment plans (خطة الأقساط) | sales |
 | 3 | المشتريات / Purchasing | truck | Purchase requests/orders, GRN, supplier invoices, debit notes, payments, AP aging | purchasing |
 | 4 | المخزون / Inventory | boxes | Items & barcodes, stock on hand, movements, transfers, counts, batches/expiry, warehouses | inventory, items |
-| 5 | المحاسبة / Accounting | ledger | Chart of accounts, journal entries, fiscal calendar & periods, trial balance & statements, period close, fixed assets (الأصول الثابتة), budgets (الموازنات) | accounting |
-| 6 | الخزينة / Treasury | banknote | Cash/bank accounts, receipts/disbursements, expenses, petty cash, transfers, cashier shifts, bank reconciliation, cheques & notes (الشيكات والأوراق التجارية), maturity calendar (تقويم الاستحقاق) | treasury |
-| 7 | التقارير / Reports | bar-chart | Saved reports, all catalog reports, VAT returns, exports, consolidated statements (القوائم الموحدة) | reporting |
-| 8 | الجهات / Partners | users | Customers, suppliers, credit terms, statements, balances | partners |
-| 9 | الإعدادات / Settings | settings | Branches/warehouses, users & roles, tax codes, numbering, branding, subscription, industry template | tenancy, identity, tax |
-| 10 | الموظفون والرواتب / HR & Payroll | users-round | Employees, salary structures, payroll runs, loans | payroll |
+| 5 | الإنتاج والتصنيع / Manufacturing | layers | Work centers, routings, shop-floor terminal (طرفية أرضية المصنع), downtime log, standard costs | manufacturing |
+| 6 | المحاسبة / Accounting | ledger | Chart of accounts, journal entries, fiscal calendar & periods, trial balance & statements, period close, fixed assets (الأصول الثابتة), budgets (الموازنات) | accounting |
+| 7 | الخزينة / Treasury | banknote | Cash/bank accounts, receipts/disbursements, expenses, petty cash, transfers, cashier shifts, bank reconciliation, cheques & notes (الشيكات والأوراق التجارية), maturity calendar (تقويم الاستحقاق) | treasury |
+| 8 | التقارير / Reports | bar-chart | Saved reports, all catalog reports, VAT returns, exports, consolidated statements (القوائم الموحدة) | reporting |
+| 9 | الجهات / Partners | users | Customers, suppliers, credit terms, statements, balances | partners |
+| 10 | الإعدادات / Settings | settings | Branches/warehouses, users & roles, tax codes, numbering, branding, subscription, industry template | tenancy, identity, tax |
+| 11 | الموظفون والرواتب / HR & Payroll | users-round | Employees, salary structures, payroll runs, loans | payroll |
 
 Group visibility = entitlement AND at least one child visible (never an empty group).
 Industry templates (PHASE-015) may add template-specific items (e.g., job cards under
 المبيعات) but **may not reorder groups or remove core items** — configuration composes,
 never forks ([../GLOSSARY.md](../GLOSSARY.md) Industry template). This is unchanged by
-v2.0: the new items below (group 10 and the additions in groups 2/5/6/7) are core items in
-the same sense — templates may surface them (e.g., education surfaces installment plans,
+v2.0 and the v3.0 waves: the items below (group 11 and the additions in groups
+2/6/7/8, plus the group-5 manufacturing execution items of §1.8) are core items in the
+same sense — templates may surface them (e.g., education surfaces installment plans,
 healthcare surfaces cheques & notes — [../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md)
-§L) but still may not remove them.
+§L) but still may not remove them. PHASE-042 (2026-11-12) inserted the الإنتاج والتصنيع
+group at position 5 — after المخزون, because production consumes what inventory stocks
+(the binding NAV_GROUPS order in `packages/contracts/src/navigation.ts`); the groups
+below it renumber accordingly.
 
 ### 1.1 v2.0 registry additions (Blueprint v2.0)
 
@@ -51,15 +56,15 @@ precedent).
 | id | Group | Label (AR / EN) | featureKey | permission | archetype |
 |----|-------|-----------------|------------|------------|-----------|
 | `sales.installment-plans` | 2 المبيعات | خطة الأقساط / Installment plans | `installments.plans` | `installments.plans.view` | List + Search (§2) — route `/installments`; plan creation runs as Wizard (§9) |
-| `accounting.fixed-assets` | 5 المحاسبة | الأصول الثابتة / Fixed assets | `fixed_assets.register` | `fixed_assets.assets.view` | List + Search (§2); asset cards on Document Detail (§5) |
-| `accounting.budgets` | 5 المحاسبة | الموازنات / Budgets | `budgeting.budgets` | `budgeting.budgets.view` | List + Search (§2) + Create/Edit Form (§3) for budget lines |
-| `treasury.cheques-notes` | 6 الخزينة | الشيكات والأوراق التجارية / Cheques & notes | `notes.received` | `notes.notes.view` | List + Search (§2) — route `/notes`; note lifecycle on Document Detail (§5) with the `note_events` custody timeline (`TimelinePanel`) |
-| `treasury.pdc-calendar` | 6 الخزينة | تقويم الاستحقاق / Maturity calendar | `notes.pdc_calendar` | `notes.notes.view` | Dashboard (§1 — the maturity workspace) — route `/notes/calendar`, with list drill (§2) |
-| `reports.consolidated` | 7 التقارير | القوائم الموحدة / Consolidated statements | `consolidation.reports` | `consolidation.reports.view` | Report Page (§7) — route `/consolidation`; promoted from template-injected nav to a **CORE NAV_ITEMS entry at PHASE-035** (template-independent — template-less tenants now see القوائم الموحدة) |
-| `payroll.employees` | 10 الموظفون والرواتب | الموظفون / Employees | `payroll.employees` | `payroll.employees.view` | List + Search (§2) |
-| `payroll.salary-structures` | 10 الموظفون والرواتب | هياكل الرواتب / Salary structures | `payroll.salary_structures` | `payroll.salary_structures.manage` (view implied) | List + Search (§2) + Create/Edit Form (§3) |
-| `payroll.runs` | 10 الموظفون والرواتب | تشغيلات الرواتب / Payroll runs | `payroll.runs` | `payroll.runs.view` | List + Search (§2); pending approvals surface in Approval Queue (§6) |
-| `payroll.loans` | 10 الموظفون والرواتب | سلف الموظفين / Employee loans | `payroll.loans` | `payroll.loans.manage` (view implied) | List + Search (§2) |
+| `accounting.fixed-assets` | 6 المحاسبة | الأصول الثابتة / Fixed assets | `fixed_assets.register` | `fixed_assets.assets.view` | List + Search (§2); asset cards on Document Detail (§5) |
+| `accounting.budgets` | 6 المحاسبة | الموازنات / Budgets | `budgeting.budgets` | `budgeting.budgets.view` | List + Search (§2) + Create/Edit Form (§3) for budget lines |
+| `treasury.cheques-notes` | 7 الخزينة | الشيكات والأوراق التجارية / Cheques & notes | `notes.received` | `notes.notes.view` | List + Search (§2) — route `/notes`; note lifecycle on Document Detail (§5) with the `note_events` custody timeline (`TimelinePanel`) |
+| `treasury.pdc-calendar` | 7 الخزينة | تقويم الاستحقاق / Maturity calendar | `notes.pdc_calendar` | `notes.notes.view` | Dashboard (§1 — the maturity workspace) — route `/notes/calendar`, with list drill (§2) |
+| `reports.consolidated` | 8 التقارير | القوائم الموحدة / Consolidated statements | `consolidation.reports` | `consolidation.reports.view` | Report Page (§7) — route `/consolidation`; promoted from template-injected nav to a **CORE NAV_ITEMS entry at PHASE-035** (template-independent — template-less tenants now see القوائم الموحدة) |
+| `payroll.employees` | 11 الموظفون والرواتب | الموظفون / Employees | `payroll.employees` | `payroll.employees.view` | List + Search (§2) |
+| `payroll.salary-structures` | 11 الموظفون والرواتب | هياكل الرواتب / Salary structures | `payroll.salary_structures` | `payroll.salary_structures.manage` (view implied) | List + Search (§2) + Create/Edit Form (§3) |
+| `payroll.runs` | 11 الموظفون والرواتب | تشغيلات الرواتب / Payroll runs | `payroll.runs` | `payroll.runs.view` | List + Search (§2); pending approvals surface in Approval Queue (§6) |
+| `payroll.loans` | 11 الموظفون والرواتب | سلف الموظفين / Employee loans | `payroll.loans` | `payroll.loans.manage` (view implied) | List + Search (§2) |
 
 ### 1.2 PHASE-035 registry additions (Blueprint v3.0 — activation)
 
@@ -86,7 +91,7 @@ plan grant rides migration `0049`). The per-entity form designer and the shared
 
 | id | Group | Label (AR / EN) | featureKey | permission | archetype |
 |----|-------|-----------------|------------|------------|-----------|
-| `settings.custom_fields` | 9 الإعدادات | الحقول المخصصة / Custom fields | `platform.custom_fields` | `configuration.custom_fields.read` | Settings (§8) — route `/settings/custom-fields`: the definitions + picklists manager (definitions / قوائم القيم), with the per-entity form designer (مصمم النماذج) opening from it; create/update/archive actions run under `configuration.custom_fields.manage` / `configuration.form_layouts.manage` |
+| `settings.custom_fields` | 10 الإعدادات | الحقول المخصصة / Custom fields | `platform.custom_fields` | `configuration.custom_fields.read` | Settings (§8) — route `/settings/custom-fields`: the definitions + picklists manager (definitions / قوائم القيم), with the per-entity form designer (مصمم النماذج) opening from it; create/update/archive actions run under `configuration.custom_fields.manage` / `configuration.form_layouts.manage` |
 
 ### 1.4 PHASE-038 registry additions (Blueprint v3.0 — procurement sourcing)
 
@@ -141,7 +146,7 @@ screen links to the hub). The command palette inherits the entry through
 
 | id | Group | Label (AR / EN) | featureKey | permission | archetype |
 |----|-------|-----------------|------------|------------|-----------|
-| `settings.imports` | 9 الإعدادات | استيراد البيانات والترحيل / Data import & migration | `platform.data_migration` | `configuration.imports.manage` | Wizard (§9) — route `/settings/imports`, order 80: four tabs (the import wizard — kind → upload → column mapping with auto-detect + saved-mapping reuse → dry-run report (bilingual AR+EN per-row issues) → ack-gated commit with polling; the jobs history; the saved mappings; the migration adapters with the documented-mapping template downloads); writes gate in-screen on `configuration.imports.manage` |
+| `settings.imports` | 10 الإعدادات | استيراد البيانات والترحيل / Data import & migration | `platform.data_migration` | `configuration.imports.manage` | Wizard (§9) — route `/settings/imports`, order 80: four tabs (the import wizard — kind → upload → column mapping with auto-detect + saved-mapping reuse → dry-run report (bilingual AR+EN per-row issues) → ack-gated commit with polling; the jobs history; the saved mappings; the migration adapters with the documented-mapping template downloads); writes gate in-screen on `configuration.imports.manage` |
 
 ### 1.7 PHASE-041 registry additions (Blueprint v3.0 — communications hub)
 
@@ -165,8 +170,35 @@ order 85, `communication.inbox` order 30).
 
 | id | Group | Label (AR / EN) | featureKey | permission | archetype |
 |----|-------|-----------------|------------|------------|-----------|
-| `settings.communication` | 9 الإعدادات | مركز الاتصالات / Communications | `communication.outbound` | `communication.templates.manage` | Settings (§8) — route `/settings/communication`, order 85: three tabs (templates — the effective catalog with override/builtin badges, the override editor, the fail-closed preview; providers — the per-channel selection with the live/sandbox/blocked resolution, the sealed-credential editor (state-only display), per-market senders, the daily send cap; defaults — the tenant-default module × channel matrix); the defaults tab writes gate on `communication.preferences.manage` |
+| `settings.communication` | 10 الإعدادات | مركز الاتصالات / Communications | `communication.outbound` | `communication.templates.manage` | Settings (§8) — route `/settings/communication`, order 85: three tabs (templates — the effective catalog with override/builtin badges, the override editor, the fail-closed preview; providers — the per-channel selection with the live/sandbox/blocked resolution, the sealed-credential editor (state-only display), per-market senders, the daily send cap; defaults — the tenant-default module × channel matrix); the defaults tab writes gate on `communication.preferences.manage` |
 | `communication.inbox` | 1 الرئيسية | صندوق الاتصالات الموحد / Communications inbox | — | `communication.inbox.read` | List + Search (§2) — route `/communication/inbox`, order 30: the unified timeline (kind/channel/direction/partner filters), the call logger (outcome + duration + notes linked to partner + user), and my-preferences (the self-plane matrix — `POST /communication/preferences/me`); the logger edits their own entries (log semantics — no deletes) |
+
+### 1.8 PHASE-042 registry additions (Blueprint v3.0 — manufacturing execution)
+
+The manufacturing execution cluster (CR-12, scope extended by v3.1/CR-45 L2-12;
+[../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md) §27): five items in the NEW
+group 5 الإنتاج والتصنيع — work centers, routings, the touch-first shop-floor terminal,
+the downtime log, and standard costs. Until this phase these surfaces rode the industry
+manifests + FALLBACK_CRUMBS; the routing/work-center/costing phase promotes them to
+first-class registry rows. Same resolution rule as every item —
+`entitlement(featureKey)` AND `permission(user, branch)`; visibility is **server-resolved**
+(`resolveNavigation`) per BR-039, and the command palette (⌘K / Ctrl+K, §3) inherits all
+five entries through the same registry (OA-04 — no separate palette registration). The
+production order's Operations tab (progress, actual times, variances) + the
+create-rework action and the rework lifecycle ride the EXISTING orders screen
+(`/manufacturing/orders`, the §14 production-orders keys) — no new item by design; the
+OEE reads surface inside the work-centers screen and the utilization report. Mirrors
+`packages/contracts/src/navigation.ts` (orders 10/20/30/40/50; the numbering note for
+the phase's migration slots — planned ≈0060…0066, shipped 0065/0066, the 0064 D-1
+precedent — is recorded in [../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.20).
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `manufacturing.work_centers` | 5 الإنتاج والتصنيع | مراكز العمل / Work centers | `manufacturing.work_centers` | `manufacturing.work_centers.manage` | List + Search (§2) — route `/manufacturing/work-centers`, order 10: capacity, hourly cost rates, status, cost-center link; the OEE/utilization reads render in-screen under `manufacturing.oee.read` |
+| `manufacturing.routings` | 5 الإنتاج والتصنيع | مسارات الإنتاج / Routings | `manufacturing.routing` | `manufacturing.routings.manage` | Create/Edit Form (§3) — route `/manufacturing/routings`, order 20: the versioned routing editor (operations grid — sequence, work center, setup/run times, rate overrides; copy + activate, one ACTIVE per item) |
+| `manufacturing.shopfloor` | 5 الإنتاج والتصنيع | طرفية أرضية المصنع / Shop-floor terminal | `manufacturing.shopfloor` | `manufacturing.shopfloor.execute` | Point of Sale (§10) — route `/manufacturing/shopfloor`, order 30: the touch-first, scan-first terminal (`OP:<order>:<seq>:<action>` — start/pause/resume/complete with actual times + scrap), large-target RTL layout for operators |
+| `manufacturing.downtime` | 5 الإنتاج والتصنيع | سجل التوقفات / Downtime log | `manufacturing.downtime` | `manufacturing.downtime.log` | List + Search (§2) — route `/manufacturing/downtime`, order 40: reason-coded records per work center (open/close; posting is the BR-070 policy opt-in) |
+| `manufacturing.standard_costs` | 5 الإنتاج والتصنيع | التكاليف المعيارية / Standard costs | `manufacturing.standard_costs` | `manufacturing.standard_costs.manage` | List + Search (§2) — route `/manufacturing/standard-costs`, order 50: versioned standards (draft → roll-up → activate with optional stock revaluation); PPV rides the GRN |
 
 ## 2. Navigation registry (data model, normative)
 
@@ -175,7 +207,7 @@ Navigation is **data**, not code — a single registry resolved per session:
 ```ts
 type NavItem = {
   id: string;                    // 'sales.invoices' — stable, used in shortcuts & deep links
-  parentGroup: NavGroupId;       // one of the 10 groups above
+  parentGroup: NavGroupId;       // one of the 11 groups above
   label: Bilingual;              // { ar: 'فواتير البيع', en: 'Sales invoices' }
   icon: LucideName;              // from the icon set, never custom SVGs per item
   route: string;                 // '/sales/invoices' — locale-agnostic; locale lives in URL prefix
@@ -303,7 +335,8 @@ hard-coded listeners in screens). POS terminal profiles define their own F-key m
 | Fixed assets (register, depreciation, revaluation, disposal) under المحاسبة | PHASE-026 |
 | Cheques & notes + maturity calendar under الخزينة; installment plans under المبيعات | PHASE-027 |
 | Budgets under المحاسبة | PHASE-028 |
-| HR & Payroll group (group 10) + its items | PHASE-029 |
-| Consolidated statements under التقارير | PHASE-034 — **LIVE** (delivered 2026-11-09: the `/consolidation` surfaces — group Settings, the elimination Transaction Entry workspace with the live balanced DR/CR preview, the run Report Page with the snapshot viewer — nav items under group 7 التقارير, `reports.consolidated`) |
+| HR & Payroll group (group 11) + its items | PHASE-029 |
+| Consolidated statements under التقارير | PHASE-034 — **LIVE** (delivered 2026-11-09: the `/consolidation` surfaces — group Settings, the elimination Transaction Entry workspace with the live balanced DR/CR preview, the run Report Page with the snapshot viewer — nav items under group 8 التقارير, `reports.consolidated`) |
 | Inventory batches & expiry + serial numbers + stock adjustments (read-only) under المخزون; the import/export visibility repair; consolidated statements as a core item | PHASE-035 — **LIVE** (delivered 2026-11-10: `/inventory/batches` + `/inventory/serials` (register + write-off / sold-at under `inventory.tracking.manage`) and the read-only `/inventory/adjustments` register — posting stays in the count wizard; `items.import_export` granted business+enterprise by the DATA-ONLY migration `0048`; `reports.consolidated` promoted from template-injected to a core NAV_ITEMS entry — template-less tenants see القوائم الموحدة) |
 | Custom-fields manager (definitions + picklists + per-entity form designer) under الإعدادات; typed values render on the six first-wave entity forms | PHASE-036 |
+| Manufacturing execution group (group 5, الإنتاج والتصنيع) + its five items (work centers, routings, shop-floor terminal, downtime log, standard costs); the Operations tab + rework ride the existing orders screen | PHASE-042 |

@@ -39,6 +39,21 @@ import { requireSupplier } from "./orders";
  *
  * BR-012: PO-less receipts require an explicit reason and may be forbidden
  * entirely by the `purchasing.allow_po_less_grn` policy (default allow).
+ *
+ * PHASE-042 standard costing (L2-12) — PPV AT RECEIPT, SHAPE A (the
+ * documented decision): when the received item carries an ACTIVE standard
+ * (item_standard_costs), the stock plan + the inventory debit ride the
+ * STANDARD total (WAC layers absorb at standard — the dual mode keeps
+ * non-standard items on the legacy WAC-at-actual path byte-identical), and
+ * the SAME G-07 journal carries the purchase-price-variance leg for the
+ * difference against the line's actual unit cost:
+ *   actual > standard: DR PURCHASE_PRICE_VARIANCE (actual − std) × qty
+ *   actual < standard: CR PURCHASE_PRICE_VARIANCE (std − actual) × qty
+ * The GRNI credit always rides the ACTUAL total, so the journal balances
+ * by construction (std debits + PPV = actual). The variance nets across
+ * the receipt's stock lines (one purpose leg per journal — the GRNI
+ * precedent); the multi-purpose engine line set makes the second-journal
+ * fallback unnecessary (recorded as NOT taken).
  */
 
 const GRN_FORMAT = { prefix: "GRN", format: "GRN-{YYYY}-{SEQ:6}", docType: "goods_receipt" };
@@ -228,19 +243,26 @@ export class GoodsReceiptService {
 
     const base = await ownTenantBaseCurrency();
 
-    // (1) Plan every stock line (locks positions, computes WAC/layers — NO writes).
+    // (1) Plan every stock line (locks positions, computes WAC/layers — NO
+    // writes). PHASE-042 PPV shape A: standard items plan at the ACTIVE
+    // standard total (the layers absorb at standard); the actual-vs-standard
+    // difference accumulates into ppvNet for the variance leg below.
     const plans: { line: store.GoodsReceiptLineRow; plan: ReceiptPlan }[] = [];
     const expenseLines: store.GoodsReceiptLineRow[] = [];
+    let ppvNet = new Decimal(0);
+    const stockLineActualValue = new Map<store.GoodsReceiptLineRow, string>();
     for (const line of lines) {
       if (line.accountId !== null) {
         expenseLines.push(line);
         continue;
       }
+      const standard = await store.findActiveItemStandardCost(line.itemId);
+      const planUnitCost = standard !== undefined ? standard.totalCost : line.unitCost;
       const plan = await planReceipt({
         itemId: line.itemId,
         warehouseId: receipt.warehouseId,
         qty: line.qty,
-        unitCost: line.unitCost,
+        unitCost: planUnitCost,
         movedAt: receipt.receiptDate,
         moveKind: "receipt",
         sourceType: "goods_receipt",
@@ -252,14 +274,26 @@ export class GoodsReceiptService {
         memoAr: `سند استلام ${receipt.receiptNo ?? id}`,
       });
       plans.push({ line, plan });
+      // The actual value at the same 4dp quantum the plan uses (qty × unit
+      // cost, HALF_UP) — the GRNI side always rides the actual cost.
+      const actualValue = new Decimal(line.qty)
+        .times(new Decimal(line.unitCost))
+        .toDecimalPlaces(4, Decimal.ROUND_HALF_UP)
+        .toFixed(4);
+      stockLineActualValue.set(line, actualValue);
+      if (standard !== undefined) {
+        ppvNet = ppvNet.plus(new Decimal(actualValue).minus(new Decimal(plan.valueAmount)));
+      }
       // Stage the pending position so a later line on the SAME item plans
       // from the cumulative position (the overlay is apply-committed; the
       // plan-all-then-apply-all sequence needs explicit staging).
       stagePendingOverlay(plan);
     }
 
-    // (2) The G-07 journal: DR INVENTORY (per resolved account) / DR expense
-    // accounts · CR GRNI (single purpose line).
+    // (2) The G-07 journal: DR INVENTORY (per resolved account, at standard
+    // for standard items — the plan value) / DR expense accounts · [DR|CR
+    // PURCHASE_PRICE_VARIANCE for the net standard-vs-actual difference] ·
+    // CR GRNI (single purpose line, at the ACTUAL total).
     const debitByAccount = new Map<string, string>();
     for (const { plan } of plans) {
       const accountId = await resolveInventoryAccount(receipt.warehouseId);
@@ -274,8 +308,10 @@ export class GoodsReceiptService {
         new Decimal(debitByAccount.get(line.accountId!) ?? "0").plus(new Decimal(line.valueAmount)).toFixed(4),
       );
     }
+    // The GRNI credit rides the ACTUAL value of every line (std plans only
+    // moved the inventory side of stock lines).
     const total = plans.reduce(
-      (sum, { plan }) => sum.plus(new Decimal(plan.valueAmount)),
+      (sum, { line }) => sum.plus(new Decimal(stockLineActualValue.get(line)!)),
       expenseLines.reduce((sum, line) => sum.plus(new Decimal(line.valueAmount)), new Decimal(0)),
     ).toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toFixed(4);
 
@@ -293,6 +329,21 @@ export class GoodsReceiptService {
     for (const [accountId, amount] of [...debitByAccount.entries()].sort(([a], [b]) => (a < b ? -1 : 1))) {
       if (amount === "0.0000") continue;
       journalLines.push({ accountId, direction: "DEBIT", amount, memo });
+    }
+    // PHASE-042 PPV shape A: the net variance leg on the SAME journal — DR
+    // when the receipt cost more than standard, CR when less (the purpose
+    // resolves to 5990 PURCHASE_PRICE_VARIANCE).
+    const ppvAmount = ppvNet.toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toFixed(4);
+    if (ppvAmount !== "0.0000") {
+      journalLines.push({
+        purpose: "PURCHASE_PRICE_VARIANCE",
+        direction: ppvNet.greaterThan(0) ? "DEBIT" : "CREDIT",
+        amount: ppvNet.lessThan(0) ? ppvNet.abs().toDecimalPlaces(4, Decimal.ROUND_HALF_UP).toFixed(4) : ppvAmount,
+        memo: {
+          en: `GRN ${receipt.receiptNo ?? id} — purchase price variance (standard vs actual)`,
+          ar: `سند استلام ${receipt.receiptNo ?? id} — انحراف سعر الشراء (المعياري مقابل الفعلي)`,
+        },
+      });
     }
     if (total !== "0.0000") {
       journalLines.push({ accountId: grniMapping.accountId, direction: "CREDIT", amount: total, memo });

@@ -149,7 +149,18 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // permission keys (267 → 272, matrix §3.19) + the six feature plan
     // grants (templates/outbound all plans; the provider tiers
     // business+enterprise).
-    expect(files.at(-1)?.tag).toBe("0064_communications_hub");
+    //
+    // PHASE-042 (CR-12, extended by v3.1/CR-45 L2-12): 0065_routing_work_
+    // centers — the six manufacturing-execution tables (work_centers,
+    // routings, routing_operations, production_order_operations,
+    // rework_orders, downtime_records) + the production_orders extension
+    // columns + the two security_invoker OEE views + CoA markers 5125/5430
+    // + the SIX manufacturing keys (272 → 278, matrix §3.20);
+    // 0066_standard_costing — item_standard_costs (L2-12) + the order
+    // std_unit_cost/yield_variance columns + CoA markers 5990/5995 + the
+    // standard_costs key (278 → 279) + the six feature plan grants + the
+    // food_manufacturing manifest enablement.
+    expect(files.at(-1)?.tag).toBe("0066_standard_costing");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

@@ -216,8 +216,8 @@ describe("owner journey: login → onboarding → branches → settings", () => 
     // set (64 accounts / 41 purposes: 2170/2180/2190 SALARIES_PAYABLE /
     // DEDUCTIONS_PAYABLE / EOS_PROVISION + 5270/5280/5295 SALARIES_EXPENSE /
     // EMPLOYER_CONTRIBUTIONS / EOS_PROVISION_EXPENSE).
-    expect(diff.accounts.created).toBe(65); // 64 + 3220 CONSOLIDATION_ADJUSTMENT (0041 — restored-lineage drift, repaired in PHASE-036)
-    expect(diff.purposes.created).toBe(42); // 41 + CONSOLIDATION_ADJUSTMENT (same drift)
+    expect(diff.accounts.created).toBe(69); // 64 + 3220 CONSOLIDATION_ADJUSTMENT (0041 — restored-lineage drift, repaired in PHASE-036) + 4 PHASE-042 markers (0065/0066: 5125 REWORK_EXPENSE · 5430 DOWNTIME_EXPENSE · 5990 PURCHASE_PRICE_VARIANCE · 5995 STANDARD_REVALUATION)
+    expect(diff.purposes.created).toBe(46); // 41 + CONSOLIDATION_ADJUSTMENT + the four PHASE-042 purposes
 
     const reRun = await request(
       "POST",
@@ -385,7 +385,13 @@ describe("platform console (S-07 at the HTTP plane)", () => {
     expect(assigned.status).toBe(200);
     // 57 → 58 (PHASE-040, migration 0060 §8): platform.demo_data rides EVERY
     // plan — the recorded trial-enablement decision (a trial must light up).
-    expect((assigned.body.data as { grantedKeys: number }).grantedKeys).toBe(58);
+    // 58 → 60 (041's 0064 §10, caught by 042's full-suite sweep): the
+    // communication.templates + communication.outbound all-plans grant moved
+    // starter to 60 at PHASE-041 — the targeted 041 gate runs never exercised
+    // this pin (the rot is recorded as a PHASE-042 completion-report repair;
+    // 042's own 0066 grants touch business + enterprise only, starter is
+    // untouched here).
+    expect((assigned.body.data as { grantedKeys: number }).grantedKeys).toBe(60);
   });
 
   it("entitlement edit: MANUAL grant + revoke through the console (audited)", async () => {

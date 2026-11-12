@@ -205,6 +205,16 @@ const BUSINESS_KEYS: readonly string[] = [
   "manufacturing.scrap",
   "manufacturing.batch_genealogy",
   "manufacturing.qc",
+  // PHASE-042 (0066 plan grants): the manufacturing-execution set — the
+  // six keys join business + enterprise (the 0026 precedent; starter
+  // excluded). The food_manufacturing template's required chain gains
+  // them (0066 §9 — the manifest enablement).
+  "manufacturing.routing",
+  "manufacturing.work_centers",
+  "manufacturing.shopfloor",
+  "manufacturing.rework",
+  "manufacturing.downtime",
+  "manufacturing.standard_costs",
   // PHASE-019 (0027 plan grants): the CRM + projects set — business gains
   // the six keys (enterprise already carries them from the 0008 base seed,
   // so the array_cat was a no-op there); starter does NOT.

@@ -1342,6 +1342,15 @@ export const FOOD_MANUFACTURING_TEMPLATE_MANIFEST: IndustryTemplateManifest = de
     "manufacturing.production_orders",
     "manufacturing.qc",
     "manufacturing.batch_genealogy",
+    // PHASE-042 (0066 §9): the manufacturing-execution set — the
+    // manufacturing-bearing template requires the routing/work-center/
+    // shop-floor keys by default (CR-36 (f) template-composable grants).
+    "manufacturing.routing",
+    "manufacturing.work_centers",
+    "manufacturing.shopfloor",
+    "manufacturing.rework",
+    "manufacturing.downtime",
+    "manufacturing.standard_costs",
     "inventory.multi_warehouse",
     "inventory.batch_tracking",
     "inventory.stock_counts",

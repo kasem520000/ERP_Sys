@@ -108,6 +108,11 @@ const completeSchema = z.object({
 
 const cancelSchema = z.object({ reason: z.string().min(1).max(500) });
 
+/** PHASE-042 (M-02): the release routing input — an explicit routing binds,
+ * null explicitly opts out (the flat-rate dual mode), omitted = auto-bind
+ * the item's ACTIVE routing when one exists. */
+const releaseSchema = z.object({ routingId: UUID.nullable().optional() });
+
 @Controller("api/v1/manufacturing/production-orders")
 export class ProductionOrdersController {
   constructor(@Inject(ProductionOrderService) private readonly orders: ProductionOrderService) {}
@@ -188,9 +193,10 @@ export class ProductionOrdersController {
   @Post(":id/release")
   @RequirePermissions("manufacturing.production_orders.approve")
   @RequireFeature("manufacturing.production_orders")
-  async release(@Req() request: Request, @Param("id") id: string) {
+  async release(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
-    return envelope(await this.orders.release(id, identity.userId));
+    const input = releaseSchema.parse(body ?? {});
+    return envelope(await this.orders.release(id, identity.userId, { routingId: input.routingId }));
   }
 
   @Post(":id/start")

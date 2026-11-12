@@ -1,6 +1,6 @@
 # Feature Catalog
 
-> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-11 (PHASE-035 truth restoration — DR-035-01/02/03 · PHASE-036 `platform.custom_fields` · PHASE-038 +5 purchasing sourcing features · PHASE-039 +4 returns & collections features)
+> **Status:** STABLE · **Owner:** Product & Platform Architecture · **Updated:** 2026-11-11 (PHASE-035 truth restoration — DR-035-01/02/03 · PHASE-036 `platform.custom_fields` · PHASE-038 +5 purchasing sourcing features · PHASE-039 +4 returns & collections features) · 2026-11-12 (PHASE-042 +6 manufacturing-execution features, §27)
 
 The canonical, exhaustive registry of product features. Every feature has exactly one
 **feature key** (`module.feature_name`). This file is the single source of truth referenced by:
@@ -502,11 +502,41 @@ called outside it, and the SANDBOX default provider makes ZERO external calls un
 provider is configured and credentialed. Numbering note: this section is appended AFTER the
 §25 maintenance protocol (not before it) so existing "§25 protocol" references stay stable.
 
-| Feature key | Feature (EN · AR) | Scope | Phase | Permission(s) | Depends on |
-|------------|-------------------|-------|-------|---------------|------------|
+| Feature key | Feature (EN · AR) | Scope | Priority | Phase | Permission(s) | Depends on |
+|------------|-------------------|-------|----------|-------|---------------|------------|
 | `communication.templates` | Tenant message templates · قوالب رسائل المستأجر | **SHIPPED PHASE-041** (migration `0064`; FD-30 — the "no email_templates, strings in code" audit gap): channel × locale × module templates with typed variable declarations, tenant-editable, the builtin bilingual catalog as fallback (tenants start from working AR/EN defaults); the print-template variable documentation ships in DATA_DICTIONARY; plan grants: **ALL plans** (0064 §10 — base messaging substrate) | 4 | 041 | `communication.templates.manage` | — |
 | `communication.outbound` | Outbound send ledger & pipeline · سجل الإرسال الخارجي ومساره | **SHIPPED PHASE-041** (migration `0064`): every send is a row — queue → provider → status transitions (QUEUED/SENT/DELIVERED/FAILED) with provider reference, cost, and bounded retries with backoff (attempts/max_attempts/next_attempt_at); the dunning letters (the 039/036 WHATSAPP/SMS QUEUED handoff) ride the source linkage; plan grants: **ALL plans** (over the SANDBOX default provider — BR-067) | 4 | 041 | `communication.outbox.read` | `communication.templates` |
 | `communication.whatsapp` | WhatsApp Business Cloud channel · قناة واتساب للأعمال | **SHIPPED PHASE-041** (H-22/N-06/IN-13): template-message sends, per-market sender numbers (market → phone-number-id routing), approval-dependent behaviors REQUIRES_VERIFICATION-flagged; the SANDBOX adapter keeps tests hermetic; plan grants: **business + enterprise** (0064 §10 — the 0051 tier-4 precedent) | 3 | 041 | `communication.outbox.read` | `communication.outbound` |
 | `communication.sms` | SMS providers · مزوّدو الرسائل القصيرة | **SHIPPED PHASE-041** (N-07/IN-14): Unifonic + Msegat + Twilio adapters behind the port, per-market selection; plan grants: **business + enterprise** | 3 | 041 | `communication.outbox.read` | `communication.outbound` |
 | `communication.email_providers` | Verified email providers · مزوّدو البريد الموثَّقون | **SHIPPED PHASE-041** (N-08/IN-15): SMTP/SendGrid/SES/Mailgun environment-selectable abstraction with the DKIM/SPF/DMARC deliverability guide + per-environment verification checklist; plan grants: **business + enterprise** | 3 | 041 | `communication.outbox.read` | `communication.outbound` |
 | `communication.calendar_integration` | Google/Outlook calendar + contacts sync · تكامل التقويم ومزامنة جهات الاتصال | **SHIPPED PHASE-041** (IN-17/IN-18): OAuth connect with minimal scopes (tokens sealed in the secret store), task/appointment event write, and opt-in two-way contacts sync with exact + fuzzy candidate review — never auto-merge; plan grants: **business + enterprise** | 3 | 041 | `communication.calendar.connect` | — |
+
+## 27. Module: manufacturing — execution extension (PHASE-042)
+
+The PHASE-042 manufacturing execution cluster (CR-12, scope extended by v3.1/CR-45
+L2-12 · H-04 · M-02…M-19): work centers, versioned routings, the shop-floor
+operation machine, rework orders, downtime logging, and the item standard-cost layer.
+Numbering note: this section is appended AFTER the §25 maintenance protocol (with §26,
+the communications module) so existing "§25 protocol" references stay stable. The
+module's PHASE-018 rows stay in §14 — these six keys extend that family; the numbering
+note for the migration slots (the phase doc's ≈0060…0066 planned numbers → the shipped
+0065/0066, the 0064 D-1 precedent) is recorded in
+[../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.20 and
+[../product/BUSINESS_RULES.md](BUSINESS_RULES.md) BR-068…071.
+
+| Feature key | Feature (EN · AR) | Scope | Priority | Phase | Permission(s) | Depends on |
+|------------|-------------------|-------|----------|-------|---------------|------------|
+| `manufacturing.work_centers` | Work centers · مراكز العمل | **SHIPPED PHASE-042** (migration 0065; M-03/H-04): per-shift capacity in hours + shifts/day, fixed + variable hourly cost rates in base currency, ACTIVE/INACTIVE status, and the cost-center analytics link — the planning datum of PHASE-043 and the denominator of the OEE views; plan grants: **business + enterprise** (0066 §8 — the 0026 manufacturing precedent, starter excluded) | 4 | 042 | `manufacturing.work_centers.manage` | — |
+| `manufacturing.routing` | Routings · مسارات التشغيل | **SHIPPED PHASE-042** (M-02): versioned per item (DRAFT → ACTIVE → ARCHIVED, exactly one ACTIVE — the BOM discipline), sequenced operations with setup (per batch) + run (per unit) times, the work center, optional per-operation rate overrides, bilingual descriptions, and the inspection hook reserved for PHASE-050; release FREEZES the operation snapshot (BR-068 — later edits never move a live order); plan grants: **business + enterprise** | 4 | 042 | `manufacturing.routings.manage` | `items.item_master`, `manufacturing.work_centers` |
+| `manufacturing.shopfloor` | Shop-floor execution · تنفيذ أرضية المصنع | **SHIPPED PHASE-042** (M-17/M-18): the release-frozen `production_order_operations` rows and the INV-028 sequence machine (PENDING → SETUP/RUNNING → PAUSED ↔ RUNNING → COMPLETED/SKIPPED — skip needs a distinct approver + reason), actual setup/run time capture, the G-40 conversion posting at frozen work-center rates, the `OP:<order>:<seq>:<action>` scan terminal (idempotent replays), statistical scrap with reason codes, and the per-operation setup/usage/rate variance records (BR-071); plan grants: **business + enterprise** | 4 | 042 | `manufacturing.shopfloor.execute` (order release/create rides the §14 production-orders keys) | `manufacturing.routing`, `manufacturing.work_centers` |
+| `manufacturing.rework` | Rework orders · أوامر إعادة التشغيل | **SHIPPED PHASE-042** (M-14): create-from-defect referencing the defective batch/serial + the parent production order, own frozen routing standard, and the G-41 completion posting to `REWORK_EXPENSE` — never capitalized into the parent FG layer (BR-069); plan grants: **business + enterprise** | 4 | 042 | `manufacturing.rework_orders.manage` | `manufacturing.production_orders` |
+| `manufacturing.downtime` | Downtime logging · تسجيل التوقفات | **SHIPPED PHASE-042** (M-15): reason-coded downtime records (the closed vocabulary) linked to the work center and an optional (order, operation) pair, the OEE availability input, and the policy-gated G-42 non-value posting (`manufacturing.downtime_posting`, default record-only — BR-070); plan grants: **business + enterprise** | 4 | 042 | `manufacturing.downtime.log` | `manufacturing.work_centers` |
+| `manufacturing.standard_costs` | Standard costing · التكاليف المعيارية | **SHIPPED PHASE-042** (L2-12/CR-45, migration 0066): item standard costs by type (material/labor/overhead + overhead sub-splits), the low-level roll-up over BOM + routing (a missing component standard fails closed naming it), freeze/activate with effective dates (one ACTIVE — the BOM discipline), PPV at receipt through the GRN journal, and the optional stock revaluation on activate; PHASE-043's planning costing and WMS 044's standard valuation consume the frozen ACTIVE row; plan grants: **business + enterprise** | 4 | 042 | `manufacturing.standard_costs.manage` | `manufacturing.bom`, `manufacturing.routing` |
+
+food_manufacturing enablement (CR-36 (f), migration 0066 §9): the manufacturing-bearing
+template's `required_feature_keys` gains all six keys (the manufacturing block:
+`manufacturing.routing`, `manufacturing.work_centers`, `manufacturing.shopfloor`,
+`manufacturing.rework`, `manufacturing.downtime`, `manufacturing.standard_costs`) — a
+food-manufacturing tenant requires the execution keys by default; the docs manifest
+mirror + the contracts verbatim transcription move with the seed (the byte/hash pins
+re-anchored — the 039 re-pin procedure).

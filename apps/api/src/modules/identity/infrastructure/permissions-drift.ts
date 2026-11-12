@@ -153,6 +153,15 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // communication.outbox.read, communication.preferences.manage,
   // communication.inbox.read, communication.calendar.connect.
   "apps/api/migrations/0064_communications_hub.sql",
+  // PHASE-042 (Blueprint v3.0 · CR-12, extended by v3.1/CR-45 L2-12):
+  // 0065 seeds the SIX manufacturing-execution keys (matrix §3.20;
+  // 272 → 278) — manufacturing.work_centers.manage,
+  // manufacturing.routings.manage, manufacturing.shopfloor.execute,
+  // manufacturing.rework_orders.manage, manufacturing.downtime.log,
+  // manufacturing.oee.read; 0066 seeds the seventh (278 → 279) —
+  // manufacturing.standard_costs.manage.
+  "apps/api/migrations/0065_routing_work_centers.sql",
+  "apps/api/migrations/0066_standard_costing.sql",
 ];
 
 export async function main(): Promise<void> {

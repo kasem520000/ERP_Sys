@@ -108,6 +108,9 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "manufacturing.costing.read",
   "manufacturing.genealogy.read",
   "manufacturing.qc.manage",
+  // PHASE-042 (0065 seed): the OEE reports' key (the work-center
+  // utilization + downtime-analysis contracts)
+  "manufacturing.oee.read",
   // PHASE-019 (0027 seed): the CRM services report key
   "crm.contracts.manage",
   // PHASE-026 (0037 seed): the fixed-assets report keys
@@ -133,6 +136,11 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // log gates on communication.outbox.read (the same §12 convention —
   // the key the outbox ledger's read surface rides).
   "communication.outbox.read",
+  // PHASE-042 (0065 seed): the manufacturing-execution report keys — the
+  // utilization/OEE + downtime-analysis contracts gate on the OEE read key
+  // the /manufacturing/oee route rides (the same §12 convention); the
+  // rework-cost + cost-variance contracts ride the 0026 costing key.
+  "manufacturing.oee.read",
 ]);
 
 @Module({

@@ -140,6 +140,13 @@ import {
 // PHASE-041 · the communications set (REPORT_CATALOG §7 addition — the
 // outbound delivery log over the send ledger).
 import { communicationOutboundDeliveryLogContract } from "./communication/outbound-delivery-log.contract";
+// PHASE-042 · the manufacturing-execution set (REPORT_CATALOG §9 additions —
+// work-center utilization/OEE, the downtime analysis, the rework cost
+// register, the cost-variance rollup).
+import { manufacturingWorkCenterUtilizationContract } from "./manufacturing/work-center-utilization.contract";
+import { manufacturingDowntimeAnalysisContract } from "./manufacturing/downtime-analysis.contract";
+import { manufacturingReworkCostContract } from "./manufacturing/rework-cost.contract";
+import { manufacturingCostVarianceContract } from "./manufacturing/cost-variance.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -291,6 +298,14 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §7 platform additions — PHASE-041 (REPORT_CATALOG §7 row): the outbound
   // delivery log (every send a row: status, provider, ref, cost, attempts).
   communicationOutboundDeliveryLogContract,
+  // §9 industry additions — PHASE-042 (REPORT_CATALOG §9 rows — the
+  // manufacturing-execution set): work-center utilization & OEE, the
+  // downtime analysis by reason, the rework cost register (G-41/BR-069),
+  // and the cost-variance rollup (setup/usage/rate + yield).
+  manufacturingWorkCenterUtilizationContract,
+  manufacturingDowntimeAnalysisContract,
+  manufacturingReworkCostContract,
+  manufacturingCostVarianceContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

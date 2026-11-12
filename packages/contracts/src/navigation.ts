@@ -27,6 +27,7 @@ export type NavGroupId =
   | "sales"
   | "purchasing"
   | "inventory"
+  | "manufacturing"
   | "accounting"
   | "treasury"
   | "reports"
@@ -66,6 +67,7 @@ export const NAV_GROUP_IDS: readonly NavGroupId[] = [
   "sales",
   "purchasing",
   "inventory",
+  "manufacturing",
   "accounting",
   "treasury",
   "reports",
@@ -119,12 +121,19 @@ export interface ResolvedNavigation {
   shortcuts: Record<string, NavItem>;
 }
 
-/** Sidebar groups — BINDING order (NAVIGATION_MODEL §1, v2.0 10-group set). */
+/** Sidebar groups — BINDING order (NAVIGATION_MODEL §1, v2.0 10-group set;
+ * PHASE-042 T-13 adds the manufacturing execution group after inventory —
+ * production consumes what inventory stocks). */
 export const NAV_GROUPS: readonly NavGroup[] = [
   { id: "home", label: { ar: "الرئيسية", en: "Home" }, icon: "home" },
   { id: "sales", label: { ar: "المبيعات", en: "Sales" }, icon: "receipt" },
   { id: "purchasing", label: { ar: "المشتريات", en: "Purchasing" }, icon: "truck" },
   { id: "inventory", label: { ar: "المخزون", en: "Inventory" }, icon: "boxes" },
+  {
+    id: "manufacturing",
+    label: { ar: "الإنتاج والتصنيع", en: "Manufacturing" },
+    icon: "layers",
+  },
   { id: "accounting", label: { ar: "المحاسبة", en: "Accounting" }, icon: "ledger" },
   { id: "treasury", label: { ar: "الخزينة", en: "Treasury" }, icon: "banknote" },
   { id: "reports", label: { ar: "التقارير", en: "Reports" }, icon: "bar-chart" },
@@ -804,6 +813,74 @@ export const NAV_ITEMS: readonly NavItem[] = [
     branchScoped: false,
     archetype: "list-search",
     order: 16,
+  },
+  // manufacturing group — PHASE-042 (T-13; matrix §3.20): the manufacturing
+  // execution surfaces. Until now these screens rode the industry manifests
+  // + FALLBACK_CRUMBS; the routing/work-center/costing phase promotes them
+  // to first-class registry rows. Feature keys are the exact 0066 §8
+  // plan-grant strings (manufacturing.work_centers / manufacturing.routing /
+  // manufacturing.shopfloor / manufacturing.downtime /
+  // manufacturing.standard_costs); permissions mirror the route-permissions
+  // rows the five controllers enforce verbatim.
+  {
+    id: "manufacturing.work_centers",
+    parentGroup: "manufacturing",
+    label: { ar: "مراكز العمل", en: "Work centers" },
+    icon: "building",
+    route: "/manufacturing/work-centers",
+    featureKey: "manufacturing.work_centers",
+    permission: "manufacturing.work_centers.manage",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 10,
+  },
+  {
+    id: "manufacturing.routings",
+    parentGroup: "manufacturing",
+    label: { ar: "مسارات الإنتاج", en: "Routings" },
+    icon: "list-ordered",
+    route: "/manufacturing/routings",
+    featureKey: "manufacturing.routing",
+    permission: "manufacturing.routings.manage",
+    branchScoped: false,
+    archetype: "create-edit",
+    order: 20,
+  },
+  {
+    id: "manufacturing.shopfloor",
+    parentGroup: "manufacturing",
+    label: { ar: "طرفية أرضية المصنع", en: "Shop-floor terminal" },
+    icon: "barcode",
+    route: "/manufacturing/shopfloor",
+    featureKey: "manufacturing.shopfloor",
+    permission: "manufacturing.shopfloor.execute",
+    branchScoped: false,
+    archetype: "point-of-sale",
+    order: 30,
+  },
+  {
+    id: "manufacturing.downtime",
+    parentGroup: "manufacturing",
+    label: { ar: "سجل التوقفات", en: "Downtime log" },
+    icon: "hourglass",
+    route: "/manufacturing/downtime",
+    featureKey: "manufacturing.downtime",
+    permission: "manufacturing.downtime.log",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 40,
+  },
+  {
+    id: "manufacturing.standard_costs",
+    parentGroup: "manufacturing",
+    label: { ar: "التكاليف المعيارية", en: "Standard costs" },
+    icon: "banknote",
+    route: "/manufacturing/standard-costs",
+    featureKey: "manufacturing.standard_costs",
+    permission: "manufacturing.standard_costs.manage",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 50,
   },
   {
     id: "purchasing.supplier_scorecards",

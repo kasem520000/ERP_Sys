@@ -273,6 +273,17 @@ export const POLICY_REGISTRY: Readonly<Record<string, PolicyDefinition>> = Objec
     description:
       "PHASE-018 §5 variance review: after each consume, cumulative consumed qty above planned × (1 + threshold/100) flags the order line (over_plan) and raises the stock-category review notification — consumption is never blocked; correction is an adjusted consumption.",
   } satisfies PolicyDefinition),
+  // --- manufacturing execution (PHASE-042) -----------------------------------
+  downtime_posting: Object.freeze({
+    key: "downtime_posting",
+    valueType: "enum",
+    enumValues: Object.freeze(["off", "post"]),
+    default: "off",
+    module: "manufacturing",
+    settingsKey: "manufacturing.downtime_posting",
+    description:
+      "PHASE-042 BR-070: work-center downtime records are record-only by default ('off' — the closed row carries ended_at + duration with cost_amount/journal_id NULL); with 'post' the close computes the idle-capacity cost (duration/60 × the center's fixed+var hourly rates) and posts the G-42 journal DR DOWNTIME_EXPENSE · CR PRODUCTION_OVERHEAD (idle capacity absorbed against applied overhead). Posting is the explicit opt-in.",
+  } satisfies PolicyDefinition),
   // --- professional services (PHASE-019) ------------------------------------
   contract_billing_mode: Object.freeze({
     key: "contract_billing_mode",

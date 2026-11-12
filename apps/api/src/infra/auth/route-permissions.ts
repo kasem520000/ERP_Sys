@@ -2878,6 +2878,170 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "manufacturing.qc.manage",
   },
 
+  // PHASE-042 (0065/0066; matrix §3.20): the manufacturing-execution slice —
+  // work centers (one manage key for the master data + the guarded status
+  // flip), versioned routings (the BOM surface shape), the shop-floor
+  // operation transitions + the OP-scan terminal endpoint (shopfloor.execute
+  // — the operational tier; the live operations view rides the order view
+  // key), the downtime log, the OEE reads, rework orders (RW- lifecycle),
+  // and the item standard costs (L2-12 — drafts, roll-ups, the revaluation
+  // activation).
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/work-centers",
+    permission: "manufacturing.work_centers.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/work-centers",
+    permission: "manufacturing.work_centers.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/manufacturing/work-centers/:id",
+    permission: "manufacturing.work_centers.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/work-centers/:id/status",
+    permission: "manufacturing.work_centers.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/routings",
+    permission: "manufacturing.routings.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/routings",
+    permission: "manufacturing.routings.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/routings/:id",
+    permission: "manufacturing.routings.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/manufacturing/routings/:id",
+    permission: "manufacturing.routings.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/routings/:id/activate",
+    permission: "manufacturing.routings.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/routings/:id/copy",
+    permission: "manufacturing.routings.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/production-orders/:id/operations",
+    permission: "manufacturing.production_orders.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/production-orders/:id/operations/:seq/start",
+    permission: "manufacturing.shopfloor.execute",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/production-orders/:id/operations/:seq/pause",
+    permission: "manufacturing.shopfloor.execute",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/production-orders/:id/operations/:seq/resume",
+    permission: "manufacturing.shopfloor.execute",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/production-orders/:id/operations/:seq/complete",
+    permission: "manufacturing.shopfloor.execute",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/production-orders/:id/operations/:seq/skip",
+    permission: "manufacturing.shopfloor.execute",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/shopfloor/scan",
+    permission: "manufacturing.shopfloor.execute",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/downtime",
+    permission: "manufacturing.downtime.log",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/downtime",
+    permission: "manufacturing.downtime.log",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/downtime/:id/close",
+    permission: "manufacturing.downtime.log",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/oee",
+    permission: "manufacturing.oee.read",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/rework-orders",
+    permission: "manufacturing.rework_orders.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/rework-orders",
+    permission: "manufacturing.rework_orders.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/rework-orders/:id/release",
+    permission: "manufacturing.rework_orders.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/rework-orders/:id/start",
+    permission: "manufacturing.rework_orders.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/rework-orders/:id/complete",
+    permission: "manufacturing.rework_orders.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/rework-orders/:id/cancel",
+    permission: "manufacturing.rework_orders.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/standard-costs",
+    permission: "manufacturing.standard_costs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/standard-costs",
+    permission: "manufacturing.standard_costs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/standard-costs/roll-up",
+    permission: "manufacturing.standard_costs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/standard-costs/:id/activate",
+    permission: "manufacturing.standard_costs.manage",
+  },
+
   // PHASE-019 (MASTER-PLAN §11; matrix §3.1/§3.8): the projects dimension
   // (view rides the existing journal-entries view tier; manage mirrors the
   // cost-center trio), the CRM intake (leads + tasks + activities), the

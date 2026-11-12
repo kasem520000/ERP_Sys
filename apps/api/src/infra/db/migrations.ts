@@ -347,6 +347,24 @@ export const MIGRATIONS: readonly string[] = [
   // before CR-50's 0055–0059 and PHASE-040's 0060–0063; 0064 is the
   // honest next slot.
   "0064_communications_hub",
+  // PHASE-042 (Blueprint v3.0 · CR-12, extended by v3.1/CR-45 L2-12):
+  // 0065_routing_work_centers — the manufacturing execution substrate: six
+  // RLS'd tables (work_centers, routings, routing_operations,
+  // production_order_operations, rework_orders, downtime_records) + the
+  // production_orders extension (routing_id/current_operation, additive)
+  // + the two security_invoker OEE views + CoA markers 5125/5430.
+  // 0066_standard_costing — the L2-12 layer: item_standard_costs (versioned
+  // frozen standards, one ACTIVE per item — the BOM discipline) + the
+  // std_unit_cost/yield_variance order columns + CoA markers 5990/5995 +
+  // the standard_costs permission. +7 permissions total (272 → 279, matrix
+  // §3.20 — the doc's planned "manufacturing.costing" is already live as
+  // manufacturing.costing.read since 0026) +6 feature keys (business+
+  // enterprise, the 0026 precedent) + the food_manufacturing manifest
+  // enablement. Numbering note: the phase doc planned ≈0060…0066 — written
+  // before 039/040/041; 0065/0066 are the honest next slots (the 0064 D-1
+  // precedent).
+  "0065_routing_work_centers",
+  "0066_standard_costing",
 ];
 
 /**

@@ -5626,6 +5626,184 @@ export interface Dictionary {
   commPrefModuleCollections: string;
   commPrefModuleWarranties: string;
   commPrefModuleDigest: string;
+  // -- PHASE-042 (T-10…T-13): routing, work centers & costing — the mfg
+  // namespace tail (work centers, routings, the shop-floor terminal, the
+  // downtime log + OEE, rework, standard costs, the operations tab) -------
+  mfgWcTitle: string;
+  mfgRoutingsTitle: string;
+  mfgShopfloorTitle: string;
+  mfgDowntimeTitle: string;
+  mfgStdCostsTitle: string;
+  mfgWcCode: string;
+  mfgWcName: string;
+  mfgWcNameAr: string;
+  mfgWcCapacity: string;
+  mfgWcShifts: string;
+  mfgWcFixedRate: string;
+  mfgWcVarRate: string;
+  mfgWcStatusActive: string;
+  mfgWcStatusInactive: string;
+  mfgWcCreate: string;
+  mfgWcActivate: string;
+  mfgWcDeactivate: string;
+  mfgWcDeactivateWarning: string;
+  mfgWcSavedToast: string;
+  mfgWcEmpty: string;
+  mfgRoutingItem: string;
+  mfgRoutingVersion: string;
+  mfgRoutingStatus: string;
+  mfgRoutingOutputUom: string;
+  mfgRoutingNew: string;
+  mfgRoutingDraftOnlyHint: string;
+  mfgRoutingOperations: string;
+  mfgRoutingAddOperation: string;
+  mfgRoutingRemoveOperation: string;
+  mfgRoutingSequence: string;
+  mfgRoutingWorkCenter: string;
+  mfgRoutingSetupTime: string;
+  mfgRoutingRunTime: string;
+  mfgRoutingRateOverrides: string;
+  mfgRoutingFixedRateOverride: string;
+  mfgRoutingVarRateOverride: string;
+  mfgRoutingDescription: string;
+  mfgRoutingDescriptionAr: string;
+  mfgRoutingActivate: string;
+  mfgRoutingArchiveWarning: string;
+  mfgRoutingActivatedToast: string;
+  mfgRoutingCopy: string;
+  mfgRoutingCopiedToast: string;
+  mfgRoutingSavedToast: string;
+  mfgRoutingsEmpty: string;
+  mfgSfScan: string;
+  mfgSfScanPlaceholder: string;
+  mfgSfScanHint: string;
+  mfgSfScanInvalid: string;
+  mfgSfScanDoneToast: string;
+  mfgSfOrder: string;
+  mfgSfOperations: string;
+  mfgSfStart: string;
+  mfgSfPause: string;
+  mfgSfResume: string;
+  mfgSfComplete: string;
+  mfgSfSkip: string;
+  mfgSfSkipTitle: string;
+  mfgSfSkipReason: string;
+  mfgSfSkipApprover: string;
+  mfgSfSkipHint: string;
+  mfgSfCompleteTitle: string;
+  mfgSfOperator: string;
+  mfgSfActualSetup: string;
+  mfgSfActualRun: string;
+  mfgSfScrapQty: string;
+  mfgSfScrapReason: string;
+  mfgSfDowntimeTitle: string;
+  mfgDtPolicyNote: string;
+  mfgDtReason: string;
+  mfgDtReasonPlanSetup: string;
+  mfgDtReasonBreakdown: string;
+  mfgDtReasonMaintenance: string;
+  mfgDtReasonMaterialShortage: string;
+  mfgDtReasonQualityHold: string;
+  mfgDtReasonPowerOutage: string;
+  mfgDtReasonChangeover: string;
+  mfgDtReasonOperatorAbsent: string;
+  mfgDtReasonOther: string;
+  mfgDtWorkCenter: string;
+  mfgDtOrder: string;
+  mfgDtStartedAt: string;
+  mfgDtEndedAt: string;
+  mfgDtDuration: string;
+  mfgDtNote: string;
+  mfgDtLog: string;
+  mfgDtLoggedToast: string;
+  mfgDtClose: string;
+  mfgDtClosedToast: string;
+  mfgDtOpenBadge: string;
+  mfgDtEmpty: string;
+  mfgDtFilterFrom: string;
+  mfgDtFilterTo: string;
+  mfgRwCreate: string;
+  mfgRwParentOrder: string;
+  mfgRwDefectRef: string;
+  mfgRwQty: string;
+  mfgRwRouting: string;
+  mfgRwDefectReason: string;
+  mfgRwCreatedToast: string;
+  mfgRwRelease: string;
+  mfgRwReleasedToast: string;
+  mfgRwStart: string;
+  mfgRwComplete: string;
+  mfgRwCompleteTitle: string;
+  mfgRwCompletedToast: string;
+  mfgRwNo: string;
+  mfgRwListTitle: string;
+  mfgRwEmpty: string;
+  mfgScVersions: string;
+  mfgScMaterial: string;
+  mfgScLabor: string;
+  mfgScOverhead: string;
+  mfgScTotalHint: string;
+  mfgScSource: string;
+  mfgScSourceManual: string;
+  mfgScSourceRolledUp: string;
+  mfgScEffectiveFrom: string;
+  mfgScCreate: string;
+  mfgScCreatedToast: string;
+  mfgScRollUp: string;
+  mfgScRolledUpToast: string;
+  mfgScActivate: string;
+  mfgScActivatedToast: string;
+  mfgScRevaluateStock: string;
+  mfgScRevaluationWarning: string;
+  mfgScEmpty: string;
+  mfgOeeTitle: string;
+  mfgOeeDaily: string;
+  mfgOeePeriod: string;
+  mfgOeeDay: string;
+  mfgOeePeriodStart: string;
+  mfgOeePlannedHours: string;
+  mfgOeeActualHours: string;
+  mfgOeeDowntimeMinutes: string;
+  mfgOeeAvailability: string;
+  mfgOeePerformance: string;
+  mfgOeeQuality: string;
+  mfgOee: string;
+  mfgOeeEmpty: string;
+  mfgOpsTab: string;
+  mfgOpsRouting: string;
+  mfgOpsRoutingNone: string;
+  mfgOpsCurrentOperation: string;
+  mfgOpsStatusPending: string;
+  mfgOpsStatusSetup: string;
+  mfgOpsStatusRunning: string;
+  mfgOpsStatusPaused: string;
+  mfgOpsStatusCompleted: string;
+  mfgOpsStatusSkipped: string;
+  mfgOpsStdSetup: string;
+  mfgOpsStdRun: string;
+  mfgOpsVariance: string;
+  mfgOpsSetupVariance: string;
+  mfgOpsUsageVariance: string;
+  mfgOpsRateVariance: string;
+  mfgOpsJournal: string;
+  mfgOpsStartedAt: string;
+  mfgOpsFinishedAt: string;
+  mfgOpsEmpty: string;
+  mfgErrWcCodeConflict: string;
+  mfgErrWcInUse: string;
+  mfgErrWcNotActive: string;
+  mfgErrRoutingNotDraft: string;
+  mfgErrRoutingVersionConflict: string;
+  mfgErrOperationState: string;
+  mfgErrOperationSequence: string;
+  mfgErrOperationsIncomplete: string;
+  mfgErrSkipApprover: string;
+  mfgErrDowntimeClosed: string;
+  mfgErrReworkState: string;
+  mfgErrStdNotDraft: string;
+  mfgErrStdVersionConflict: string;
+  mfgErrStdMissing: string;
+  mfgErrStdRevaluationZero: string;
 }
 
 const ar: Dictionary = {
@@ -11271,6 +11449,194 @@ const ar: Dictionary = {
   commPrefModuleCollections: "التحصيل",
   commPrefModuleWarranties: "الضمانات",
   commPrefModuleDigest: "الملخص اليومي",
+  // -- PHASE-042 (T-10…T-13): مراكز العمل ومسارات الإنتاج والتكاليف -------
+  mfgWcTitle: "مراكز العمل",
+  mfgRoutingsTitle: "مسارات الإنتاج",
+  mfgShopfloorTitle: "طرفية أرضية المصنع",
+  mfgDowntimeTitle: "سجل التوقفات",
+  mfgStdCostsTitle: "التكاليف المعيارية",
+  mfgWcCode: "الرمز",
+  mfgWcName: "الاسم (إنجليزي)",
+  mfgWcNameAr: "الاسم (عربي)",
+  mfgWcCapacity: "سعة الوردية (ساعة)",
+  mfgWcShifts: "عدد الورديات يومياً",
+  mfgWcFixedRate: "معدل التكلفة الثابتة",
+  mfgWcVarRate: "معدل التكلفة المتغيرة",
+  mfgWcStatusActive: "نشط",
+  mfgWcStatusInactive: "موقوف",
+  mfgWcCreate: "مركز عمل جديد",
+  mfgWcActivate: "تنشيط",
+  mfgWcDeactivate: "إيقاف",
+  mfgWcDeactivateWarning:
+    "لن يظهر المركز الموقوف في المسارات الجديدة، بينما تُستكمل العمليات الجارية عليه. لا يمكن إيقاف مركز تشير إليه مسارات نشطة أو عمليات قيد التنفيذ.",
+  mfgWcSavedToast: "تم حفظ مركز العمل.",
+  mfgWcEmpty: "لا توجد مراكز عمل بعد.",
+  mfgRoutingItem: "الصنف",
+  mfgRoutingVersion: "الإصدار",
+  mfgRoutingStatus: "حالة المسار",
+  mfgRoutingOutputUom: "وحدة قياس المخرجات",
+  mfgRoutingNew: "مسار جديد",
+  mfgRoutingDraftOnlyHint:
+    "التحرير متاح للمسودات فقط؛ لتعديل إصدار منشط انسخه إلى مسودة جديدة.",
+  mfgRoutingOperations: "عمليات المسار",
+  mfgRoutingAddOperation: "إضافة عملية",
+  mfgRoutingRemoveOperation: "حذف العملية",
+  mfgRoutingSequence: "التسلسل",
+  mfgRoutingWorkCenter: "مركز العمل",
+  mfgRoutingSetupTime: "زمن التجهيز (ساعة)",
+  mfgRoutingRunTime: "زمن التشغيل (ساعة)",
+  mfgRoutingRateOverrides: "تجاوز المعدلات",
+  mfgRoutingFixedRateOverride: "معدل ثابت مُخصّص",
+  mfgRoutingVarRateOverride: "معدل متغير مُخصّص",
+  mfgRoutingDescription: "الوصف (إنجليزي)",
+  mfgRoutingDescriptionAr: "الوصف (عربي)",
+  mfgRoutingActivate: "تنشيط المسار",
+  mfgRoutingArchiveWarning:
+    "تنشيط هذا الإصدار يؤرشف الإصدار النشط الحالي للصنف نفسه ويحل محله في أوامر الإنتاج الجديدة.",
+  mfgRoutingActivatedToast: "تم تنشيط المسار وأرشفة الإصدار السابق إن وُجد.",
+  mfgRoutingCopy: "نسخ إلى مسودة جديدة",
+  mfgRoutingCopiedToast: "أُنشئت مسودة جديدة بنسخ عمليات المسار.",
+  mfgRoutingSavedToast: "تم حفظ عمليات المسار.",
+  mfgRoutingsEmpty: "لا توجد مسارات إنتاج بعد.",
+  mfgSfScan: "مسح الباركود",
+  mfgSfScanPlaceholder: "OP:<orderId>:<seq>:<action>",
+  mfgSfScanHint:
+    "صيغة الكود: OP:معرّف أمر الإنتاج:رقم العملية:ثم start أو pause أو resume أو complete.",
+  mfgSfScanInvalid: "صيغة الكود غير صحيحة — استخدم OP:<orderId>:<seq>:<action>.",
+  mfgSfScanDoneToast: "تم تنفيذ {action} على العملية {seq}.",
+  mfgSfOrder: "أمر الإنتاج",
+  mfgSfOperations: "العمليات المباشرة",
+  mfgSfStart: "بدء",
+  mfgSfPause: "إيقاف مؤقت",
+  mfgSfResume: "استئناف",
+  mfgSfComplete: "إنهاء",
+  mfgSfSkip: "تخطٍّ",
+  mfgSfSkipTitle: "تخطي العملية",
+  mfgSfSkipReason: "سبب التخطي",
+  mfgSfSkipApprover: "المعتمد",
+  mfgSfSkipHint: "يشترط اعتماد مستخدم آخر نشط غير المشغّل (فصل المهام).",
+  mfgSfCompleteTitle: "إنهاء العملية",
+  mfgSfOperator: "المشغّل",
+  mfgSfActualSetup: "زمن التجهيز الفعلي (ساعة)",
+  mfgSfActualRun: "زمن التشغيل الفعلي (ساعة)",
+  mfgSfScrapQty: "كمية الهالك",
+  mfgSfScrapReason: "سبب الهالك",
+  mfgSfDowntimeTitle: "تسجيل توقف سريع",
+  mfgDtPolicyNote:
+    "الوضع الافتراضي تسجيل فقط دون قيود محاسبية — ترحيل تكلفة التوقف (G-40) يُفعَّل عند تشغيل السياسة.",
+  mfgDtReason: "سبب التوقف",
+  mfgDtReasonPlanSetup: "تجهيز مخطط",
+  mfgDtReasonBreakdown: "عطل",
+  mfgDtReasonMaintenance: "صيانة",
+  mfgDtReasonMaterialShortage: "نقص مواد",
+  mfgDtReasonQualityHold: "إيقاف لسبب جودة",
+  mfgDtReasonPowerOutage: "انقطاع كهرباء",
+  mfgDtReasonChangeover: "تغيير التشغيلة",
+  mfgDtReasonOperatorAbsent: "غياب مشغّل",
+  mfgDtReasonOther: "أخرى",
+  mfgDtWorkCenter: "مركز العمل",
+  mfgDtOrder: "أمر الإنتاج (اختياري)",
+  mfgDtStartedAt: "بداية التوقف",
+  mfgDtEndedAt: "نهاية التوقف",
+  mfgDtDuration: "المدة (بالدقائق)",
+  mfgDtNote: "ملاحظة",
+  mfgDtLog: "تسجيل التوقف",
+  mfgDtLoggedToast: "تم تسجيل التوقف.",
+  mfgDtClose: "إغلاق السجل",
+  mfgDtClosedToast: "تم إغلاق سجل التوقف.",
+  mfgDtOpenBadge: "مفتوح",
+  mfgDtEmpty: "لا توجد سجلات توقف في النطاق المحدد.",
+  mfgDtFilterFrom: "من تاريخ",
+  mfgDtFilterTo: "إلى تاريخ",
+  mfgRwCreate: "إنشاء أمر إعادة تشغيل",
+  mfgRwParentOrder: "أمر الإنتاج الأصل",
+  mfgRwDefectRef: "مرجع العيب",
+  mfgRwQty: "الكمية",
+  mfgRwRouting: "المسار",
+  mfgRwDefectReason: "كود سبب العيب",
+  mfgRwCreatedToast: "أُنشئ أمر إعادة التشغيل كمسودة.",
+  mfgRwRelease: "إصدار",
+  mfgRwReleasedToast: "تم إصدار أمر إعادة التشغيل.",
+  mfgRwStart: "بدء التشغيل",
+  mfgRwComplete: "إنهاء",
+  mfgRwCompleteTitle: "إنهاء أمر إعادة التشغيل",
+  mfgRwCompletedToast: "تم إنهاء أمر إعادة التشغيل وترحيل تكلفته.",
+  mfgRwNo: "رقم إعادة التشغيل",
+  mfgRwListTitle: "أوامر إعادة التشغيل",
+  mfgRwEmpty: "لا توجد أوامر إعادة تشغيل لهذا الأمر.",
+  mfgScVersions: "الإصدارات",
+  mfgScMaterial: "تكلفة المواد",
+  mfgScLabor: "تكلفة العمالة",
+  mfgScOverhead: "التكاليف غير المباشرة",
+  mfgScTotalHint: "يُحتسب الإجمالي في الخادم ولا يُقبل من العميل.",
+  mfgScSource: "المصدر",
+  mfgScSourceManual: "إدخال يدوي",
+  mfgScSourceRolledUp: "تجميع قائمة المواد والمسار",
+  mfgScEffectiveFrom: "سارٍ من تاريخ",
+  mfgScCreate: "تكلفة معيارية يدوية",
+  mfgScCreatedToast: "أُنشئت التكلفة المعيارية كمسودة.",
+  mfgScRollUp: "تجميع من قائمة المواد والمسار",
+  mfgScRolledUpToast: "تم التجميع — مسودة جديدة بانتظار التنشيط.",
+  mfgScActivate: "تنشيط",
+  mfgScActivatedToast: "تم تنشيط التكلفة المعيارية.",
+  mfgScRevaluateStock: "إعادة تقييم المخزون بهذا المعيار",
+  mfgScRevaluationWarning:
+    "إعادة التقييم تُرحّل قيد تسوية على فروق المخزون لكل المستودعات — لا تفعلها إلا بعد تأكيد المحاسبة.",
+  mfgScEmpty: "لا توجد تكاليف معيارية بعد.",
+  mfgOeeTitle: "مؤشر كفاءة المعدات (OEE)",
+  mfgOeeDaily: "يومي",
+  mfgOeePeriod: "شهري",
+  mfgOeeDay: "اليوم",
+  mfgOeePeriodStart: "بداية الفترة",
+  mfgOeePlannedHours: "الساعات المعيارية",
+  mfgOeeActualHours: "الساعات الفعلية",
+  mfgOeeDowntimeMinutes: "دقائق التوقف",
+  mfgOeeAvailability: "الإتاحة",
+  mfgOeePerformance: "الأداء",
+  mfgOeeQuality: "الجودة",
+  mfgOee: "OEE",
+  mfgOeeEmpty: "لا توجد بيانات OEE في النطاق المحدد.",
+  mfgOpsTab: "العمليات",
+  mfgOpsRouting: "المسار المرتبط",
+  mfgOpsRoutingNone: "بلا مسار — نمط المعدل الثابت",
+  mfgOpsCurrentOperation: "العملية الحالية",
+  mfgOpsStatusPending: "بالانتظار",
+  mfgOpsStatusSetup: "تجهيز",
+  mfgOpsStatusRunning: "قيد التشغيل",
+  mfgOpsStatusPaused: "متوقفة مؤقتاً",
+  mfgOpsStatusCompleted: "منتهية",
+  mfgOpsStatusSkipped: "متخطاة",
+  mfgOpsStdSetup: "التجهيز المعياري",
+  mfgOpsStdRun: "التشغيل المعياري",
+  mfgOpsVariance: "الانحراف",
+  mfgOpsSetupVariance: "انحراف التجهيز",
+  mfgOpsUsageVariance: "انحراف الاستخدام",
+  mfgOpsRateVariance: "انحراف المعدل",
+  mfgOpsJournal: "القيد",
+  mfgOpsStartedAt: "بدأت",
+  mfgOpsFinishedAt: "انتهت",
+  mfgOpsEmpty:
+    "لا توجد عمليات لهذا الأمر — تُجمَّد عند التحرير إذا كان للصنف مسار نشط.",
+  mfgErrWcCodeConflict: "رمز مركز العمل مستخدم مسبقاً.",
+  mfgErrWcInUse:
+    "لا يمكن إيقاف المركز — تشير إليه مسارات نشطة أو عمليات قيد التنفيذ.",
+  mfgErrWcNotActive: "مركز العمل غير نشط.",
+  mfgErrRoutingNotDraft: "التحرير والتنشيط متاحان للمسودات فقط.",
+  mfgErrRoutingVersionConflict:
+    "تعذر حفظ الإصدار — يبدو أن تغييراً متزامناً تم أولاً؛ حدّث القائمة وأعد المحاولة.",
+  mfgErrOperationState: "حالة العملية لا تسمح بهذا الإجراء.",
+  mfgErrOperationSequence: "أنهِ العمليات الأدنى تسلسلاً أو تخطَّها قبل بدء هذه العملية.",
+  mfgErrOperationsIncomplete:
+    "لا يمكن إنهاء أمر الإنتاج قبل إنهاء أو تخطي جميع عملياته.",
+  mfgErrSkipApprover: "المعتمد يجب أن يكون مستخدماً آخر نشطاً غير المشغّل.",
+  mfgErrDowntimeClosed: "سجل التوقف مغلق مسبقاً.",
+  mfgErrReworkState: "حالة أمر إعادة التشغيل لا تسمح بهذا الإجراء.",
+  mfgErrStdNotDraft: "التنشيط متاح للمسودات فقط.",
+  mfgErrStdVersionConflict:
+    "تعذر حفظ إصدار التكلفة — تغيير متزامن؛ حدّث القائمة وأعد المحاولة.",
+  mfgErrStdMissing:
+    "التجميع يتطلب تكلفة معيارية نشطة لكل مكوّن في قائمة المواد — أكملها أولاً.",
+  mfgErrStdRevaluationZero: "قيمة إعادة التقييم صفر — لا يمكن ترحيل قيد فارغ.",
 };
 
 const en: Dictionary = {
@@ -16930,6 +17296,194 @@ const en: Dictionary = {
   commPrefModuleCollections: "Collections",
   commPrefModuleWarranties: "Warranties",
   commPrefModuleDigest: "Daily digest",
+  // -- PHASE-042 (T-10…T-13): routing, work centers & costing -------------
+  mfgWcTitle: "Work centers",
+  mfgRoutingsTitle: "Routings",
+  mfgShopfloorTitle: "Shop-floor terminal",
+  mfgDowntimeTitle: "Downtime log",
+  mfgStdCostsTitle: "Standard costs",
+  mfgWcCode: "Code",
+  mfgWcName: "Name (English)",
+  mfgWcNameAr: "Name (Arabic)",
+  mfgWcCapacity: "Capacity per shift (hours)",
+  mfgWcShifts: "Shifts per day",
+  mfgWcFixedRate: "Fixed cost rate",
+  mfgWcVarRate: "Variable cost rate",
+  mfgWcStatusActive: "Active",
+  mfgWcStatusInactive: "Inactive",
+  mfgWcCreate: "New work center",
+  mfgWcActivate: "Activate",
+  mfgWcDeactivate: "Deactivate",
+  mfgWcDeactivateWarning:
+    "An inactive center is no longer offered to new routings, while operations already running on it still finish. A center referenced by ACTIVE routings or live operations cannot be deactivated.",
+  mfgWcSavedToast: "Work center saved.",
+  mfgWcEmpty: "No work centers yet.",
+  mfgRoutingItem: "Item",
+  mfgRoutingVersion: "Version",
+  mfgRoutingStatus: "Routing status",
+  mfgRoutingOutputUom: "Output UoM",
+  mfgRoutingNew: "New routing",
+  mfgRoutingDraftOnlyHint:
+    "Only DRAFT versions can be edited — copy an activated version to draft a new one.",
+  mfgRoutingOperations: "Routing operations",
+  mfgRoutingAddOperation: "Add operation",
+  mfgRoutingRemoveOperation: "Remove operation",
+  mfgRoutingSequence: "Sequence",
+  mfgRoutingWorkCenter: "Work center",
+  mfgRoutingSetupTime: "Setup time (hours)",
+  mfgRoutingRunTime: "Run time (hours)",
+  mfgRoutingRateOverrides: "Rate overrides",
+  mfgRoutingFixedRateOverride: "Fixed rate override",
+  mfgRoutingVarRateOverride: "Variable rate override",
+  mfgRoutingDescription: "Description (English)",
+  mfgRoutingDescriptionAr: "Description (Arabic)",
+  mfgRoutingActivate: "Activate routing",
+  mfgRoutingArchiveWarning:
+    "Activating this version archives the item's current ACTIVE routing and takes its place for new production orders.",
+  mfgRoutingActivatedToast: "Routing activated; the previous version was archived if one existed.",
+  mfgRoutingCopy: "Copy to a new draft",
+  mfgRoutingCopiedToast: "New draft created from this routing's operations.",
+  mfgRoutingSavedToast: "Routing operations saved.",
+  mfgRoutingsEmpty: "No routings yet.",
+  mfgSfScan: "Scan barcode",
+  mfgSfScanPlaceholder: "OP:<orderId>:<seq>:<action>",
+  mfgSfScanHint:
+    "Code shape: OP:<production order id>:<operation sequence>:start | pause | resume | complete.",
+  mfgSfScanInvalid: "Invalid code shape — use OP:<orderId>:<seq>:<action>.",
+  mfgSfScanDoneToast: "{action} applied to operation {seq}.",
+  mfgSfOrder: "Production order",
+  mfgSfOperations: "Live operations",
+  mfgSfStart: "Start",
+  mfgSfPause: "Pause",
+  mfgSfResume: "Resume",
+  mfgSfComplete: "Complete",
+  mfgSfSkip: "Skip",
+  mfgSfSkipTitle: "Skip operation",
+  mfgSfSkipReason: "Skip reason",
+  mfgSfSkipApprover: "Approver",
+  mfgSfSkipHint: "Requires a distinct ACTIVE user as the approver (separation of duties).",
+  mfgSfCompleteTitle: "Complete operation",
+  mfgSfOperator: "Operator",
+  mfgSfActualSetup: "Actual setup time (hours)",
+  mfgSfActualRun: "Actual run time (hours)",
+  mfgSfScrapQty: "Scrap qty",
+  mfgSfScrapReason: "Scrap reason",
+  mfgSfDowntimeTitle: "Quick downtime log",
+  mfgDtPolicyNote:
+    "Record-only by default — downtime cost posting (G-40) stays off until the policy is switched on.",
+  mfgDtReason: "Downtime reason",
+  mfgDtReasonPlanSetup: "Planned setup",
+  mfgDtReasonBreakdown: "Breakdown",
+  mfgDtReasonMaintenance: "Maintenance",
+  mfgDtReasonMaterialShortage: "Material shortage",
+  mfgDtReasonQualityHold: "Quality hold",
+  mfgDtReasonPowerOutage: "Power outage",
+  mfgDtReasonChangeover: "Changeover",
+  mfgDtReasonOperatorAbsent: "Operator absent",
+  mfgDtReasonOther: "Other",
+  mfgDtWorkCenter: "Work center",
+  mfgDtOrder: "Production order (optional)",
+  mfgDtStartedAt: "Started at",
+  mfgDtEndedAt: "Ended at",
+  mfgDtDuration: "Duration (minutes)",
+  mfgDtNote: "Note",
+  mfgDtLog: "Log downtime",
+  mfgDtLoggedToast: "Downtime recorded.",
+  mfgDtClose: "Close record",
+  mfgDtClosedToast: "Downtime record closed.",
+  mfgDtOpenBadge: "Open",
+  mfgDtEmpty: "No downtime records in the selected window.",
+  mfgDtFilterFrom: "From",
+  mfgDtFilterTo: "To",
+  mfgRwCreate: "Create rework order",
+  mfgRwParentOrder: "Parent order",
+  mfgRwDefectRef: "Defect ref",
+  mfgRwQty: "Quantity",
+  mfgRwRouting: "Routing",
+  mfgRwDefectReason: "Defect reason code",
+  mfgRwCreatedToast: "Rework order created as a draft.",
+  mfgRwRelease: "Release",
+  mfgRwReleasedToast: "Rework order released.",
+  mfgRwStart: "Start work",
+  mfgRwComplete: "Complete",
+  mfgRwCompleteTitle: "Complete rework order",
+  mfgRwCompletedToast: "Rework order completed and its cost posted.",
+  mfgRwNo: "Rework no",
+  mfgRwListTitle: "Rework orders",
+  mfgRwEmpty: "No rework orders for this order.",
+  mfgScVersions: "Versions",
+  mfgScMaterial: "Material cost",
+  mfgScLabor: "Labor cost",
+  mfgScOverhead: "Overhead cost",
+  mfgScTotalHint: "The total is derived server-side — never accepted from the client.",
+  mfgScSource: "Source",
+  mfgScSourceManual: "Manual entry",
+  mfgScSourceRolledUp: "BOM & routing roll-up",
+  mfgScEffectiveFrom: "Effective from",
+  mfgScCreate: "Manual standard",
+  mfgScCreatedToast: "Standard cost created as a draft.",
+  mfgScRollUp: "Roll up from BOM & routing",
+  mfgScRolledUpToast: "Roll-up complete — a new draft awaits activation.",
+  mfgScActivate: "Activate",
+  mfgScActivatedToast: "Standard cost activated.",
+  mfgScRevaluateStock: "Revaluate stock with this standard",
+  mfgScRevaluationWarning:
+    "Revaluation posts a stock-adjustment journal across every warehouse — confirm with accounting before you check it.",
+  mfgScEmpty: "No standard costs yet.",
+  mfgOeeTitle: "OEE — work centers",
+  mfgOeeDaily: "Daily",
+  mfgOeePeriod: "Monthly",
+  mfgOeeDay: "Day",
+  mfgOeePeriodStart: "Period start",
+  mfgOeePlannedHours: "Planned hours",
+  mfgOeeActualHours: "Actual hours",
+  mfgOeeDowntimeMinutes: "Downtime minutes",
+  mfgOeeAvailability: "Availability",
+  mfgOeePerformance: "Performance",
+  mfgOeeQuality: "Quality",
+  mfgOee: "OEE",
+  mfgOeeEmpty: "No OEE data in the selected window.",
+  mfgOpsTab: "Operations",
+  mfgOpsRouting: "Bound routing",
+  mfgOpsRoutingNone: "No routing bound — flat-rate mode",
+  mfgOpsCurrentOperation: "Current operation",
+  mfgOpsStatusPending: "Pending",
+  mfgOpsStatusSetup: "Setup",
+  mfgOpsStatusRunning: "Running",
+  mfgOpsStatusPaused: "Paused",
+  mfgOpsStatusCompleted: "Completed",
+  mfgOpsStatusSkipped: "Skipped",
+  mfgOpsStdSetup: "Std setup",
+  mfgOpsStdRun: "Std run",
+  mfgOpsVariance: "Variance",
+  mfgOpsSetupVariance: "Setup variance",
+  mfgOpsUsageVariance: "Usage variance",
+  mfgOpsRateVariance: "Rate variance",
+  mfgOpsJournal: "Journal",
+  mfgOpsStartedAt: "Started",
+  mfgOpsFinishedAt: "Finished",
+  mfgOpsEmpty:
+    "No operations for this order — they freeze at release when the item has an active routing.",
+  mfgErrWcCodeConflict: "That work-center code is already in use.",
+  mfgErrWcInUse:
+    "Cannot deactivate the center — it is referenced by active routings or live operations.",
+  mfgErrWcNotActive: "The work center is not active.",
+  mfgErrRoutingNotDraft: "Only DRAFT routings accept edits or activation.",
+  mfgErrRoutingVersionConflict:
+    "Could not save the version — a concurrent change landed first; refresh and retry.",
+  mfgErrOperationState: "The operation's state does not allow this action.",
+  mfgErrOperationSequence: "Earlier operations must be completed or skipped before this one starts.",
+  mfgErrOperationsIncomplete:
+    "The order cannot complete until every operation is completed or skipped.",
+  mfgErrSkipApprover: "The approver must be a distinct active user — not the operator.",
+  mfgErrDowntimeClosed: "The downtime record is already closed.",
+  mfgErrReworkState: "The rework order's state does not allow this action.",
+  mfgErrStdNotDraft: "Only DRAFT standard costs activate.",
+  mfgErrStdVersionConflict:
+    "Could not save the cost version — a concurrent change landed; refresh and retry.",
+  mfgErrStdMissing:
+    "The roll-up needs an active standard for every BOM component — complete those first.",
+  mfgErrStdRevaluationZero: "The revaluation value is zero — an empty journal cannot post.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

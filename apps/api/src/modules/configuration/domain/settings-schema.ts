@@ -469,6 +469,13 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-018 §5: after each consumption, cumulative consumed quantity above planned × (1 + threshold/100) flags the order line (over_plan) and raises the stock-category review notification — consumption is never blocked.",
   }),
+  "manufacturing.downtime_posting": Object.freeze({
+    key: "manufacturing.downtime_posting",
+    schema: z.enum(["off", "post"]),
+    default: "off",
+    description:
+      "PHASE-042 §2.7 (BR-070): downtime records are record-only by default ('off' — the availability input of OEE, no ledger effect); 'post' makes closing a record post the non-value cost leg (G-42: DR DOWNTIME_EXPENSE · CR PRODUCTION_OVERHEAD at the work center's rates × idle hours) — the explicit opt-in.",
+  }),
   // PHASE-019 professional-services keys (the §9 policy surface; the
   // professional_services manifest sets the six as L1 defaults via
   // workflow_policies, and the crm services read them from the resolved

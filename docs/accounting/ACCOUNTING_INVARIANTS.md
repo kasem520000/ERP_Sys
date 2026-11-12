@@ -1,6 +1,6 @@
 # Accounting Invariants
 
-> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-10 (PHASE-037 — INV-027)
+> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-10 (PHASE-037 — INV-027) · 2026-11-12 (PHASE-042 — INV-028)
 
 The testable, normative invariants of the financial core. Each invariant has an ID
 referenced by module code comments, test names (`INV-xxx`), and phase acceptance
@@ -80,10 +80,16 @@ entitlement may violate any invariant (directive §1.15). Test plan:
 |----|-----------|------------------------|
 | INV-027 | ZATCA chain integrity (PHASE-037): per-device ICV strictly monotonic 1..N, zero gaps (partial UNIQUE (tenant, device, icv) as the DB floor); every PIH equals the predecessor's stored invoice_hash (genesis = base64(SHA-256(ASCII "0"))); the verification service re-derives every digest and FAILS CLOSED on any tamper with a typed failure pack. The stamp rides the invoice post transaction — never a partial chain. Digest carries a code-level version marker (invoice-hash-v1); PHASE-054's UBL 2.1 digest re-derives the full walk (PIH links survive). | `ZatcaPhase1Service` `stampForPost` (ICV minted via SELECT FOR UPDATE inside the post transaction — zero-journal, the negative ledger proof) + `verifyDeviceChain` (re-derives digests; typed `ZatcaChainBrokenError` failure pack) · DB floor `uq_sales_invoices_tenant_device_icv` + `ck_sales_invoices_zatca_stamp_shape` (all-stamp-or-all-null, migration `0050_zatca_phase1.sql`) · BR-060/BR-061 ([../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md)) · INV-027 suite (`zatca-phase1.spec.ts` — chain 1..N + genesis PIH, tamper fail-closed) |
 
+## Manufacturing execution integrity (Blueprint v3.0 — PHASE-042)
+
+| ID | Invariant | Enforced by / tested at |
+|----|-----------|------------------------|
+| INV-028 | Operation sequence discipline (PHASE-042, migration 0065 — the phase doc's planned "INV-027" predates PHASE-037's ZATCA invariant, so the honest slot is INV-028; migrations 0065/0066, the 0064 D-1 precedent): on a routing-bound production order, operation N+1 cannot START before operation N reaches COMPLETED or SKIPPED (SKIPPED counts as sequence-satisfied); each operation COMPLETES at most once — an idempotent replay (re-scanned, re-called) returns the STORED row and never a second journal (the `op_<seq>` INV-013 source operation + the journal unique source index are the floor); `current_operation` advances exactly with the last resolved operation (start stamps it; completion/skip advances to the next non-terminal sequence, or stays at the last resolved one); SKIPPED requires a DISTINCT ACTIVE approver + a reason of 1..500 chars (SoD — the BR-034 house pattern: `SelfApprovalBlockedError`/`ApproverNotFoundError`); a COMPLETED operation never skips and a live order (not CANCELLED/COMPLETED) is the execution floor. | `OperationExecutionService` (`assertSequenceGate` — typed `OperationSequenceError` naming the blocking sequence; `completeOp` replay path returns `{operation, journalEntryId: op.journalId}`) · DB floors `uq_production_order_operations_order_sequence` (one row per order × sequence) + `ck_production_order_operations_state_evidence` (terminal states carry their timestamps; SKIPPED carries reason + approver) · G-40 posting (source `production_order`, operation `op_<seq>`) · BR-068…BR-071 ([../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md)) · INV-028 suite (`__db__/manufacturing/routing-execution.db.spec.ts` — the gate, the one-journal replay, the skip SoD, the `current_operation` cursor, the routing-less dual mode) |
+
 Definitions are canonical in [../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) §G (ED-13);
 the INV-022 principle extends to them unchanged — no configuration, template, or entitlement
 can disable or alter any invariant on this list. The golden postings that exercise them are
-G-21…G-32 ([JOURNAL_RULES.md](JOURNAL_RULES.md) §7).
+G-21…G-42 ([JOURNAL_RULES.md](JOURNAL_RULES.md) §7).
 
 ## Maintenance protocol
 
