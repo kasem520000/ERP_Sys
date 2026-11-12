@@ -505,3 +505,25 @@ export class AbcThresholdError extends DomainError {
     super("ABC_THRESHOLD_INVALID", `ABC thresholds must satisfy 0 < aPct < bPct ≤ 1: ${aPct}/${bPct}`);
   }
 }
+
+// -- consignment / VMI (PHASE-044 T-09; §2.9; I-10/I-11/I-19) --------------------------
+
+export class ConsignmentPartnerInvalidError extends DomainError {
+  constructor(partnerId: string, detail: string) {
+    super("CONSIGNMENT_PARTNER_INVALID", `partner ${partnerId} cannot own consignment stock: ${detail}`);
+  }
+}
+export class ConsignmentStockShortError extends DomainError {
+  constructor(details: { ownerPartnerId: string; itemId: string; onHand: string; requested: string }) {
+    super(
+      "CONSIGNMENT_STOCK_SHORT",
+      `consignment issue of ${details.requested} exceeds the owner's on-hand ${details.onHand} (owner ${details.ownerPartnerId}, item ${details.itemId})`,
+      details,
+    );
+  }
+}
+export class ConsignmentStateError extends DomainError {
+  constructor(message: string) {
+    super("CONSIGNMENT_STATE_INVALID", message);
+  }
+}

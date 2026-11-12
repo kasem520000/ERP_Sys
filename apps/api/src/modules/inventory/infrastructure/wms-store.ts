@@ -498,6 +498,28 @@ export async function listAllocatableBinContents(input: {
   }[];
 }
 
+/**
+ * T-09 (§2.9): the consignment allocation source — the OWNER's AVAILABLE
+ * rows for (owner, warehouse, item), FIFO by received_at (the tenant rows
+ * are never visible here — BR-076's exclusion runs both ways).
+ */
+export async function listOwnerRows(input: {
+  ownerPartnerId: string;
+  warehouseId: string;
+  itemId: string;
+}): Promise<{ id: string; binId: string; qty: string; serialId: string | null; status: string }[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, bin_id AS "binId", qty::text AS qty, serial_id AS "serialId", status
+    FROM bin_contents
+    WHERE owner_partner_id = ${input.ownerPartnerId}
+      AND warehouse_id = ${input.warehouseId}
+      AND item_id = ${input.itemId}
+      AND status = 'AVAILABLE' AND qty > 0
+    ORDER BY received_at, id
+  `);
+  return rows.rows as unknown as { id: string; binId: string; qty: string; serialId: string | null; status: string }[];
+}
+
 /** Does the item have ANY tenant-owned bin row in the warehouse? */
 export async function hasAnyBinContent(warehouseId: string, itemId: string): Promise<boolean> {
   const rows = await tenantTx().execute<{ n: number }>(sql`
