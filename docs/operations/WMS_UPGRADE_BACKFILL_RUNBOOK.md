@@ -56,10 +56,19 @@ Every `(warehouse, item)` shortfall row in the report carries:
     pass writes it and the fold goes exact.
   - **`PARTIAL_UNATTRIBUTED`** — the proven distribution covers LESS than
     `item_stock` (e.g. pre-tracking NULL-batch moves, a registered serial
-    with no ledger legs). **The unproven residue is NEVER written**: it stays
-    visible to the nightly probe, it is no more spendable than before the
-    backfill (the FEFO/BR-017 and named-unit/BR-018 laws were already the
-    spend gate), and the live pass files ONE critical owner notification.
+    with no ledger legs). **The unproven residue is NEVER written**: it
+    stays visible to the nightly probe and the live pass files ONE
+    critical owner notification. The spendability consequence is
+    asymmetric and TEST-PROVEN (`wms-backfill-races.spec`, wave 2):
+    BATCH residue was never spendable anyway (the FEFO/BR-017 law only
+    issues batch-attributed stock — unchanged by the pass); SERIAL residue
+    WAS spendable before the pass (the binless grace + a registered
+    in_stock serial satisfies BR-018) and becomes **BLOCKED at the bin
+    gate (`BinContentsShortError`) the moment the pass lands the item's
+    first proven bin row** — any tenant-owned bin row ends the binless
+    grace for that (warehouse, item), and no fabricated row is ever
+    invented to keep an unprovable unit sellable. Fail-closed by design:
+    the block is the safety, not a regression — resolve per §5.
   - **`NON_RECONCILABLE`** — the sources DISAGREE (the per-batch ledger
     shortfalls, or the provable serial count, EXCEED the `item_stock`
     shortfall). The distribution is untrustworthy: **nothing is written for
@@ -128,7 +137,10 @@ completed but unproven residue remains (§5 — the operator MUST review) ·
    spendable): issue a small quantity of a batch-tracked item (explicit batch
    and FEFO) and a serialized unit by its serial through the normal issue
    surfaces. Pre-fix behavior (the audit's finding) was a typed
-   `BIN_CONTENTS_SHORT` on exactly these flows.
+   `BIN_CONTENTS_SHORT` on exactly these flows. (The serial-location proof
+   and the race coverage live in `wms-backfill-races.spec` — the strictness
+   cases netHere 2/netTotal 1-or-0, the zero-qty history slot, and the
+   mid-pass issue/receipt rendezvous.)
 4. The next nightly `inventory.bin-reconcile` run must report the tenant
    clean except the accepted residue rows.
 
@@ -140,18 +152,26 @@ shortfall. When the live pass exits 2:
 - Every unproven unit stays unwritten; the drift remains in the probe's
   report every night (ONE critical owner notification per day), and the
   live pass itself filed ONE critical notification naming the items.
+- A SERIAL phantom unit is BLOCKED at the bin gate from the moment its
+  item's first proven bin row lands (§3) — picking it returns the typed
+  `BIN_CONTENTS_SHORT` with the runbook pointer. That block is the
+  designed fail-closed state: the unit was spendable only while the item
+  was entirely binless, and selling an unprovable unit is exactly the
+  risk this migration exists to end.
 - For each unresolved item the operator EITHER:
   1. **Corrects the data** through a documented stock adjustment (the count
      wizard / adjustment surfaces — through the movement core, never raw
-     SQL), then re-runs the backfill (the corrected stock becomes provable);
-     OR
+     SQL), then re-runs the backfill (the corrected stock becomes provable;
+     a serial that gains its missing ledger leg through a documented
+     receipt/return becomes placeable and the block lifts); OR
   2. **Accepts the drift** with a recorded decision (ticket id in the change
-     log) — the residue stays visible forever; it is never spendable through
-     the batch/serial paths (it never was).
+     log) — the residue stays visible forever; batch residue was never
+     spendable, serial residue stays BLOCKED at the bin gate (it stops
+     being sellable — the honest consequence, never a hidden one).
 - **`NON_RECONCILABLE` is never accepted silently**: the ledger claiming
-  MORE than the position table is a data-integrity incident — find the
-  divergent legs (the report's notes name the batches/serials) before any
-  correction.
+     MORE than the position table is a data-integrity incident — find the
+     divergent legs (the report's notes name the batches/serials) before any
+     correction.
 
 **There is no time-based auto-anything here.** The safety chain is:
 the binless grace keeps pre-backfill tenants spendable (§7) → the operator
@@ -168,11 +188,46 @@ deadline — nothing flips, blocks, or expires on a timer.
   tenant write.
 - **Interruption (Ctrl-C / crash):** the current tenant's UoW dies uncommitted;
   every committed tenant stands. Re-run.
-- **Concurrency:** a transaction-local advisory lock
+- **Concurrency with OTHER BACKFILLS:** a transaction-local advisory lock
   (`pg_advisory_xact_lock('erp:wms-bins-backfill:<tenant>')`) serializes
   per-tenant passes — two operators (or a double-invocation) converge: the
   loser re-reads the healed fold and writes nothing (proven by the tracked
   backfill spec's parallel-run test).
+- **Concurrency with INVENTORY MOVEMENTS (wave 2's protocol — the audit's
+  top-priority race):** the advisory lock never serialized movements; they
+  serialize on the `item_stock` ROW lock (CC-04's `lockItemStock`, the
+  first lock of every movement UoW). The live pass now JOINS that protocol:
+  1. advisory lock (backfill-vs-backfill),
+  2. a PRE-PASS locks every candidate `(warehouse, item)` position row
+     `FOR UPDATE` in ONE canonical order (`warehouse_id, item_id`) BEFORE
+     any write,
+  3. the shortfall list is RE-DERIVED fresh under the held locks — every
+     plan number and every post-write verification number (stockQty, bin
+     fold, batch/serial distribution) is stable; a movement committing
+     between the unlocked snapshot and the locks can no longer make the
+     pass write the stale `row.stockQty` (pre-fix: a concurrent binless
+     issue SHIPPED an oversubscribed fold silently — fold 30 vs stock 25;
+     a concurrent receipt tripped a spurious whole-tenant rollback — both
+     reproduced then fixed in `wms-backfill-races.spec`),
+  4. a fresh shortfall row outside the locked candidate set aborts the
+     pass fail-closed (a protocol violation that cannot occur under the
+     movement invariants — the guard exists for regressions only).
+  A movement UoW touching a backfilled position QUEUES on the pass's row
+  lock; when it unblocks (the pass committed) its binless check — which
+  runs AFTER its own position lock — sees the healed bin rows and takes
+  the binned path (test-proven: the queued issue's move row carries
+  `source_bin_id`, the binned signature).
+- **Deadlock discipline & the retry contract:** the pass acquires its
+  position locks in ONE canonical order, but a MULTI-position movement
+  (a multi-line document, a transfer: source then destination) locks ITS
+  positions in its own order — an inverse-order overlap on two or more
+  shared positions can deadlock. Postgres resolves it within
+  `deadlock_timeout` (default 1s) and aborts one side; the operator tool
+  then RETRIES the tenant pass (up to 3 attempts, exponential backoff,
+  each attempt logged) — safe because a pass is atomic + idempotent (a
+  rolled-back pass re-derives from scratch; a committed one is a no-op on
+  re-run). Movements are never retried by this tool and never blocked
+  longer than one tenant pass.
 - **A SURPLUS** (bins > stock) is genuine drift the backfill NEVER touches —
   the probe owns it; investigate, never "fix" by writing more rows.
 
@@ -181,10 +236,15 @@ deadline — nothing flips, blocks, or expires on a timer.
 The movement core's binless path (`hasAnyBinContent` → the 0071 grace) lets
 an item with NO bin rows issue/receive as before. **It stays.** It is the
 safety net that keeps un-backfilled tenants spendable, and the backfill's
-residue classification depends on it for the no-bins-at-all case. It may be
-retired ONLY when: every ACTIVE tenant's backfill verification (§4.5) has
-passed AND a release has explicitly re-planned the removal with its own
-migration analysis — removing it earlier would strand exactly the stock this
+residue classification depends on it for the no-bins-at-all case. Two
+per-item facts are test-proven (wave 2): the grace ends with the item's
+FIRST tenant-owned bin row of ANY kind (qty 0, QUARANTINE, HOLD included —
+`hasAnyBinContent` counts rows, not quantities), and a PARTIAL pass lands
+exactly such a first row — so the residue of a partially-migrated item is
+bin-gated from that moment (§3/§5). The grace may be retired ONLY when:
+every ACTIVE tenant's backfill verification (§4.5) has passed AND a
+release has explicitly re-planned the removal with its own migration
+analysis — removing it earlier would strand exactly the stock this
 runbook exists to place. INV-029's wording ("AT ALL TIMES") is the law for
 every post-0067 economic move; the pre-existing stock is the migration-era
 residue this runbook closes — the probe keeps the residue visible until it

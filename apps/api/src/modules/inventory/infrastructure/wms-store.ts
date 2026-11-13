@@ -907,8 +907,11 @@ export async function listBatchDistribution(
  * serial's net position PER warehouse from the stock_moves ledger (qty is
  * 1 per serialized move), the registry status (item_serials has NO
  * warehouse column — the ledger is the only warehouse attribution source;
- * the registry is the lifecycle truth), and whether a tenant-owned bin row
- * already places the serial anywhere. The service classifies: provable /
+ * the registry is the lifecycle truth), and WHERE the tenant-owned bin rows
+ * place the unit — here vs elsewhere, BY QUANTITY (the concurrency-audit
+ * fix: a ZERO-qty history row places nothing — row existence alone is NOT
+ * placement evidence; a positive row at ANOTHER warehouse is a named
+ * conflict, never a silent skip). The service classifies: provable /
  * ambiguous / conflicting — never inventing a placement. */
 export interface SerialDistributionRow {
   serialId: string;
@@ -920,8 +923,13 @@ export interface SerialDistributionRow {
   /** Net ledger position across ALL warehouses (1 = provably in stock
    * somewhere; > 1 = duplicated ledger legs — ambiguous). */
   netTotal: string;
-  /** A tenant-owned bin_contents row already carries this serial. */
-  alreadyBinned: boolean;
+  /** Σ qty of tenant-owned bin rows carrying this serial AT THIS warehouse
+   * (any status — the fold spans all statuses). 0 = placed nowhere here
+   * (zero-qty history rows included in that 0). */
+  binnedHereQty: string;
+  /** Σ qty of tenant-owned bin rows carrying this serial at OTHER
+   * warehouses — a positive value contradicts a here-placement. */
+  binnedElsewhereQty: string;
 }
 
 export async function listSerialDistribution(
@@ -941,14 +949,18 @@ export async function listSerialDistribution(
     ), totals AS (
       SELECT serial_id, SUM(net) AS net_total FROM moves GROUP BY serial_id
     ), binned AS (
-      SELECT serial_id FROM bin_contents
+      SELECT serial_id,
+             SUM(CASE WHEN warehouse_id = ${warehouseId} THEN qty ELSE 0 END) AS here_qty,
+             SUM(CASE WHEN warehouse_id <> ${warehouseId} THEN qty ELSE 0 END) AS elsewhere_qty
+      FROM bin_contents
       WHERE item_id = ${itemId} AND serial_id IS NOT NULL AND owner_partner_id IS NULL
       GROUP BY serial_id
     )
     SELECT s.id AS "serialId", s.serial_no AS "serialNo", s.status AS "registryStatus",
            COALESCE(a.net_at_wh, 0)::text AS "netAtWarehouse",
            COALESCE(t.net_total, 0)::text AS "netTotal",
-           (b.serial_id IS NOT NULL) AS "alreadyBinned"
+           COALESCE(b.here_qty, 0)::text AS "binnedHereQty",
+           COALESCE(b.elsewhere_qty, 0)::text AS "binnedElsewhereQty"
     FROM item_serials s
     LEFT JOIN at_wh a ON a.serial_id = s.id
     LEFT JOIN totals t ON t.serial_id = s.id

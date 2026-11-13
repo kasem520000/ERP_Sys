@@ -26,12 +26,22 @@
  *       and either correct through a documented adjustment or accept the
  *       drift (the nightly probe keeps reporting it; see the runbook §5).
  *
- * Safety properties (tested in __db__/inventory/wms-tracked-backfill.spec):
+ * Safety properties (tested in __db__/inventory/wms-tracked-backfill.spec +
+ * __db__/inventory/wms-backfill-races.spec):
  * - dry-run writes NOTHING;
  * - one tenant UoW per pass (ADR-0005) — a failure rolls back that tenant
  *   whole, never a partial write that hides the shortfall;
  * - per-tenant advisory lock — two concurrent invocations converge (the
  *   loser re-reads the healed fold and writes nothing);
+ * - the live pass joins the movement core's lock protocol (item_stock
+ *   FOR UPDATE per candidate position, in one canonical order, before any
+ *   write) — a movement UoW on a backfilled position queues behind the
+ *   pass and then sees the healed bins (its binless check runs after its
+ *   position lock); every plan number is re-derived FRESH under the held
+ *   locks (never the stale snapshot);
+ * - a 40P01 deadlock against a MULTI-position movement (which locks its
+ *   positions in its own order) is RETRIED per tenant — bounded, logged,
+ *   idempotent (the rolled-back pass re-derives from scratch);
  * - idempotent — a second run finds the proven parts already placed;
  * - NEVER automatic: nothing schedules this tool; the nightly
  *   inventory.bin-reconcile probe only DETECTS drift (the detector, never
@@ -40,6 +50,23 @@
 import { writeFileSync } from "node:fs";
 
 import { config as loadDotenv } from "dotenv";
+
+/** SQLSTATE 40P01 (deadlock_detected) anywhere in the error's cause chain —
+ * the rollback shape the retry contract below handles. */
+function isDeadlockError(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; depth < 8 && current !== undefined && current !== null; depth += 1) {
+    if (
+      typeof current === "object" &&
+      "code" in current &&
+      (current as { code?: string }).code === "40P01"
+    ) {
+      return true;
+    }
+    current = (current as { cause?: unknown }).cause;
+  }
+  return false;
+}
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
@@ -96,11 +123,39 @@ async function main(): Promise<void> {
   let failures = 0;
   let rows = 0;
   const reportByTenant: Record<string, unknown> = {};
-  for (const tenantId of tenantIds) {
+
+  /** One tenant pass with the DEADLOCK RETRY contract (runbook §6): the
+   * live pass locks every candidate position in ONE canonical order, but a
+   * multi-position movement (multi-line document, transfer) locks its own
+   * positions in ITS order — an inverse-order overlap on ≥2 shared rows
+   * deadlocks; Postgres resolves it within deadlock_timeout and aborts one
+   * side. The pass is atomic + idempotent, so the honest recovery is a
+   * bounded whole-tenant re-run (never a partial retry). */
+  const runTenantPass = async (
+    tenantId: string,
+    attempt: number,
+  ): Promise<Awaited<ReturnType<typeof service.backfillDefaultBins>>> => {
     try {
-      const result = await withTenant(tenantId, () =>
+      return await withTenant(tenantId, () =>
         service.backfillDefaultBins({ dryRun, actorId: null }),
       );
+    } catch (error) {
+      if (isDeadlockError(error) && attempt < 3) {
+        const backoffMs = 250 * 2 ** (attempt - 1);
+        console.warn(
+          `[backfill-bins] tenant ${tenantId}: deadlock (40P01) against a concurrent movement — ` +
+            `UoW rolled back whole, retrying in ${backoffMs}ms (attempt ${attempt}/3, idempotent)`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, backoffMs));
+        return runTenantPass(tenantId, attempt + 1);
+      }
+      throw error;
+    }
+  };
+
+  for (const tenantId of tenantIds) {
+    try {
+      const result = await runTenantPass(tenantId, 1);
       rows += result.rows;
       unresolved += result.partialItems + result.nonReconcilableItems;
       reportByTenant[tenantId] = result;

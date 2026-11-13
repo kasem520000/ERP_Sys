@@ -6,6 +6,7 @@ import { InboxService } from "../../notifications/application/inbox-service";
 import { listActiveTenantIds } from "../../../infra/jobs/system-tenants";
 import { requireTenantContext, withTenant } from "../../../infra/db/tenant-context";
 import * as wms from "../infrastructure/wms-store";
+import * as stockStore from "../infrastructure/inventory.store";
 import {
   AisleNotFoundError,
   BinBarcodeExistsError,
@@ -674,7 +675,10 @@ export class WmsService {
     }
     if (tracking.trackSerial) {
       // Serialized: one provable bin row (qty 1) per serial whose ledger
-      // position is exactly +1 at THIS warehouse, whose registry status is
+      // position is EXACTLY +1 at THIS warehouse and EXACTLY +1 across all
+      // warehouses (a single physical unit cannot be netted twice here nor
+      // simultaneously owed to another warehouse — anything else is a
+      // CONFLICT, never a "provable" placement), whose registry status is
       // in_stock, and which no tenant-owned bin row already places.
       const serials = await wms.listSerialDistribution(row.warehouseId, row.itemId);
       const provable: { serialId: string; serialNo: string }[] = [];
@@ -682,14 +686,50 @@ export class WmsService {
       for (const s of serials) {
         const netHere = new Decimal(s.netAtWarehouse);
         const netAll = new Decimal(s.netTotal);
-        if (s.alreadyBinned) continue;
+        const binnedHere = new Decimal(s.binnedHereQty);
+        const binnedElsewhere = new Decimal(s.binnedElsewhereQty);
+        // Placement precedence (never duplicate, never hide a conflict):
+        // a POSITIVE bin row already places the single unit — the serial is
+        // never written again (an over-placed shape — >1 here, or also
+        // elsewhere — is a NAMED conflict, not a silent skip). A ZERO-qty
+        // history row places NOTHING (the honest history floor): such a
+        // serial stays a migration candidate and the upsert below lands its
+        // unit on the existing slot without duplicating the fold.
+        if (binnedHere.greaterThan(0)) {
+          if (binnedHere.greaterThan(1) || binnedElsewhere.greaterThan(0)) {
+            notes.push(
+              `serial ${s.serialNo}: bin rows place ${s.binnedHereQty} unit(s) here` +
+                (binnedElsewhere.greaterThan(0) ? ` and ${s.binnedElsewhereQty} at other warehouse(s)` : "") +
+                " — a single-unit serial cannot sit in multiple slots, placement over-subscribed",
+            );
+          }
+          continue;
+        }
+        if (binnedElsewhere.greaterThan(0)) {
+          notes.push(
+            `serial ${s.serialNo}: bin rows place ${s.binnedElsewhereQty} unit(s) at another warehouse while its ledger nets ${s.netAtWarehouse} here — the sources disagree`,
+          );
+          continue;
+        }
         if (netAll.greaterThan(1)) {
           notes.push(
             `serial ${s.serialNo}: ledger net ${s.netTotal} across warehouses — duplicated legs, placement ambiguous`,
           );
           continue;
         }
-        if (netHere.lessThan(1)) continue; // not provably at this warehouse
+        if (netHere.greaterThan(1)) {
+          notes.push(
+            `serial ${s.serialNo}: ledger nets ${s.netAtWarehouse} at this warehouse (global net ${s.netTotal}) — a single-unit serial counted more than once here, conflicting distribution`,
+          );
+          continue;
+        }
+        if (!netHere.equals(1)) continue; // not provably at this warehouse
+        if (!netAll.equals(1)) {
+          notes.push(
+            `serial ${s.serialNo}: ledger nets ${s.netTotal} across ALL warehouses while this warehouse nets 1 — legs elsewhere contradict a unit here, conflicting distribution`,
+          );
+          continue;
+        }
         if (s.registryStatus !== "in_stock") {
           notes.push(
             `serial ${s.serialNo}: ledger says in stock but registry status is ${s.registryStatus} — conflicting sources`,
@@ -728,7 +768,7 @@ export class WmsService {
           residue.isZero()
             ? notes.slice(0, 5)
             : [
-                `${residue.toFixed(6)} unit(s) of item_stock have no provable in-stock serial at this warehouse — left unwritten: no more spendable than before the backfill (BR-018 requires named units), stays visible to the nightly probe until corrected through a documented adjustment`,
+                `${residue.toFixed(6)} unit(s) of item_stock have no provable in-stock serial at this warehouse — left unwritten and left visible to the nightly probe. NOTE (test-proven consequence): landing the proven rows ENDS the binless grace for this (warehouse, item) — the unproven units become BLOCKED at the bin gate (BinContentsShortError) until resolved through a documented adjustment (runbook §5); a phantom unit is never sellable through the named-unit path again`,
                 ...notes.slice(0, 5),
               ],
       };
@@ -802,13 +842,52 @@ export class WmsService {
    * per (batch, warehouse) and per serial, reconciled against the
    * (warehouse, item) total BEFORE any write. Unprovable residue
    * (PARTIAL_UNATTRIBUTED) and source disagreements (NON_RECONCILABLE) are
-   * NEVER written: the residue stays visible to the nightly probe, it is
-   * never MORE spendable than before the backfill (the tracking laws —
-   * FEFO/BR-017, named units/BR-018 — were already the spend gate), and
-   * the live pass files ONE critical owner notification when anything
-   * stays unresolved. The whole tenant pass is serialized by a
-   * transaction-local advisory lock (concurrent runs converge — the loser
-   * re-reads an already-healed fold).
+   * NEVER written: the residue stays visible to the nightly probe, and the
+   * live pass files ONE critical owner notification when anything stays
+   * unresolved. The whole tenant pass is serialized by a transaction-local
+   * advisory lock (concurrent runs converge — the loser re-reads an
+   * already-healed fold).
+   *
+   * CONCURRENCY AUDIT FIX (this wave — the migration-vs-movement race):
+   * the advisory lock only serializes backfill-vs-backfill. Inventory
+   * movements (issue/receive/transfer/…) serialize on the item_stock ROW
+   * lock (CC-04's `lockItemStock`, taken FIRST in every movement UoW, held
+   * to commit). The live pass now joins THAT protocol — the movement
+   * core's own lock, in its own order:
+   *
+   * 1. advisory lock (backfill-vs-backfill, unchanged);
+   * 2. PRE-PASS: every candidate (warehouse, item) position row is locked
+   *    `FOR UPDATE` in ONE canonical order (warehouseId, itemId) BEFORE
+   *    any write — the same first-lock the movements take, so a movement
+   *    UoW for a locked position now queues behind this UoW and, once it
+   *    unblocks, its binless check (`hasAnyBinContent`) — which runs AFTER
+   *    its position lock — observes the healed bin rows and switches to
+   *    the binned path (never a binless write over a binned position);
+   * 3. FRESH RE-DERIVE: the shortfall list is RE-READ under the held
+   *    position locks. Every number the plan and its post-write
+   *    verification use — stockQty, bin fold, batch/serial distribution —
+   *    is therefore stable: no movement can commit between the shortage
+   *    read and the verification (the pre-fix race: a binless issue or a
+   *    receipt committing in that window made the verification compare a
+   *    FRESH fold against the STALE row.stockQty — either a spurious
+   *    whole-tenant rollback or, worse, an oversubscribed fold that SHIPPED
+   *    silently). A fresh shortfall row outside the locked candidate set
+   *    is a protocol violation and aborts the pass (fail-closed) — by the
+   *    movement invariants it cannot occur (a position not short in the
+   *    unlocked snapshot cannot become short), so this guard only fires on
+   *    a regression;
+   * 4. classify → write → verify per FRESH row (the verification law is
+   *    unchanged: Σ bins == stock − residue, a violation rolls the whole
+   *    tenant UoW back).
+   *
+   * Deadlock discipline (the price of joining the movement protocol): lock
+   * acquisition is a SINGLE canonical order, but a MULTI-position movement
+   * (a multi-line document or a transfer: source then destination) locks
+   * its positions in ITS OWN order — an inverse-order overlap on ≥2 shared
+   * positions can deadlock; Postgres resolves it within deadlock_timeout
+   * and the operator tool RETRIES the tenant pass (bounded, idempotent —
+   * a rolled-back pass re-derives from scratch). The runbook §6 documents
+   * the protocol and the retry contract.
    */
   async backfillDefaultBins(input: {
     dryRun: boolean;
@@ -817,12 +896,17 @@ export class WmsService {
     // Serialize concurrent backfills on this tenant (the lock releases at
     // UoW end — a racing run waits here, then sees the healed fold below).
     await wms.lockBackfill();
-    const shortfalls = await wms.listBinShortfalls();
-    const plan: BackfillPlanRow[] = [];
-    for (const row of shortfalls) {
-      plan.push(await this.classifyShortfall(row));
-    }
-    if (input.dryRun || plan.length === 0) {
+    const candidates = await wms.listBinShortfalls();
+    if (input.dryRun || candidates.length === 0) {
+      // The dry-run report is a SNAPSHOT (advisory-locked against other
+      // backfills, never row-locked against movements — a read-only report
+      // must not block the store). The live pass re-derives everything
+      // under the position locks, so a movement committing between the two
+      // can change the numbers safely (never the fold's exactness).
+      const plan: BackfillPlanRow[] = [];
+      for (const row of candidates) {
+        plan.push(await this.classifyShortfall(row));
+      }
       return {
         dryRun: input.dryRun,
         warehouses: new Set(plan.map((row) => row.warehouseId)).size,
@@ -847,6 +931,41 @@ export class WmsService {
           notes: row.notes,
         })),
       };
+    }
+    // (2) The pre-pass — join the movement core's lock protocol BEFORE any
+    // write, in ONE canonical order (warehouseId, itemId).
+    const lockedPositions = new Set<string>();
+    const canonical = [...candidates].sort(
+      (a, b) =>
+        (a.warehouseId === b.warehouseId
+          ? a.itemId < b.itemId
+            ? -1
+            : a.itemId > b.itemId
+              ? 1
+              : 0
+          : a.warehouseId < b.warehouseId
+            ? -1
+            : 1),
+    );
+    for (const candidate of canonical) {
+      await stockStore.lockItemStock(candidate.itemId, candidate.warehouseId);
+      lockedPositions.add(`${candidate.warehouseId}:${candidate.itemId}`);
+    }
+    // (3) The fresh re-derive — every decision below is made on numbers no
+    // movement can change while this UoW holds the position locks.
+    const shortfalls = await wms.listBinShortfalls();
+    for (const row of shortfalls) {
+      if (!lockedPositions.has(`${row.warehouseId}:${row.itemId}`)) {
+        throw new BinContentStateError(
+          `backfill locking protocol violated: item ${row.itemSku ?? row.itemId} at warehouse ` +
+            `${row.warehouseCode ?? row.warehouseId} surfaced as a fresh shortfall outside the locked candidate set — ` +
+            "nothing written, the tenant rolls back whole (fail-closed)",
+        );
+      }
+    }
+    const plan: BackfillPlanRow[] = [];
+    for (const row of shortfalls) {
+      plan.push(await this.classifyShortfall(row));
     }
     const binByWarehouse = new Map<string, string>();
     let written = 0;
@@ -875,9 +994,11 @@ export class WmsService {
         written += 1;
       }
       // Post-write verification (the audit fix's guard): the fold for a
-      // written item must land EXACTLY on stock − residue — a violation
-      // throws and rolls the whole tenant UoW back (never a partial write
-      // that hides the shortfall).
+      // written item must land EXACTLY on stock − residue — both sides are
+      // the FRESH numbers re-derived under the held position locks (the
+      // concurrency fix: never the stale snapshot's row.stockQty) — a
+      // violation throws and rolls the whole tenant UoW back (never a
+      // partial write that hides the shortfall).
       const fold = await wms.foldTenantBinQty(row.warehouseId, row.itemId);
       const expected = new Decimal(row.stockQty).minus(new Decimal(row.residueQty));
       if (!fold.equals(expected)) {
