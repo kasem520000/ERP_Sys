@@ -1,6 +1,6 @@
 # Risk Register
 
-> **Status:** STABLE — extended by v3.1 (RISK-026…RISK-028) and v3.2 (RISK-029…RISK-030) · **Owner:** Platform Architecture · **Updated:** 2026-11-11
+> **Status:** STABLE — extended by v3.1 (RISK-026…RISK-028), v3.2 (RISK-029…RISK-030), and the post-044 audit waves (RISK-031) · **Owner:** Platform Architecture · **Updated:** 2026-11-13
 
 Living risk register. Likelihood/Impact: L/M/H. Each risk has mitigations (built into
 phases) and a trigger (when it becomes an issue to escalate). IDs referenced by phase
@@ -70,6 +70,12 @@ documents. **Update protocol:** any phase that materializes a risk must update t
 |----|------|---|---|------------|-----------------|
 | RISK-029 | Dual-book (R-02) + intercompany trade (R-07) in 053 corrupt the single-base posting invariants — a book-tagged reconciliation layer or a PO↔SO pair that double-counts breaks both books and the eliminations | M | H | Book tags live ONLY on reconciling adjustment entries (never a parallel ledger copy — one journal substrate, dual filters); dual statements render from the same lines with deterministic book filters; intercompany matching is proposal-first with tolerance rules and never auto-posts; golden worked examples for both books + the clearance statement; invariants suite extended before any 054 Zakat/IFRS consumer lands | Any statement pair (books or entities) failing to reconcile to the same journal substrate → block the 053 release / platform architecture |
 | RISK-030 | ECL estimate discipline (R-01 in 066, IFRS 9) — fabricated loss rates are worse than no allowance (the RISK-026 class applied to receivables) | M | H | REQUIRES_VERIFICATION on every matrix rate (tenant-entered with source evidence or the run refuses to post — worksheet mode); matrix versioned with effective dating; the ECL report never prints unsourced rates; movement postings ride the golden-numbered discipline with failure packs | Any ECL posting lacking a cited rate source → block the 066 release / platform architecture |
+
+## Operational risks (the post-044 migration era)
+
+| ID | Risk | L | I | Mitigation | Trigger / owner |
+|----|------|---|---|------------|-----------------|
+| RISK-031 | The nightly INV-029 probe is trusted as a per-batch/per-serial integrity proof — it is ONLY the aggregate (warehouse, item) fold (Σ tenant-owned `bin_contents` = `item_stock`), so a balanced position can hide disagreeing batches/serials (a batch whose bins hold stock with zero ledger legs against a sibling batch's ledger; a placed serial whose registry says `sold`/`returned` while bins and ledger corroborate the placement). Pre-wave-5 the backfill could even ERASE a visible deficit by writing a provable sibling onto the aggregate (test-proven: the wave-5 owner's case) | M | H | The aggregate check is documented as a NECESSARY condition, never a per-batch/per-serial proof ([WMS_UPGRADE_BACKFILL_RUNBOOK.md](../operations/WMS_UPGRADE_BACKFILL_RUNBOOK.md) §9); the backfill's totals-matching guard (waves 3/4/5) refuses to write whenever a named per-batch/per-serial conflict exists — a visible deficit stays visible; conflicts are named per batch/serial in the report; a per-batch/per-serial recurring detector remains future hardening | Any operator or report presenting a green probe as proof that every batch and serial is correct → operations owner; any post-backfill position whose sources were never examined (green before the first run) → ticket the §5 investigation |
 
 ## Top-5 watchlist (reviewed at every phase boundary)
 

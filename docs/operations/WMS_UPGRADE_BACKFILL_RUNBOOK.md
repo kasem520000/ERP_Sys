@@ -25,7 +25,7 @@ items:
 |---|---|---|
 | Untracked | `item_stock` itself | The position table IS the truth; one NULL-dimension row. |
 | Batch-tracked (`track_batch`) | `stock_moves` per `(batch, warehouse)` — the SAME append-only ledger `batchOnHand`/`listFefoBatches` fold at runtime, netted against the bin rows each batch already holds. **The comparison spans the UNION of the batches present in the ledger OR the boxes (the 2026-11-13 wave-4 fix)** — scoped exactly like the probe: tenant-owned rows only (`owner_partner_id IS NULL`), ALL bin statuses (`AVAILABLE`/`QUARANTINE`/`HOLD` — the probe folds them alike), tenant-scoped through the RLS context and the `item_batches` join. | A batch with no ledger legs cannot be proven; a `WRITTEN_OFF` batch with a positive ledger balance is an anomaly (never pickable — left unwritten, reported); a batch whose bins EXCEED its ledger is a NAMED per-batch conflict — **legs or no legs** (a batch whose bins hold stock with ZERO ledger legs at the warehouse is named with its exact shape: "the ledger has NO movements for this batch at this warehouse"; its bins count toward Σ bins, so healing the aggregate around it would HIDE it from the nightly probe — reported, never healed by the backfill, never hidden behind a totals-matching write). |
-| Serialized (`track_serial`) | `stock_moves` per serial (net ±1 legs) for the warehouse + the `item_serials` registry status | `item_serials` has NO warehouse column — the ledger is the only warehouse attribution; a serial whose registry status contradicts its ledger (`sold` vs +1 here) is a CONFLICT, never placed; a placed serial whose ledger does not corroborate the placement (bin rows place 1 here while the ledger nets anything other than exactly 1 here / 1 across all warehouses — e.g. a bin row for a serial with ZERO ledger legs) is a NAMED conflict (the wave-4 fix — never again silently accepted as "already placed"). |
+| Serialized (`track_serial`) | `stock_moves` per serial (net ±1 legs) for the warehouse + the `item_serials` registry status | `item_serials` has NO warehouse column — the ledger is the only warehouse attribution; a serial whose registry status contradicts its ledger (`sold` vs +1 here) is a CONFLICT, never placed; a placed serial whose ledger does not corroborate the placement (bin rows place 1 here while the ledger nets anything other than exactly 1 here / 1 across all warehouses — e.g. a bin row for a serial with ZERO ledger legs) is a NAMED conflict (the wave-4 fix — never again silently accepted as "already placed"); a PLACED serial whose registry status contradicts the placement (bin rows place it here while `item_serials` says `sold`/`returned` — even when the ledger corroborates the placement exactly, +1 here / +1 total) is a NAMED conflict too (the wave-5 fix — pre-fix the placed branch examined the bins and the ledger but never `registryStatus`, so a provable sibling's write landed Σ bins exactly on `item_stock` and ERASED a visible deficit from the nightly probe while the registry conflict hid). |
 
 Every distribution is reconciled against the `(warehouse, item)` total
 **BEFORE any write** (never a blind NULL-dimension row on a tracked item —
@@ -72,9 +72,9 @@ Every `(warehouse, item)` shortfall row in the report carries:
   - **`NON_RECONCILABLE`** — the sources DISAGREE. Two shapes: (a) the
     per-batch ledger shortfalls, or the provable serial count, EXCEED the
     `item_stock` shortfall; (b) **the totals-matching shape (the 2026-11-13
-    wave-3 + wave-4 fixes)** — the proven parts exactly EQUAL the shortfall
-    while a NAMED per-batch conflict exists (a batch whose bins hold more
-    than its ledger ever moved here — whether the batch carries ledger
+    wave-3 + wave-4 + wave-5 fixes)** — the proven parts exactly EQUAL the
+    shortfall while a NAMED per-batch conflict exists (a batch whose bins hold
+    more than its ledger ever moved here — whether the batch carries ledger
     legs (`listBatchDistribution`'s clamped `GREATEST(ledger − bins, 0)`
     shortfall keeps the write plan honest, but the conflict is reported,
     never silently skipped) or has ZERO ledger legs at the warehouse
@@ -84,7 +84,10 @@ Every `(warehouse, item)` shortfall row in the report carries:
     at this warehouse") or a named serial conflict exists (over-placed,
     cross-warehouse contradiction, registry mismatch, or — wave-4 — a
     placement the ledger does not corroborate: bin rows place 1 here
-    while the ledger nets 0 here / 0 across warehouses). Writing the
+    while the ledger nets 0 here / 0 across warehouses, or — wave-5 —
+    **the registry-status conflict for a placed serial**: bin rows place
+    it here and the ledger corroborates the placement exactly (+1 here /
+    +1 total) while the registry says `sold`/`returned`). Writing the
     proven parts of such a position would land Σ bins exactly on
     `item_stock` and turn the nightly probe GREEN — hiding the conflict
     from the only recurring detector (the wave-3 owner's case: batch A
@@ -93,7 +96,12 @@ Every `(warehouse, item)` shortfall row in the report carries:
     wave-4 owner's case: batch A in bins 8 with NO ledger movements,
     batch B ledger 2/bins 0, `item_stock` 10 — the pre-fix pass wrote
     B's 2, classified WRITABLE, and the position vanished from the probe
-    AND the re-run). The distribution is untrustworthy: **nothing is
+    AND the re-run; the wave-5 owner's case: serial A in a bin with its
+    ledger corroborating (+1 here / +1 total) but its registry `sold`,
+    serial B clean and unplaced, `item_stock` 2, Σ bins 1 — the position
+    STARTED as a visible deficit in the probe, the pre-fix pass wrote
+    B's unit, and the deficit VANISHED: a visible conflict erased BY the
+    migration). The distribution is untrustworthy: **nothing is
     written for the item** — the full shortfall stays visible to the
     probe; the operator must investigate (§5). A position whose residue
     > 0 keeps the probe visible anyway: its proven writes stay
@@ -197,13 +205,17 @@ shortfall. When the live pass exits 2:
 - **`NON_RECONCILABLE` is never accepted silently**: the sources
      disagreeing — the ledger claiming MORE than the position table, or
      the boxes claiming MORE than the ledger ever moved (a bins-only
-     batch, an uncorroborated serial placement) — is a data-integrity
+     batch, an uncorroborated serial placement), or the REGISTRY
+     contradicting a unit the bins and the ledger both place (a placed
+     serial whose status is `sold`/`returned`) — is a data-integrity
      incident: find the divergent legs (the report's notes name the
      batches/serials with their exact shape) before any correction. A
      documented adjustment that reconciles the sources (e.g. the receipt
-     that creates batch A's missing ledger legs, or the count that
-     corrects its bins) makes the position re-classifiable on the next
-     pass; the backfill itself never writes over a named disagreement.
+     that creates batch A's missing ledger legs, the count that
+     corrects its bins, or the registry correction that clears the
+     placed serial's status) makes the position re-classifiable on the
+     next pass; the backfill itself never writes over a named
+     disagreement.
 
 **There is no time-based auto-anything here.** The safety chain is:
 the binless grace keeps pre-backfill tenants spendable (§7) → the operator
@@ -289,3 +301,44 @@ notification). There is no destructive rollback path — if a pass must be
 undone, restore the backup taken at §4.3 (the whole-database restore drill,
 [BACKUP_RESTORE_RUNBOOK.md](BACKUP_RESTORE_RUNBOOK.md) §4) — which is why the
 backup step is mandatory.
+
+## 9. The nightly probe's known limits (operational risk — read before trusting a green probe)
+
+The `inventory.bin-reconcile` probe folds **Σ tenant-owned `bin_contents` vs
+`item_stock` per (warehouse, item)** — an **AGGREGATE** check. A green probe
+is a *necessary* condition (the totals hold), **never a proof that every
+batch and every serial agrees with its sources**: per-batch and per-serial
+disagreements can sit inside a balanced aggregate. Two blindness shapes,
+with different owners:
+
+1. **Positions whose Σ bins ALREADY equals `item_stock` while the per-batch
+   or per-serial sources disagree** (e.g. batch A bins 8 / no ledger legs +
+   batch B ledger 8 / bins 0 + `item_stock` 8; or a placed `sold` serial
+   whose ledger corroborates the placement with no unplaced sibling). These
+   are invisible to BOTH detectors: the probe is green (Σ bins == stock) and
+   the backfill never sees the position (no shortfall row). This is a KNOWN
+   LIMIT of the aggregate design (registered as RISK-031) — a per-batch /
+   per-serial recurring detector (folding bins against the ledger and the
+   registry per batch/serial every night, not just per position) remains
+   future hardening and is deliberately NOT built in the 044 post-closure
+   waves.
+2. **Positions that START with a visible deficit and would be erased BY the
+   migration** — the shape the wave-3/4/5 guards forbid: when a named
+   conflict exists at the position, writing the provable parts would land Σ
+   bins exactly on `item_stock` and turn the probe green, so the pass refuses
+   (NON_RECONCILABLE, nothing written, the deficit stays visible). The
+   wave-5 owner's case proved the pre-fix code could do the opposite (a
+   placed `sold` serial corroborated by its ledger + a clean unplaced
+   sibling: the pass wrote the sibling, the visible deficit vanished, the
+   registry conflict hid). Post-fix that guarantee is test-proven for the
+   named conflict shapes (per-batch bins-vs-ledger, uncorroborated or
+   over-placed or registry-contradicting placements).
+
+**Operating consequence:** a green probe after the backfill means the
+AGGREGATE holds for every position — it does NOT certify per-batch or
+per-serial integrity. Positions that were green BEFORE the first backfill
+run (shape 1) were never examined by the migration at all; residual
+per-batch/per-serial doubts at a balanced position need the §5 investigation
+path (the report's notes are the per-position surface) or the future
+per-batch/per-serial detector. Never present the probe's green state as
+proof that every batch and serial is correct.
