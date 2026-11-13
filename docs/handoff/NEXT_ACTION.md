@@ -1,60 +1,69 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-044 COMPLETE — PHASE-043 (MRP) unblocked; STOPPED awaiting the owner's go per the standing rule)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-043 COMPLETE — Wave 2's third phase; PHASE-045 (HR Core) is next; STOPPED awaiting the owner's go per the standing rule)
 
 ## The single next action
 
-**PHASE-044 is COMPLETE and pushed** — the triple flip is done (the phase doc
-header, the IMPLEMENTATION_STATUS row + header, and
-[the completion report](../implementation/phases/reports/PHASE-044-COMPLETION.md)
+**PHASE-043 is COMPLETE and pushed** — the triple flip is done (the phase doc
+header, the IMPLEMENTATION_STATUS row + header + narrative entry, and
+[the completion report](../implementation/phases/reports/PHASE-043-COMPLETION.md)
 with the CR-48 code-evidence checklist). **Execution is stopped here per the
 owner's standing rule** — the next phase awaits the owner's go.
 
-**Start PHASE-043 (Manufacturing II — MRP & Planning, CR-13)** — «ابدأ تنفيذ
-المرحلة PHASE-043» — when the owner gives the go. Its prerequisites are ALL
-satisfied now (042 ✓ · 044 ✓ · 038 ✓): the WMS inputs it consumes shipped with
-this phase — bin-level availability, the FEFO/expiry-aware supply qualification,
-the consignment exclusion (BR-076), and the reservation policy engine (I-14);
-the pick strategy service is the single source both sales picking and MRP
-netting call (the PHASE-044.md §8 handoff notes). Read
-[PHASE-043.md](../implementation/phases/PHASE-043.md) first. **PHASE-045 (HR
-Core)** remains eligible in parallel («ابدأ تنفيذ المرحلة PHASE-045»).
+**Start PHASE-045 (HR Core — Attendance, Leaves & Shifts)** — «ابدأ تنفيذ
+المرحلة PHASE-045» — when the owner gives the go. Its prerequisite (035 ✓) has
+been satisfied since Wave 1; nothing in HR consumes MRP directly (the payroll
+variable-feed discipline mirrors the run-snapshot pattern 043 delivered — the
+PHASE-043.md §8 handoff notes). Read [PHASE-045.md](../implementation/phases/PHASE-045.md)
+first. Any other unblocked wave-2 phase remains eligible in parallel (046 waits
+on 045; 047 on 046; 048 and 053+ per the roadmap).
 
-## Post-PHASE-044 context for the next author (2026-11-13)
+## Post-PHASE-043 context for the next author (2026-11-13)
 
-PHASE-044 (WMS & Inventory Intelligence, CR-14 — scope extended by v3.1/CR-46
-L1-20 returnable packaging) is COMPLETE — H-07, I-01…I-25, PP-11/PP-12, DF-12,
-and L1-20 all closed: migrations `0067`–`0073` (schema_version 73; 22 RLS'd
-tables, catalog 239 → 261; the INV-029 same-transaction law with the nightly
-`inventory.bin-reconcile` probe), the directed putaway (PP-12 BIN-LABEL-V1) +
-picking (FIFO/FEFO/NEAREST, waves, cluster, PP-11 scan confirms) surfaces, LPN
-plates, the ABC-classified cycle counts (BR-075), the quarantine/HOLD board
-(G-43), consignment/VMI (BR-076 + G-44), cross-docking, kitting (G-45), the
-serial-movement ledger, the alert jobs + transit exceptions + transfer pricing
-(G-46), the OA-02 sync duty (the task feeds + the two scan write intents,
-BR-074), the five web boards + the PP-11 embeds, and the four intelligence
-reports (registry 95 → 99). Permissions 279 → 287 (matrix §3.21); goldens
-G-43…G-46 (the honest slots — the planned G-47…G-50 numbering note); INV-029;
-BR-072…077; i18n 5,672 keys/locale.
+PHASE-043 (Manufacturing II — MRP & Planning, CR-13) is COMPLETE — the planning
+brain the audit called the single most disqualifying manufacturing gap:
+migrations `0074`–`0079` (schema_version 79; 11 tables — 10 RLS'd + the global
+lot-sizing catalog; ENTITY_CATALOG 261 → 272), the deterministic MRP engine
+(low-level codes depth-from-root, cycle typing, phantom Σ-preservation,
+ROOT-component substitution, batch-aware carry, exact 4-dp netting), replayable
+run snapshots (runs post nothing), the INV-030 idempotent one-click conversion
+through the OWNING services (the PO via the 038 path, the MO BOM-pre-bound, the
+transfer via inventory — 0079 is the link leg), MPS with the BR-078 frozen
+fence, the BOR rough-cut warning law, ATP/CTP with the BR-080 hard exclusions
+consumed by sales lines, the G-49 MTO chain, the G-48 tolling round trip
+(1420/2136/5126), the G-47 joint allocation, the reservation policy engine over
+the 044 strategies, the /mrp + /mps screens + the item-card planning tab, and
+the two reports (registry 99 → 101). Permissions 287 → 291 (matrix §3.22);
+goldens G-47/G-48/G-49 · INV-030 · BR-078…080 (planning goldens 12/12); i18n
+5,767 keys/locale; the full DB suite 210 files / 3,095 green; OA-06 EXPLAIN
+budgets 4/4. **Stage 13's CR-38 "full ERP" gate condition — MRP live — is now
+satisfied; record its evidence in the gate checklist.**
 
 **The honest notes for the next author:**
 
-- **The full DB suite is the gate that catches corpus drift** — 2,979/2,979 over
-  202 files this phase, but only because T-20 ran it FIRST since 042 and repaired
-  what T-03…T-13's isolated-folder runs had missed (the AppModule-boot DI hole,
-  the tenancy CoA pins, the picking suite's shared-item WAC pollution, the
-  corpus-fragile assertions — PHASE-044-COMPLETION.md §4f). Run the full suite
-  before every flip; isolated folders lie.
-- **Nest DI under vitest:** the transform emits no `design:paramtypes` — every
-  constructor param BEFORE a later `@Inject` must carry its own `@Inject` (the
-  compiled app is unaffected; the boot is not). The four WMS services carry the
-  repaired pattern.
-- **The legacy-stock backfill** ships as an operator job
-  (`apps/api/scripts/backfill-bins.ts`, dry-run first) — existing tenants'
-  pre-WMS stock lands on the DEFAULT bins on its first run; the probe goes green
-  after it.
-- **Migration slots continue from 0074.**
+- **RISK-031 stays OPEN by decision** — the nightly INV-029 probe remains a
+  NECESSARY aggregate condition, never a per-batch/per-serial integrity proof;
+  043's netting consumes the aggregate fold and claims nothing stronger. The
+  per-batch/per-serial recurring detector is future hardening exactly as the
+  register records it.
+- **The full DB suite keeps catching what isolated folders hide** — this phase
+  it surfaced the G-49 golden straddling the WIP-GL as-of window (an in-flight
+  100.0000 that matched control-to-subledger — status OK, diffCount 0, but the
+  pinned absolute zero broke), the cycle-count shared-warehouse lottery, and the
+  mail/CRM capture timing (PHASE-043-COMPLETION.md §4). Run it before every
+  flip; isolated folders lie.
+- **Server pages never VALUE-import the `@erp/ui` barrel** (the P5-T12 rule,
+  `apps/web/lib/cx.ts`) — the 043 item-card tab broke the web build until the
+  client bridge (`item-detail-tabs.tsx`) took the barrel import over. Reach
+  interactive overlays through app-side client components.
+- **Visual baselines are gitignored by design** — a fresh clone writes them on
+  the first harness run then compares on the second (the documented first-run
+  protocol); do not commit them.
+- **The pure-kernel oracle tests earn their keep** — they forced three real
+  design corrections (batch-aware carry, ROOT-component substitution, the LLC
+  depth formula) before any golden ran. Keep new domain math pure-first.
+- **Migration slots continue from 0080.**
 
-The roadmap's Wave-2 order continues: 043 (MRP) → 045/046 (HR) → 047 (Costing
-II) → 048 (Field Service) → … — see
-[MASTER_ROADMAP.md](../planning/MASTER_ROADMAP.md) §Wave 2.
+The roadmap's Wave-2 order continues: 045/046 (HR) → 047 (Costing II) → 048
+(Field Service) → … — see [MASTER_ROADMAP.md](../planning/MASTER_ROADMAP.md)
+§Wave 2.

@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-044 COMPLETE — Wave 2's second phase: 035…042 + 044 delivered; PHASE-043 (MRP) unblocked)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-043 COMPLETE — Wave 2's third phase: 035…044 delivered; PHASE-045 (HR Core) next)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -177,6 +177,31 @@ count); ENTITY_CATALOG 232 → **239**; isolation suite 1,320/1,320 (+42 —
 errata-corrected 2026-11-13: originally announced 1,332, re-run verified
 against the 042-era tree at 1,320, 219 tables × 6 + 6 fixed).
 Evidence: [the completion report](../implementation/phases/reports/PHASE-042-COMPLETION.md).
+**PHASE-043 (2026-11-13 — CR-13):** Manufacturing II — MRP & Planning delivered
+—the planning brain: the deterministic MRP engine (low-level codes depth-from-root,
+cycle typing, phantom Σ-preservation, ROOT-component substitution, batch-aware
+carry, exact 4-dp netting with once-only safety restoration), replayable run
+snapshots (runs post nothing — the planning family's no-golden-for-runs law), the
+INV-030 idempotent one-click conversion through the OWNING services (PO via the
+038 path, MO BOM-pre-bound, transfer via inventory — migration 0079 is the link
+leg), MPS with the BR-078 frozen fence (permission AND reason), the BOR rough-cut
+warning law, ATP/CTP with the BR-080 hard exclusions consumed by sales lines, the
+G-49 MTO chain, the G-48 tolling round trip (1420/2136/5126), the G-47 joint
+allocation, the reservation policy engine over the 044 strategies, the /mrp +
+/mps screens + the item-card planning tab, and the two reports (mrp-exceptions —
+the M-01 mitigation; atp-position). Migrations `0074`–`0079` (schema_version
+79; 11 tables — 10 RLS'd + the global lot-sizing catalog). Permissions 287 →
+**291** (matrix §3.22 — the drift canon honestly extended after the checker was
+found passing 287 = 287 while ignoring the four keys); feature keys +3 (the §25
+closure edges); report registry 99 → **101**; i18n 5,422 → **5,767** (+95,
+the operative count from the 044 baseline of 5,672); ENTITY_CATALOG 261 →
+**272**; isolation suite **1,512/1,512** (+60); goldens G-47/G-48/G-49 · INV-030
+· BR-078…080 (planning goldens 12/12); the full DB suite **210 files / 3,095
+green**; api unit 616/616 (40 pure-kernel oracle/property tests — they caught and
+forced the correction of three real design defects before any golden ran);
+OA-06 EXPLAIN budgets 4/4; RISK-031 deliberately still open (the aggregate probe
+is a necessary condition, never a per-batch/per-serial proof). Evidence:
+[the completion report](../implementation/phases/reports/PHASE-043-COMPLETION.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -207,7 +232,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-040](../implementation/phases/PHASE-040.md) | Data Onboarding & Migration Toolkit (imports + adapters + demo data + sandboxes — L1-21 export half) | 1 / 12 | 035 | **COMPLETE 2026-11-11** — [report](../implementation/phases/reports/PHASE-040-COMPLETION.md) |
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email — Wave 1 closer) | 1 / 12 | 035 | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-041-COMPLETION.md) |
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
-| [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | NOT_STARTED — PLANNED |
+| [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-043-COMPLETION.md) |
 | [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-044-COMPLETION.md) |
 | [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-046](../implementation/phases/PHASE-046.md) | HR Payroll Compliance | 2 / 13 | 045 | NOT_STARTED — PLANNED |

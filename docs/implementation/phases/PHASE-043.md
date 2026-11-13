@@ -1,6 +1,6 @@
 # PHASE-043 — Manufacturing II — MRP & Planning
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-13](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE 2026-11-13 (Blueprint v3.0) — [the completion report](reports/PHASE-043-COMPLETION.md) · **Wave:** 2 / Stage 13 · **Register:** [CR-13](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-03 · §7 M-01, M-05…M-11, M-21/M-22/M-24/M-25 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 1: التصنيع»
 
 ## 1. Phase Overview
