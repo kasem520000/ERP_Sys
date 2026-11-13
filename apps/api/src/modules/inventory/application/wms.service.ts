@@ -662,7 +662,15 @@ export class WmsService {
    * a conflicting serial) additionally FORBIDS the totals-matching
    * WRITABLE — writing the proven parts would equal the aggregate and hide
    * the conflict from the nightly probe (the only recurring detector), so
-   * the whole position stays unwritten and visible. */
+   * the whole position stays unwritten and visible. WAVE-5: a serial whose
+   * bin rows PLACE it while its registry status contradicts the placement
+   * (sold/returned) is a NAMED conflict too — pre-fix the placed branch
+   * checked the bins and the ledger and then skipped the serial without
+   * ever examining registryStatus, so a provable sibling's unit landed the
+   * aggregate exactly on item_stock and ERASED a VISIBLE deficit from the
+   * probe (the owner's case: A placed+sold with a corroborating ledger,
+   * B clean, stock 2, Σ bins 1 — the pass wrote B, the probe went green,
+   * A's registry conflict hid). */
   private async classifyShortfall(row: wms.BinBackfillRow): Promise<BackfillPlanRow> {
     const base = {
       warehouseId: row.warehouseId,
@@ -726,7 +734,15 @@ export class WmsService {
         // analogue) is a NAMED conflict too — pre-fix it was silently
         // accepted as "already placed", so a provable sibling's placement
         // landed the aggregate exactly on item_stock and hid it from the
-        // nightly probe.
+        // nightly probe. WAVE-5: the REGISTRY is the third source — a
+        // placement whose registry status contradicts it (anything other
+        // than in_stock: sold, returned) is a NAMED conflict on the placed
+        // branch as well — pre-fix the branch skipped the serial without
+        // examining registryStatus (the registry-vs-ledger check existed
+        // only on the unplaced/provable branch), so the owner's shape — a
+        // placed serial corroborated by bins AND ledger while its registry
+        // said sold — was accepted silently and a provable sibling's write
+        // erased the visible deficit from the probe.
         if (binnedHere.greaterThan(0)) {
           if (binnedHere.greaterThan(1) || binnedElsewhere.greaterThan(0)) {
             notes.push(
@@ -741,12 +757,32 @@ export class WmsService {
               `serial ${s.serialNo}: bin rows place ${s.binnedHereQty} unit(s) here but the ledger nets ${s.netAtWarehouse} here (${s.netTotal} across all warehouses) — the sources disagree (a placement the ledger does not corroborate; resolve through a documented adjustment, runbook §5)`,
             );
           }
+          // WAVE-5 — the registry-status conflict for the placed serial: the
+          // check is INDEPENDENT of the two above (a serial can contradict
+          // the registry while the ledger corroborates the placement — the
+          // owner's exact shape — or while it also disagrees with the
+          // ledger; both facts are named). Feeds the totals-matching guard
+          // below: residue 0 + this note ⇒ NON_RECONCILABLE, nothing
+          // written, the deficit stays visible to the nightly probe.
+          if (s.registryStatus !== "in_stock") {
+            notes.push(
+              `serial ${s.serialNo}: bin rows place ${s.binnedHereQty} unit(s) here and the ledger nets ${s.netAtWarehouse} here (${s.netTotal} across all warehouses), but the registry status is ${s.registryStatus} — the registry-status conflict for a placed serial (the sources disagree; resolve through a documented adjustment, runbook §5)`,
+            );
+          }
           continue;
         }
         if (binnedElsewhere.greaterThan(0)) {
           notes.push(
             `serial ${s.serialNo}: bin rows place ${s.binnedElsewhereQty} unit(s) at another warehouse while its ledger nets ${s.netAtWarehouse} here — the sources disagree`,
           );
+          // WAVE-5 — the registry contradiction names a serial placed
+          // ANYWHERE: a unit the registry calls sold/returned cannot sit in
+          // another warehouse's bin either.
+          if (s.registryStatus !== "in_stock") {
+            notes.push(
+              `serial ${s.serialNo}: bin rows place ${s.binnedElsewhereQty} unit(s) at another warehouse while its registry status is ${s.registryStatus} — the registry-status conflict for a placed serial (the sources disagree; resolve through a documented adjustment, runbook §5)`,
+            );
+          }
           continue;
         }
         if (netAll.greaterThan(1)) {
