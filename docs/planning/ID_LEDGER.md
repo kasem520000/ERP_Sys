@@ -89,7 +89,17 @@ stale G-52 to **G-51** (045's new reservation):
    "invariant INV-xx added", "Golden suites G-xx/G-yy with failure packs" in a
    task row). A REFERENCE is any other mention ("reuses the G-13/G-14 shapes",
    "excluded by design — G-80", "the BR-063 one-award law"). The checker's
-   claim-context patterns implement this split.
+   claim-context patterns implement this split **per CLAUSE, not per
+   paragraph** (the wave-3 fix): the 043/045/046 posting-canon shape is ONE
+   logical unit holding BOTH an old-plan reference note ("… — the original
+   plan's G-44…G-46/INV-028/BR-061…063 predate …): ") and the phase's new
+   claims ("goldens G-47 (…), G-48 (…) added to JOURNAL_RULES §7") — each
+   clause is judged by its OWN markers (a marker-less clause inherits the
+   unit verdict; an id within ±45 chars of a reference-only marker inside a
+   claim clause — "… as the extension of the G-29 family" — stays a
+   reference). A reference-only marker in one clause NEVER demotes another
+   clause's claim: swapping a claim sentence's id for an implemented one is
+   a STALE claim, caught at its file:line.
 2. **Validity.** A claim of id X in phase P is valid iff X is inside P's
    reservation (§2). A claim of an IMPLEMENTED id is a STALE claim (the id
    already shipped). A claim of another phase's reserved id is a CONFLICT.
@@ -116,4 +126,9 @@ stale G-52 to **G-51** (045's new reservation):
 - `pnpm check:id-ledger -- --self-test` — injects a synthetic CONFLICTING
   claim (a second phase reserving an already-reserved id — must be detected)
   and a synthetic LEGITIMATE reference (a future phase referencing an
-  implemented id — must pass), proving both sides of the classifier.
+  implemented id — must pass), proving both sides of the classifier; the
+  wave-3 probes replay the REAL 043/045/046 posting-canon paragraphs — the
+  clean text claims its reserved ids with the old-plan note staying
+  references, and the mutated claim sentence (G-47/G-50/G-52 → the
+  implemented G-44) is REJECTED as a stale claim while the same G-44 inside
+  the old-plan note remains a legitimate reference.
