@@ -56,6 +56,10 @@ jobs:
       # (DEPENDENCY_RULES.md §4 — PHASE-001 deliverables).
       - run: pnpm lint
       - run: pnpm lint:depcruise
+      # The ID ledger: the canon/reservation collision scan + the
+      # classifier self-test probes (the 043-audit fix — CI previously
+      # never ran this gate; the local gate always did).
+      - run: pnpm check:id-ledger -- --self-test
       # PHASE-005 design-system gates: i18n parity, catalog coverage,
       # negative proofs for the erp-ui lint rules and the parity checker.
       - run: pnpm check:i18n-parity

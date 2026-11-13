@@ -100,12 +100,27 @@ stale G-52 to **G-51** (045's new reservation):
    reference). A reference-only marker in one clause NEVER demotes another
    clause's claim: swapping a claim sentence's id for an implemented one is
    a STALE claim, caught at its file:line.
-2. **Validity.** A claim of id X in phase P is valid iff X is inside P's
-   reservation (§2). A claim of an IMPLEMENTED id is a STALE claim (the id
-   already shipped). A claim of another phase's reserved id is a CONFLICT.
-   A reference is valid iff X is implemented or reserved by any phase;
-   references to ids in NO ledger state surface as warnings (typos, stale
-   cross-refs — reviewed by hand).
+2. **Validity (the owner-based claim law — the 043-audit fix).** A claim of
+   id X in phase P is judged by WHO owns X, never by P's delivery status:
+   X implemented & owned by P → P's legitimate historical record (valid);
+   X implemented & owned by another phase → STALE claim (the id already
+   shipped under a different meaning — caught for ANY phase status; a
+   delivered doc claiming a live golden of another phase is exactly the
+   9b shape); X implemented with UNKNOWN ownership (the pre-ledger corpus —
+   the INV/BR canon rows carry no per-row phase cell, and the G-01…20
+   battery rows predate this ledger) → STALE for a FUTURE phase only (its
+   ids are reserved, never implemented — a future claimant is provably
+   wrong), conservative pass for delivered/unlisted phases (their own
+   historical claims are indistinguishable from drift without ownership
+   data — the honest boundary); X reserved by P → valid (P's live
+   reservation); X reserved by another phase → CONFLICT; X in no ledger
+   state → claim-unreserved. Ownership resolution: the canon's per-row
+   `PHASE-0xx` cell (the G-21+ JOURNAL_RULES §7 rows), else the DELIVERED
+   rows of §2 (the canonical record for every phase delivered after this
+   ledger's creation — each delivered phase's row names its ids in the
+   first cell). A reference is valid iff X is implemented or reserved by
+   any phase; references to ids in NO ledger state surface as warnings
+   (typos, stale cross-refs — reviewed by hand).
 3. **Final numbers at implementation.** A reservation may shrink (scope cut);
    a phase takes the next free slot when it needs MORE than reserved — the
    implementing commit updates this ledger in the same change (the
@@ -123,12 +138,17 @@ stale G-52 to **G-51** (045's new reservation):
   classifies claims vs references, and fails (exit 1) on: a stale claim (an
   implemented id claimed as new), a reservation overlap, a claim outside its
   phase's reservation, or a §3 cross-reference that does not resolve.
-- `pnpm check:id-ledger -- --self-test` — injects a synthetic CONFLICTING
-  claim (a second phase reserving an already-reserved id — must be detected)
-  and a synthetic LEGITIMATE reference (a future phase referencing an
-  implemented id — must pass), proving both sides of the classifier; the
-  wave-3 probes replay the REAL 043/045/046 posting-canon paragraphs — the
-  clean text claims its reserved ids with the old-plan note staying
-  references, and the mutated claim sentence (G-47/G-50/G-52 → the
+- `pnpm check:id-ledger -- --self-test` — injects SYNTHETIC-FIXTURE probes
+  (the 043-audit fix: probes 1/5/8 now carry their own synthetic
+  reservation world — ids in the 880+ range no canon will ever reach and
+  synthetic phases — so they can never break on a real phase's delivery;
+  probes 9/9b/9c/9d replay the REAL 043/045/046 posting-canon paragraphs
+  and hold under the owner-based law across BOTH statuses of their
+  phases): the clean text claims its reserved ids with the old-plan note
+  staying references, and the mutated claim sentence (G-47/G-50/G-52 → the
   implemented G-44) is REJECTED as a stale claim while the same G-44 inside
-  the old-plan note remains a legitimate reference.
+  the old-plan note remains a legitimate reference. The negative proof on
+  the REAL scan path: mutating PHASE-043.md's T-17 claim G-47→G-44 fails
+  the plain scan with `stale-claim … already implemented (PHASE-044)`. The
+  self-test rides the local gate AND the CI quality job (the 043-audit fix
+  — CI previously never ran this check).

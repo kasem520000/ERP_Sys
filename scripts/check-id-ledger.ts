@@ -219,6 +219,7 @@ interface CrossRef {
 function parseLedger(): {
   reservations: Reservation[];
   crossRefs: CrossRef[];
+  deliveredOwnership: Map<string, string>;
   findings: Finding[];
 } {
   const findings: Finding[] = [];
@@ -242,6 +243,19 @@ function parseLedger(): {
       rules: values[2]!.filter((id) => id.startsWith("BR-")),
     });
   }
+  // The DELIVERED rows (§2) are the canonical per-phase ownership record
+  // for the ids a delivered phase owns — the canon's INV/BR rows carry no
+  // per-row phase cell and the G-01…20 battery rows predate the ledger, so
+  // those ids resolve to UNKNOWN ownership (see classifyText). Only the
+  // FIRST cell counts: the trailing "Was (the stale plan)" column lists
+  // the OLD ids the phase does NOT own.
+  const deliveredOwnership = new Map<string, string>();
+  for (const row of ledger.matchAll(/^\| ~~(PHASE-\d{3})~~([^|]*)\|/gm)) {
+    if (!/\*\*DELIVERED/.test(row[2] ?? "")) continue;
+    for (const id of idsIn(row[2]!)) {
+      deliveredOwnership.set(id, row[1]!);
+    }
+  }
   const crossRefs: CrossRef[] = [];
   for (const match of ledger.matchAll(/^\| (PHASE-\d{3}) \|([^|]*)\| (PHASE-\d{3}) \|/gm)) {
     crossRefs.push({
@@ -250,7 +264,7 @@ function parseLedger(): {
       ownedBy: match[3]!,
     });
   }
-  return { reservations, crossRefs, findings };
+  return { reservations, crossRefs, deliveredOwnership, findings };
 }
 
 /**
@@ -439,7 +453,20 @@ function referenceMarkerNear(clause: string, index: number, length: number): boo
  * and inside a claim clause an id token within ±45 chars of a proximity
  * reference marker stays a reference (the G-29 family idiom). Appends
  * findings (invalid ranges diagnosed at `where`). Exported for the
- * self-test. */
+ * self-test.
+ *
+ * The 043-audit fix — the OWNER-BASED claim law: a claim is validated by
+ * WHO owns the id, never by the claiming phase's delivery status.
+ * Pre-fix, every claim in a DELIVERED phase's doc was wholesale exempt
+ * ("historical plan text") — so a delivered doc claiming ANOTHER phase's
+ * implemented id (the 9b shape) or a live reservation (probes 1/5's
+ * shape) passed silently the moment its phase left the reservation table.
+ * Now, for ANY phase status: implemented & own → the legitimate
+ * historical record; implemented & other (known owner) → stale-claim;
+ * implemented & unknown owner (the pre-ledger corpus) → stale-claim for a
+ * FUTURE phase only, conservative pass otherwise; reserved & own → its
+ * live reservation; reserved & other → claim-conflict; unreserved →
+ * claim-unreserved. */
 export function classifyText(
   text: string,
   phase: string,
@@ -448,7 +475,6 @@ export function classifyText(
   reservedBy: Map<string, string>,
   reservationPhases: Set<string>,
 ): { claims: number; references: number } {
-  const isFuture = reservationPhases.has(phase);
   let claims = 0;
   let references = 0;
   const unitClaim = isClaimLine(text);
@@ -475,24 +501,49 @@ export function classifyText(
         if (clauseClaim && !nearReference) {
           claims += 1;
           if (implementedOwner !== undefined) {
-            if (isFuture) {
+            // Owner resolution: the canon's per-row PHASE-0xx cell (the
+            // G-21+ JOURNAL_RULES rows), else the ledger's DELIVERED-row
+            // ownership (the canonical record for INV/BR and every phase
+            // delivered after the ledger's creation). Generic "implemented"
+            // with no delivered row is the PRE-LEDGER corpus — ownership
+            // UNKNOWN: only a FUTURE phase can be proven wrong when
+            // claiming it (its ids are reserved, never implemented);
+            // delivered/unlisted phases pass conservatively (their own
+            // historical claims are indistinguishable from drift without
+            // ownership data).
+            const owner = implementedOwner.startsWith("PHASE-")
+              ? implementedOwner
+              : DELIVERED_OWNERSHIP.get(id);
+            if (owner !== undefined) {
+              if (owner !== phase) {
+                out.push({
+                  severity: "error",
+                  kind: "stale-claim",
+                  detail: `${phase} (${where}) claims ${id} as new, but it is already implemented (${owner}) — a different meaning under an existing id`,
+                });
+              }
+              continue; // own delivered claims: the legitimate historical record
+            }
+            if (reservationPhases.has(phase)) {
               out.push({
                 severity: "error",
                 kind: "stale-claim",
-                detail: `${phase} (${where}) claims ${id} as new, but it is already implemented (${implementedOwner}) — a different meaning under an existing id`,
+                detail: `${phase} (${where}) claims ${id} as new, but it is already implemented (a pre-ledger id — ownership predates the ledger)`,
               });
             }
             continue;
           }
-          if (!isFuture) continue; // a completed phase's historical plan text
           const owner = reservedBy.get(id);
+          if (owner === phase) {
+            continue; // the phase's own live reservation
+          }
           if (owner === undefined) {
             out.push({
               severity: "error",
               kind: "claim-unreserved",
               detail: `${phase} (${where}) claims ${id} but it is in no reservation (reserve it in ID_LEDGER §2 first)`,
             });
-          } else if (owner !== phase) {
+          } else {
             out.push({
               severity: "error",
               kind: "claim-conflict",
@@ -599,7 +650,8 @@ export function buildBlocks(text: string): TextBlock[] {
 
 // -- the main scan ----------------------------------------------------------------
 
-const { reservations, crossRefs, findings: ledgerFindings } = parseLedger();
+const { reservations, crossRefs, deliveredOwnership: DELIVERED_OWNERSHIP, findings: ledgerFindings } =
+  parseLedger();
 const { reservedBy: RESERVED_BY, findings: overlapFindings } =
   detectReservationOverlaps(reservations);
 const RESERVATION_PHASES = new Set(reservations.map((r) => r.phase));
@@ -642,17 +694,34 @@ function runSelfTest(): boolean {
     if (!pass) ok = false;
   };
 
-  // (1) A CONFLICTING claim: PHASE-043's doc line claiming G-50 (which the
-  // ledger reserves for PHASE-045) — the classifier must flag it.
+  // (1) A CONFLICTING claim — SYNTHETIC FIXTURE STATE (the 043-audit
+  // fix: the probe previously leaned on the LIVE ledger — attributing the
+  // claim to PHASE-043 and leaning on 045's real G-50/G-51 reservation —
+  // so it broke the moment 043 moved from reservations to implemented and
+  // the delivered-status exemption swallowed the check. The classifier is
+  // a pure function over its fixture arguments; the probe now carries its
+  // own synthetic reservation world, with ids no canon will ever reach):
+  // PHASE-880 (a future phase) claiming G-880/G-881 + INV-880, which the
+  // synthetic ledger reserves for PHASE-881 — the conflict must fire.
   const conflictFindings: Finding[] = [];
-  classifyLine(
-    "| T-99 | Golden suites G-50…G-51 with failure packs; INV-031 suite | api |",
-    "PHASE-043",
+  const st1Reserved = new Map([
+    ["G-880", "PHASE-881"],
+    ["G-881", "PHASE-881"],
+    ["INV-880", "PHASE-881"],
+  ]);
+  classifyText(
+    "| T-99 | Golden suites G-880…G-881 with failure packs; INV-880 suite | api |",
+    "PHASE-880",
     conflictFindings,
+    "synthetic:probe-1",
+    st1Reserved,
+    new Set(["PHASE-880"]),
   );
   check(
-    "(1) conflicting claim — PHASE-043 claiming G-50/G-51 (reserved for PHASE-045)",
-    conflictFindings.some((f) => f.kind === "claim-conflict"),
+    "(1) conflicting claim — a phase claiming another phase's reserved ids (synthetic fixture, ledger-independent)",
+    conflictFindings.some(
+      (f) => f.kind === "claim-conflict" && f.detail.includes("G-880") && f.detail.includes("PHASE-881"),
+    ),
   );
 
   // (2) A LEGITIMATE reference: PHASE-046's doc line referencing the
@@ -716,31 +785,38 @@ function runSelfTest(): boolean {
   // (5) A CLAIM WRAPPED ACROSS LINES: the marker ("Golden suites … added
   // to") on one physical line, the ids on the next — the block scanner must
   // join them into one unit and classify the CLAIM (a per-line scan saw a
-  // bare id line and treated it as a reference).
+  // bare id line and treated it as a reference). SYNTHETIC FIXTURE STATE
+  // (the 043-audit fix — same independence as probe 1): PHASE-890 claiming
+  // G-890…G-892 which the synthetic ledger reserves for PHASE-891.
   const wrappedText = [
-    "PHASE-090 adds the leave goldens",
-    "G-60…G-62 added to JOURNAL_RULES §7 with failure packs.",
+    "PHASE-890 adds the leave goldens",
+    "G-890…G-892 added to JOURNAL_RULES §7 with failure packs.",
   ].join("\n");
   const wrappedBlocks = buildBlocks(wrappedText);
   const wrappedFindings: Finding[] = [];
   let wrappedClaims = 0;
+  const st5Reserved = new Map([
+    ["G-890", "PHASE-891"],
+    ["G-891", "PHASE-891"],
+    ["G-892", "PHASE-891"],
+  ]);
   for (const block of wrappedBlocks) {
     if (block.kind === "heading" || block.kind === "quote" || block.kind === "code") continue;
     const result = classifyText(
       block.text,
-      "PHASE-043",
+      "PHASE-890",
       wrappedFindings,
       `synthetic:${block.line}`,
-      RESERVED_BY,
-      RESERVATION_PHASES,
+      st5Reserved,
+      new Set(["PHASE-890"]),
     );
     wrappedClaims += result.claims;
   }
   check(
-    "(5) multi-line claim — the wrapped marker+ids join into one claimed unit (vs a legitimate wrapped reference)",
+    "(5) multi-line claim — the wrapped marker+ids join into one claimed unit (synthetic fixture, ledger-independent)",
     wrappedBlocks.length === 1 &&
       wrappedClaims === 3 &&
-      wrappedFindings.some((f) => f.kind === "claim-conflict" && f.detail.includes("G-60")),
+      wrappedFindings.some((f) => f.kind === "claim-conflict" && f.detail.includes("G-890")),
   );
 
   // (5b) The DISTINCTION holds for wrapped references too: a wrapped
@@ -821,14 +897,24 @@ function runSelfTest(): boolean {
 
   // (8) A claim of an IMPLEMENTED id under a different meaning — the
   // stale-claim finding (an existing number re-claimed as new).
+  // SYNTHETIC FIXTURE STATE (the 043-audit fix): pre-fix this probe was
+  // attributed to PHASE-043 and only fired while 043 sat in the
+  // reservation table; its delivery flipped `isFuture` off and the
+  // delivered-status exemption swallowed the finding. The claiming phase
+  // is now a SYNTHETIC FUTURE phase (a phase whose ids are reserved, never
+  // implemented — the one status where claiming ANY implemented id is
+  // provably stale, ownership known or not).
   const staleFindings: Finding[] = [];
-  classifyLine(
-    "| T-98 | PHASE-090 gains the new golden G-13 (a totally different entitlement meaning) | api |",
-    "PHASE-043",
+  classifyText(
+    "| T-98 | PHASE-892 gains the new golden G-13 (a totally different entitlement meaning) | api |",
+    "PHASE-892",
     staleFindings,
+    "synthetic:probe-8",
+    new Map(),
+    new Set(["PHASE-892"]),
   );
   check(
-    "(8) implemented id re-claimed under a different meaning — the stale-claim finding",
+    "(8) implemented id re-claimed under a different meaning — the stale-claim finding (synthetic future claimant, ledger-independent)",
     staleFindings.some((f) => f.kind === "stale-claim" && f.detail.includes("G-13")),
   );
 

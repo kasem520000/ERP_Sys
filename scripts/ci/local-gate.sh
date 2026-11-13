@@ -14,7 +14,7 @@ run "typecheck" pnpm typecheck
 run "lint (incl. module boundaries)" pnpm lint
 run "lint:depcruise (dependency graph rules)" pnpm lint:depcruise
 run "permissions docs-drift (seed ↔ AUTHORIZATION_MATRIX)" pnpm check:permissions-drift
-run "id-ledger collision check (implemented G/INV/BR ↔ reservations)" pnpm check:id-ledger
+run "id-ledger collision check + self-test (implemented G/INV/BR ↔ reservations; the classifier probes)" pnpm check:id-ledger -- --self-test
 run "unit + property tests" pnpm test
 run "industry manifests validation (industries/README §3)" pnpm validate:manifests
 run "db suite (embedded PostgreSQL 16: RLS attacks, identity flows, jobs, files, readiness)" pnpm test:db
