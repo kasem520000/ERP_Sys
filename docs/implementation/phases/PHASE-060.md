@@ -31,7 +31,7 @@
   بالصيغة (تكلفة + هامش + تقريب)، سجل قنوات بيع بتسعير لكل قناة، جدولة نوافذ
   التسليم، بيع من الباطن من الطلب إلى شحن المورد إلى الفوترة، وبوابة عملاء
   (كشف الحساب/الفواتير/روابط الدفع/النزاعات) تتشارك بنية بوابة الموردين، مع
-  تقييم ائتماني للشركاء — تحت القيود الذهبية G-76/G-77 والثابت INV-042.
+  تقييم ائتماني للشركاء — تحت القيود الذهبية G-75/G-76 والثابت INV-043.
 
 ## 2. Scope
 
@@ -50,7 +50,7 @@ In scope:
    rule-based assignment of partners and reps; `/sales/territories`.
 5. **Rebates with accruals** (S-05): `rebate_agreements` (volume-based yearly scales,
    settlement terms) + `rebate_accruals` (periodic accrual as qualification
-   progresses, settlement by credit note) — golden G-76 guards the accrual posting.
+   progresses, settlement by credit note) — golden G-75 guards the accrual posting.
 6. **Contract price agreements** (S-06, S-18): `price_agreements` — customer/item,
    validity period, min/max quantity, priority; the price-resolution precedence
    (agreement > channel price > formula price list > base list) handles overlapping
@@ -63,10 +63,10 @@ In scope:
    delivery notes, surfaced in fulfillment planning.
 10. **Drop-ship flow** (S-21): `drop_ship_links` — customer order line → supplier
     direct-ship purchase order → customer billing, with COGS recognized at supplier
-    ship-confirm (golden G-77 guards the timing).
+    ship-confirm (golden G-76 guards the timing).
 11. **Sales forecasting** (S-17): weighted pipeline (Σ value × probability) plus
     history-based baseline; `sales_forecasts` snapshot records per period; invariant
-    INV-042 keeps the weighted value consistent across board, list, forecast, KPI,
+    INV-043 keeps the weighted value consistent across board, list, forecast, KPI,
     and report surfaces.
 12. **Customer portal** (S-20): `portal_accounts` — customer-contact scoped logins;
     statement, invoice, and payment-link views (payment links from PHASE-056 when
@@ -122,17 +122,17 @@ payment-behavior signals the dunning engine produces.
   (CR-36 c).
 - **Docs:** `NAVIGATION_MODEL.md` (`crm` and `sales` groups) · `SALES_AND_CRM.md`
   (pipeline methodology, pricing resolution precedence, rebate accounting) ·
-  `JOURNAL_RULES.md` and `ACCOUNTING_INVARIANTS.md` updated for G-76/G-77/INV-042 ·
+  `JOURNAL_RULES.md` and `ACCOUNTING_INVARIANTS.md` updated for G-75/G-76/INV-043 (reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-76/G-77/INV-042 predate the 044 wave's consumption of those slots) ·
   `BUSINESS_RULES.md` rows for price resolution and credit review triggers.
 - **Reports:** +4 code-level contracts — `sales.pipeline-forecast`,
   `sales.campaign-roi`, `sales.target-achievement`, `sales.rebate-accruals`;
   catalog rows mandatory.
 - **Feature flags:** `crm.depth` and `sales.customer_portal` — template-composable
   grants (CR-36 f).
-- **Goldens and invariants:** G-76 (rebate accrual: the accrued rebate liability
-  matches the agreement's progress scale exactly at each period close) · G-77
+- **Goldens and invariants:** G-75 (rebate accrual: the accrued rebate liability
+  matches the agreement's progress scale exactly at each period close) · G-76
   (drop-ship COGS timing: COGS recognized at supplier ship-confirm, not at order or
-  billing, with the `drop_ship_links` audit chain) · INV-042 (pipeline value
+  billing, with the `drop_ship_links` audit chain) · INV-043 (pipeline value
   consistency: weighted pipeline value equals Σ value × probability across every
   surface, with identical stage sets and closed-won exclusions).
 - **Architecture:** no new ADR required — pricing resolution and rebate posting
@@ -147,13 +147,13 @@ payment-behavior signals the dunning engine produces.
 | T-03 | Pipeline board and list screens with drag-between-stages and KPI feed | web |
 | T-04 | Campaigns: `campaigns`/`campaign_members`/`campaign_costs` CRUD + ROI computation | api |
 | T-05 | Targets and territories: CRUD + vs-actual aggregation + drill-through | api |
-| T-06 | Rebates: agreements + periodic accrual job + settlement credit notes (G-76 golden + tests) | api/jobs |
+| T-06 | Rebates: agreements + periodic accrual job + settlement credit notes (G-75 golden + tests) | api/jobs |
 | T-07 | Pricing: `price_agreements` + resolution precedence engine + overlap/priority tests | api |
 | T-08 | Pricing: `price_list_rules` formula evaluation (cost + margin + rounding) + preview | api |
 | T-09 | `sales_channels` registry + per-channel pricing + migration off free-text channel | api |
 | T-10 | Delivery-note scheduling fields + fulfillment planning surface | api/web |
-| T-11 | Drop-ship flow: order → supplier PO → ship-confirm → billing, `drop_ship_links` chain (G-77 golden + tests) | api |
-| T-12 | Forecasting: weighted pipeline + history baseline + `sales_forecasts` snapshots (INV-042 tests) | api |
+| T-11 | Drop-ship flow: order → supplier PO → ship-confirm → billing, `drop_ship_links` chain (G-76 golden + tests) | api |
+| T-12 | Forecasting: weighted pipeline + history baseline + `sales_forecasts` snapshots (INV-043 tests) | api |
 | T-13 | Customer portal: `portal_accounts` + statement/invoice/payment-link views + dispute submission | web/api |
 | T-14 | Credit scoring: `partner_credit_scores` + automated review triggers + review tasks | jobs |
 | T-15 | Screens: `/crm/campaigns`, `/sales/targets`, `/sales/territories`, `/pricing/agreements` + NAV/⌘K registration (OA-04) | web |
@@ -166,20 +166,20 @@ Acceptance criteria (all must pass with recorded evidence):
 1. The pipeline board renders configurable stages (per tenant), moves an opportunity
    between stages with audit history, and the weighted pipeline value on the board
    matches the list, the forecast surface, and the `sales.pipeline-forecast` report
-   to the decimal (INV-042 test recorded).
+   to the decimal (INV-043 test recorded).
 2. A campaign with seeded members and costs computes ROI from attributed revenue;
    attribution rules (lead source, order link) are documented and tested.
 3. Sales targets aggregate actuals by rep/team/territory per period with drill-through
    to the contributing documents.
 4. Rebate accruals: with a seeded yearly volume agreement, each period close posts
-   the accrual matching the progress scale exactly (G-76 golden run green), and
+   the accrual matching the progress scale exactly (G-75 golden run green), and
    settlement issues a credit note that clears the accrual.
 5. Price resolution: for overlapping `price_agreements`, quantity-bounded and
    channel-specific cases, the precedence engine returns the documented winner in
    every golden test; formula price lists evaluate cost + margin + rounding with
    preview parity.
 6. Drop-ship: a customer order generates the linked supplier PO, ship-confirm
-   triggers COGS recognition at the documented timing (G-77 golden run green), and
+   triggers COGS recognition at the documented timing (G-76 golden run green), and
    customer billing completes the chain with the `drop_ship_links` audit trail.
 7. The customer portal: a contact-scoped login sees only its partner's statements,
    invoices, and payment links, submits a dispute case that lands in the case
@@ -205,7 +205,7 @@ Acceptance criteria (all must pass with recorded evidence):
   Mitigated by a golden price-resolution test matrix, a resolution-trace breadcrumb
   on every priced line, and a feature-flag rollout per tenant.
 - **Drop-ship COGS timing errors** — recognizing COGS at the wrong event overstates
-  or understates margin for a period. Mitigated by G-77 as a golden with a
+  or understates margin for a period. Mitigated by G-76 as a golden with a
   full-chain fixture and a close-cycle checklist item.
 - **Portal security scope** — customer-contact logins touch financial documents.
   Mitigated by contact-scoped accounts, RLS attack tests, no staff-capability
@@ -220,8 +220,8 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-060-COMPLETION.md`
-  (evidence per acceptance criterion, the pricing-resolution test matrix, G-76/G-77
-  golden outputs, INV-042 test output, portal security notes, gate outputs).
+  (evidence per acceptance criterion, the pricing-resolution test matrix, G-75/G-76
+  golden outputs, INV-043 test output, portal security notes, gate outputs).
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-060 row → COMPLETE; `NEXT_ACTION.md`
   points to the next eligible phase PHASE-061 (POS & Retail Depth) per
   [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §5.

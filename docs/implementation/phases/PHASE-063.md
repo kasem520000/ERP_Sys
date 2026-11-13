@@ -18,7 +18,7 @@
   suggestions from PHASE-043, seasonal shift patterns from PHASE-045, and season-over-season
   analytics; the **Murabaha/Tawarruq accounting template pack** (DF-10) — cost-of-goods plus
   fixed-markup receivable structures with zero interest postings, guarded by a new golden
-  **G-80** (murabaha non-interest consistency) with a Sharia-board disclaimer and documented
+  **G-79** (murabaha non-interest consistency) with a Sharia-board disclaimer and documented
   structures; the **country packs** (DF-05, DF-06, DF-54, IN-05) — the JoFotara (Jordan)
   e-invoicing adapter following the ZATCA GATE discipline (stub-until-verified), the Yemen
   market pack completion (sales-tax + Zakat al-Mal worksheets under the verification
@@ -39,7 +39,7 @@
   موازنات موسمية وملفات طلبٍ تغذي اقتراحات إعادة الطلب ووردية موسمية وتحليلات
   موسم-مقابل-موسم؛ وحزمة قوالب المرابحة/التورق المحاسبية بلا أي فوائد — تكلفة البضاعة
   وهامش ربحٍ ثابت وربحٌ مؤجَّل بالتقسيط لا يُعيد تسعيره بالزمن — تحت القاعدة الذهبية
-  الجديدة G-80 مع إخلاء مسؤولية مجلس الشريعة وهياكل موثقة؛ وحزم الدول: مهايئ فاتورة
+  الجديدة G-79 مع إخلاء مسؤولية مجلس الشريعة وهياكل موثقة؛ وحزم الدول: مهايئ فاتورة
   JoFotara الأردنية بانضباط بوابات ZATCA (كعب حتى التحقق)، واستكمال الحزمة اليمنية
   بورقتي ضريبة المبيعات وزكاة المال، ومصفوفة جاهزية الفاتورة الإلكترونية الخليجية،
   وتعميق حزمتي عُمان والبحرين؛ وأخيراً إكمال عرض الأرقام العربية الهندية لكل الأرقام
@@ -78,7 +78,7 @@ In scope:
    cost-of-goods plus fixed-markup receivable structures; **no interest by construction**:
    deferred installment markup is recognized as fixed profit, never re-valued with time;
    documented structures (cost account, markup receivable, installment schedule) with a
-   **Sharia-board disclaimer** on every surface and document; the new golden **G-80**
+   **Sharia-board disclaimer** on every surface and document; the new golden **G-79**
    (murabaha non-interest consistency) guards every posting set.
 5. **Country packs** (DF-05, DF-06, DF-54, IN-05):
    - **JoFotara (Jordan) e-invoicing adapter** following the ZATCA GATE discipline
@@ -102,7 +102,7 @@ In scope:
 
 Out of scope: AI narration/copilot (064) · growth/partners/trust (065) · ZATCA Phase-2
 clearance/CSID/XAdES and the Egypt ETA adapter (054) · KSA Zakat declaration support (054) ·
-new interest-bearing financing features (excluded by design — G-80) · a second fiscal
+new interest-bearing financing features (excluded by design — G-79) · a second fiscal
 calendar engine (fiscal periods remain Gregorian; Hijri is a display and filtering layer
 plus closing notes).
 
@@ -138,7 +138,7 @@ register's phase-document-wins rule applies.
   substrate gains its first deep consumers — the Hijri/Tafqeet/numerals renderers are
   display layers over existing dictionaries; no new locale packs ship here (pack content
   is owner-planned data on the 062 substrate).
-- **Goldens:** **G-80 — murabaha non-interest consistency** added to `JOURNAL_RULES.md`
+- **Goldens:** **G-79 — murabaha non-interest consistency** (reservation re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the plan's original numbering predates the 044 wave's slot consumption) added to `JOURNAL_RULES.md`
   §7 and cross-referenced in `ACCOUNTING_INVARIANTS.md`: every murabaha/tawarruq posting
   set is interest-free by construction — cost plus fixed markup posts to the designated
   markup-receivable and Islamic-finance-profit accounts, zero postings to any
@@ -149,7 +149,7 @@ register's phase-document-wins rule applies.
   `localization.yemen-sales-tax`, `localization.yemen-zakat-al-mal` (the Yemen pack
   worksheets, REQUIRES_VERIFICATION-labeled).
 - **Docs:** `FEATURE_CATALOG.md` (localization module) · `ENTITY_CATALOG.md` ·
-  `REPORT_CATALOG.md` (+3) · `JOURNAL_RULES.md` (G-80) · `ACCOUNTING_INVARIANTS.md` ·
+  `REPORT_CATALOG.md` (+3) · `JOURNAL_RULES.md` (G-79) · `ACCOUNTING_INVARIANTS.md` ·
   `CHART_OF_ACCOUNTS.md` (markup-receivable + Islamic-finance-profit purposes) · the tax
   compliance pack (country packs + the GCC readiness matrix) · `NAVIGATION_MODEL.md` ·
   `IMPLEMENTATION_STATUS.md`.
@@ -169,7 +169,7 @@ register's phase-document-wins rule applies.
 | T-05 | Tafqeet on every money surface: invoice prints, cheque prints, reports, receipts — standard and tenant-designed templates | web |
 | T-06 | Season packs: seasonal budget templates + demand profiles feeding 043 reorder suggestions + seasonal shift patterns over the 045 roster engine | api |
 | T-07 | `localization.season-comparison` report contract + season-over-season analytics surface | api |
-| T-08 | Islamic finance pack: products/contracts/installments, posting templates, G-80 golden wiring, SoD create ≠ post | api |
+| T-08 | Islamic finance pack: products/contracts/installments, posting templates, G-79 golden wiring, SoD create ≠ post | api |
 | T-09 | Murabaha/Tawarruq authoring surfaces + Sharia-board disclaimer + documented structures pages | web |
 | T-10 | JoFotara adapter stub under the ZATCA GATE discipline: payload shapes, counters, typed REQUIRES_VERIFICATION errors | api |
 | T-11 | Yemen pack: `localization.yemen-sales-tax` + `localization.yemen-zakat-al-mal` worksheet contracts with verification-discipline labels | api |
@@ -195,7 +195,7 @@ Acceptance criteria (all must pass with recorded evidence):
    cheque amounts; every money surface renders the narration (DF-03).
 5. **A Murabaha contract walkthrough proves zero interest postings**: cost-of-goods +
    fixed markup receivable + installment schedule → every generated journal set satisfies
-   G-80 (no interest-bearing purpose touched; deferred markup recognized once as fixed
+   G-79 (no interest-bearing purpose touched; deferred markup recognized once as fixed
    profit, never re-valued); the Sharia-board disclaimer appears on every surface and
    document (DF-10).
 6. Season packs: a Ramadan profile lifts a seeded item's reorder suggestion through the
@@ -228,7 +228,7 @@ Acceptance criteria (all must pass with recorded evidence):
   versioned pure service so corrections are deliberate.
 - **Sharia interpretation risk** — the platform ships accounting structures, not religious
   rulings: mitigated by the Sharia-board disclaimer on every surface, documented posting
-  structures, the G-80 invariant, and owner/legal review of the template pack before
+  structures, the G-79 invariant, and owner/legal review of the template pack before
   release.
 - **Country-pack verification drift** (JoFotara, Yemen, GCC) — external rulesets change:
   mitigated by the ZATCA GATE discipline (stub-until-verified, fail closed, typed errors)
@@ -241,7 +241,7 @@ Acceptance criteria (all must pass with recorded evidence):
 
 - Completion report: `docs/implementation/phases/reports/PHASE-063-COMPLETION.md` — evidence
   per acceptance criterion, the Hijri round-trip test output, the Tafqeet golden test set
-  with reviewer sign-off, the Murabaha walkthrough journals proving G-80, and the
+  with reviewer sign-off, the Murabaha walkthrough journals proving G-79, and the
   verification-discipline record for JoFotara/Yemen.
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-063 row → COMPLETE; `NEXT_ACTION.md` → next
   eligible phase PHASE-064 (AI Copilot & Intelligent Automation) with its prerequisites

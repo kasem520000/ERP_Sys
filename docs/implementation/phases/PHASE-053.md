@@ -24,7 +24,7 @@
   segment statements per branch answer the multi-branch tenant's first question; the
   accountant polish items (period compare, closing checklist) turn month-end from a
   spreadsheet exercise into an in-product workflow.
-- **الملخص التنفيذي (AR):** تُكمل هذه المرحلة «الميل الأخير» في المحاسبة: أبعادٌ تحليلية قابلة للتهيئة (قسم/منطقة/قناة/موظف) بتخزينٍ مفهرس للأبعاد الساخنة وJSONB للبقية مع إلزام الاكتمال عند الترحيل (INV-037)، تجميعٌ هرمي لمراكز التكلفة، محركُ إعادة تقييم عملات كامل بعكسٍ تلقائي للفترة التالية (G-69، والسياسة الافتراضية تبقى إيقاف التشغيل)، قوائمُ أرباح مرحلية لكل فرع، مقاصةُ ذمم مدينة/دائنة للطرف المزدوج (G-70)، إيصالاتُ بين الشركات عبر قارئ المنصة المُدقَّق دون أي كتابة عابرة للمستأجرين (G-71)، وحزمةُ خزينة كاملة: توقعات التدفق النقدي، المركز النقدي اليومي، الضمانات البنكية، بيانات الحسابات المصرفية (IBAN/SWIFT)، الخزائن الحديدية، الصناديق متعددة العملات، تسوية البطاقات والبوابات، الدفعات المقسّمة، وعُهد الموظفين.
+- **الملخص التنفيذي (AR):** تُكمل هذه المرحلة «الميل الأخير» في المحاسبة: أبعادٌ تحليلية قابلة للتهيئة (قسم/منطقة/قناة/موظف) بتخزينٍ مفهرس للأبعاد الساخنة وJSONB للبقية مع إلزام الاكتمال عند الترحيل (INV-038)، تجميعٌ هرمي لمراكز التكلفة، محركُ إعادة تقييم عملات كامل بعكسٍ تلقائي للفترة التالية (G-68، والسياسة الافتراضية تبقى إيقاف التشغيل)، قوائمُ أرباح مرحلية لكل فرع، مقاصةُ ذمم مدينة/دائنة للطرف المزدوج (G-69)، إيصالاتُ بين الشركات عبر قارئ المنصة المُدقَّق دون أي كتابة عابرة للمستأجرين (G-70)، وحزمةُ خزينة كاملة: توقعات التدفق النقدي، المركز النقدي اليومي، الضمانات البنكية، بيانات الحسابات المصرفية (IBAN/SWIFT)، الخزائن الحديدية، الصناديق متعددة العملات، تسوية البطاقات والبوابات، الدفعات المقسّمة، وعُهد الموظفين.
 
 ## 2. Scope
 
@@ -34,7 +34,7 @@ In scope:
    configurable dimensions (department / region / channel / employee and up to N
    tenant-defined others); `journal_lines` gains dedicated indexed columns for the hot
    dimensions and a jsonb bag for the rest; posting-time completeness enforcement per
-   account/dimension configuration (INV-037) and a budget-availability enforcement
+   account/dimension configuration (INV-038) and a budget-availability enforcement
    option at posting (A-11 — BR-051 advisory becomes enforceable when configured).
 2. **`cost_center_hierarchies`** (A-02): hierarchy closure + rollup reporting with
    recursive aggregation and materialized rollup snapshots for large trees.
@@ -50,11 +50,11 @@ In scope:
    and segments (A-05 served) — the v3.0 "deferred decision" on duplicate ledgers is
    now **resolved by R-02** (item 17: the dual-book layer, v3.2/CR-50).
 5. **`partner_netting_documents`** (A-09): AR/AP offset documents for dual-role
-   partners with paired subledger application on both sides (G-70 zero-sum); partial
+   partners with paired subledger application on both sides (G-69 zero-sum); partial
    application and currency handling defined.
 6. **`intercompany_vouchers`** (A-10): paired journals — IC AP in one tenant, IC AR in
    the counterparty tenant — posted through the audited platform-plane reader pattern;
-   zero cross-tenant writes preserved (G-71 pairing).
+   zero cross-tenant writes preserved (G-70 pairing).
 7. **`cash_flow_forecasts`** (A-08, T-01): forecast documents assembled from AR/AP
    aging, recurring entries, and budget schedules; the daily cash-position dashboard
    (T-02) with per-account and per-currency drill-down.
@@ -171,8 +171,8 @@ netting, intercompany vouchers are approval-gated documents).
   re-extended (registry = seed, cumulative v3.0 count).
 - **i18n**: ~260 new AR/EN keys (dimension admin, segment picker, treasury screens,
   closing checklist, netting/IC documents); parity check extended.
-- **Docs**: `ACCOUNTING_ENGINE_SPECIFICATION.md`, `JOURNAL_RULES.md` (G-69…G-71),
-  `ACCOUNTING_INVARIANTS.md` (INV-037), `CHART_OF_ACCOUNTS.md` (IC AP/IC AR
+- **Docs** (reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-69…G-71/INV-037 predate the 044 wave's consumption of those slots): `ACCOUNTING_ENGINE_SPECIFICATION.md`, `JOURNAL_RULES.md` (G-68…G-70),
+  `ACCOUNTING_INVARIANTS.md` (INV-038), `CHART_OF_ACCOUNTS.md` (IC AP/IC AR
   guidance), `PERIOD_CLOSING.md`, `RECONCILIATION.md`, `ENTITY_CATALOG.md`,
   `REPORT_CATALOG.md`, `FEATURE_CATALOG.md`, `NAVIGATION_MODEL.md`.
 - **Reports**: +8 contracts — `accounting.segment-pnl`,
@@ -195,12 +195,12 @@ netting, intercompany vouchers are approval-gated documents).
 |---|---|---|
 | T-01 | Author migrations 0094–0100 + journal/spec updates; backfill job for dimension columns | api |
 | T-02 | Drizzle mirrors + `ENTITY_CATALOG.md` rows + RLS policies + attack tests A1–A10 (incl. cross-tenant IC attack) | api |
-| T-03 | Dimension engine: definitions CRUD, document-context population of journal-line dimensions, INV-037 posting check, budget-availability option | api |
+| T-03 | Dimension engine: definitions CRUD, document-context population of journal-line dimensions, INV-038 posting check, budget-availability option | api |
 | T-04 | Cost-center hierarchy closure + recursive rollup aggregation + materialized snapshots | api |
-| T-05 | FX revaluation engine: per-period runs, unrealized per account by currency, auto-reversal, hedge participation, G-69 | api |
+| T-05 | FX revaluation engine: per-period runs, unrealized per account by currency, auto-reversal, hedge participation, G-68 | api |
 | T-06 | Segment P&L statements + segment picker + indirect cash-flow statement + period-vs-period compare | api |
-| T-07 | Netting documents: paired AR/AP subledger application, partial application, G-70 | api |
-| T-08 | Intercompany vouchers through the platform-plane reader: paired per-tenant journals, G-71, zero cross-tenant writes | api |
+| T-07 | Netting documents: paired AR/AP subledger application, partial application, G-69 | api |
+| T-08 | Intercompany vouchers through the platform-plane reader: paired per-tenant journals, G-70, zero cross-tenant writes | api |
 | T-09 | Cash-flow forecast assembly (AR/AP aging + recurring + budget schedules) + daily cash-position computation | api |
 | T-10 | Treasury registers: guarantees (issue/expiry/margin + alerts), vaults + transactions, multi-currency cash boxes, banking columns, inter-account transfers | api |
 | T-11 | Card/gateway reconciliation surfaces + split payment allocments + employee custody documents | api |
@@ -208,7 +208,7 @@ netting, intercompany vouchers are approval-gated documents).
 | T-13 | Screens: `/accounting/dimensions`, netting document UI, intercompany voucher UI, segment report picker | web |
 | T-14 | Screens: `/treasury/forecasts`, `/treasury/position`, `/treasury/guarantees`, vault register screens | web |
 | T-15 | Report contracts (+8) with tests + `REPORT_CATALOG.md` rows | api |
-| T-16 | Goldens G-69/G-70/G-71 + INV-037 into `JOURNAL_RULES.md` / `ACCOUNTING_INVARIANTS.md`; update accounting docs | docs |
+| T-16 | Goldens G-68/G-69/G-70 + INV-038 into `JOURNAL_RULES.md` / `ACCOUNTING_INVARIANTS.md`; update accounting docs | docs |
 | T-17 | Run full local gates (typecheck/lint/boundaries/tests/docs/i18n parity/permissions drift/manifests/EXPLAIN budgets) and record evidence | all |
 
 ## 6. Verification
@@ -218,23 +218,23 @@ Acceptance criteria (all must pass with recorded evidence):
 1. Migrations 0094–0100 apply cleanly; Drizzle mirrors and `ENTITY_CATALOG.md` rows
    present; RLS attack tests A1–A10 pass — including an explicit cross-tenant attack
    against intercompany vouchers proving zero cross-tenant writes.
-2. Dimension completeness (INV-037): posting a journal line missing a required
+2. Dimension completeness (INV-038): posting a journal line missing a required
    dimension (per account configuration) is rejected by the posting engine; hot-dim
    queries are EXPLAIN-verified against the OA-06 budgets on seeded volumes.
 3. Cost-center rollups: a three-level hierarchy aggregates child balances to parents
    exactly (recursive test), and the materialized snapshot matches the live
    computation after refresh.
 4. FX revaluation: a seeded multi-currency period produces per-account unrealized
-   gain/loss entries that balance per run (G-69), auto-reverse in the next period,
+   gain/loss entries that balance per run (G-68), auto-reverse in the next period,
    and hedge contracts net into the run; the default remains OFF until a tenant
    enables it (policy preserved).
 5. Segment reporting: two branches produce independent P&L statement sets with the
    segment picker; consolidated totals equal the single-book totals (tie-out test).
 6. Netting: a dual-role partner's AR and AP documents offset through a netting
-   document whose applications sum to zero on both subledgers (G-70); partial
+   document whose applications sum to zero on both subledgers (G-69); partial
    application and currency cases covered by tests.
 7. Intercompany: a voucher between two group tenants creates exactly two journals —
-   IC AP in one, IC AR in the other — mirrored and sign-inverted (G-71), both posted
+   IC AP in one, IC AR in the other — mirrored and sign-inverted (G-70), both posted
    through the audited platform-plane reader with no cross-tenant session writes.
 8. Treasury surfaces render with AR/EN parity and RTL: forecast vs actual, daily
    cash position with per-account/currency drill-down, guarantees with expiry alerts,
@@ -252,14 +252,14 @@ Acceptance criteria (all must pass with recorded evidence):
   posting paths; mitigated by additive nullable columns, a controlled backfill job,
   and EXPLAIN-verified budgets as acceptance criteria (OA-06).
 - **Revaluation correctness** — auto-reversal and per-account currency math are classic
-  error sources; mitigated by G-69 balancing, seeded multi-currency fixtures, and the
+  error sources; mitigated by G-68 balancing, seeded multi-currency fixtures, and the
   default-OFF policy until verified.
 - **Intercompany security** — any cross-tenant write would break the RLS invariant the
   platform is praised for; mitigated by reusing the consolidation platform-plane
   reader unchanged, paired per-tenant posting, and a dedicated attack test.
 - **Netting edge cases** — partial application, mixed currencies, and crossed periods
   can corrupt subledger aging; mitigated by paired application semantics, period
-  guards, and golden G-70.
+  guards, and golden G-69.
 - **Migration size** — seven migrations with backfills in one phase; mitigated by
   splitting per domain and keeping every migration reversible or additive.
 

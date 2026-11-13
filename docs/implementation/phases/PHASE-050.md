@@ -40,10 +40,10 @@ In scope:
 2. **NCR records (Q-01)**: `ncr_records` — source
    INSPECTION/PRODUCTION/COMPLAINT/SUPPLIER, severity, affected quantity, disposition
    REWORK/SCRAP/ACCEPT/RETURN_TO_SUPPLIER; the SCRAP disposition posts the inventory
-   write-off (G-63); closure requires a disposition (BR-071).
+   write-off (G-62); closure requires a disposition (BR-101).
 3. **CAPA records (Q-02)**: `capa_records` — root-cause analysis text, corrective and
    preventive actions with owners and dates, and an effectiveness check recorded after
-   the action due date (BR-072).
+   the action due date (BR-102).
 4. **Calibration records (Q-03)**: `calibration_records` — instrument (tracked as an
    asset on the 049 surfaces), standard used, result, due date; feeds the expiry sweep
    pattern.
@@ -54,13 +54,13 @@ In scope:
    from NCRs, rejections and delivery performance; they feed the supplier scorecards of
    PHASE-038 through a documented contract.
 7. **COA generation (Q-07)**: `coa_documents` — certificate of analysis generated from
-   inspection results against the item's specifications (BR-073), bilingual AR/EN print;
+   inspection results against the item's specifications (BR-103), bilingual AR/EN print;
    certificates of conformity ride the same table as a document type.
 8. **Complaints (Q-08)**: `complaints` — customer complaint intake (channel, severity,
    item/batch reference), triage, NCR link, resolution and feedback.
 9. **Batch holds & recall (Q-09, Q-12)**: `batch_quality_holds` — hold/release with
-   reason and disposition link, blocking every issue/ship path server-side (INV-034,
-   BR-070) — and `recall_registry` — the traceability drill batch → where-used →
+   reason and disposition link, blocking every issue/ship path server-side (INV-035,
+   BR-100) — and `recall_registry` — the traceability drill batch → where-used →
    customers, built on the existing batch/serial ledger.
 10. **Management review & hazard registers (Q-10, Q-11)**: `quality_management_reviews`
     — meeting records with an indicator pack (NCR/CAPA/complaint/SPC status) and
@@ -113,10 +113,11 @@ binds the WMS picking paths of 044 when that phase delivers.
 - **Feature flags**: `quality`, `quality.spc` — template-composable grants (CR-36f);
   food-manufacturing, agriculture, healthcare and electronics templates compose
   `quality` by default; `quality.spc` composes for food-manufacturing and electronics.
-- **Posting rules**: `JOURNAL_RULES.md` gains G-63 (NCR scrap disposition → inventory
-  write-off posting) and G-64 (external calibration/CAPA service costs → quality
-  expense posting); `ACCOUNTING_INVARIANTS.md` gains INV-034 (hold enforcement);
-  `BUSINESS_RULES.md` gains BR-070…BR-073.
+- **Posting rules** (reservations re-coordinated 2026-11-13 per
+  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-63/G-64/INV-034/BR-070…073 predate the 037–042/044 waves' consumption of those slots): `JOURNAL_RULES.md` gains G-62 (NCR scrap disposition → inventory
+  write-off posting) and G-63 (external calibration/CAPA service costs → quality
+  expense posting); `ACCOUNTING_INVARIANTS.md` gains INV-035 (hold enforcement);
+  `BUSINESS_RULES.md` gains BR-100…BR-103.
 - **Jobs**: a `quality-calibration-due` sweep (30/7/0) on the existing pg-boss queue.
 - **Docs**: `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`, `NAVIGATION_MODEL.md`,
   `JOURNAL_RULES.md`, `ACCOUNTING_INVARIANTS.md`, `BUSINESS_RULES.md`, the
@@ -136,19 +137,19 @@ binds the WMS picking paths of 044 when that phase delivers.
 | T-03 | Migration `0089` (calibration records, supplier quality scores, COA documents) | api |
 | T-04 | Migration `0090` (batch holds, recall registry, management reviews, hazard registers) + grants | api |
 | T-05 | Specifications API + inspection-result mapping contract (feeds from the existing inspections module) | api |
-| T-06 | NCR API: sources, severity, dispositions; G-63 scrap write-off posting; closure gate (BR-071) | api |
-| T-07 | CAPA API: root cause, actions, effectiveness check gate (BR-072); G-64 external cost posting | api |
+| T-06 | NCR API: sources, severity, dispositions; G-62 scrap write-off posting; closure gate (BR-101) | api |
+| T-07 | CAPA API: root cause, actions, effectiveness check gate (BR-102); G-63 external cost posting | api |
 | T-08 | Calibration API: instrument-as-asset binding, due-date sweep job | api |
 | T-09 | SPC service: X-bar/R computation, Cp/Cpk, out-of-control flags + property tests on known datasets | api |
 | T-10 | Supplier quality scores: rolling computation + the documented feed contract to the 038 scorecards | api |
-| T-11 | COA generation service (BR-073) + bilingual print template | api |
+| T-11 | COA generation service (BR-103) + bilingual print template | api |
 | T-12 | Complaints API with NCR link + intake notifications | api |
-| T-13 | Batch holds: shared blocking validation service wired into every issue/ship path (INV-034, BR-070) + invariant test | api |
+| T-13 | Batch holds: shared blocking validation service wired into every issue/ship path (INV-035, BR-100) + invariant test | api |
 | T-14 | Recall registry: batch → where-used → customers drill on the batch/serial ledger | api |
 | T-15 | `/quality/ncr`, `/quality/capa`, `/quality/calibration`, `/quality/spc`, `/quality/complaints` screens + COA print surface | web |
 | T-16 | Management review pack + hazard registers composed into the food-manufacturing template manifest | api |
 | T-17 | Report contracts ×4 + `REPORT_CATALOG.md` rows + catalog↔registry check extension | api |
-| T-18 | Golden tests G-63/G-64 + INV-034 test + RLS attack tests A1–A10 + OA-06 budgets on SPC and recall drill queries | api |
+| T-18 | Golden tests G-62/G-63 + INV-035 test + RLS attack tests A1–A10 + OA-06 budgets on SPC and recall drill queries | api |
 | T-19 | Docs: catalog/invariants/journal-rules/business-rules/navigation/template updates | docs |
 | T-20 | Run full local gates and record evidence | all |
 
@@ -158,17 +159,17 @@ Acceptance criteria (all must pass with recorded evidence):
 
 1. Migrations `0087…0090` apply cleanly with Drizzle mirror parity; all 12 new tables
    have `ENTITY_CATALOG.md` rows (CR-36a).
-2. The NCR → CAPA lifecycle runs end-to-end: NCR closure requires a disposition (BR-071);
+2. The NCR → CAPA lifecycle runs end-to-end: NCR closure requires a disposition (BR-101);
    CAPA closure requires the effectiveness check recorded after the action due date
-   (BR-072); golden tests G-63 (scrap write-off) and G-64 (external quality cost) post
+   (BR-102); golden tests G-62 (scrap write-off) and G-63 (external quality cost) post
    balanced entries through the posting engine.
-3. INV-034 holds: any issue/ship document line referencing a batch with an active
+3. INV-035 holds: any issue/ship document line referencing a batch with an active
    quality hold is rejected server-side on every baseline path (sales delivery,
    inventory issue, and any 044 picking path when delivered); release requires a
-   disposition-linked record (BR-070).
+   disposition-linked record (BR-100).
 4. COA generation produces a certificate from inspection results against the item's
    specification, blocked unless every parameter is within tolerance or carries an
-   accepted-deviation NCR reference (BR-073); the print renders bilingual AR/EN with
+   accepted-deviation NCR reference (BR-103); the print renders bilingual AR/EN with
    RTL correctness.
 5. SPC charts compute correctly on known datasets (X-bar/R, Cp/Cpk) with out-of-control
    points flagged; property tests cover the math.
@@ -189,7 +190,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 7. Risks and Constraints
 
 - **Enforcement drift** — a new issue path added later could bypass the hold check:
-  mitigated by a single shared validation service plus the INV-034 invariant test wired
+  mitigated by a single shared validation service plus the INV-035 invariant test wired
   into the document-validation test suite every path must extend.
 - **SPC math correctness** — wrong control limits silently mislead: mitigated by property
   tests against reference datasets and pinned formulas documented in the phase report.
@@ -202,7 +203,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-050-COMPLETION.md`
-  (evidence per acceptance criterion, G-63/G-64 transcripts, the INV-034 blocking test
+  (evidence per acceptance criterion, G-62/G-63 transcripts, the INV-035 blocking test
   matrix, SPC reference-dataset results).
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-050 row → COMPLETE; `NEXT_ACTION.md`
   → next eligible phase PHASE-051 (Foreign Trade & Logistics); unconnected Wave-2

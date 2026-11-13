@@ -29,7 +29,7 @@
   PHASE-041، وواجهة API لنقاط بيع خارجية تدفع الجلسات برموزٍ محدودة النطاق، وطبقة
   عتادة الكاشير: طابعات حرارية ESC/POS عبر WebUSB/WebSerial وجسر سطح المكتب، وفتح
   درج النقدية، وشاشة عرض العميل، وتكامل الموازين بتحليل باركود الوزن EAN-13 الذي
-  يُكمل أخيراً تدفّق وزن البقالة — تحت القيود الذهبية G-78/G-79 والثابت INV-043.
+  يُكمل أخيراً تدفّق وزن البقالة — تحت القيود الذهبية G-77/G-78 والثابت INV-044.
 
 ## 2. Scope
 
@@ -62,8 +62,8 @@ In scope:
    bridge/ESC-POS path; label template design stays with PHASE-062 (the honest split
    is recorded — hardware here, templates there).
 8. **Retail accounting discipline**: loyalty points liability and gift card
-   liability mapping with period-close checks — goldens G-78 (loyalty ledger balance:
-   earned = redeemed + expired + outstanding per account) and G-79 (gift card
+   liability mapping with period-close checks — goldens G-77 (loyalty ledger balance:
+   earned = redeemed + expired + outstanding per account) and G-78 (gift card
    liability GL balance equals Σ outstanding gift-card balances at close).
 
 Out of scope: label template design (062) · carrier/shipment integrations (056) ·
@@ -103,16 +103,16 @@ send path would violate the channel-port discipline the platform already decided
 - **Docs:** `NAVIGATION_MODEL.md` (POS group entries) · `POS_RETAIL.md` (loyalty
   program design, gift card liability accounting, hardware setup, scale prefix
   rules, external API contract) · `JOURNAL_RULES.md` and `ACCOUNTING_INVARIANTS.md`
-  updated for G-78/G-79/INV-043 · `BUSINESS_RULES.md` rows for earn rules and
+  updated for G-77/G-78/INV-044 (reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-78/G-79/INV-043 predate the 044 wave's consumption of those slots) · `BUSINESS_RULES.md` rows for earn rules and
   expiry sweeps.
 - **Reports:** +2 code-level contracts — `pos.loyalty-activity` (enrollment, earn/
   redeem/expiry flows) and `pos.gift-card-liability` (outstanding balances roll);
   catalog rows mandatory.
 - **Feature flags:** `pos.retail_suite` — template-composable grant for
   retail-facing industry templates first (CR-36 f).
-- **Goldens and invariants:** G-78 (loyalty ledger balance per account: earned =
-  redeemed + expired + outstanding, at every sweep) · G-79 (gift card liability GL
-  balance equals Σ outstanding gift-card balances at period close) · INV-043 (gift
+- **Goldens and invariants:** G-77 (loyalty ledger balance per account: earned =
+  redeemed + expired + outstanding, at every sweep) · G-78 (gift card liability GL
+  balance equals Σ outstanding gift-card balances at period close) · INV-044 (gift
   card balance can never be negative — redemption cannot exceed the remaining
   balance, and offline-synced redemptions are re-validated server-side with
   automatic reversal on over-spend).
@@ -126,10 +126,10 @@ send path would violate the channel-port discipline the platform already decided
 | Task | Description | Layer |
 |---|---|---|
 | T-01 | Migrations (≈0129…0131) + Drizzle mirror + `ENTITY_CATALOG.md` rows | api |
-| T-02 | Loyalty core: programs, accounts, earn/redeem engine with source-document links (G-78 ledger tests) | api |
+| T-02 | Loyalty core: programs, accounts, earn/redeem engine with source-document links (G-77 ledger tests) | api |
 | T-03 | Loyalty expiry sweep job + tier evaluation + customer tier display | jobs |
-| T-04 | Gift cards: issue/top-up/redeem/expire ledger + POS tender integration (INV-043 tests) | api |
-| T-05 | Gift card liability accounting: deferred-revenue mapping + close reconciliation (G-79 golden) | api |
+| T-04 | Gift cards: issue/top-up/redeem/expire ledger + POS tender integration (INV-044 tests) | api |
+| T-05 | Gift card liability accounting: deferred-revenue mapping + close reconciliation (G-78 golden) | api |
 | T-06 | E-receipt dispatch through the 041 channel ports + checkout toggle + dispatch records | api |
 | T-07 | External POS API: `pos_api_tokens` auth, order-push endpoint with idempotency, payload contract + tests | api |
 | T-08 | ESC/POS printer service over WebUSB/WebSerial + desktop-bridge fallback + receipt/test print | web |
@@ -147,13 +147,13 @@ Acceptance criteria (all must pass with recorded evidence):
 
 1. A loyalty program with seeded earn rules accrues points on a POS checkout and on
    an invoice, redeems at a later checkout, and the per-account ledger satisfies
-   G-78 exactly (earned = redeemed + expired + outstanding) after an expiry sweep.
+   G-77 exactly (earned = redeemed + expired + outstanding) after an expiry sweep.
 2. A gift card is issued, topped up, redeemed partially, and expired on schedule;
-   every redemption is bounded by the remaining balance (INV-043 negative-balance
+   every redemption is bounded by the remaining balance (INV-044 negative-balance
    test passes, including a forced offline-sync over-spend that auto-reverses
    server-side).
 3. At period close, the gift card liability GL balance equals Σ outstanding
-   gift-card balances (G-79 golden run green) and the loyalty points liability
+   gift-card balances (G-78 golden run green) and the loyalty points liability
    valuation posts per the documented rate policy.
 4. An e-receipt is dispatched by email and by WhatsApp through the PHASE-041
    channel ports with the checkout toggle honored; dispatch records (status,
@@ -182,7 +182,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 7. Risks and Constraints
 
 - **Offline double-spend on gift cards and points** — offline POS sessions can
-  redeem balances they cannot see. Mitigated by INV-043's server-side re-validation
+  redeem balances they cannot see. Mitigated by INV-044's server-side re-validation
   with automatic reversal, an offline balance ceiling per session, and the OA-02
   assessment documenting the residual risk honestly.
 - **Hardware matrix fragmentation** — WebUSB/WebSerial support varies by browser
@@ -193,7 +193,7 @@ Acceptance criteria (all must pass with recorded evidence):
   and decimals per produce type. Mitigated by configurable prefix rules per tenant
   with a parsing test matrix instead of hard-coded assumptions.
 - **Liability accounting drift** — loyalty and gift card liabilities can silently
-  diverge from the ledgers. Mitigated by G-78/G-79 as close-cycle goldens with
+  diverge from the ledgers. Mitigated by G-77/G-78 as close-cycle goldens with
   reconciliation reports and a checklist entry at period close.
 - **WhatsApp receipt template approval** — receipt templates are transactional but
   still subject to provider policy. Mitigated by per-channel capability flags and
@@ -202,8 +202,8 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-061-COMPLETION.md`
-  (evidence per acceptance criterion, hardware test transcripts, G-78/G-79 golden
-  outputs, INV-043 test output including the offline over-spend reversal, gate
+  (evidence per acceptance criterion, hardware test transcripts, G-77/G-78 golden
+  outputs, INV-044 test output including the offline over-spend reversal, gate
   outputs).
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-061 row → COMPLETE; `NEXT_ACTION.md`
   points to the next eligible phase PHASE-062 (UX Excellence & Document Design) per

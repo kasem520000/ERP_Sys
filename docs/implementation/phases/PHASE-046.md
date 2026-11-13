@@ -68,7 +68,7 @@ In scope:
    invent a new one.
 6. **Variable-line consumption** (feeds from PHASE-045): overtime / absence / late
    feeds land as variable lines with multiplier application at run time; leave
-   encashment rides the G-52 settlement delivered in PHASE-045.
+   encashment rides the G-51 settlement delivered in PHASE-045.
 7. **GOSI integration profile** (IN-06): remittance-ready exports (file + report)
    with the contribution breakdown per employee, plus the integration profile
    configuration surface — readiness only, no live government API claims (exports +
@@ -123,11 +123,12 @@ payroll goldens — the 029 regression packs must stay green throughout.
 - **Reports**: +2 contracts into `REPORT_CATALOG.md`
   (`payroll.statutory-summary`, `payroll.eosb-liability`); catalog ↔ registry
   reconciliation check extended.
-- **Posting canon**: goldens G-53 (statutory accrual — employee share withheld to a
-  statutory payable with the remittance settlement leg), G-54 (employer contribution
-  expense), G-55 (EOSB true-up — provision delta only) added to `JOURNAL_RULES.md`
-  §7 as the extension of the G-29 family; invariant INV-031 (statutory exactness)
-  added to `ACCOUNTING_INVARIANTS.md`; BR-071…BR-073 added to
+- **Posting canon** (reservations re-coordinated 2026-11-13 per
+  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-53…G-55/INV-031/BR-071…073 predate the 039–042/044 waves' consumption of those slots; the references to 045's delivery follow its re-coordinated G-51): goldens G-52 (statutory accrual — employee share withheld to a
+  statutory payable with the remittance settlement leg), G-53 (employer contribution
+  expense), G-54 (EOSB true-up — provision delta only) added to `JOURNAL_RULES.md`
+  §7 as the extension of the G-29 family; invariant INV-032 (statutory exactness)
+  added to `ACCOUNTING_INVARIANTS.md`; BR-084…BR-086 added to
   `BUSINESS_RULES.md`.
 - **Feature flags**: `payroll.statutory.*`, `payroll.eosb.*` — template-composable
   grants (CR-36 (f)); enabled by market/jurisdiction configuration rather than plan
@@ -150,10 +151,10 @@ payroll goldens — the 029 regression packs must stay green throughout.
 |---|---|---|
 | T-01 | Author migrations ≈ 0089…0093 (statutory profiles + verification records, PIT brackets, EOSB rules, EOSB calculations, run/line extension, seeds incl. verified GOSI + REQUIRES_VERIFICATION profiles) + journal/spec updates | api |
 | T-02 | Drizzle mirrors, `ENTITY_CATALOG.md` rows, RLS policies + attack tests A1–A10 for the four new tables | api |
-| T-03 | Statutory profile service: effective-dated resolution, wage-base component mapping, cap clamps, fail-closed REQUIRES_VERIFICATION gate (BR-071) | api |
+| T-03 | Statutory profile service: effective-dated resolution, wage-base component mapping, cap clamps, fail-closed REQUIRES_VERIFICATION gate (BR-084) | api |
 | T-04 | PIT withholding engine: bracket resolution per period, exemption fields, marginal computation, rounding discipline | api |
-| T-05 | Payroll run integration: statutory line types computed during the run, G-53/G-54 postings through the G-29 machinery, remittance liability tracking (BR-072) | api |
-| T-06 | EOSB engine: tier resolution per rules, per-employee entitlement calculations (event + period runs), provision delta true-up (G-55), reconciliation view vs the 029 provision balance (BR-073) | api |
+| T-05 | Payroll run integration: statutory line types computed during the run, G-52/G-53 postings through the G-29 machinery, remittance liability tracking (BR-085) | api |
+| T-06 | EOSB engine: tier resolution per rules, per-employee entitlement calculations (event + period runs), provision delta true-up (G-54), reconciliation view vs the 029 provision balance (BR-086) | api |
 | T-07 | Variable-line consumption: overtime/absence/late feeds from PHASE-045 as run-time variable lines with multiplier application; encashment via G-52 | api |
 | T-08 | GOSI remittance export (file + report) + integration profile readiness surface (IN-06) | api |
 | T-09 | Verification workflow: verify action (permission + audit), status flip REQUIRES_VERIFICATION → VERIFIED, verification register doc | api |
@@ -161,8 +162,8 @@ payroll goldens — the 029 regression packs must stay green throughout.
 | T-11 | Build `/payroll/eosb` (calculations, true-up, reconciliation view) + payroll run screen extension (statutory lines per employee) | web |
 | T-12 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-13 | Implement the 2 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-14 | Golden suites G-53/G-54/G-55 with failure packs + the 029 regression packs re-run (G-29/G-30/G-31 stay green); INV-031 suite (rate × base ≤ cap, totals equality, true-up delta exactness); BR-071…073 guards | api |
-| T-15 | Docs: JOURNAL_RULES §7 rows, ACCOUNTING_INVARIANTS INV-031, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, statutory verification register, entitlements note | docs |
+| T-14 | Golden suites G-52/G-53/G-54 with failure packs + the 029 regression packs re-run (G-29/G-30/G-31 stay green); INV-032 suite (rate × base ≤ cap, totals equality, true-up delta exactness); BR-084…073 guards | api |
+| T-15 | Docs: JOURNAL_RULES §7 rows, ACCOUNTING_INVARIANTS INV-032, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, statutory verification register, entitlements note | docs |
 | T-16 | Run full local gates + OA-06 EXPLAIN budgets (bracket resolution, EOSB calculation queries); record evidence | all |
 
 ## 6. Verification
@@ -172,20 +173,20 @@ Acceptance criteria (all must pass with recorded evidence):
 1. Migrations ≈ 0089…0093 apply cleanly; Drizzle mirrors + `ENTITY_CATALOG.md` parity
    for all 4 tables (CR-36 (a)); RLS attack tests A1–A10 pass for every new tenant
    table (CR-36 (e)).
-2. INV-031 holds: every statutory line equals rate × wage base with cap clamps
+2. INV-032 holds: every statutory line equals rate × wage base with cap clamps
    applied exactly (no line above the capped maximum); payroll run statutory totals
    equal Σ statutory lines; the true-up delta equals recalculated entitlement minus
    the standing provision balance exactly.
 3. The fail-closed gate is proven: a run that selects a REQUIRES_VERIFICATION profile
-   is rejected with a typed error and an audit event (BR-071); the UAE / Egypt /
+   is rejected with a typed error and an audit event (BR-084); the UAE / Egypt /
    Jordan profiles cannot post until the verify action (permission + audit) flips
    them; the GOSI profile posts out of the box on a KSA tenant fixture.
-4. Golden G-53 green: the run posts employee shares withheld to the statutory
+4. Golden G-52 green: the run posts employee shares withheld to the statutory
    payable (extending G-29's line set) and the remittance settlement leg clears it
    through the payout machinery; failure pack red for each wrong shape.
-5. Golden G-54 green: the employer share posts to the employer contribution expense
+5. Golden G-53 green: the employer share posts to the employer contribution expense
    purpose (the G-29 account family) with the liability leg; failure pack red.
-6. Golden G-55 green: the EOSB true-up posts only the delta against the existing
+6. Golden G-54 green: the EOSB true-up posts only the delta against the existing
    provision; a fixture where the provision exceeds the recalculated entitlement
    posts the release leg; the 029 regression packs (G-29/G-30/G-31) stay green.
 7. PIT withholding: progressive brackets compute correctly over fixtures (marginal
@@ -193,7 +194,7 @@ Acceptance criteria (all must pass with recorded evidence):
    explicit, never absorbed.
 8. Variable lines: overtime / absence / late feeds from PHASE-045 land as run
    variable lines with multipliers applied at run time; encashment settles through
-   G-52; nothing writes financial records outside a payroll run (BR-072).
+   G-51; nothing writes financial records outside a payroll run (BR-085).
 9. All house gates green: typecheck · lint · boundaries · unit tests ·
    `docs:validate` · i18n parity · permissions drift equality · manifests; OA-06
    budgets met; sync-surface assessment N/A-recorded (CR-36 (g)).
@@ -214,7 +215,7 @@ Acceptance criteria (all must pass with recorded evidence):
 - **EOSB true-up against a hand-managed provision** — existing tenants carry manual
   provision balances that may disagree with the computed entitlement: mitigated by
   the reconciliation view, an explicit opening-true-up posting on first adoption,
-  and delta-only postings thereafter (BR-073).
+  and delta-only postings thereafter (BR-086).
 - **PIT and EOSB variability across jurisdictions** — laws differ and change:
   mitigated by effective-dated data-driven tables (no hard-coded math beyond the
   engine), exemption fields as data, and the same verification regime for brackets

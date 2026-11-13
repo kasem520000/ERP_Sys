@@ -37,24 +37,24 @@ In scope:
 
 1. **Maintenance work orders (FA-F-02, H-15)**: `maintenance_work_orders` — status
    REQUESTED→PLANNED→IN_PROGRESS→ON_HOLD→COMPLETED, problem/solution text, priority,
-   assigned technician, and labor/parts/external cost totals; completion posts G-60
+   assigned technician, and labor/parts/external cost totals; completion posts G-59
    (maintenance expense) through the posting engine.
 2. **Preventive plans (FA-F-01, FA-F-03)**: `maintenance_plans` — trigger CALENDAR (by
    interval in days) or METER (by reading delta on a chosen meter); plan evaluation
    creates work orders automatically, at most one open order per asset per trigger
-   window (BR-066).
+   window (BR-096).
 3. **Plan checklists (FA-F-03)**: `maintenance_plan_tasks` — checklist steps carried
    onto generated work orders with per-step results; a work order cannot complete with
-   open steps (BR-067).
+   open steps (BR-097).
 4. **Asset meters (FA-F-05)**: `asset_meters` (type HOURS/KM/PRODUCTION/CUSTOM, unit,
    last reading) + `asset_meter_readings` (value, date, source MANUAL/JOB/IMPORT) — the
    readings log that drives METER triggers and usage views.
 5. **Spare-parts BOM (FA-F-04)**: `asset_spares` — spare item + qty per asset; work-order
-   parts lines draw from the BOM; consumption posts as an inventory issue (G-61) under
-   the existing no-negative-stock discipline (BR-068).
+   parts lines draw from the BOM; consumption posts as an inventory issue (G-60) under
+   the existing no-negative-stock discipline (BR-098).
 6. **Asset transfers (FA-F-07)**: `asset_transfers` — from/to branch, reason, approval;
    on approval the GL reclassification moves net book value between branch cost centers
-   (G-62), posted exactly once (BR-069).
+   (G-61), posted exactly once (BR-099).
 7. **Asset tags (FA-F-06)**: `asset_tags` — QR/barcode generation (unguessable signed
    codes), print sheet, and a scan surface that resolves the code to the asset card.
 8. **Asset card extensions (FA-F-08, FA-F-09, F-11, F-12, F-13)**: `warranty_expiry`,
@@ -63,7 +63,7 @@ In scope:
    tracking via a parent-asset link — components carry their own meters and spares and
    roll up into the parent's history.
 9. **Integration & alerts**: work-order costs post to GL via the posting engine
-   (maintenance expense, G-60); spares consumption = inventory issue (G-61); meter
+   (maintenance expense, G-59); spares consumption = inventory issue (G-60); meter
    readings trigger plan evaluation; a daily `asset-expiry-sweep` job fires 30/7/0-day
    alerts for warranty, insurance and license expiries.
 10. **Fleet light — vehicle documents + odometer** (**R-10 — added by v3.2/CR-50**,
@@ -125,11 +125,12 @@ without it
 - **Feature flags**: `assets.maintenance`, `assets.transfer` — template-composable
   grants (CR-36f); automotive-workshop, rental-logistics, healthcare and
   food-manufacturing templates compose them by default.
-- **Posting rules**: `JOURNAL_RULES.md` gains G-60 (work-order completion → maintenance
-  expense: labor + parts + external, asset cost untouched), G-61 (spares consumption →
-  inventory issue posting), G-62 (asset transfer approval → NBV reclassification between
-  branch cost centers); `ACCOUNTING_INVARIANTS.md` gains INV-033 (work-order cost
-  integrity); `BUSINESS_RULES.md` gains BR-066…BR-069.
+- **Posting rules** (reservations re-coordinated 2026-11-13 per
+  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-60…G-62/INV-033/BR-066…069 predate the 037–042/044 waves' consumption of those slots): `JOURNAL_RULES.md` gains G-59 (work-order completion → maintenance
+  expense: labor + parts + external, asset cost untouched), G-60 (spares consumption →
+  inventory issue posting), G-61 (asset transfer approval → NBV reclassification between
+  branch cost centers); `ACCOUNTING_INVARIANTS.md` gains INV-034 (work-order cost
+  integrity); `BUSINESS_RULES.md` gains BR-096…BR-099.
 - **Jobs**: `asset-expiry-sweep` (daily) + meter-trigger plan evaluation (event-driven on
   reading insert) on the existing pg-boss queue.
 - **Docs**: `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`, `NAVIGATION_MODEL.md`,
@@ -149,19 +150,19 @@ without it
 | T-02 | Migration `0084` (meters, readings log, spares BOM, tags) | api |
 | T-03 | Migration `0085` (asset transfers with approval) | api |
 | T-04 | Migration `0086` (assets expiry columns + grouping + DATA-ONLY grants) | api |
-| T-05 | Work-order API: status machine, cost collectors (labor/parts/external), completion gate (BR-067) | api |
-| T-06 | G-60 posting rule: maintenance expense on completion, idempotent, via posting engine | api |
-| T-07 | Plans API: CALENDAR/METER triggers, single-open-per-window (BR-066), checklist carry-over | api |
+| T-05 | Work-order API: status machine, cost collectors (labor/parts/external), completion gate (BR-097) | api |
+| T-06 | G-59 posting rule: maintenance expense on completion, idempotent, via posting engine | api |
+| T-07 | Plans API: CALENDAR/METER triggers, single-open-per-window (BR-096), checklist carry-over | api |
 | T-08 | Meters API: readings log with monotonic-value validation, last-reading snapshot, trigger evaluation | api |
-| T-09 | Spares API: BOM maintenance, parts lines → inventory issue posting G-61 (BR-068) | api |
-| T-10 | Transfers API: approval flow + G-62 NBV reclassification posted exactly once (BR-069) | api |
+| T-09 | Spares API: BOM maintenance, parts lines → inventory issue posting G-60 (BR-098) | api |
+| T-10 | Transfers API: approval flow + G-61 NBV reclassification posted exactly once (BR-099) | api |
 | T-11 | Tags: signed code generation, print sheet, scan resolution route | api |
 | T-12 | `asset-expiry-sweep` job (30/7/0) + notifications | api |
 | T-13 | `/assets/maintenance` screen (orders board + plans admin + checklist entry) | web |
 | T-14 | `/assets/meters` and `/assets/transfers` screens + QR scan surface | web |
 | T-15 | Asset card extension: history timeline, expiry chips, components, cost-center grouping | web |
 | T-16 | Report contracts ×4 + `REPORT_CATALOG.md` rows + catalog↔registry check extension | api |
-| T-17 | Golden tests G-60…G-62 + INV-033 test + RLS attack tests A1–A10 + OA-06 budgets on readings/boards | api |
+| T-17 | Golden tests G-59…G-61 + INV-034 test + RLS attack tests A1–A10 + OA-06 budgets on readings/boards | api |
 | T-18 | Docs: catalog/invariants/journal-rules/business-rules/navigation updates | docs |
 | T-19 | Run full local gates and record evidence | all |
 
@@ -173,16 +174,16 @@ Acceptance criteria (all must pass with recorded evidence):
    the `assets` column family have `ENTITY_CATALOG.md` rows (CR-36a).
 2. The work-order status machine enforces REQUESTED→PLANNED→IN_PROGRESS→ON_HOLD→
    COMPLETED transitions only; completion is blocked while checklist steps are open
-   (BR-067) or cost lines are unposted.
-3. Golden tests pass: G-60 posts maintenance expense (labor + parts + external) on
-   completion with the asset's cost and depreciation untouched; G-61 posts spares
-   consumption as a balanced inventory issue; G-62 reclassifies NBV between branch cost
+   (BR-097) or cost lines are unposted.
+3. Golden tests pass: G-59 posts maintenance expense (labor + parts + external) on
+   completion with the asset's cost and depreciation untouched; G-60 posts spares
+   consumption as a balanced inventory issue; G-61 reclassifies NBV between branch cost
    centers on transfer approval — all idempotent through the posting engine.
-4. INV-033 holds: per work order, the GL maintenance expense equals the sum of its labor,
+4. INV-034 holds: per work order, the GL maintenance expense equals the sum of its labor,
    parts and external source lines to the cent; no posting occurs before completion.
 5. Preventive plans behave: a CALENDAR plan generates on its day interval; a METER plan
    generates when the reading delta crosses its threshold; at most one open order per
-   asset per trigger window (BR-066); back-dated readings cannot double-trigger.
+   asset per trigger window (BR-096); back-dated readings cannot double-trigger.
 6. Meter readings validate monotonically per meter with an effective-date order; the
    last-reading snapshot and usage views reconcile with the log.
 7. Asset tags: generated codes are unguessable and unique; scanning resolves to the
@@ -201,11 +202,11 @@ Acceptance criteria (all must pass with recorded evidence):
 
 - **Meter data quality** — out-of-order and back-dated readings can corrupt trigger
   evaluation: mitigated by monotonic-value validation, effective-date semantics and the
-  single-open rule (BR-066).
+  single-open rule (BR-096).
 - **Spare BOM drift** — BOM lines pointing at discontinued items break parts picking:
   mitigated by foreign keys into the item master and validation at BOM save time.
 - **Transfer GL mapping** — branches without a mapped maintenance/cost-center account
-  would break G-62: mitigated by a mapping check before posting and a clear error
+  would break G-61: mitigated by a mapping check before posting and a clear error
   surface.
 - **Tag security** — guessable QR codes would let outsiders probe asset records:
   mitigated by signed unguessable codes and the standard auth + RLS stack on resolution.
@@ -213,7 +214,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-049-COMPLETION.md`
-  (evidence per acceptance criterion, the three golden test transcripts, INV-033
+  (evidence per acceptance criterion, the three golden test transcripts, INV-034
   reconciliation output, sweep log).
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-049 row → COMPLETE; `NEXT_ACTION.md`
   → next eligible phase PHASE-050 (Quality Management System); unconnected Wave-2

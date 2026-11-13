@@ -33,14 +33,14 @@ In scope:
    profile — computed bases over the GL with rate profiles sourced only from the
    verified compliance matrices; unverified jurisdictions run in worksheet mode and
    refuse to post (REQUIRES_VERIFICATION, no fabricated rates); provisions post as
-   balanced accrual journals (G-72). Line detail in `tax_provision_lines`.
+   balanced accrual journals (G-71). Line detail in `tax_provision_lines`.
 2. **Zakat declaration worksheet** (X-06): the KSA base computation (Zakat base
    components, adjustments, final base) producing a declaration document in
-   `tax_declarations` — immutable once filed (INV-038).
+   `tax_declarations` — immutable once filed (INV-039).
 3. **`withholding_tax_rules` + `withholding_certificates`** (X-03): rule-driven
    deduction at invoice posting (rate per partner/jurisdiction/nature), certificate
    issuance, and a WHT payable liability that always balances the deducted amounts
-   (G-73).
+   (G-72).
 4. **Excise positions and stamp duty registers** (X-04, X-05): `excise_positions`
    for excise-tagged items and `stamp_duty_registers` for stamped documents, both
    feeding declarations.
@@ -148,7 +148,8 @@ chain, and the GATE discipline must survive the transition from stub to client.
   ZATCA dashboard, rejection triage); parity check extended.
 - **Docs**: `TAX_ENGINE.md`, `COUNTRY_PACKS.md`, `E_INVOICING_ARCHITECTURE.md`
   (Phase-2), compliance-matrix `sa.md`/`eg.md` + `verification-log.md`,
-  `JOURNAL_RULES.md` (G-72/G-73), `ACCOUNTING_INVARIANTS.md` (INV-038),
+  `JOURNAL_RULES.md` (G-71/G-72 — reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-72/G-73/INV-038 predate the 044 wave's consumption of those slots),
+  `ACCOUNTING_INVARIANTS.md` (INV-039),
   `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`, `FEATURE_CATALOG.md`,
   `NAVIGATION_MODEL.md`, decision records for provider verification gates.
 - **Reports**: +5 contracts — `tax.provision-summary`, `tax.withholding-statement`,
@@ -169,9 +170,9 @@ chain, and the GATE discipline must survive the transition from stub to client.
 |---|---|---|
 | T-01 | Author migrations 0101–0104 + journal/spec updates | api |
 | T-02 | Drizzle mirrors + `ENTITY_CATALOG.md` rows + RLS policies + attack tests A1–A10 | api |
-| T-03 | CIT provision engine: jurisdiction profiles from verified matrices, worksheet mode for unverified, G-72 posting | api |
-| T-04 | Zakat worksheet (KSA base computation) + declaration document lifecycle with INV-038 immutability | api |
-| T-05 | WHT rules engine: deduction at posting, certificates, G-73 payable balance | api |
+| T-03 | CIT provision engine: jurisdiction profiles from verified matrices, worksheet mode for unverified, G-71 posting | api |
+| T-04 | Zakat worksheet (KSA base computation) + declaration document lifecycle with INV-039 immutability | api |
+| T-05 | WHT rules engine: deduction at posting, certificates, G-72 payable balance | api |
 | T-06 | Excise positions + stamp duty registers feeding declarations | api |
 | T-07 | Tax calendar + obligations tracker with reminders | api |
 | T-08 | Multi-year tax statements + transfer-pricing extracts (dimension filters from 053) | api |
@@ -182,7 +183,7 @@ chain, and the GATE discipline must survive the transition from stub to client.
 | T-13 | Egypt ETA adapter under GATE discipline (stub-until-verified) + `eta_submissions` pipeline | api |
 | T-14 | Screens: `/tax/provisions`, `/tax/calendar`, `/tax/declarations` with AR/EN parity and RTL | web |
 | T-15 | Screens: audit-file export wizard + ZATCA dashboard (submission pipeline, rejection triage, CSID status) | web |
-| T-16 | Docs: tax/e-invoicing/compliance-matrix updates + goldens G-72/G-73 + INV-038 + decision records | docs |
+| T-16 | Docs: tax/e-invoicing/compliance-matrix updates + goldens G-71/G-72 + INV-039 + decision records | docs |
 | T-17 | Run full local gates (typecheck/lint/boundaries/tests/docs/i18n parity/permissions drift/manifests) and record evidence | all |
 
 ## 6. Verification
@@ -192,13 +193,13 @@ Acceptance criteria (all must pass with recorded evidence):
 1. Migrations 0101–0104 apply cleanly; Drizzle mirrors and `ENTITY_CATALOG.md` rows
    present; RLS attack tests A1–A10 pass for all twelve new tables.
 2. A CIT provision run over a seeded jurisdiction with a verified rate profile posts a
-   balanced accrual journal (G-72); the same run against an unverified jurisdiction
+   balanced accrual journal (G-71); the same run against an unverified jurisdiction
    stays in worksheet mode and refuses to post — REQUIRES_VERIFICATION honored, zero
    fabricated rates in the codebase (grep check).
 3. The Zakat worksheet computes the KSA base from seeded GL data; the resulting
-   declaration is immutable once filed (INV-038 invariant test).
+   declaration is immutable once filed (INV-039 invariant test).
 4. WHT: a rule-matched invoice deducts at posting, issues a certificate, and the WHT
-   payable liability equals the sum of deductions (G-73) across the seeded fixture
+   payable liability equals the sum of deductions (G-72) across the seeded fixture
    set.
 5. The tax calendar tracks obligations per jurisdiction with reminders and completion
    states — G-08 closed; the multi-year statement and transfer-pricing extract

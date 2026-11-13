@@ -29,7 +29,7 @@
   (GDPR/CCPA) بإتمام تصدير/إخفاء موثّق، وإدارة موافقات التسويق، وسياسات استبقاء
   بأولوية الحجز القانوني، ووحدة تدقيق داخلي بسجل مخاطر، ومحرك كشف احتيال يغذّي طابور
   حالات، ومصفوفة فصل مهام حقيقية، وأسطح تدقيق على مستوى الحقل، وتوقيع إلكتروني بأثر
-  تدقيقي — كل ذلك تحت الثابت INV-041: لا حذف مادي لسجلات مالية، بل إخفاء هوية مع
+  تدقيقي — كل ذلك تحت الثابت INV-042: لا حذف مادي لسجلات مالية، بل إخفاء هوية مع
   حفظ سلامة القيد.
 
 ## 2. Scope
@@ -166,7 +166,7 @@ this phase consumes is already delivered and on the "do not touch" list.
   with SLA aging) and `governance.fraud-case-summary`; catalog rows mandatory.
 - **Feature flags:** `identity.enterprise_sso` and `governance.suite` —
   template-composable grants, enterprise-first entitlement migration (CR-36 f).
-- **Invariants:** INV-041 (new) — ledger-preserving erasure and legal-hold supremacy:
+- **Invariants:** INV-042 (new — reservation re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md), the plan's INV-041 predates the 044 wave) — ledger-preserving erasure and legal-hold supremacy:
   DSR erase fulfillment and retention automation must never hard-delete
   journal-bearing financial records; they anonymize PII while preserving posting
   integrity, and a legal hold blocks both. Enforced by an invariant test plus a
@@ -188,7 +188,7 @@ this phase consumes is already delivered and on the "do not touch" list.
 | T-07 | Session management center (list/revoke) + field-level audit surfaces over `audit_events` | web |
 | T-08 | DSR register: intake → verification → export/erase fulfillment workflows + SLA clocks + audit | api |
 | T-09 | Consent records + channel-send suppression hook (041 ports) | api |
-| T-10 | Retention policies: dry-run preview + automation job + legal-hold override + INV-041 tests | jobs |
+| T-10 | Retention policies: dry-run preview + automation job + legal-hold override + INV-042 tests | jobs |
 | T-11 | Internal audit programs, risk register, fraud rules engine + case queue | api/jobs |
 | T-12 | SoD rules: conflict evaluation at role grant + exception approval path | api |
 | T-13 | E-signature: requests + append-only events + document/report hash verification + signer flow | api |
@@ -212,7 +212,7 @@ Acceptance criteria (all must pass with recorded evidence):
    `identity.mfa_policy` set to required, a non-MFA login is blocked and the
    exception list is honored; the session center lists and revokes sessions.
 5. A DSR access request produces a complete per-subject export; an erase request
-   anonymizes PII while INV-041 holds — journal-bearing records remain posted and
+   anonymizes PII while INV-042 holds — journal-bearing records remain posted and
    balanced, and a legal-held entity is untouched by the retention job.
 6. The fraud rules engine fires on seeded GL/user-behavior heuristics and opens
    auditable cases; the case queue shows investigation states and disposition.
@@ -240,7 +240,7 @@ Acceptance criteria (all must pass with recorded evidence):
   auto-provision accounts. Mitigated by mandatory domain verification before SSO
   activation and an explicit allowlist in the JIT rules.
 - **Retention automation destroying financial truth** — the highest-consequence risk
-  in the phase. Mitigated by INV-041 as a hard invariant, dry-run previews with
+  in the phase. Mitigated by INV-042 as a hard invariant, dry-run previews with
   counts, legal-hold override, and a golden close-cycle test that must stay green.
 - **E-signature legal weight overstatement** — this is audit-grade e-signature, not
   a qualified trust-service signature. Mitigated by explicit wording in the UI,
@@ -251,7 +251,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-058-COMPLETION.md`
-  (evidence per acceptance criterion, IdP/SCIM test transcripts, INV-041 test output,
+  (evidence per acceptance criterion, IdP/SCIM test transcripts, INV-042 test output,
   governance operating notes, gate outputs).
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-058 row → COMPLETE; `NEXT_ACTION.md`
   points to the next eligible phase PHASE-059 (Platform Operations & Trust) per

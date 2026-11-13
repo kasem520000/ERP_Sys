@@ -96,9 +96,9 @@ In scope:
    (with per-field confidence + the human-confirmation gate, exactly as the upload
    path). The intake address rides the 041 channel substrate (inbound email
    provider behind the provider-port); every intake event is audited; spam/bounce
-   handling documented. No auto-posting — INV-044 governs this path identically.
+   handling documented. No auto-posting — INV-045 governs this path identically.
 
-Out of scope: any AI write path to posted records (excluded by INV-044) · auto-approval or
+Out of scope: any AI write path to posted records (excluded by INV-045) · auto-approval or
 auto-matching that bypasses human confirmation · AI-generated financial advice or
 automated decisioning on credit/limits · public/model training on tenant data (contract
 term in the adapter port, not a feature) · marketing-website content generation ·
@@ -134,7 +134,7 @@ weeks**.
   matrix rows). **Permission scoping is dual**: the feature key gates the surface, and
   every tool call re-checks the acting user's own data permissions — a user without AR
   read cannot pull a customer statement through the copilot.
-- **Invariants:** **INV-044 — AI guardrail invariants** added to
+- **Invariants:** **INV-045 — AI guardrail invariants** (reservation re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md), the plan's INV-044 predates the 044 wave) added to
   `ACCOUNTING_INVARIANTS.md`: (1) no AI subsystem holds posting authority — AI output that
   would mutate financial records is staged as a draft or suggestion only; (2) human
   confirmation is mandatory and executes under the confirming user's own permissions and
@@ -146,7 +146,7 @@ weeks**.
 - **Reports:** +1 contract — `ai.activity-report` (tenant-admin review of interactions,
   suggestions, and cost over a period), registered in `REPORT_CATALOG.md`.
 - **Docs:** `FEATURE_CATALOG.md` (ai module) · `ENTITY_CATALOG.md` ·
-  `ACCOUNTING_INVARIANTS.md` (INV-044) · `REPORT_CATALOG.md` (+1) · the architecture
+  `ACCOUNTING_INVARIANTS.md` (INV-045) · `REPORT_CATALOG.md` (+1) · the architecture
   document carrying documented non-goal #9, amended by CR-34 with a pointer to this phase
   and its guardrails · `ARCHITECTURE_RISKS_AND_OPEN_QUESTIONS.md` (model-provider
   dependency risk row) · `NAVIGATION_MODEL.md` · `IMPLEMENTATION_STATUS.md`.
@@ -175,8 +175,8 @@ weeks**.
 | T-12 | Anomaly detection on journal entries: outlier scoring → case creation feeding the 058 fraud case queue | api |
 | T-13 | Arabic report narration on report results (labeled generated narration) + PP-16 journal entry narrative from source documents | api |
 | T-14 | Voice entry assist: Arabic speech-to-text into quick forms with user confirmation | web |
-| T-15 | `ai.activity-report` contract + admin review surface; docs: FEATURE_CATALOG/ENTITY_CATALOG/INV-044/non-goal amendment/report catalog | docs |
-| T-16 | Full local gates incl. the INV-044 negative tests (permission-scoping refusal, no-auto-write, cost hard-stop, opt-in default OFF) + evidence recording | all |
+| T-15 | `ai.activity-report` contract + admin review surface; docs: FEATURE_CATALOG/ENTITY_CATALOG/INV-045/non-goal amendment/report catalog | docs |
+| T-16 | Full local gates incl. the INV-045 negative tests (permission-scoping refusal, no-auto-write, cost hard-stop, opt-in default OFF) + evidence recording | all |
 
 ## 6. Verification
 
@@ -187,8 +187,8 @@ Acceptance criteria (all must pass with recorded evidence):
    actor, tools, and disposition.
 2. **Permission-scoping negative test**: a user without the relevant data permission asks
    the copilot for a customer statement → the tool call is refused, the refusal is
-   audited, and no data leaks through the answer text (INV-044 guardrail exercised).
-3. **No-auto-write test (INV-044)**: OCR extraction and every suggester produce drafts or
+   audited, and no data leaks through the answer text (INV-045 guardrail exercised).
+3. **No-auto-write test (INV-045)**: OCR extraction and every suggester produce drafts or
    suggestions only; no test path exists where AI output reaches the posting engine
    without a human confirmation step under the confirming user's identity; postings made
    after confirmation carry the human actor, never an AI principal.
@@ -220,7 +220,7 @@ Acceptance criteria (all must pass with recorded evidence):
 - **Non-goal reversal optics** — the platform's celebrated honesty says AI was a declared
   non-goal: mitigated by carrying the reversal only through register decision CR-34,
   amending the non-goal document in the same change, defaulting opt-in OFF, and making
-  the guardrails testable invariants (INV-044) whose negative tests are acceptance
+  the guardrails testable invariants (INV-045) whose negative tests are acceptance
   criteria.
 - **Incorrect or hallucinated answers** — mitigated by the closed tool whitelist with
   source links, explicit refusal when tools are insufficient, and no free-form financial
@@ -239,7 +239,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-064-COMPLETION.md` — evidence
-  per acceptance criterion including the INV-044 negative-test output, the two-provider
+  per acceptance criterion including the INV-045 negative-test output, the two-provider
   adapter-port run, the cost hard-stop demonstration, and the CR-34 non-goal amendment.
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-064 row → COMPLETE; `NEXT_ACTION.md` →
   next eligible phase PHASE-065 (Growth Platform & Customer Success) with its

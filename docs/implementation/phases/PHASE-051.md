@@ -28,7 +28,7 @@
   وإقرارات جمركية بأسعار HS ومنشأ وكميات ورسوم تتدفق إلى توزيع التكاليف الأرضية
   القائم، وشهادات منشأ ومطابقة، وتتبّع أحداث الشحنة يحدّث حالة المستندات، وحركات
   المستودع الجمركي بمخزون معلّق الرسوم، وطلبات استرداد الرسوم — مع ترحيل هامش
-  الاعتماد ورسومه ومصاريفه وتحمل الرسوم الجمركية (G-65/G-66/G-67).
+  الاعتماد ورسومه ومصاريفه وتحمل الرسوم الجمركية (G-64/G-65/G-66).
 
 ## 2. Scope
 
@@ -37,20 +37,20 @@ In scope:
 1. **Letters of credit (L-01, H-08)**: `letters_of_credit` + `lc_amendments`
    (value/validity/document changes) + `lc_documents` (the documents checklist with
    presented/verified status and discrepancy notes); margin deposit and retirement
-   postings per G-65; expiry/discrepancy alerts at 30/14/7/1 days (BR-074).
+   postings per G-64; expiry/discrepancy alerts at 30/14/7/1 days (BR-104).
 2. **Documentary collections (L-02)**: `documentary_collections` — D/P and D/A terms,
    the documents set, status and settlement linkage.
 3. **Incoterms (L-03)**: `incoterms` registry (2020 set seeded, tenant-extensible) with
    selection on purchase and sales orders plus risk hints — the carriage/insurance/duty
-   ownership matrix shown at selection time (BR-075).
+   ownership matrix shown at selection time (BR-105).
 4. **Transport documents (L-04, L-05, L-13)**: `bills_of_lading` (sea/air/road — the
    document types cover multimodal trade) and `packing_lists` tied to shipments and
    receipts.
 5. **Customs declarations (L-06, L-07, L-08)**: `customs_declarations` +
    `customs_declaration_lines` (HS code, origin, quantities, customs value, duty rates,
    import VAT) and the tenant-extensible `hs_code_registry` seed; duties and taxes flow
-   into the existing landed-cost allocation (G-66) with declaration completeness
-   enforced (INV-035).
+   into the existing landed-cost allocation (G-65) with declaration completeness
+   enforced (INV-036).
 6. **Certificates of origin (L-09, L-10)**: `certificates_of_origin` with bilingual
    chamber-format prints; certificates of conformity ride the same table as a document
    type attached to declarations.
@@ -58,10 +58,10 @@ In scope:
    per shipment (booked → departed → arrived → cleared → delivered) driving document
    status on the linked trade documents.
 8. **Bonded warehouse (L-14)**: `bonded_warehouse_moves` — duty-suspended stock flag;
-   moves inside the bond post no duty (G-67); release into free circulation triggers
-   duty recognition (BR-076).
+   moves inside the bond post no duty (G-66); release into free circulation triggers
+   duty recognition (BR-106).
 9. **Duty drawback (L-12)**: `duty_drawback_claims` — export-evidence linkage, claimed
-   amounts, status workflow; submission requires the linked export evidence (BR-077).
+   amounts, status workflow; submission requires the linked export evidence (BR-107).
 10. **Integration**: LC fees post to financial charges through the existing bank-charge
     discipline; FX applies at the contract rate through the existing FX discipline;
     customs duties and import taxes flow into the existing landed-cost allocation on
@@ -112,11 +112,12 @@ cost machinery rather than replacing it.
 - **Feature flags**: `trade`, `trade.lc`, `trade.customs` — template-composable grants
   (CR-36f); wholesale, distribution-field-sales and electronics templates compose them
   by default.
-- **Posting rules**: `JOURNAL_RULES.md` gains G-65 (LC margin deposit and retirement),
-  G-66 (customs duty + import VAT capitalization into landed cost), G-67 (bonded
+- **Posting rules** (reservations re-coordinated 2026-11-13 per
+  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-65…G-67/INV-035/BR-074…077 predate the 044 wave's consumption of those slots): `JOURNAL_RULES.md` gains G-64 (LC margin deposit and retirement),
+  G-65 (customs duty + import VAT capitalization into landed cost), G-66 (bonded
   transfer — physical move without duty recognition, duty on release from bond);
-  `ACCOUNTING_INVARIANTS.md` gains INV-035 (declaration completeness);
-  `BUSINESS_RULES.md` gains BR-074…BR-077.
+  `ACCOUNTING_INVARIANTS.md` gains INV-036 (declaration completeness);
+  `BUSINESS_RULES.md` gains BR-104…BR-107.
 - **Seeds**: Incoterms 2020 set and an HS-code starter set (tenant-extensible by design,
   with a documented accuracy disclaimer — the tenant owns final classification).
 - **Jobs**: a `trade-expiry-sweep` (LC validity + document checklist due dates) on the
@@ -137,18 +138,18 @@ cost machinery rather than replacing it.
 | T-02 | Migration `0092` (incoterms, bills of lading, packing lists, certificates of origin) | api |
 | T-03 | Migration `0093` (declarations + lines, HS registry, bonded moves, drawback claims) | api |
 | T-04 | Migration `0094` (tracking events + grants + Incoterms/HS seeds) | api |
-| T-05 | LC API: lifecycle with amendments, checklist states, discrepancy notes; G-65 margin/retirement postings | api |
-| T-06 | LC fee postings to financial charges + `trade-expiry-sweep` job (BR-074) | api |
+| T-05 | LC API: lifecycle with amendments, checklist states, discrepancy notes; G-64 margin/retirement postings | api |
+| T-06 | LC fee postings to financial charges + `trade-expiry-sweep` job (BR-104) | api |
 | T-07 | Documentary collections API with settlement linkage | api |
-| T-08 | Incoterms registry + PO/SO selector with the risk-hint matrix (BR-075) | api |
+| T-08 | Incoterms registry + PO/SO selector with the risk-hint matrix (BR-105) | api |
 | T-09 | Transport documents API: bills of lading (multimodal types), packing lists, shipment linkage | api |
-| T-10 | Customs API: declarations + lines, HS registry extension, duty computation into landed costs (G-66, INV-035) | api |
-| T-11 | Bonded warehouse API: duty-suspended moves (G-67), release triggers duty recognition (BR-076) | api |
-| T-12 | Duty drawback API: export-evidence gate (BR-077) + claim workflow | api |
+| T-10 | Customs API: declarations + lines, HS registry extension, duty computation into landed costs (G-65, INV-036) | api |
+| T-11 | Bonded warehouse API: duty-suspended moves (G-66), release triggers duty recognition (BR-106) | api |
+| T-12 | Duty drawback API: export-evidence gate (BR-107) + claim workflow | api |
 | T-13 | Shipment tracking API: milestone events → document status transitions | api |
 | T-14 | `/trade/lc`, `/trade/customs`, `/trade/shipments` screens + Incoterms reference page + certificate prints | web |
 | T-15 | Report contracts ×4 + `REPORT_CATALOG.md` rows + catalog↔registry check extension | api |
-| T-16 | Golden tests G-65…G-67 + INV-035 test + RLS attack tests A1–A10 + OA-06 budgets on declaration/tracking queries | api |
+| T-16 | Golden tests G-64…G-66 + INV-036 test + RLS attack tests A1–A10 + OA-06 budgets on declaration/tracking queries | api |
 | T-17 | Docs: catalog/invariants/journal-rules/business-rules/navigation updates + seed disclaimer | docs |
 | T-18 | Run full local gates and record evidence | all |
 
@@ -160,19 +161,19 @@ Acceptance criteria (all must pass with recorded evidence):
    have `ENTITY_CATALOG.md` rows (CR-36a); the Incoterms and HS seeds load and are
    tenant-extensible.
 2. The LC lifecycle runs end-to-end — issue, amend, track the documents checklist with
-   discrepancies, retire — with G-65 posting balanced margin/retirement entries and LC
-   fees posting to financial charges; expiry alerts fire at 30/14/7/1 days (BR-074).
+   discrepancies, retire — with G-64 posting balanced margin/retirement entries and LC
+   fees posting to financial charges; expiry alerts fire at 30/14/7/1 days (BR-104).
 3. Customs declarations compute duties and import VAT per line and flow into the
-   existing landed-cost allocation (G-66); INV-035 holds — no landed-cost allocation on
+   existing landed-cost allocation (G-65); INV-036 holds — no landed-cost allocation on
    an import receipt without a completed declaration reference, and every allocated duty
    ties to a declaration line.
-4. Bonded moves post no duty on movement (G-67); release into free circulation
-   recognizes duty exactly once (BR-076); duty-suspended stock is visibly flagged and
+4. Bonded moves post no duty on movement (G-66); release into free circulation
+   recognizes duty exactly once (BR-106); duty-suspended stock is visibly flagged and
    blocked from customer issue while suspended.
-5. Duty drawback claims cannot submit without linked export evidence (BR-077); the
+5. Duty drawback claims cannot submit without linked export evidence (BR-107); the
    claim workflow records claimed amounts and status transitions.
 6. Incoterm selection is mandatory on trade-flagged purchase/sales orders and renders
-   the carriage/insurance/duty risk-hint matrix (BR-075); the registry page lists the
+   the carriage/insurance/duty risk-hint matrix (BR-105); the registry page lists the
    seeded set and accepts tenant additions.
 7. Shipment tracking events drive document status transitions (booked → departed →
    arrived → cleared → delivered) on the linked bills of lading, packing lists and
@@ -196,19 +197,19 @@ Acceptance criteria (all must pass with recorded evidence):
   hardcoded rates) with jurisdiction-pack notes carrying the REQUIRES_VERIFICATION
   discipline.
 - **LC banking complexity** — full trade-finance semantics outrun an ERP ledger:
-  mitigated by keeping the ledger side to margin, fees and retirement (G-65) and leaving
+  mitigated by keeping the ledger side to margin, fees and retirement (G-64) and leaving
   bank connectivity to the payments phase (056).
 - **HS seed accuracy** — a shipped classification table ages and misclassifies:
   mitigated by a starter-set disclaimer, tenant extensibility, and classification
   ownership staying with the tenant.
 - **Bonded regimes differ** — free-zone and bond rules vary by country: mitigated by
-  configuration flags per jurisdiction pack rather than fixed behavior, with the G-67
+  configuration flags per jurisdiction pack rather than fixed behavior, with the G-66
   invariant unchanged.
 
 ## 8. Completion and Handoff
 
 - Completion report: `docs/implementation/phases/reports/PHASE-051-COMPLETION.md`
-  (evidence per acceptance criterion, G-65…G-67 transcripts, the INV-035 completeness
+  (evidence per acceptance criterion, G-64…G-66 transcripts, the INV-036 completeness
   test, seed disclaimer).
 - Status flip: `IMPLEMENTATION_STATUS.md` PHASE-051 row → COMPLETE; `NEXT_ACTION.md`
   → next eligible phase PHASE-052 (Workflow & Approvals Engine — Wave 3 entry), with

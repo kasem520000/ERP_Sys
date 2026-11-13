@@ -43,7 +43,8 @@
     "check:ui-catalog": "tsx scripts/check-ui-catalog-coverage.ts",
     "validate:manifests": "tsx scripts/validate-manifests.ts",
     "test:visual-harness-run": "pnpm --filter @erp/ui test:harness",
-    "test:e2e-desktop": "playwright test -c tests/e2e/playwright.config.ts"
+    "test:e2e-desktop": "playwright test -c tests/e2e/playwright.config.ts",
+    "check:id-ledger": "tsx scripts/check-id-ledger.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

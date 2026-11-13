@@ -26,7 +26,7 @@
   actually buy; store connectors eliminate double entry for the Salla/Zid/Shopify
   retail segment; carrier milestones answer "where is my order" inside the invoice;
   and bank feeds remove the last manual copy-paste from reconciliation.
-- **الملخص التنفيذي (AR):** تحسم هذه المرحلة قرار DR-002 بتشغيل مزوّد دفع إقليمي واحد على الأقل (Moyasar أو HyperPay أو Tap أو PayTabs) في الإنتاج مع إبقاء البقية في بيئات التجريب، وتبني مسار تحصيل الأموال كاملاً: روابطُ دفع تحوّل الفاتورة إلى صفحة دفع آمنة مستضافة، تُسوّى عبر الويب-هوكس إلى إيصالٍ محاسبي، مع المرتجعات المالية والتقاط التمويل بالتقسيط (Tamara/Tabby) بمحاسبةِ الرسوم وتكلفة التقسيط (G-75). وفي جانب التجارة تُنفَّذ واجهة `commerce-port` فعلياً: اتصالات Salla وZid وShopify وWooCommerce، استيرادُ الطلبات إلى مسودات فواتير بيع بقواعد مطابقة أصناف، ودفعُ المنتجات والمخزون وكتابةُ حالة التنفيذ؛ مع توثيق مسارات أسواق Amazon/Noon، وتكامل شركات الشحن (Aramex/SMSA/DHL) بالملصقات والأسعار ومراحل التتبع على الفاتورة (S-13)، واستيرادُ كشوف البنوك عبر مجمّع يغذي التسوية المصرفية القائمة — كل ذلك فوق سجلِّ استيعاب أحداثٍ موثوقٍ (idempotent) يحفظ توازن الدفع (G-74).
+- **الملخص التنفيذي (AR):** تحسم هذه المرحلة قرار DR-002 بتشغيل مزوّد دفع إقليمي واحد على الأقل (Moyasar أو HyperPay أو Tap أو PayTabs) في الإنتاج مع إبقاء البقية في بيئات التجريب، وتبني مسار تحصيل الأموال كاملاً: روابطُ دفع تحوّل الفاتورة إلى صفحة دفع آمنة مستضافة، تُسوّى عبر الويب-هوكس إلى إيصالٍ محاسبي، مع المرتجعات المالية والتقاط التمويل بالتقسيط (Tamara/Tabby) بمحاسبةِ الرسوم وتكلفة التقسيط (G-74). وفي جانب التجارة تُنفَّذ واجهة `commerce-port` فعلياً: اتصالات Salla وZid وShopify وWooCommerce، استيرادُ الطلبات إلى مسودات فواتير بيع بقواعد مطابقة أصناف، ودفعُ المنتجات والمخزون وكتابةُ حالة التنفيذ؛ مع توثيق مسارات أسواق Amazon/Noon، وتكامل شركات الشحن (Aramex/SMSA/DHL) بالملصقات والأسعار ومراحل التتبع على الفاتورة (S-13)، واستيرادُ كشوف البنوك عبر مجمّع يغذي التسوية المصرفية القائمة — كل ذلك فوق سجلِّ استيعاب أحداثٍ موثوقٍ (idempotent) يحفظ توازن الدفع (G-73).
 
 ## 2. Scope
 
@@ -39,15 +39,15 @@ In scope:
    resolution and evidence.
 2. **`payment_links`** (IN-03): invoice → secure hosted link → checkout → webhook
    reconcile → receipt posting; link lifecycle (issued, paid, expired, cancelled)
-   with INV-040 idempotency — one payment event posts exactly one receipt; delivery
+   with INV-041 idempotency — one payment event posts exactly one receipt; delivery
    of the link through the communications channels (email/WhatsApp).
 3. **Refunds flow**: refund requests against paid invoices posting reversal journals
    and marking link/invoice state; partial and full refunds.
 4. **BNPL capture** (IN-04): Tamara/Tabby installment plans recorded at capture with
-   fee/cost accounting (G-75) and reconciliation of provider settlements.
+   fee/cost accounting (G-74) and reconciliation of provider settlements.
 5. **`payment_provider_events`**: the idempotent webhook ingestion ledger — every
    provider callback recorded by provider event id, deduplicated, then processed;
-   re-deliveries never double-post (feeds G-74).
+   re-deliveries never double-post (feeds G-73).
 6. **`commerce_channel_connections`** (N-04, IN-07): OAuth tokens per store for
    Salla, Zid, Shopify, WooCommerce — implementations of the existing commerce-port;
    connection health and token refresh surfaced in the integrations screen.
@@ -104,7 +104,8 @@ events feed commerce reconciliation).
 - **i18n**: ~200 new AR/EN keys (payment-link UI, refund flow, BNPL terms, channel
   connections, staging review queue, shipment panel, bank-feed import); parity check
   extended.
-- **Docs**: `JOURNAL_RULES.md` (G-74/G-75), `ACCOUNTING_INVARIANTS.md` (INV-040),
+- **Docs** (reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-74/G-75/INV-040 predate the 044 wave's consumption of those slots): `JOURNAL_RULES.md` (G-73/G-74),
+  `ACCOUNTING_INVARIANTS.md` (INV-041),
   the DR-002 decision record update, `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`,
   `FEATURE_CATALOG.md`, `NAVIGATION_MODEL.md`, integration guides per provider and
   per commerce platform (the `docs/api/integrations` set), THREAT_MODEL update for
@@ -128,10 +129,10 @@ events feed commerce reconciliation).
 | T-02 | Drizzle mirrors + `ENTITY_CATALOG.md` rows + RLS policies + attack tests A1–A10 | api |
 | T-03 | DR-002 resolution: spike evidence review, provider selection, decision record update | docs |
 | T-04 | Production payment adapter (selected provider) + sandboxed adapters for the remaining candidates | api |
-| T-05 | Payment links: lifecycle, hosted checkout redirect, secure link delivery via 041 channels, INV-040 | api |
-| T-06 | Payment reconciliation: `payment_provider_events` idempotent ingestion → receipt posting, G-74 | api |
+| T-05 | Payment links: lifecycle, hosted checkout redirect, secure link delivery via 041 channels, INV-041 | api |
+| T-06 | Payment reconciliation: `payment_provider_events` idempotent ingestion → receipt posting, G-73 | api |
 | T-07 | Refunds flow (full/partial) with reversal journals | api |
-| T-08 | BNPL capture: Tamara/Tabby plans, fee/installment cost accounting, G-75 | api |
+| T-08 | BNPL capture: Tamara/Tabby plans, fee/installment cost accounting, G-74 | api |
 | T-09 | Commerce connections: OAuth for Salla/Zid/Shopify/WooCommerce, token refresh, connection health | api |
 | T-10 | Store order staging: import, item match rules, review queue, sales-invoice draft mapping | api |
 | T-11 | Product/stock push jobs + fulfillment status write-back | api |
@@ -139,7 +140,7 @@ events feed commerce reconciliation).
 | T-13 | Carrier integrations: rates, labels, tracking milestones on invoices (S-13) | api |
 | T-14 | Bank feeds: aggregator statement import into the existing bank reconciliation | api |
 | T-15 | Screens: `/billing/payment-links`, `/integrations/channels`, `/integrations/carriers`, payment webhook console | web |
-| T-16 | Docs: integration guides, goldens G-74/G-75, INV-040, catalog/report/feature/nav updates | docs |
+| T-16 | Docs: integration guides, goldens G-73/G-74, INV-041, catalog/report/feature/nav updates | docs |
 | T-17 | Run full local gates (typecheck/lint/boundaries/tests/docs/i18n parity/permissions drift/manifests) and record evidence | all |
 
 ## 6. Verification
@@ -153,14 +154,14 @@ Acceptance criteria (all must pass with recorded evidence):
    capture, refund, webhook) and the production credentials path is documented;
    non-selected candidates remain functional sandboxed adapters behind the port.
 3. Payment links: an invoice generates a hosted link; completing checkout fires the
-   provider webhook; the receipt posts exactly once (INV-040) — a duplicated
+   provider webhook; the receipt posts exactly once (INV-041) — a duplicated
    provider event delivery is proven inert by replaying it in tests.
-4. Golden G-74: the payment reconciliation ledger ties provider events, receipts,
+4. Golden G-73: the payment reconciliation ledger ties provider events, receipts,
    and invoice balances — the seeded fixture set reconciles to zero variance.
 5. Refunds: full and partial refunds post reversal journals and update link and
    invoice state; the refund never double-reverses on webhook replay.
 6. BNPL: a Tamara/Tabby-style capture records the installment plan, posts the
-   provider fee and BNPL cost entries (G-75), and reconciles against the settlement
+   provider fee and BNPL cost entries (G-74), and reconciles against the settlement
    statement fixture.
 7. Commerce: a Salla/Zid/Shopify/WooCommerce sandbox store connects via OAuth,
    imports orders into staging, maps them to sales-invoice drafts with item match
@@ -181,7 +182,7 @@ Acceptance criteria (all must pass with recorded evidence):
 
 - **Money-movement correctness** — duplicate webhooks, partial captures, and refund
   races can double-post receipts; mitigated by the idempotent provider-event ledger,
-  INV-040, G-74, and replay tests as acceptance criteria.
+  INV-041, G-73, and replay tests as acceptance criteria.
 - **Provider sandbox drift and credential secrecy** — sandboxes behave differently
   from production; mitigated by fixture-based tests, the DR-002 evidence gate before
   production cutover, and secrets stored through the existing secrets baseline

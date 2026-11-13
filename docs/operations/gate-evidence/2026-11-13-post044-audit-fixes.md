@@ -65,3 +65,12 @@ registry history shows 219 tables and the suite structure suggests
   announcement, not re-proven here.
 - Browser-level Playwright assertions — out of scope for this wave (no web
   surface changed).
+
+## 6. RUN — the ID-ledger collision check (audit fix 4, 2026-11-13)
+
+| # | Command | Result |
+|---|---|---|
+| 6.1 | `pnpm exec tsx scripts/check-id-ledger.ts --self-test` | **0 errors, 0 warnings — OK**. Self-test: (1) the conflicting claim (PHASE-043 claiming G-50/G-51, reserved for PHASE-045) **DETECTED**; (2) the legitimate reference (PHASE-046 referencing the implemented G-13/G-14) **PASSED**; (3) the shorthand ranges `BR-068…070` and `G-47…G-50` both expand correctly. Parsed: implemented G 46 (the split canon: ACCOUNTING_TESTS §3 G-01…G-20 + JOURNAL_RULES §7 G-21…G-46) · INV 29 · BR 77; reservations 21 phases / 79 ids; 68 phase docs scanned (77 claim ids, 2,486 reference ids). |
+| 6.2 | `pnpm exec eslint scripts/check-id-ledger.ts` | **0 problems** |
+| 6.3 | The FIRST checker run (before the phase-doc re-coordination) | **40 unique failures** — the stale claims (043's G-44…G-46/INV-028/BR-061…063; 045's G-51/G-52/INV-030/BR-068…070; 046's G-53…G-55/INV-031/BR-071…073; 047's BR-057…060; 048's G-56…G-59/INV-032/BR-061…065; 049's G-60…G-62/INV-033/BR-066…069; 050's G-63/G-64/INV-034/BR-070…073; 051's G-65…G-67/INV-035/BR-074…077; plus the 052–064 invariant/golden shifts) — every one re-coordinated onto the ID_LEDGER §2 ladder, then the check went green (6.1). |
+| 6.4 | `pnpm check:id-ledger` wired into `scripts/ci/local-gate.sh` (after permissions-drift) | The standing gate now runs the collision check on every local gate pass. |

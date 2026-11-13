@@ -16,7 +16,7 @@
   read-only OData/CSV BI feeds for Power BI/Tableau; iPaaS recipe documentation for
   Zapier/Make/n8n; and CDC-style change streams carried on the webhook event fabric.
   This is deliberately a non-financial phase: no new goldens, only the platform
-  invariant INV-039 (key hashing + scope enforcement).
+  invariant INV-040 (key hashing + scope enforcement).
 - **Business value:** Integrations scored 22% — the weakest axis in the audit — with
   API keys, webhooks, and generated OpenAPI all at zero ("designed, not built").
   Every enterprise deal now asks "where is your API?" and every iPaaS/BI ecosystem
@@ -24,7 +24,7 @@
   transport for the payments and commerce integrations that follow immediately after,
   and the delivery console closes UX-09 (user-visible integration logs) for every
   future connector.
-- **الملخص التنفيذي (AR):** تفتح هذه المرحلة المنصة على الخارج بانضباطٍ إنتاجي: مفاتيح API لكل مستأجر مخزّنة كـ hash فقط بنطاقاتٍ تعكس مصفوفة الصلاحيات 245 حرفياً، مع طبقاتِ حدّ معدل وقوائم IP مسموحة لكل مستأجر؛ سطحُ API عام مُصدَّر بإصدارٍ ثابت على `/api/public/v1/*` مولَّدٍ من سجل المسارات والعقود القائمة مع مستند OpenAPI 3.1 يُخدَم ويُنشَر؛ وويب-هوكس صادرة موقّعة بـ HMAC مع إعادة محاولة تراجعية وسجل تسليمٍ مرئي للمستخدم (UX-09)؛ وخلاصات BI للقراءة فقط بنمط OData/CSV لأدوات Power BI وTableau؛ ووصفاتُ تكامل موثّقة لـ Zapier وMake وn8n؛ وتدفقاتُ تغيير بنمط CDC فوق نسيج أحداث الويب-هوكس — دون أي قيودٍ ذهبية جديدة لأن السطح غير مالي، مع الثابت INV-039: تخزين المفاتيح كـ hash وإلزام النطاقات.
+- **الملخص التنفيذي (AR):** تفتح هذه المرحلة المنصة على الخارج بانضباطٍ إنتاجي: مفاتيح API لكل مستأجر مخزّنة كـ hash فقط بنطاقاتٍ تعكس مصفوفة الصلاحيات 245 حرفياً، مع طبقاتِ حدّ معدل وقوائم IP مسموحة لكل مستأجر؛ سطحُ API عام مُصدَّر بإصدارٍ ثابت على `/api/public/v1/*` مولَّدٍ من سجل المسارات والعقود القائمة مع مستند OpenAPI 3.1 يُخدَم ويُنشَر؛ وويب-هوكس صادرة موقّعة بـ HMAC مع إعادة محاولة تراجعية وسجل تسليمٍ مرئي للمستخدم (UX-09)؛ وخلاصات BI للقراءة فقط بنمط OData/CSV لأدوات Power BI وTableau؛ ووصفاتُ تكامل موثّقة لـ Zapier وMake وn8n؛ وتدفقاتُ تغيير بنمط CDC فوق نسيج أحداث الويب-هوكس — دون أي قيودٍ ذهبية جديدة لأن السطح غير مالي، مع الثابت INV-040: تخزين المفاتيح كـ hash وإلزام النطاقات.
 
 ## 2. Scope
 
@@ -124,14 +124,15 @@ hard prerequisite for 056 (webhooks/events feed commerce reconciliation).
 - **Docs**: `OPENAPI_STRATEGY.md` (generation pipeline), `API_VERSIONING.md`
   (v1 policy + deprecation rules), `AUTHENTICATION.md` (key auth), `ERROR_MODEL.md`
   (public error envelope), `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`,
-  `FEATURE_CATALOG.md`, `NAVIGATION_MODEL.md`, new iPaaS recipe documents, INV-039
+  `FEATURE_CATALOG.md`, `NAVIGATION_MODEL.md`, new iPaaS recipe documents, INV-040
   entry in the invariants documentation.
 - **Reports**: +2 contracts — `platform.api-usage`, `platform.webhook-deliveries`
   (catalog rows mandatory).
 - **Feature flags**: `platform.api.public`, `platform.api.keys`,
   `platform.api.webhooks`, `platform.api.bi-feeds` — template-composable grants; the
   public API flag defaults on for enterprise-tier templates only.
-- **No new goldens** (non-financial surface by design); INV-039 (key hashing + scope
+- **No new goldens** (non-financial surface by design); INV-040 (key hashing + scope
+  enforcement — reservation re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md), the plan's INV-039 predates the 044 wave's consumption)
   enforcement) is added and enforced in the public auth guard. No architectural
   change — the public surface is a gateway module in front of existing handlers;
   offline sync assessment: platform-only, N/A recorded for sync clients (CR-36 g).
@@ -142,7 +143,7 @@ hard prerequisite for 056 (webhooks/events feed commerce reconciliation).
 |---|---|---|
 | T-01 | Author migrations 0105–0106 + journal/spec updates | api |
 | T-02 | Drizzle mirrors + `ENTITY_CATALOG.md` rows + RLS policies + attack tests A1–A10 | api |
-| T-03 | Key lifecycle: creation (show-once raw key), hashed storage, rotation, revocation, `last_used` tracking, INV-039 enforcement | api |
+| T-03 | Key lifecycle: creation (show-once raw key), hashed storage, rotation, revocation, `last_used` tracking, INV-040 enforcement | api |
 | T-04 | Scope model: key scopes derived from the 245-key permission matrix; enforcement guard resolving tenant from key | api |
 | T-05 | Rate-limiting middleware (sliding window per key, plan-tiered) + `api_usage_counters` + IP allowlist enforcement | api |
 | T-06 | Public API surface: `/api/public/v1/*` generated from the route registry + contracts behind the public auth guard | api |
@@ -152,7 +153,7 @@ hard prerequisite for 056 (webhooks/events feed commerce reconciliation).
 | T-10 | BI feeds: read-only OData/CSV endpoints over whitelisted entities with scoped keys | api |
 | T-11 | Screens: `/settings/api-keys` (issue/rotate/revoke, usage) and `/settings/webhooks` + delivery log console with resend | web |
 | T-12 | iPaaS + CRM recipe documents (Zapier/Make/n8n) with tested example flows | docs |
-| T-13 | Docs: API strategy/versioning/auth/error model updates + INV-039 + catalog/report/feature/nav updates | docs |
+| T-13 | Docs: API strategy/versioning/auth/error model updates + INV-040 + catalog/report/feature/nav updates | docs |
 | T-14 | Run full local gates (typecheck/lint/boundaries/tests/docs/i18n parity/permissions drift/manifests) and record evidence | all |
 
 ## 6. Verification
@@ -162,7 +163,7 @@ Acceptance criteria (all must pass with recorded evidence):
 1. Migrations 0105–0106 apply cleanly; Drizzle mirrors and `ENTITY_CATALOG.md` rows
    present; RLS attack tests A1–A10 pass — including an attack proving one tenant's
    key cannot reach another tenant's data on public paths.
-2. INV-039: keys are stored hashed only (raw value never persisted or logged — grep
+2. INV-040: keys are stored hashed only (raw value never persisted or logged — grep
    and integration proof); a key with a narrow scope cannot invoke an out-of-scope
    route (scope enforcement test against the 245-matrix mapping).
 3. Rate limiting: a key exceeding its tier receives 429 responses with correct
@@ -183,7 +184,7 @@ Acceptance criteria (all must pass with recorded evidence):
    gaps or duplicates on the seeded fixture sequence.
 9. All CR-36 discipline gates green (catalog parity, permissions zero-drift, AR/EN
    parity, `docs:validate`, RLS tests, feature flags, sync-surface N/A recorded);
-   no new goldens, INV-039 documented and tested.
+   no new goldens, INV-040 documented and tested.
 10. Completion report `reports/PHASE-055-COMPLETION.md` appended with evidence;
     `IMPLEMENTATION_STATUS.md` row flipped; archive delivered as
     `ERP_PLATFORM_PHASE055.zip` (OA-07).
@@ -191,7 +192,7 @@ Acceptance criteria (all must pass with recorded evidence):
 ## 7. Risks and Constraints
 
 - **The largest new attack surface** — public authentication bypasses user sessions;
-  mitigated by hashed keys (INV-039), scopes mirroring the permission matrix, RLS
+  mitigated by hashed keys (INV-040), scopes mirroring the permission matrix, RLS
   preserved on public paths, IP allowlists, and dedicated attack tests.
 - **Spec drift** — a hand-maintained OpenAPI document rots immediately; mitigated by
   generation from the route registry and a parity contract test that fails the build

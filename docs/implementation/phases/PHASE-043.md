@@ -69,14 +69,14 @@ In scope:
 6. **ATP/CTP computation service** (M-06, S-10): available-to-promise /
    capable-to-promise per item and date, consumed by sales order lines (promise-date
    suggestion + warning on over-promise); conservative exclusions are hard rules —
-   quarantined, reserved, and consignment-owned stock never promise (BR-063).
+   quarantined, reserved, and consignment-owned stock never promise (BR-080).
 7. **MTO linkage** (M-22): production order ↔ sales order line link with a hard
    reservation; completion routes to the sales delivery with the MO's actual cost.
 8. **Contract manufacturing flow** (M-21): tolling — material issue to the processor
    (stock-at-processor tracking), conversion service purchase order receipt, and
    yield/scrap settlement on return.
 9. **By/co-product completion posting** (M-11): joint allocation of actual WIP cost
-   across main product and co/by-products per BOM percentages (G-44).
+   across main product and co/by-products per BOM percentages (G-47).
 10. **Reservation policy engine** (I-14): automatic reservation of sales and
     production order lines against bin-level stock using PHASE-044 strategies
     (FIFO/FEFO) — the missing policy layer over the existing `stock_reservations`.
@@ -126,12 +126,13 @@ PHASE-042 prerequisite.
 - **Reports**: +2 contracts into `REPORT_CATALOG.md`
   (`manufacturing.mrp-exceptions`, `manufacturing.atp-position`); catalog ↔ registry
   reconciliation check extended.
-- **Posting canon**: goldens G-44 (by/co-product joint allocation), G-45 (contract
-  manufacturing tolling round trip), G-46 (MTO completion at actual cost with
+- **Posting canon** (reservations re-coordinated 2026-11-13 per
+  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-44…G-46/INV-028/BR-061…063 predate the 039–044 waves' consumption of those slots): goldens G-47 (by/co-product joint allocation), G-48 (contract
+  manufacturing tolling round trip), G-49 (MTO completion at actual cost with
   reservation chain) added to `JOURNAL_RULES.md` §7; note added that MRP runs and
   suggestions are **not ledger documents** (the budgeting precedent — no golden row
-  for the run itself). Invariant INV-028 (MRP netting exactness) added to
-  `ACCOUNTING_INVARIANTS.md`; BR-061…BR-063 added to `BUSINESS_RULES.md`.
+  for the run itself). Invariant INV-030 (MRP netting exactness) added to
+  `ACCOUNTING_INVARIANTS.md`; BR-078…BR-080 added to `BUSINESS_RULES.md`.
 - **Feature flags**: `manufacturing.mrp.*`, `manufacturing.mps.*`,
   `manufacturing.planning.*` — template-composable grants (CR-36 (f)).
 - **Custom fields**: `mrp_runs`, `mrp_suggestions`, and `mps_entries` registered as
@@ -157,17 +158,17 @@ PHASE-042 prerequisite.
 | T-05 | Suggestion lifecycle: generation, accept / dismiss-with-reason, idempotent one-click conversion to PO (via the auto-PO path), MO (routing pre-bound), or transfer | api |
 | T-06 | MPS service + entries grid backend; frozen-fence edit permission + reason | api |
 | T-07 | Bill of resources service + rough-cut capacity check against PHASE-042 work-center capacities | api |
-| T-08 | ATP/CTP service + sales order line integration (S-10): promise-date suggestion, over-promise warning, hard exclusions (BR-063) | api |
-| T-09 | MTO linkage: MO ↔ sales line link, hard reservation, completion routing to sales delivery (G-46) | api |
-| T-10 | Contract manufacturing flow: stock-at-processor issue/return, conversion service PO, yield settlement (G-45) | api |
-| T-11 | By/co-product completion posting with joint allocation (G-44) + substitution records on explosion | api |
+| T-08 | ATP/CTP service + sales order line integration (S-10): promise-date suggestion, over-promise warning, hard exclusions (BR-080) | api |
+| T-09 | MTO linkage: MO ↔ sales line link, hard reservation, completion routing to sales delivery (G-49) | api |
+| T-10 | Contract manufacturing flow: stock-at-processor issue/return, conversion service PO, yield settlement (G-48) | api |
+| T-11 | By/co-product completion posting with joint allocation (G-47) + substitution records on explosion | api |
 | T-12 | Reservation policy engine (I-14) over `stock_reservations` using PHASE-044 strategies | api |
 | T-13 | Build `/manufacturing/mrp` (run config, run history, suggestions board with netting drill-down) | web |
 | T-14 | Build `/manufacturing/mps` bucket grid editor + item-card planning tab | web |
 | T-15 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-16 | Implement the 2 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-17 | Golden suites G-44/G-45/G-46 with failure packs; INV-028 suite (netting, idempotent conversion, cycle termination, allocation exactness); BR-061…063 guards | api |
-| T-18 | Docs: JOURNAL_RULES §7 rows + no-golden-for-runs note, ACCOUNTING_INVARIANTS INV-028, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, module determinism note | docs |
+| T-17 | Golden suites G-47/G-48/G-49 with failure packs; INV-030 suite (netting, idempotent conversion, cycle termination, allocation exactness); BR-078…063 guards | api |
+| T-18 | Docs: JOURNAL_RULES §7 rows + no-golden-for-runs note, ACCOUNTING_INVARIANTS INV-030, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, module determinism note | docs |
 | T-19 | Run full local gates + OA-06 EXPLAIN budgets (explosion queries, suggestion board queries); record evidence | all |
 
 ## 6. Verification
@@ -182,7 +183,7 @@ Acceptance criteria (all must pass with recorded evidence):
    reserved) − (open POs + open MOs) computes exactly; low-level-code explosion
    terminates on cyclic fixture graphs with a typed error; phantom flattening
    preserves total component demand (Σ before = Σ after).
-3. Suggestions: acceptance is idempotent (INV-028 — exactly one document per
+3. Suggestions: acceptance is idempotent (INV-030 — exactly one document per
    suggestion, retry returns the original); dismissal requires a reason; converted
    documents carry bidirectional links to their suggestion and run.
 4. Converted production orders arrive routing pre-bound from PHASE-042 data and
@@ -190,12 +191,12 @@ Acceptance criteria (all must pass with recorded evidence):
    document-creation logic.
 5. ATP/CTP: a sales order line suggests promise dates from live supply; over-promise
    warns; quarantined, reserved, and consignment-owned stock are excluded by hard
-   rule (BR-063) — asserted by tests.
+   rule (BR-080) — asserted by tests.
 6. MTO linkage end-to-end: MO completion routes to the linked sales delivery and
-   carries the MO actual cost (G-46 golden green with failure pack).
-7. Contract manufacturing round trip green (G-45): stock-at-processor balances to
+   carries the MO actual cost (G-49 golden green with failure pack).
+7. Contract manufacturing round trip green (G-48): stock-at-processor balances to
    zero on full return, conversion fee posts through AP, yield loss posts explicitly.
-8. By/co-product completion (G-44): Σ allocated costs = actual WIP consumed exactly;
+8. By/co-product completion (G-47): Σ allocated costs = actual WIP consumed exactly;
    allocation percentages sum to 100 or a typed validation rejects the BOM.
 9. All house gates green: typecheck · lint · boundaries · unit tests ·
    `docs:validate` · i18n parity · permissions drift equality · manifests; OA-06
@@ -217,7 +218,7 @@ Acceptance criteria (all must pass with recorded evidence):
   produce nonsense plans: mitigated by policy validation warnings, a data-readiness
   panel on the run screen, and the MRP exceptions report.
 - **Duplicate document creation** — double-clicking conversion must never create two
-  POs: mitigated by idempotent acceptance (INV-028), unique suggestion→document keys,
+  POs: mitigated by idempotent acceptance (INV-030), unique suggestion→document keys,
   and coverage netting that subtracts in-flight suggestions on re-run.
 - **Expectation management** — this is infinite-capacity MRP with rough-cut checks,
   not a finite scheduler: mitigated by explicit documentation, the bill-of-resources

@@ -22,7 +22,7 @@
   days to hours; the visible approval timeline (PP-17) is an enterprise checkbox in every
   demo; and the event bus emitted here becomes the substrate the API/webhook platform
   and payment integrations consume later in this wave.
-- **الملخص التنفيذي (AR):** تحوّل هذه المرحلة الموافقات من خطوةٍ واحدة جامدة إلى محرك سير عمل كامل: سلاسل موافقة متعددة المستويات بتفريعٍ شرطي على المبلغ والقسم والحقول المخصصة، تفويضٌ أثناء الغياب مع منعٍ صارم للموافقة الذاتية عبر التفويض (G-68)، تصعيدٌ تلقائي عند تجاوز مهلة الخطوة مع تذكيرات دورية، موافقةٌ عبر البريد والجوال بروابط موقّعة أحادية الاستخدام، صندوق موافقات ومخطط زمني مرئي لكل خطوة على كل مستند (PP-17)، مهام مرتبطة بالمستند وتنبيهات قواعد ذكية (UX-13)، وجسرٌ يحوّل سياسات الموافقة الحالية إلى تعريفات سير عمل دون كسر أي مستند قائم — مع إطلاق أحداثٍ صادرة تُغذّي لاحقاً منصة الويب-هوكس.
+- **الملخص التنفيذي (AR):** تحوّل هذه المرحلة الموافقات من خطوةٍ واحدة جامدة إلى محرك سير عمل كامل: سلاسل موافقة متعددة المستويات بتفريعٍ شرطي على المبلغ والقسم والحقول المخصصة، تفويضٌ أثناء الغياب مع منعٍ صارم للموافقة الذاتية عبر التفويض (G-67)، تصعيدٌ تلقائي عند تجاوز مهلة الخطوة مع تذكيرات دورية، موافقةٌ عبر البريد والجوال بروابط موقّعة أحادية الاستخدام، صندوق موافقات ومخطط زمني مرئي لكل خطوة على كل مستند (PP-17)، مهام مرتبطة بالمستند وتنبيهات قواعد ذكية (UX-13)، وجسرٌ يحوّل سياسات الموافقة الحالية إلى تعريفات سير عمل دون كسر أي مستند قائم — مع إطلاق أحداثٍ صادرة تُغذّي لاحقاً منصة الويب-هوكس.
 
 ## 2. Scope
 
@@ -36,7 +36,7 @@ In scope:
    owner's manager); branch conditions on amount thresholds, department, and custom
    fields surfaced by PHASE-036; per-step SLA hours.
 3. **`workflow_instances`** (W-07): one instance per triggered document — entity
-   reference, current step pointer, terminal state, immutable on completion (INV-036).
+   reference, current step pointer, terminal state, immutable on completion (INV-037).
 4. **`workflow_step_instances`** (W-07, PP-17): per-step state PENDING / APPROVED /
    REJECTED / SKIPPED / DELEGATED with assignee, `delegated_to`, `acted_at`, and
    `comment` — the complete step-history record the timeline renders.
@@ -103,8 +103,8 @@ Wave 3 and hard-requires only 036.
   seed, cumulative v3.0 count, no drift).
 - **i18n**: ~180 new AR/EN dictionary keys (chain editor, inbox, timeline, delegation,
   escalation, tasks); the 4,186-style parity check is extended (AR = EN per key).
-- **Docs**: `BUSINESS_WORKFLOWS.md` (engine semantics), `JOURNAL_RULES.md` (G-68),
-  `ACCOUNTING_INVARIANTS.md` (INV-036), `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`,
+- **Docs** (reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-68/INV-036 predate the 044 wave's consumption of those slots): `BUSINESS_WORKFLOWS.md` (engine semantics), `JOURNAL_RULES.md` (G-67),
+  `ACCOUNTING_INVARIANTS.md` (INV-037), `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`,
   `FEATURE_CATALOG.md`, `NAVIGATION_MODEL.md` (+3 nav items), decision records for
   the bridge policy and the W-10 scope note.
 - **Reports**: +2 contracts — `workflow.pending-approvals`, `workflow.sla-aging`
@@ -125,12 +125,12 @@ Wave 3 and hard-requires only 036.
 | T-01 | Author migrations 0090–0093 (definitions/steps, instances/step-instances, delegations/escalations, policy bridge) + journal/spec updates | api |
 | T-02 | Drizzle mirrors + `ENTITY_CATALOG.md` rows + RLS policies + attack tests A1–A10 for the six new tables | api |
 | T-03 | Workflow engine core: trigger resolution on document state transitions, conditions + branch evaluation, instance/step state machine | api |
-| T-04 | Delegation resolution (absence windows, scope) + escalation/reminder jobs on the scheduler + G-68 enforcement | api |
+| T-04 | Delegation resolution (absence windows, scope) + escalation/reminder jobs on the scheduler + G-67 enforcement | api |
 | T-05 | `approval_policies` bridge: conversion tool, compatibility mode, parity tests, mapping record | api |
 | T-06 | Email/mobile approve actions: signed one-time deep links, comment capture, expiry handling | api |
 | T-07 | Outbound event bus emission (workflow lifecycle events) + rules-engine alert adapters (UX-13) | api |
 | T-08 | Document-linked tasks: TASK step type, assignment, due dates, completion write-back | api |
-| T-09 | Golden G-68 (no self-approval through delegation) + INV-036 (instance immutability post-completion) tests and doc entries | api |
+| T-09 | Golden G-67 (no self-approval through delegation) + INV-037 (instance immutability post-completion) tests and doc entries | api |
 | T-10 | Build `/settings/workflows` chain editor (ordered steps, branch conditions, SLA, assignee rules) | web |
 | T-11 | Build the approval inbox screen with aging indicators and quick actions | web |
 | T-12 | Build the document timeline component and embed it on document detail pages (PP-17) | web |
@@ -150,7 +150,7 @@ Acceptance criteria (all must pass with recorded evidence):
    PHASE-036 custom field selects a different chain (integration test).
 3. Delegation: an active absence window re-routes PENDING steps to the delegate within
    scope only; expired windows stop routing; circular delegations are rejected at save.
-4. Golden G-68: an actor cannot approve their own document through a delegation chain
+4. Golden G-67: an actor cannot approve their own document through a delegation chain
    (directly or transitively) — covered in the golden suite and documentation.
 5. Escalation: a step left past its SLA hours produces an `escalation_events` row and
    fires the configured escalation/notification plus reminders via the scheduler.
@@ -160,7 +160,7 @@ Acceptance criteria (all must pass with recorded evidence):
 7. The timeline component renders the full step history (state, assignee,
    `delegated_to`, `acted_at`, comment) on documents across modules, and the approval
    inbox lists PENDING work with aging — PP-17 satisfied with AR/EN parity and RTL.
-8. INV-036: terminal workflow instances are immutable — any mutation attempt after
+8. INV-037: terminal workflow instances are immutable — any mutation attempt after
    completion is rejected by the service layer and covered by an invariant test.
 9. The `approval_policies` bridge converts seeded policies without behavior change
    (parity test on documents gated before/after), and in-flight documents complete
@@ -177,7 +177,7 @@ Acceptance criteria (all must pass with recorded evidence):
   definitions; mitigated by indexed trigger lookups, short-circuit condition
   evaluation, and asynchronous instance creation where posting order allows.
 - **Delegation abuse** — circular or self-serving delegation chains; mitigated by the
-  G-68 golden plus delegation-graph validation at save time.
+  G-67 golden plus delegation-graph validation at save time.
 - **Bridge backward compatibility** — existing tenants depend on `approval_policies`
   semantics; mitigated by the compatibility mode, the parity test, and a recorded
   mapping before any cutover.

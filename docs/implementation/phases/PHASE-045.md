@@ -121,11 +121,12 @@ on this phase's feeds and the `employees.user_id` bridge.
 - **Reports**: +3 contracts into `REPORT_CATALOG.md` (`hr.attendance-register`,
   `hr.leave-balances`, `hr.overtime-summary`); catalog ↔ registry reconciliation
   check extended.
-- **Posting canon**: goldens G-51 (period-end leave accrual run — policy-gated) and
-  G-52 (leave encashment settlement through the payroll payout machinery) added to
+- **Posting canon** (reservations re-coordinated 2026-11-13 per
+  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-51/G-52/INV-030/BR-068…070 predate the 039–042 waves' consumption of those slots): goldens G-50 (period-end leave accrual run — policy-gated) and
+  G-50 (leave encashment settlement through the payroll payout machinery) added to
   `JOURNAL_RULES.md` §7 with a note that attendance, rosters, and overtime entries
-  are **not ledger documents**. Invariant INV-030 (attendance / leave exactness)
-  added to `ACCOUNTING_INVARIANTS.md`; BR-068…BR-070 added to
+  are **not ledger documents**. Invariant INV-031 (attendance / leave exactness)
+  added to `ACCOUNTING_INVARIANTS.md`; BR-081…BR-083 added to
   `BUSINESS_RULES.md`.
 - **Feature flags**: `hr.attendance.*`, `hr.leave.*`, `hr.shifts.*` —
   template-composable grants (CR-36 (f)); enabled by default on templates whose
@@ -149,21 +150,21 @@ on this phase's feeds and the `employees.user_id` bridge.
 | T-01 | Author migrations ≈ 0082…0088 (shifts, rotations, attendance, overtime family, leave family, holidays, `employees.user_id`, seeds) + journal/spec updates | api |
 | T-02 | Drizzle mirrors, `ENTITY_CATALOG.md` rows, RLS policies + attack tests A1–A10 for the ten new tables | api |
 | T-03 | Shift service + roster grid backend + rotation pattern generator (employee × date) | api |
-| T-04 | Attendance service: record capture, daily status derivation (roster + holidays + leave), exception computation, immutability window (BR-068) | api |
+| T-04 | Attendance service: record capture, daily status derivation (roster + holidays + leave), exception computation, immutability window (BR-081) | api |
 | T-05 | Device import: generic CSV adapter (ZKTeco-style layouts + configurable mapping), preview, dedupe, anomaly quarantine, commit with file fingerprint, import log | api |
-| T-06 | Overtime engine: tier matching, multiplier application, pre-approval enforcement, approved entries + exception surfacing (BR-070) | api |
-| T-07 | Leave engine: accrual policy runs, carry-over cap, per-year balances, request lifecycle with simple approval (INV-030) | api |
+| T-06 | Overtime engine: tier matching, multiplier application, pre-approval enforcement, approved entries + exception surfacing (BR-083) | api |
+| T-07 | Leave engine: accrual policy runs, carry-over cap, per-year balances, request lifecycle with simple approval (INV-031) | api |
 | T-08 | Holiday calendars per jurisdiction + absence/overtime-tier integration | api |
 | T-09 | Employee ↔ user bridge: link service, uniqueness guard, audit trail, SoD documentation | api |
 | T-10 | Payroll variable-feed service: overtime / absence / late feeds per pay period + leave balance snapshots (PHASE-046 inputs) | api |
-| T-11 | Golden G-51 (leave accrual run, policy-gated) + G-52 (encashment settlement) + posting-engine source keys | api |
+| T-11 | Golden G-50 (leave accrual run, policy-gated) + G-50 (encashment settlement) + posting-engine source keys | api |
 | T-12 | Build `/hr/attendance` (daily register, exception board, import wizard) | web |
 | T-13 | Build `/hr/leave` (requests + balances) and `/hr/shifts` (roster editor grid) | web |
 | T-14 | Employee self-service tabs (own attendance calendar, leave request + balance, own roster) gated by `hr.self_service` | web |
 | T-15 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-16 | Implement the 3 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-17 | INV-030 suite (non-overlapping intervals, balance caps, feed totals) + BR-068…070 guards + golden failure packs | api |
-| T-18 | Docs: JOURNAL_RULES §7 rows + non-ledger note, ACCOUNTING_INVARIANTS INV-030, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, AUTHORIZATION_MATRIX SoD note, simple-approval decision record | docs |
+| T-17 | INV-031 suite (non-overlapping intervals, balance caps, feed totals) + BR-081…070 guards + golden failure packs | api |
+| T-18 | Docs: JOURNAL_RULES §7 rows + non-ledger note, ACCOUNTING_INVARIANTS INV-031, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, AUTHORIZATION_MATRIX SoD note, simple-approval decision record | docs |
 | T-19 | Run full local gates + OA-06 EXPLAIN budgets (`attendance_records`, `leave_balances` hot paths); record evidence | all |
 
 ## 6. Verification
@@ -174,7 +175,7 @@ Acceptance criteria (all must pass with recorded evidence):
    for all 10 tables (CR-36 (a)); RLS attack tests A1–A10 pass for every new tenant
    table — including a dedicated cross-employee data-isolation attack on
    `attendance_records` (CR-36 (e)).
-2. INV-030 holds: attendance intervals never overlap per employee-day (imported and
+2. INV-031 holds: attendance intervals never overlap per employee-day (imported and
    manual alike); leave used never exceeds entitlement + carried-forward at any
    moment (property tests incl. mid-year joiners and carry-over boundaries);
    overtime hours are non-negative and within configured caps.
@@ -186,12 +187,12 @@ Acceptance criteria (all must pass with recorded evidence):
    missing punch / holiday / on-leave statuses match the roster, holiday calendar,
    and leave tables; exceptions surface on the register board.
 5. Overtime: pre-approval-required rules block unapproved entries from the feed and
-   surface them as exceptions (BR-070); approved entries carry hours, multiplier,
+   surface them as exceptions (BR-083); approved entries carry hours, multiplier,
    and the linked request.
 6. Leave lifecycle: request → approve → balance decrement → snapshot at period
    close; carry-over cap truncates excess with an audit line; the simple-approval
    decision record exists and points to PHASE-052 as the upgrade path.
-7. Goldens G-51/G-52 green with failure packs: the accrual run posts only when the
+7. Goldens G-50/G-50 green with failure packs: the accrual run posts only when the
    tenant policy enables it (BR-055-style no-defaults discipline); encashment
    settles through the payroll payout machinery without new account purposes.
 8. Employee ↔ user bridge: uniqueness holds, the link is audited, and a test proves
@@ -216,7 +217,7 @@ Acceptance criteria (all must pass with recorded evidence):
   deep hierarchies: mitigated by the decision record naming PHASE-052 as the engine
   that will retro-fit leave and overtime approvals without data migration.
 - **Balance arithmetic drift** — accrual, carry-over, and proration interact:
-  mitigated by INV-030 property tests, period-close snapshots (reconstructable
+  mitigated by INV-031 property tests, period-close snapshots (reconstructable
   balances), and boundary fixtures (year-end, joiners, terminations).
 - **Labor-law variability** — accrual policies and caps are jurisdiction-specific:
   mitigated by tenant-configurable policies with no fabricated defaults (the

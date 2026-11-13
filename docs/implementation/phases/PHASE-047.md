@@ -125,7 +125,7 @@ talent data without the employee master and its user linkage has no substrate.
 - **Jobs**: one daily sweep (`hr-expiry-sweep`) on the existing pg-boss queue covering
   documents, certifications, probation end and review due.
 - **Docs**: `ENTITY_CATALOG.md`, `REPORT_CATALOG.md`, `NAVIGATION_MODEL.md`,
-  `FEATURE_CATALOG.md`, `BUSINESS_RULES.md` (BR-057…BR-060), the HR tables doc, and the
+  `FEATURE_CATALOG.md`, `BUSINESS_RULES.md` (BR-087…BR-090 — reservations re-coordinated 2026-11-13 per [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md); the original plan's BR-057…060 predate the 036/037 waves' consumption of those slots), the HR tables doc, and the
   integrations README (bridge contracts).
 - **No GL postings** — `JOURNAL_RULES.md` and `ACCOUNTING_INVARIANTS.md` are untouched;
   this phase adds no golden entries.
@@ -141,9 +141,9 @@ talent data without the employee master and its user linkage has no substrate.
 | T-02 | Migration `0076` (vacancies, applicants, interviews) + journal/spec updates | api |
 | T-03 | Migration `0077` (training, certifications, org units, positions, employee documents) + journal/spec updates | api |
 | T-04 | Migration `0078` DATA-ONLY: permission seeds, plan/template grants, competency scale seed | api |
-| T-05 | Performance API: cycle lifecycle, review submission, 360 aggregation with min-3 anonymization (BR-059), calibration | api |
-| T-06 | Goals API: cascade tree, weight-sum validation (BR-058), KRI progress rollup | api |
-| T-07 | Recruitment API: vacancies, applicant pipeline with monotonic stages (BR-057), interview scorecards | api |
+| T-05 | Performance API: cycle lifecycle, review submission, 360 aggregation with min-3 anonymization (BR-089), calibration | api |
+| T-06 | Goals API: cascade tree, weight-sum validation (BR-088), KRI progress rollup | api |
+| T-07 | Recruitment API: vacancies, applicant pipeline with monotonic stages (BR-087), interview scorecards | api |
 | T-08 | Training/certifications API + org tree/positions API with reports_to cycle detection | api |
 | T-09 | Employee documents API + `hr-expiry-sweep` job (30/7/0, deduplicated) + notifications | api |
 | T-10 | External HR bridges: export/import endpoints, validation reports, integration contract docs | api |
@@ -163,9 +163,9 @@ Acceptance criteria (all must pass with recorded evidence):
 1. Migrations `0075…0078` apply cleanly with Drizzle mirror parity; all 14 new tables
    have `ENTITY_CATALOG.md` rows (CR-36a).
 2. A full performance cycle runs end-to-end — activate, submit reviews with 360 inputs
-   (aggregated, minimum 3 responses per relationship, never attributed — BR-059),
-   calibrate, close — and per-reviewee goal weights sum to exactly 100% (BR-058).
-3. The recruitment pipeline enforces monotonic stage transitions (BR-057); hiring an
+   (aggregated, minimum 3 responses per relationship, never attributed — BR-089),
+   calibrate, close — and per-reviewee goal weights sum to exactly 100% (BR-088).
+3. The recruitment pipeline enforces monotonic stage transitions (BR-087); hiring an
    applicant links the record to the 045 employee master; interview scorecards record
    per panelist per round.
 4. Training enrollments and certifications record completion and results; certifications
@@ -194,13 +194,13 @@ Acceptance criteria (all must pass with recorded evidence):
 
 - **Sensitive appraisal data** — the most privacy-sensitive payload in the platform:
   mitigated by dedicated permission keys, RLS attack tests per table, and aggregate-only
-  360 visibility (BR-059); a field-level audit note is recorded for the governance phase
+  360 visibility (BR-089); a field-level audit note is recorded for the governance phase
   to formalize later.
 - **Org-tree corruption** — a cycle in `reports_to` or `org_units` breaks every rollup:
   mitigated by cycle-detection validation at write time and materialized paths.
 - **Stage sprawl in recruitment** — tenant-custom stage sets would fragment the pipeline
   report: mitigated by the fixed stage enum with an explicit recorded reopen action
-  instead of backward jumps (BR-057).
+  instead of backward jumps (BR-087).
 - **Prerequisite drift** — the 045/046 field contracts (probation date, employee↔user
   linkage) may shift before this phase runs: mitigated by consuming their documented
   contracts and recording any delta in the completion report.
