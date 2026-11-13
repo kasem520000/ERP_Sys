@@ -24,8 +24,8 @@ items:
 | Item kind | Source of truth for the distribution | Trust boundary |
 |---|---|---|
 | Untracked | `item_stock` itself | The position table IS the truth; one NULL-dimension row. |
-| Batch-tracked (`track_batch`) | `stock_moves` per `(batch, warehouse)` — the SAME append-only ledger `batchOnHand`/`listFefoBatches` fold at runtime, netted against the bin rows each batch already holds | A batch with no ledger legs cannot be proven; a `WRITTEN_OFF` batch with a positive ledger balance is an anomaly (never pickable — left unwritten, reported); a batch whose bins EXCEED its ledger is a NAMED per-batch conflict (reported, never healed by the backfill — and never hidden behind a totals-matching write). |
-| Serialized (`track_serial`) | `stock_moves` per serial (net ±1 legs) for the warehouse + the `item_serials` registry status | `item_serials` has NO warehouse column — the ledger is the only warehouse attribution; a serial whose registry status contradicts its ledger (`sold` vs +1 here) is a CONFLICT, never placed. |
+| Batch-tracked (`track_batch`) | `stock_moves` per `(batch, warehouse)` — the SAME append-only ledger `batchOnHand`/`listFefoBatches` fold at runtime, netted against the bin rows each batch already holds. **The comparison spans the UNION of the batches present in the ledger OR the boxes (the 2026-11-13 wave-4 fix)** — scoped exactly like the probe: tenant-owned rows only (`owner_partner_id IS NULL`), ALL bin statuses (`AVAILABLE`/`QUARANTINE`/`HOLD` — the probe folds them alike), tenant-scoped through the RLS context and the `item_batches` join. | A batch with no ledger legs cannot be proven; a `WRITTEN_OFF` batch with a positive ledger balance is an anomaly (never pickable — left unwritten, reported); a batch whose bins EXCEED its ledger is a NAMED per-batch conflict — **legs or no legs** (a batch whose bins hold stock with ZERO ledger legs at the warehouse is named with its exact shape: "the ledger has NO movements for this batch at this warehouse"; its bins count toward Σ bins, so healing the aggregate around it would HIDE it from the nightly probe — reported, never healed by the backfill, never hidden behind a totals-matching write). |
+| Serialized (`track_serial`) | `stock_moves` per serial (net ±1 legs) for the warehouse + the `item_serials` registry status | `item_serials` has NO warehouse column — the ledger is the only warehouse attribution; a serial whose registry status contradicts its ledger (`sold` vs +1 here) is a CONFLICT, never placed; a placed serial whose ledger does not corroborate the placement (bin rows place 1 here while the ledger nets anything other than exactly 1 here / 1 across all warehouses — e.g. a bin row for a serial with ZERO ledger legs) is a NAMED conflict (the wave-4 fix — never again silently accepted as "already placed"). |
 
 Every distribution is reconciled against the `(warehouse, item)` total
 **BEFORE any write** (never a blind NULL-dimension row on a tracked item —
@@ -72,22 +72,33 @@ Every `(warehouse, item)` shortfall row in the report carries:
   - **`NON_RECONCILABLE`** — the sources DISAGREE. Two shapes: (a) the
     per-batch ledger shortfalls, or the provable serial count, EXCEED the
     `item_stock` shortfall; (b) **the totals-matching shape (the 2026-11-13
-    wave-3 fix)** — the proven parts exactly EQUAL the shortfall while a
-    NAMED per-batch conflict exists (a batch whose bins hold more than its
-    ledger ever moved here — `listBatchDistribution`'s clamped
-    `GREATEST(ledger − bins, 0)` shortfall keeps the write plan honest, but
-    the conflict is reported, never silently skipped) or a named serial
-    conflict exists (over-placed, cross-warehouse contradiction, registry
-    mismatch). Writing the proven parts of such a position would land
-    Σ bins exactly on `item_stock` and turn the nightly probe GREEN —
-    hiding the conflict from the only recurring detector (the owner's
-    case: batch A ledger 5/bins 8, batch B ledger 2/bins 0, `item_stock`
-    10 — the pre-fix pass wrote 2 for B and the aggregate difference
-    vanished). The distribution is untrustworthy: **nothing is written for
-    the item** — the full shortfall stays visible to the probe; the
-    operator must investigate (§5). A position whose residue > 0 keeps the
-    probe visible anyway: its proven writes stay legitimate
-    (`PARTIAL_UNATTRIBUTED`) with the conflicts named in the notes.
+    wave-3 + wave-4 fixes)** — the proven parts exactly EQUAL the shortfall
+    while a NAMED per-batch conflict exists (a batch whose bins hold more
+    than its ledger ever moved here — whether the batch carries ledger
+    legs (`listBatchDistribution`'s clamped `GREATEST(ledger − bins, 0)`
+    shortfall keeps the write plan honest, but the conflict is reported,
+    never silently skipped) or has ZERO ledger legs at the warehouse
+    (invisible to the old ledger-driven population while its bins still
+    counted toward Σ bins — the wave-4 UNION population now lists and
+    names it: "bins hold N but the ledger has NO movements for this batch
+    at this warehouse") or a named serial conflict exists (over-placed,
+    cross-warehouse contradiction, registry mismatch, or — wave-4 — a
+    placement the ledger does not corroborate: bin rows place 1 here
+    while the ledger nets 0 here / 0 across warehouses). Writing the
+    proven parts of such a position would land Σ bins exactly on
+    `item_stock` and turn the nightly probe GREEN — hiding the conflict
+    from the only recurring detector (the wave-3 owner's case: batch A
+    ledger 5/bins 8, batch B ledger 2/bins 0, `item_stock` 10 — the
+    pre-fix pass wrote 2 for B and the aggregate difference vanished; the
+    wave-4 owner's case: batch A in bins 8 with NO ledger movements,
+    batch B ledger 2/bins 0, `item_stock` 10 — the pre-fix pass wrote
+    B's 2, classified WRITABLE, and the position vanished from the probe
+    AND the re-run). The distribution is untrustworthy: **nothing is
+    written for the item** — the full shortfall stays visible to the
+    probe; the operator must investigate (§5). A position whose residue
+    > 0 keeps the probe visible anyway: its proven writes stay
+    legitimate (`PARTIAL_UNATTRIBUTED`) with the conflicts named in the
+    notes.
 - `plannedWrites` — the dry-run's per-batch/per-serial write plan.
 - `residueQty` — the unproven remainder (`0` when `WRITABLE`).
 - `notes` — the named anomalies (the conflicting serial number, the
@@ -183,10 +194,16 @@ shortfall. When the live pass exits 2:
      log) — the residue stays visible forever; batch residue was never
      spendable, serial residue stays BLOCKED at the bin gate (it stops
      being sellable — the honest consequence, never a hidden one).
-- **`NON_RECONCILABLE` is never accepted silently**: the ledger claiming
-     MORE than the position table is a data-integrity incident — find the
-     divergent legs (the report's notes name the batches/serials) before any
-     correction.
+- **`NON_RECONCILABLE` is never accepted silently**: the sources
+     disagreeing — the ledger claiming MORE than the position table, or
+     the boxes claiming MORE than the ledger ever moved (a bins-only
+     batch, an uncorroborated serial placement) — is a data-integrity
+     incident: find the divergent legs (the report's notes name the
+     batches/serials with their exact shape) before any correction. A
+     documented adjustment that reconciles the sources (e.g. the receipt
+     that creates batch A's missing ledger legs, or the count that
+     corrects its bins) makes the position re-classifiable on the next
+     pass; the backfill itself never writes over a named disagreement.
 
 **There is no time-based auto-anything here.** The safety chain is:
 the binless grace keeps pre-backfill tenants spendable (§7) → the operator
