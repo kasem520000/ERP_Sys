@@ -4,6 +4,40 @@
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-13 — **PHASE-044 post-closure audit fixes** (the owner's audit of the
+  closed phase; no phase re-execution, no triple-flip changes — five commits, all
+  gates re-run; evidence:
+  [the gate-evidence ledger](../operations/gate-evidence/2026-11-13-post044-audit-fixes.md)):
+  (1) the tracked-item bin backfill — legacy stock on batch/serial items is now
+  DISTRIBUTED from the proven stock_moves ledger (per (batch, warehouse) and per
+  serial, reconciled against the total BEFORE any write; WRITABLE /
+  PARTIAL_UNATTRIBUTED / NON_RECONCILABLE classifications; unproven residue never
+  written, never hidden — one critical owner notification + the nightly probe;
+  post-write fold verification inside the tenant UoW; a per-tenant advisory lock
+  makes concurrent runs converge) + the operator tool rewritten for production
+  (app-role only, --tenant/--report, exit codes 0/1/2,
+  `pnpm --filter @erp/api backfill:bins`) + the MANDATORY
+  [WMS upgrade runbook](../operations/WMS_UPGRADE_BACKFILL_RUNBOOK.md);
+  (2) the evidence-ledger corrections — the 042 isolation baseline re-run-proven
+  at **1,320** (the announced 1,332 was a miscount; +132 = 22 tables × the SIX
+  generated it-blocks, not ×10), the 035 baseline likewise at **1,086** (announced
+  1,095), the 044 report's migration-section table corrected (lpns §5,
+  bin_contents §6, the stock_moves extension §7 + 0073, transfer_pricing_policies
+  0070 §1, transit_exceptions §2 added, inventory_alert_jobs §3,
+  warehouse_kit_orders/lines §4, 0070 §5 = the CoA markers), the PHASE-044 doc
+  re-pinned to the implemented G-43…G-46 / BR-072…077 / 22 tables /
+  inventory_alert_jobs / migrations 0067–0073, the stale .db.spec citations
+  renamed to the real files, and ACCOUNTING_TESTS re-pinned to the real tree with
+  the INV-027/028/029 rows; (3) [ID_LEDGER.md](../planning/ID_LEDGER.md) + the
+  `pnpm check:id-ledger` collision checker (shorthand ranges, claim-vs-reference
+  classification, reservation conflicts; self-tested with a conflicting claim and
+  a legitimate reference) + the comprehensive reservation re-coordination
+  (043: G-47…49/INV-030/BR-078…080 per the owner's proposal; the 045…064 ladders
+  shifted contiguously; 046's cross-references follow 045's G-51; no implemented
+  record renumbered); (4) the legacy contradictions — PHASE-042.md:144 re-pinned
+  to the implemented G-40/G-41/G-42/INV-028/BR-068…071, the payments-ready
+  phrase made honest (STAGED for PHASE-056), the binless grace's survival and
+  removal precondition documented in INV-029's canon row + runbook §7.
 - 2026-11-10 — **PHASE-038 — Procurement Sourcing & Supplier Collaboration — COMPLETE**
   (Blueprint v3.0 wave 1 / CR-08 — the audit's H-11 verdict resolved; evidence:
   [PHASE-038-COMPLETION.md](../implementation/phases/reports/PHASE-038-COMPLETION.md)):
