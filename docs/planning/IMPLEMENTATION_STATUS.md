@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-12 (PHASE-042 COMPLETE — Wave 2 opens: 035…042 delivered; roadmap v3.1 + v3.2 applied)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-044 COMPLETE — Wave 2's second phase: 035…042 + 044 delivered; PHASE-043 (MRP) unblocked)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -206,7 +206,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-041](../implementation/phases/PHASE-041.md) | Communications Hub (WhatsApp/SMS/Email — Wave 1 closer) | 1 / 12 | 035 | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-041-COMPLETION.md) |
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | NOT_STARTED — PLANNED |
-| [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-044-COMPLETION.md) |
 | [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | NOT_STARTED — PLANNED |
 | [PHASE-046](../implementation/phases/PHASE-046.md) | HR Payroll Compliance | 2 / 13 | 045 | NOT_STARTED — PLANNED |
 | [PHASE-047](../implementation/phases/PHASE-047.md) | HR Growth — Talent & Performance | 2 / 13 | 046 | NOT_STARTED — PLANNED |

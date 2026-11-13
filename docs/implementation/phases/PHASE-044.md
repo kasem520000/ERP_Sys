@@ -1,6 +1,6 @@
 # PHASE-044 — WMS & Inventory Intelligence
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.1/CR-46) · **Wave:** 2 / Stage 13 · **Register:** [CR-14](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE 2026-11-13 (Blueprint v3.0, scope extended by v3.1/CR-46) — [the completion report](reports/PHASE-044-COMPLETION.md) · **Wave:** 2 / Stage 13 · **Register:** [CR-14](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-07 · §6 I-01…I-25 · §20 PP-11/PP-12, DF-12/DF-17 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 inventory depth · [gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md) (L1-20 returnable packaging — the v3.1 scope extension)
 
 ## 1. Phase Overview
