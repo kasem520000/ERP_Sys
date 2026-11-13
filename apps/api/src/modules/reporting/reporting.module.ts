@@ -148,6 +148,10 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "inventory.wms.locations",
   "inventory.cycle_counts",
   "inventory.abc",
+  // PHASE-043 (0078 seed, matrix §3.22): the planning report keys — the
+  // MRP exceptions + ATP position contracts both gate on the mrp key the
+  // /manufacturing/mrp routes ride (the same §12 convention).
+  "manufacturing.mrp",
 ]);
 
 @Module({

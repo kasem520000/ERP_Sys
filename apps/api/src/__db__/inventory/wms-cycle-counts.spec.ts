@@ -17,7 +17,7 @@ import {
   ensureInventoryItem,
   setupInventoryFixture,
   stock,
-  type InventoryFixture,
+  warehouses,
 } from "./fixtures";
 
 /**
@@ -35,7 +35,6 @@ import {
  * window — the Pareto shares are fully deterministic.
  */
 
-let fixture: InventoryFixture;
 let cycleCounts: CycleCountService;
 
 const D_RECEIPT = "2026-10-01";
@@ -47,9 +46,10 @@ let itemB1 = "";
 let itemC1 = "";
 let itemZero = "";
 let scheduleId = "";
+let ccWarehouseId = "";
 
 beforeAll(async () => {
-  fixture = await setupInventoryFixture();
+  await setupInventoryFixture();
   const { AuditService } = await import("../../modules/audit/api/audit");
   const { DrizzleAuditStore } = await import("../../modules/audit/infrastructure/drizzle-audit.store");
   const { PostingService } = await import("../../modules/accounting/application/posting-service");
@@ -62,13 +62,41 @@ beforeAll(async () => {
     new NumberingService(audit),
   );
 
+  // The dedicated warehouse (the 044 gate-repair (d) precedent — the
+  // wms-picking suite's dedicated items): the schedule's due-scan rides
+  // the warehouse's stocked items, and on the SHARED MAIN-WH the sibling
+  // suites' never-counted stock turned the maxItems selection into a uuid
+  // lottery that could crowd this suite's C items out of the document
+  // (the T-19 gate catch). A dedicated warehouse pins the due population
+  // to exactly this suite's items; the DEFAULT bin still materializes
+  // lazily on the first receipt (the D-5 anchor), so the bin-aware
+  // assertions are untouched.
+  const { listBranches } = await import("../../modules/tenancy/infrastructure/tenancy.store");
+  const branches = await withTenant(TENANT_I, () => listBranches(null));
+  const ccBranch = branches.find((b) => b.code === "MAIN") ?? branches[0]!;
+  const existing = await withTenant(TENANT_I, () => warehouses.list({ limit: 50 }));
+  const ccWhRow =
+    existing.find((w) => w.code === "CC-WH") ??
+    (await withTenant(TENANT_I, () =>
+      warehouses.create({
+        branchId: ccBranch.id,
+        code: "CC-WH",
+        name: "Cycle count suite warehouse",
+        nameAr: "مستودع حزمة الجرد الدوري",
+        inventoryAccountId: null,
+        note: "dedicated — the T-19 corpus-independence repair",
+        actorId: I_ACTOR,
+      }),
+    ));
+  ccWarehouseId = ccWhRow.id;
+
   itemA1 = await ensureInventoryItem("INV-ABC-A1", "ABC heavy consumer");
   itemA2 = await ensureInventoryItem("INV-ABC-A2", "ABC second consumer");
   itemB1 = await ensureInventoryItem("INV-ABC-B1", "ABC mid consumer");
   itemC1 = await ensureInventoryItem("INV-ABC-C1", "ABC tail consumer");
   itemZero = await ensureInventoryItem("INV-ABC-Z", "ABC zero consumer");
 
-  const wh = fixture.warehouseMain;
+  const wh = ccWarehouseId;
   const seed = async (itemId: string, issueQty: string | null) => {
     await withTenant(TENANT_I, () =>
       stock.manualReceipt({
@@ -156,7 +184,7 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
   it("creates the schedule (A ≤ B ≤ C days enforced)", async () => {
     const schedule = await withTenant(TENANT_I, () =>
       cycleCounts.createSchedule({
-        warehouseId: fixture.warehouseMain,
+        warehouseId: ccWarehouseId,
         name: "MAIN cycle count",
         classADays: 30,
         classBDays: 90,
@@ -173,7 +201,7 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
     await expect(
       withTenant(TENANT_I, () =>
         cycleCounts.createSchedule({
-          warehouseId: fixture.warehouseMain,
+          warehouseId: ccWarehouseId,
           name: "bad order",
           classADays: 90,
           classBDays: 30,
@@ -281,13 +309,13 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
     // INV-029 after the posting: A1 bins = 47 = item_stock.
     const wmsStore = await import("../../modules/inventory/infrastructure/wms-store");
     const binRows = await withTenant(TENANT_I, () =>
-      wmsStore.listBinContents({ warehouseId: fixture.warehouseMain, itemId: itemA1, limit: 10 }),
+      wmsStore.listBinContents({ warehouseId: ccWarehouseId, itemId: itemA1, limit: 10 }),
     );
     const binTotal = binRows
       .filter((r) => r.ownerPartnerId === null)
       .reduce((sum, r) => sum + Number(r.qty), 0);
     const stockRow = await withTenant(TENANT_I, () =>
-      store.findItemStock(itemA1, fixture.warehouseMain),
+      store.findItemStock(itemA1, ccWarehouseId),
     );
     expect(binTotal).toBeCloseTo(597, 6);
     expect(Number(stockRow?.qty)).toBeCloseTo(597, 6);
@@ -313,7 +341,7 @@ describe("§2.6 — the schedule: frequency-gated generation + the count lifecyc
 describe("BR-075 — the variance approval threshold", () => {
   it("an over-threshold variance needs a supervisor (or a recount); the recount path posts clean", async () => {
     const item = await ensureInventoryItem("INV-CC-THR", "Cycle count threshold item");
-    const wh = fixture.warehouseMain;
+    const wh = ccWarehouseId;
     await withTenant(TENANT_I, () =>
       stock.manualReceipt({
         itemId: item,

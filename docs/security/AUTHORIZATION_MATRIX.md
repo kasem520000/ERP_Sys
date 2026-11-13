@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272 · PHASE-042 — §3.20 manufacturing execution; permission catalog 272 → 279 · PHASE-044 — §3.21 WMS & inventory intelligence; permission catalog 279 → 287)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-13 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272 · PHASE-042 — §3.20 manufacturing execution; permission catalog 272 → 279 · PHASE-044 — §3.21 WMS & inventory intelligence; permission catalog 279 → 287 · PHASE-043 — §3.22 MRP & planning; permission catalog 287 → 291)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -567,6 +567,45 @@ family — `zones` (+`/:id` PATCH, `/:id/aisles`), `aisles/:id/racks`, `bins`
 matrix row, not the sales create key). Role grants per 0071 §2: owner + accountant
 hold all eight; warehouse holds the operational seven (abc stays the analysis tier);
 viewer holds the read pair (`abc` + `serial_ledger` — the 042 oee.read precedent).
+
+### 3.22 `manufacturing` MRP & planning (PHASE-043)
+
+The PHASE-043 planning cluster (CR-13 · H-03 · M-01/M-05…M-11/M-21/M-22/M-24/M-25 ·
+S-10 · I-14): the deterministic MRP engine and its run/suggestion lifecycle, the
+master production schedule with its BR-078 frozen-fence law, the item planning
+policies (lead time, safety stock, lot sizing, time fences), the ATP/CTP query with
+the BR-080 hard exclusions, and the bill-of-resources rough-cut check. **All four
+keys seed in migration `0078` §1 — the permission catalog extends 287 → 291
+(seed = mirror, zero drift).** The plan grants (0078 §2) put the three feature keys
+(`manufacturing.mrp` · `manufacturing.mps` · `manufacturing.planning`) on business +
+enterprise only — planning is not a starter feature; the food_manufacturing template
+requires them by default (0078 §4).
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `manufacturing.mrp` | Run MRP and manage suggestions (accept / dismiss / convert) / تشغيل تخطيط الاحتياجات وإدارة الاقتراحات (قبول/رفض/تحويل) | owner, accountant, warehouse | tenant | no (audited; runs are read-only snapshots that post nothing — the INV-030 one-conversion law makes acceptance idempotent; the converted PO/MO/transfer posts through the owning module's exactly-once engine) |
+| `manufacturing.mps` | Manage master production schedule entries / إدارة سطور الجدول الزمني للإنتاج الرئيسي | owner, accountant, warehouse | tenant | **yes** (MPS rows are demand input to every run — an in-fence edit requires the override key AND a reason, BR-078; the MpsFenceEdit audit rows carry both) |
+| `manufacturing.planning_policies` | Manage item planning policies (lead time, safety stock, lot sizing, time fences) / إدارة سياسات تخطيط الصنف (زمن التوريد ومخزون الأمان والتحجم والأسوار الزمنية) | owner, accountant | tenant | no (audited master data — but policy edits change every later plan; the MRP exceptions report surfaces the data-readiness defects, M-01) |
+| `manufacturing.mps.frozen_edit` | Edit MPS entries inside the frozen fence (with reason) / تعديل سطور الجدول داخل السياج المجمد (مع السبب) | owner, accountant | tenant | **yes** (the BR-078 override — DATA-DEPENDENT, resolved per request against the entry's bucket vs the item's frozen fence; never a bare route key, always paired with the reason the service requires) |
+
+**Guarded routes** (ROUTE_PERMISSIONS, PHASE-043): the `/api/v1/manufacturing/mrp`
+family — `runs` (GET, POST), `runs/:id` (GET), `suggestions` (GET),
+`suggestions/:id/accept` + `suggestions/:id/dismiss` (POST) — `manufacturing.mrp`;
+the `/mps` family — `entries` (GET, POST, PATCH), `readiness` (GET) —
+`manufacturing.mps`; the `/planning` family — `lot-sizing-rules` (GET),
+`policies/:itemId` (GET, PATCH) — `manufacturing.planning_policies`; `atp` (POST)
+and `bor/rough-cut` (POST) — `manufacturing.mrp`. The cluster also guards its
+existing-key routes: `planning/bor/:bomId` (GET, PUT), `boms/:id/substitutions`
+(GET, PUT), `boms/:id/outputs` (GET, PUT) — `manufacturing.boms.manage`; the tolling
+round trip `tolling/orders` (GET, POST), `tolling/orders/:id` (GET),
+`tolling/orders/:id/issue|return|settle` (POST) — the `production_orders`
+view/create/post keys; the MTO link `production-orders/:id/link-sales-order` (POST)
+— `manufacturing.production_orders.create`; and the sales-side ATP probe
+`/api/v1/sales/sales-orders/:id/lines/:lineId/atp` (GET) — `sales.orders.view`.
+Role grants per 0078 §1: owner + accountant hold all four; the warehouse role (the
+material planners' tier) holds `mrp` + `mps` — NOT the policy master data and NOT
+the frozen-fence override; the viewer role holds none (runs are operational
+screens — `oee.read` remains the viewer's manufacturing read surface).
 
 ## 4. Segregation of duties & approval limits
 

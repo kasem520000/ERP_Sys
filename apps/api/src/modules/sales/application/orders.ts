@@ -48,7 +48,10 @@ export interface OrderLineInput {
 export class SalesOrderService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly numbering: NumberingService,
+    // The explicit token: the vitest transform emits no design:paramtypes,
+    // so an undecorated param before a later @Inject punches an undefined
+    // hole into Nest's token array (the 044 T-08 gate repair precedent).
+    @Inject(NumberingService) private readonly numbering: NumberingService,
     @Inject(AtpService) private readonly atp: AtpService,
   ) {}
 

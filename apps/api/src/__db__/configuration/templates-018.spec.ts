@@ -84,6 +84,13 @@ const MANUFACTURING_KEYS: readonly string[] = [
   "manufacturing.rework",
   "manufacturing.downtime",
   "manufacturing.standard_costs",
+  // PHASE-043 (0078 §2): the planning set joins the add-on the same way —
+  // mrp depends on work_centers + bom + inventory.wms (FEATURE_DEPS §25),
+  // so leaving the planning keys active over a revoked execution set
+  // breaks the BR-040 closure at apply time (the T-19 gate catch).
+  "manufacturing.mrp",
+  "manufacturing.mps",
+  "manufacturing.planning",
 ];
 
 // -- tenant A: food_manufacturing apply ------------------------------------

@@ -219,6 +219,17 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "manufacturing.rework": ["manufacturing.production_orders"],
   "manufacturing.downtime": ["manufacturing.work_centers"],
   "manufacturing.standard_costs": ["manufacturing.bom", "manufacturing.routing"],
+  // PHASE-043 (0078 plan grants — FEATURE_CATALOG §25 protocol, the 042
+  // intake precedent): the planning set. The MRP engine explodes BOMs,
+  // reads bin-level availability through the WMS surfaces, and its BOR
+  // rough-cut check reads work-center capacities; MPS is demand input to
+  // the engine; the planning policies feed the engine's lot-sizing +
+  // fences. Without these rows the CLOSED catalog reports every granted
+  // planning key as missing itself in every BR-040 closure check (the
+  // T-19 gate catch — the 0078 §2 grants ran ahead of this intake).
+  "manufacturing.mrp": ["manufacturing.work_centers", "manufacturing.bom", "inventory.wms"],
+  "manufacturing.mps": ["manufacturing.mrp"],
+  "manufacturing.planning": ["manufacturing.mrp"],
   // distribution
   "distribution.routes": ["partners.directory", "sales.reps"],
   "distribution.van_stock": ["inventory.multi_warehouse", "inventory.stock_transfers"],

@@ -363,7 +363,7 @@ export function planItemBuckets(input: {
     const reservedQty = supply
       .filter((term) => term.kind === "RESERVED")
       .reduce((sum, term) => sum.plus(new Decimal(term.qty)), new Decimal(0));
-    let next: Portion[] = [...live];
+    const next: Portion[] = [...live];
     for (const term of supply) {
       if (term.kind === "RESERVED") continue;
       if (

@@ -185,8 +185,9 @@ describe("seeds (acceptance 9)", () => {
     // inventory.wms.picking, inventory.cycle_counts, inventory.abc,
     // inventory.tracking.serial_ledger, inventory.quarantine,
     // inventory.tracking.consignment; the drift checker agrees: matrix 287
-    // = seed 287).
-    expect(result.rows[0]?.n).toBe(287);
+    // = seed 287) + 4 = 291 after 0078 — the four PHASE-043 planning keys
+    // (manufacturing.mrp/mps/planning_policies/mps.frozen_edit, matrix §3.22).
+    expect(result.rows[0]?.n).toBe(291);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

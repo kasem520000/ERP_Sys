@@ -168,6 +168,12 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // inventory.abc, inventory.tracking.serial_ledger, inventory.quarantine,
   // inventory.tracking.consignment.
   "apps/api/migrations/0071_wms_seeds.sql",
+  // PHASE-043 (Blueprint v3.0 · CR-13): 0078 seeds the FOUR planning keys
+  // (matrix §3.22; 287 → 291) — manufacturing.mrp, manufacturing.mps,
+  // manufacturing.planning_policies, manufacturing.mps.frozen_edit (the
+  // DATA-DEPENDENT frozen-fence override — granted to owner + accountant,
+  // resolved per request by the MPS service against the entry's bucket).
+  "apps/api/migrations/0078_mrp_seeds.sql",
 ];
 
 export async function main(): Promise<void> {

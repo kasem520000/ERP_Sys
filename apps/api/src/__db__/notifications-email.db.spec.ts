@@ -162,7 +162,10 @@ afterAll(async () => {
  * delivery is async, so positional waits race across tests). */
 async function waitForMailMatching(
   predicate: (mail: CapturedMail) => boolean,
-  deadlineMs = 10_000,
+  // 25s under the FULL-suite load (the embedded SMTP + pg-boss round trip
+  // rides one shared process; the T-19 gate catch — 10s flaked at ~10.05s
+  // on the loaded run while the "email delivered" log proved the arrival).
+  deadlineMs = 25_000,
 ): Promise<CapturedMail> {
   const started = Date.now();
   for (;;) {

@@ -1106,7 +1106,7 @@ describe("registry integration (the shared contract)", () => {
       expect(contract!.executionClass).toBe("inline");
       expect(ALL_KNOWN_PERMISSIONS.has(permission), permission).toBe(true);
     }
-    expect(snapshot).toHaveLength(99); // PHASE-028: +2 budgeting; PHASE-029: +3 payroll; PHASE-034: +4 consolidation; PHASE-035: +1 tax.e-invoicing-log; PHASE-038: +2 sourcing; PHASE-039: +2 returns/collections; PHASE-041: +1 delivery log; PHASE-042: +4 manufacturing; PHASE-044: +4 WMS intelligence
+    expect(snapshot).toHaveLength(101); // … PHASE-044: +4 WMS intelligence; PHASE-043: +2 planning (mrp-exceptions, atp-position)
   });
 
   it("exports flow through the shared contract (CSV renderer over the stored envelope)", async () => {
