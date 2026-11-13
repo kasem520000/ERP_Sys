@@ -73,7 +73,9 @@ export class WmsService {
     actorId: string | null;
   }) {
     if (!ZONE_TYPES.has(input.zoneType)) {
-      throw new BinContentStateError(`zone type must be one of PICKING/BULK/QUARANTINE/DOCK/STAGE: ${input.zoneType}`);
+      throw new BinContentStateError(
+        `zone type must be one of PICKING/BULK/QUARANTINE/DOCK/STAGE: ${input.zoneType}`,
+      );
     }
     const zones = await wms.listZones({ warehouseId: input.warehouseId, limit: 500 });
     if (zones.some((z) => z.code === input.code)) {
@@ -118,7 +120,9 @@ export class WmsService {
     const zone = await wms.findZoneById(id);
     if (zone === undefined) throw new ZoneNotFoundError(id);
     if (patch.zoneType !== undefined && !ZONE_TYPES.has(patch.zoneType)) {
-      throw new BinContentStateError(`zone type must be one of PICKING/BULK/QUARANTINE/DOCK/STAGE: ${patch.zoneType}`);
+      throw new BinContentStateError(
+        `zone type must be one of PICKING/BULK/QUARANTINE/DOCK/STAGE: ${patch.zoneType}`,
+      );
     }
     if (patch.isDefault === true && !zone.isDefault) {
       const siblings = await wms.listZones({ warehouseId: zone.warehouseId, limit: 500 });
@@ -151,7 +155,8 @@ export class WmsService {
     nameAr: string | null;
     actorId: string | null;
   }) {
-    if ((await wms.findZoneById(input.zoneId)) === undefined) throw new ZoneNotFoundError(input.zoneId);
+    if ((await wms.findZoneById(input.zoneId)) === undefined)
+      throw new ZoneNotFoundError(input.zoneId);
     const existing = await wms.listAisles(input.zoneId);
     if (existing.some((a) => a.code === input.code)) {
       throw new ZoneCodeExistsError(input.code);
@@ -185,7 +190,8 @@ export class WmsService {
     nameAr: string | null;
     actorId: string | null;
   }) {
-    if ((await wms.findAisleById(input.aisleId)) === undefined) throw new AisleNotFoundError(input.aisleId);
+    if ((await wms.findAisleById(input.aisleId)) === undefined)
+      throw new AisleNotFoundError(input.aisleId);
     const existing = await wms.listRacks(input.aisleId);
     if (existing.some((r) => r.code === input.code)) {
       throw new ZoneCodeExistsError(input.code);
@@ -241,7 +247,8 @@ export class WmsService {
     note: string | null;
     actorId: string | null;
   }) {
-    if ((await wms.findRackById(input.rackId)) === undefined) throw new RackNotFoundError(input.rackId);
+    if ((await wms.findRackById(input.rackId)) === undefined)
+      throw new RackNotFoundError(input.rackId);
     const bins = await wms.listBins({ warehouseId: input.warehouseId, limit: 1000 });
     if (bins.some((b) => b.code === input.code)) {
       throw new BinCodeExistsError(input.code);
@@ -512,7 +519,12 @@ export class WmsService {
    * quarantined at the new slot) — the structural move; item_stock never
    * moves. A CLOSED plate never moves again (LpnClosedError).
    */
-  async moveLpn(input: { lpnId: string; toBinId: string; note: string | null; actorId: string | null }) {
+  async moveLpn(input: {
+    lpnId: string;
+    toBinId: string;
+    note: string | null;
+    actorId: string | null;
+  }) {
     const lpn = await wms.findLpnById(input.lpnId);
     if (lpn === undefined) throw new LpnNotFoundError(input.lpnId);
     if (lpn.status !== "ACTIVE") {
@@ -579,7 +591,11 @@ export class WmsService {
    * job NEVER repairs (blocking is the movement core's job — this is the
    * detector). Returns the aggregate counts for the worker log.
    */
-  async reconcileAllTenants(): Promise<{ tenants: number; mismatchedTenants: number; mismatches: number }> {
+  async reconcileAllTenants(): Promise<{
+    tenants: number;
+    mismatchedTenants: number;
+    mismatches: number;
+  }> {
     const tenantIds = await listActiveTenantIds();
     let mismatchedTenants = 0;
     let mismatches = 0;
@@ -596,7 +612,10 @@ export class WmsService {
           if (prefs.inApp) {
             const named = rows
               .slice(0, 5)
-              .map((row) => `${row.itemSku ?? row.itemId} @ ${row.warehouseCode ?? row.warehouseId}: bins ${row.binQty} vs stock ${row.stockQty}`)
+              .map(
+                (row) =>
+                  `${row.itemSku ?? row.itemId} @ ${row.warehouseCode ?? row.warehouseId}: bins ${row.binQty} vs stock ${row.stockQty}`,
+              )
               .join("؛ ");
             await this.inbox.record({
               category: "stock",
@@ -638,10 +657,13 @@ export class WmsService {
   /** The per-(warehouse, item) classification of one shortfall row: what
    * the evidence PROVES, what may be written, and what stays unwritten
    * with a named reason (the post-closure audit fix — never a blind
-   * NULL-dimension row on a tracked item, never an invented balance). */
-  private async classifyShortfall(
-    row: wms.BinBackfillRow,
-  ): Promise<BackfillPlanRow> {
+   * NULL-dimension row on a tracked item, never an invented balance).
+   * WAVE-3: a named source conflict (a batch whose bins exceed its ledger,
+   * a conflicting serial) additionally FORBIDS the totals-matching
+   * WRITABLE — writing the proven parts would equal the aggregate and hide
+   * the conflict from the nightly probe (the only recurring detector), so
+   * the whole position stays unwritten and visible. */
+  private async classifyShortfall(row: wms.BinBackfillRow): Promise<BackfillPlanRow> {
     const base = {
       warehouseId: row.warehouseId,
       warehouseCode: row.warehouseCode,
@@ -668,7 +690,9 @@ export class WmsService {
         ...base,
         tracking: "NONE" as const,
         classification: "WRITABLE" as const,
-        writes: [{ batchId: null, serialId: null, batchNo: null, serialNo: null, qty: row.shortfall }],
+        writes: [
+          { batchId: null, serialId: null, batchNo: null, serialNo: null, qty: row.shortfall },
+        ],
         residueQty: "0.000000",
         notes: [],
       };
@@ -699,7 +723,9 @@ export class WmsService {
           if (binnedHere.greaterThan(1) || binnedElsewhere.greaterThan(0)) {
             notes.push(
               `serial ${s.serialNo}: bin rows place ${s.binnedHereQty} unit(s) here` +
-                (binnedElsewhere.greaterThan(0) ? ` and ${s.binnedElsewhereQty} at other warehouse(s)` : "") +
+                (binnedElsewhere.greaterThan(0)
+                  ? ` and ${s.binnedElsewhereQty} at other warehouse(s)`
+                  : "") +
                 " — a single-unit serial cannot sit in multiple slots, placement over-subscribed",
             );
           }
@@ -752,10 +778,36 @@ export class WmsService {
         };
       }
       const residue = total.minus(provable.length);
+      // WAVE-3 — the same totals-matching guard for serialized positions:
+      // a NAMED serial conflict (an over-placed serial, a cross-warehouse
+      // contradiction, a registry mismatch) with a zero residue would be
+      // HIDDEN by placing the provable units — Σ bins would land exactly on
+      // item_stock and the nightly probe would go green while the
+      // conflicting serial's drift stayed invisible (the batch-path
+      // hiding's exact analogue). Nothing is written; the full shortfall
+      // stays visible to the probe; the notes already name the conflicts.
+      // A residue > 0 keeps the probe visible anyway — its provable writes
+      // stay legitimate (PARTIAL_UNATTRIBUTED, the tested TBF-S-0004
+      // shape).
+      if (residue.isZero() && notes.length > 0) {
+        return {
+          ...base,
+          tracking: "SERIAL" as const,
+          classification: "NON_RECONCILABLE" as const,
+          writes: [],
+          residueQty: row.shortfall,
+          notes: [
+            `the provable in-stock serials (${provable.length}) exactly cover the item_stock shortfall ${row.shortfall}, but the sources disagree elsewhere at this position — placing the provable units would make Σ bins == item_stock and HIDE the named conflict(s) from the nightly probe; nothing written, the position stays whole to the probe (resolve per runbook §5)`,
+            ...notes.slice(0, 5),
+          ],
+        };
+      }
       return {
         ...base,
         tracking: "SERIAL" as const,
-        classification: residue.isZero() ? ("WRITABLE" as const) : ("PARTIAL_UNATTRIBUTED" as const),
+        classification: residue.isZero()
+          ? ("WRITABLE" as const)
+          : ("PARTIAL_UNATTRIBUTED" as const),
         writes: provable.map((s) => ({
           batchId: null,
           serialId: s.serialId,
@@ -764,23 +816,36 @@ export class WmsService {
           qty: "1.000000",
         })),
         residueQty: residue.toFixed(6),
-        notes:
-          residue.isZero()
-            ? notes.slice(0, 5)
-            : [
-                `${residue.toFixed(6)} unit(s) of item_stock have no provable in-stock serial at this warehouse — left unwritten and left visible to the nightly probe. NOTE (test-proven consequence): landing the proven rows ENDS the binless grace for this (warehouse, item) — the unproven units become BLOCKED at the bin gate (BinContentsShortError) until resolved through a documented adjustment (runbook §5); a phantom unit is never sellable through the named-unit path again`,
-                ...notes.slice(0, 5),
-              ],
+        notes: residue.isZero()
+          ? notes.slice(0, 5)
+          : [
+              `${residue.toFixed(6)} unit(s) of item_stock have no provable in-stock serial at this warehouse — left unwritten and left visible to the nightly probe. NOTE (test-proven consequence): landing the proven rows ENDS the binless grace for this (warehouse, item) — the unproven units become BLOCKED at the bin gate (BinContentsShortError) until resolved through a documented adjustment (runbook §5); a phantom unit is never sellable through the named-unit path again`,
+              ...notes.slice(0, 5),
+            ],
       };
     }
     // Batch-tracked: one row per batch whose warehouse ledger balance
     // exceeds its tenant bin qty (ACTIVE batches only — a WRITTEN_OFF batch
     // with a positive balance is itself an anomaly, never a pickable row).
+    // WAVE-3 (the batch-conflict hiding fix): a batch whose BINS EXCEED ITS
+    // LEDGER at this warehouse is a NAMED per-batch source conflict — the
+    // clamped shortfall (GREATEST(ledger − bins, 0)) keeps the write plan
+    // honest, but the conflict is never again a silent clamp-to-zero skip,
+    // and it can never hide behind a totals-matching WRITABLE (the guard
+    // below).
     const batches = await wms.listBatchDistribution(row.warehouseId, row.itemId);
     const notes: string[] = [];
     const writes: BackfillWrite[] = [];
     let proven = new Decimal(0);
     for (const b of batches) {
+      const ledgerQty = new Decimal(b.ledgerQty);
+      const binQty = new Decimal(b.binQty);
+      if (binQty.greaterThan(ledgerQty)) {
+        notes.push(
+          `batch ${b.batchNo}: bins hold ${b.binQty} but the ledger nets ${b.ledgerQty} here — the per-batch sources disagree (drift the backfill never heals; resolve through a documented adjustment, runbook §5)`,
+        );
+        continue; // never a write for a conflicting batch (its clamped shortfall is 0)
+      }
       const shortfall = new Decimal(b.shortfall);
       if (shortfall.lte(0)) continue;
       if (b.batchStatus !== "ACTIVE") {
@@ -812,19 +877,44 @@ export class WmsService {
       };
     }
     const residue = total.minus(proven);
+    // WAVE-3 — the totals-matching guard: writing the proven parts of a
+    // position that carries a NAMED anomaly (a per-batch conflict or a
+    // non-pickable written-off balance) would land Σ bins exactly on
+    // item_stock and turn the nightly probe GREEN — hiding the conflict
+    // from the only recurring detector. The owner's case: batch A ledger 5
+    // / bins 8, batch B ledger 2 / bins 0, item_stock 10 — the pre-fix pass
+    // wrote 2 for B, classified the position WRITABLE, and the aggregate
+    // difference vanished from the probe while A's per-batch disagreement
+    // stayed invisible forever. A position whose sources disagree anywhere
+    // is NEVER healed by this job: nothing is written, the FULL shortfall
+    // stays visible to the probe, and the notes name every conflicting
+    // batch (a position whose residue > 0 keeps the probe visible anyway —
+    // its proven writes stay legitimate, PARTIAL_UNATTRIBUTED).
+    if (residue.isZero() && notes.length > 0) {
+      return {
+        ...base,
+        tracking: "BATCH" as const,
+        classification: "NON_RECONCILABLE" as const,
+        writes: [],
+        residueQty: row.shortfall,
+        notes: [
+          `the per-batch proven shortfalls sum to ${proven.toFixed(6)} == the item_stock shortfall ${row.shortfall}, but the per-batch sources disagree at this position — writing the proven parts would make Σ bins == item_stock and HIDE the named conflict(s) from the nightly probe; nothing written, the position stays whole to the probe (resolve per runbook §5)`,
+          ...notes.slice(0, 5),
+        ],
+      };
+    }
     return {
       ...base,
       tracking: "BATCH" as const,
       classification: residue.isZero() ? ("WRITABLE" as const) : ("PARTIAL_UNATTRIBUTED" as const),
       writes,
       residueQty: residue.toFixed(6),
-      notes:
-        residue.isZero()
-          ? notes.slice(0, 5)
-          : [
-              `${residue.toFixed(6)} unit(s) of item_stock carry no batch on the ledger (pre-tracking legacy moves) — left unwritten: no more spendable than before the backfill (the FEFO law only issues batch-attributed stock), stays visible to the nightly probe until corrected through a documented adjustment`,
-              ...notes.slice(0, 5),
-            ],
+      notes: residue.isZero()
+        ? notes.slice(0, 5)
+        : [
+            `${residue.toFixed(6)} unit(s) of item_stock carry no batch on the ledger (pre-tracking legacy moves) — left unwritten: no more spendable than before the backfill (the FEFO law only issues batch-attributed stock), stays visible to the nightly probe until corrected through a documented adjustment`,
+            ...notes.slice(0, 5),
+          ],
     };
   }
 
@@ -915,7 +1005,8 @@ export class WmsService {
         written: 0,
         resolvedItems: 0,
         partialItems: plan.filter((row) => row.classification === "PARTIAL_UNATTRIBUTED").length,
-        nonReconcilableItems: plan.filter((row) => row.classification === "NON_RECONCILABLE").length,
+        nonReconcilableItems: plan.filter((row) => row.classification === "NON_RECONCILABLE")
+          .length,
         report: plan.map((row) => ({
           warehouseCode: row.warehouseCode,
           itemSku: row.itemSku,
@@ -935,17 +1026,16 @@ export class WmsService {
     // (2) The pre-pass — join the movement core's lock protocol BEFORE any
     // write, in ONE canonical order (warehouseId, itemId).
     const lockedPositions = new Set<string>();
-    const canonical = [...candidates].sort(
-      (a, b) =>
-        (a.warehouseId === b.warehouseId
-          ? a.itemId < b.itemId
-            ? -1
-            : a.itemId > b.itemId
-              ? 1
-              : 0
-          : a.warehouseId < b.warehouseId
-            ? -1
-            : 1),
+    const canonical = [...candidates].sort((a, b) =>
+      a.warehouseId === b.warehouseId
+        ? a.itemId < b.itemId
+          ? -1
+          : a.itemId > b.itemId
+            ? 1
+            : 0
+        : a.warehouseId < b.warehouseId
+          ? -1
+          : 1,
     );
     for (const candidate of canonical) {
       await stockStore.lockItemStock(candidate.itemId, candidate.warehouseId);

@@ -24,7 +24,7 @@ items:
 | Item kind | Source of truth for the distribution | Trust boundary |
 |---|---|---|
 | Untracked | `item_stock` itself | The position table IS the truth; one NULL-dimension row. |
-| Batch-tracked (`track_batch`) | `stock_moves` per `(batch, warehouse)` — the SAME append-only ledger `batchOnHand`/`listFefoBatches` fold at runtime, netted against the bin rows each batch already holds | A batch with no ledger legs cannot be proven; a `WRITTEN_OFF` batch with a positive ledger balance is an anomaly (never pickable — left unwritten, reported). |
+| Batch-tracked (`track_batch`) | `stock_moves` per `(batch, warehouse)` — the SAME append-only ledger `batchOnHand`/`listFefoBatches` fold at runtime, netted against the bin rows each batch already holds | A batch with no ledger legs cannot be proven; a `WRITTEN_OFF` batch with a positive ledger balance is an anomaly (never pickable — left unwritten, reported); a batch whose bins EXCEED its ledger is a NAMED per-batch conflict (reported, never healed by the backfill — and never hidden behind a totals-matching write). |
 | Serialized (`track_serial`) | `stock_moves` per serial (net ±1 legs) for the warehouse + the `item_serials` registry status | `item_serials` has NO warehouse column — the ledger is the only warehouse attribution; a serial whose registry status contradicts its ledger (`sold` vs +1 here) is a CONFLICT, never placed. |
 
 Every distribution is reconciled against the `(warehouse, item)` total
@@ -69,10 +69,25 @@ Every `(warehouse, item)` shortfall row in the report carries:
     grace for that (warehouse, item), and no fabricated row is ever
     invented to keep an unprovable unit sellable. Fail-closed by design:
     the block is the safety, not a regression — resolve per §5.
-  - **`NON_RECONCILABLE`** — the sources DISAGREE (the per-batch ledger
-    shortfalls, or the provable serial count, EXCEED the `item_stock`
-    shortfall). The distribution is untrustworthy: **nothing is written for
-    the item**; the operator must investigate (§5).
+  - **`NON_RECONCILABLE`** — the sources DISAGREE. Two shapes: (a) the
+    per-batch ledger shortfalls, or the provable serial count, EXCEED the
+    `item_stock` shortfall; (b) **the totals-matching shape (the 2026-11-13
+    wave-3 fix)** — the proven parts exactly EQUAL the shortfall while a
+    NAMED per-batch conflict exists (a batch whose bins hold more than its
+    ledger ever moved here — `listBatchDistribution`'s clamped
+    `GREATEST(ledger − bins, 0)` shortfall keeps the write plan honest, but
+    the conflict is reported, never silently skipped) or a named serial
+    conflict exists (over-placed, cross-warehouse contradiction, registry
+    mismatch). Writing the proven parts of such a position would land
+    Σ bins exactly on `item_stock` and turn the nightly probe GREEN —
+    hiding the conflict from the only recurring detector (the owner's
+    case: batch A ledger 5/bins 8, batch B ledger 2/bins 0, `item_stock`
+    10 — the pre-fix pass wrote 2 for B and the aggregate difference
+    vanished). The distribution is untrustworthy: **nothing is written for
+    the item** — the full shortfall stays visible to the probe; the
+    operator must investigate (§5). A position whose residue > 0 keeps the
+    probe visible anyway: its proven writes stay legitimate
+    (`PARTIAL_UNATTRIBUTED`) with the conflicts named in the notes.
 - `plannedWrites` — the dry-run's per-batch/per-serial write plan.
 - `residueQty` — the unproven remainder (`0` when `WRITABLE`).
 - `notes` — the named anomalies (the conflicting serial number, the
