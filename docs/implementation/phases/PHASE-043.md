@@ -126,12 +126,15 @@ PHASE-042 prerequisite.
 - **Reports**: +2 contracts into `REPORT_CATALOG.md`
   (`manufacturing.mrp-exceptions`, `manufacturing.atp-position`); catalog ↔ registry
   reconciliation check extended.
-- **Posting canon** (reservations re-coordinated 2026-11-13 per
-  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-44…G-46/INV-028/BR-061…063 predate the 039–044 waves' consumption of those slots): goldens G-47 (by/co-product joint allocation), G-48 (contract
-  manufacturing tolling round trip), G-49 (MTO completion at actual cost with
-  reservation chain) added to `JOURNAL_RULES.md` §7; note added that MRP runs and
-  suggestions are **not ledger documents** (the budgeting precedent — no golden row
-  for the run itself). Invariant INV-030 (MRP netting exactness) added to
+- **Posting canon** (**as implemented: goldens G-47…G-49 · INV-030 ·
+  BR-078…BR-080 — the ID_LEDGER-coordinated slots; the plan's G-44…G-46/INV-028/
+  BR-061…063 predate the 039–044 waves' consumption of those slots**; see the
+  completion report and JOURNAL_RULES note 15): G-47 (by/co-product joint
+  allocation), G-48 (contract manufacturing tolling round trip), G-49 (MTO
+  completion at actual cost with reservation chain) added to `JOURNAL_RULES.md`
+  §7; a note records that MRP runs and suggestions are **not ledger documents**
+  (the budgeting precedent — no golden row for the run itself). Invariant
+  INV-030 (MRP netting exactness + the one-conversion law) added to
   `ACCOUNTING_INVARIANTS.md`; BR-078…BR-080 added to `BUSINESS_RULES.md`.
 - **Feature flags**: `manufacturing.mrp.*`, `manufacturing.mps.*`,
   `manufacturing.planning.*` — template-composable grants (CR-36 (f)).
@@ -167,8 +170,8 @@ PHASE-042 prerequisite.
 | T-14 | Build `/manufacturing/mps` bucket grid editor + item-card planning tab | web |
 | T-15 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-16 | Implement the 2 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-17 | Golden suites G-47/G-48/G-49 with failure packs; INV-030 suite (netting, idempotent conversion, cycle termination, allocation exactness); BR-078…080 guards | api |
-| T-18 | Docs: JOURNAL_RULES §7 rows + no-golden-for-runs note, ACCOUNTING_INVARIANTS INV-030, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, module determinism note | docs |
+| T-17 | Golden suites G-47/G-48/G-49 with failure packs (**delivered** — the planned slots, kept; see JOURNAL_RULES note 15); INV-030 suite (netting, idempotent conversion, cycle termination, allocation exactness); BR-078…080 guards | api |
+| T-18 | Docs (delivered 2026-11-13): JOURNAL_RULES §7 rows for the three goldens + the no-golden-for-runs note, the invariants doc's INV-030 row, the business-rules register's BR-078…080 rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, module determinism note | docs |
 | T-19 | Run full local gates + OA-06 EXPLAIN budgets (explosion queries, suggestion board queries); record evidence | all |
 
 ## 6. Verification

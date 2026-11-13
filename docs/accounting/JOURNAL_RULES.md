@@ -120,13 +120,22 @@ mandatory failure pack ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_T
 | G-44 | Consignment consumption settlement — `inventory` | Source `consignment_consumption:{id}:settle` (exactly-once per settlement): DR `COGS` · CR `CONSIGNATION_PAYABLE` (2135) at the AGREED unit price, the owner partner stamped on both legs; fail-closed `PURPOSE_NOT_MAPPED` until 2135 maps (the 038 discipline — BR-077); the receive/return legs are STRUCTURAL (owner rows never enter `item_stock`/`stock_moves`/the tenant ledger — BR-076; INV-010 stays the tenant's own) | PHASE-044 |
 | G-45 | Warehouse kitting — the Σ-components roll-up — `inventory` | Source `kit_order` operation `post` (WK- numbering): the kit BOM snapshot lines issue from their directed bins (reason `KIT_CONSUMPTION`) and the kit receipts at Σ component costs EXACTLY — same-account by construction, so NO journal posts (the D-4/G-15 policy-none mirror); INV-029 holds on every leg (the plans ride the movement core — bins and `item_stock` move in the same transaction); serialized components/kits name their units at post (`KIT_OUT`/`KIT_IN` serial events — omitting them fails closed) | PHASE-044 |
 | G-46 | Internal transfer-price valuation difference — `inventory` | The per-warehouse-pair policy (MARKUP % / FIXED price, migration 0070 — the operand discipline: exactly one of the two): the policy-priced transfer receipt posts the explicit valuation difference DR destination INVENTORY · CR `TRANSFER_PRICING_ADJUSTMENT` (4990) — fail-closed `PURPOSE_NOT_MAPPED` until 4990 maps; a policy-less transfer keeps the legacy G-15 shape byte-identical; the transit exceptions (I-22) post the G-13 shrinkage shape at the carried cost with their own exactly-once keys | PHASE-044 |
+| G-47 | By/co-product completion — the joint WIP allocation — `manufacturing` | Source `production_order`, operation `complete` (the same exactly-once key as the single-output completion — the extension, never a second key): when the bound BOM carries `bom_outputs`, the actual WIP cost allocates across ALL outputs per the activation-validated percentages (main + Σ outputs = 100 EXACTLY — the typed `BOM_ALLOCATION_INVALID` rejects the BOM otherwise, G-47's activation floor): DR inventory(main, value × main%) · DR inventory(each output, value × its %) · CR `WIP` (the full balance) — the main product ABSORBS the outputs' rounding residue (each output's 6dp unit cost reconstitutes its 4dp value; Σ allocated = the WIP consumed EXACTLY — INV-030's sibling law); each allocation lands its own batch (the QC gate + the genealogy edge ride every batch); a BOM without outputs keeps the single-output shape byte-identical (additive-only 0075) | PHASE-043 |
+| G-48 | Contract-manufacturing (tolling) round trip — `manufacturing` | Source `contract_mfg_order`: `issue_<n>` DR `TOLLING_MATERIALS` (1420) · CR inventory(component) at the issue WAC (the BOM explosion at planned qty; phantoms flatten — the custody moves to the processor, one move row per slice in `contract_mfg_moves`); `return_finished_<n>` DR inventory(FG at materials + fee) · CR 1420 (the materials content) · CR `TOLLING_CONVERSION_PAYABLE` (2136 — the fee accrual cleared by the fee PO's supplier invoice through the AP flow); `return_material_<n>` DR inventory · CR 1420 (unused materials at their issue cost); `yield_loss_<n>` DR `TOLLING_YIELD_LOSS` (5126) · CR 1420 (explicit loss, no stock move — the material is gone from custody); THE SETTLEMENT LAW: Σ issue = Σ return(material + finished-materials-content) + Σ yield EXACTLY — the typed `CONTRACT_MFG_SETTLEMENT_BROKEN` rejects any residue (never a partial settlement); all three purposes fail closed (`PURPOSE_NOT_MAPPED`) until mapped (BR-077's discipline) | PHASE-043 |
+| G-49 | MTO completion at actual cost with the reservation chain — `manufacturing` | Source `production_order`, operation `complete` (the G-47/G-single shape carries it) + the MTO chain around it: binding a production order to its driving sales line creates the HARD reservation (holder `PRODUCTION_ORDER`, the 0076 widening — planned qty, released only on unbind); completion receipts the FG batch at the MO's ACTUAL unit cost (the batch layer IS the MO cost) and routes the output to the linked sales delivery — a DRAFT delivery note pinning the produced batch (`orderLineId` + `batchId`), so the delivery's COGS posts at exactly the MO's actual unit cost (the batch layer the movement core consumes); the routing failure never fails the committed completion (the hook records the failure — the delivery is raised manually) | PHASE-043 |
 
 Notes:
 
 1. Budgeting (PHASE-028) deliberately has **no** golden row — budgets are not ledger
    documents and never post a journal (BR-051; [DOCUMENT_LIFECYCLE.md](DOCUMENT_LIFECYCLE.md)
    §3).
-2. Note custody is event-driven: journals post only on the economically effective
+2. MRP runs and suggestions (PHASE-043) ride the same precedent — **no** golden row: a
+   planning run (`mrp_runs` + its demand/supply lines) and its suggestions
+   (`mrp_suggestions`) are replayable SNAPSHOTS over the ledger, not ledger documents;
+   they never post a journal and never touch stock (INV-030 records the snapshot law).
+   The goldens the phase DID add (G-47…G-49) ride the converting documents' own posting
+   shapes.
+3. Note custody is event-driven: journals post only on the economically effective
    transitions (collect/dishonor/return/discount, plus the initial recognition of G-24 and
    G-27); endorsement and deposit move custody without a journal (BR-047).
 3. Depreciation posts only via runs — no manual asset journals (BR-042); payroll accounts
@@ -276,4 +285,24 @@ Notes:
     150.0000 → DR `COGS` · CR 2135 (owner-stamped); **G-45** 20×3 + 30×5 = 210.0000 for
     10 kits → NO journal (kit at 21.000000/unit, same-account); **G-46** MARKUP 25% on
     a 4.00 carry → the receipt's margin leg at the explicit difference.
+15. **G-47…G-49 delivered mechanics (PHASE-043, migrations 0074–0078).** Numbering: the
+    PHASE-043 document planned G-44…G-46 — those numbers predate the 039–044 waves that
+    consumed them (the ID_LEDGER coordination; the honest slots are G-47…G-49). The
+    planning family itself posts NOTHING: MRP runs (`mrp_runs`/`mrp_demand_lines`/
+    `mrp_supply_lines`) and suggestions (`mrp_suggestions`) are planning snapshots — the
+    budgeting precedent (no golden row for the run itself; the JOURNAL_RULES §3 note
+    records it). The three goldens ride the DOCUMENT surfaces the planning brain drives:
+    G-47 through the production-order completion extension (the allocation percentages
+    validated at BOM activation — `BOM_ALLOCATION_INVALID` fails closed), G-48 through the
+    tolling service's five operations (1420/2136/5126 markers seeded in 0077; existing
+    tenants stay `PURPOSE_NOT_MAPPED`-closed until they map), and G-49 through the MTO
+    chain (the hard reservation holder widened in 0076 + the batch-pinned delivery
+    routing). Worked examples as pinned by the DB suites
+    (`__db__/manufacturing/planning-goldens.spec.ts`): **G-47** a 60/40 split over 1,000
+    WIP → main 600.0000 · co-product 400.0000, Σ = 1,000.0000 exactly, the co-product
+    batch at its allocated cost; **G-48** issue 1,000.0000 → return 1,080.0000 = 900
+    materials + 180 fee accrual + the explicit 100 yield loss → settle at EXACTLY zero;
+    **G-49** the MTO chain — the DRAFT-only link, the ACTIVE PRODUCTION_ORDER hard
+    reservation before the QC hold, the completion at actual cost, the delivery pinning
+    the produced batch.
 

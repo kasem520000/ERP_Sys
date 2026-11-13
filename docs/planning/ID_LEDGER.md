@@ -38,7 +38,7 @@ corrections never move a slot.)*
 
 | Phase | Goldens | Invariants | Business rules | Was (the stale plan) |
 |---|---|---|---|---|
-| PHASE-043 (MRP) | G-47…G-49 | INV-030 | BR-078…BR-080 | G-44…G-46 · INV-028 · BR-061…063 (all consumed by 039–044) |
+| ~~PHASE-043 (MRP)~~ **DELIVERED 2026-11-13** — its slots are now IMPLEMENTED (G-47…G-49 · INV-030 · BR-078…080; see §1) and no longer reservations | — | — | — | G-44…G-46 · INV-028 · BR-061…063 (all consumed by 039–044) |
 | PHASE-045 (HR Core) | G-50…G-51 | INV-031 | BR-081…BR-083 | G-51…G-52 · INV-030 · BR-068…070 (consumed by 039–042) |
 | PHASE-046 (HR Payroll) | G-52…G-54 | INV-032 | BR-084…BR-086 | G-53…G-55 · INV-031 · BR-071…073 (consumed by 039–042/044) |
 | PHASE-047 (HR Growth) | — | — | BR-087…BR-090 | BR-057…060 (consumed by 036/037) |
@@ -62,14 +62,14 @@ corrections never move a slot.)*
 | PHASE-065…068 | — | — | — | none claimed |
 
 **Coordination arithmetic** (the checker re-derives it): goldens — implemented
-ends at G-46; 043 takes 47–49, 045 50–51, 046 52–54, 048 55–58, 049 59–61,
-050 62–63, 051 64–66, 052 67, 053 68–70, 054 71–72, 056 73–74, 060 75–76,
-061 77–78, 063 79 — contiguous, no overlap. Invariants — implemented ends at
-INV-029; 043 030, 045 031, 046 032, 048 033, 049 034, 050 035, 051 036,
-052 037, 053 038, 054 039, 055 040, 056 041, 058 042, 060 043, 061 044,
-064 045 — contiguous. Business rules — implemented ends at BR-077; 043 078–080,
-045 081–083, 046 084–086, 047 087–090, 048 091–095, 049 096–099, 050 100–103,
-051 104–107 — contiguous.
+ends at G-49 (PHASE-043 delivered 2026-11-13); 045 takes 50–51, 046 52–54,
+048 55–58, 049 59–61, 050 62–63, 051 64–66, 052 67, 053 68–70, 054 71–72,
+056 73–74, 060 75–76, 061 77–78, 063 79 — contiguous, no overlap. Invariants —
+implemented ends at INV-030 (PHASE-043 delivered); 045 031, 046 032, 048 033,
+049 034, 050 035, 051 036, 052 037, 053 038, 054 039, 055 040, 056 041, 058 042,
+060 043, 061 044, 064 045 — contiguous. Business rules — implemented ends at
+BR-080 (PHASE-043 delivered); 045 081–083, 046 084–086, 047 087–090, 048 091–095,
+049 096–099, 050 100–103, 051 104–107 — contiguous.
 
 ## 3. Cross-references (forward references between future phases)
 

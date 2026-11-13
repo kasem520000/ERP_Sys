@@ -1,6 +1,6 @@
 # Navigation Model
 
-> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-11 (PHASE-035 / PHASE-036 / PHASE-038 / PHASE-039) · 2026-11-12 (PHASE-042 — the manufacturing execution group, §1.8)
+> **Status:** STABLE · **Owner:** Design System Architecture · **Updated:** 2026-11-11 (PHASE-035 / PHASE-036 / PHASE-038 / PHASE-039) · 2026-11-12 (PHASE-042 — the manufacturing execution group, §1.8) · 2026-11-13 (PHASE-043 — the planning surfaces, §1.10)
 
 How users move through the platform: the information architecture, the entitlement-driven
 navigation registry, the command menu as universal navigation, back/deep-link behavior,
@@ -223,6 +223,25 @@ design — the putaway queue on `/purchasing/receipts`, the wave action + pick s
 | `inventory.cycle_counts` | 4 المخزون | الجرد الدوري / Cycle counts | `inventory.cycle_counts` | `inventory.cycle_counts` | Wizard (§4) — route `/inventory/cycle-counts`, order 140: schedules (create + run-now), count documents with the DRAFT→POSTED lifecycle, bin-aware line entry, and the BR-075 supervisor approval |
 | `inventory.abc` | 4 المخزون | تصنيف ABC / ABC classification | `inventory.abc` | `inventory.abc` | Report Page (§7) — route `/inventory/abc`, order 150: the latest Pareto generation with the class summary + recompute |
 | `inventory.quarantine` | 4 المخزون | لوحة الحجر الصحي / Quarantine board | `inventory.quarantine` | `inventory.quarantine` | List + Search (§2) — route `/inventory/quarantine`, order 160: the held-rows board with the G-43 transitions and the three dispositions |
+
+### 1.10 PHASE-043 registry additions (Blueprint v3.0 — MRP & planning)
+
+The planning surfaces (CR-13; [../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md)
+§27's planning block): two items in group 5 الإنتاج والتصنيع — the MRP engine + suggestions
+board and the master production schedule. Same resolution rule as every item —
+`entitlement(featureKey)` AND `permission(user, branch)`; visibility is **server-resolved**
+(`resolveNavigation`) per BR-039, and the command palette (⌘K / Ctrl+K, §3) inherits both
+through the same registry (OA-04). The item card's planning tab rides the EXISTING item
+screen (`/inventory/items/:id`, the §4 items keys) as an embedded tab — no new item by
+design; the frozen-fence override permission (`manufacturing.mps.frozen_edit`) stays
+DATA-DEPENDENT (resolved per request by the MPS service — never a static nav row). Mirrors
+`packages/contracts/src/navigation.ts` (orders 60/70; the 0078 permission keys —
+[../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.20).
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `manufacturing.mrp` | 5 الإنتاج والتصنيع | تخطيط الاحتياجات / MRP | `manufacturing.mrp` | `manufacturing.mrp` | List + Search (§2) — route `/manufacturing/mrp`, order 60: the run configuration (mode, bucket, horizon, scope) + run history + the suggestions board (accept / dismiss-with-reason / convert; the netting drill-down per suggestion) |
+| `manufacturing.mps` | 5 الإنتاج والتصنيع | الجدول الرئيسي / MPS | `manufacturing.mps` | `manufacturing.mps` | List + Search (§2) — route `/manufacturing/mps`, order 70: the PeriodGrid bucket editor with FIRMED toggles, the data-readiness panel, and the BR-078 frozen-fence guard (the in-fence edit needs the distinct permission + a reason) |
 
 ## 2. Navigation registry (data model, normative)
 
