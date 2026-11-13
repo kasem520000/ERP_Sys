@@ -495,9 +495,14 @@ describe("G-49 MTO completion (the reservation chain)", () => {
         noteAr: null,
         actorId: M_ACTOR,
       });
+      // Same-day completion (2026-03-10, the consume date): the WIP-GL green
+      // path in wip-recon.spec.ts asserts an ABSOLUTE zero as of 2026-03-10 —
+      // a completion dated after that as-of would leave this order's WIP in
+      // flight inside the window (the file-order-independence contract there:
+      // every in-window order must net WIP to exactly zero).
       const result = await orders.complete(order.id, {
         actualQty: "10",
-        completedAt: "2026-03-12",
+        completedAt: "2026-03-10",
         actorId: M_ACTOR,
       });
       expect(result.order.status).toBe("COMPLETED");
