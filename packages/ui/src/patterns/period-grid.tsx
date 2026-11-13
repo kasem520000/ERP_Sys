@@ -313,7 +313,7 @@ export function PeriodGrid({
                   role="gridcell"
                   className="px-3 py-1.5 text-end font-mono text-sm tabular-nums font-medium text-gray-900"
                   dir="ltr"
-                  aria-label={`${row.dimensionLabel} · ${rowTotalLabel}`}
+                  aria-label={`${formatMoneyDisplay(rowTotals.get(row.key) ?? "0", minorUnits)} · ${row.dimensionLabel} · ${rowTotalLabel}`}
                 >
                   {formatMoneyDisplay(rowTotals.get(row.key) ?? "0", minorUnits)}
                 </td>

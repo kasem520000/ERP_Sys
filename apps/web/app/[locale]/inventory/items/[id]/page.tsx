@@ -9,13 +9,12 @@
 import { notFound, redirect } from "next/navigation";
 import type { JSX } from "react";
 
-import { Tabs } from "@erp/ui";
-
 import { AppShell } from "../../../../../components/app-shell";
 import { ArchiveAction } from "../../../../../components/archive-action";
 import { AttachmentsSection } from "../../../../../components/attachments-section";
 import { ErrorState } from "../../../../../components/client-ui";
 import { ItemBarcodes } from "../../../../../components/item-barcodes";
+import { ItemDetailTabs } from "../../../../../components/item-detail-tabs";
 import { ItemForm } from "../../../../../components/item-form";
 import { ItemPlanning } from "../../../../../components/item-planning";
 import { RetryButton } from "../../../../../components/retry-button";
@@ -95,7 +94,7 @@ export default async function ItemDetailPage({
           (edit form + barcodes + archive + attachments) stays verbatim on the
           general slot; the planning slot carries the planning-policy editor
           (the manufacturing-orders data-slot pattern). */}
-      <Tabs
+      <ItemDetailTabs
         items={[
           { value: "general", label: d.itemGeneralTab },
           { value: "planning", label: d.mfgPlanningTab },
@@ -143,7 +142,7 @@ export default async function ItemDetailPage({
         <div data-slot="planning" className="pt-4">
           <ItemPlanning locale={localeValue} itemId={id} />
         </div>
-      </Tabs>
+      </ItemDetailTabs>
     </AppShell>
   );
 }
