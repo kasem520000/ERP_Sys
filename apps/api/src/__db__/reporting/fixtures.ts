@@ -170,6 +170,10 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "inventory.wms.locations",
   "inventory.cycle_counts",
   "inventory.abc",
+  // PHASE-043 (0078 seed, matrix §3.20): the planning permission (the MRP
+  // exceptions + ATP/CTP contracts' read permission — the same key the
+  // /manufacturing/mrp routes ride).
+  "manufacturing.mrp",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

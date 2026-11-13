@@ -156,6 +156,11 @@ import {
   inventoryCycleCountVarianceContract,
   inventorySlowMovementContract,
 } from "./operational/wms";
+// PHASE-043 · the MRP & planning set (REPORT_CATALOG additions — the MRP
+// exceptions view (the data-readiness defects + the run residuals) and the
+// ATP/CTP position register with the BR-080 exclusion evidence).
+import { manufacturingMrpExceptionsContract } from "./manufacturing/mrp-exceptions.contract";
+import { manufacturingAtpPositionContract } from "./manufacturing/atp-position.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -320,6 +325,8 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   manufacturingDowntimeAnalysisContract,
   manufacturingReworkCostContract,
   manufacturingCostVarianceContract,
+  manufacturingMrpExceptionsContract,
+  manufacturingAtpPositionContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

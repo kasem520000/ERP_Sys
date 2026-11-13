@@ -84,6 +84,9 @@ export const boms = new BomService(audit);
 export const warehouses = new WarehouseService(audit);
 export const stock = new StockService(audit, posting);
 export const tracking = new TrackingService(audit, stock);
+// PHASE-043 (T-16): the reservation service surfaces for the reporting
+// spec's seeded ACTIVE reservation (the BR-080 evidence row).
+export const reservations = new ReservationService(audit);
 // PHASE-042 (0065/0066): the manufacturing-execution surfaces — the
 // operation-freeze collaborator joins the order service's constructor (8th
 // param), then the five new services on the same module-local instances.
