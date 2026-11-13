@@ -1,8 +1,65 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-13 (PHASE-044 post-closure audit fixes, wave 4)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-13 (PHASE-044 post-closure audit fixes, wave 5)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 5** (the owner's
+  review of the fourth wave at head `8f943aa` — the union fix accepted,
+  then the remaining sequential scenario from the wave-4 §5 limitation: a
+  PLACED serial whose ledger corroborates the placement exactly (+1 here /
+  +1 across all warehouses) while its `item_serials` status is `sold` was
+  skipped without a registry check; evidence:
+  [the wave-5 gate-evidence ledger](../operations/gate-evidence/2026-11-13-post044-audit-fixes-wave5.md)):
+  THE PLACED-SERIAL REGISTRY CONFLICT HIDING — `classifyShortfall`'s placed
+  branch (`wms.service.ts` 730–744) examined the bins and the ledger, then
+  `continue` without ever examining `registryStatus` (the registry-vs-ledger
+  check existed only on the unplaced/provable branch). The owner's
+  prescribed case (serial A in a bin qty 1, ledger net 1 here / 1 total,
+  registry `sold`; serial B `in_stock`, ledger net 1, never placed;
+  `item_stock` 2, Σ bins 1) was run on the pre-fix code FIRST and
+  confirmed on a real database: the position STARTED as a VISIBLE DEFICIT
+  in the nightly probe (bins 1 vs stock 2), the pre-fix pass classified B
+  provable (WRITABLE), wrote its unit, Σ bins landed on 2 ==
+  `item_stock`, and the probe went GREEN — a visible deficit ERASED BY the
+  migration while A's registry conflict (a sold unit occupying a bin its
+  ledger still calls in stock) hid from every recurring detector (the
+  wave-4 §5 claim "the probe cannot see such a position anyway (bins ==
+  ledger ⇒ no shortfall row)" was true only for the already-balanced
+  shape; its "this wave guarantees the migration cannot CREATE such a
+  hidden state from a visible one" was FALSE for this shape until now).
+  THE FIX — a serial whose bin rows place it (here, or at another
+  warehouse) while its registry status is anything other than `in_stock`
+  (`sold`/`returned` — migration 0015's complete vocabulary) is a NAMED
+  conflict: "the registry-status conflict for a placed serial", an
+  INDEPENDENT check alongside the over-placement and
+  ledger-corroboration notes, feeding the wave-3 totals-matching guard
+  (residue 0 + a named conflict ⇒ NON_RECONCILABLE, nothing written, the
+  deficit stays visible to the probe). The other registry contradiction
+  shapes reviewed under the SAME logic (the owner's no-redesign
+  directive): the unplaced mismatch keeps its wave-3 note
+  (test-proven unchanged); a registry `in_stock` with a zero ledger net
+  claims nothing and cannot hide (stays unnamed by design). The OPERATING
+  LIMIT documented as demanded: the aggregate probe is a NECESSARY
+  condition, NEVER a proof that every batch and serial is correct —
+  registered as RISK-031 (the risk register's new "Operational risks"
+  section) and written operator-facing as the runbook's new §9 ("The
+  nightly probe's known limits"), including the already-balanced blindness
+  shape (Σ bins == `item_stock` with disagreeing sources is invisible to
+  BOTH detectors — a per-batch/per-serial recurring detector remains
+  future hardening). `wms-backfill-placed-registry.spec` (7 tests): the
+  owner's case dry-run/live/re-run (all refuse, the probe keeps bins 1 vs
+  stock 2), the `returned` variant (same logic), the PARTIAL variant (the
+  proven sibling still written under a visible residue — the guard only
+  forbids the HIDING write), the healthy WRITABLE counterpart (an
+  agreeing registry still heals, the probe clears), and the unplaced
+  control (the wave-3 path unchanged) — 7/7 on the fix, 5 failed pre-fix
+  exactly as predicted (the two negative controls passed both sides); the
+  sibling WMS db corpus 9 files 62/62 (the wave-3 conflicts spec 7/7 and
+  the wave-4 bins-no-ledger spec 9/9 — no regression); api unit 51/51
+  files 576/576 (after the one-time sandbox chromium re-bootstrap);
+  tsc/eslint/prettier/depcruise/docs:validate/id-ledger all clean. Runbook
+  §1/§3/§5/§9 + RISK-031 updated.
 
 - 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 4** (the owner's
   review of the third wave at head `0038fc0` — the checker fix accepted,
