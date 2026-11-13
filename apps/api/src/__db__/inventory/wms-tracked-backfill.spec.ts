@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { sql } from "drizzle-orm";
 
@@ -185,6 +185,32 @@ async function binSum(warehouseId: string, itemId: string): Promise<string> {
       .toFixed(6);
   });
 }
+
+/**
+ * SUITE HYGIENE (the recon.spec RC-05 cleanup precedent): the seeded
+ * legacy rows are ORPHANS by design — moves without journals (the pre-WMS
+ * shape under test) and serial moves without serial_movements rows. They
+ * are removed at the spec's end through the documented superuser tooling
+ * (guard trigger disabled for the moment of the fixture cleanup) so the
+ * sibling suites' tenant-wide folds — INV-010 (RC-04/RC-05, golden G-16,
+ * the counts/valuation packs) and the T-11 serial-ledger completeness
+ * property — stay clean over the shared tenant. The SERVICE-posted moves
+ * (through manualIssue) stay: each carries its balanced journal and its
+ * serial_movements row, so they are fold-consistent by construction. The
+ * item_stock/bin_contents residue (the unproven shortfall the test asserts
+ * stays visible) is money-neutral for those folds and remains.
+ */
+afterAll(async () => {
+  const su = await (await import("../test-db")).superuserClient();
+  await su.query(`ALTER TABLE stock_moves DISABLE TRIGGER trg_stock_moves_guard`);
+  await su.query(
+    `DELETE FROM stock_moves WHERE tenant_id = $1 AND posted_journal_id IS NULL
+       AND item_id IN ($2, $3, $4)`,
+    [TENANT_I, batchItem, serialItem, nonReconItem],
+  );
+  await su.query(`ALTER TABLE stock_moves ENABLE TRIGGER trg_stock_moves_guard`);
+  await su.end();
+});
 
 async function stockQty(warehouseId: string, itemId: string): Promise<string> {
   return withTenant(TENANT_I, async () => {

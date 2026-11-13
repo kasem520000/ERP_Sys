@@ -57,14 +57,46 @@ registry history shows 219 tables and the suite structure suggests
   `git show e68ab59:…tables.registry.ts` + the same structure math; it was
   NOT re-run (no 041-era baseline dispute is open).
 
-## 5. Not run in this wave (honest limitations)
+## 5. RUN — the full DB suite, batched (2026-11-13, after the audit-fix code)
 
-- The FULL 202-file DB suite (2,979 tests) — the sandbox's per-command time
-  budget; the wave's changed specs (§2), the isolation suite (§3), and the
-  historical re-run were. The 2,979 figure remains the phase-closure
-  announcement, not re-proven here.
+The sandbox's per-command time budget forbids one continuous invocation, so
+the suite ran as FIVE alphabetical batches (each its own embedded PG16 + the
+full 73-migration chain) plus the local smoke file — all 202 spec files
+executed:
+
+| Batch | Files | Tests | Result |
+|---|---|---|---|
+| 1 | 41 | 298 | **298 passed** |
+| 2 | 41 | 1,741 | **1,738 passed · 3 failed** — all three the crm/tasks mail-capture timing race (10s waits under load); the file re-ran GREEN standalone (10/10) and with its neighbors (21/21) — a timing flake, not a defect |
+| 3 | 41 | 333 | **332 passed · 1 failed** — performance/ga-full-load T-04: the 100k statement-tier p95 measured 34.9s against the 10s budget on this sandbox CPU — the documented environmental class (the 036 report-hammer precedent: "the sandbox CPU misses the … budget"), recorded, not repaired |
+| 4 | 41 | 306 | **306 passed** |
+| 5 | 37 | 302 | **302 passed** |
+| + | 1 (posting-smoke.local) | 1 | **1 passed** |
+| **Total** | **202** | **2,981** | **2,977 green + 3 timing flakes (re-run green) + 1 environmental perf miss** |
+
+Counting note (honest): the batched total (2,981) is NOT directly comparable
+to the phase-closure announcement (2,979 over 202 files, one continuous
+invocation): some suites generate corpus-dependent tests, and the batches
+each see less cross-folder corpus than a continuous run. The announced
+figures stand unchanged; this table records what THIS environment ran.
+
+The FIRST batch-2 run (before the spec-hygiene fix below) caught a REAL
+defect in this wave's own new spec: the seeded legacy rows (orphan
+stock_moves by design — the pre-WMS shape) leaked into the sibling suites'
+tenant-wide folds (INV-010 RC-04/RC-05/G-16/counts/valuation + the T-11
+serial-ledger completeness) because vitest's size-ordered sequence ran the
+new spec BEFORE them. Fixed by the suite-hygiene afterAll (the recon.spec
+RC-05 documented cleanup precedent: superuser + the guard-trigger
+disable/enable window) — the seeded orphans are removed at the spec's end,
+the service-posted moves (balanced journal + serial_movements pairs) stay.
+Batch 2 then ran green except the crm/tasks timing flakes above.
+
+## 5b. Not run in this wave (honest limitations)
+
 - Browser-level Playwright assertions — out of scope for this wave (no web
   surface changed).
+- One CONTINUOUS full-suite invocation (the batched equivalent is §5; the
+  corpus-dependent count difference is recorded above, not reconciled).
 
 ## 6. RUN — the ID-ledger collision check (audit fix 4, 2026-11-13)
 
