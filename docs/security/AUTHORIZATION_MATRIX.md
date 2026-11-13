@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272 · PHASE-042 — §3.20 manufacturing execution; permission catalog 272 → 279)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-12 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272 · PHASE-042 — §3.20 manufacturing execution; permission catalog 272 → 279 · PHASE-044 — §3.21 WMS & inventory intelligence; permission catalog 279 → 287)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -523,6 +523,50 @@ holds all seven; accountant gains `work_centers.manage`, `routings.manage`,
 `rework_orders.manage`, `oee.read` + `standard_costs.manage`; warehouse gains
 `shopfloor.execute` + `downtime.log` + `oee.read` (the operational tier — the 0026
 `qc.manage` precedent); viewer gains `oee.read` only.
+
+### 3.21 `inventory` WMS & inventory intelligence (PHASE-044)
+
+The PHASE-044 WMS cluster (CR-14 · H-07 · I-01…I-25 · PP-11/PP-12): the location tree
+(zones/aisles/racks/bins with barcodes), bin-level contents with status/ownership, the
+INV-029 same-transaction discipline, directed putaway with the PP-12 label, directed
+picking (FIFO/FEFO/NEAREST, waves, cluster, scan confirms), cycle-count schedules and
+their BR-075 threshold gate, ABC classification, the serial-movement ledger, the
+quarantine/HOLD board with its G-43 policy gate, and the consignment/VMI substrate.
+**All eight keys seed in migration `0071` §1–§2 — the permission catalog extends
+279 → 287 (seed = mirror, zero drift).** The plan grants (0071 §3) put the eight
+feature keys on business + enterprise; the distribution-bearing templates
+(`industry.distribution` + `industry.wholesale`) require them by default (0071 §4).
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `inventory.wms.locations` | Manage the WMS location tree (zones/aisles/racks/bins, barcodes, pick sequence) / إدارة شجرة مواقع المستودع | owner, accountant, warehouse | tenant | no (audited; structural master data — the one-default floors are BR-073; the INV-029 reconciliation read rides this key) |
+| `inventory.wms.putaway` | Execute directed putaway (suggested tasks, bin-label print, scan confirm) / تنفيذ التخزين الموجّه | owner, accountant, warehouse | tenant | no (audited; the scan confirm is a structural move — the wrong-bin scan is the typed zero-residue rejection; the economic write rode the receipt's own journal) |
+| `inventory.wms.picking` | Execute directed picking (waves, strategies FIFO/FEFO/NEAREST, cluster + scan) / تنفيذ الانتقاء الموجّه | owner, accountant, warehouse | tenant | no (audited; task confirms are bookkeeping — the economic move rides the delivery post's directedTakes, INV-029 holds either way) |
+| `inventory.cycle_counts` | Manage cycle-count schedules, documents, and variance approvals / إدارة الجداول والمستندات والاعتمادات | owner, accountant, warehouse | tenant | **yes** (posting variances adjusts the ledger — the BR-075 threshold forces the supervisor flag on material variances; the approval is SoD-shaped by design) |
+| `inventory.abc` | Read ABC classifications and recompute schedules / قراءة تصنيفات ABC وإعادة احتسابها | owner, accountant, viewer | tenant | no (read + recompute of the derived generation — never a valuation write) |
+| `inventory.tracking.serial_ledger` | Read the serial-movement ledger / قراءة دفتر الحركة التسلسلية | owner, accountant, warehouse, viewer | tenant | no (append-only ledger reads) |
+| `inventory.quarantine` | Manage the quarantine/HOLD board and dispositions / إدارة اللوحة والتصرفات | owner, accountant, warehouse | tenant | **yes** (the SCRAP/RTV dispositions post through the movement core + engine — audited, exactly-once; the G-43 leg is the BR-077 policy gate) |
+| `inventory.tracking.consignment` | Manage consignment/VMI stock (receive, settle) / إدارة مخزون الأمانة | owner, accountant, warehouse | tenant | **yes** (the G-44 consumption settlement posts COGS · CONSIGNATION_PAYABLE — fail-closed until 2135 maps, BR-077) |
+
+**Guarded routes** (ROUTE_PERMISSIONS, PHASE-044): the `/api/v1/inventory/wms/*`
+family — `zones` (+`/:id` PATCH, `/:id/aisles`), `aisles/:id/racks`, `bins`
+(+`/barcode/:barcode`, `/:id` PATCH), `locations/tree`, `bin-contents`,
+`availability-by-bin`, `reconcile`, `lpns` (+`/:id/close|bind|move|contents`) —
+`inventory.wms.locations`; `serial-movements` — `inventory.tracking.serial_ledger`;
+`putaway/rules` (+`/:id` PATCH), `putaway/tasks` (+`/:id/assign|confirm|cancel`,
+`/:id/label`, `labels`) — `inventory.wms.putaway`; `pick-strategy`
+(GET `/:warehouseId` + PUT), `pick-waves` (+`/:id`, `/:id/tasks`,
+`/:id/cluster-route`, `/:id/release|complete|cancel`), `pick-tasks`
+(+`/:id/assign|start|confirm|cancel`) — `inventory.wms.picking`;
+`cycle-count-schedules` (+`/:id` PATCH, `/:id/run`), `cycle-count-documents`
+(+`/:id`, `/:id/lines`, `/:id/enter|recount|submit|review|approve|cancel`) —
+`inventory.cycle_counts`; `abc` + `abc/recompute` — `inventory.abc`;
+`quarantine-board` (+`/:contentId/transition|dispose`) and the raw
+`bin-contents/:id/transition` — `inventory.quarantine`; plus the delivery wave
+`/api/v1/sales/delivery-notes/:id/pick-wave` — `inventory.wms.picking` (the 0071 §1
+matrix row, not the sales create key). Role grants per 0071 §2: owner + accountant
+hold all eight; warehouse holds the operational seven (abc stays the analysis tier);
+viewer holds the read pair (`abc` + `serial_ledger` — the 042 oee.read precedent).
 
 ## 4. Segregation of duties & approval limits
 

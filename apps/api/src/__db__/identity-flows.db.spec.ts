@@ -179,9 +179,14 @@ describe("seeds (acceptance 9)", () => {
     // manufacturing.downtime.log, manufacturing.oee.read,
     // manufacturing.standard_costs.manage; the doc's planned
     // "manufacturing.costing" is already live as manufacturing.costing.read
-    // since 0026 — recorded deviation; the drift checker agrees: matrix 279
-    // = seed 279).
-    expect(result.rows[0]?.n).toBe(279);
+    // since 0026 — recorded deviation).
+    // 279 + 8 = 287 after 0071 — the eight PHASE-044 WMS keys
+    // (inventory.wms.locations, inventory.wms.putaway,
+    // inventory.wms.picking, inventory.cycle_counts, inventory.abc,
+    // inventory.tracking.serial_ledger, inventory.quarantine,
+    // inventory.tracking.consignment; the drift checker agrees: matrix 287
+    // = seed 287).
+    expect(result.rows[0]?.n).toBe(287);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {
@@ -210,8 +215,9 @@ describe("seeds (acceptance 9)", () => {
     // reporting.reports.run grants (0005 seed §2) + the 3 PHASE-018 read
     // keys (0026 seed §3.8: production_orders.view, genealogy.read,
     // costing.read) + the PHASE-042 OEE read key (0065 seed, matrix §3.20)
-    // = 47.
-    expect(viewer.grants).toBe(47); // view-class + reports read tier + manufacturing reads
+    // + the 2 PHASE-044 WMS read keys (0071 seed §2c: inventory.abc +
+    // inventory.tracking.serial_ledger, matrix §3.21) = 49.
+    expect(viewer.grants).toBe(49); // view-class + reports read tier + manufacturing reads + WMS reads
   });
 });
 
@@ -741,6 +747,10 @@ describe("route × role permission checklist (acceptance 5)", () => {
       "manufacturing.production_orders.view",
       "manufacturing.genealogy.read",
       "manufacturing.costing.read",
+      // PHASE-044 (matrix §3.21): the viewer-tier WMS read pair (the
+      // analysis-tier abc + the serial-ledger reads — 0071 seed §2c).
+      "inventory.abc",
+      "inventory.tracking.serial_ledger",
       // PHASE-042 (matrix §3.20): the viewer-tier OEE read key (the
       // utilization + downtime-analysis report surface).
       "manufacturing.oee.read",

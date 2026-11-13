@@ -1,6 +1,6 @@
 # Journal Rules
 
-> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-12 (PHASE-039 — goldens G-35…G-39, migrations 0055–0059 · PHASE-042 — goldens G-40…G-42, migrations 0065–0066)
+> **Status:** STABLE · **Owner:** Accounting Domain Architecture · **Updated:** 2026-11-12 (PHASE-039 — goldens G-35…G-39, migrations 0055–0059 · PHASE-042 — goldens G-40…G-42, migrations 0065–0066 · PHASE-044 — goldens G-43…G-46, migrations 0067–0073)
 
 Rules governing manual journals, recurring entries, approvals, FX entries, and rounding
 entries. Posted-entry mechanics (immutability, reversal) are defined in
@@ -116,6 +116,10 @@ mandatory failure pack ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_T
 | G-40 | Operation completion — the conversion roll-up into WIP — `manufacturing` | Source `production_order`, operation `op_<seq>` (one journal per routing sequence, migration 0065): DR `WIP` (the conversion total — the typed sum of the two credit legs) · CR `PRODUCTION_LABOR` ((actual setup + run hours) × the FROZEN var rate) · CR `PRODUCTION_OVERHEAD` ((actual setup + run hours) × the FROZEN fixed rate) — the rates snapshot at release from the routing's per-operation overrides ?? the work center (later routing/work-center edits never move a live order, BR-068); a zero leg is skipped, an entirely uncosted operation (both legs 0) records its times WITHOUT a journal, and the credit sum MUST equal the debit at 4dp (typed `OPERATION_COST_ROUNDING` — rounding residuals explicit, never absorbed); the completion also stamps the per-operation setup/usage/rate variance columns (BR-071) | PHASE-042 |
 | G-41 | Rework completion — the rework conversion roll-up — `manufacturing` | Source `rework_order`, operation `complete`: DR `REWORK_EXPENSE` (the rework roll-up = labor + overhead at the rework's frozen rates × actual setup + run hours) · CR `PRODUCTION_LABOR` · CR `PRODUCTION_OVERHEAD` — NEVER the parent FG layer (BR-069: the parent order's fg/wip/labor/overhead columns stay byte-identical before/after — pinned by the rework-costing db spec); a zero-conversion completion is the typed `REWORK_COST_ZERO` rejection (a rework that cost nothing did not happen); the COMPLETED row carries `rework_value > 0` + its `journal_id` (the `ck_rework_orders_completion` floor) | PHASE-042 |
 | G-42 | Downtime close — the policy-gated non-value posting — `manufacturing` | Source `downtime_record`, operation `close` — GATED by the `manufacturing.downtime_posting` policy (enum `off`/`post`, default **off** — BR-070): with `post`, DR `DOWNTIME_EXPENSE` · CR `PRODUCTION_OVERHEAD` (idle capacity absorbed against applied overhead) at the work center's FULL hourly rate (fixed + var) × idle hours (duration_minutes/60, 4dp); under the default `off` the close is record-only — `cost_amount`/`journal_id` stay NULL (the `ck_downtime_records_window` floor), and an uncosted center (rate sum 0) never posts (the honest zero-value floor) | PHASE-042 |
+| G-43 | Quarantine move — the policy-gated distinct-account leg — `inventory` | Source `bin_content`, operations `quarantine`/`release` — GATED by the `inventory.quarantine_posting` policy (enum `off`/`distinct`, default **off** — BR-077): with `distinct`, TO_QUARANTINE posts DR `QUARANTINE_INVENTORY` (1290) · CR the warehouse INVENTORY account at qty × avg cost, and the release mirrors it; under the default `off` the transition posts NOTHING (the G-15 policy-none mirror — the qty never economically moved, INV-029 folds ALL statuses); HOLD never posts (a legal hold, not a valuation state); an unmapped 1290 fails closed (`PURPOSE_NOT_MAPPED`, zero residue); the dispositions ride their own shapes (SCRAP = G-13 with the SCRAP serial event; RTV = the explicit-counter discipline; RELEASE structural) | PHASE-044 |
+| G-44 | Consignment consumption settlement — `inventory` | Source `consignment_consumption:{id}:settle` (exactly-once per settlement): DR `COGS` · CR `CONSIGNATION_PAYABLE` (2135) at the AGREED unit price, the owner partner stamped on both legs; fail-closed `PURPOSE_NOT_MAPPED` until 2135 maps (the 038 discipline — BR-077); the receive/return legs are STRUCTURAL (owner rows never enter `item_stock`/`stock_moves`/the tenant ledger — BR-076; INV-010 stays the tenant's own) | PHASE-044 |
+| G-45 | Warehouse kitting — the Σ-components roll-up — `inventory` | Source `kit_order` operation `post` (WK- numbering): the kit BOM snapshot lines issue from their directed bins (reason `KIT_CONSUMPTION`) and the kit receipts at Σ component costs EXACTLY — same-account by construction, so NO journal posts (the D-4/G-15 policy-none mirror); INV-029 holds on every leg (the plans ride the movement core — bins and `item_stock` move in the same transaction); serialized components/kits name their units at post (`KIT_OUT`/`KIT_IN` serial events — omitting them fails closed) | PHASE-044 |
+| G-46 | Internal transfer-price valuation difference — `inventory` | The per-warehouse-pair policy (MARKUP % / FIXED price, migration 0070 — the operand discipline: exactly one of the two): the policy-priced transfer receipt posts the explicit valuation difference DR destination INVENTORY · CR `TRANSFER_PRICING_ADJUSTMENT` (4990) — fail-closed `PURPOSE_NOT_MAPPED` until 4990 maps; a policy-less transfer keeps the legacy G-15 shape byte-identical; the transit exceptions (I-22) post the G-13 shrinkage shape at the carried cost with their own exactly-once keys | PHASE-044 |
 
 Notes:
 
@@ -254,4 +258,22 @@ Notes:
     standard) is the typed `STANDARD_REVALUATION_ZERO` rejection and a no-stock
     activation is the documented no-op (no journal). Worked: (12 − 10) × 100 = 200.0000
     up → DR inventory · CR `STANDARD_REVALUATION` (the same spec).
+14. **G-43…G-46 delivered mechanics (PHASE-044, migrations 0067–0073).** Numbering: the
+    PHASE-044 document planned G-47…G-50 — those numbers predate the v3.1/v3.2 scope
+    extension decision that the WMS goldens take the next free slots after G-42 (the
+    042 precedent), so the honest slots are G-43…G-46 over migrations 0067…0073. The
+    cycle-count variance deliberately reuses the EXISTING G-13/G-14 shapes with
+    `CYCLE_COUNT_LOSS`/`CYCLE_COUNT_GAIN` reasons (source `cycle_count`, one move per
+    item + ONE balanced journal per document — no new golden row; the threshold
+    approval is BR-075). Purpose mapping stays fail-closed: 0070 seeds the CoA template
+    markers `1290 QUARANTINE_INVENTORY` + `4990 TRANSFER_PRICING_ADJUSTMENT`
+    (+ `2135 CONSIGNATION_PAYABLE` where absent), and existing tenants stay
+    `PURPOSE_NOT_MAPPED`-closed until they map (zero partial writes — the CARD_RECEIVABLE
+    precedent). Worked examples as pinned by the DB suites
+    (`__db__/inventory/wms-quarantine.db.spec.ts`, `wms-consignment.db.spec.ts`,
+    `wms-kitting.db.spec.ts`, `wms-alerts-policies.db.spec.ts`): **G-43** 8 × 5.00 =
+    40.0000 → DR 1290 · CR INVENTORY (release mirrors); **G-44** 20 × 7.500000 =
+    150.0000 → DR `COGS` · CR 2135 (owner-stamped); **G-45** 20×3 + 30×5 = 210.0000 for
+    10 kits → NO journal (kit at 21.000000/unit, same-account); **G-46** MARKUP 25% on
+    a 4.00 carry → the receipt's margin leg at the explicit difference.
 

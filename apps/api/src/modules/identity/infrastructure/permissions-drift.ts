@@ -162,6 +162,12 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // manufacturing.standard_costs.manage.
   "apps/api/migrations/0065_routing_work_centers.sql",
   "apps/api/migrations/0066_standard_costing.sql",
+  // PHASE-044 (Blueprint v3.0 · CR-14): 0071 seeds the EIGHT WMS keys
+  // (matrix §3.21; 279 → 287) — inventory.wms.locations,
+  // inventory.wms.putaway, inventory.wms.picking, inventory.cycle_counts,
+  // inventory.abc, inventory.tracking.serial_ledger, inventory.quarantine,
+  // inventory.tracking.consignment.
+  "apps/api/migrations/0071_wms_seeds.sql",
 ];
 
 export async function main(): Promise<void> {

@@ -200,6 +200,30 @@ precedent — is recorded in [../security/AUTHORIZATION_MATRIX.md](../security/A
 | `manufacturing.downtime` | 5 الإنتاج والتصنيع | سجل التوقفات / Downtime log | `manufacturing.downtime` | `manufacturing.downtime.log` | List + Search (§2) — route `/manufacturing/downtime`, order 40: reason-coded records per work center (open/close; posting is the BR-070 policy opt-in) |
 | `manufacturing.standard_costs` | 5 الإنتاج والتصنيع | التكاليف المعيارية / Standard costs | `manufacturing.standard_costs` | `manufacturing.standard_costs.manage` | List + Search (§2) — route `/manufacturing/standard-costs`, order 50: versioned standards (draft → roll-up → activate with optional stock revaluation); PPV rides the GRN |
 
+### 1.9 PHASE-044 registry additions (Blueprint v3.0 — WMS & inventory intelligence)
+
+The WMS surfaces (CR-14; [../product/FEATURE_CATALOG.md](../product/FEATURE_CATALOG.md) §4's
+WMS block): five items in group 4 المخزون — the location tree, the pick waves, the
+cycle-count workspace, ABC, and the quarantine board. Same resolution rule as every
+item — `entitlement(featureKey)` AND `permission(user, branch)`; visibility is
+**server-resolved** (`resolveNavigation`) per BR-039, and the command palette
+(⌘K / Ctrl+K, §3) inherits all five through the same registry (OA-04). The PP-11 scan
+embeds ride the EXISTING receipt/delivery/transfer/count screens (no new items by
+design — the putaway queue on `/purchasing/receipts`, the wave action + pick scan on
+`/sales/deliveries`, the LPN mover on `/inventory/transfers`, the bin-scan helper on
+`/inventory/counting`); the field workforce's synced task list is the Android surface
+(OA-02 — LOCAL_DATABASE §1.1). Mirrors `packages/contracts/src/navigation.ts`
+(orders 120/130/140/150/160; the eight 0071 permission keys —
+[../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.21).
+
+| id | Group | Label (AR / EN) | featureKey | permission | archetype |
+|----|-------|-----------------|------------|------------|-----------|
+| `inventory.locations` | 4 المخزون | مواقع المستودع / Warehouse locations | `inventory.wms` | `inventory.wms.locations` | List + Search (§2) — route `/inventory/locations`, order 120: the zone→aisle→rack→bin tree with inline creation, the bin-contents board, the INV-029 reconciliation report, and the LPN registry + move-by-LPN |
+| `inventory.pick_waves` | 4 المخزون | موجات الانتقاء / Pick waves | `inventory.picking` | `inventory.wms.picking` | List + Search (§2) — route `/inventory/pick-waves`, order 130: waves with the release/complete/cancel lifecycle, the PP-11 scan-confirmed task list, and the strategy card (FIFO/FEFO/NEAREST + allow-partial) |
+| `inventory.cycle_counts` | 4 المخزون | الجرد الدوري / Cycle counts | `inventory.cycle_counts` | `inventory.cycle_counts` | Wizard (§4) — route `/inventory/cycle-counts`, order 140: schedules (create + run-now), count documents with the DRAFT→POSTED lifecycle, bin-aware line entry, and the BR-075 supervisor approval |
+| `inventory.abc` | 4 المخزون | تصنيف ABC / ABC classification | `inventory.abc` | `inventory.abc` | Report Page (§7) — route `/inventory/abc`, order 150: the latest Pareto generation with the class summary + recompute |
+| `inventory.quarantine` | 4 المخزون | لوحة الحجر الصحي / Quarantine board | `inventory.quarantine` | `inventory.quarantine` | List + Search (§2) — route `/inventory/quarantine`, order 160: the held-rows board with the G-43 transitions and the three dispositions |
+
 ## 2. Navigation registry (data model, normative)
 
 Navigation is **data**, not code — a single registry resolved per session:
@@ -340,3 +364,4 @@ hard-coded listeners in screens). POS terminal profiles define their own F-key m
 | Inventory batches & expiry + serial numbers + stock adjustments (read-only) under المخزون; the import/export visibility repair; consolidated statements as a core item | PHASE-035 — **LIVE** (delivered 2026-11-10: `/inventory/batches` + `/inventory/serials` (register + write-off / sold-at under `inventory.tracking.manage`) and the read-only `/inventory/adjustments` register — posting stays in the count wizard; `items.import_export` granted business+enterprise by the DATA-ONLY migration `0048`; `reports.consolidated` promoted from template-injected to a core NAV_ITEMS entry — template-less tenants see القوائم الموحدة) |
 | Custom-fields manager (definitions + picklists + per-entity form designer) under الإعدادات; typed values render on the six first-wave entity forms | PHASE-036 |
 | Manufacturing execution group (group 5, الإنتاج والتصنيع) + its five items (work centers, routings, shop-floor terminal, downtime log, standard costs); the Operations tab + rework ride the existing orders screen | PHASE-042 |
+| WMS surfaces under المخزون (location tree, pick waves, cycle counts, ABC, quarantine board) + the PP-11 scan embeds on the existing receipt/delivery/transfer/count screens | PHASE-044 |
