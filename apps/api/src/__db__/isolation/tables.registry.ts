@@ -454,6 +454,24 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "inventory_alert_jobs" },
   { table: "warehouse_kit_orders" },
   { table: "warehouse_kit_lines" },
+  // PHASE-043 (CR-13 — MRP & Planning; migrations 0074…0078): the planning
+  // cluster — mps_entries, the BOM planning satellites (substitutions/
+  // outputs/bill_of_resources — DELETE granted for the DRAFT full-replace
+  // discipline, the bom_lines 0026 precedent), the MRP run family (runs +
+  // demand lines + supply lines + suggestions — status lifecycles, no
+  // deletes: superseded rows stay as audit trail), and the tolling pair.
+  // lot_sizing_rules carries NO tenant_id (the global permissions-pattern
+  // catalog — deliberately not registered here).
+  { table: "mps_entries" },
+  { table: "bom_substitutions", deleteGranted: true },
+  { table: "bom_outputs", deleteGranted: true },
+  { table: "bill_of_resources", deleteGranted: true },
+  { table: "mrp_runs" },
+  { table: "mrp_demand_lines" },
+  { table: "mrp_supply_lines" },
+  { table: "mrp_suggestions" },
+  { table: "contract_mfg_orders" },
+  { table: "contract_mfg_moves" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

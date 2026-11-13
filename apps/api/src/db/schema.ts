@@ -727,6 +727,22 @@ export const items = pgTable(
     shelfLifeDays: integer("shelf_life_days"),
     reorderLevel: numeric("reorder_level", { precision: 19, scale: 6 }),
     reorderQty: numeric("reorder_qty", { precision: 19, scale: 6 }),
+    // PHASE-043 (migration 0074, M-01/DF-24): the planning-policy fields —
+    // lead time, safety stock (manual value or the AUTO policy: z × σ × √LT
+    // over the look-back window), the lot-sizing rule + its operand, and
+    // the time fences. NULL lead time/safety = "no policy" (the run's
+    // data-readiness panel surfaces it — never silently zero).
+    leadTimeDays: integer("lead_time_days"),
+    safetyStockPolicy: text("safety_stock_policy").notNull().default("MANUAL"),
+    safetyStockQty: numeric("safety_stock_qty", { precision: 19, scale: 6 }),
+    ssServiceLevelPct: numeric("ss_service_level_pct", { precision: 5, scale: 2 }),
+    ssLookbackDays: integer("ss_lookback_days"),
+    lotSizingRule: text("lot_sizing_rule").notNull().default("LOT_FOR_LOT"),
+    fixedOrderQty: numeric("fixed_order_qty", { precision: 19, scale: 6 }),
+    orderMultiple: numeric("order_multiple", { precision: 19, scale: 6 }),
+    periodSupplyBuckets: integer("period_supply_buckets"),
+    frozenFenceDays: integer("frozen_fence_days").notNull().default(0),
+    slushyFenceDays: integer("slushy_fence_days").notNull().default(0),
     basePrice: numeric("base_price", { precision: 19, scale: 6 }),
     status: text("status").notNull().default("ACTIVE"),
     deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "string" }),
@@ -2830,6 +2846,10 @@ export const purchaseOrders = pgTable(
     // PHASE-038 (migration 0052, P-06): the linked CRM service contract —
     // contract-linked purchasing; NULLABLE additive column.
     contractId: uuid("contract_id"),
+    // PHASE-043 (0076): the suggestion this PO was converted from (the
+    // bidirectional link — acceptance criterion 3; the conversion itself
+    // flows through the PHASE-038 create path, never duplicated).
+    mrpSuggestionId: uuid("mrp_suggestion_id"),
     status: text("status").notNull().default("DRAFT"),
     totalNet: numeric("total_net", { precision: 19, scale: 4 }).notNull().default("0"),
     totalTax: numeric("total_tax", { precision: 19, scale: 4 }).notNull().default("0"),
@@ -3455,6 +3475,12 @@ export const salesOrderLines = pgTable(
     netAmount: numeric("net_amount", { precision: 19, scale: 4 }).notNull(),
     taxAmount: numeric("tax_amount", { precision: 19, scale: 4 }).notNull().default("0"),
     reservationId: uuid("reservation_id"),
+    // PHASE-043 (0076, M-06/S-10): the ATP stamps — the user's promise
+    // date, the engine's verdict (OK | SHORT — the over-promise warning)
+    // and its suggested date (CTP: the first date live supply covers).
+    promisedDate: date("promised_date"),
+    atpStatus: text("atp_status"),
+    atpSuggestedDate: date("atp_suggested_date"),
     note: text("note"),
   },
   (table) => [
@@ -4885,6 +4911,12 @@ export const billsOfMaterials = pgTable(
     status: text("status").notNull().default("DRAFT"),
     outputUomId: uuid("output_uom_id").notNull(),
     yieldPct: numeric("yield_pct", { precision: 7, scale: 4 }).notNull().default("100.0000"),
+    // PHASE-043 (0075, M-11): the joint-allocation share of the MAIN
+    // product when the BOM carries co/by-product outputs (100 by default —
+    // the single-output BOM; activation requires main + Σ outputs = 100).
+    mainAllocationPct: numeric("main_allocation_pct", { precision: 7, scale: 4 })
+      .notNull()
+      .default("100"),
     effectiveFrom: date("effective_from"),
     note: text("note"),
     noteAr: text("note_ar"),
@@ -4918,6 +4950,10 @@ export const bomLines = pgTable(
     uomId: uuid("uom_id").notNull(),
     qtyPerOutput: numeric("qty_per_output", { precision: 19, scale: 6 }).notNull(),
     scrapPct: numeric("scrap_pct", { precision: 7, scale: 4 }).notNull().default("0"),
+    // PHASE-043 (0075, M-08): a phantom component never gets its own
+    // supply suggestion — at explosion its components are demanded in
+    // its place (flattening preserves Σ component demand).
+    phantomFlag: boolean("phantom_flag").notNull().default(false),
     note: text("note"),
     noteAr: text("note_ar"),
   },
@@ -4925,6 +4961,152 @@ export const bomLines = pgTable(
     uniqueIndex("uq_bom_lines_id_tenant").on(table.id, table.tenantId),
     uniqueIndex("uq_bom_lines_bom_line").on(table.tenantId, table.bomId, table.lineNo),
     index("ix_bom_lines_tenant_component").on(table.tenantId, table.componentItemId),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-043 · MRP & Planning (migrations 0074…0078): the planning cluster —
+// the lot-sizing catalog, the MPS, the BOM planning extension (substitutions
+// + outputs + bill of resources), the MRP run family, and the contract
+// manufacturing (tolling) pair. Cost math per ADR-0009: quantities 19,6;
+// money quanta 19,4. Planning data is SELECT/INSERT/UPDATE (status
+// lifecycles — no tombstone deletes; superseded suggestions stay as audit
+// trail). lot_sizing_rules is the GLOBAL catalog (no tenant_id — the
+// permissions pattern).
+
+/** The global lot-sizing rule catalog (M-01): seeded read-only in 0078 —
+ * param_required names the items column the rule consumes. */
+export const lotSizingRules = pgTable("lot_sizing_rules", {
+  code: text("code").primaryKey(),
+  name: text("name").notNull(),
+  nameAr: text("name_ar").notNull(),
+  description: text("description").notNull(),
+  descriptionAr: text("description_ar").notNull(),
+  paramRequired: text("param_required"),
+});
+
+/** Master production schedule entries (M-05): planned/firmed production
+ * per (warehouse, item, bucket); frozen-fence edits need the
+ * manufacturing.mps.frozen_edit permission + a reason (BR-078). */
+export const mpsEntries = pgTable(
+  "mps_entries",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    warehouseId: uuid("warehouse_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    bucketStart: date("bucket_start").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id").notNull(),
+    status: text("status").notNull().default("PLANNED"),
+    lastEditReason: text("last_edit_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_mps_entries_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_mps_entries_slot").on(
+      table.tenantId,
+      table.warehouseId,
+      table.itemId,
+      table.bucketStart,
+    ),
+    index("ix_mps_entries_tenant_wh_item").on(
+      table.tenantId,
+      table.warehouseId,
+      table.itemId,
+      table.bucketStart,
+    ),
+    index("ix_mps_entries_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** Ordered alternative materials per BOM line (M-09): netting tries them
+ * by priority for the uncovered remainder. */
+export const bomSubstitutions = pgTable(
+  "bom_substitutions",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    bomLineId: uuid("bom_line_id").notNull(),
+    substituteItemId: uuid("substitute_item_id").notNull(),
+    priority: integer("priority").notNull(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_bom_substitutions_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_bom_substitutions_line_priority").on(
+      table.tenantId,
+      table.bomLineId,
+      table.priority,
+    ),
+    uniqueIndex("uq_bom_substitutions_line_item").on(
+      table.tenantId,
+      table.bomLineId,
+      table.substituteItemId,
+    ),
+    index("ix_bom_substitutions_line").on(
+      table.tenantId,
+      table.bomLineId,
+      table.priority,
+    ),
+  ],
+);
+
+/** The co/by-product outputs of a BOM (M-11): allocation percentages ride
+ * the rows; the MAIN product's share rides the BOM header — activation
+ * requires main + Σ outputs = 100 exactly (G-47 joint allocation). */
+export const bomOutputs = pgTable(
+  "bom_outputs",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    bomId: uuid("bom_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    outputKind: text("output_kind").notNull(),
+    allocationPct: numeric("allocation_pct", { precision: 7, scale: 4 }).notNull(),
+    qtyPerOutput: numeric("qty_per_output", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id").notNull(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_bom_outputs_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_bom_outputs_bom_item").on(table.tenantId, table.bomId, table.itemId),
+    index("ix_bom_outputs_bom").on(table.tenantId, table.bomId),
+  ],
+);
+
+/** The critical-resource overlay per BOM (M-25): work centers (hours per
+ * output — the rough-cut capacity check) + key materials (qty per output —
+ * the supply feasibility check). A planning overlay, not costing data. */
+export const billOfResources = pgTable(
+  "bill_of_resources",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    bomId: uuid("bom_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    resourceKind: text("resource_kind").notNull(),
+    workCenterId: uuid("work_center_id"),
+    itemId: uuid("item_id"),
+    consumptionFactor: numeric("consumption_factor", { precision: 19, scale: 6 }).notNull(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_bill_of_resources_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_bill_of_resources_bom_line").on(
+      table.tenantId,
+      table.bomId,
+      table.lineNo,
+    ),
+    index("ix_bill_of_resources_bom").on(table.tenantId, table.bomId),
+    index("ix_bill_of_resources_wc")
+      .on(table.tenantId, table.workCenterId)
+      .where(sql`${table.workCenterId} IS NOT NULL`),
   ],
 );
 
@@ -4964,6 +5146,13 @@ export const productionOrders = pgTable(
     yieldVariance: numeric("yield_variance", { precision: 19, scale: 4 })
       .notNull()
       .default("0"),
+    // PHASE-043 (0076, M-22): the MTO link — the driving sales line; set at
+    // MRP conversion or directly. Completion routes the output to the
+    // linked sales delivery with the MO's actual cost (G-49).
+    salesOrderLineId: uuid("sales_order_line_id"),
+    // PHASE-043 (0076): the suggestion this order was converted from
+    // (the bidirectional link, acceptance criterion 3).
+    mrpSuggestionId: uuid("mrp_suggestion_id"),
     fgBatchId: uuid("fg_batch_id"),
     fgJournalId: uuid("fg_journal_id"),
     fgValue: numeric("fg_value", { precision: 19, scale: 4 }).notNull().default("0"),
@@ -8514,5 +8703,252 @@ export const warehouseKitLines = pgTable(
       table.lineNo,
     ),
     index("ix_warehouse_kit_lines_tenant_doc").on(table.tenantId, table.orderId),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-043 · MRP & Planning (migration 0076): the run family. The engine
+// is deterministic and explanation-first — the run rows snapshot EVERY
+// netting term (demand lines, supply lines) and every suggestion carries
+// its netting drill-down (jsonb); runs and suggestions are NOT ledger
+// documents (the budgeting precedent — no golden row for the run itself).
+
+/** One planning run per (warehouse, parameters): run mode, bucket size,
+ * horizon, scope items + the FULL parameter snapshot (jsonb params —
+ * replayable determinism). */
+export const mrpRuns = pgTable(
+  "mrp_runs",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    status: text("status").notNull().default("RUNNING"),
+    runMode: text("run_mode").notNull(),
+    bucketSize: text("bucket_size").notNull(),
+    horizonBuckets: integer("horizon_buckets").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    asOfDate: date("as_of_date").notNull(),
+    scopeItemIds: jsonb("scope_item_ids").notNull().default([]),
+    params: jsonb("params").notNull(),
+    stats: jsonb("stats"),
+    errorCode: text("error_code"),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+  },
+  (table) => [
+    uniqueIndex("uq_mrp_runs_id_tenant").on(table.id, table.tenantId),
+    index("ix_mrp_runs_tenant_wh_created").on(
+      table.tenantId,
+      table.warehouseId,
+      table.createdAt,
+    ),
+    index("ix_mrp_runs_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** The per-run demand snapshot (INV-030 terms): MPS + unreserved firm sales
+ * + the safety-stock gap + BOM explosion (with the generating parent) +
+ * substitution coverage. bucket_index 0 is the pre-horizon past-due slot. */
+export const mrpDemandLines = pgTable(
+  "mrp_demand_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    runId: uuid("run_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    bucketIndex: integer("bucket_index").notNull(),
+    bucketStart: date("bucket_start").notNull(),
+    demandKind: text("demand_kind").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    salesOrderLineId: uuid("sales_order_line_id"),
+    mpsEntryId: uuid("mps_entry_id"),
+    parentItemId: uuid("parent_item_id"),
+    substitutedItemId: uuid("substituted_item_id"),
+    substitutes: jsonb("substitutes").notNull().default([]),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_mrp_demand_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_mrp_demand_lines_slot").on(
+      table.tenantId,
+      table.runId,
+      table.itemId,
+      table.bucketIndex,
+      table.demandKind,
+      table.parentItemId,
+    ),
+    index("ix_mrp_demand_lines_run_item").on(
+      table.tenantId,
+      table.runId,
+      table.itemId,
+      table.bucketIndex,
+    ),
+    index("ix_mrp_demand_lines_run_kind").on(table.tenantId, table.runId, table.demandKind),
+  ],
+);
+
+/** The per-run supply snapshot (INV-030 terms): qualified on-hand (per
+ * batch for expiry items — M-10: a batch whose expiry precedes the bucket
+ * start does NOT cover it), ACTIVE reservations, open POs, open MOs,
+ * inbound transfers, co/by-product receipts. */
+export const mrpSupplyLines = pgTable(
+  "mrp_supply_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    runId: uuid("run_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    bucketIndex: integer("bucket_index").notNull(),
+    bucketStart: date("bucket_start").notNull(),
+    supplyKind: text("supply_kind").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    batchId: uuid("batch_id"),
+    expiresOn: date("expires_on"),
+    purchaseOrderId: uuid("purchase_order_id"),
+    productionOrderId: uuid("production_order_id"),
+    stockTransferId: uuid("stock_transfer_id"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_mrp_supply_lines_id_tenant").on(table.id, table.tenantId),
+    index("ix_mrp_supply_lines_run_item").on(
+      table.tenantId,
+      table.runId,
+      table.itemId,
+      table.bucketIndex,
+    ),
+    index("ix_mrp_supply_lines_run_kind").on(table.tenantId, table.runId, table.supplyKind),
+  ],
+);
+
+/** Actionable suggestions (H-03/M-01/M-24): PURCHASE_ORDER /
+ * PRODUCTION_ORDER / TRANSFER with quantity after lot sizing, due/release
+ * dates, the per-suggestion netting drill-down (jsonb), and the one-to-one
+ * converted-document link — acceptance is idempotent (INV-030/BR-079),
+ * dismissal requires a reason (BR-079), re-run supersedes. */
+export const mrpSuggestions = pgTable(
+  "mrp_suggestions",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    runId: uuid("run_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    fromWarehouseId: uuid("from_warehouse_id"),
+    suggestionType: text("suggestion_type").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id"),
+    dueDate: date("due_date").notNull(),
+    releaseDate: date("release_date").notNull(),
+    frozenFence: boolean("frozen_fence").notNull().default(false),
+    status: text("status").notNull().default("SUGGESTED"),
+    substitutedItemId: uuid("substituted_item_id"),
+    bomId: uuid("bom_id"),
+    netting: jsonb("netting").notNull().default({}),
+    dismissedReason: text("dismissed_reason"),
+    convertedDocType: text("converted_doc_type"),
+    convertedDocId: uuid("converted_doc_id"),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true, mode: "string" }),
+    acceptedBy: uuid("accepted_by"),
+    dismissedAt: timestamp("dismissed_at", { withTimezone: true, mode: "string" }),
+    dismissedBy: uuid("dismissed_by"),
+    supersededAt: timestamp("superseded_at", { withTimezone: true, mode: "string" }),
+    supersededByRunId: uuid("superseded_by_run_id"),
+  },
+  (table) => [
+    uniqueIndex("uq_mrp_suggestions_id_tenant").on(table.id, table.tenantId),
+    // The one-to-one conversion link (acceptance criterion 3) — the
+    // idempotency anchor: a document is claimed by exactly one suggestion.
+    uniqueIndex("uq_mrp_suggestions_converted_doc")
+      .on(table.tenantId, table.convertedDocType, table.convertedDocId)
+      .where(sql`${table.convertedDocId} IS NOT NULL`),
+    index("ix_mrp_suggestions_tenant_status").on(
+      table.tenantId,
+      table.status,
+      table.suggestionType,
+    ),
+    index("ix_mrp_suggestions_tenant_item").on(
+      table.tenantId,
+      table.itemId,
+      table.warehouseId,
+      table.status,
+    ),
+    index("ix_mrp_suggestions_run").on(table.tenantId, table.runId),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-043 · Contract manufacturing / tolling (migration 0077, M-21):
+// the stock-at-processor round trip — material issue to the processor,
+// the conversion-service PO through the 038 path, the return with
+// yield/scrap settlement (G-48).
+
+/** Tolling orders: DRAFT → ISSUED (TLG- number + material out) → RETURNED
+ * → SETTLED | CANCELLED; the fee PO rides the purchasing lifecycle. */
+export const contractMfgOrders = pgTable(
+  "contract_mfg_orders",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    tollingNo: text("tolling_no"),
+    processorPartnerId: uuid("processor_partner_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    bomId: uuid("bom_id").notNull(),
+    warehouseId: uuid("warehouse_id").notNull(),
+    plannedQty: numeric("planned_qty", { precision: 19, scale: 6 }).notNull(),
+    uomId: uuid("uom_id").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    feePoId: uuid("fee_po_id"),
+    conversionFee: numeric("conversion_fee", { precision: 19, scale: 6 }),
+    expectedReturnDate: date("expected_return_date"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }),
+    returnedAt: timestamp("returned_at", { withTimezone: true, mode: "string" }),
+    settledAt: timestamp("settled_at", { withTimezone: true, mode: "string" }),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true, mode: "string" }),
+    cancelReason: text("cancel_reason"),
+  },
+  (table) => [
+    uniqueIndex("uq_contract_mfg_orders_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_contract_mfg_orders_tenant_no")
+      .on(table.tenantId, table.tollingNo)
+      .where(sql`${table.tollingNo} IS NOT NULL`),
+    index("ix_contract_mfg_orders_tenant_status").on(table.tenantId, table.status),
+    index("ix_contract_mfg_orders_partner").on(
+      table.tenantId,
+      table.processorPartnerId,
+    ),
+  ],
+);
+
+/** The stock-at-processor ledger: one row per leg — the settlement
+ * invariant is Σ issue = Σ return + Σ yield per order (balances to zero
+ * on full return — G-48). */
+export const contractMfgMoves = pgTable(
+  "contract_mfg_moves",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    orderId: uuid("order_id").notNull(),
+    moveKind: text("move_kind").notNull(),
+    itemId: uuid("item_id").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    unitCost: numeric("unit_cost", { precision: 19, scale: 6 }),
+    valueAmount: numeric("value_amount", { precision: 19, scale: 4 }),
+    batchId: uuid("batch_id"),
+    stockMoveId: uuid("stock_move_id"),
+    journalId: uuid("journal_id"),
+    movedAt: timestamp("moved_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_contract_mfg_moves_id_tenant").on(table.id, table.tenantId),
+    index("ix_contract_mfg_moves_order").on(table.tenantId, table.orderId, table.moveKind),
   ],
 );

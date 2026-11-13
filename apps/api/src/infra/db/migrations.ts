@@ -406,6 +406,39 @@ export const MIGRATIONS: readonly string[] = [
   // quarantine_disposition, consignment_settlement, warehouse_kit,
   // cross_dock — the 0027 replacement pattern, additive-only).
   "0073_stock_moves_wms_sources",
+  // PHASE-043 (CR-13) — the MRP & Planning cluster (the doc's "≈ 0067…0072"
+  // was written before PHASE-044 took 0067…0073; 0074…0078 are the honest
+  // slots — the 0065 numbering-note precedent):
+  // 0074_item_planning_policies — the items planning-policy fields (lead
+  // time, safety-stock manual/AUTO, lot sizing, time fences — the
+  // ck_items_planning_shape operand discipline) + the lot_sizing_rules
+  // global catalog (the permissions pattern) + mps_entries (M-05, the
+  // frozen-fence reason riding the row — BR-078);
+  // 0075_bom_planning — the BOM planning extension: bom_lines.phantom_flag
+  // (M-08), bom_substitutions (M-09), bom_outputs + the header's
+  // main_allocation_pct (M-11 — activation requires main + Σ outputs = 100,
+  // G-47), bill_of_resources (M-25 — the critical-resource overlay for
+  // rough-cut checks, NOT finite scheduling);
+  // 0076_mrp_engine — the run family (mrp_runs + mrp_demand_lines +
+  // mrp_supply_lines + mrp_suggestions with the per-suggestion netting
+  // drill-down and the one-to-one converted-document link — INV-030/BR-079)
+  // + the document links (production_orders.sales_order_line_id the MTO
+  // link M-22 + mrp_suggestion_id, purchase_orders.mrp_suggestion_id,
+  // sales_order_lines promised_date/atp stamps) + stock_reservations
+  // holder gains PRODUCTION_ORDER (the 0025/0028 widening pattern);
+  // 0077_contract_manufacturing — the tolling pair (contract_mfg_orders +
+  // contract_mfg_moves — the stock-at-processor ledger, G-48) + the
+  // stock_moves source gains 'contract_mfg' + the CoA markers
+  // 1420/2136/5126 (the 0026 additive pattern);
+  // 0078_mrp_seeds — the DATA-ONLY seed (the 0071 pattern): the FOUR
+  // permission keys (287 → 291, matrix §3.20), the THREE feature plan
+  // grants (business + enterprise — the tier-4 precedent), the lot-sizing
+  // rule definitions, the food_manufacturing manifest enablement.
+  "0074_item_planning_policies",
+  "0075_bom_planning",
+  "0076_mrp_engine",
+  "0077_contract_manufacturing",
+  "0078_mrp_seeds",
 ];
 
 /**

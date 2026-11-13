@@ -1,6 +1,6 @@
 # Entity Catalog
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-12 (PHASE-044 — the WMS & Inventory Intelligence cluster, 239 → 261 domain rows)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-13 (PHASE-043 — the MRP & Planning cluster, 261 → 272 domain rows)
 
 All planned entities grouped by owning module, with the phase that introduces them and
 key relationships. This is the catalog-level map; column-level specifications for core
@@ -568,6 +568,56 @@ POSITION table; `serial_movements` + `returnable_packaging_movements` are append
 | `inventory_alert_jobs` | The shelf-life + slow-movement job registration (I-17/I-21/I-25): thresholds + the last-run stats | tenant_id, job_kind (SHELF_LIFE/SLOW_MOVEMENT — unique per tenant), shelf_life_days/slow_movement_days ≥ 1, is_active, last_run_at?, last_flagged, note | 044 | no |
 | `warehouse_kit_orders` | Light kit assembly from bins without a production order (I-13): WK- at POST; the G-45 roll-up (kit = Σ components exactly) | tenant_id, kit_no? (unique), warehouse_id (FK), kit_item_id (FK), qty > 0, uom_id?, status (DRAFT/POSTED/CANCELLED — POSTED ⇒ kit_no+posted_at), total_component_cost?, posted_journal_id?/posted_at?/posted_by?, note/note_ar | 044 | no |
 | `warehouse_kit_lines` | The kit component consumption with its bin + cost | tenant_id, order_id (composite FK, CASCADE), line_no, component_item_id (FK), qty > 0, unit_cost?/value_amount?, from_bin_id? (FK) | 044 | no |
+
+## manufacturing planning — MRP (PHASE-043 — DELIVERED by migrations `0074_item_planning_policies.sql` … `0078_mrp_seeds.sql`, schema_version 78)
+
+Manufacturing II — MRP & Planning (CR-13): the planning brain — a deterministic, explanation-first
+net-requirements engine ((MPS + unreserved firm sales + safety-stock gap) − (qualified on-hand −
+reserved) − (open POs + open MOs + inbound transfers) per bucket, INV-030) over multi-level BOM
+explosions with low-level codes, phantom flattening, alternative-material substitution and
+by/co-product netting, producing actionable suggestions that convert to real documents in one
+click (idempotent — exactly one document per suggestion, BR-079). Around the engine: the item
+planning policies (lead time, manual/AUTO safety stock, lot sizing, time fences — the items-table
+extension), the master production schedule (frozen-fence edits need the explicit
+manufacturing.mps.frozen_edit permission + reason, BR-078), the bill of resources (rough-cut
+capacity + supply feasibility against PHASE-042 work-center capacities — NOT finite scheduling),
+the ATP/CTP service consumed by sales order lines (hard exclusions — quarantined, reserved and
+consignment-owned stock never promise, BR-080), the MTO linkage (production order ↔ sales line
+with a hard reservation — G-49), and the contract manufacturing tolling round trip
+(stock-at-processor ledger + the conversion-service PO through the 038 path — G-48). +11 tables —
+the catalog count moves 261 → 272. +3 CoA purposes (1420 TOLLING_MATERIALS · 2136
+TOLLING_CONVERSION_PAYABLE · 5126 TOLLING_YIELD_LOSS — the 0026 additive-marker pattern).
+Numbering note: the phase doc planned ≈0067…0072 — written before PHASE-044 took 0067…0073;
+0074…0078 are the honest next slots (the 0065 precedent). Grants: planning data
+(SELECT/INSERT/UPDATE — status lifecycles, no app-role deletes; superseded suggestions stay as
+audit trail); the BOM planning satellites carry DELETE for the DRAFT full-replace discipline
+(the bom_lines 0026 precedent); `lot_sizing_rules` is the GLOBAL seeded catalog (no tenant_id —
+the permissions pattern, deliberately outside the RLS suite). Runs and suggestions are NOT ledger
+documents (the budgeting precedent — no golden row for the run itself; the three goldens are
+G-47/G-48/G-49).
+
+| Entity | Purpose | Key fields / relationships | Phase | OC |
+|--------|---------|---------------------------|-------|----|
+| `lot_sizing_rules` | The GLOBAL lot-sizing rule catalog (M-01): seeded read-only in 0078 — the permissions pattern (no tenant_id, no RLS) | code (PK), name/name_ar, description/description_ar, param_required? (NULL/fixed_order_qty/order_multiple/period_supply_buckets — names the items column the rule consumes); grants SELECT only | 043 | no |
+| `mps_entries` | Master production schedule entries (M-05): planned/firmed production per (warehouse, item, bucket); frozen-fence edits need the mps.frozen_edit permission + reason (BR-078 — service-enforced, the reason rides the row) | tenant_id, warehouse_id/item_id/bucket_start (slot unique), qty numeric(19,6) (≥ 0), uom_id (composite FKs), status (PLANNED/FIRMED), last_edit_reason? (1..300 — the frozen-fence audit), note/note_ar; wh/item + status indexes; grants SELECT/INSERT/UPDATE | 043 | no |
+| `bom_substitutions` | Ordered alternative materials per BOM line (M-09): netting tries them by priority for the uncovered remainder — the substitution lands on the demand line, never silently | tenant_id, bom_line_id (composite FK, CASCADE), substitute_item_id (composite FK), priority smallint (1..20, line-unique), note?; line+priority unique, line+item unique; grants SELECT/INSERT/UPDATE/DELETE (the DRAFT full-replace discipline) | 043 | no |
+| `bom_outputs` | The co/by-product outputs of a BOM (M-11): joint-allocation percentages — the MAIN product's share rides bills_of_materials.main_allocation_pct; activation requires main + Σ outputs = 100 exactly (G-47; a typed BOM_ALLOCATION_INVALID otherwise) | tenant_id, bom_id (composite FK, CASCADE), item_id (composite FK, bom+item unique), output_kind (CO_PRODUCT/BY_PRODUCT), allocation_pct numeric(7,4) (0 < x < 100), qty_per_output numeric(19,6) (> 0 — units per parent unit), uom_id (composite FK), note?; grants SELECT/INSERT/UPDATE/DELETE (the DRAFT full-replace discipline) | 043 | no |
+| `bill_of_resources` | The critical-resource overlay per BOM (M-25): work centers (hours per output — the rough-cut capacity check vs capacity_per_shift × shifts_per_day) + key materials (qty per output — the supply feasibility check); a planning overlay, not costing data — rows attach to a BOM version and stay editable while ACTIVE | tenant_id, bom_id (composite FK, CASCADE), line_no (1..500, bom-unique), resource_kind (WORK_CENTER/KEY_MATERIAL), work_center_id?/item_id? (exactly one set — the CHECK), consumption_factor numeric(19,6) (> 0), note?; grants SELECT/INSERT/UPDATE/DELETE (the line-replace discipline) | 043 | no |
+| `mrp_runs` | One deterministic planning run per (warehouse, parameters) (H-03/M-01/M-07): the FULL parameter snapshot rides the row (jsonb params — replayable determinism; the demand/supply lines are the input evidence) | tenant_id, warehouse_id (composite FK), status (RUNNING/COMPLETED/FAILED — FAILED ⇒ error_code + completed_at), run_mode (REGENERATIVE/NET_CHANGE), bucket_size (DAY/WEEK), horizon_buckets (1..366), as_of_date, scope_item_ids jsonb (empty = all eligible), params jsonb, stats jsonb?, error_code?, started_at/completed_at?; wh+created + status indexes; grants SELECT/INSERT/UPDATE | 043 | no |
+| `mrp_demand_lines` | The per-run demand snapshot (the INV-030 terms): MPS + unreserved firm sales + the safety-stock gap + BOM explosion (with the generating parent) + substitution coverage; bucket 0 is the pre-horizon past-due slot | tenant_id, run_id (composite FK, CASCADE), warehouse_id, item_id (composite FK), bucket_index (≥ 0)/bucket_start, demand_kind (MPS/SALES_ORDER/SAFETY_STOCK/BOM_EXPLOSION/SUBSTITUTION), qty numeric(19,6) (≥ 0), sales_order_line_id?/mps_entry_id? (the source refs), parent_item_id? (the explosion generator — slot-unique with kind), substituted_item_id?, substitutes jsonb (the M-09 records riding the line); run+item+bucket + run+kind indexes; grants SELECT/INSERT/UPDATE | 043 | no |
+| `mrp_supply_lines` | The per-run supply snapshot (the INV-030 terms): qualified on-hand (per batch for expiry items — M-10: a batch whose expiry precedes the bucket start does NOT cover it), ACTIVE reservations, open POs, open MOs, inbound transfers, co/by-product receipts | tenant_id, run_id (composite FK, CASCADE), warehouse_id, item_id (composite FK), bucket_index/bucket_start, supply_kind (ON_HAND/RESERVED/OPEN_PO/OPEN_MO/INBOUND_TRANSFER/CO_PRODUCT/SUGGESTED_RECEIPT), qty numeric(19,6) (≥ 0), batch_id? + expires_on? (the M-10 evidence), purchase_order_id?/production_order_id?/stock_transfer_id? (the source refs); run+item+bucket + run+kind indexes; grants SELECT/INSERT/UPDATE | 043 | no |
+| `mrp_suggestions` | Actionable suggestions (H-03/M-01/M-24): PURCHASE_ORDER/PRODUCTION_ORDER/TRANSFER with quantity after lot sizing, due/release dates and the per-suggestion netting drill-down (jsonb — the explanation-first law); acceptance is idempotent (INV-030/BR-079 — exactly one document per suggestion, the converted-doc partial unique is the anchor), dismissal requires a reason (BR-079), re-run supersedes (coverage netting) | tenant_id, run_id (composite FK), item_id/warehouse_id/from_warehouse_id? (composite FKs — TRANSFER ⇒ from set), suggestion_type (the CHECK), qty numeric(19,6) (> 0), uom_id?, due_date/release_date (release ≤ due — the CHECK), frozen_fence bool, status (SUGGESTED/ACCEPTED/DISMISSED/SUPERSEDED — DISMISSED ⇒ reason 1..300, ACCEPTED ⇒ doc type+id), substituted_item_id?, bom_id? (the BOM used at run time), netting jsonb (the drill-down), converted_doc_type?/converted_doc_id? (partial unique per tenant — the idempotency anchor), accepted/dismissed/superseded stamps + superseded_by_run_id?; status/item/run indexes; grants SELECT/INSERT/UPDATE (no deletes — superseded rows stay as audit trail) | 043 | no |
+| `contract_mfg_orders` | Contract manufacturing / tolling orders (M-21): material issue to the processor (stock-at-processor through the 1420 subledger), the conversion-service PO through the PHASE-038 path (no duplicated document-creation logic), the return with yield/scrap settlement (G-48) | tenant_id, tolling_no? (TLG- at issue, partial-unique DEFERRABLE), processor_partner_id/item_id/bom_id/warehouse_id (composite FKs), planned_qty numeric(19,6) (> 0), uom_id, status (DRAFT/ISSUED/RETURNED/SETTLED/CANCELLED — ISSUED+ ⇒ tolling_no + issued_at), fee_po_id? + conversion_fee? (⇒ status ≠ DRAFT), expected_return_date?, note/note_ar, lifecycle timestamps + cancel_reason?; status/no/partner indexes; grants SELECT/INSERT/UPDATE | 043 | no |
+| `contract_mfg_moves` | The stock-at-processor ledger (M-21): one row per leg — the settlement invariant is Σ issue = Σ return + Σ yield per order (balances to zero on full return — G-48) | tenant_id, order_id (composite FK), move_kind (ISSUE_TO_PROCESSOR/RETURN_FINISHED/RETURN_MATERIAL/YIELD_LOSS), item_id (composite FK), qty numeric(19,6) (> 0), unit_cost?/value_amount?, batch_id?/stock_move_id?/journal_id? (the posting refs), moved_at, note?; order+kind index; grants SELECT/INSERT/UPDATE | 043 | no |
+
+Diagram note: the PHASE-043 items-table extension (lead_time_days, safety_stock_policy/qty,
+ss_service_level_pct, ss_lookback_days, lot_sizing_rule + its operand columns, frozen/slushy
+fence days — the ck_items_planning_shape operand discipline), the BOM extension
+(bom_lines.phantom_flag M-08, bills_of_materials.main_allocation_pct M-11), the MTO/conversion
+links (production_orders.sales_order_line_id + mrp_suggestion_id, purchase_orders.
+mrp_suggestion_id), the ATP stamps (sales_order_lines.promised_date/atp_status/
+atp_suggested_date), and the stock_reservations PRODUCTION_ORDER holder widening are additive
+columns on existing catalog rows — no new entity rows (MIGRATION_STRATEGY §6).
 
 ## Diagrams
 

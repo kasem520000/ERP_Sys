@@ -511,6 +511,41 @@
       "when": 1796468900000,
       "tag": "0073_stock_moves_wms_sources",
       "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1796519400000,
+      "tag": "0074_item_planning_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1796519500000,
+      "tag": "0075_bom_planning",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1796519600000,
+      "tag": "0076_mrp_engine",
+      "breakpoints": true
+    },
+    {
+      "idx": 76,
+      "version": "7",
+      "when": 1796519700000,
+      "tag": "0077_contract_manufacturing",
+      "breakpoints": true
+    },
+    {
+      "idx": 77,
+      "version": "7",
+      "when": 1796519800000,
+      "tag": "0078_mrp_seeds",
+      "breakpoints": true
     }
   ],
   "version": "7"

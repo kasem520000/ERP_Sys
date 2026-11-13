@@ -175,7 +175,20 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // 0073 the stock_moves source-shape extension for the WMS document
     // family (cycle_count / quarantine_disposition /
     // consignment_settlement / warehouse_kit / cross_dock — T-07…T-10).
-    expect(files.at(-1)?.tag).toBe("0073_stock_moves_wms_sources");
+    //
+    // PHASE-043 (CR-13 — MRP & Planning; the doc's "≈ 0067…0072" was
+    // written before 044 took those slots): 0074_item_planning_policies
+    // (the items planning fields + the lot_sizing_rules global catalog +
+    // mps_entries), 0075_bom_planning (phantom_flag + bom_substitutions +
+    // bom_outputs/main_allocation_pct + bill_of_resources),
+    // 0076_mrp_engine (the run family + the MTO/conversion/ATP document
+    // links + the PRODUCTION_ORDER reservation holder),
+    // 0077_contract_manufacturing (the tolling pair + 'contract_mfg'
+    // stock_moves source + the CoA markers 1420/2136/5126),
+    // 0078_mrp_seeds (the DATA-ONLY seed: FOUR manufacturing keys —
+    // 287 → 291, matrix §3.20; the three feature plan grants; the
+    // lot-sizing definitions; the food_manufacturing enablement).
+    expect(files.at(-1)?.tag).toBe("0078_mrp_seeds");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {
