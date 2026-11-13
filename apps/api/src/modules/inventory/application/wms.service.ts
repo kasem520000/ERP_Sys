@@ -718,7 +718,15 @@ export class WmsService {
         // elsewhere — is a NAMED conflict, not a silent skip). A ZERO-qty
         // history row places NOTHING (the honest history floor): such a
         // serial stays a migration candidate and the upsert below lands its
-        // unit on the existing slot without duplicating the fold.
+        // unit on the existing slot without duplicating the fold. WAVE-4: a
+        // single-unit placement the LEDGER does not corroborate (the ledger
+        // netting anything other than exactly 1 here, or anything other
+        // than 1 across all warehouses — e.g. a bin row for a serial with
+        // ZERO ledger legs, the bins-without-ledger batch's exact serial
+        // analogue) is a NAMED conflict too — pre-fix it was silently
+        // accepted as "already placed", so a provable sibling's placement
+        // landed the aggregate exactly on item_stock and hid it from the
+        // nightly probe.
         if (binnedHere.greaterThan(0)) {
           if (binnedHere.greaterThan(1) || binnedElsewhere.greaterThan(0)) {
             notes.push(
@@ -727,6 +735,10 @@ export class WmsService {
                   ? ` and ${s.binnedElsewhereQty} at other warehouse(s)`
                   : "") +
                 " — a single-unit serial cannot sit in multiple slots, placement over-subscribed",
+            );
+          } else if (!netHere.equals(1) || !netAll.equals(1)) {
+            notes.push(
+              `serial ${s.serialNo}: bin rows place ${s.binnedHereQty} unit(s) here but the ledger nets ${s.netAtWarehouse} here (${s.netTotal} across all warehouses) — the sources disagree (a placement the ledger does not corroborate; resolve through a documented adjustment, runbook §5)`,
             );
           }
           continue;
@@ -832,7 +844,13 @@ export class WmsService {
     // clamped shortfall (GREATEST(ledger − bins, 0)) keeps the write plan
     // honest, but the conflict is never again a silent clamp-to-zero skip,
     // and it can never hide behind a totals-matching WRITABLE (the guard
-    // below).
+    // below). WAVE-4 (the union population): the comparison spans the
+    // batches present in the LEDGER or the BOXES, so the wave-3 §5
+    // limitation's hiding shape — a batch whose bins hold stock with ZERO
+    // ledger legs at this warehouse (invisible to the ledger-driven
+    // population while its bins still count toward Σ bins and the probe) —
+    // is listed and named with its exact shape; a batch whose legs NET to
+    // zero or negative keeps the wave-3 netting phrasing.
     const batches = await wms.listBatchDistribution(row.warehouseId, row.itemId);
     const notes: string[] = [];
     const writes: BackfillWrite[] = [];
@@ -842,7 +860,9 @@ export class WmsService {
       const binQty = new Decimal(b.binQty);
       if (binQty.greaterThan(ledgerQty)) {
         notes.push(
-          `batch ${b.batchNo}: bins hold ${b.binQty} but the ledger nets ${b.ledgerQty} here — the per-batch sources disagree (drift the backfill never heals; resolve through a documented adjustment, runbook §5)`,
+          b.ledgerLegs === 0
+            ? `batch ${b.batchNo}: bins hold ${b.binQty} but the ledger has NO movements for this batch at this warehouse — the per-batch sources disagree (drift the backfill never heals; resolve through a documented adjustment, runbook §5)`
+            : `batch ${b.batchNo}: bins hold ${b.binQty} but the ledger nets ${b.ledgerQty} here — the per-batch sources disagree (drift the backfill never heals; resolve through a documented adjustment, runbook §5)`,
         );
         continue; // never a write for a conflicting batch (its clamped shortfall is 0)
       }

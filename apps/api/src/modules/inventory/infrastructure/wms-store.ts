@@ -467,7 +467,14 @@ export async function listAllocatableBinContents(input: {
   serialId: string | null;
   statuses?: string[];
 }): Promise<
-  { id: string; binId: string; qty: string; status: string; lpnId: string | null; uomId: string | null }[]
+  {
+    id: string;
+    binId: string;
+    qty: string;
+    status: string;
+    lpnId: string | null;
+    uomId: string | null;
+  }[]
 > {
   const statuses = input.statuses ?? ["AVAILABLE"];
   // drizzle binds a raw JS array as ONE flattened param — the ARRAY[]
@@ -517,7 +524,13 @@ export async function listOwnerRows(input: {
       AND status = 'AVAILABLE' AND qty > 0
     ORDER BY received_at, id
   `);
-  return rows.rows as unknown as { id: string; binId: string; qty: string; serialId: string | null; status: string }[];
+  return rows.rows as unknown as {
+    id: string;
+    binId: string;
+    qty: string;
+    serialId: string | null;
+    status: string;
+  }[];
 }
 
 /** Does the item have ANY tenant-owned bin row in the warehouse? */
@@ -619,10 +632,7 @@ export async function addToBinSlot(input: {
     const factor = conversion.reverse
       ? new Decimal(1).div(new Decimal(conversion.factor))
       : new Decimal(conversion.factor);
-    qty = new Decimal(input.qty)
-      .times(factor)
-      .toDecimalPlaces(6, Decimal.ROUND_HALF_UP)
-      .toFixed(6);
+    qty = new Decimal(input.qty).times(factor).toDecimalPlaces(6, Decimal.ROUND_HALF_UP).toFixed(6);
     uomId = slotUom;
   }
   const upserted = await tenantTx().execute<{ id: string }>(sql`
@@ -787,10 +797,7 @@ export async function listBinShortfalls(): Promise<BinBackfillRow[]> {
 
 /** The tenant-owned bin fold for ONE (warehouse, item) — the backfill's
  * post-write verification read (INV-029's left side, scoped). */
-export async function foldTenantBinQty(
-  warehouseId: string,
-  itemId: string,
-): Promise<Decimal> {
+export async function foldTenantBinQty(warehouseId: string, itemId: string): Promise<Decimal> {
   const rows = await tenantTx().execute<{ q: string }>(sql`
     SELECT COALESCE(SUM(qty), 0)::text AS q FROM bin_contents
     WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId}
@@ -864,7 +871,22 @@ export async function findItemTracking(
  * the same fold `batchOnHand`/`listFefoBatches` read — scoped to THIS
  * warehouse, netted against the tenant-owned bin rows already sitting on
  * each batch. Only the service reconciles these rows against the
- * (warehouse, item) total BEFORE anything is written. */
+ * (warehouse, item) total BEFORE anything is written.
+ *
+ * WAVE-4 (the union population — the wave-3 §5 limitation corrected): the
+ * comparison spans the UNION of the batches present in the LEDGER or the
+ * BOXES (a FULL OUTER JOIN), no longer the ledger-driven `FROM ledger`
+ * intersection. A batch whose bins hold stock with ZERO ledger legs at
+ * this warehouse is listed too — its bins count toward Σ bins (the probe's
+ * fold), so healing the aggregate around it would HIDE its disagreement
+ * from the only recurring detector; it must be listed to be named. The
+ * scoping mirrors the probe exactly (tenant: the RLS context plus the
+ * `item_batches` tenant join — complete over the union because both
+ * `stock_moves.batch_id` and `bin_contents.batch_id` carry composite
+ * same-tenant RESTRICT FKs; ownership: `owner_partner_id IS NULL` — the
+ * probe never counts partner-owned consignment rows; bin status: ALL three
+ * statuses — the probe's fold spans AVAILABLE/QUARANTINE/HOLD alike, so a
+ * HOLD bins-only batch hides exactly like an AVAILABLE one). */
 export interface BatchDistributionRow {
   batchId: string;
   batchNo: string;
@@ -873,6 +895,10 @@ export interface BatchDistributionRow {
   binQty: string;
   /** max(ledger − bins, 0) — the PROVEN per-batch shortfall candidate. */
   shortfall: string;
+  /** The number of stock_moves legs behind ledgerQty (0 for a bins-only
+   * batch) — distinguishes "NO movements" from "movements netting zero"
+   * in the service's conflict naming. */
+  ledgerLegs: number;
 }
 
 export async function listBatchDistribution(
@@ -881,7 +907,8 @@ export async function listBatchDistribution(
 ): Promise<BatchDistributionRow[]> {
   const rows = await tenantTx().execute(sql`
     WITH ledger AS (
-      SELECT batch_id, SUM(CASE WHEN direction = 'IN' THEN qty ELSE -qty END) AS ledger_qty
+      SELECT batch_id, SUM(CASE WHEN direction = 'IN' THEN qty ELSE -qty END) AS ledger_qty,
+             COUNT(*) AS ledger_legs
       FROM stock_moves
       WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId} AND batch_id IS NOT NULL
       GROUP BY batch_id
@@ -891,14 +918,24 @@ export async function listBatchDistribution(
       WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId}
         AND batch_id IS NOT NULL AND owner_partner_id IS NULL
       GROUP BY batch_id
+    ), united AS (
+      -- WAVE-4: the UNION of the ledger-side and bins-side batch ids — a
+      -- bins-only batch (positive bin_qty, no ledger legs) enters here with
+      -- ledger_qty 0 / ledger_legs 0 instead of being invisible.
+      SELECT COALESCE(l.batch_id, s.batch_id) AS batch_id,
+             COALESCE(l.ledger_qty, 0) AS ledger_qty,
+             COALESCE(l.ledger_legs, 0)::int AS ledger_legs,
+             COALESCE(s.bin_qty, 0) AS bin_qty
+      FROM ledger l
+      FULL OUTER JOIN bins s ON s.batch_id = l.batch_id
     )
-    SELECT l.batch_id AS "batchId", b.batch_no AS "batchNo", b.status AS "batchStatus",
-           l.ledger_qty::text AS "ledgerQty", COALESCE(s.bin_qty, 0)::text AS "binQty",
-           GREATEST(l.ledger_qty - COALESCE(s.bin_qty, 0), 0)::text AS "shortfall"
-    FROM ledger l
-    JOIN item_batches b ON b.id = l.batch_id AND b.tenant_id = erp.current_tenant_id()
-    LEFT JOIN bins s ON s.batch_id = l.batch_id
-    ORDER BY b.expiry_date NULLS LAST, b.created_at
+    SELECT u.batch_id AS "batchId", b.batch_no AS "batchNo", b.status AS "batchStatus",
+           u.ledger_qty::text AS "ledgerQty", u.bin_qty::text AS "binQty",
+           GREATEST(u.ledger_qty - u.bin_qty, 0)::text AS "shortfall",
+           u.ledger_legs AS "ledgerLegs"
+    FROM united u
+    JOIN item_batches b ON b.id = u.batch_id AND b.tenant_id = erp.current_tenant_id()
+    ORDER BY b.expiry_date NULLS LAST, b.created_at, u.batch_id
   `);
   return rows.rows as unknown as BatchDistributionRow[];
 }
@@ -1584,7 +1621,14 @@ export async function listPickableRows(input: {
   itemId: string;
   method: "FIFO" | "FEFO" | "NEAREST";
 }): Promise<
-  { id: string; binId: string; binCode: string | null; qty: string; batchId: string | null; expiryDate: string | null }[]
+  {
+    id: string;
+    binId: string;
+    binCode: string | null;
+    qty: string;
+    batchId: string | null;
+    expiryDate: string | null;
+  }[]
 > {
   const order =
     input.method === "FEFO"
