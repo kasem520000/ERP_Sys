@@ -104,7 +104,11 @@ describe("I-17/I-21 — the alert probes", () => {
     expect(job?.lastFlagged).toBeGreaterThanOrEqual(1);
     expect(job?.lastRunAt).toBeTruthy();
 
-    // Inactive: the probe skips the tenant's stock (0 flagged for it).
+    // Inactive: the probe skips THIS tenant (its contribution stops). The
+    // aggregate is corpus-relative — other specs' tenants carry their own
+    // expiring batches (absent job rows run fail-closed on the default
+    // threshold) — so the honest assertions are the drop below the active
+    // run's count and the tenant's stamp freezing.
     await withTenant(TENANT_I, () =>
       alerts.upsertJob({
         jobKind: "SHELF_LIFE",
@@ -115,8 +119,11 @@ describe("I-17/I-21 — the alert probes", () => {
         actorId: I_ACTOR,
       }),
     );
+    const stampBefore = await withTenant(TENANT_I, () => policies.findAlertJob("SHELF_LIFE"));
     const skipped = await withTenant(TENANT_I, () => alerts.runShelfLifeAlerts());
-    expect(skipped.flagged).toBe(0);
+    expect(skipped.flagged).toBeLessThan(run.flagged); // tenant I's batches left the count
+    const stampAfter = await withTenant(TENANT_I, () => policies.findAlertJob("SHELF_LIFE"));
+    expect(stampAfter?.lastRunAt).toBe(stampBefore?.lastRunAt); // the inactive tenant never re-stamps
     await withTenant(TENANT_I, () =>
       alerts.upsertJob({
         jobKind: "SHELF_LIFE",

@@ -82,6 +82,10 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "manufacturing.qc.manage",
   // PHASE-042 (0065 seed): the OEE reports' key
   "manufacturing.oee.read",
+  // PHASE-044 (0071 seed, matrix §3.21): the WMS intelligence report keys.
+  "inventory.wms.locations",
+  "inventory.cycle_counts",
+  "inventory.abc",
   "crm.contracts.manage",
   "fixed_assets.reports.view",
   "notes.notes.view",
@@ -113,12 +117,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(95); // PHASE-042: +4 manufacturing-execution rows (91 → 95)
+    expect(result.count).toBe(99); // PHASE-044: +4 WMS intelligence rows (95 → 99)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(95); // PHASE-042: +4 manufacturing-execution rows (91 → 95)
+    expect(snapshot).toHaveLength(99); // PHASE-044: +4 WMS intelligence rows (95 → 99)
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();

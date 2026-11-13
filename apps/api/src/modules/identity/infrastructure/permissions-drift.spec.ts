@@ -40,6 +40,7 @@ const SEED_PATHS = [
   // missed its own negative (caught by the PHASE-044 gate re-run).
   join(process.cwd(), "migrations", "0065_routing_work_centers.sql"), // PHASE-042 routing/work-center keys
   join(process.cwd(), "migrations", "0066_standard_costing.sql"), // PHASE-042 standard-costing key
+  join(process.cwd(), "migrations", "0071_wms_seeds.sql"), // PHASE-044 the eight WMS keys
   // NOT YET LISTED: 0071_wms_seeds.sql — its eight inventory WMS keys
   // join this contract together with their AUTHORIZATION_MATRIX §3.21
   // rows (the route wiring lands with the PHASE-044 web tasks; adding

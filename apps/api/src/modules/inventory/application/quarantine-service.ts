@@ -49,7 +49,7 @@ type Disposition = "RELEASE" | "RETURN_TO_VENDOR" | "SCRAP";
 export class QuarantineService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
+    @Inject(PostingService) private readonly posting: PostingService,
     @Inject(WmsService) private readonly wms: WmsService,
   ) {}
 

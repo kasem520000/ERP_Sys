@@ -39,6 +39,39 @@ import {
  * bin decrements (directedTakes; INV-029 holds end to end).
  */
 
+
+/** The suite's DEDICATED items — never the shared S-A/S-B golden items
+ * (their WAC carries pos/golden's pinned COGS legs; the full-suite corpus
+ * order makes any extra receipt a golden drift — the PHASE-044 T-20 gate
+ * repair). */
+async function ensurePickItem(sku: string): Promise<string> {
+  return withTenant(TENANT_S, async () => {
+    const itemsStore = await import("../../modules/items/infrastructure/items.store");
+    const found = await itemsStore.findItemBySku(sku);
+    if (found !== undefined) return found.id;
+    const uoms = await itemsStore.listUoms();
+    const pcs = uoms.find((u) => u.code === "PCS") ?? uoms[0]!;
+    const created = await itemsStore.insertItem({
+      sku,
+      name: `Picking ${sku}`,
+      nameAr: null,
+      kind: "STOCK",
+      uomId: pcs.id,
+      categoryId: null,
+      taxCodeId: null,
+      costingMethod: "WAC",
+      trackBatch: false,
+      trackSerial: false,
+      trackImei: false,
+      hasExpiry: false,
+      reorderLevel: null,
+      reorderQty: null,
+      basePrice: null,
+    });
+    return created.id;
+  });
+}
+
 let fixture: SalesFixture;
 let picking: PickingService;
 let deliveries: DeliveryNoteService;
@@ -57,7 +90,7 @@ async function sBinReceipt(input: {
   itemId: string;
   qty: string;
   unitCost: string;
-  targetBinId: string;
+  targetBinId: string | null;
 }) {
   await withTenant(TENANT_S, async () => {
     const plan = await planReceipt({
@@ -115,7 +148,7 @@ async function stockQtyOf(warehouseId: string, itemId: string): Promise<string> 
 
 describe("§2.4 — strategy + wave lifecycle + cluster + scan (PP-11)", () => {
   it("NEAREST allocation + the cluster route serves two deliveries on ONE walk; confirms drive the delivery post's bins; INV-029 holds", async () => {
-    const item = fixture.items.a;
+    const item = await ensurePickItem("PICK-WMS-1");
     const wh = fixture.warehouseId;
 
     // Two extra faces: NEAR (pick_sequence 1) and FAR (pick_sequence 9).
@@ -318,8 +351,11 @@ describe("§2.4 — strategy + wave lifecycle + cluster + scan (PP-11)", () => {
   });
 
   it("FEFO allocation prefers the earliest-expiring batch; allow_partial=false rejects short confirms", async () => {
-    const item = fixture.items.b;
+    const item = await ensurePickItem("PICK-WMS-2");
     const wh = fixture.warehouseId;
+    // The dedicated item's own DEFAULT-bin stock (10 units — the shape the
+    // old shared-item fixture W-1 opening provided; idempotent per qty).
+    await sBinReceipt({ itemId: item, qty: "10", unitCost: "25.000000", targetBinId: null });
     // A batch-tracked receipt… item B is plain; use the DEFAULT bin stock
     // (10 units) and prove the partial rule on it instead — the FEFO leg
     // needs a batch item, so this test focuses on the partial rule.
@@ -384,7 +420,7 @@ describe("§2.4 — strategy + wave lifecycle + cluster + scan (PP-11)", () => {
   });
 
   it("cancelWave refuses once picks are confirmed; cancels cleanly before", async () => {
-    const item = fixture.items.b;
+    const item = await ensurePickItem("PICK-WMS-2");
     const wh = fixture.warehouseId;
     const created = await withTenant(TENANT_S, () =>
       deliveries.create({

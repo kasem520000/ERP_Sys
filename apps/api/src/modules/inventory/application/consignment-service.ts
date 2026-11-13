@@ -41,7 +41,7 @@ import {
 export class ConsignmentService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
+    @Inject(PostingService) private readonly posting: PostingService,
   ) {}
 
   /** The board: the owner's rows (per partner or the whole consignment floor). */

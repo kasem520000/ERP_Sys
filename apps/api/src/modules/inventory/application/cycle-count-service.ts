@@ -44,7 +44,7 @@ const ABC_DEFAULT_B_PCT = "0.95";
 export class CycleCountService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
+    @Inject(PostingService) private readonly posting: PostingService,
     private readonly numbering: NumberingService,
   ) {}
 

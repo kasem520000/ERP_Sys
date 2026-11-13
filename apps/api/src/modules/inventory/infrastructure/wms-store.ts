@@ -745,6 +745,72 @@ export async function reconcileBins(filter: {
   return rows.rows as unknown as BinReconciliationRow[];
 }
 
+/**
+ * PHASE-044 T-20 — the legacy-stock backfill (§7's mitigation): every
+ * (warehouse, item) where item_stock EXCEEDS Σ tenant-owned bin_contents
+ * (the pre-WMS residue: stock that predates the bin substrate). The
+ * backfill lands the shortfall on the warehouse's DEFAULT bin; a SURPLUS
+ * (bins > stock) is genuine drift the backfill never touches.
+ */
+export interface BinBackfillRow {
+  warehouseId: string;
+  warehouseCode: string | null;
+  itemId: string;
+  itemSku: string | null;
+  binQty: string;
+  stockQty: string;
+  shortfall: string;
+}
+
+export async function listBinShortfalls(): Promise<BinBackfillRow[]> {
+  const rows = await tenantTx().execute(sql`
+    WITH bins AS (
+      SELECT warehouse_id, item_id, sum(qty) AS bin_qty
+      FROM bin_contents
+      WHERE owner_partner_id IS NULL
+      GROUP BY warehouse_id, item_id
+    )
+    SELECT s.warehouse_id AS "warehouseId", w.code AS "warehouseCode",
+           s.item_id AS "itemId", i.sku AS "itemSku",
+           COALESCE(b.bin_qty, 0)::text AS "binQty",
+           s.qty::text AS "stockQty",
+           (s.qty - COALESCE(b.bin_qty, 0))::text AS shortfall
+    FROM item_stock s
+    LEFT JOIN bins b ON b.warehouse_id = s.warehouse_id AND b.item_id = s.item_id
+    LEFT JOIN warehouses w ON w.id = s.warehouse_id AND w.tenant_id = erp.current_tenant_id()
+    LEFT JOIN items i ON i.id = s.item_id AND i.tenant_id = erp.current_tenant_id()
+    WHERE s.qty > COALESCE(b.bin_qty, 0)
+    ORDER BY w.code, i.sku
+  `);
+  return rows.rows as unknown as BinBackfillRow[];
+}
+
+/** Insert one backfill row onto a bin (the uq_bin_contents_slot shape — a
+ * single AVAILABLE, tenant-owned, batch-less, LPN-less row per slot). */
+export async function insertBackfillContent(input: {
+  binId: string;
+  warehouseId: string;
+  itemId: string;
+  qty: string;
+  note: string;
+  createdBy: string | null;
+}): Promise<string> {
+  const id = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO bin_contents
+      (id, tenant_id, bin_id, warehouse_id, item_id, batch_id, serial_id,
+       lpn_id, owner_partner_id, status, qty, uom_id, received_at, note, created_by)
+    VALUES (${id}, erp.current_tenant_id(), ${input.binId}, ${input.warehouseId},
+            ${input.itemId}, NULL, NULL, NULL, NULL, 'AVAILABLE', ${input.qty},
+            NULL, now(), ${input.note}, ${input.createdBy})
+    ON CONFLICT ("tenant_id", "bin_id", "item_id", "batch_id", "serial_id",
+                 "lpn_id", "owner_partner_id", "status")
+    DO UPDATE SET qty = bin_contents.qty + EXCLUDED.qty, updated_at = now()
+    RETURNING id
+  `);
+  return id;
+}
+
 /** Available-to-promise at bin level: AVAILABLE, tenant-owned rows only. */
 export async function availableQtyByBin(filter: {
   warehouseId: string;

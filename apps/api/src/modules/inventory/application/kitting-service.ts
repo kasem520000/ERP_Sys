@@ -51,7 +51,7 @@ import {
 export class KittingService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
+    @Inject(PostingService) private readonly posting: PostingService,
     private readonly numbering: NumberingService,
   ) {}
 

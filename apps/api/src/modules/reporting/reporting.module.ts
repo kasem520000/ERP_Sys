@@ -141,6 +141,13 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // the /manufacturing/oee route rides (the same §12 convention); the
   // rework-cost + cost-variance contracts ride the 0026 costing key.
   "manufacturing.oee.read",
+  // PHASE-044 (0071 seed, matrix §3.21): the WMS intelligence report keys
+  // — bin-contents rides the locations key, the cycle-count variance the
+  // cycle_counts key, and the ABC classification the analysis-tier abc key
+  // (the same §12 convention — the keys the /inventory/wms routes ride).
+  "inventory.wms.locations",
+  "inventory.cycle_counts",
+  "inventory.abc",
 ]);
 
 @Module({

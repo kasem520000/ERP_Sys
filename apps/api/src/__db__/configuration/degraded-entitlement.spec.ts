@@ -35,7 +35,11 @@ beforeAll(async () => {
   const optional = await provisionBusinessTenant("degraded-optional", "industry.retail");
   tenantOptional = optional.tenantId;
   ownerOptional = optional.ownerId;
+  // PHASE-044 (0071 §3): the business plan carries inventory.serial_ledger,
+  // which DEPENDS on serial_tracking (the feature-catalog closure) — the
+  // clean hide needs both revoked (the dependent WMS key leaves with it).
   await revokeEntitlement(tenantOptional, "inventory.serial_tracking");
+  await revokeEntitlement(tenantOptional, "inventory.serial_ledger");
 
   const blocked = await provisionBusinessTenant("degraded-blocked", "industry.grocery");
   tenantBlocked = blocked.tenantId;

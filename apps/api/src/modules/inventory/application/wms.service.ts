@@ -633,4 +633,74 @@ export class WmsService {
     }
     return { tenants: tenantIds.length, mismatchedTenants, mismatches };
   }
+
+  /**
+   * PHASE-044 T-20 — the legacy-stock backfill (§7's mitigation): stock
+   * that predates the bin substrate (item_stock rows with no matching
+   * tenant-owned bin_contents) lands on the warehouse's DEFAULT bin so
+   * INV-029 holds from the first post-upgrade night. DRY-RUN reports the
+   * shortfalls without writing; a SURPLUS (bins > stock) is genuine drift
+   * this job never touches (the detector owns it). Audited; idempotent
+   * (a second run finds no shortfall).
+   */
+  async backfillDefaultBins(input: {
+    dryRun: boolean;
+    actorId: string | null;
+  }): Promise<{
+    dryRun: boolean;
+    warehouses: number;
+    items: number;
+    rows: number;
+    report: { warehouseCode: string | null; itemSku: string | null; binQty: string; stockQty: string; shortfall: string }[];
+  }> {
+    const shortfalls = await wms.listBinShortfalls();
+    if (input.dryRun || shortfalls.length === 0) {
+      return {
+        dryRun: input.dryRun,
+        warehouses: new Set(shortfalls.map((row) => row.warehouseId)).size,
+        items: shortfalls.length,
+        rows: 0,
+        report: shortfalls.map((row) => ({
+          warehouseCode: row.warehouseCode,
+          itemSku: row.itemSku,
+          binQty: row.binQty,
+          stockQty: row.stockQty,
+          shortfall: row.shortfall,
+        })),
+      };
+    }
+    const binByWarehouse = new Map<string, string>();
+    let written = 0;
+    for (const row of shortfalls) {
+      let binId = binByWarehouse.get(row.warehouseId);
+      if (binId === undefined) {
+        const bin = await wms.ensureDefaultBin(row.warehouseId);
+        binId = bin.id;
+        binByWarehouse.set(row.warehouseId, binId);
+      }
+      await wms.insertBackfillContent({
+        binId,
+        warehouseId: row.warehouseId,
+        itemId: row.itemId,
+        qty: row.shortfall,
+        note: "INV-029 legacy-stock backfill (PHASE-044 T-20)",
+        createdBy: input.actorId,
+      });
+      written += 1;
+    }
+    await this.audit.record({
+      action: "inventory.wms_bins_backfilled",
+      entityType: "bin_contents",
+      entityId: binByWarehouse.values().next().value ?? "default-bins",
+      actorId: input.actorId ?? undefined,
+      after: { rows: written, warehouses: binByWarehouse.size },
+    });
+    return {
+      dryRun: false,
+      warehouses: binByWarehouse.size,
+      items: shortfalls.length,
+      rows: written,
+      report: [],
+    };
+  }
 }

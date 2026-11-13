@@ -188,6 +188,18 @@ describe("adapter rollout gate (T13) — default OFF + cert-provisioned enableme
   });
 
   it("enablement REFUSES without a provisioned certificate", async () => {
+    // The shared SA pack tenant accumulates fake-zatca certificates from
+    // other specs' drills (secrets-rotation's S-10 runs earlier in the
+    // corpus order) — revoke them so the gate's no-cert state is honest
+    // for THIS assertion.
+    await withTenant(tenant.tenantId, async () => {
+      const { requireTenantContext } = await import("../../infra/db/tenant-context");
+      const { sql } = await import("drizzle-orm");
+      const tx = requireTenantContext();
+      await tx.tx!.execute(sql`
+        UPDATE e_invoicing_certificates SET status = 'REVOKED'
+        WHERE tenant_id = erp.current_tenant_id() AND adapter_id = 'fake-zatca'`);
+    });
     await expect(
       withTenant(tenant.tenantId, () =>
         rollout.setAdapterEnabled({
