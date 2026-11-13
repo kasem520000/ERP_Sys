@@ -45,18 +45,20 @@ house RLS triple + the master-data/document grants (the 0026 precedent;
 | Table | Migration | schema.ts (Drizzle) |
 |---|---|---|
 | warehouse_zones / warehouse_aisles / warehouse_racks / warehouse_bins | 0067 §1–§4 | `warehouseZones` :7783 · `warehouseAisles` :7816 · `warehouseRacks` :7839 · `warehouseBins` :7864 |
-| bin_contents (+ the `stock_moves` source-bin/bin-status extension) | 0067 §4/§6 + 0073 | `binContents` :7927 |
-| lpns | 0067 §7 | `lpns` :7904 |
+| bin_contents | 0067 §6 | `binContents` :7927 |
+| lpns | 0067 §5 | `lpns` :7904 |
 | returnable_packaging / returnable_packaging_movements (L1-20) | 0067 §8–§9 | :7986 · :8014 |
+| the `stock_moves` extension (source/target bin + LPN refs §7; the WMS document source shapes) | 0067 §7 + 0073 | the movement-core writes |
 | putaway_rules | 0068 §1 | `putawayRules` :8058 |
 | pick_strategies / pick_waves / pick_tasks | 0068 §2–§4 | :8085 · :8104 · :8136 |
 | cycle_count_schedules / cycle_count_documents / cycle_count_lines | 0069 §1–§3 | :8193 · :8229 · :8271 |
 | abc_classifications | 0069 §4 | `abcClassifications` :8303 |
 | serial_movements | 0069 §5 | `serialMovements` :8342 |
-| inventory_alert_jobs | 0070 §1 | `inventoryAlertJobs` :8433 |
-| transfer_pricing_policies | 0070 §2 | `transferPricingPolicies` :8381 |
-| kit_orders / kit_order_lines | 0070 §3–§4 | the kitting store mirrors |
-| consignment consumption settlements (exactly-once keys) | 0070 §5 | the consignment surface |
+| transfer_pricing_policies | 0070 §1 | `transferPricingPolicies` :8381 |
+| transit_exceptions (I-22) | 0070 §2 | the transit surface |
+| inventory_alert_jobs | 0070 §3 | `inventoryAlertJobs` :8433 |
+| warehouse_kit_orders / warehouse_kit_lines | 0070 §4 | the kitting store mirrors |
+| 0070 §5 is the CoA template markers (1290 QUARANTINE_INVENTORY · 2135 CONSIGNATION_PAYABLE · 4990 TRANSFER_PRICING_ADJUSTMENT), not a settlements table — the consignment consumption settlements ride the posting engine's exactly-once source keys (`consignment_consumption:{id}:settle`, G-44) with NO new table | 0070 §5 | the G-44 surface |
 
 **Migrations & manifest:** journal idx 66/67…72/73 appended (73 entries); the
 manifest `src/infra/db/migrations.ts` carries the tags with the numbering-note
@@ -100,7 +102,7 @@ the desktop.routes/mobility mirrors ride the registry.
 
 | # | Criterion | Evidence |
 |---|---|---|
-| 1 | Migrations apply cleanly; Drizzle + catalog parity; RLS A1–A10 on every new table | 0067–0073 apply + re-apply no-op over the 73-entry chain (`migrations.db.spec.ts`); catalog 239 → 261 with the parity gate green; the A-suite extended +132 (the 22 tables × the 10 attacks) — identity-isolation 1,452/1,452 in the full run |
+| 1 | Migrations apply cleanly; Drizzle + catalog parity; RLS A1–A10 on every new table | 0067–0073 apply + re-apply no-op over the 73-entry chain (`migrations.db.spec.ts`); catalog 239 → 261 with the parity gate green; the A-suite extended +132 (the 22 tables × the SIX generated `it()` blocks per table — the A1–A10 attack classes packed six per table, NOT ×10) — identity-isolation 1,452/1,452 in the full run |
 | 2 | INV-029 at all times; quarantined/HOLD excluded from availability; consignment excluded from valuation + ATP | The `wms-inv029` suite walks EVERY movement kind asserting the fold + the probe after each step; the exclusion rules pinned at the ATP fold, the valuation fold, and the pick-allocation source (BR-076); the nightly probe (`inventory.bin-reconcile`, 01:45 UTC) is the read-only detector — its corpus test proves the mismatch notification + the SYSTEM audit row; the blocking side is the movement core's `BinContentsShortError` (the T-03/T-04 suites) |
 | 3 | Directed putaway: rules generate tasks on receipt; the label prints; wrong-bin is typed | `wms-putaway.spec` — first-match-by-priority, the emptiest-bin zone resolution, receipt task generation, the scan-confirmed structural move (the slot moves; `item_stock` never does), the PP-12 BIN-LABEL-V1 payload, the wrong-bin typed rejection with zero residue + the idempotent replay; the receipts screen renders the queue with the receipt-58 label print (PP-12's fixed format — the 062 designer later) |
 | 4 | Directed picking per strategy with scan verification; partial per the warehouse rule; the cluster route | `wms-picking.spec` — NEAREST allocation + the two-deliveries-one-walk cluster proof with the confirms driving the delivery post's `directedTakes` (INV-029 end to end); FEFO + `allow_partial=false`'s typed short-confirm rejection; the wave lifecycle (PW- numbers) + the 0072 cancel-evidence repair |
@@ -157,7 +159,10 @@ the desktop.routes/mobility mirrors ride the registry.
   **2,979/2,979 — 202 files, 0 failures** (the 042 baseline was 2,768/189; +211
   tests across T-03…T-20 and the regression base).
 - **isolation (RLS A1–A10):** identity-isolation 1,452/1,452 (+132 for the 22
-  WMS tables — the 042 A-suite was 1,332).
+  WMS tables — the 042-era A-suite baseline was **1,320** (219 tables × 6 + 6
+  fixed), re-run verified 2026-11-13; the originally announced "1,332" was a
+  miscount, corrected with errata in the 042 report and
+  IMPLEMENTATION_STATUS).
 - **migrations:** apply + re-apply no-op; the RLS catalog drift probe green with
   the 22 new tables catalogued.
 - **docs:validate:** 33/33. **i18n parity:** 5,672 = 5,672 (AR = EN; +250, the
@@ -175,8 +180,17 @@ the desktop.routes/mobility mirrors ride the registry.
   (75.000000) without writing; the LIVE pass lands it on the DEFAULT bin
   (AVAILABLE, tenant-owned, the INV-029 note); the fold goes exact; the probe
   clears it; the second run is a no-op (idempotent). The operator script:
-  `pnpm --filter @erp/api exec tsx scripts/backfill-bins.ts --dry-run` then
-  without the flag (one UoW per ACTIVE tenant, audited).
+  `pnpm --filter @erp/api backfill:bins -- --dry-run` then without the flag
+  (one UoW per ACTIVE tenant, audited).
+  **Post-closure audit fix (2026-11-13):** tracked items (batch/serial) are
+  now DISTRIBUTED from the proven stock_moves ledger per (batch, warehouse)
+  and per serial — reconciled against the total BEFORE any write, never a
+  blind NULL-dimension row; unprovable residue is never written (the probe
+  keeps it, one critical owner notification) and concurrent passes converge
+  on an advisory lock. Evidence: `wms-tracked-backfill.spec` (7 tests) + the
+  mandatory operator runbook
+  [docs/operations/WMS_UPGRADE_BACKFILL_RUNBOOK.md](../../../operations/WMS_UPGRADE_BACKFILL_RUNBOOK.md)
+  + [the gate-evidence ledger](../../../operations/gate-evidence/2026-11-13-post044-audit-fixes.md).
 
 ## 6. Delivery
 

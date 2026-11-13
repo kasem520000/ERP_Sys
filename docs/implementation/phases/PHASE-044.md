@@ -76,7 +76,7 @@ In scope:
 12. **Serial movement ledger** (`serial_movements`) (I-16, I-18): append-only
     per-serial history (receive / putaway / pick / transfer / adjust / return) with
     document references — the audit's "serials without movements" gap closed.
-13. **Automation jobs** (`shelf_life_alert_jobs`) (I-17, I-21, I-25): daily
+13. **Automation jobs** (`inventory_alert_jobs`) (I-17, I-21, I-25): daily
     shelf-life alert job (batch expiry thresholds), slow-movement rotation alert job
     (stale-stock automation), both emitting notifications through the existing
     center; transit exception states (I-22) — damaged/missing in-transit stock posts
@@ -125,20 +125,27 @@ phase must COMPLETE before PHASE-043 (bins for supply).
 
 ## 4. Design Impact
 
-- **Migrations**: the sequence continues from PHASE-043's last journal entry (≈ 0072;
-  exact numbers taken at implementation time — planned ≈ 0073…0081): location tree
+- **Migrations** (**as implemented: 0067–0071 + 0072/0073 — the plan's ≈
+  0073…0081 assumed PHASE-043 had run first; it had not, so the honest next
+  slots were 0067+**, the 0064/0065 D-1 precedent): location tree
   (zones/aisles/racks/bins) · `bin_contents` + `stock_moves` bin/LPN references +
   ownership fields · `putaway_rules` · `pick_strategies` + `pick_waves` +
   `pick_tasks` · `lpns` · `cycle_count_schedules` + generated count documents ·
-  `abc_classifications` · `serial_movements` · `shelf_life_alert_jobs` + job
+  `abc_classifications` · `serial_movements` · `inventory_alert_jobs` + job
   registration · seed migration (permissions, feature grants, strategies, reason
   codes — DATA-ONLY). Drizzle `_journal.json` + `migrations.ts/spec` updated per
   house convention.
-- **Entities/catalog parity**: +16 tables (`warehouse_zones`, `warehouse_aisles`,
-  `warehouse_racks`, `warehouse_bins`, `bin_contents`, `putaway_rules`,
-  `pick_strategies`, `pick_waves`, `pick_tasks`, `lpns`,
-  `cycle_count_schedules`, cycle-count document header + lines, `abc_classifications`,
-  `serial_movements`, `shelf_life_alert_jobs`) — each with SQL + Drizzle mirror +
+- **Entities/catalog parity** (**as implemented: +22 tables, not the +16 the plan
+  enumerated** — the v3.1 L1-20 returnable-packaging pair, the split cycle-count
+  document family, `transit_exceptions`, the kitting pair, and
+  `inventory_alert_jobs` joined the planned set): `warehouse_zones`,
+  `warehouse_aisles`, `warehouse_racks`, `warehouse_bins`, `bin_contents`,
+  `putaway_rules`, `pick_strategies`, `pick_waves`, `pick_tasks`, `lpns`,
+  `cycle_count_schedules`, `cycle_count_documents`, `cycle_count_lines`,
+  `abc_classifications`, `serial_movements`, `inventory_alert_jobs`,
+  `transfer_pricing_policies`, `transit_exceptions`, `warehouse_kit_orders`,
+  `warehouse_kit_lines`, `returnable_packaging`,
+  `returnable_packaging_movements` — each with SQL + Drizzle mirror +
   `ENTITY_CATALOG.md` row (CR-36 (a)); ownership fields extend existing stock tables.
 - **Permissions**: +8 keys (`inventory.wms.locations`, `inventory.wms.putaway`,
   `inventory.wms.picking`, `inventory.cycle_counts`, `inventory.abc`,
@@ -150,12 +157,15 @@ phase must COMPLETE before PHASE-043 (bins for supply).
 - **Reports**: +4 contracts into `REPORT_CATALOG.md` (`inventory.bin-contents`,
   `inventory.cycle-count-variance`, `inventory.abc-classification`,
   `inventory.slow-movement`); catalog ↔ registry reconciliation check extended.
-- **Posting canon**: goldens G-47 (quarantine move — distinct-account policy, G-15
-  policy mirror), G-48 (consignment consumption settlement), G-49 (warehouse kitting),
-  G-50 (internal transfer-price valuation difference) added to `JOURNAL_RULES.md` §7;
+- **Posting canon** (**as implemented: goldens G-43…G-46 and BR-072…BR-077 —
+  NOT the plan's G-47…G-50/BR-064…067, which predate the 039–042 waves'
+  consumption of those slots**; see the completion report §4 and JOURNAL_RULES
+  note 14): G-43 (quarantine move — policy-gated distinct-account, G-15 policy
+  mirror), G-44 (consignment consumption settlement), G-45 (warehouse kitting),
+  G-46 (internal transfer-price valuation difference) added to `JOURNAL_RULES.md` §7;
   a note records that cycle-count variances reuse G-13/G-14 shapes with CYCLE_COUNT
   reasons. Invariant INV-029 (bin-content exactness) added to
-  `ACCOUNTING_INVARIANTS.md`; BR-064…BR-067 added to `BUSINESS_RULES.md`.
+  `ACCOUNTING_INVARIANTS.md`; BR-072…BR-077 added to `BUSINESS_RULES.md`.
 - **Feature flags**: `inventory.wms.*`, `inventory.cycle_count.*`,
   `inventory.tracking.*` — template-composable grants (CR-36 (f));
   distribution-bearing industry templates enable WMS by default.
@@ -175,24 +185,24 @@ phase must COMPLETE before PHASE-043 (bins for supply).
 
 | Task | Description | Layer |
 |---|---|---|
-| T-01 | Author migrations ≈ 0073…0081 (location tree, `bin_contents` + move references + ownership, putaway, picking family, LPN, cycle counts, ABC, serial ledger, jobs, seeds) + journal/spec updates | api |
+| T-01 | Author migrations (as implemented 0067–0071 + 0072/0073; the plan's ≈ 0073…0081 assumed PHASE-043 had run): location tree, `bin_contents` + move references + ownership, putaway, picking family, LPN, cycle counts, ABC, serial ledger, jobs, seeds + journal/spec updates | api |
 | T-02 | Drizzle mirrors, `ENTITY_CATALOG.md` rows, RLS policies + attack tests A1–A10 for every new table | api |
 | T-03 | Bin-contents service: same-transaction writes with `item_stock` (INV-029), reconciliation job, status transitions, auto-UOM conversion inside moves | api |
 | T-04 | Putaway rule engine + suggested tasks on goods receipt + bin-label print (PP-12) | api |
 | T-05 | Pick strategy engine (FIFO/FEFO/NEAREST, partial rules) + wave/task lifecycle + cluster picking + scan verification endpoints | api |
 | T-06 | LPN service: LPN-bound contents, LPN receipt, move-by-LPN | api |
 | T-07 | Cycle-count schedules + ABC recompute + generated count documents + recount/approval + variance posting (G-13/G-14 with CYCLE_COUNT reasons, threshold approval) | api |
-| T-08 | Quarantine/HOLD board service + G-47 posting (policy-gated distinct account) + disposition flows | api |
-| T-09 | Consignment/VMI ownership: owner-partner stock, valuation/ATP exclusion, consumption settlement + G-48 | api |
-| T-10 | Cross-docking flow + warehouse kitting + G-49 | api |
+| T-08 | Quarantine/HOLD board service + G-43 posting (policy-gated distinct account) + disposition flows | api |
+| T-09 | Consignment/VMI ownership: owner-partner stock, valuation/ATP exclusion, consumption settlement + G-44 | api |
+| T-10 | Cross-docking flow + warehouse kitting + G-45 | api |
 | T-11 | `serial_movements` ledger hooks on every stock movement + completeness test | api |
-| T-12 | Shelf-life / slow-movement alert jobs (pg-boss) + transit exception states (I-22) + transfer pricing policy + G-50 | api |
+| T-12 | Shelf-life / slow-movement alert jobs (pg-boss) + transit exception states (I-22) + transfer pricing policy + G-46 | api |
 | T-13 | Sync duty (OA-02): outbox/inbox contracts for pick/putaway tasks + scan confirmations; sync-fleet harness run | api |
 | T-14 | Build `/inventory/locations` (zone tree + bin grid), `/inventory/pick-waves` (wave/task boards with scan), `/inventory/cycle-counts`, `/inventory/abc`, quarantine board | web |
 | T-15 | Embed bin/LPN selectors + scan into existing receipt, delivery, transfer, and count screens (PP-11) | web |
 | T-16 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-17 | Implement the 4 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-18 | Golden suites G-47…G-50 with failure packs; INV-029 suite (reconciliation, exclusion rules, ledger completeness); BR-064…067 guards | api |
+| T-18 | Golden suites G-43…G-46 (as implemented — the plan's G-47…G-50 predates the 039–042 slot consumption) with failure packs; INV-029 suite (reconciliation, exclusion rules, ledger completeness); BR-072…077 guards | api |
 | T-19 | Docs: JOURNAL_RULES §7 rows + cycle-count note, ACCOUNTING_INVARIANTS INV-029, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, sync-contract update | docs |
 | T-20 | Run full local gates + OA-06 EXPLAIN budgets (`bin_contents`, `serial_movements`, pick-task board) + backfill job for existing stock into a default bin per warehouse; record evidence | all |
 
@@ -200,13 +210,15 @@ phase must COMPLETE before PHASE-043 (bins for supply).
 
 Acceptance criteria (all must pass with recorded evidence):
 
-1. Migrations ≈ 0073…0081 apply cleanly; Drizzle mirrors + `ENTITY_CATALOG.md` parity
-   for all 16 tables (CR-36 (a)); RLS attack tests A1–A10 pass for every new tenant
+1. Migrations (as implemented 0067–0073; the plan's ≈ 0073…0081 assumed
+   PHASE-043 had run) apply cleanly; Drizzle mirrors + `ENTITY_CATALOG.md` parity
+   for all 22 tables (CR-36 (a)); RLS attack tests A1–A10 pass for every new tenant
    table (CR-36 (e)).
 2. INV-029 holds at all times: Σ `bin_contents` = `item_stock` per warehouse/item
    (same-transaction writes; nightly reconciliation job green over seeded fixtures);
    quarantined/HOLD stock is excluded from availability, and owner-partner
-   (consignment) stock is excluded from valuation and ATP (BR-065/BR-067 asserted).
+   (consignment) stock is excluded from valuation and ATP (BR-072/BR-076 asserted —
+   the implemented slots).
 3. Directed putaway: a goods receipt generates suggested putaway tasks from rules; a
    bin label prints immediately after receipt commit (PP-12); wrong-bin putaway is
    rejected with a typed error.
@@ -217,10 +229,10 @@ Acceptance criteria (all must pass with recorded evidence):
 5. Cycle counting: an ABC schedule generates count documents at the configured
    frequency; variance approval gates posting over threshold; variances post through
    the existing adjustment shapes with CYCLE_COUNT reasons (G-13/G-14 note).
-6. Goldens G-47…G-50 green with failure packs: quarantine move (policy-gated distinct
-   account; same-account default posts nothing — the G-15 mirror), consignment
-   consumption settlement, kitting cost roll-up (kit = Σ components exactly),
-   transfer-price valuation difference.
+6. Goldens G-43…G-46 (as implemented) green with failure packs: quarantine move
+   (policy-gated distinct account; same-account default posts nothing — the G-15
+   mirror), consignment consumption settlement, kitting cost roll-up (kit = Σ
+   components exactly), transfer-price valuation difference.
 7. Serial ledger completeness: every stock movement touching a serialized item
    appends exactly one `serial_movements` row with document references (property
    test over all movement kinds).

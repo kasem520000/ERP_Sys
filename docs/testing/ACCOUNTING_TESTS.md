@@ -1,8 +1,8 @@
 # Accounting Tests
 
-> **Status:** STABLE · **Owner:** Quality Engineering & Accounting Domain · **Updated:** 2026-11-07
+> **Status:** STABLE · **Owner:** Quality Engineering & Accounting Domain · **Updated:** 2026-11-07 (re-pinned to the real file layout + INV-027/028/029 rows: 2026-11-13, the PHASE-044 post-closure audit)
 
-The accounting test bible: (a) invariant suite mapping INV-001..INV-026, (b) golden tests
+The accounting test bible: (a) invariant suite mapping INV-001..INV-029, (b) golden tests
 for every canonical posting rule in
 [../accounting/POSTING_ENGINE.md](../accounting/POSTING_ENGINE.md) §4 with three fully
 worked numeric examples, (c) property tests, (d) reconciliation tests, (e) concurrency
@@ -14,9 +14,21 @@ below are exact.
 
 ## 1. Suite layout and conventions
 
-- Suites: `tests/accounting/invariants/` (§2), `tests/accounting/golden/` (§3),
-  `tests/accounting/property/` (§4), `tests/accounting/reconciliation/` (§5),
-  `tests/accounting/concurrency/` (§6), `tests/accounting/periods/` (§7).
+- Suites (the real tree — re-pinned 2026-11-13 to the actual files under
+  `apps/api/src/__db__/`): `accounting/invariants/` (§2: `INV-001-009.spec.ts` +
+  `INV-011-022.spec.ts` — two RANGE files, not per-id files),
+  `accounting/golden/` (§3: `golden.spec.ts` + the per-module golden packs
+  — `inventory/golden.spec.ts`, `sales/*`, `purchasing/*`, `fixed-assets/*`,
+  `notes/*`, `payroll/*`, `consolidation/g32-elimination.spec.ts`,
+  `manufacturing/*`), the property/reconciliation coverage (§4/§5) lives
+  INSIDE the module suites (`inventory/valuation-ledger.spec.ts`,
+  `inventory/recon.spec.ts` RC-01…RC-05, `notes/rc-11.spec.ts`,
+  `consolidation/inv-026-reconciliation.spec.ts`), `accounting/concurrency/`
+  (§6: `concurrency.spec.ts` + the per-module CC packs), `accounting/periods/`
+  (§7: `periods.spec.ts`). Module rule suites live under their module folders
+  (`fixed-assets/fixed-assets-rules.spec.ts`, `notes/notes-rules.spec.ts`,
+  `payroll/payroll-rules.spec.ts`, `manufacturing/routing-execution.spec.ts`,
+  `inventory/wms-*.spec.ts`, …).
 - Module rule suites (per [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §8):
   PHASE-026 adds `fixed-assets-rules.spec` (BR-041 category usability, BR-042
   run-only/period-locked depreciation, BR-043 salvage floor + disposal lock, BR-044
@@ -41,36 +53,39 @@ below are exact.
   no subledger rows, document state unchanged, no sequence consumed for the document type
   where the engine assigns numbers only on success.
 
-## 2. Invariant suite mapping (INV-001..INV-026)
+## 2. Invariant suite mapping (INV-001..INV-029)
 
 | ID | Positive scenario (must hold) | Violation attempt (must fail, typed) | Test file |
 |----|-------------------------------|--------------------------------------|-----------|
-| INV-001 | Balanced spec posts: Σdebit=Σcredit in document currency, 0 tolerance | Spec off by 0.0001 → `ENTRY_NOT_BALANCED`, zero residue | `invariants/INV-001.spec.ts` |
-| INV-002 | FX entry balances in base currency (per-line conversion) | Line-level FX rounding drift → engine rejects (caller must pre-balance) | `invariants/INV-002.spec.ts` |
-| INV-003 | Posted entry: UPDATE via repository guard → error; direct SQL UPDATE/DELETE as `erp_app` → 0 rows/trigger error; repeat after simulated restore drill | Attempted UPDATE of a posted line, DELETE of entry | `invariants/INV-003.spec.ts` |
-| INV-004 | Posting to active leaf account succeeds | Group (non-leaf) account → `ACCOUNT_NOT_POSTABLE`; archived → `ACCOUNT_ARCHIVED` | `invariants/INV-004.spec.ts` |
-| INV-005 | SAR-restricted account accepts SAR line | Same account + USD line → `CURRENCY_MISMATCH` | `invariants/INV-005.spec.ts` |
-| INV-006 | Posted invoice references journal entries and vice versa (`source` chain complete) | Attempt to mark document `POSTED` with zero journal entries (service-level sabotage) → impossible by API; integration asserts chain after every golden post | `invariants/INV-006.spec.ts` |
-| INV-007 | Line tax + line nets + header totals reconcile exactly; residual → rounding purpose line | Feed amounts engineered to round unevenly (e.g., 3 lines × 33.333…): residual must appear as explicit rounding line, never dropped | `invariants/INV-007.spec.ts` |
-| INV-008 | FX entry stores rate>0 and base = doc × rate exactly as stored | Missing rate → `MISSING_FX_RATE`; rate ≤ 0 → `INVALID_AMOUNT`; re-read returns stored values, no recomputation drift | `invariants/INV-008.spec.ts` |
-| INV-009 | AR/AP lines carry partner; Σ partner subledger (base) = control account balance across 20 randomized ops | AR line without partner → `MISSING_PARTNER_ON_CONTROL`; seeded subledger drift detected by job (see §5) | `invariants/INV-009.spec.ts` |
-| INV-010 | Σ(qty×valuation) over stock ledger = inventory account balance after each golden inventory op | Seeded orphan stock move (no journal) → reconciliation `BROKEN` (drift test §5) | `invariants/INV-010.spec.ts` |
-| INV-011 | Entry in OPEN period posts | Entry dated in LOCKED period → `PERIOD_LOCKED` (engine) AND trigger double-check fires on direct insert attempt | `invariants/INV-011.spec.ts` |
-| INV-012 | Per period Σ document tax summaries by treatment = GL tax-account movements | Seeded summary/GL mismatch → VAT return reconciliation flags (§5) | `invariants/INV-012.spec.ts` |
-| INV-013 | Same `(tenant, source_type, source_id, operation)` posted twice sequentially → second returns original result, no new entry | Retry after success + concurrent duplicate (§6) → one entry only | `invariants/INV-013.spec.ts` |
-| INV-014 | `reverse()` mirrors accounts/partners/items/amounts, links both ways; original marked `REVERSED` | Reverse twice → `ALREADY_REVERSED`; reverse a non-POSTED entry → error; mirror mismatch impossible by construction (assert full mirror) | `invariants/INV-014.spec.ts` |
-| INV-015 | Delete account without postings/children succeeds (archival flow) | Delete account with postings → blocked; archive required-purpose mapped account → blocked | `invariants/INV-015.spec.ts` |
-| INV-016 | Allocations ≤ receipt amount; document allocated total ≤ total | Over-allocation attempt (allocate 500 on 300 receipt; allocate beyond invoice total) → rejected, both sides unchanged | `invariants/INV-016.spec.ts` |
-| INV-017 | Method switch runs dated revaluation posting; past issues keep original costs | Switch without revaluation/attempts to retro-restate → rejected; history query returns original issue costs | `invariants/INV-017.spec.ts` |
-| INV-018 | Every stock move has its journal in the same transaction (or policy-none for same-account transfer) | Simulated crash between move and journal (test double aborts mid-transaction) → rollback leaves **neither**; move-without-journal impossible via API | `invariants/INV-018.spec.ts` |
-| INV-019 | Cash account balance = Σ its treasury movements after receipts/payments/transfers/shifts | Seeded drift (movement row without ledger effect) → reconciliation `BROKEN` | `invariants/INV-019.spec.ts` |
-| INV-020 | Reopen requires `accounting.periods.reopen` + reason; audit event written; subsequent posting revalidates all invariants | Reopen without permission → 403; reopen without reason → 400; missing audit event fails test | `invariants/INV-020.spec.ts` |
-| INV-021 | Official numbers unique per (tenant, type, branch); voided numbers stay reserved | Two invoices racing for same number (§6); reuse of a voided number → rejected | `invariants/INV-021.spec.ts` |
-| INV-022 | Fuzz: flip entitlements/templates/feature flags mid-dataset → posting math identical; no config path disables any invariant check | Fuzz corpus of 50 config permutations against golden dataset → byte-identical journals | `invariants/INV-022.spec.ts` |
-| INV-023 | Asset depreciation stays within the floor: after every run Σ depreciation ≤ cost − salvage_value and NBV ≥ 0; disposal only once, only from ACTIVE/FULLY_DEPRECIATED | Depreciation engineered to cross the floor (method/period override) → `NBV_BELOW_SALVAGE`, run rejected zero-residue; second disposal of the same asset → `ASSET_ALREADY_DISPOSED`; disposal from DISPOSED/WRITTEN_OFF status → `ASSET_NOT_DISPOSABLE` | `invariants/INV-023.spec.ts` |
-| INV-024 | COLLECTED/DISCOUNTED/RETURNED note carries zero `NOTES_RECEIVABLE` balance; DISHONORED note restores the AR open item exactly (amount + references) | Dishonor fixture with amount/reference drift vs the original open item → `DISHONOR_MISMATCH`, rejected zero-residue; collected note seeded with a residual balance → note-custody reconciliation `BROKEN` (diff row lists the note) | `invariants/INV-024.spec.ts` |
-| INV-025 | Payroll run totals = Σ lines (gross, deductions, net); net = gross − deductions exactly (0 tolerance); posted runs immutable (reversal-only) | Seeded line-sum drift → run rejected before post; UPDATE/DELETE on a posted run as `erp_app` → 0 rows / trigger error; API edit-after-post impossible — reversal + new run only | `invariants/INV-025.spec.ts` |
-| INV-026 | Consolidation run writes zero rows to member books; consolidated statement = Σ member statements (group currency, dated FX) − eliminations; eliminations are balanced journals in the consolidation books | Cross-tenant write attempt through the run service → rejected by the read-only consolidation role + RLS (0 rows); member-book hash identical before/after run; unbalanced elimination spec → `ENTRY_NOT_BALANCED` | `invariants/INV-026.spec.ts` |
+| INV-001 | Balanced spec posts: Σdebit=Σcredit in document currency, 0 tolerance | Spec off by 0.0001 → `ENTRY_NOT_BALANCED`, zero residue | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-002 | FX entry balances in base currency (per-line conversion) | Line-level FX rounding drift → engine rejects (caller must pre-balance) | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-003 | Posted entry: UPDATE via repository guard → error; direct SQL UPDATE/DELETE as `erp_app` → 0 rows/trigger error; repeat after simulated restore drill | Attempted UPDATE of a posted line, DELETE of entry | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-004 | Posting to active leaf account succeeds | Group (non-leaf) account → `ACCOUNT_NOT_POSTABLE`; archived → `ACCOUNT_ARCHIVED` | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-005 | SAR-restricted account accepts SAR line | Same account + USD line → `CURRENCY_MISMATCH` | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-006 | Posted invoice references journal entries and vice versa (`source` chain complete) | Attempt to mark document `POSTED` with zero journal entries (service-level sabotage) → impossible by API; integration asserts chain after every golden post | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-007 | Line tax + line nets + header totals reconcile exactly; residual → rounding purpose line | Feed amounts engineered to round unevenly (e.g., 3 lines × 33.333…): residual must appear as explicit rounding line, never dropped | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-008 | FX entry stores rate>0 and base = doc × rate exactly as stored | Missing rate → `MISSING_FX_RATE`; rate ≤ 0 → `INVALID_AMOUNT`; re-read returns stored values, no recomputation drift | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-009 | AR/AP lines carry partner; Σ partner subledger (base) = control account balance across 20 randomized ops | AR line without partner → `MISSING_PARTNER_ON_CONTROL`; seeded subledger drift detected by job (see §5) | `accounting/invariants/INV-001-009.spec.ts` |
+| INV-010 | Σ(qty×valuation) over stock ledger = inventory account balance after each golden inventory op | Seeded orphan stock move (no journal) → reconciliation `BROKEN` (drift test §5) | `inventory/recon.spec.ts` (RC-04/RC-05) + the golden/periods ties |
+| INV-011 | Entry in OPEN period posts | Entry dated in LOCKED period → `PERIOD_LOCKED` (engine) AND trigger double-check fires on direct insert attempt | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-012 | Per period Σ document tax summaries by treatment = GL tax-account movements | Seeded summary/GL mismatch → VAT return reconciliation flags (§5) | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-013 | Same `(tenant, source_type, source_id, operation)` posted twice sequentially → second returns original result, no new entry | Retry after success + concurrent duplicate (§6) → one entry only | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-014 | `reverse()` mirrors accounts/partners/items/amounts, links both ways; original marked `REVERSED` | Reverse twice → `ALREADY_REVERSED`; reverse a non-POSTED entry → error; mirror mismatch impossible by construction (assert full mirror) | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-015 | Delete account without postings/children succeeds (archival flow) | Delete account with postings → blocked; archive required-purpose mapped account → blocked | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-016 | Allocations ≤ receipt amount; document allocated total ≤ total | Over-allocation attempt (allocate 500 on 300 receipt; allocate beyond invoice total) → rejected, both sides unchanged | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-017 | Method switch runs dated revaluation posting; past issues keep original costs | Switch without revaluation/attempts to retro-restate → rejected; history query returns original issue costs | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-018 | Every stock move has its journal in the same transaction (or policy-none for same-account transfer) | Simulated crash between move and journal (test double aborts mid-transaction) → rollback leaves **neither**; move-without-journal impossible via API | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-019 | Cash account balance = Σ its treasury movements after receipts/payments/transfers/shifts | Seeded drift (movement row without ledger effect) → reconciliation `BROKEN` | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-020 | Reopen requires `accounting.periods.reopen` + reason; audit event written; subsequent posting revalidates all invariants | Reopen without permission → 403; reopen without reason → 400; missing audit event fails test | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-021 | Official numbers unique per (tenant, type, branch); voided numbers stay reserved | Two invoices racing for same number (§6); reuse of a voided number → rejected | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-022 | Fuzz: flip entitlements/templates/feature flags mid-dataset → posting math identical; no config path disables any invariant check | Fuzz corpus of 50 config permutations against golden dataset → byte-identical journals | `accounting/invariants/INV-011-022.spec.ts` |
+| INV-023 | Asset depreciation stays within the floor: after every run Σ depreciation ≤ cost − salvage_value and NBV ≥ 0; disposal only once, only from ACTIVE/FULLY_DEPRECIATED | Depreciation engineered to cross the floor (method/period override) → `NBV_BELOW_SALVAGE`, run rejected zero-residue; second disposal of the same asset → `ASSET_ALREADY_DISPOSED`; disposal from DISPOSED/WRITTEN_OFF status → `ASSET_NOT_DISPOSABLE` | `fixed-assets/fixed-assets-rules.spec.ts` |
+| INV-024 | COLLECTED/DISCOUNTED/RETURNED note carries zero `NOTES_RECEIVABLE` balance; DISHONORED note restores the AR open item exactly (amount + references) | Dishonor fixture with amount/reference drift vs the original open item → `DISHONOR_MISMATCH`, rejected zero-residue; collected note seeded with a residual balance → note-custody reconciliation `BROKEN` (diff row lists the note) | `notes/inv-024.spec.ts` + `notes/notes-rules.spec.ts` |
+| INV-025 | Payroll run totals = Σ lines (gross, deductions, net); net = gross − deductions exactly (0 tolerance); posted runs immutable (reversal-only) | Seeded line-sum drift → run rejected before post; UPDATE/DELETE on a posted run as `erp_app` → 0 rows / trigger error; API edit-after-post impossible — reversal + new run only | `payroll/payroll-rules.spec.ts` |
+| INV-026 | Consolidation run writes zero rows to member books; consolidated statement = Σ member statements (group currency, dated FX) − eliminations; eliminations are balanced journals in the consolidation books | Cross-tenant write attempt through the run service → rejected by the read-only consolidation role + RLS (0 rows); member-book hash identical before/after run; unbalanced elimination spec → `ENTRY_NOT_BALANCED` | `consolidation/inv-026-reconciliation.spec.ts` |
+| INV-027 | ZATCA Phase-1 chain integrity (PHASE-037): per-device ICV strictly monotonic 1..N, zero gaps (the partial UNIQUE floor); every PIH equals the predecessor's stored invoice_hash (genesis = base64(SHA-256(ASCII "0"))); verification re-derives every digest and FAILS CLOSED on tamper; the stamp rides the invoice post transaction | Tamper a stored hash/ICV → the typed `ZatcaChainBrokenError` pack, zero residue; a partial stamp is impossible (the all-or-nothing CHECK) | `sales/zatca-phase1.spec.ts` (chain 1..N + genesis PIH + the tamper fail-closed) |
+| INV-028 | Operation sequence discipline (PHASE-042): operation N+1 cannot START before N is COMPLETED/SKIPPED; each operation COMPLETES at most once (the replay returns the STORED row, never a second journal); `current_operation` advances exactly with the last resolved operation; SKIPPED requires a distinct approver + reason | Out-of-sequence start → typed `OperationSequenceError` naming the blocking sequence; a replayed completion returns the stored journal id; a COMPLETED operation never skips | `manufacturing/routing-execution.spec.ts` (the gate, the one-journal replay, the skip SoD, the cursor, the routing-less dual mode) |
+| INV-029 | Bin-content exactness (PHASE-044): Σ tenant-owned `bin_contents` = `item_stock` per (warehouse, item) at all times — every qty-changing economic move writes the bin rows in the SAME transaction; the fold spans ALL statuses and EXCLUDES owner-partner rows (BR-076); the migration-era binless grace keeps pre-WMS stock spendable until the operator backfill places it (runbook) | An under-stocked bin refuses the move (`BinContentsShortError`, zero residue); a seeded fold drift is DETECTED by the nightly probe (never auto-repaired); the backfill never writes an unprovable balance | `inventory/wms-core.spec.ts` + `inventory/wms-inv029.spec.ts` + `inventory/wms-tracked-backfill.spec.ts` (the fold after EVERY movement kind, the exclusion rules, the serialized-completeness property, the backfill distribution/idempotency/concurrency) |
 
 ## 3. Posting golden tests (canonical rule per [POSTING_ENGINE.md](../accounting/POSTING_ENGINE.md) §4)
 
@@ -93,7 +108,7 @@ account), `ACCUM_DEPRECIATION`, `DEPRECIATION_EXPENSE`, `ASSET_DISPOSAL_GAIN` /
 `DEDUCTIONS_PAYABLE`, `EMPLOYER_CONTRIBUTIONS`, `EOS_PROVISION`, `EOS_PROVISION_EXPENSE`,
 `CONSOLIDATION_ADJUSTMENT` — run the same standard failure pack, and assert the
 source-document state per §1 (`POSTED` + `postedJournalId`/`journal_entry_id` + audit
-event); module-level rejection codes are asserted in the INV-023…INV-026 suites (§2).
+event); module-level rejection codes are asserted in the INV-023…INV-026 suites (§2) and the INV-027/028/029 packs.
 
 | # | Operation (source) | Given seed | Action | Expected journal lines (DR/CR by purpose) | Subledger effects |
 |---|--------------------|-----------|--------|-------------------------------------------|-------------------|

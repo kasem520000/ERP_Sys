@@ -5,6 +5,15 @@
 > · **Triple flip:** this report + the phase doc header + the IMPLEMENTATION_STATUS
 > row flipped together (CR-48) · **Wave 2 opens here** — the first Wave-2 phase
 > delivered on this lineage.
+>
+> **Errata 2026-11-13 (post-closure audit):** the isolation A-suite figures
+> originally announced here as **1,332/1,332** were a miscount — the true
+> 042-era baseline is **1,320** (219 registered tables × 6 generated `it()`
+> blocks + 6 fixed tests), re-run verified against this report's exact commit
+> (embedded PG16 + that tree's 66-entry chain: 1,320/1,320, exit 0 —
+> [the gate-evidence ledger](../../../operations/gate-evidence/2026-11-13-post044-audit-fixes.md) §3).
+> The +42 delta for this phase's seven tables was and remains correct
+> (1,278 → 1,320).
 
 ## 1. Executive summary
 
@@ -150,13 +159,14 @@ the composition comment extended; the known-permission catalogs extended with
 - `__db__/manufacturing/explain-budgets.db.spec.ts` (3) — the OA-06 budgets:
   the terminal scan, the OEE daily fold, the downtime list (seeded + ANALYZEd,
   enable_seqscan=off — index-driven, no seq-scan).
-- The isolation A-suite: the seven tables registered (+42 → **1,332/1,332**).
+- The isolation A-suite: the seven tables registered (+42 → **1,320/1,320**;
+  originally announced as 1,332 — see the errata note above).
 
 ## 3. Acceptance criteria vs. evidence (§6 of the phase doc)
 
 | # | Criterion | Evidence |
 |---|---|---|
-| 1 | Migrations apply cleanly; tables RLS'd; Drizzle + catalog parity; A1–A10 | migrations.db.spec 28/28 over the 66-entry chain; catalog 232 → 239 (ENTITY_CATALOG §"manufacturing execution"; the check-rls catalog drift green inside the suite); the A-suite 1,332/1,332 |
+| 1 | Migrations apply cleanly; tables RLS'd; Drizzle + catalog parity; A1–A10 | migrations.db.spec 28/28 over the 66-entry chain; catalog 232 → 239 (ENTITY_CATALOG §"manufacturing execution"; the check-rls catalog drift green inside the suite); the A-suite 1,320/1,320 (errata-corrected 2026-11-13; originally announced 1,332) |
 | 2 | Routing-bound order executes operation-by-operation; INV-028 (N+1 gated, at-most-once, current_operation advances) | routing-execution.spec: the sequence gate, the idempotent replay (one `op_<seq>` journal), the advance assertions |
 | 3 | G-40 green: DR WIP · CR conversion at rates × actual times, balanced, idempotent, failure packs | routing-execution.spec (exact journal_lines, 4dp; the rounding guard typed; the uncosted-op zero-journal proof) |
 | 4 | Completion computes the variance records exactly; rounding explicit | the variance columns asserted exactly (setup/usage); yield_variance at order completion ((planned−actual)×std, 4dp); rate_variance v1-zero — the documented honest decision (D-4 below) |
@@ -245,7 +255,9 @@ the composition comment extended; the known-permission catalogs extended with
 - **DB suite (embedded PG16, the full 66-migration chain):**
   **2,768/2,768 — 189 files, 0 failures** (the 041 baseline was 176 files /
   2,619 at 040 + 041's additions; +50 new tests here + the regression base).
-- **isolation (RLS A1–A10):** **1,332/1,332** (+42 for the seven 042 tables).
+- **isolation (RLS A1–A10):** **1,320/1,320** (+42 for the seven 042 tables;
+  errata-corrected 2026-11-13 — originally announced 1,332, re-run verified
+  1,320).
 - **migrations:** 28/28 (apply + re-apply no-op; the RLS catalog drift probe
   green with the seven new tables catalogued).
 - **docs:validate:** **33/33**. **i18n parity:** **5,422 = 5,422** (AR = EN;

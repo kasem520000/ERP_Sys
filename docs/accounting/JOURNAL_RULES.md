@@ -231,8 +231,8 @@ Notes:
     existing tenants map once and stay `PURPOSE_NOT_MAPPED`-closed until then (the
     CARD_RECEIVABLE precedent, DR-016-02) — an unmapped rework/downtime close rejects
     typed BEFORE any ledger work, zero partial writes. Worked examples as pinned by the
-    DB suites (`__db__/manufacturing/routing-execution.db.spec.ts`,
-    `rework-costing.db.spec.ts`, `downtime-oee.db.spec.ts`): **G-40** 3h conversion ×
+    DB suites (`__db__/manufacturing/routing-execution.spec.ts`,
+    `rework-costing.spec.ts`, `downtime-oee.spec.ts`): **G-40** 3h conversion ×
     (var 25 / fixed 15) → DR `WIP` 120.0000 · CR labor 75.0000 · CR overhead 45.0000,
     with setup_variance (1 − 0.5) × 40 = 20.0000 and usage_variance (2 − 0.1 × 100) × 25
     = −200.0000 (the qty basis is the running actual qty mid-order, planned when none
@@ -248,7 +248,7 @@ Notes:
     receipt, the GRNI precedent), while the GRNI credit always rides the ACTUAL total so
     the journal balances by construction (std debits + PPV = actual); standard-less
     items keep the legacy two-line shape byte-identical (the dual mode — pinned by
-    `__db__/manufacturing/standard-costing.db.spec.ts`: receive 100 @ 12 over std 10 →
+    `__db__/manufacturing/standard-costing.spec.ts`: receive 100 @ 12 over std 10 →
     inventory 1,000.0000 · PPV 200.0000 · GRNI 1,200.0000, the layers at 10.000000).
     (b) **Stock revaluation on standard activate** — `activate(id, {revaluateStock})`
     posts source `item_standard_cost`, operation `revaluate`: ONE batch journal over
@@ -270,8 +270,8 @@ Notes:
     (+ `2135 CONSIGNATION_PAYABLE` where absent), and existing tenants stay
     `PURPOSE_NOT_MAPPED`-closed until they map (zero partial writes — the CARD_RECEIVABLE
     precedent). Worked examples as pinned by the DB suites
-    (`__db__/inventory/wms-quarantine.db.spec.ts`, `wms-consignment.db.spec.ts`,
-    `wms-kitting.db.spec.ts`, `wms-alerts-policies.db.spec.ts`): **G-43** 8 × 5.00 =
+    (`__db__/inventory/wms-quarantine.spec.ts`, `wms-consignment.spec.ts`,
+    `wms-kitting.spec.ts`, `wms-alerts-policies.spec.ts`): **G-43** 8 × 5.00 =
     40.0000 → DR 1290 · CR INVENTORY (release mirrors); **G-44** 20 × 7.500000 =
     150.0000 → DR `COGS` · CR 2135 (owner-stamped); **G-45** 20×3 + 30×5 = 210.0000 for
     10 kits → NO journal (kit at 21.000000/unit, same-account); **G-46** MARKUP 25% on

@@ -173,7 +173,9 @@ routing, freeze/activate, PPV at receipt, stock revaluation), the touch-first sh
 with the OP-scan endpoint (M-17), 4 report contracts (registry 91 → 95), and the five web surfaces
 + the Operations tab. Permissions 272 → **279** (matrix §3.20); feature keys +6 (business+
 enterprise + the food_manufacturing enablement); i18n 5,247 → **5,422** (+175, the operative
-count); ENTITY_CATALOG 232 → **239**; isolation suite 1,332/1,332 (+42).
+count); ENTITY_CATALOG 232 → **239**; isolation suite 1,320/1,320 (+42 —
+errata-corrected 2026-11-13: originally announced 1,332, re-run verified
+against the 042-era tree at 1,320, 219 tables × 6 + 6 fixed).
 Evidence: [the completion report](../implementation/phases/reports/PHASE-042-COMPLETION.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
