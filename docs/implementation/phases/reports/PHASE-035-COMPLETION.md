@@ -1,6 +1,16 @@
 # Completion Report — PHASE-035
 
 > **Status:** COMPLETE · **Updated:** 2026-11-10
+>
+> **Errata 2026-11-13 (post-closure audit):** the isolation/RLS figures originally
+> announced here as **1,095/1,095** (and the derived fresh-chain-critical total
+> **1,145**) were a miscount — the true 035-era count is **1,086** (the identity
+> A-suite 178 registry tables × 6 generated `it()` blocks + 6 fixed = 1,074, plus
+> platform-isolation 12), re-run verified against this phase's code commit
+> (embedded PG16 + that tree's migration chain: 1,086/1,086, exit 0 —
+> [the gate-evidence ledger](../../../operations/gate-evidence/2026-11-13-post044-audit-fixes.md) §7).
+> The +24 delta for the four 0041 consolidation tables was and remains correct
+> (4 × 6); the corrected fresh-chain-critical total is 7+11+4+6+22+1,086 = **1,136**.
 
 ## Phase ID / Date
 
@@ -153,7 +163,7 @@ code comment at the fix site (the honest ledger; none are 035 scope):
 9. **The isolation registry missing the four 0041 tables** —
    `__db__/isolation/tables.registry.ts` (+ `identity-isolation.db.spec.ts`):
    the A-suite's negative proof extended +24 rows; isolation + RLS now
-   1,095/1,095.
+   1,086/1,086 (errata-corrected 2026-11-13; originally announced 1,095).
 10. **The inv-026 spec's cash account typo (1110 → 1111) and the missing
     `purge_mode` SET** — the tamper lever needs `SET erp.purge_mode = 'on'`
     to mutate the sealed snapshot (RESET after).
@@ -231,11 +241,11 @@ embedded PostgreSQL 16 fresh chain 0001→0048):
 | DB — einvoicing-log | `__db__/reporting/einvoicing-log.spec.ts` | **4/4** |
 | DB — reporting golden | `__db__/reporting/golden.spec.ts` | **6/6** (the 86-contract pin) |
 | DB — consolidation | `__db__/consolidation/**` | **22/22** (G-32, INV-026, BR-056, FX, isolation) |
-| DB — isolation + RLS | the generated A-suite + RLS suites | **1,095/1,095** (incl. +24 rows for the 0041 tables) |
+| DB — isolation + RLS | the generated A-suite + RLS suites | **1,086/1,086** (incl. +24 rows for the 0041 tables; errata-corrected 2026-11-13 — originally announced 1,095) |
 | Boundaries | `pnpm lint:depcruise` | **0 violations** |
 | Catalog/capabilities/observability/tokens/history-secrets | `check:*` scripts | all green |
 
-Unit total **1,386**; DB fresh-chain-critical total **1,145** (7+11+4+6+22+1,095).
+Unit total **1,386**; DB fresh-chain-critical total **1,136** (7+11+4+6+22+1,086 — errata-corrected 2026-11-13; originally announced 1,145 on the 1,095 miscount).
 
 ## Invariants covered
 
@@ -263,7 +273,7 @@ Unit total **1,386**; DB fresh-chain-critical total **1,145** (7+11+4+6+22+1,095
 | 6.6 | DR-035-01/02/03 exist, linked from corrected claims; grep proves no stale text | PASS | The three records (Files created); FEATURE_CATALOG `reporting.scheduled_reports` → 057 DEFERRED (DR-035-01), SUBSCRIPTION_AND_ENTITLEMENTS `platform.payouts` substrate/surface split (DR-035-03); grep for "SHIPPED PHASE-025 scheduled reports" / "SHIPPED PHASE-023 payouts" matches only PHASE-035.md's own criterion text quoting the strings. |
 | 6.7 | CURRENT_STATE / NEXT_ACTION / IMPLEMENTATION_STATUS show the 34-phase reality, the v3.0 pointer, PHASE-035 active | PASS | The T-09 truth sweep (this report's §Documentation updated): header/ledger/callout/registry trails (86 with history), the git-narrative correction (single squash commit `3d19e2f`, no tags), CURRENT_SHIPPED_PHASE PHASE-035 / 0048 / 13 templates / 86 contracts / 4,290=4,290. |
 | 6.8 | `git status` proves untracking; `.gitignore` covers them; docs describe regeneration | PASS | **251 staged deletions** (dist-storybook + `__image_snapshots__` + `.playwright-artifacts*`); `.gitignore` extended (4 patterns + regeneration comments); `ci-visual.yml` guard step fails the build on any tracked baseline; README "Generated artifacts" + VISUAL_TESTING §5 rewritten. |
-| 6.9 | All house gates green | PASS | The Tests-executed table: typecheck 8/8 · lint 8/8 · unit 1,386 · i18n 4,290=4,290 / 371=371 · drift 245=245 · docs 32/32 · manifests 13/13 · depcruise 0 · DB fresh-chain 1,145 (migrations 7/7, entitlements 11/11, einvoicing-log 4/4, golden 6/6, consolidation 22/22, isolation/RLS 1,095/1,095). |
+| 6.9 | All house gates green | PASS | The Tests-executed table: typecheck 8/8 · lint 8/8 · unit 1,386 · i18n 4,290=4,290 / 371=371 · drift 245=245 · docs 32/32 · manifests 13/13 · depcruise 0 · DB fresh-chain 1,136 (migrations 7/7, entitlements 11/11, einvoicing-log 4/4, golden 6/6, consolidation 22/22, isolation/RLS 1,086/1,086 — errata-corrected 2026-11-13). |
 | 6.10 | Completion report appended; status flipped; archive delivered | PASS | This report; IMPLEMENTATION_STATUS PHASE-035 row → **COMPLETE 2026-11-10** + the v3.0 ledger note; NEXT_ACTION → PHASE-036; archive `ERP_PLATFORM_PHASE035.zip` (OA-07) delivered with this phase's state. |
 
 ## Build results
@@ -297,9 +307,9 @@ production build artifact is part of this phase's gate set).
 - The full DB suite (all 143 files) was not run end-to-end in this phase's
   verification; the fresh-chain-critical suites were: migrations /
   entitlements / einvoicing-log / golden / consolidation / isolation+RLS =
-  **1,145 tests** (all green).
+  **1,136 tests** (all green — errata-corrected 2026-11-13; originally announced 1,145).
 - `check:rls` requires `MIGRATE_DATABASE_URL` + a provisioned postgres and is
-  not runnable in this sandbox — the RLS attack suites (A-series, 1,095/1,095
+  not runnable in this sandbox — the RLS attack suites (A-series, 1,086/1,086 — errata-corrected 2026-11-13
   incl. the +24 consolidation rows) ran instead.
 
 ## Deferred work

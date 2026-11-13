@@ -141,10 +141,13 @@ complete — only PHASE-036 does.
 - **Reports**: +4 contracts into `REPORT_CATALOG.md` (`manufacturing.work-center-
   utilization` (OEE), `manufacturing.downtime-analysis`, `manufacturing.rework-cost`,
   `manufacturing.cost-variance`); the catalog ↔ registry reconciliation check extends.
-- **Posting canon**: goldens G-38 (operation WIP posting), G-39 (rework cost), G-40
+- **Posting canon** (**as implemented: G-40/G-41/G-42, INV-028, BR-068…071** — the original
+  plan's G-38/G-39/G-40/INV-027/BR-057…060 predate the 039–041 waves' consumption of
+  those slots; JOURNAL_RULES note 13 + the INV-028 row record the decision):
+  goldens G-40 (operation WIP posting), G-41 (rework cost), G-42
   (downtime non-value posting) added to `JOURNAL_RULES.md` §7 with registered
-  source/operation keys; invariant INV-027 (operation completion invariants) added to
-  `ACCOUNTING_INVARIANTS.md`; BR-057…BR-060 added to `BUSINESS_RULES.md`.
+  source/operation keys; invariant INV-028 (operation completion invariants) added to
+  `ACCOUNTING_INVARIANTS.md`; BR-068…BR-071 added to `BUSINESS_RULES.md`.
 - **Feature flags**: `manufacturing.routing.*`, `manufacturing.work_centers.*`,
   `manufacturing.shopfloor.*` — template-composable grants (CR-36 (f));
   manufacturing-bearing industry templates enable them by default.
@@ -169,18 +172,18 @@ complete — only PHASE-036 does.
 | T-02 | Drizzle mirrors, `ENTITY_CATALOG.md` rows, RLS policies + attack tests A1–A10 for every new table | api |
 | T-03 | Work-center module: CRUD, cost rates, per-shift capacity, status, cost-center link | api |
 | T-04 | Routing module: versioned header + operations grid (sequence, times, rate overrides), copy-from-routing, activation discipline | api |
-| T-05 | Production order execution service: routing binding, operation state machine, actual time capture, `current_operation` advance, sequence enforcement (INV-027) | api |
-| T-06 | Actual costing engine: rate × time roll-up into WIP legs (G-38), variance record computation (setup/usage/rate + order yield, M-12/M-13/M-19), posting-engine source keys | api |
-| T-07 | Rework order service: create-from-defect, own routing execution, G-39 posting (expense — never parent FG) | api |
-| T-08 | Downtime service: reason codes, duration, G-40 non-value posting policy (default OFF — record-only), OEE view inputs | api |
+| T-05 | Production order execution service: routing binding, operation state machine, actual time capture, `current_operation` advance, sequence enforcement (INV-028) | api |
+| T-06 | Actual costing engine: rate × time roll-up into WIP legs (G-40), variance record computation (setup/usage/rate + order yield, M-12/M-13/M-19), posting-engine source keys | api |
+| T-07 | Rework order service: create-from-defect, own routing execution, G-41 posting (expense — never parent FG) | api |
+| T-08 | Downtime service: reason codes, duration, G-42 non-value posting policy (default OFF — record-only), OEE view inputs | api |
 | T-09 | Shop-floor scan endpoints (start/pause/complete by barcode, idempotent keys) + offline scan queue assessment for the desktop client | api |
 | T-10 | Build `/manufacturing/routings` and `/manufacturing/work-centers` screens with versioned editor and rate forms | web |
 | T-11 | Build the shop-floor terminal view (touch-first, scan-first, AR/EN RTL) and the downtime log screen | web |
 | T-12 | Production order detail: Operations tab (progress, actual times, variance view) + create-rework action | web |
 | T-13 | NAV_ITEMS + ⌘K registration, permissions seeding, feature-flag grants, i18n keys | web |
 | T-14 | Implement the 4 report contracts (`defineReport`) + tests + `REPORT_CATALOG.md` rows | api |
-| T-15 | Golden suites G-38/G-39/G-40 with mandatory failure packs; INV-027 suite; BR-057…060 rules + guards | api |
-| T-16 | Docs: JOURNAL_RULES §7 rows, ACCOUNTING_INVARIANTS INV-027, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries | docs |
+| T-15 | Golden suites G-40/G-41/G-42 with mandatory failure packs; INV-028 suite; BR-068…060 rules + guards | api |
+| T-16 | Docs: JOURNAL_RULES §7 rows, ACCOUNTING_INVARIANTS INV-028, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries | docs |
 | T-17 | Run full local gates (typecheck/lint/boundaries/tests/docs/i18n parity/permissions drift/manifests) + OA-06 EXPLAIN budgets for `production_order_operations` and `downtime_records` hot paths; record evidence | all |
 
 ## 6. Verification
@@ -191,19 +194,19 @@ Acceptance criteria (all must pass with recorded evidence):
    exist for all 6 tables + 2 views (CR-36 (a)); RLS attack tests A1–A10 pass for every
    new tenant table (CR-36 (e)).
 2. A routing-bound production order executes operation-by-operation: the state machine
-   honors sequence (INV-027: operation N+1 cannot start before N completes; each
+   honors sequence (INV-028: operation N+1 cannot start before N completes; each
    operation completes at most once), actual setup/run times are captured, and
    `current_operation` advances exactly with the last completed operation.
-3. Golden G-38 green: operation completion posts DR `WIP` · CR conversion-cost accrual
+3. Golden G-40 green: operation completion posts DR `WIP` · CR conversion-cost accrual
    at work-center rates × actual times, balanced in document and base currency
    (INV-001/002) and idempotent under retry (INV-013); the mandatory failure pack is
    red for each wrong shape.
 4. Order completion computes standard-vs-actual variance records per operation
    (setup/usage/rate) and order-level yield variance exactly; rounding residuals are
    explicit, never absorbed.
-5. Goldens G-39 (rework cost) and G-40 (downtime non-value posting) green with failure
-   packs; a test asserts rework cost never lands in the parent FG layer (BR-058) and
-   downtime posting is policy-gated (BR-059).
+5. Goldens G-41 (rework cost) and G-42 (downtime non-value posting) green with failure
+   packs; a test asserts rework cost never lands in the parent FG layer (BR-069) and
+   downtime posting is policy-gated (BR-070).
 6. Routing-less orders still post through the legacy flat-rate path with zero drift in
    the existing G-17/G-18 golden packs (dual mode documented).
 7. OEE views compute availability × performance × quality over seeded fixtures and the

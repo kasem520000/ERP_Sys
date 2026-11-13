@@ -40,7 +40,7 @@
 
 | Wave / Stage | Phases | Gate | Theme |
 |---|---|---|---|
-| **Wave 1 — Stage 12** | 035–041 | **Sellable** (ZATCA-1 ✓ + OQ-002 resolved + payments-ready path) | سدّ الفجوات الحرجة التي تمنع البيع |
+| **Wave 1 — Stage 12** | 035–041 | **Sellable** (ZATCA-1 ✓ + OQ-002 resolved + the payments path STAGED — the DR-002 production adapter ships with PHASE-056; no production payment rail exists before it) | سدّ الفجوات الحرجة التي تمنع البيع |
 | **Wave 2 — Stage 13** | 042–051 | **Full ERP** (MRP + HR + WMS + projects live) | اكتمال الوحدات: تصنيع، مستودعات، موارد بشرية، مشاريع، جودة، تجارة خارجية |
 | **Wave 3 — Stage 14** | 052–059 + **066 + 068** (v3.1) | **Enterprise** (API platform + SSO + BI + operations + IFRS depth) | المنصة المؤسسية: سير عمل، عمق محاسبي، ضرائب، تكاملات، حوكمة، تشغيل، امتثال IFRS متقدم |
 | **Wave 4 — Stage 15** | 060–065 + **067** (v3.1) | **Differentiated** (Arabic/AI/growth advantages + ownership/structured reporting) | التميّز: عمق المبيعات ونقاط البيع، تجربة المستخدم، الخليج والعربية، الذكاء الاصطناعي، النمو، الأعمال والملكية والإفصاح |
