@@ -18,7 +18,7 @@
 
 | # | Command (cwd `apps/api`) | Result |
 |---|---|---|
-| 2.1 | `pnpm exec vitest run --config vitest.db.config.ts src/__db__/inventory/wms-budgets-backfill.spec.ts src/__db__/inventory/wms-tracked-backfill.spec.ts` | **12/12 passed** (the T-20 original re-pinned + the 7 new audit-fix tests: dry-run no-write + classification, batch distribution + explicit-batch and FEFO spends, serial distribution + named-unit spend, residue stays in the probe, idempotent re-run, concurrent convergence, the audit counts) |
+| 2.1 | `pnpm exec vitest run --config vitest.db.config.ts src/__db__/inventory/wms-budgets-backfill.spec.ts src/__db__/inventory/wms-tracked-backfill.spec.ts` | **12/12 passed** (the T-20 original re-pinned + the 7 new audit-fix tests: dry-run no-write + classification, batch distribution + explicit-batch and FEFO spends, serial distribution + named-unit spend, residue stays in the probe, idempotent re-run, concurrent convergence, the audit counts) — superseded this wave by wms-backfill-races.spec's 5-test pack (the wave-2 ledger §2); this wave's re-run of the trio + core + inv029: 34/34 |
 | 2.2 | `pnpm exec vitest run --config vitest.db.config.ts src/__db__/inventory/wms-core.spec.ts src/__db__/inventory/wms-inv029.spec.ts` | **17/17 passed** (the surrounding corpus unaffected) |
 | 2.3 | `pnpm exec tsc --noEmit -p tsconfig.json` | **0 errors** (incl. the rewritten script) |
 | 2.4 | `env -u DATABASE_URL pnpm exec tsx scripts/backfill-bins.ts --dry-run` | **exit 1** with the runbook §2 pointer (the fail-fast contract) |
@@ -67,12 +67,12 @@ executed:
 | Batch | Files | Tests | Result |
 |---|---|---|---|
 | 1 | 41 | 298 | **298 passed** |
-| 2 | 41 | 1,741 | **1,738 passed · 3 failed** — all three the crm/tasks mail-capture timing race (10s waits under load); the file re-ran GREEN standalone (10/10) and with its neighbors (21/21) — a timing flake, not a defect |
-| 3 | 41 | 333 | **332 passed · 1 failed** — performance/ga-full-load T-04: the 100k statement-tier p95 measured 34.9s against the 10s budget on this sandbox CPU — the documented environmental class (the 036 report-hammer precedent: "the sandbox CPU misses the … budget"), recorded, not repaired |
+| 2 | 41 | 1,741 | **1,738 passed · 3 failed** — all three the crm/tasks mail-capture timing race (10s wall-clock waits under the batched load); the file re-ran GREEN standalone (10/10) and with its neighbors (21/21). AMENDED (wave 2, §4 of the wave-2 ledger): re-verified 10/10 × 3 consecutive standalone runs; the mechanism is a hard wall-clock deadline under CPU contention — the honest classification is "load-sensitive timing, defect neither demonstrated nor excluded", not a flat "flake, not a defect" |
+| 3 | 41 | 333 | **332 passed · 1 failed** — performance/ga-full-load T-04: the 100k statement-tier p95 measured 34.9s against the 10s budget on this sandbox CPU. AMENDED (wave 2, §5 of the wave-2 ledger): the standalone re-run on the SAME 2-vCPU sandbox class measures **p95 = 1,693 ms — 13/13 green, 5.9× under budget**; the environmental classification now rests on that run-verified contrast (batched 34.9s vs standalone 1.69s on identical code), not on precedent alone |
 | 4 | 41 | 306 | **306 passed** |
 | 5 | 37 | 302 | **302 passed** |
 | + | 1 (posting-smoke.local) | 1 | **1 passed** |
-| **Total** | **202** | **2,981** | **2,977 green + 3 timing flakes (re-run green) + 1 environmental perf miss** |
+| **Total** | **202** | **2,981** | **2,977 green + 3 timing flakes (re-run green; re-verified standalone ×3 in wave 2) + 1 environmental perf miss (standalone re-run GREEN in wave 2 — 1,693 ms vs the 10,000 ms budget)** |
 
 Counting note (honest): the batched total (2,981) is NOT directly comparable
 to the phase-closure announcement (2,979 over 202 files, one continuous
@@ -100,6 +100,15 @@ Batch 2 then ran green except the crm/tasks timing flakes above.
 
 ## 6. RUN — the ID-ledger collision check (audit fix 4, 2026-11-13)
 
+**Commit pinning (the wave-2 amendment):** the numbers below were produced
+by the checker on the MID-WAVE tree (before a457f5e's doc touches). The
+checker re-run on the prior wave's FINAL head `6f44ee4` (the worktree
+method) is green: **0 errors · 0 warnings · self-test 3/3 — implemented G 46
+· INV 29 · BR 77 · reservations 21 phases / 79 ids · 68 docs (73 claim ids,
+2,503 reference ids)**. The wave-2 rewrite of the checker (commit
+`77d0d7d`) re-derives its own numbers on the final head — see the wave-2
+ledger §3.
+
 | # | Command | Result |
 |---|---|---|
 | 6.1 | `pnpm exec tsx scripts/check-id-ledger.ts --self-test` | **0 errors, 0 warnings — OK**. Self-test: (1) the conflicting claim (PHASE-043 claiming G-50/G-51, reserved for PHASE-045) **DETECTED**; (2) the legitimate reference (PHASE-046 referencing the implemented G-13/G-14) **PASSED**; (3) the shorthand ranges `BR-068…070` and `G-47…G-50` both expand correctly. Parsed: implemented G 46 (the split canon: ACCOUNTING_TESTS §3 G-01…G-20 + JOURNAL_RULES §7 G-21…G-46) · INV 29 · BR 77; reservations 21 phases / 79 ids; 68 phase docs scanned (77 claim ids, 2,486 reference ids). |
@@ -122,7 +131,7 @@ re-run-verified:
 | 7.3 | PHASE-042.md:144 (the goldens/invariant/BR claim line) | Re-pinned to the implemented slots (G-40/G-41/G-42, INV-028, BR-068…071) with the as-implemented note — matching JOURNAL_RULES note 13 and the INV-028 canon row (the doc previously claimed the planned G-38/G-39/G-40, INV-027, BR-057…060). |
 | 7.4 | The payments-ready phrase (COMPLETENESS_ROADMAP §2 Wave-1 gate + COMPLETENESS_REGISTER CR-38) | Corrected to the honest "payments path STAGED — the DR-002 production adapter ships with PHASE-056; the gate's payments leg is a staged path, not a delivered rail" (matching PHASE-041.md's own "staged for 056" wording and PHASE-056's scope). |
 
-## 8. The undecodable term — reported honestly
+## 8. The undecodable term — reported honestly (RESOLVED in wave 2)
 
 The auditor's list contains one term that could not be decoded with certainty:
 "ترويستا 035 و036". It matches no identifier, tenant, company, or artifact in
@@ -130,6 +139,11 @@ the repository (searched AR/EN, all docs and specs). The 035/036 evidence
 chain was nevertheless swept end-to-end (§7.1/§7.2: the reports' counts,
 deltas, and claims re-derived against the actual tree), the ONE material
 contradiction found (the 1,095 miscount) was re-run-verified and corrected
-with errata, and the 036 report came back clean. If the term names a specific
-artifact the owner has in mind, the sweep is repeatable on request — nothing
-in this wave was marked "done" on the strength of a guess.
+with errata, and the 036 report came back clean.
+
+**RESOLVED (wave 2):** the owner clarified the term — it meant the **Status
+line at the head of PHASE-035.md and PHASE-036.md**, which still read
+"NOT_STARTED — PLANNED" while both phases are COMPLETE (2026-11-10, per
+their completion reports and IMPLEMENTATION_STATUS). Both lines are corrected
+in the wave-2 commit `77d0d7d` — the term was a typo, the sweep it prompted
+stands on its own evidence.

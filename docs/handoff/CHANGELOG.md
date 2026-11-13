@@ -4,6 +4,67 @@
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 2** (the owner's
+  review of the five-commit wave at head `6f44ee4`; no phase re-execution, no
+  triple-flip changes; evidence:
+  [the wave-2 gate-evidence ledger](../operations/gate-evidence/2026-11-13-post044-audit-fixes-wave2.md)):
+  (1) THE MIGRATION-VS-MOVEMENT RACE (the review's top priority) — the
+  advisory backfill lock never serialized inventory movements (they serialize
+  on the `item_stock` ROW lock, CC-04); a movement committing between the
+  pass's unlocked shortage read and its verification made it compare a fresh
+  fold against the STALE `row.stockQty` — a concurrent binless issue SHIPPED
+  an oversubscribed fold silently (reproduced: fold 30 vs stock 25) and a
+  concurrent receipt tripped a spurious whole-tenant rollback (reproduced:
+  the rejected pass). The live pass now JOINS the movement protocol: a
+  pre-pass locks every candidate position `FOR UPDATE` in ONE canonical
+  order before any write, the shortfall plan is re-derived FRESH under the
+  held locks, a queued movement unblocks onto the healed bins (its binless
+  check runs after its own position lock — test-proven via the binned-path
+  `source_bin_id` signature), and a multi-position-movement deadlock is
+  resolved by the operator tool's bounded 3-attempt 40P01 retry (runbook §6
+  documents the protocol + the contract; `wms-backfill-races.spec` — 5/5
+  green on the fix, the two pre-fix failure shapes reproduced by the
+  stash-and-run proof); (2) the SERIAL LOCATION PROOF made strict — provable
+  requires netAtWarehouse == 1 AND netTotal == 1 (netHere 2 with netTotal 1
+  or 0 is a NAMED conflict, never a placement), and `alreadyBinned` becomes
+  placement BY QUANTITY (a zero-qty history row places nothing — the serial
+  stays migratable, the upsert lands 0→1 on the existing slot with no
+  duplication; a positive row at another warehouse is a named source
+  conflict); (3) the PARTIAL-migration consequence test-proven and documented
+  — landing a partial pass's first proven bin row ENDS the binless grace for
+  the item, so serial phantom units go from binless-spendable to BLOCKED at
+  the bin gate until resolved per runbook §5 (the false "no more spendable
+  than before" phrasing corrected — batch residue was never FEFO-spendable,
+  serial residue was; the honest asymmetry); (4) the ID CHECKER made honest
+  — the findings TDZ fixed (a reservation overlap is a Finding, never the
+  ReferenceError crash), range extraction from actual text with …/.../../–/—
+  all normalized (the token regex previously matched only the literal
+  ellipsis), inverted/family-mismatched/too-wide ranges DIAGNOSED by name at
+  file:line instead of silently dropped, MULTI-LINE claims scanned as
+  logical blocks (a wrapped marker+ids pair is one claim, while wrapped
+  references and the PHASE-053 "journal_lines gains columns … (BR-051
+  advisory)" shape stay references) — 10 self-test probes; (5) the
+  renumbering regressions corrected (042:185 BR-068…071, 043:170 BR-078…080,
+  045:166 BR-081…083, 046:165 BR-084…086; 045's G-50/G-50 → G-50 accrual /
+  G-51 encashment across definition, T-11 and acceptance §6.7) with a
+  repo-wide sweep finding NO other inverted ranges or same-id duplications;
+  (6) the descriptive contradictions — PHASE-035/036 Status lines flipped to
+  COMPLETE (2026-11-10, with the 035 isolation-errata pointer), ID_LEDGER
+  §2's names re-verified against the actual titles (046 HR Payroll, 047 HR
+  Growth, 048 Projects & Contracting, 049 CMMS, 053…063 likewise —
+  reservations unchanged), ACCOUNTING_TESTS INV-027's path corrected to
+  `tax/zatca-phase1.spec.ts` and INV-029's evidence cell extended; (7) the
+  evidence ledger re-evaluated — the prior checker numbers pinned to their
+  commits (mid-wave 77/2,486 vs the 6f44ee4 re-run 73/2,503, both green),
+  the email-flake claim re-verified (crm/tasks 10/10 × 3 standalone runs;
+  the honest classification: load-sensitive wall-clock timing, defect
+  neither demonstrated nor excluded), and the p95-environmental claim now
+  EVIDENCE-BACKED (the standalone re-run on the same 2-vCPU sandbox class:
+  13/13 green, statement-tier p95 1,693 ms — 5.9× under budget vs the
+  batched 34.9 s); the "ترويستا" mystery resolved (the 035/036 Status
+  lines). Gates: typecheck 8/8 · lint 8/8 · depcruise 0/1,787 modules ·
+  api unit 51/51 files (576/576 tests) · docs 33/33 · id-ledger 10/10
+  self-test 0 errors · the WMS corpus 34/34 + serial-ledger 10/10.
 - 2026-11-13 — **PHASE-044 post-closure audit fixes** (the owner's audit of the
   closed phase; no phase re-execution, no triple-flip changes — five commits, all
   gates re-run; evidence:
