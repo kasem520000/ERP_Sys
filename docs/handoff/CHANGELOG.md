@@ -1,8 +1,56 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-13 (PHASE-044 post-closure audit fixes, wave 3)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-13 (PHASE-044 post-closure audit fixes, wave 4)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 4** (the owner's
+  review of the third wave at head `0038fc0` — the checker fix accepted,
+  then ONE point from the wave-3 §5 recorded limitation: a batch with a
+  positive BOX balance and NO ledger movements may HIDE its conflict from
+  the total probe, not merely leave it unreported; evidence:
+  [the wave-4 gate-evidence ledger](../operations/gate-evidence/2026-11-13-post044-audit-fixes-wave4.md)):
+  THE BINS-WITHOUT-LEDGER HIDING — `listBatchDistribution`'s population
+  was LEDGER-DRIVEN (`FROM ledger l`), so a batch whose bins hold stock
+  with ZERO ledger legs at the warehouse was never listed, never named.
+  The owner's prescribed case (batch A in the boxes 8 with no ledger
+  movements, batch B in the ledger 2 / boxes 0, `item_stock` 10) was run
+  on the pre-fix code FIRST and confirmed on every axis: the pass wrote
+  B's pinned 2, classified the position WRITABLE (Σ bins 10 ==
+  `item_stock` 10), and the case vanished from the aggregate probe AND
+  the re-run (the conflict gone from every recurring detector — the
+  wave-3 §5 note had wrongly said the probe "keeps reporting the position
+  until the shortfall is zero": the backfill write itself TAKES it to
+  zero). THE FIX — the batch comparison now spans the UNION of the
+  batches present in the LEDGER or the BOXES (a FULL OUTER JOIN), scoped
+  exactly like the probe (tenant: RLS + the `item_batches` tenant join,
+  complete over the union via the composite same-tenant RESTRICT FKs;
+  ownership: `owner_partner_id IS NULL` — consignment rows never counted;
+  bin status: all three, the probe folds them alike); a batch whose bins
+  exceed its ledger — legs or no legs — is a NAMED conflict with its
+  exact shape ("bins hold N but the ledger has NO movements for this
+  batch at this warehouse"; a new `ledgerLegs` count distinguishes it
+  from legs netting zero), and the wave-3 totals-matching guard keeps
+  such a position NON_RECONCILABLE: nothing written, the full shortfall
+  stays visible to the probe (a residue > 0 keeps the proven writes
+  legitimate — PARTIAL_UNATTRIBUTED — with the conflict named; the union
+  never over-blocks). The serialized path carries the same fix at the
+  classification level: a placed serial whose ledger does not corroborate
+  the placement (bin rows place 1 here while the ledger nets other than
+  exactly 1 here / 1 across all warehouses — e.g. a bin row for a serial
+  with ZERO ledger legs) was silently accepted as "already placed"; now
+  NAMED, so a provable sibling can no longer cover the aggregate and
+  hide it. `wms-backfill-bins-no-ledger.spec` (9 tests): the owner's case
+  dry-run/live/re-run/concurrent (all refuse, the probe keeps bins 8 vs
+  stock 10), the healthy WRITABLE counterpart, the PARTIAL variant, the
+  serialized analogue, the HOLD bin-status variant, and the consignment
+  ownership negative control — 9/9 on the fix, 7 failed pre-fix exactly
+  as predicted (the two negative controls passed both sides); the
+  sibling WMS db corpus 8 files 55/55 (the wave-3 conflicts spec 7/7 — no
+  regression); api unit 51/51 files 576/576; tsc/eslint/prettier/
+  depcruise/docs:validate/id-ledger all clean. Runbook §1/§3/§5 updated
+  (the union trust boundary, both owner's cases in the vocabulary, the
+  corrected resolution guidance).
 
 - 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 3** (the owner's
   review of the second wave at head `a8db23e` — two named points, both
