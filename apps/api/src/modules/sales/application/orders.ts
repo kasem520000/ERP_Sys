@@ -15,6 +15,7 @@ import {
   SalesOrderNotFoundError,
 } from "../domain/sales-errors";
 import { requireCustomer, requireSellableItem } from "./quotations";
+import { AtpService } from "../../manufacturing/application/atp-service";
 import { resolveSalesPrice, salesLineNetAmount, PRICE_RE } from "./pricing";
 
 /**
@@ -48,6 +49,7 @@ export class SalesOrderService {
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
     private readonly numbering: NumberingService,
+    @Inject(AtpService) private readonly atp: AtpService,
   ) {}
 
   async list(filter: { status?: string; customerId?: string; limit: number }) {
@@ -63,6 +65,62 @@ export class SalesOrderService {
   async findWithLines(id: string) {
     const order = await this.find(id);
     return { ...order, lines: await store.listSalesOrderLines(id) };
+  }
+
+  /**
+   * PHASE-043 (T-08, M-06/S-10): ATP-check one sales order line against
+   * live supply at the order's warehouse and stamp the verdict — the
+   * promise-date suggestion + the over-promise warning (atp_status SHORT
+   * + the CTP atp_suggested_date). The hard exclusions (BR-080) live in
+   * the ATP service (quarantined, reserved, consignment-owned never
+   * promise); this method owns the sales-side stamp.
+   */
+  async checkLineAtp(
+    orderId: string,
+    lineId: string,
+    input: { promisedDate?: string | null; actorId: string | null },
+  ): Promise<{
+    line: store.SalesOrderLineRow;
+    verdict: "OK" | "SHORT";
+    availableNow: string;
+    suggestedDate: string | null;
+  }> {
+    const order = await this.find(orderId);
+    const lines = await store.listSalesOrderLines(orderId);
+    const line = lines.find((candidate) => candidate.id === lineId);
+    if (line === undefined) {
+      throw new SalesOrderNotFoundError(`sales order line ${lineId} does not belong to order ${orderId}`);
+    }
+    const result = await this.atp.check({
+      itemId: line.itemId,
+      warehouseId: order.warehouseId,
+      qty: line.qty,
+      date: input.promisedDate ?? order.expectedDate ?? null,
+    });
+    await store.updateOrderLineAtp({
+      lineId,
+      promisedDate: input.promisedDate ?? order.expectedDate ?? null,
+      atpStatus: result.verdict,
+      atpSuggestedDate: result.suggestedDate,
+    });
+    await this.audit.record({
+      action: "sales.sales_order_line.atp_checked",
+      entityType: "sales_order",
+      entityId: orderId,
+      actorId: input.actorId ?? undefined,
+      after: {
+        lineId,
+        verdict: result.verdict,
+        availableNow: result.availableNow,
+        suggestedDate: result.suggestedDate,
+      },
+    });
+    return {
+      line: (await store.listSalesOrderLines(orderId)).find((candidate) => candidate.id === lineId)!,
+      verdict: result.verdict,
+      availableNow: result.availableNow,
+      suggestedDate: result.suggestedDate,
+    };
   }
 
   async create(input: {

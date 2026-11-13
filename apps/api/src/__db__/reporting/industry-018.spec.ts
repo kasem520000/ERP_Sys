@@ -21,6 +21,8 @@ import { RegistrationService } from "../../modules/tax/application/registration-
 import { WarehouseService } from "../../modules/inventory/application/warehouse-service";
 import { StockService } from "../../modules/inventory/application/stock-service";
 import { TrackingService } from "../../modules/inventory/application/tracking-service";
+import { ReservationService } from "../../modules/inventory/application/reservation-service";
+import { ReservationPolicyService } from "../../modules/manufacturing/application/reservation-policy-service";
 import { SalesInvoiceService } from "../../modules/sales/application/invoices";
 import { BomService } from "../../modules/manufacturing/application/bom-service";
 import { ProductionOrderService } from "../../modules/manufacturing/application/production-order-service";
@@ -99,6 +101,7 @@ const orders = new ProductionOrderService(
   new InboxService(),
   new ResolveEffectiveConfigService(new ConfigRepository()),
   shopFloor,
+  new ReservationPolicyService(audit, new ReservationService(audit)),
 );
 const inspections = new InspectionService(audit, posting, tracking);
 const salesInvoices = new SalesInvoiceService(audit, posting, numbering, resolver);

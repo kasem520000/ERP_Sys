@@ -2923,6 +2923,137 @@ async function seedFixtures(superuser: {
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
+  // -- PHASE-043 MRP & Planning fixtures (0074…0077) -----------------------
+  // One FK-consistent row per registered planning table per tenant:
+  // mps_entries (the warehouse+item+bucket slot), the BOM planning
+  // satellites (a substitution on the fixture BOM line; a CO_PRODUCT
+  // output with a 20% allocation; a WORK_CENTER BOR row on the fixture
+  // center), the MRP run family (a COMPLETED REGENERATIVE DAY run + one
+  // demand line + one supply line + one SUGGESTED PURCHASE suggestion),
+  // and the tolling pair (a DRAFT order + one ISSUE_TO_PROCESSOR ledger
+  // row). Isolation rows, not business ones — the allocation gate is the
+  // business services' discipline, not the suite's.
+  await superuser.query(
+    `INSERT INTO mps_entries (id, tenant_id, warehouse_id, item_id, bucket_start, qty, uom_id, status)
+     VALUES
+       ('67676767-0000-4000-8000-000000000001', $1, 'f0f0f0f0-1000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', '2027-03-01', 10,
+        'b2b2b2b2-0000-4000-8000-000000000001', 'PLANNED'),
+       ('67676767-0000-4000-8000-000000000002', $2, 'f0f0f0f0-1000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', '2027-03-01', 10,
+        'b2b2b2b2-0000-4000-8000-000000000002', 'PLANNED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO bom_substitutions (id, tenant_id, bom_line_id, substitute_item_id, priority)
+     VALUES
+       ('68686868-0000-4000-8000-000000000001', $1, '35353535-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', 1),
+       ('68686868-0000-4000-8000-000000000002', $2, '35353535-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', 1)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO bom_outputs (id, tenant_id, bom_id, item_id, output_kind, allocation_pct,
+                              qty_per_output, uom_id)
+     VALUES
+       ('69696969-0000-4000-8000-000000000001', $1, '34343434-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', 'CO_PRODUCT', 20, 0.1,
+        'b2b2b2b2-0000-4000-8000-000000000001'),
+       ('69696969-0000-4000-8000-000000000002', $2, '34343434-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', 'CO_PRODUCT', 20, 0.1,
+        'b2b2b2b2-0000-4000-8000-000000000002')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO bill_of_resources (id, tenant_id, bom_id, line_no, resource_kind, work_center_id,
+                                    consumption_factor)
+     VALUES
+       ('6a6a6a6a-0000-4000-8000-000000000001', $1, '34343434-0000-4000-8000-000000000001',
+        1, 'WORK_CENTER', '49494942-0000-4000-8000-000000000001', 0.5),
+       ('6a6a6a6a-0000-4000-8000-000000000002', $2, '34343434-0000-4000-8000-000000000002',
+        1, 'WORK_CENTER', '49494942-0000-4000-8000-000000000002', 0.5)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO mrp_runs (id, tenant_id, status, run_mode, bucket_size, horizon_buckets,
+                           warehouse_id, as_of_date, scope_item_ids, params)
+     VALUES
+       ('6b6b6b6b-0000-4000-8000-000000000001', $1, 'COMPLETED', 'REGENERATIVE', 'DAY', 7,
+        'f0f0f0f0-1000-4000-8000-000000000001', '2027-03-01', '[]', '{}'),
+       ('6b6b6b6b-0000-4000-8000-000000000002', $2, 'COMPLETED', 'REGENERATIVE', 'DAY', 7,
+        'f0f0f0f0-1000-4000-8000-000000000002', '2027-03-01', '[]', '{}')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO mrp_demand_lines (id, tenant_id, run_id, warehouse_id, item_id, bucket_index,
+                                   bucket_start, demand_kind, qty)
+     VALUES
+       ('6c6c6c6c-0000-4000-8000-000000000001', $1, '6b6b6b6b-0000-4000-8000-000000000001',
+        'f0f0f0f0-1000-4000-8000-000000000001', 'babababa-0000-4000-8000-000000000001',
+        0, '2027-03-01', 'MPS', 10),
+       ('6c6c6c6c-0000-4000-8000-000000000002', $2, '6b6b6b6b-0000-4000-8000-000000000002',
+        'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+        0, '2027-03-01', 'MPS', 10)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO mrp_supply_lines (id, tenant_id, run_id, warehouse_id, item_id, bucket_index,
+                                   bucket_start, supply_kind, qty)
+     VALUES
+       ('6d6d6d6d-0000-4000-8000-000000000001', $1, '6b6b6b6b-0000-4000-8000-000000000001',
+        'f0f0f0f0-1000-4000-8000-000000000001', 'babababa-0000-4000-8000-000000000001',
+        0, '2027-03-01', 'ON_HAND', 4),
+       ('6d6d6d6d-0000-4000-8000-000000000002', $2, '6b6b6b6b-0000-4000-8000-000000000002',
+        'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+        0, '2027-03-01', 'ON_HAND', 4)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO mrp_suggestions (id, tenant_id, run_id, item_id, warehouse_id, suggestion_type,
+                                  qty, uom_id, due_date, release_date, status, netting)
+     VALUES
+       ('6e6e6e6e-0000-4000-8000-000000000001', $1, '6b6b6b6b-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', 'f0f0f0f0-1000-4000-8000-000000000001',
+        'PURCHASE_ORDER', 6, 'b2b2b2b2-0000-4000-8000-000000000001',
+        '2027-03-01', '2027-02-22', 'SUGGESTED', '{}'),
+       ('6e6e6e6e-0000-4000-8000-000000000002', $2, '6b6b6b6b-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002',
+        'PURCHASE_ORDER', 6, 'b2b2b2b2-0000-4000-8000-000000000002',
+        '2027-03-01', '2027-02-22', 'SUGGESTED', '{}')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO contract_mfg_orders (id, tenant_id, processor_partner_id, item_id, bom_id,
+                                      warehouse_id, planned_qty, uom_id, status)
+     VALUES
+       ('6f6f6f6f-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', '34343434-0000-4000-8000-000000000001',
+        'f0f0f0f0-1000-4000-8000-000000000001', 10, 'b2b2b2b2-0000-4000-8000-000000000001', 'DRAFT'),
+       ('6f6f6f6f-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', '34343434-0000-4000-8000-000000000002',
+        'f0f0f0f0-1000-4000-8000-000000000002', 10, 'b2b2b2b2-0000-4000-8000-000000000002', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO contract_mfg_moves (id, tenant_id, order_id, move_kind, item_id, qty)
+     VALUES
+       ('70707070-0000-4000-8000-000000000001', $1, '6f6f6f6f-0000-4000-8000-000000000001',
+        'ISSUE_TO_PROCESSOR', 'babababa-0000-4000-8000-000000000001', 2),
+       ('70707070-0000-4000-8000-000000000002', $2, '6f6f6f6f-0000-4000-8000-000000000002',
+        'ISSUE_TO_PROCESSOR', 'babababa-0000-4000-8000-000000000002', 2)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
 
   // -- seedFixtures end --
 
@@ -3440,6 +3571,17 @@ const OWN_ROW: Record<string, [string, string]> = {
   inventory_alert_jobs: ["64646464-0000-4000-8000-000000000001", "64646464-0000-4000-8000-000000000002"],
   warehouse_kit_orders: ["65656565-0000-4000-8000-000000000001", "65656565-0000-4000-8000-000000000002"],
   warehouse_kit_lines: ["66666666-0000-4000-8000-000000000001", "66666666-0000-4000-8000-000000000002"],
+  // PHASE-043 MRP & Planning cluster (0074…0077)
+  mps_entries: ["67676767-0000-4000-8000-000000000001", "67676767-0000-4000-8000-000000000002"],
+  bom_substitutions: ["68686868-0000-4000-8000-000000000001", "68686868-0000-4000-8000-000000000002"],
+  bom_outputs: ["69696969-0000-4000-8000-000000000001", "69696969-0000-4000-8000-000000000002"],
+  bill_of_resources: ["6a6a6a6a-0000-4000-8000-000000000001", "6a6a6a6a-0000-4000-8000-000000000002"],
+  mrp_runs: ["6b6b6b6b-0000-4000-8000-000000000001", "6b6b6b6b-0000-4000-8000-000000000002"],
+  mrp_demand_lines: ["6c6c6c6c-0000-4000-8000-000000000001", "6c6c6c6c-0000-4000-8000-000000000002"],
+  mrp_supply_lines: ["6d6d6d6d-0000-4000-8000-000000000001", "6d6d6d6d-0000-4000-8000-000000000002"],
+  mrp_suggestions: ["6e6e6e6e-0000-4000-8000-000000000001", "6e6e6e6e-0000-4000-8000-000000000002"],
+  contract_mfg_orders: ["6f6f6f6f-0000-4000-8000-000000000001", "6f6f6f6f-0000-4000-8000-000000000002"],
+  contract_mfg_moves: ["70707070-0000-4000-8000-000000000001", "70707070-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4285,6 +4427,46 @@ const MISMATCHED_INSERT: Record<string, string> = {
   warehouse_kit_lines: `INSERT INTO warehouse_kit_lines (id, tenant_id, order_id, line_no, component_item_id, qty)
      VALUES ('66666666-3000-4000-8000-000000000003', $1, '65656565-0000-4000-8000-000000000002', 1,
              'babababa-0000-4000-8000-000000000002', 1)`,
+  // PHASE-043 MRP & Planning cluster (0074…0077) — FK targets at the
+  // foreign tenant's own fixtures (the composite (id, tenant_id) FKs stay
+  // valid; the RLS WITH CHECK is the isolated rejection).
+  mps_entries: `INSERT INTO mps_entries (id, tenant_id, warehouse_id, item_id, bucket_start, qty, uom_id, status)
+     VALUES ('67676767-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', '2027-03-01', 1,
+             'b2b2b2b2-0000-4000-8000-000000000002', 'PLANNED')`,
+  bom_substitutions: `INSERT INTO bom_substitutions (id, tenant_id, bom_line_id, substitute_item_id, priority)
+     VALUES ('68686868-3000-4000-8000-000000000003', $1, '35353535-0000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', 9)`,
+  bom_outputs: `INSERT INTO bom_outputs (id, tenant_id, bom_id, item_id, output_kind, allocation_pct, qty_per_output, uom_id)
+     VALUES ('69696969-3000-4000-8000-000000000003', $1, '34343434-0000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', 'BY_PRODUCT', 10, 0.1,
+             'b2b2b2b2-0000-4000-8000-000000000002')`,
+  bill_of_resources: `INSERT INTO bill_of_resources (id, tenant_id, bom_id, line_no, resource_kind, work_center_id, consumption_factor)
+     VALUES ('6a6a6a6a-3000-4000-8000-000000000003', $1, '34343434-0000-4000-8000-000000000002',
+             9, 'WORK_CENTER', '49494942-0000-4000-8000-000000000002', 1)`,
+  mrp_runs: `INSERT INTO mrp_runs (id, tenant_id, status, run_mode, bucket_size, horizon_buckets, warehouse_id, as_of_date, scope_item_ids, params)
+     VALUES ('6b6b6b6b-3000-4000-8000-000000000003', $1, 'RUNNING', 'REGENERATIVE', 'DAY', 7,
+             'f0f0f0f0-1000-4000-8000-000000000002', '2027-03-01', '[]', '{}')`,
+  mrp_demand_lines: `INSERT INTO mrp_demand_lines (id, tenant_id, run_id, warehouse_id, item_id, bucket_index, bucket_start, demand_kind, qty)
+     VALUES ('6c6c6c6c-3000-4000-8000-000000000003', $1, '6b6b6b6b-0000-4000-8000-000000000002',
+             'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+             9, '2027-03-10', 'SAFETY_STOCK', 1)`,
+  mrp_supply_lines: `INSERT INTO mrp_supply_lines (id, tenant_id, run_id, warehouse_id, item_id, bucket_index, bucket_start, supply_kind, qty)
+     VALUES ('6d6d6d6d-3000-4000-8000-000000000003', $1, '6b6b6b6b-0000-4000-8000-000000000002',
+             'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+             9, '2027-03-10', 'OPEN_PO', 1)`,
+  mrp_suggestions: `INSERT INTO mrp_suggestions (id, tenant_id, run_id, item_id, warehouse_id, suggestion_type, qty, uom_id, due_date, release_date, status, netting)
+     VALUES ('6e6e6e6e-3000-4000-8000-000000000003', $1, '6b6b6b6b-0000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002',
+             'PURCHASE_ORDER', 1, 'b2b2b2b2-0000-4000-8000-000000000002',
+             '2027-03-10', '2027-03-01', 'SUGGESTED', '{}')`,
+  contract_mfg_orders: `INSERT INTO contract_mfg_orders (id, tenant_id, processor_partner_id, item_id, bom_id, warehouse_id, planned_qty, uom_id, status)
+     VALUES ('6f6f6f6f-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+             'babababa-0000-4000-8000-000000000002', '34343434-0000-4000-8000-000000000002',
+             'f0f0f0f0-1000-4000-8000-000000000002', 1, 'b2b2b2b2-0000-4000-8000-000000000002', 'DRAFT')`,
+  contract_mfg_moves: `INSERT INTO contract_mfg_moves (id, tenant_id, order_id, move_kind, item_id, qty)
+     VALUES ('70707070-3000-4000-8000-000000000003', $1, '6f6f6f6f-0000-4000-8000-000000000002',
+             'RETURN_MATERIAL', 'babababa-0000-4000-8000-000000000002', 1)`,
 };
 
 beforeAll(async () => {

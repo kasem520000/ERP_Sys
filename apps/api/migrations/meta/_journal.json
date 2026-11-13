@@ -546,6 +546,13 @@
       "when": 1796519800000,
       "tag": "0078_mrp_seeds",
       "breakpoints": true
+    },
+    {
+      "idx": 78,
+      "version": "7",
+      "when": 1796519900000,
+      "tag": "0079_transfer_mrp_link",
+      "breakpoints": true
     }
   ],
   "version": "7"

@@ -2552,6 +2552,10 @@ export const stockTransfers = pgTable(
     receiveDate: date("receive_date"),
     receivedBy: uuid("received_by"),
     postedJournalId: uuid("posted_journal_id"),
+    // PHASE-043 (0079): the suggestion this transfer was converted from
+    // (the TRANSFER leg of the bidirectional conversion link — acceptance
+    // criterion 3; the 0076 PO/MO pair completed for all three types).
+    mrpSuggestionId: uuid("mrp_suggestion_id"),
     note: text("note"),
     noteAr: text("note_ar"),
   },

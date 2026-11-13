@@ -6,6 +6,7 @@ import { AuditModule } from "../audit/audit.module";
 import { FilesModule } from "../files/files.module";
 import { UomService } from "./application/uom-service";
 import { ItemService } from "./application/item-service";
+import { PlanningPolicyService } from "./application/planning-policy-service";
 import { PriceListService } from "./application/price-list-service";
 import { CompositeService } from "./application/composite-service";
 import { ImportService, IMPORT_QUEUE, type ImportJobPayload } from "./application/import-service";
@@ -27,8 +28,8 @@ import { ImportController } from "./presentation/import.controller";
 @Module({
   imports: [InfrastructureModule, AuditModule, FilesModule],
   controllers: [ItemsController, ImportController],
-  providers: [UomService, ItemService, PriceListService, CompositeService, ImportService, ExportService],
-  exports: [UomService, ItemService, PriceListService, CompositeService, ImportService, ExportService],
+  providers: [UomService, ItemService, PriceListService, CompositeService, ImportService, ExportService, PlanningPolicyService],
+  exports: [UomService, ItemService, PriceListService, CompositeService, ImportService, ExportService, PlanningPolicyService],
 })
 export class ItemsModule implements OnModuleInit {
   constructor(@Inject(ImportService) private readonly imports: ImportService) {}

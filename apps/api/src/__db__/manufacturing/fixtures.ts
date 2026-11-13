@@ -29,6 +29,8 @@ import { DowntimeService } from "../../modules/manufacturing/application/downtim
 import { StandardCostService } from "../../modules/manufacturing/application/standard-cost-service";
 import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
 import { PutawayService } from "../../modules/inventory/application/putaway-service";
+import { ReservationService } from "../../modules/inventory/application/reservation-service";
+import { ReservationPolicyService } from "../../modules/manufacturing/application/reservation-policy-service";
 import { ConfigRepository } from "../../modules/configuration/infrastructure/config-repository";
 import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
 import { InboxService } from "../../modules/notifications/application/inbox-service";
@@ -78,6 +80,10 @@ export const tracking = new TrackingService(audit, stock);
 // operation-freeze collaborator joins the order service's constructor (8th
 // param), then the five new services on the same module-local instances.
 export const shopFloor = new OperationExecutionService(audit, posting);
+export const reservationPolicy = new ReservationPolicyService(
+  audit,
+  new ReservationService(audit),
+);
 export const orders = new ProductionOrderService(
   audit,
   numbering,
@@ -87,6 +93,7 @@ export const orders = new ProductionOrderService(
   new InboxService(),
   new ResolveEffectiveConfigService(new ConfigRepository()),
   shopFloor,
+  reservationPolicy,
 );
 export const workCenters = new WorkCenterService(audit);
 export const routingsSrv = new RoutingService(audit);

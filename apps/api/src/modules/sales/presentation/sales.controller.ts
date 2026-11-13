@@ -410,6 +410,29 @@ export class SalesController {
     return envelope(this.orders.submit(id, identity.userId));
   }
 
+  /** PHASE-043 (T-08, M-06/S-10): ATP-check one line — the promise-date
+   * suggestion + the over-promise warning stamped on the line (the ATP
+   * engine's hard exclusions — BR-080 — apply). */
+  @Post("sales-orders/:id/lines/:lineId/atp")
+  @RequirePermissions("sales.orders.view")
+  checkLineAtp(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Param("lineId") lineId: string,
+    @Body() body: unknown,
+  ) {
+    const identity = requireIdentity(request);
+    const input = z
+      .object({ promisedDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "ISO date").nullable().optional() })
+      .parse(body ?? {});
+    return envelope(
+      this.orders.checkLineAtp(id, lineId, {
+        promisedDate: input.promisedDate ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
   @Post("sales-orders/:id/approve")
   @RequirePermissions("sales.orders.approve")
   approveOrder(@Req() request: Request, @Param("id") id: string) {

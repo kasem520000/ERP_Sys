@@ -13,6 +13,8 @@ import { PartnerSubledgerService } from "../../modules/partners/application/subl
 import { WarehouseService } from "../../modules/inventory/application/warehouse-service";
 import { StockService } from "../../modules/inventory/application/stock-service";
 import { TrackingService } from "../../modules/inventory/application/tracking-service";
+import { ReservationService } from "../../modules/inventory/application/reservation-service";
+import { ReservationPolicyService } from "../../modules/manufacturing/application/reservation-policy-service";
 import { BomService } from "../../modules/manufacturing/application/bom-service";
 import { ProductionOrderService } from "../../modules/manufacturing/application/production-order-service";
 import { OperationExecutionService } from "../../modules/manufacturing/application/operation-execution-service";
@@ -80,6 +82,7 @@ const orders = new ProductionOrderService(
   new InboxService(),
   new ResolveEffectiveConfigService(new ConfigRepository()),
   shopFloor,
+  new ReservationPolicyService(audit, new ReservationService(audit)),
 );
 const workCenters = new WorkCenterService(audit);
 const routingsSrv = new RoutingService(audit);

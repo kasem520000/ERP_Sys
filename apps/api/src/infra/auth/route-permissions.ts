@@ -3387,6 +3387,164 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "manufacturing.standard_costs.manage",
   },
 
+  // PHASE-043 (matrix §3.20): the MRP & Planning surface — the run
+  // engine + suggestions board (manufacturing.mrp), the master production
+  // schedule (manufacturing.mps — the frozen-fence override key
+  // manufacturing.mps.frozen_edit is DATA-DEPENDENT, resolved per request
+  // by the service, not a static row here), the item planning policies +
+  // the lot-sizing catalog (manufacturing.planning_policies), the ATP
+  // query (manufacturing.mrp), the BOR maintenance (the boms.manage tier)
+  // + the rough-cut check (manufacturing.mrp), the tolling round trip
+  // (the production-order permission family — tolling posts stock and
+  // journals exactly like production orders; no dedicated key was
+  // seeded), and the sales-line ATP stamp (sales.orders.view — the
+  // promise-date suggestion surface S-10).
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/mrp/runs",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/mrp/runs",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/mrp/runs/:id",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/mrp/suggestions",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/mrp/suggestions/:id/accept",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/mrp/suggestions/:id/dismiss",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/mps/entries",
+    permission: "manufacturing.mps",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/manufacturing/mps/entries",
+    permission: "manufacturing.mps",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/mps/readiness",
+    permission: "manufacturing.mps",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/planning/lot-sizing-rules",
+    permission: "manufacturing.planning_policies",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/planning/policies/:itemId",
+    permission: "manufacturing.planning_policies",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/manufacturing/planning/policies/:itemId",
+    permission: "manufacturing.planning_policies",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/planning/atp",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/planning/bor/:bomId",
+    permission: "manufacturing.boms.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/manufacturing/planning/bor/:bomId",
+    permission: "manufacturing.boms.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/planning/bor/rough-cut",
+    permission: "manufacturing.mrp",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/tolling/orders",
+    permission: "manufacturing.production_orders.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/tolling/orders",
+    permission: "manufacturing.production_orders.create",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/tolling/orders/:id",
+    permission: "manufacturing.production_orders.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/tolling/orders/:id/issue",
+    permission: "manufacturing.production_orders.post",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/tolling/orders/:id/return",
+    permission: "manufacturing.production_orders.post",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/tolling/orders/:id/settle",
+    permission: "manufacturing.production_orders.post",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/tolling/orders/:id/cancel",
+    permission: "manufacturing.production_orders.approve",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/boms/:id/substitutions",
+    permission: "manufacturing.boms.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/manufacturing/boms/:id/substitutions",
+    permission: "manufacturing.boms.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/manufacturing/boms/:id/outputs",
+    permission: "manufacturing.boms.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/manufacturing/boms/:id/outputs",
+    permission: "manufacturing.boms.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/manufacturing/production-orders/:id/link-sales-order",
+    permission: "manufacturing.production_orders.create",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/sales/sales-orders/:id/lines/:lineId/atp",
+    permission: "sales.orders.view",
+  },
+
   // PHASE-019 (MASTER-PLAN §11; matrix §3.1/§3.8): the projects dimension
   // (view rides the existing journal-entries view tier; manage mirrors the
   // cost-center trio), the CRM intake (leads + tasks + activities), the

@@ -4,8 +4,16 @@ import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
 import { InventoryModule } from "../inventory/inventory.module";
 import { ItemsModule } from "../items/items.module";
+import { PurchasingModule } from "../purchasing/purchasing.module";
 import { ConfigurationModule } from "../configuration/configuration.module";
 import { NotificationsModule } from "../notifications/notifications.module";
+import { MrpEngineService } from "./application/mrp-engine-service";
+import { MrpSuggestionsService } from "./application/mrp-suggestions-service";
+import { MpsService } from "./application/mps-service";
+import { BillOfResourcesService } from "./application/bill-of-resources-service";
+import { AtpService } from "./application/atp-service";
+import { TollingService } from "./application/tolling-service";
+import { ReservationPolicyService } from "./application/reservation-policy-service";
 import { BomService } from "./application/bom-service";
 import { ProductionOrderService } from "./application/production-order-service";
 import { ManufacturingReconciliationService } from "./application/wip-reconciliation-service";
@@ -17,6 +25,10 @@ import { OperationExecutionService } from "./application/operation-execution-ser
 import { ReworkService } from "./application/rework-service";
 import { DowntimeService } from "./application/downtime-service";
 import { StandardCostService } from "./application/standard-cost-service";
+import { MrpController } from "./presentation/mrp.controller";
+import { MpsController } from "./presentation/mps.controller";
+import { PlanningController } from "./presentation/planning.controller";
+import { TollingController } from "./presentation/tolling.controller";
 import { BomsController } from "./presentation/boms.controller";
 import { ProductionOrdersController } from "./presentation/production-orders.controller";
 import { ReconciliationController } from "./presentation/reconciliation.controller";
@@ -70,8 +82,20 @@ import { StandardCostsController } from "./presentation/standard-costs.controlle
  * (shape A — the documented integration point).
  */
 @Module({
-  imports: [AccountingModule, AuditModule, InventoryModule, ItemsModule, ConfigurationModule, NotificationsModule],
+  imports: [
+    AccountingModule,
+    AuditModule,
+    InventoryModule,
+    ItemsModule,
+    PurchasingModule,
+    ConfigurationModule,
+    NotificationsModule,
+  ],
   controllers: [
+    MrpController,
+    MpsController,
+    PlanningController,
+    TollingController,
     BomsController,
     ProductionOrdersController,
     ReconciliationController,
@@ -84,6 +108,13 @@ import { StandardCostsController } from "./presentation/standard-costs.controlle
     StandardCostsController,
   ],
   providers: [
+    MrpEngineService,
+    MrpSuggestionsService,
+    MpsService,
+    BillOfResourcesService,
+    AtpService,
+    TollingService,
+    ReservationPolicyService,
     BomService,
     ProductionOrderService,
     ManufacturingReconciliationService,
@@ -97,6 +128,9 @@ import { StandardCostsController } from "./presentation/standard-costs.controlle
     StandardCostService,
   ],
   exports: [
+    MrpEngineService,
+    MrpSuggestionsService,
+    AtpService,
     BomService,
     ProductionOrderService,
     ManufacturingReconciliationService,

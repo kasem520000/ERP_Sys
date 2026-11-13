@@ -52,13 +52,18 @@ export interface BomRow {
   noteAr: string | null;
   activatedAt: string | null;
   archivedAt: string | null;
+  /** PHASE-043 (0075, M-11): the MAIN product's joint-allocation share
+   * (100 by default — the single-output BOM; activation requires main +
+   * Σ outputs = 100 exactly, G-47). */
+  mainAllocationPct: string;
 }
 
 const BOM_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
   created_by AS "createdBy", item_id AS "itemId", version_no AS "versionNo", status,
   output_uom_id AS "outputUomId", yield_pct::text AS "yieldPct",
   effective_from::text AS "effectiveFrom", note, note_ar AS "noteAr",
-  activated_at::text AS "activatedAt", archived_at::text AS "archivedAt"`;
+  activated_at::text AS "activatedAt", archived_at::text AS "archivedAt",
+  main_allocation_pct::text AS "mainAllocationPct"`;
 
 /**
  * A component line as the store persists it (the service normalizes decimals
@@ -72,6 +77,8 @@ export interface BomLineInsert {
   uomId: string;
   qtyPerOutput: string;
   scrapPct: string;
+  /** PHASE-043 (M-08): the phantom flag. */
+  phantomFlag: boolean;
   note: string | null;
   noteAr: string | null;
 }
@@ -84,6 +91,8 @@ export interface BomLineRow {
   uomId: string;
   qtyPerOutput: string;
   scrapPct: string;
+  /** PHASE-043 (M-08): the phantom flag (flattening at explosion time). */
+  phantomFlag: boolean;
   note: string | null;
   noteAr: string | null;
 }
@@ -119,6 +128,7 @@ export async function insertBom(input: {
       uomId: line.uomId,
       qtyPerOutput: line.qtyPerOutput,
       scrapPct: line.scrapPct,
+      phantomFlag: line.phantomFlag,
       note: line.note,
       noteAr: line.noteAr,
       preservedId: line.id ?? null,
@@ -207,7 +217,7 @@ export async function patchBom(input: {
 const BOM_LINE_COLUMNS = sql`id, bom_id AS "bomId", line_no AS "lineNo",
   component_item_id AS "componentItemId", uom_id AS "uomId",
   qty_per_output::text AS "qtyPerOutput", scrap_pct::text AS "scrapPct",
-  note, note_ar AS "noteAr"`;
+  phantom_flag AS "phantomFlag", note, note_ar AS "noteAr"`;
 
 export async function listBomLines(bomId: string): Promise<BomLineRow[]> {
   const rows = await tenantTx().execute(sql`
@@ -232,6 +242,7 @@ async function insertBomLine(
     uomId: string;
     qtyPerOutput: string;
     scrapPct: string;
+    phantomFlag: boolean;
     note: string | null;
     noteAr: string | null;
     preservedId: string | null;
@@ -239,10 +250,10 @@ async function insertBomLine(
 ): Promise<void> {
   await tenantTx().execute(sql`
     INSERT INTO bom_lines (id, tenant_id, bom_id, line_no, component_item_id, uom_id,
-                           qty_per_output, scrap_pct, note, note_ar)
+                           qty_per_output, scrap_pct, phantom_flag, note, note_ar)
     VALUES (${line.preservedId ?? generateUuidV7()}, erp.current_tenant_id(), ${line.bomId},
             ${line.lineNo}, ${line.componentItemId}, ${line.uomId}, ${line.qtyPerOutput},
-            ${line.scrapPct}, ${line.note}, ${line.noteAr})
+            ${line.scrapPct}, ${line.phantomFlag}, ${line.note}, ${line.noteAr})
   `);
 }
 
@@ -265,6 +276,7 @@ export async function replaceBomLines(bomId: string, lines: readonly BomLineInse
       uomId: line.uomId,
       qtyPerOutput: line.qtyPerOutput,
       scrapPct: line.scrapPct,
+      phantomFlag: line.phantomFlag,
       note: line.note,
       noteAr: line.noteAr,
       preservedId: line.id ?? null,
@@ -351,6 +363,13 @@ export interface ProductionOrderRow {
   /** PHASE-042 (M-19): (planned_qty − actual_qty) × std_unit_cost at
    * completion, 4dp — positive = produced-less-than-planned (unfavorable). */
   yieldVariance: string;
+  /** PHASE-043 (0076, M-22): the driving sales line of a make-to-order
+   * production order — completion routes the output to the linked sales
+   * delivery with the MO's actual cost (G-49). */
+  salesOrderLineId: string | null;
+  /** PHASE-043 (0076): the MRP suggestion this order was converted from
+   * (the bidirectional link — acceptance criterion 3). */
+  mrpSuggestionId: string | null;
 }
 
 const ORDER_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
@@ -367,7 +386,8 @@ const ORDER_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text 
   started_at::text AS "startedAt", completed_at::text AS "completedAt",
   cancelled_at::text AS "cancelledAt",
   routing_id AS "routingId", current_operation AS "currentOperation",
-  std_unit_cost::text AS "stdUnitCost", yield_variance::text AS "yieldVariance"`;
+  std_unit_cost::text AS "stdUnitCost", yield_variance::text AS "yieldVariance",
+  sales_order_line_id AS "salesOrderLineId", mrp_suggestion_id AS "mrpSuggestionId"`;
 
 export async function insertProductionOrder(input: {
   branchId: string;
@@ -384,6 +404,11 @@ export async function insertProductionOrder(input: {
   note: string | null;
   noteAr: string | null;
   actorId: string | null;
+  /** PHASE-043 (0076): the MTO link (M-22) — set at conversion (from the
+   * suggestion) or directly (a make-to-order shop binding demand). */
+  salesOrderLineId?: string | null;
+  /** PHASE-043 (0076): the suggestion this order was converted from. */
+  mrpSuggestionId?: string | null;
 }): Promise<ProductionOrderRow> {
   const tx = tenantTx();
   const id = generateUuidV7();
@@ -391,11 +416,12 @@ export async function insertProductionOrder(input: {
     INSERT INTO production_orders (id, tenant_id, created_by, branch_id, item_id, uom_id,
                                    planned_qty, planned_date, materials_warehouse_id,
                                    fg_warehouse_id, labor_rate, overhead_rate, cost_center_id,
-                                   bom_id, note, note_ar)
+                                   bom_id, note, note_ar, sales_order_line_id, mrp_suggestion_id)
     VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.branchId}, ${input.itemId},
             ${input.uomId}, ${input.plannedQty}, ${input.plannedDate}, ${input.materialsWarehouseId},
             ${input.fgWarehouseId}, ${input.laborRate}, ${input.overheadRate}, ${input.costCenterId},
-            ${input.bomId}, ${input.note}, ${input.noteAr})
+            ${input.bomId}, ${input.note}, ${input.noteAr},
+            ${input.salesOrderLineId ?? null}, ${input.mrpSuggestionId ?? null})
   `);
   return (await findProductionOrderById(id))!;
 }
@@ -464,6 +490,10 @@ export async function patchProductionOrder(input: {
   stdUnitCost?: string | null;
   /** PHASE-042 (M-19): order-level yield variance (4dp, set at completion). */
   yieldVariance?: string;
+  /** PHASE-043 (0076): the MTO link (M-22) — DRAFT-only set/clear. */
+  salesOrderLineId?: string | null;
+  /** PHASE-043 (0076): the suggestion this order was converted from. */
+  mrpSuggestionId?: string | null;
 }): Promise<void> {
   await tenantTx().execute(sql`
     UPDATE production_orders SET
@@ -503,6 +533,10 @@ export async function patchProductionOrder(input: {
       std_unit_cost = CASE WHEN ${input.stdUnitCost === undefined} THEN std_unit_cost
                            ELSE ${input.stdUnitCost ?? null} END,
       yield_variance = COALESCE(${input.yieldVariance ?? null}, yield_variance),
+      sales_order_line_id = CASE WHEN ${input.salesOrderLineId === undefined} THEN sales_order_line_id
+                                 ELSE ${input.salesOrderLineId ?? null} END,
+      mrp_suggestion_id = CASE WHEN ${input.mrpSuggestionId === undefined} THEN mrp_suggestion_id
+                               ELSE ${input.mrpSuggestionId ?? null} END,
       version = version + 1, updated_at = now()
     WHERE id = ${input.id}
   `);

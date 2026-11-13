@@ -6,6 +6,7 @@ import { SelfApprovalBlockedError } from "../../accounting/domain/accounting-err
 import { NumberingService } from "../../accounting/application/numbering-service";
 import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
 import * as store from "../infrastructure/purchasing.store";
+import * as collab from "../infrastructure/collaboration.store";
 import {
   EmptyDocumentError,
   OrderLineInvalidError,
@@ -499,5 +500,42 @@ export class PurchaseOrderService {
       after: { reason },
     });
     return this.find(id);
+  }
+
+  /**
+   * PHASE-043 (0076, acceptance criterion 3): stamp the bidirectional
+   * MRP-conversion link on a PO the manufacturing suggestion-conversion
+   * created through the normal 038 path. Purchasing stays the one writer
+   * of purchase_orders rows — the manufacturing module calls THIS method,
+   * never the store.
+   */
+  async linkMrpSuggestion(purchaseOrderId: string, mrpSuggestionId: string): Promise<void> {
+    await store.stampPurchaseOrderMrpLink({ purchaseOrderId, mrpSuggestionId });
+  }
+
+  /**
+   * PHASE-043 (P-04/T-05): the deterministic approved-supplier pick for a
+   * PURCHASE conversion — the item's APPROVED sourcing rows, the pick is
+   * the earliest non-expiring (expires_at NULLS LAST), then the most
+   * recently approved, then the supplier id (a total order — the same
+   * input always converts to the same supplier). Undefined when the item
+   * has no approved sourcing (the caller decides: BLOCK gate rejection or
+   * the price-list fallback).
+   */
+  async findApprovedSupplierForItem(itemId: string): Promise<string | undefined> {
+    const rows = await collab.listApprovedSupplierItems({ itemId, limit: 50 });
+    const approved = rows
+      .filter((row) => row.status === "APPROVED")
+      .filter((row) => row.expiresAt === null || row.expiresAt >= new Date().toISOString().slice(0, 10))
+      .sort((a, b) => {
+        const aExp = a.expiresAt ?? "9999-12-31";
+        const bExp = b.expiresAt ?? "9999-12-31";
+        if (aExp !== bExp) return aExp < bExp ? -1 : 1;
+        const aAt = a.approvedAt ?? "";
+        const bAt = b.approvedAt ?? "";
+        if (aAt !== bAt) return aAt > bAt ? -1 : 1;
+        return a.supplierId < b.supplierId ? -1 : 1;
+      });
+    return approved[0]?.supplierId;
   }
 }

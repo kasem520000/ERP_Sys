@@ -636,6 +636,21 @@ export async function findTransferById(id: string): Promise<TransferRow | undefi
   return (rows.rows as unknown as TransferRow[])[0];
 }
 
+/** PHASE-043 (0079): stamp the bidirectional MRP-conversion link on a
+ * transfer the manufacturing suggestion-conversion created (the
+ * manufacturing module calls TransferService.linkMrpSuggestion — never a
+ * cross-module write). */
+export async function stampTransferMrpLink(input: {
+  transferId: string;
+  mrpSuggestionId: string;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE stock_transfers SET mrp_suggestion_id = ${input.mrpSuggestionId},
+                              version = version + 1, updated_at = now()
+    WHERE id = ${input.transferId}
+  `);
+}
+
 export interface TransferLineRow {
   id: string;
   lineNo: number;

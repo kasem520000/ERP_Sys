@@ -598,3 +598,168 @@ export class StandardRevaluationZeroError extends DomainError {
     );
   }
 }
+
+// -- PHASE-043 — MRP & Planning (the planning slice) --------------------------------
+//
+// The planning family (MRP runs, suggestions, MPS, BOR, ATP, tolling) is
+// planning data — no run or suggestion posts a journal (the budgeting
+// precedent; JOURNAL_RULES §7 note). Only the conversion legs reach real
+// documents (PO/MO/transfer through their owning services) and only the
+// tolling legs + the co/by-product completion post (G-48/G-47).
+
+/** Unknown or foreign MRP run id (A7: no existence disclosure). */
+export class MrpRunNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("MRP_RUN_NOT_FOUND", `MRP run ${id} does not exist in this tenant`);
+  }
+}
+/** Unknown or foreign MRP suggestion id (A7). */
+export class MrpSuggestionNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("MRP_SUGGESTION_NOT_FOUND", `MRP suggestion ${id} does not exist in this tenant`);
+  }
+}
+/** A suggestion lifecycle violation: accept/dismiss on a non-SUGGESTED row
+ * (ACCEPTED/DISMISSED/SUPERSEDED are terminal — BR-079). */
+export class MrpSuggestionStateError extends DomainError {
+  constructor(id: string, status: string, action: string) {
+    super("MRP_SUGGESTION_STATE_INVALID", `suggestion ${id} is ${status} — ${action} is only legal on SUGGESTED rows`, {
+      suggestionId: id,
+      status,
+      action,
+    });
+  }
+}
+/** A run-parameter violation (bad horizon, bucket, scope, or dates). */
+export class MrpRunInputInvalidError extends DomainError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super("MRP_RUN_INPUT_INVALID", message, details);
+  }
+}
+/** Dismissal requires a reason of 1..300 chars (BR-079). */
+export class MrpDismissReasonRequiredError extends DomainError {
+  constructor() {
+    super("MRP_DISMISS_REASON_REQUIRED", "dismissing a suggestion requires a reason of 1..300 characters");
+  }
+}
+/** The idempotent conversion failed: the suggestion already carries its
+ * document (INV-030 — the retry must return the ORIGINAL, so this fires
+ * only when the stored link cannot be honored, e.g. the document vanished). */
+export class MrpConversionConflictError extends DomainError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super("MRP_CONVERSION_CONFLICT", message, details);
+  }
+}
+/** A conversion prerequisite failed (no approved supplier for a PURCHASE
+ * conversion under the BLOCK gate; a missing from-warehouse for a
+ * TRANSFER). */
+export class MrpConversionPrerequisiteError extends DomainError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super("MRP_CONVERSION_PREREQUISITE", message, details);
+  }
+}
+/** MPS entry input violations (bad bucket/qty/status, a malformed slot). */
+export class MpsEntryInvalidError extends DomainError {
+  constructor(message: string) {
+    super("MPS_ENTRY_INVALID", message);
+  }
+}
+/** Unknown or foreign MPS entry id (A7). */
+export class MpsEntryNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("MPS_ENTRY_NOT_FOUND", `MPS entry ${id} does not exist in this tenant`);
+  }
+}
+/** Editing an MPS entry inside the item's frozen fence without the
+ * manufacturing.mps.frozen_edit permission — BR-078's typed rejection
+ * (with the permission, a reason is still required). */
+export class MpsFrozenFenceEditError extends DomainError {
+  constructor(itemId: string, bucketStart: string, frozenDays: number) {
+    super(
+      "MPS_FROZEN_FENCE_EDIT",
+      `bucket ${bucketStart} of item ${itemId} sits inside the frozen fence (${frozenDays} days) — the mps.frozen_edit permission is required`,
+      { itemId, bucketStart, frozenDays },
+    );
+  }
+}
+/** A frozen-fence edit carried no reason (the permission was held, but the
+ * reason discipline is unconditional inside the fence — BR-078). */
+export class MpsFrozenReasonRequiredError extends DomainError {
+  constructor() {
+    super("MPS_FROZEN_REASON_REQUIRED", "edits inside the frozen fence require a reason of 1..300 characters");
+  }
+}
+/** BOM activation with co/by-product outputs whose joint allocation does
+ * not sum to exactly 100 (main + Σ outputs) — acceptance criterion 8's
+ * typed rejection (G-47). */
+export class BomAllocationInvalidError extends DomainError {
+  constructor(bomId: string, mainPct: string, outputsTotal: string, grandTotal: string) {
+    super(
+      "BOM_ALLOCATION_INVALID",
+      `BOM ${bomId}: main ${mainPct}% + outputs ${outputsTotal}% = ${grandTotal}% — the joint allocation must sum to exactly 100%`,
+      { bomId, mainPct, outputsTotal, grandTotal },
+    );
+  }
+}
+/** A substitution row violation (bad priority, a dangling substitute, a
+ * duplicate, self-substitution). */
+export class BomSubstitutionInvalidError extends DomainError {
+  constructor(message: string) {
+    super("BOM_SUBSTITUTION_INVALID", message);
+  }
+}
+/** A co/by-product output row violation (bad kind/percentage/qty/uom, a
+ * duplicate output item, an output equal to the main item). */
+export class BomOutputInvalidError extends DomainError {
+  constructor(message: string) {
+    super("BOM_OUTPUT_INVALID", message);
+  }
+}
+/** A bill-of-resources row violation (bad kind/factor/line, a dangling
+ * work center or item, both-or-neither resource refs). */
+export class BorInvalidError extends DomainError {
+  constructor(message: string) {
+    super("BOR_INVALID", message);
+  }
+}
+/** ATP/CTP input violations (a non-positive qty, a malformed date). */
+export class AtpInputInvalidError extends DomainError {
+  constructor(message: string) {
+    super("ATP_INPUT_INVALID", message);
+  }
+}
+/** Unknown or foreign tolling order id (A7). */
+export class TollingOrderNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("TOLLING_ORDER_NOT_FOUND", `contract manufacturing order ${id} does not exist in this tenant`);
+  }
+}
+/** A tolling lifecycle violation (issue on ISSUED, return on DRAFT, settle
+ * with an unbalanced ledger — the Σ issue = Σ return + Σ yield invariant,
+ * acceptance criterion 7 / G-48). */
+export class TollingStateError extends DomainError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super("TOLLING_STATE_INVALID", message, details);
+  }
+}
+/** A tolling input violation (bad qty/fee/dates, an empty material list). */
+export class TollingInputInvalidError extends DomainError {
+  constructor(message: string) {
+    super("TOLLING_INPUT_INVALID", message);
+  }
+}
+/** The MTO link shape violation (a link to a line of another item, a link
+ * on a non-DRAFT order — M-22). */
+export class MtoLinkInvalidError extends DomainError {
+  constructor(message: string) {
+    super("MTO_LINK_INVALID", message);
+  }
+}
+/** The reservation policy engine's typed rejection (a policy that cannot
+ * be honored: an unknown strategy, a non-positive target, an
+ * over-reservation against available bins — I-14). */
+export class ReservationPolicyError extends DomainError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super("RESERVATION_POLICY_INVALID", message, details);
+  }
+}

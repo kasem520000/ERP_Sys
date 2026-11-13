@@ -408,6 +408,11 @@ export interface SalesOrderLineRow {
   netAmount: string;
   taxAmount: string;
   reservationId: string | null;
+  /** PHASE-043 (0076, M-06/S-10): the ATP stamps — the user's promise
+   * date, the engine's verdict (OK | SHORT), and its CTP suggestion. */
+  promisedDate: string | null;
+  atpStatus: string | null;
+  atpSuggestedDate: string | null;
 }
 
 export async function listSalesOrderLines(orderId: string): Promise<SalesOrderLineRow[]> {
@@ -415,7 +420,9 @@ export async function listSalesOrderLines(orderId: string): Promise<SalesOrderLi
     SELECT id, line_no AS "lineNo", item_id AS "itemId", description, description_ar AS "descriptionAr",
            qty::text AS qty, unit_price::text AS "unitPrice", discount_amount::text AS "discountAmount",
            tax_code_id AS "taxCodeId", net_amount::text AS "netAmount", tax_amount::text AS "taxAmount",
-           reservation_id AS "reservationId"
+           reservation_id AS "reservationId",
+           promised_date::text AS "promisedDate", atp_status AS "atpStatus",
+           atp_suggested_date::text AS "atpSuggestedDate"
     FROM sales_order_lines WHERE order_id = ${orderId} ORDER BY line_no
   `);
   return rows.rows as unknown as SalesOrderLineRow[];
@@ -452,6 +459,25 @@ export async function setOrderLineReservation(lineId: string, reservationId: str
   await tenantTx().execute(sql`
     UPDATE sales_order_lines SET reservation_id = ${reservationId}, updated_at = now()
     WHERE id = ${lineId}
+  `);
+}
+
+/** PHASE-043 (0076, M-06/S-10): stamp the ATP verdict on a sales order
+ * line — the promise-date suggestion + the over-promise warning (the
+ * setOrderLineReservation pattern verbatim). */
+export async function updateOrderLineAtp(input: {
+  lineId: string;
+  promisedDate: string | null;
+  atpStatus: "OK" | "SHORT";
+  atpSuggestedDate: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE sales_order_lines SET
+      promised_date = ${input.promisedDate},
+      atp_status = ${input.atpStatus},
+      atp_suggested_date = ${input.atpSuggestedDate},
+      updated_at = now()
+    WHERE id = ${input.lineId}
   `);
 }
 

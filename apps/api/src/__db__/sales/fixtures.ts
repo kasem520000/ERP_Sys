@@ -16,6 +16,7 @@ import { OpeningBalancesService } from "../../modules/partners/application/openi
 import { WarehouseService } from "../../modules/inventory/application/warehouse-service";
 import { OpeningStockService } from "../../modules/inventory/application/opening-stock-service";
 import { TaxResolverService } from "../../modules/tax/application/tax-resolver-service";
+import { AtpService } from "../../modules/manufacturing/application/atp-service";
 import { TaxCodesService } from "../../modules/tax/application/codes-service";
 import { RegistrationService } from "../../modules/tax/application/registration-service";
 import { AccountService } from "../../modules/treasury/application/account-service";
@@ -56,7 +57,7 @@ const numbering = new NumberingService(audit);
 const resolver = new TaxResolverService();
 
 export const quotations = new QuotationService(audit, numbering);
-export const salesOrders = new SalesOrderService(audit, numbering);
+export const salesOrders = new SalesOrderService(audit, numbering, new AtpService());
 export const deliveries = new DeliveryNoteService(
       audit,
       posting,

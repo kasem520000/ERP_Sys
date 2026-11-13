@@ -40,7 +40,10 @@ export class ReservationService {
     itemId: string;
     warehouseId: string;
     qty: string;
-    holderType: "MANUAL" | "SALES_ORDER";
+    /** PHASE-043 (0076): PRODUCTION_ORDER joins the union — the MTO hard
+     * reservation + the policy engine's production reservations (the DB
+     * widening landed with migration 0076; the TS union follows now). */
+    holderType: "MANUAL" | "SALES_ORDER" | "PRODUCTION_ORDER";
     holderId: string | null;
     expiresAt: string | null;
     note: string | null;

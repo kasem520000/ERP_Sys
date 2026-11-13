@@ -14,6 +14,7 @@ import { ReturnsService } from "./application/rma";
 import { WarrantiesService } from "./application/warranties";
 import { DunningService } from "./application/dunning";
 import { CommunicationModule } from "../communication/communication.module";
+import { ManufacturingModule } from "../manufacturing/manufacturing.module";
 import { SalesReallocationService } from "./application/reallocations";
 import { ArQueriesService } from "./application/ar-queries";
 import { SalesRepService, InvoiceOverdueService } from "./application/reps";
@@ -62,6 +63,10 @@ import { getBoss } from "../../infra/jobs/boss";
     InventoryModule,
     NotificationsModule,
     CommunicationModule,
+    // PHASE-043 (T-08): the ATP service the sales order lines consume
+    // (the promise-date suggestion + the over-promise warning, S-10) —
+    // manufacturing never imports sales, so no cycle.
+    ManufacturingModule,
   ],
   controllers: [
     SalesController,

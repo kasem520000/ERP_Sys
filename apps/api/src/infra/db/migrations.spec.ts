@@ -187,8 +187,11 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // stock_moves source + the CoA markers 1420/2136/5126),
     // 0078_mrp_seeds (the DATA-ONLY seed: FOUR manufacturing keys —
     // 287 → 291, matrix §3.20; the three feature plan grants; the
-    // lot-sizing definitions; the food_manufacturing enablement).
-    expect(files.at(-1)?.tag).toBe("0078_mrp_seeds");
+    // lot-sizing definitions; the food_manufacturing enablement),
+    // 0079_transfer_mrp_link (stock_transfers.mrp_suggestion_id — the
+    // TRANSFER leg of the bidirectional conversion link, acceptance
+    // criterion 3).
+    expect(files.at(-1)?.tag).toBe("0079_transfer_mrp_link");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

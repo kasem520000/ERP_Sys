@@ -433,12 +433,16 @@ export const MIGRATIONS: readonly string[] = [
   // 0078_mrp_seeds — the DATA-ONLY seed (the 0071 pattern): the FOUR
   // permission keys (287 → 291, matrix §3.20), the THREE feature plan
   // grants (business + enterprise — the tier-4 precedent), the lot-sizing
-  // rule definitions, the food_manufacturing manifest enablement.
+  // rule definitions, the food_manufacturing manifest enablement;
+  // 0079_transfer_mrp_link — stock_transfers.mrp_suggestion_id: the
+  // TRANSFER leg of the bidirectional conversion link (acceptance
+  // criterion 3 — the 0076 pair completed for all three document types).
   "0074_item_planning_policies",
   "0075_bom_planning",
   "0076_mrp_engine",
   "0077_contract_manufacturing",
   "0078_mrp_seeds",
+  "0079_transfer_mrp_link",
 ];
 
 /**

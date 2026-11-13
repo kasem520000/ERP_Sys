@@ -186,4 +186,96 @@ export class BomsController {
     const identity = requireIdentity(request);
     return envelope(await this.boms.archive(id, { actorId: identity.userId }));
   }
+
+  // -- PHASE-043 planning satellites (M-09/M-11) ---------------------------------------
+
+  /** Ordered alternative materials per BOM line (M-09). */
+  @Get(":id/substitutions")
+  @RequirePermissions("manufacturing.boms.manage")
+  @RequireFeature("manufacturing.bom")
+  async listSubstitutions(@Param("id") id: string) {
+    return envelope(await this.boms.listSubstitutions(id));
+  }
+
+  /** Full-replace the substitution records (per line, priority order). */
+  @Put(":id/substitutions")
+  @RequirePermissions("manufacturing.boms.manage")
+  @RequireFeature("manufacturing.bom")
+  async replaceSubstitutions(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = z
+      .object({
+        rows: z
+          .array(
+            z.object({
+              bomLineId: UUID,
+              substituteItemId: UUID,
+              priority: z.coerce.number().int().min(1).max(20),
+              note: z.string().min(1).max(500).nullable().optional(),
+            }),
+          )
+          .max(400),
+      })
+      .parse(body ?? { rows: [] });
+    return envelope(
+      await this.boms.replaceSubstitutions(
+        id,
+        input.rows.map((row) => ({
+          bomLineId: row.bomLineId,
+          substituteItemId: row.substituteItemId,
+          priority: row.priority,
+          note: row.note ?? null,
+        })),
+        identity.userId,
+      ),
+    );
+  }
+
+  /** The co/by-product outputs of a BOM (M-11). */
+  @Get(":id/outputs")
+  @RequirePermissions("manufacturing.boms.manage")
+  @RequireFeature("manufacturing.bom")
+  async listOutputs(@Param("id") id: string) {
+    return envelope(await this.boms.listOutputs(id));
+  }
+
+  /** Full-replace the output records (the G-47 allocation discipline —
+   * main + Σ outputs = 100 enforced at activation, and immediately when
+   * replacing on an ACTIVE BOM). */
+  @Put(":id/outputs")
+  @RequirePermissions("manufacturing.boms.manage")
+  @RequireFeature("manufacturing.bom")
+  async replaceOutputs(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = z
+      .object({
+        rows: z
+          .array(
+            z.object({
+              itemId: UUID,
+              outputKind: z.enum(["CO_PRODUCT", "BY_PRODUCT"]),
+              allocationPct: z.string().regex(/^\d+(\.\d{1,4})?$/, "percentage decimal (≤ 4dp)"),
+              qtyPerOutput: z.string().regex(/^\d+(\.\d{1,6})?$/, "decimal quantity (≤ 6dp)"),
+              uomId: UUID,
+              note: z.string().min(1).max(500).nullable().optional(),
+            }),
+          )
+          .max(50),
+      })
+      .parse(body ?? { rows: [] });
+    return envelope(
+      await this.boms.replaceOutputs(
+        id,
+        input.rows.map((row) => ({
+          itemId: row.itemId,
+          outputKind: row.outputKind,
+          allocationPct: row.allocationPct,
+          qtyPerOutput: row.qtyPerOutput,
+          uomId: row.uomId,
+          note: row.note ?? null,
+        })),
+        identity.userId,
+      ),
+    );
+  }
 }

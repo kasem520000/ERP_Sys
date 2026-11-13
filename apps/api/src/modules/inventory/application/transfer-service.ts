@@ -523,6 +523,16 @@ export class TransferService {
       actorId: actorId ?? undefined,
     });
   }
+
+  /**
+   * PHASE-043 (0079, acceptance criterion 3): stamp the bidirectional
+   * MRP-conversion link on a transfer the manufacturing
+   * suggestion-conversion created. Inventory stays the one writer of
+   * stock_transfers rows.
+   */
+  async linkMrpSuggestion(transferId: string, mrpSuggestionId: string): Promise<void> {
+    await store.stampTransferMrpLink({ transferId, mrpSuggestionId });
+  }
 }
 
 function today(): string {

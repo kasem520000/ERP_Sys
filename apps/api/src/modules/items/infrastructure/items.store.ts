@@ -404,6 +404,45 @@ export async function updateItem(
   return (rows as ItemRow[])[0];
 }
 
+/** PHASE-043 (0074): the planning-policy columns — the items module's
+ * planning writer (the PlanningPolicyService surface; the manufacturing
+ * module reads them through its own projection, never writes here). */
+export async function updateItemPlanningPolicy(
+  id: string,
+  patch: {
+    leadTimeDays: number | null;
+    safetyStockPolicy: "MANUAL" | "AUTO";
+    safetyStockQty: string | null;
+    ssServiceLevelPct: string | null;
+    ssLookbackDays: number | null;
+    lotSizingRule: "LOT_FOR_LOT" | "FIXED_ORDER_QTY" | "ORDER_MULTIPLE" | "PERIOD_SUPPLY";
+    fixedOrderQty: string | null;
+    orderMultiple: string | null;
+    periodSupplyBuckets: number | null;
+    frozenFenceDays: number;
+    slushyFenceDays: number;
+  },
+): Promise<void> {
+  const tx = tenantTx();
+  await tx
+    .update(schema.items)
+    .set({
+      leadTimeDays: patch.leadTimeDays,
+      safetyStockPolicy: patch.safetyStockPolicy,
+      safetyStockQty: patch.safetyStockQty,
+      ssServiceLevelPct: patch.ssServiceLevelPct,
+      ssLookbackDays: patch.ssLookbackDays,
+      lotSizingRule: patch.lotSizingRule,
+      fixedOrderQty: patch.fixedOrderQty,
+      orderMultiple: patch.orderMultiple,
+      periodSupplyBuckets: patch.periodSupplyBuckets,
+      frozenFenceDays: patch.frozenFenceDays,
+      slushyFenceDays: patch.slushyFenceDays,
+      updatedAt: sql`now()`,
+    })
+    .where(eq(schema.items.id, id));
+}
+
 export async function archiveItem(id: string): Promise<ItemRow | undefined> {
   const tx = tenantTx();
   const rows = await tx

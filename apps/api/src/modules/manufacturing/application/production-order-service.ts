@@ -25,16 +25,21 @@ import {
 import { requireTenantContext } from "../../../infra/db/tenant-context";
 import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
 import * as store from "../infrastructure/manufacturing.store";
+import * as planningStore from "../infrastructure/planning.store";
 import type { BomRow } from "../infrastructure/manufacturing.store";
 import type { ProductionOrderRow } from "../infrastructure/manufacturing.store";
 import { BomService } from "./bom-service";
 import { OperationExecutionService } from "./operation-execution-service";
+import { ReservationPolicyService } from "./reservation-policy-service";
 import {
+  BomCycleError,
   BomNotFoundError,
   BomRequiredError,
+  BomTooDeepError,
   CompleteWithoutConsumptionError,
   ConsumptionNotPlannedError,
   FgShelfLifeRequiredError,
+  MtoLinkInvalidError,
   OperationsIncompleteError,
   OrderNotCancelableError,
   ProductionCostRoundingError,
@@ -196,6 +201,8 @@ export class ProductionOrderService {
     private readonly resolveConfig: ResolveEffectiveConfigService,
     @Inject(OperationExecutionService)
     private readonly ops: OperationExecutionService,
+    @Inject(ReservationPolicyService)
+    private readonly reservationPolicy: ReservationPolicyService,
   ) {}
 
   // -- reads -------------------------------------------------------------------
@@ -363,30 +370,91 @@ export class ProductionOrderService {
     // The frozen level-1 snapshot (MASTER-PLAN §3): gross = round6(planned ×
     // qtyPerOutput × (1 + scrap/100) ÷ (yield/100)) — the SAME formula as
     // BomService.explode's level 1; deeper levels belong to chained
-    // semi-finished orders, never this order.
+    // semi-finished orders, never this order. PHASE-043 (M-08): a PHANTOM
+    // level-1 line expands into its OWN components here too — execution and
+    // planning must agree (the planner flattened it at explosion time; the
+    // shop floor consumes its components directly, never the phantom).
     const bomLines = await store.listBomLines(bom.id);
     const yieldDivisor = new Decimal(bom.yieldPct).div(100);
     const planned = new Decimal(order.plannedQty);
     const snapshot: store.ProductionOrderLineInsert[] = [];
-    for (const line of bomLines) {
+    const expandLine = async (
+      line: store.BomLineRow,
+      parentQty: Decimal,
+      path: readonly string[],
+    ): Promise<void> => {
+      if (path.length > 16) {
+        throw new BomTooDeepError(16);
+      }
+      if (path.includes(line.componentItemId)) {
+        throw new BomCycleError([...path, line.componentItemId]);
+      }
       const component = await store.findItemForProduction(line.componentItemId);
       if (component === undefined || component.deletedAt !== null) {
         throw new BomNotFoundError(`component ${line.componentItemId} does not exist in this tenant`);
       }
-      const gross = round6(
+      // The phantom chain applies each BOM's yield exactly once (the
+      // parent's yield already scaled parentQty; this line's yield rides
+      // ITS OWN expansion when it is itself a phantom).
+      const lineGross = round6(
+        parentQty
+          .times(new Decimal(line.qtyPerOutput))
+          .times(new Decimal(line.scrapPct).plus(100).div(100)),
+      );
+      if (line.phantomFlag) {
+        // The phantom expands: its OWN ACTIVE BOM's lines take over (the
+        // phantom's yield/scrap already applied to lineGross above).
+        const phantomBom = await store.findActiveBom(line.componentItemId);
+        if (phantomBom === undefined) {
+          throw new BomRequiredError(line.componentItemId);
+        }
+        const phantomYield = new Decimal(phantomBom.yieldPct).div(100);
+        const phantomQty = round6(lineGross.div(phantomYield));
+        for (const phantomLine of await store.listBomLines(phantomBom.id)) {
+          await expandLine(phantomLine, phantomQty, [...path, line.componentItemId]);
+        }
+        return;
+      }
+      snapshot.push({
+        componentItemId: line.componentItemId,
+        uomId: component.baseUomId,
+        plannedQty: lineGross.toFixed(6),
+        scrapPct: line.scrapPct,
+        note: line.note,
+        noteAr: line.noteAr,
+      });
+    };
+    for (const line of bomLines) {
+      const lineGross = round6(
         planned
           .times(new Decimal(line.qtyPerOutput))
           .times(new Decimal(line.scrapPct).plus(100).div(100))
           .div(yieldDivisor),
       );
-      snapshot.push({
-        componentItemId: line.componentItemId,
-        uomId: component.baseUomId,
-        plannedQty: gross.toFixed(6),
-        scrapPct: line.scrapPct,
-        note: line.note,
-        noteAr: line.noteAr,
-      });
+      if (line.phantomFlag) {
+        const phantomBom = await store.findActiveBom(line.componentItemId);
+        if (phantomBom === undefined) {
+          throw new BomRequiredError(line.componentItemId);
+        }
+        const phantomYield = new Decimal(phantomBom.yieldPct).div(100);
+        const phantomQty = round6(lineGross.div(phantomYield));
+        for (const phantomLine of await store.listBomLines(phantomBom.id)) {
+          await expandLine(phantomLine, phantomQty, [line.componentItemId]);
+        }
+      } else {
+        const component = await store.findItemForProduction(line.componentItemId);
+        if (component === undefined || component.deletedAt !== null) {
+          throw new BomNotFoundError(`component ${line.componentItemId} does not exist in this tenant`);
+        }
+        snapshot.push({
+          componentItemId: line.componentItemId,
+          uomId: component.baseUomId,
+          plannedQty: lineGross.toFixed(6),
+          scrapPct: line.scrapPct,
+          note: line.note,
+          noteAr: line.noteAr,
+        });
+      }
     }
     await store.insertProductionOrderLines(id, snapshot);
 
@@ -841,11 +909,91 @@ export class ProductionOrderService {
       }
     }
 
+    // PHASE-043 (T-11, M-11 — G-47): the co/by-product joint allocation.
+    // When the bound BOM carries outputs, the actual WIP cost (fgValue)
+    // allocates across the MAIN product and every output per the BOM
+    // percentages — outputs at their exact 4dp share (item-id order),
+    // the MAIN taking the residue so Σ allocated = fgValue EXACTLY (the
+    // activation gate guaranteed main + Σ outputs = 100). Output-only
+    // completion stays byte-identical when no outputs exist.
+    const boundBom = order.bomId !== null ? await store.findBomById(order.bomId) : undefined;
+    const bomOutputs =
+      boundBom !== undefined && boundBom.status === "ACTIVE" ? await planningStore.listBomOutputs(boundBom.id) : [];
+    type OutputLeg = {
+      itemId: string;
+      qty: string;
+      unitCost: string;
+      value: string;
+      batchNo: string | null;
+      expiry: string | null;
+    };
+    let mainValue = fgValue;
+    const outputLegs: OutputLeg[] = [];
+    if (bomOutputs.length > 0) {
+      const fgTotal = new Decimal(fgValue);
+      let outputsTotal = new Decimal(0);
+      for (const output of bomOutputs) {
+        const outputValue = round4(fgTotal.times(new Decimal(output.allocationPct)).div(100));
+        const outputQty = round6(new Decimal(output.qtyPerOutput).times(new Decimal(actualQty)));
+        if (outputQty.lessThanOrEqualTo(0) || outputValue.lessThanOrEqualTo(0)) {
+          throw new ProductionOrderInputInvalidError(
+            `output ${output.itemId} of BOM ${boundBom!.id} computes qty ${outputQty.toFixed(6)} / value ${outputValue.toFixed(4)} — a co/by-product leg must be positive`,
+          );
+        }
+        const outputUnitCost = round6(outputValue.div(outputQty));
+        if (!round4(outputUnitCost.times(outputQty)).equals(outputValue)) {
+          throw new ProductionCostRoundingError({
+            fgValue: outputValue.toFixed(4),
+            unitCost: outputUnitCost.toFixed(6),
+            qty: outputQty.toFixed(6),
+          });
+        }
+        const outputItem = await store.findItemForProduction(output.itemId);
+        if (outputItem === undefined || outputItem.deletedAt !== null) {
+          throw new ProductionOrderNotFoundError(`output item ${output.itemId} does not exist in this tenant`);
+        }
+        let outputExpiry: string | null = null;
+        if (policies.expiryFromShelfLife && outputItem.hasExpiry) {
+          if (outputItem.shelfLifeDays === null) {
+            throw new FgShelfLifeRequiredError(output.itemId, completedAt);
+          }
+          outputExpiry = addDaysIso(completedAt, outputItem.shelfLifeDays);
+        }
+        outputLegs.push({
+          itemId: output.itemId,
+          qty: outputQty.toFixed(6),
+          unitCost: outputUnitCost.toFixed(6),
+          value: outputValue.toFixed(4),
+          batchNo: outputItem.trackBatch ? (order.orderNo ?? id) : null,
+          expiry: outputExpiry,
+        });
+        outputsTotal = outputsTotal.plus(outputValue);
+      }
+      mainValue = round4(fgTotal.minus(outputsTotal)).toFixed(4);
+      if (new Decimal(mainValue).lessThanOrEqualTo(0)) {
+        throw new ProductionOrderInputInvalidError(
+          `the joint allocation leaves the main product ${mainValue} — the main share must stay positive (G-47)`,
+          { mainValue, outputsTotal: outputsTotal.toFixed(4), fgValue },
+        );
+      }
+    }
+    const mainUnitCost =
+      bomOutputs.length > 0
+        ? round6(new Decimal(mainValue).div(new Decimal(actualQty))).toFixed(6)
+        : unitCost;
+    if (bomOutputs.length > 0 && !round4(new Decimal(mainUnitCost).times(new Decimal(actualQty))).equals(new Decimal(mainValue))) {
+      throw new ProductionCostRoundingError({
+        fgValue: mainValue,
+        unitCost: mainUnitCost,
+        qty: actualQty,
+      });
+    }
+
     const receiptPlan: ReceiptPlan = await planReceipt({
       itemId: order.itemId,
       warehouseId: order.fgWarehouseId,
       qty: actualQty,
-      unitCost,
+      unitCost: mainUnitCost,
       movedAt: completedAt,
       moveKind: "receipt",
       sourceType: "production_order",
@@ -855,27 +1003,60 @@ export class ProductionOrderService {
       memo: `Production order ${order.orderNo ?? id} — finished goods receipt`,
       memoAr: `أمر إنتاج ${order.orderNo ?? id} — استلام الإنتاج التام`,
     });
+    // The co/by-product receipts (G-47 — every output lands as its own
+    // batch-bearing receipt at its allocated cost).
+    const outputReceiptPlans: ReceiptPlan[] = [];
+    for (const leg of outputLegs) {
+      outputReceiptPlans.push(
+        await planReceipt({
+          itemId: leg.itemId,
+          warehouseId: order.fgWarehouseId,
+          qty: leg.qty,
+          unitCost: leg.unitCost,
+          movedAt: completedAt,
+          moveKind: "receipt",
+          sourceType: "production_order",
+          sourceId: id,
+          batchNo: leg.batchNo,
+          batchExpiry: leg.expiry,
+          memo: `Production order ${order.orderNo ?? id} — co/by-product receipt`,
+          memoAr: `أمر إنتاج ${order.orderNo ?? id} — استلام منتج مصاحب/ثانوي`,
+        }),
+      );
+    }
 
     const lines: JournalLineSpec[] = [
       {
         accountId: await resolveInventoryAccount(order.fgWarehouseId),
         direction: "DEBIT",
-        amount: fgValue,
+        amount: mainValue,
         memo: {
-          en: `Production order ${order.orderNo ?? id} — finished goods at ${unitCost}/unit`,
-          ar: `أمر إنتاج ${order.orderNo ?? id} — إنتاج تام بسعر ${unitCost}/وحدة`,
-        },
-      },
-      {
-        purpose: "WIP",
-        direction: "CREDIT",
-        amount: wipBalance,
-        memo: {
-          en: `Production order ${order.orderNo ?? id} — WIP to finished goods`,
-          ar: `أمر إنتاج ${order.orderNo ?? id} — من تحت التشغيل إلى الإنتاج التام`,
+          en: `Production order ${order.orderNo ?? id} — finished goods at ${mainUnitCost}/unit`,
+          ar: `أمر إنتاج ${order.orderNo ?? id} — إنتاج تام بسعر ${mainUnitCost}/وحدة`,
         },
       },
     ];
+    for (let legIndex = 0; legIndex < outputLegs.length; legIndex += 1) {
+      const leg = outputLegs[legIndex]!;
+      lines.push({
+        accountId: await resolveInventoryAccount(order.fgWarehouseId),
+        direction: "DEBIT",
+        amount: leg.value,
+        memo: {
+          en: `Production order ${order.orderNo ?? id} — co/by-product ${leg.itemId} at ${leg.unitCost}/unit`,
+          ar: `أمر إنتاج ${order.orderNo ?? id} — منتج مصاحب/ثانوي ${leg.itemId} بسعر ${leg.unitCost}/وحدة`,
+        },
+      });
+    }
+    lines.push({
+      purpose: "WIP",
+      direction: "CREDIT",
+      amount: wipBalance,
+      memo: {
+        en: `Production order ${order.orderNo ?? id} — WIP to finished goods`,
+        ar: `أمر إنتاج ${order.orderNo ?? id} — من تحت التشغيل إلى الإنتاج التام`,
+      },
+    });
     if (new Decimal(laborValue).greaterThan(0)) {
       lines.push({
         purpose: "PRODUCTION_LABOR",
@@ -910,13 +1091,38 @@ export class ProductionOrderService {
     };
     const posted = await this.posting.post(spec, { postedBy: input.actorId });
     await applyReceipt(receiptPlan, posted.journalEntryId);
+    for (const outputPlan of outputReceiptPlans) {
+      await applyReceipt(outputPlan, posted.journalEntryId);
+      if (outputPlan.createdBatch !== null) {
+        await this.tracking.linkBatchProduction(outputPlan.createdBatch.id, id);
+      }
+    }
     if (receiptPlan.createdBatch !== null) {
       // Produced-batch provenance (the genealogy edge) + the QC gate hold
       // (QUARANTINED until inspection releases it — T39's surface).
       await this.tracking.linkBatchProduction(receiptPlan.createdBatch.id, id);
-      if (policies.qcGate === "required") {
-        await this.tracking.quarantineBatch(receiptPlan.createdBatch.id);
-      }
+    }
+    // PHASE-043 (T-09, M-22 — G-49): the MTO hard reservation — the
+    // finished goods of a linked sales line are reserved for it the
+    // moment they land (holder PRODUCTION_ORDER, holderId = the MO id);
+    // the delivery consumes the reservation. BEFORE the QC hold so the
+    // policy walk sees the available stock (a gated batch releases later
+    // and the hold is already recorded).
+    let mtoReservationId: string | null = null;
+    if (order.salesOrderLineId !== null) {
+      const reserved = await this.reservationPolicy.reserveForHolder({
+        itemId: order.itemId,
+        warehouseId: order.fgWarehouseId,
+        qty: actualQty,
+        holderType: "PRODUCTION_ORDER",
+        holderId: id,
+        note: `MTO — production order ${order.orderNo ?? id} for sales line ${order.salesOrderLineId}`,
+        actorId: input.actorId,
+      });
+      mtoReservationId = reserved.reservationId;
+    }
+    if (receiptPlan.createdBatch !== null && policies.qcGate === "required") {
+      await this.tracking.quarantineBatch(receiptPlan.createdBatch.id);
     }
 
     await store.patchProductionOrder({
@@ -946,17 +1152,56 @@ export class ProductionOrderService {
         wipCreditValue: wipBalance,
         laborValue,
         overheadValue,
-        unitCost,
+        unitCost: mainUnitCost,
         fgBatchId: receiptPlan.batchId,
         batchNo: receiptPlan.createdBatch?.batchNo ?? null,
         expiry,
         qcGate: policies.qcGate,
         journalEntryId: posted.journalEntryId,
+        coByProducts: outputLegs,
+        mtoReservationId,
         ...(yieldVariance === undefined ? {} : { yieldVariance }),
       },
     });
     order = await this.requireOrder(id);
     return { order, ...(await this.completionSummary(order)) };
+  }
+
+  // -- MTO link (PHASE-043 T-09, M-22 — DRAFT-only binding) -------------------------
+
+  /** Bind a production order to its driving sales order line (the MTO
+   * link — G-49's reservation chain). DRAFT-only (a released order's
+   * demand is frozen); the line's item must equal the order's item. */
+  async linkSalesOrder(
+    id: string,
+    input: { salesOrderLineId: string | null; actorId: string | null },
+  ): Promise<ProductionOrderRow> {
+    const order = await this.requireOrder(id);
+    if (order.status !== "DRAFT") {
+      throw new MtoLinkInvalidError(
+        `production order ${order.orderNo ?? id} is ${order.status} — the MTO link binds on DRAFT orders only`,
+      );
+    }
+    if (input.salesOrderLineId !== null) {
+      const line = await planningStore.findSalesOrderLine(input.salesOrderLineId);
+      if (line === undefined) {
+        throw new MtoLinkInvalidError(`sales order line ${input.salesOrderLineId} does not exist in this tenant`);
+      }
+      if (line.itemId !== order.itemId) {
+        throw new MtoLinkInvalidError(
+          `sales order line ${input.salesOrderLineId} is for item ${line.itemId} — the MTO link requires the order's item ${order.itemId}`,
+        );
+      }
+    }
+    await store.patchProductionOrder({ id, salesOrderLineId: input.salesOrderLineId });
+    await this.audit.record({
+      action: "manufacturing.production_order.mto_linked",
+      entityType: "production_order",
+      entityId: id,
+      actorId: input.actorId ?? undefined,
+      after: { salesOrderLineId: input.salesOrderLineId },
+    });
+    return this.requireOrder(id);
   }
 
   // -- cancel (DRAFT/RELEASED/IN_PROGRESS with ZERO consumptions; reason) -----------

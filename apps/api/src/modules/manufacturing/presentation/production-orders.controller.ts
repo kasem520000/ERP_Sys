@@ -263,6 +263,23 @@ export class ProductionOrdersController {
     );
   }
 
+  /** PHASE-043 (T-09, M-22): the MTO link — bind the order to its driving
+   * sales line (DRAFT-only; the completion reserves the FG for the line —
+   * G-49's chain). */
+  @Post(":id/link-sales-order")
+  @RequirePermissions("manufacturing.production_orders.create")
+  @RequireFeature("manufacturing.production_orders")
+  async linkSalesOrder(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = z.object({ salesOrderLineId: UUID.nullable() }).parse(body ?? {});
+    return envelope(
+      await this.orders.linkSalesOrder(id, {
+        salesOrderLineId: input.salesOrderLineId ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
   @Post(":id/cancel")
   @RequirePermissions("manufacturing.production_orders.approve")
   @RequireFeature("manufacturing.production_orders")

@@ -292,6 +292,20 @@ export async function findPurchaseOrderById(id: string): Promise<PurchaseOrderRo
   return (rows.rows as unknown as PurchaseOrderRow[])[0];
 }
 
+/** PHASE-043 (0076): stamp the bidirectional MRP-conversion link on a
+ * PO created through the normal 038 path (the manufacturing module calls
+ * PurchaseOrderService.linkMrpSuggestion — never a cross-module write). */
+export async function stampPurchaseOrderMrpLink(input: {
+  purchaseOrderId: string;
+  mrpSuggestionId: string;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE purchase_orders SET mrp_suggestion_id = ${input.mrpSuggestionId},
+                              version = version + 1, updated_at = now()
+    WHERE id = ${input.purchaseOrderId}
+  `);
+}
+
 export async function listPurchaseOrders(filter: {
   status?: string;
   supplierId?: string;

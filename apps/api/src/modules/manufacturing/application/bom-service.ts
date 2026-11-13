@@ -3,15 +3,19 @@ import { Decimal, InvalidValueError } from "@erp/domain-core";
 
 import { AuditService } from "../../audit/api/audit";
 import * as store from "../infrastructure/manufacturing.store";
+import * as planningStore from "../infrastructure/planning.store";
 import type { BomRow } from "../infrastructure/manufacturing.store";
 import {
   BomActiveExistsError,
+  BomAllocationInvalidError,
   BomItemNotStockError,
   BomLineInvalidError,
   BomNotFoundError,
   BomNotActiveError,
   BomNotDraftError,
+  BomOutputInvalidError,
   BomSelfReferenceError,
+  BomSubstitutionInvalidError,
   BomTooDeepError,
   BomUomMismatchError,
   BomVersionConflictError,
@@ -77,6 +81,9 @@ export interface BomLineInput {
   qtyPerOutput: string;
   /** ≥ 0, ≤ 4dp. Defaults to 0. */
   scrapPct?: string | null;
+  /** PHASE-043 (M-08): the phantom flag — a phantom never gets its own
+   * supply suggestion; its components are demanded in its place. */
+  phantomFlag?: boolean | null;
   note?: string | null;
   noteAr?: string | null;
 }
@@ -111,6 +118,8 @@ interface ValidatedLine {
   uomId: string;
   qtyPerOutput: string;
   scrapPct: string;
+  /** PHASE-043 (M-08): the phantom flag. */
+  phantomFlag: boolean;
   note: string | null;
   noteAr: string | null;
 }
@@ -274,6 +283,29 @@ export class BomService {
     if (!DATE_RE.test(effectiveFrom)) {
       throw new InvalidValueError(`effectiveFrom must be an ISO date (YYYY-MM-DD): ${effectiveFrom}`);
     }
+    // PHASE-043 (T-11, M-11 — G-47): the joint-allocation gate — when the
+    // version carries co/by-product outputs, main + Σ outputs must equal
+    // EXACTLY 100 (a typed rejection otherwise; acceptance criterion 8).
+    {
+      const outputs = await planningStore.listBomOutputs(id);
+      if (outputs.length > 0) {
+        const outputsTotal = outputs.reduce(
+          (sum, output) => sum.plus(new Decimal(output.allocationPct)),
+          new Decimal(0),
+        );
+        const mainPct = new Decimal(bom.mainAllocationPct);
+        const grandTotal = mainPct.plus(outputsTotal);
+        if (!grandTotal.equals(100)) {
+          throw new BomAllocationInvalidError(
+            id,
+            mainPct.toFixed(4),
+            outputsTotal.toFixed(4),
+            grandTotal.toFixed(4),
+          );
+        }
+      }
+    }
+
     // One-active invariant: archive the previous ACTIVE version first, in
     // this same call/transaction — the partial unique index never trips on
     // our own writes; the 23505 catch below is the concurrent-activate race.
@@ -331,6 +363,172 @@ export class BomService {
     }
     const item = await this.requireBomItem(itemId);
     return this.explodeResolved(item, qty, bomId ?? null);
+  }
+
+  // -- PHASE-043 planning satellites: substitutions + outputs (M-09/M-11) ------------
+
+  /** Ordered alternative materials per BOM line (M-09) — DRAFT and ACTIVE
+   * BOMs alike (the planning overlay law: substitutions are recipe-adjacent
+   * data; the netting reads them at planning time). */
+  async listSubstitutions(id: string): Promise<planningStore.BomSubstitutionRow[]> {
+    await this.find(id);
+    return planningStore.listBomSubstitutions(id);
+  }
+
+  /** Full-replace the substitution records (per line, priority order). */
+  async replaceSubstitutions(
+    id: string,
+    rows: readonly {
+      bomLineId: string;
+      substituteItemId: string;
+      priority: number;
+      note?: string | null;
+    }[],
+    actorId: string | null,
+  ): Promise<planningStore.BomSubstitutionRow[]> {
+    const bom = await this.find(id);
+    if (bom.status === "ARCHIVED") {
+      throw new BomNotActiveError(`bill of materials ${id} is ARCHIVED — its substitution records are frozen`);
+    }
+    const lines = await store.listBomLines(id);
+    const lineById = new Map(lines.map((line) => [line.id, line]));
+    const seenLines = new Set<string>();
+    for (const row of rows) {
+      const line = lineById.get(row.bomLineId);
+      if (line === undefined) {
+        throw new BomSubstitutionInvalidError(`line ${row.bomLineId} does not belong to bill of materials ${id}`);
+      }
+      if (seenLines.has(`${row.bomLineId}:${row.substituteItemId}`)) {
+        throw new BomSubstitutionInvalidError(
+          `duplicate substitution ${row.substituteItemId} for line ${row.bomLineId} — one record per substitute per line`,
+        );
+      }
+      seenLines.add(`${row.bomLineId}:${row.substituteItemId}`);
+      if (row.substituteItemId === line.componentItemId) {
+        throw new BomSubstitutionInvalidError(
+          `line ${row.bomLineId}: an item cannot substitute for itself`,
+        );
+      }
+      const substitute = await store.findItemForBom(row.substituteItemId);
+      if (substitute === undefined || substitute.deletedAt !== null) {
+        throw new BomSubstitutionInvalidError(`substitute ${row.substituteItemId} does not exist in this tenant`);
+      }
+      if (substitute.kind !== "STOCK" || substitute.status !== "ACTIVE") {
+        throw new BomSubstitutionInvalidError(
+          `substitute ${substitute.sku} must be an ACTIVE STOCK item`,
+        );
+      }
+      if (!Number.isInteger(row.priority) || row.priority < 1 || row.priority > 20) {
+        throw new BomSubstitutionInvalidError(`priority must be 1..20 — got ${row.priority}`);
+      }
+    }
+    await planningStore.replaceBomSubstitutions(
+      id,
+      rows.map((row) => ({
+        bomLineId: row.bomLineId,
+        substituteItemId: row.substituteItemId,
+        priority: row.priority,
+        note: row.note ?? null,
+      })),
+    );
+    await this.audit.record({
+      action: "manufacturing.bom.substitutions_replaced",
+      entityType: "bom",
+      entityId: id,
+      actorId: actorId ?? undefined,
+      after: { rows: rows.length, bomStatus: bom.status },
+    });
+    return planningStore.listBomSubstitutions(id);
+  }
+
+  /** The co/by-product outputs of a BOM (M-11). */
+  async listOutputs(id: string): Promise<planningStore.BomOutputRow[]> {
+    await this.find(id);
+    return planningStore.listBomOutputs(id);
+  }
+
+  /** Full-replace the output records — DRAFT and ACTIVE alike; the
+   * ACTIVATION gate (main + Σ outputs = 100) is enforced at activate()
+   * for new versions; replacing outputs on an ACTIVE BOM requires the
+   * same discipline immediately (the running production orders keep
+   * THEIR frozen snapshots — this shapes the NEXT orders). */
+  async replaceOutputs(
+    id: string,
+    rows: readonly {
+      itemId: string;
+      outputKind: "CO_PRODUCT" | "BY_PRODUCT";
+      allocationPct: string;
+      qtyPerOutput: string;
+      uomId: string;
+      note?: string | null;
+    }[],
+    actorId: string | null,
+  ): Promise<planningStore.BomOutputRow[]> {
+    const bom = await this.find(id);
+    if (bom.status === "ARCHIVED") {
+      throw new BomNotActiveError(`bill of materials ${id} is ARCHIVED — its output records are frozen`);
+    }
+    const seen = new Set<string>();
+    for (const row of rows) {
+      if (seen.has(row.itemId)) {
+        throw new BomOutputInvalidError(`output item ${row.itemId} appears twice — one row per output`);
+      }
+      seen.add(row.itemId);
+      if (row.itemId === bom.itemId) {
+        throw new BomOutputInvalidError(`item ${row.itemId} is the BOM's MAIN product — it cannot also be an output`);
+      }
+      const item = await store.findItemForBom(row.itemId);
+      if (item === undefined || item.deletedAt !== null) {
+        throw new BomOutputInvalidError(`output item ${row.itemId} does not exist in this tenant`);
+      }
+      if (item.kind !== "STOCK" || item.status !== "ACTIVE") {
+        throw new BomOutputInvalidError(`output ${item.sku} must be an ACTIVE STOCK item`);
+      }
+      if (row.outputKind !== "CO_PRODUCT" && row.outputKind !== "BY_PRODUCT") {
+        throw new BomOutputInvalidError(`outputKind must be CO_PRODUCT or BY_PRODUCT — got ${row.outputKind}`);
+      }
+      if (!/^\d+(\.\d{1,4})?$/.test(row.allocationPct) || new Decimal(row.allocationPct).lessThanOrEqualTo(0) || new Decimal(row.allocationPct).greaterThanOrEqualTo(100)) {
+        throw new BomOutputInvalidError(`allocationPct must be 0 < pct < 100 (≤ 4dp): ${row.allocationPct}`);
+      }
+      if (!/^\d+(\.\d{1,6})?$/.test(row.qtyPerOutput) || new Decimal(row.qtyPerOutput).lessThanOrEqualTo(0)) {
+        throw new BomOutputInvalidError(`qtyPerOutput must be a positive decimal (≤ 6dp): ${row.qtyPerOutput}`);
+      }
+      if (row.uomId !== item.baseUomId) {
+        throw new BomOutputInvalidError(`output ${item.sku}: uomId must equal the item's base uom (no conversion seam)`);
+      }
+    }
+    // The G-47 discipline applies IMMEDIATELY when the BOM is ACTIVE.
+    if (bom.status === "ACTIVE" && rows.length > 0) {
+      const outputsTotal = rows.reduce((sum, row) => sum.plus(new Decimal(row.allocationPct)), new Decimal(0));
+      const grandTotal = new Decimal(bom.mainAllocationPct).plus(outputsTotal);
+      if (!grandTotal.equals(100)) {
+        throw new BomAllocationInvalidError(
+          id,
+          new Decimal(bom.mainAllocationPct).toFixed(4),
+          outputsTotal.toFixed(4),
+          grandTotal.toFixed(4),
+        );
+      }
+    }
+    await planningStore.replaceBomOutputs(
+      id,
+      rows.map((row) => ({
+        itemId: row.itemId,
+        outputKind: row.outputKind,
+        allocationPct: new Decimal(row.allocationPct).toFixed(4),
+        qtyPerOutput: new Decimal(row.qtyPerOutput).toFixed(6),
+        uomId: row.uomId,
+        note: row.note ?? null,
+      })),
+    );
+    await this.audit.record({
+      action: "manufacturing.bom.outputs_replaced",
+      entityType: "bom",
+      entityId: id,
+      actorId: actorId ?? undefined,
+      after: { rows: rows.length, bomStatus: bom.status },
+    });
+    return planningStore.listBomOutputs(id);
   }
 
   // -- validation helpers (shared by create + the DRAFT full-replace) --------------
@@ -402,6 +600,7 @@ export class BomService {
         uomId: component.baseUomId,
         qtyPerOutput: new Decimal(line.qtyPerOutput).toFixed(6),
         scrapPct: new Decimal(scrapRaw).toFixed(4),
+        phantomFlag: line.phantomFlag === true,
         note: line.note ?? null,
         noteAr: line.noteAr ?? null,
       });
@@ -491,23 +690,28 @@ export class BomService {
           .div(yieldDivisor),
       );
       const component = await store.findItemForBom(line.componentItemId);
-      const entry = levels.get(level) ?? [];
-      entry.push({
-        itemId: line.componentItemId,
-        sku: component?.sku ?? line.componentItemId,
-        name: component?.name ?? line.componentItemId,
-        nameAr: component?.nameAr ?? null,
-        qty: gross.toFixed(6),
-        scrapPct: line.scrapPct,
-        yieldPct: bom.yieldPct,
-        viaSemiFinished: level === 1 ? null : parentItemId,
-      });
-      levels.set(level, entry);
-      const total = totals.get(line.componentItemId);
-      if (total === undefined) {
-        totals.set(line.componentItemId, { sku: component?.sku ?? line.componentItemId, qty: gross });
-      } else {
-        total.qty = total.qty.plus(gross);
+      if (!line.phantomFlag) {
+        // A phantom (PHASE-043 M-08) never carries demand of its own — its
+        // OWN components are demanded in its place below (the flattening:
+        // Σ component demand preserved, the phantom's line never counted).
+        const entry = levels.get(level) ?? [];
+        entry.push({
+          itemId: line.componentItemId,
+          sku: component?.sku ?? line.componentItemId,
+          name: component?.name ?? line.componentItemId,
+          nameAr: component?.nameAr ?? null,
+          qty: gross.toFixed(6),
+          scrapPct: line.scrapPct,
+          yieldPct: bom.yieldPct,
+          viaSemiFinished: level === 1 ? null : parentItemId,
+        });
+        levels.set(level, entry);
+        const total = totals.get(line.componentItemId);
+        if (total === undefined) {
+          totals.set(line.componentItemId, { sku: component?.sku ?? line.componentItemId, qty: gross });
+        } else {
+          total.qty = total.qty.plus(gross);
+        }
       }
       const nested = await store.findActiveBom(line.componentItemId);
       if (nested !== undefined) {
