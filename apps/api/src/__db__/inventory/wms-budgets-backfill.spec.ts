@@ -289,11 +289,15 @@ describe("PHASE-044 T-20 — the legacy-stock backfill (acceptance §7)", () => 
     const after = await withTenant(TENANT_I, () => wmsStore.reconcileBins({ warehouseId: wh }));
     expect(after.some((row) => row.itemSku === LEGACY_SKU)).toBe(false);
 
-    // Idempotent: a second run finds no shortfall.
+    // Idempotent: a second run finds no shortfall for THIS item (the
+    // per-SKU filter is corpus-honest — tenant I accumulates other specs'
+    // intentional drift elsewhere, the wms-inv029 precedent).
     const second = await withTenant(TENANT_I, () =>
       wms.backfillDefaultBins({ dryRun: false, actorId: I_ACTOR }),
     );
-    expect(second.items).toBe(0);
-    expect(second.rows).toBe(0);
+    expect(second.report.some((row) => row.itemSku === LEGACY_SKU)).toBe(false);
+    expect(
+      second.report.filter((row) => row.classification === "WRITABLE").length,
+    ).toBe(0);
   });
 });

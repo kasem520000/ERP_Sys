@@ -785,12 +785,31 @@ export async function listBinShortfalls(): Promise<BinBackfillRow[]> {
   return rows.rows as unknown as BinBackfillRow[];
 }
 
-/** Insert one backfill row onto a bin (the uq_bin_contents_slot shape — a
- * single AVAILABLE, tenant-owned, batch-less, LPN-less row per slot). */
+/** The tenant-owned bin fold for ONE (warehouse, item) — the backfill's
+ * post-write verification read (INV-029's left side, scoped). */
+export async function foldTenantBinQty(
+  warehouseId: string,
+  itemId: string,
+): Promise<Decimal> {
+  const rows = await tenantTx().execute<{ q: string }>(sql`
+    SELECT COALESCE(SUM(qty), 0)::text AS q FROM bin_contents
+    WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId}
+      AND owner_partner_id IS NULL
+  `);
+  return new Decimal(rows.rows[0]!.q);
+}
+
+/** Insert one backfill row onto a bin (the uq_bin_contents_slot shape — one
+ * AVAILABLE, tenant-owned, LPN-less row per slot; the batch/serial dims carry
+ * the PROVEN distribution — the post-closure audit fix: a tracked item's row
+ * names its batch/serial so the pick allocation walk can actually spend it,
+ * an untracked item keeps the historical NULL-dimension row). */
 export async function insertBackfillContent(input: {
   binId: string;
   warehouseId: string;
   itemId: string;
+  batchId: string | null;
+  serialId: string | null;
   qty: string;
   note: string;
   createdBy: string | null;
@@ -801,14 +820,143 @@ export async function insertBackfillContent(input: {
       (id, tenant_id, bin_id, warehouse_id, item_id, batch_id, serial_id,
        lpn_id, owner_partner_id, status, qty, uom_id, received_at, note, created_by)
     VALUES (${id}, erp.current_tenant_id(), ${input.binId}, ${input.warehouseId},
-            ${input.itemId}, NULL, NULL, NULL, NULL, 'AVAILABLE', ${input.qty},
-            NULL, now(), ${input.note}, ${input.createdBy})
+            ${input.itemId}, ${input.batchId}, ${input.serialId}, NULL, NULL, 'AVAILABLE',
+            ${input.qty}, NULL, now(), ${input.note}, ${input.createdBy})
     ON CONFLICT ("tenant_id", "bin_id", "item_id", "batch_id", "serial_id",
                  "lpn_id", "owner_partner_id", "status")
     DO UPDATE SET qty = bin_contents.qty + EXCLUDED.qty, updated_at = now()
     RETURNING id
   `);
   return id;
+}
+
+/**
+ * PHASE-044 post-closure audit fix — the backfill's serialization guard:
+ * a transaction-local advisory lock so two concurrent backfill UoWs on the
+ * same tenant can never compute the same shortfall twice and double-write
+ * (the second run waits, re-reads the fold, and finds nothing to do). The
+ * lock is keyed on the constant backfill name + the ambient tenant.
+ */
+export async function lockBackfill(): Promise<void> {
+  await tenantTx().execute(sql`
+    SELECT pg_advisory_xact_lock(hashtext('erp:wms-bins-backfill:' || erp.current_tenant_id()::text))
+  `);
+}
+
+/** The tracking flags of a shortfall item (the backfill's classification
+ * input — read from the items table, the same source the movement core's
+ * requireStockItem folds). */
+export async function findItemTracking(
+  itemId: string,
+): Promise<{ trackBatch: boolean; trackSerial: boolean } | undefined> {
+  const rows = await tenantTx().execute<{ track_batch: boolean; track_serial: boolean }>(sql`
+    SELECT track_batch, track_serial FROM items
+    WHERE id = ${itemId} AND tenant_id = erp.current_tenant_id() LIMIT 1
+  `);
+  const row = rows.rows[0];
+  return row === undefined
+    ? undefined
+    : { trackBatch: row.track_batch, trackSerial: row.track_serial };
+}
+
+/** The per-batch distribution evidence for a batch-tracked shortfall (the
+ * post-closure audit fix): stock_moves is the append-only LEDGER truth —
+ * the same fold `batchOnHand`/`listFefoBatches` read — scoped to THIS
+ * warehouse, netted against the tenant-owned bin rows already sitting on
+ * each batch. Only the service reconciles these rows against the
+ * (warehouse, item) total BEFORE anything is written. */
+export interface BatchDistributionRow {
+  batchId: string;
+  batchNo: string;
+  batchStatus: string;
+  ledgerQty: string;
+  binQty: string;
+  /** max(ledger − bins, 0) — the PROVEN per-batch shortfall candidate. */
+  shortfall: string;
+}
+
+export async function listBatchDistribution(
+  warehouseId: string,
+  itemId: string,
+): Promise<BatchDistributionRow[]> {
+  const rows = await tenantTx().execute(sql`
+    WITH ledger AS (
+      SELECT batch_id, SUM(CASE WHEN direction = 'IN' THEN qty ELSE -qty END) AS ledger_qty
+      FROM stock_moves
+      WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId} AND batch_id IS NOT NULL
+      GROUP BY batch_id
+    ), bins AS (
+      SELECT batch_id, SUM(qty) AS bin_qty
+      FROM bin_contents
+      WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId}
+        AND batch_id IS NOT NULL AND owner_partner_id IS NULL
+      GROUP BY batch_id
+    )
+    SELECT l.batch_id AS "batchId", b.batch_no AS "batchNo", b.status AS "batchStatus",
+           l.ledger_qty::text AS "ledgerQty", COALESCE(s.bin_qty, 0)::text AS "binQty",
+           GREATEST(l.ledger_qty - COALESCE(s.bin_qty, 0), 0)::text AS "shortfall"
+    FROM ledger l
+    JOIN item_batches b ON b.id = l.batch_id AND b.tenant_id = erp.current_tenant_id()
+    LEFT JOIN bins s ON s.batch_id = l.batch_id
+    ORDER BY b.expiry_date NULLS LAST, b.created_at
+  `);
+  return rows.rows as unknown as BatchDistributionRow[];
+}
+
+/** The per-serial distribution evidence for a serialized shortfall: the
+ * serial's net position PER warehouse from the stock_moves ledger (qty is
+ * 1 per serialized move), the registry status (item_serials has NO
+ * warehouse column — the ledger is the only warehouse attribution source;
+ * the registry is the lifecycle truth), and whether a tenant-owned bin row
+ * already places the serial anywhere. The service classifies: provable /
+ * ambiguous / conflicting — never inventing a placement. */
+export interface SerialDistributionRow {
+  serialId: string;
+  serialNo: string;
+  /** item_serials.status: in_stock / sold / returned. */
+  registryStatus: string;
+  /** Net ledger position at THIS warehouse (serialized moves are qty 1). */
+  netAtWarehouse: string;
+  /** Net ledger position across ALL warehouses (1 = provably in stock
+   * somewhere; > 1 = duplicated ledger legs — ambiguous). */
+  netTotal: string;
+  /** A tenant-owned bin_contents row already carries this serial. */
+  alreadyBinned: boolean;
+}
+
+export async function listSerialDistribution(
+  warehouseId: string,
+  itemId: string,
+): Promise<SerialDistributionRow[]> {
+  const rows = await tenantTx().execute(sql`
+    WITH moves AS (
+      SELECT serial_id, warehouse_id,
+             SUM(CASE WHEN direction = 'IN' THEN 1 ELSE -1 END) AS net
+      FROM stock_moves
+      WHERE item_id = ${itemId} AND serial_id IS NOT NULL
+      GROUP BY serial_id, warehouse_id
+    ), at_wh AS (
+      SELECT serial_id, SUM(net) AS net_at_wh FROM moves
+      WHERE warehouse_id = ${warehouseId} GROUP BY serial_id
+    ), totals AS (
+      SELECT serial_id, SUM(net) AS net_total FROM moves GROUP BY serial_id
+    ), binned AS (
+      SELECT serial_id FROM bin_contents
+      WHERE item_id = ${itemId} AND serial_id IS NOT NULL AND owner_partner_id IS NULL
+      GROUP BY serial_id
+    )
+    SELECT s.id AS "serialId", s.serial_no AS "serialNo", s.status AS "registryStatus",
+           COALESCE(a.net_at_wh, 0)::text AS "netAtWarehouse",
+           COALESCE(t.net_total, 0)::text AS "netTotal",
+           (b.serial_id IS NOT NULL) AS "alreadyBinned"
+    FROM item_serials s
+    LEFT JOIN at_wh a ON a.serial_id = s.id
+    LEFT JOIN totals t ON t.serial_id = s.id
+    LEFT JOIN binned b ON b.serial_id = s.id
+    WHERE s.item_id = ${itemId} AND s.tenant_id = erp.current_tenant_id()
+    ORDER BY s.serial_no
+  `);
+  return rows.rows as unknown as SerialDistributionRow[];
 }
 
 /** Available-to-promise at bin level: AVAILABLE, tenant-owned rows only. */

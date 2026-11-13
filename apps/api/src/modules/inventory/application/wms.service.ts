@@ -4,7 +4,7 @@ import { Decimal } from "@erp/domain-core";
 import { AuditService } from "../../audit/api/audit";
 import { InboxService } from "../../notifications/application/inbox-service";
 import { listActiveTenantIds } from "../../../infra/jobs/system-tenants";
-import { withTenant } from "../../../infra/db/tenant-context";
+import { requireTenantContext, withTenant } from "../../../infra/db/tenant-context";
 import * as wms from "../infrastructure/wms-store";
 import {
   AisleNotFoundError,
@@ -634,6 +634,160 @@ export class WmsService {
     return { tenants: tenantIds.length, mismatchedTenants, mismatches };
   }
 
+  /** The per-(warehouse, item) classification of one shortfall row: what
+   * the evidence PROVES, what may be written, and what stays unwritten
+   * with a named reason (the post-closure audit fix — never a blind
+   * NULL-dimension row on a tracked item, never an invented balance). */
+  private async classifyShortfall(
+    row: wms.BinBackfillRow,
+  ): Promise<BackfillPlanRow> {
+    const base = {
+      warehouseId: row.warehouseId,
+      warehouseCode: row.warehouseCode,
+      itemId: row.itemId,
+      itemSku: row.itemSku,
+      binQty: row.binQty,
+      stockQty: row.stockQty,
+      shortfall: row.shortfall,
+    };
+    const tracking = await wms.findItemTracking(row.itemId);
+    if (tracking === undefined) {
+      return {
+        ...base,
+        tracking: "NONE" as const,
+        classification: "NON_RECONCILABLE" as const,
+        writes: [],
+        residueQty: row.shortfall,
+        notes: ["item row not found — nothing written"],
+      };
+    }
+    const total = new Decimal(row.shortfall);
+    if (!tracking.trackBatch && !tracking.trackSerial) {
+      return {
+        ...base,
+        tracking: "NONE" as const,
+        classification: "WRITABLE" as const,
+        writes: [{ batchId: null, serialId: null, batchNo: null, serialNo: null, qty: row.shortfall }],
+        residueQty: "0.000000",
+        notes: [],
+      };
+    }
+    if (tracking.trackSerial) {
+      // Serialized: one provable bin row (qty 1) per serial whose ledger
+      // position is exactly +1 at THIS warehouse, whose registry status is
+      // in_stock, and which no tenant-owned bin row already places.
+      const serials = await wms.listSerialDistribution(row.warehouseId, row.itemId);
+      const provable: { serialId: string; serialNo: string }[] = [];
+      const notes: string[] = [];
+      for (const s of serials) {
+        const netHere = new Decimal(s.netAtWarehouse);
+        const netAll = new Decimal(s.netTotal);
+        if (s.alreadyBinned) continue;
+        if (netAll.greaterThan(1)) {
+          notes.push(
+            `serial ${s.serialNo}: ledger net ${s.netTotal} across warehouses — duplicated legs, placement ambiguous`,
+          );
+          continue;
+        }
+        if (netHere.lessThan(1)) continue; // not provably at this warehouse
+        if (s.registryStatus !== "in_stock") {
+          notes.push(
+            `serial ${s.serialNo}: ledger says in stock but registry status is ${s.registryStatus} — conflicting sources`,
+          );
+          continue;
+        }
+        provable.push({ serialId: s.serialId, serialNo: s.serialNo });
+      }
+      if (provable.length > Number(total)) {
+        return {
+          ...base,
+          tracking: "SERIAL" as const,
+          classification: "NON_RECONCILABLE" as const,
+          writes: [],
+          residueQty: row.shortfall,
+          notes: [
+            `ledger proves ${provable.length} in-stock serial(s) at this warehouse but item_stock shortfall is only ${row.shortfall} — the sources disagree, nothing written`,
+            ...notes.slice(0, 5),
+          ],
+        };
+      }
+      const residue = total.minus(provable.length);
+      return {
+        ...base,
+        tracking: "SERIAL" as const,
+        classification: residue.isZero() ? ("WRITABLE" as const) : ("PARTIAL_UNATTRIBUTED" as const),
+        writes: provable.map((s) => ({
+          batchId: null,
+          serialId: s.serialId,
+          batchNo: null,
+          serialNo: s.serialNo,
+          qty: "1.000000",
+        })),
+        residueQty: residue.toFixed(6),
+        notes:
+          residue.isZero()
+            ? notes.slice(0, 5)
+            : [
+                `${residue.toFixed(6)} unit(s) of item_stock have no provable in-stock serial at this warehouse — left unwritten: no more spendable than before the backfill (BR-018 requires named units), stays visible to the nightly probe until corrected through a documented adjustment`,
+                ...notes.slice(0, 5),
+              ],
+      };
+    }
+    // Batch-tracked: one row per batch whose warehouse ledger balance
+    // exceeds its tenant bin qty (ACTIVE batches only — a WRITTEN_OFF batch
+    // with a positive balance is itself an anomaly, never a pickable row).
+    const batches = await wms.listBatchDistribution(row.warehouseId, row.itemId);
+    const notes: string[] = [];
+    const writes: BackfillWrite[] = [];
+    let proven = new Decimal(0);
+    for (const b of batches) {
+      const shortfall = new Decimal(b.shortfall);
+      if (shortfall.lte(0)) continue;
+      if (b.batchStatus !== "ACTIVE") {
+        notes.push(
+          `batch ${b.batchNo}: ledger balance ${b.ledgerQty} but status ${b.batchStatus} — not pickable, left unwritten`,
+        );
+        continue;
+      }
+      writes.push({
+        batchId: b.batchId,
+        serialId: null,
+        batchNo: b.batchNo,
+        serialNo: null,
+        qty: shortfall.toFixed(6),
+      });
+      proven = proven.plus(shortfall);
+    }
+    if (proven.greaterThan(total)) {
+      return {
+        ...base,
+        tracking: "BATCH" as const,
+        classification: "NON_RECONCILABLE" as const,
+        writes: [],
+        residueQty: row.shortfall,
+        notes: [
+          `per-batch ledger shortfalls sum to ${proven.toFixed(6)} but the item_stock shortfall is only ${row.shortfall} — the sources disagree, nothing written`,
+          ...notes.slice(0, 5),
+        ],
+      };
+    }
+    const residue = total.minus(proven);
+    return {
+      ...base,
+      tracking: "BATCH" as const,
+      classification: residue.isZero() ? ("WRITABLE" as const) : ("PARTIAL_UNATTRIBUTED" as const),
+      writes,
+      residueQty: residue.toFixed(6),
+      notes:
+        residue.isZero()
+          ? notes.slice(0, 5)
+          : [
+              `${residue.toFixed(6)} unit(s) of item_stock carry no batch on the ledger (pre-tracking legacy moves) — left unwritten: no more spendable than before the backfill (the FEFO law only issues batch-attributed stock), stays visible to the nightly probe until corrected through a documented adjustment`,
+              ...notes.slice(0, 5),
+            ],
+    };
+  }
+
   /**
    * PHASE-044 T-20 — the legacy-stock backfill (§7's mitigation): stock
    * that predates the bin substrate (item_stock rows with no matching
@@ -642,65 +796,225 @@ export class WmsService {
    * shortfalls without writing; a SURPLUS (bins > stock) is genuine drift
    * this job never touches (the detector owns it). Audited; idempotent
    * (a second run finds no shortfall).
+   *
+   * POST-CLOSURE AUDIT FIX (2026-11-13): tracked items (batch/serial) are
+   * DISTRIBUTED from the proven sources of truth — the stock_moves ledger
+   * per (batch, warehouse) and per serial, reconciled against the
+   * (warehouse, item) total BEFORE any write. Unprovable residue
+   * (PARTIAL_UNATTRIBUTED) and source disagreements (NON_RECONCILABLE) are
+   * NEVER written: the residue stays visible to the nightly probe, it is
+   * never MORE spendable than before the backfill (the tracking laws —
+   * FEFO/BR-017, named units/BR-018 — were already the spend gate), and
+   * the live pass files ONE critical owner notification when anything
+   * stays unresolved. The whole tenant pass is serialized by a
+   * transaction-local advisory lock (concurrent runs converge — the loser
+   * re-reads an already-healed fold).
    */
   async backfillDefaultBins(input: {
     dryRun: boolean;
     actorId: string | null;
-  }): Promise<{
-    dryRun: boolean;
-    warehouses: number;
-    items: number;
-    rows: number;
-    report: { warehouseCode: string | null; itemSku: string | null; binQty: string; stockQty: string; shortfall: string }[];
-  }> {
+  }): Promise<BackfillResult> {
+    // Serialize concurrent backfills on this tenant (the lock releases at
+    // UoW end — a racing run waits here, then sees the healed fold below).
+    await wms.lockBackfill();
     const shortfalls = await wms.listBinShortfalls();
-    if (input.dryRun || shortfalls.length === 0) {
+    const plan: BackfillPlanRow[] = [];
+    for (const row of shortfalls) {
+      plan.push(await this.classifyShortfall(row));
+    }
+    if (input.dryRun || plan.length === 0) {
       return {
         dryRun: input.dryRun,
-        warehouses: new Set(shortfalls.map((row) => row.warehouseId)).size,
-        items: shortfalls.length,
+        warehouses: new Set(plan.map((row) => row.warehouseId)).size,
+        items: plan.length,
         rows: 0,
-        report: shortfalls.map((row) => ({
+        written: 0,
+        resolvedItems: 0,
+        partialItems: plan.filter((row) => row.classification === "PARTIAL_UNATTRIBUTED").length,
+        nonReconcilableItems: plan.filter((row) => row.classification === "NON_RECONCILABLE").length,
+        report: plan.map((row) => ({
           warehouseCode: row.warehouseCode,
           itemSku: row.itemSku,
           binQty: row.binQty,
           stockQty: row.stockQty,
           shortfall: row.shortfall,
+          tracking: row.tracking,
+          classification: row.classification,
+          plannedWrites: input.dryRun
+            ? row.writes.map((w) => ({ batchNo: w.batchNo, serialNo: w.serialNo, qty: w.qty }))
+            : [],
+          residueQty: row.residueQty,
+          notes: row.notes,
         })),
       };
     }
     const binByWarehouse = new Map<string, string>();
     let written = 0;
-    for (const row of shortfalls) {
+    for (const row of plan) {
+      if (row.writes.length === 0) continue;
       let binId = binByWarehouse.get(row.warehouseId);
       if (binId === undefined) {
         const bin = await wms.ensureDefaultBin(row.warehouseId);
         binId = bin.id;
         binByWarehouse.set(row.warehouseId, binId);
       }
-      await wms.insertBackfillContent({
-        binId,
-        warehouseId: row.warehouseId,
-        itemId: row.itemId,
-        qty: row.shortfall,
-        note: "INV-029 legacy-stock backfill (PHASE-044 T-20)",
-        createdBy: input.actorId,
-      });
-      written += 1;
+      for (const w of row.writes) {
+        await wms.insertBackfillContent({
+          binId,
+          warehouseId: row.warehouseId,
+          itemId: row.itemId,
+          batchId: w.batchId,
+          serialId: w.serialId,
+          qty: w.qty,
+          note:
+            "INV-029 legacy-stock backfill (PHASE-044 T-20" +
+            (w.serialId !== null || w.batchId !== null ? ", tracked distribution" : "") +
+            ")",
+          createdBy: input.actorId,
+        });
+        written += 1;
+      }
+      // Post-write verification (the audit fix's guard): the fold for a
+      // written item must land EXACTLY on stock − residue — a violation
+      // throws and rolls the whole tenant UoW back (never a partial write
+      // that hides the shortfall).
+      const fold = await wms.foldTenantBinQty(row.warehouseId, row.itemId);
+      const expected = new Decimal(row.stockQty).minus(new Decimal(row.residueQty));
+      if (!fold.equals(expected)) {
+        throw new BinContentStateError(
+          `backfill verification failed for item ${row.itemSku ?? row.itemId} at warehouse ${row.warehouseCode ?? row.warehouseId}: Σ bins ${fold.toFixed(6)} ≠ stock − residue ${expected.toFixed(6)} — rolled back`,
+        );
+      }
     }
+    const partial = plan.filter((row) => row.classification === "PARTIAL_UNATTRIBUTED");
+    const nonReconcilable = plan.filter((row) => row.classification === "NON_RECONCILABLE");
     await this.audit.record({
       action: "inventory.wms_bins_backfilled",
       entityType: "bin_contents",
-      entityId: binByWarehouse.values().next().value ?? "default-bins",
+      // A writeless pass (only unprovable residue) anchors on the tenant —
+      // the reconcile-mismatch precedent (entity_id is a NOT NULL uuid).
+      entityId: binByWarehouse.values().next().value ?? requireTenantContext().tenantId,
       actorId: input.actorId ?? undefined,
-      after: { rows: written, warehouses: binByWarehouse.size },
+      after: {
+        rows: written,
+        warehouses: binByWarehouse.size,
+        partialItems: partial.length,
+        nonReconcilableItems: nonReconcilable.length,
+      },
     });
+    // The CLEAR ALERT the audit demands: one critical owner notification
+    // whenever anything stayed unresolved (partial residue or source
+    // disagreement) — the drift is never silently absorbed.
+    if (partial.length + nonReconcilable.length > 0) {
+      const target = await this.inbox.ownerTarget();
+      if (target !== null) {
+        const prefs = await this.inbox.prefsFor(target.userId, "stock");
+        if (prefs.inApp) {
+          const named = [...partial, ...nonReconcilable]
+            .slice(0, 5)
+            .map(
+              (row) =>
+                `${row.itemSku ?? row.itemId} @ ${row.warehouseCode ?? row.warehouseId}: ${row.classification} (${row.residueQty} unproven)`,
+            )
+            .join("؛ ");
+          await this.inbox.record({
+            category: "stock",
+            severity: "critical",
+            title: {
+              ar: `ترحيل الصناديق ترك ${partial.length + nonReconcilable.length} حالة غير محسومة`,
+              en: `Bin backfill left ${partial.length + nonReconcilable.length} case(s) unresolved`,
+            },
+            body: {
+              ar:
+                `تعذّر إثبات توزيع جزء من الرصيد على دفعات/أرقام تسلسلية في ${partial.length} حالة، وتعارضت المصادر في ${nonReconcilable.length} حالة (INV-029)` +
+                (named === "" ? "" : `: ${named}`) +
+                ". لم تُكتب أرصدة غير مثبتة — راجع تقرير الترحيل الجاف.",
+              en:
+                `${partial.length} case(s) had unprovable batch/serial distribution and ${nonReconcilable.length} had disagreeing sources (INV-029)` +
+                (named === "" ? "" : `: ${named}`) +
+                ". No unproven balance was written — review the dry-run backfill report.",
+            },
+            actionLabel: { ar: "فتح شاشة المواقع", en: "Open the locations screen" },
+            actionUrl: "/inventory/locations",
+            dedupeKey: `stock.bins_backfill_unresolved:${new Date().toISOString().slice(0, 13)}`,
+            userId: target.userId,
+          });
+        }
+      }
+    }
     return {
       dryRun: false,
       warehouses: binByWarehouse.size,
-      items: shortfalls.length,
+      items: plan.length,
       rows: written,
-      report: [],
+      written,
+      resolvedItems: plan.filter((row) => row.classification === "WRITABLE").length,
+      partialItems: partial.length,
+      nonReconcilableItems: nonReconcilable.length,
+      report: plan.map((row) => ({
+        warehouseCode: row.warehouseCode,
+        itemSku: row.itemSku,
+        binQty: row.binQty,
+        stockQty: row.stockQty,
+        shortfall: row.shortfall,
+        tracking: row.tracking,
+        classification: row.classification,
+        plannedWrites: [],
+        residueQty: row.residueQty,
+        notes: row.notes,
+      })),
     };
   }
+}
+
+/** One proven write of the backfill plan (a tracked row names its batch or
+ * serial; an untracked row keeps the historical NULL dimensions). */
+interface BackfillWrite {
+  batchId: string | null;
+  serialId: string | null;
+  batchNo: string | null;
+  serialNo: string | null;
+  qty: string;
+}
+
+/** The classification outcome for one (warehouse, item) shortfall. */
+interface BackfillPlanRow {
+  warehouseId: string;
+  warehouseCode: string | null;
+  itemId: string;
+  itemSku: string | null;
+  binQty: string;
+  stockQty: string;
+  shortfall: string;
+  tracking: "NONE" | "BATCH" | "SERIAL";
+  classification: "WRITABLE" | "PARTIAL_UNATTRIBUTED" | "NON_RECONCILABLE";
+  writes: BackfillWrite[];
+  residueQty: string;
+  notes: string[];
+}
+
+/** The backfill's public result (dry-run and live): the per-item report
+ * carries the classification, the proven writes, the unproven residue, and
+ * the honest notes — the operator runbook's review surface. */
+export interface BackfillResult {
+  dryRun: boolean;
+  warehouses: number;
+  items: number;
+  rows: number;
+  written: number;
+  resolvedItems: number;
+  partialItems: number;
+  nonReconcilableItems: number;
+  report: {
+    warehouseCode: string | null;
+    itemSku: string | null;
+    binQty: string;
+    stockQty: string;
+    shortfall: string;
+    tracking: "NONE" | "BATCH" | "SERIAL";
+    classification: "WRITABLE" | "PARTIAL_UNATTRIBUTED" | "NON_RECONCILABLE";
+    plannedWrites: { batchNo: string | null; serialNo: string | null; qty: string }[];
+    residueQty: string;
+    notes: string[];
+  }[];
 }
