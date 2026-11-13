@@ -1,8 +1,56 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-10 (PHASE-038 — Procurement Sourcing & Supplier Collaboration delivered)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-13 (PHASE-044 post-closure audit fixes, wave 3)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 3** (the owner's
+  review of the second wave at head `a8db23e` — two named points, both
+  reproduced pre-fix, fixed, and re-proven; evidence:
+  [the wave-3 gate-evidence ledger](../operations/gate-evidence/2026-11-13-post044-audit-fixes-wave3.md)):
+  (1) THE CHECKER'S SAME-UNIT CLAIM/NOTE SPLIT — the 043/045/046
+  posting-canon paragraphs are ONE logical unit holding BOTH an old-plan
+  reference note (`… — the original plan's G-44…G-46/INV-028/BR-061…063
+  predate …): `) and the phase's NEW claims (`goldens G-47 (…), G-48 (…)
+  added to JOURNAL_RULES §7`); the note's reference-only marker demoted the
+  ENTIRE unit, so the owner's mutation (the claim sentence's G-47 → the
+  implemented G-44) passed with 0 errors. The classifier now works per
+  CLAUSE (split at paren-depth 0 and outside code spans on `; : . ·` and
+  SPACED dashes — an unspaced dash or a dot run `..`/`...` is id-range
+  syntax, never a separator), a marker-less clause inherits the unit
+  verdict, and inside a claim clause an id within ±45 chars of a proximity
+  reference marker stays a reference (`… as the extension of the G-29
+  family`). Self-tests 9/9b/9c/9d replay the REAL 043/045/046 paragraphs —
+  the clean text claims its reserved ids with the note staying references,
+  and each mutated claim (G-47/G-50/G-52 → G-44) is REJECTED as a stale
+  claim while the same G-44 in the old-plan note remains a legitimate
+  reference; the same proof ran file-level on the real docs (each mutation
+  → exactly one stale-claim at its file:line). Corpus: 43 → 115 claim ids /
+  2,527 → 2,455 references, every changed block audited (the 043–051
+  posting paragraphs + the completed-phase as-implemented claims + 055's
+  hidden INV-040 claim; the audit also caught and fixed a dot-split defect
+  on PHASE-039's `G-35..G-37`); (2) THE BATCH-BALANCE CONFLICT HIDING —
+  `listBatchDistribution` clamps a batch's negative ledger-vs-bins
+  difference to zero and the classification loop skipped the clamped rows
+  silently: the owner's case (batch A ledger 5 / bins 8, batch B ledger 2 /
+  bins 0, item_stock 10) wrote 2 for B, classified WRITABLE (Σ bins 10 ==
+  item_stock), and the nightly probe went GREEN — batch A's per-batch
+  disagreement vanished from the only recurring detector (reproduced
+  pre-fix: `expected 'WRITABLE' to be 'NON_RECONCILABLE'` + the vanished
+  probe row). A batch whose bins EXCEED its ledger is now a NAMED per-batch
+  conflict (never a silent clamp-skip), and the totals-matching guard
+  (batch and serial paths alike) makes such a position NON_RECONCILABLE:
+  NOTHING is written, the FULL shortfall stays visible to the probe, and
+  the notes name every conflict with the refusal explained — while a
+  position whose residue > 0 keeps its proven writes legitimate
+  (PARTIAL_UNATTRIBUTED, the TBF-S-0004 precedent) and the healthy WRITABLE
+  path is untouched. `wms-backfill-conflicts.spec` (7 tests): the owner's
+  case, discovery-after-migration (the probe + the audit row), the stable
+  re-run, concurrent passes (both refuse), PARTIAL-with-conflict, the
+  serialized analogue, and the healthy control — 7/7 on the fix, 6 failed
+  pre-fix exactly as predicted; the sibling WMS corpus 46/46. Runbook §1/§3
+  updated (the trust boundary + the NON_RECONCILABLE totals-matching
+  shape).
 
 - 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 2** (the owner's
   review of the five-commit wave at head `6f44ee4`; no phase re-execution, no
