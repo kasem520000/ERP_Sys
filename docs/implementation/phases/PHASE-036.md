@@ -1,6 +1,6 @@
 # PHASE-036 — Extensibility Core — Custom Fields
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 1 / Stage 12 · **Register:** [CR-06](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE — DELIVERED 2026-11-10 (the [completion report](reports/PHASE-036-COMPLETION.md) carries the evidence) · **Wave:** 1 / Stage 12 · **Register:** [CR-06](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §25.2 (FD-18/FD-19/FD-20) · §29.2 (DF-39) · UX-12 · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §5/§6.3
 
 ## 1. Phase Overview

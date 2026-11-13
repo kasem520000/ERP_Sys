@@ -162,7 +162,7 @@ payroll goldens — the 029 regression packs must stay green throughout.
 | T-11 | Build `/payroll/eosb` (calculations, true-up, reconciliation view) + payroll run screen extension (statutory lines per employee) | web |
 | T-12 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-13 | Implement the 2 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-14 | Golden suites G-52/G-53/G-54 with failure packs + the 029 regression packs re-run (G-29/G-30/G-31 stay green); INV-032 suite (rate × base ≤ cap, totals equality, true-up delta exactness); BR-084…073 guards | api |
+| T-14 | Golden suites G-52/G-53/G-54 with failure packs + the 029 regression packs re-run (G-29/G-30/G-31 stay green); INV-032 suite (rate × base ≤ cap, totals equality, true-up delta exactness); BR-084…086 guards | api |
 | T-15 | Docs: JOURNAL_RULES §7 rows, ACCOUNTING_INVARIANTS INV-032, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, statutory verification register, entitlements note | docs |
 | T-16 | Run full local gates + OA-06 EXPLAIN budgets (bracket resolution, EOSB calculation queries); record evidence | all |
 

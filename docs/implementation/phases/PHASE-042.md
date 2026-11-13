@@ -182,7 +182,7 @@ complete — only PHASE-036 does.
 | T-12 | Production order detail: Operations tab (progress, actual times, variance view) + create-rework action | web |
 | T-13 | NAV_ITEMS + ⌘K registration, permissions seeding, feature-flag grants, i18n keys | web |
 | T-14 | Implement the 4 report contracts (`defineReport`) + tests + `REPORT_CATALOG.md` rows | api |
-| T-15 | Golden suites G-40/G-41/G-42 with mandatory failure packs; INV-028 suite; BR-068…060 rules + guards | api |
+| T-15 | Golden suites G-40/G-41/G-42 with mandatory failure packs; INV-028 suite; BR-068…071 rules + guards | api |
 | T-16 | Docs: JOURNAL_RULES §7 rows, ACCOUNTING_INVARIANTS INV-028, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries | docs |
 | T-17 | Run full local gates (typecheck/lint/boundaries/tests/docs/i18n parity/permissions drift/manifests) + OA-06 EXPLAIN budgets for `production_order_operations` and `downtime_records` hot paths; record evidence | all |
 

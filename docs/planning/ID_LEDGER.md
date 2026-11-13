@@ -27,28 +27,37 @@ slots after the implemented inventory, with NO gaps and NO overlaps inside a
 family. A phase may take FEWER slots than reserved (scope cut at
 implementation); it may never take another phase's slot.
 
+*(2026-11-13, wave 2 errata: the descriptive names in this table were
+re-verified against the actual phase-doc titles — 046 HR Payroll, 047 HR
+Growth, 048 Projects & Contracting, 049 CMMS, 053 Accounting Depth &
+Treasury, 054 Tax & Corporate Compliance, 057 BI & Analytics, 058 Enterprise
+Identity & Governance, 059 Platform Operations & Trust, 060 Sales & CRM
+Depth, 061 POS & Retail Depth, 062 UX Excellence & Document Design, 063 Gulf
+& Arabic Differentiators. The reservations themselves are UNCHANGED — name
+corrections never move a slot.)*
+
 | Phase | Goldens | Invariants | Business rules | Was (the stale plan) |
 |---|---|---|---|---|
 | PHASE-043 (MRP) | G-47…G-49 | INV-030 | BR-078…BR-080 | G-44…G-46 · INV-028 · BR-061…063 (all consumed by 039–044) |
 | PHASE-045 (HR Core) | G-50…G-51 | INV-031 | BR-081…BR-083 | G-51…G-52 · INV-030 · BR-068…070 (consumed by 039–042) |
-| PHASE-046 (Statutory) | G-52…G-54 | INV-032 | BR-084…BR-086 | G-53…G-55 · INV-031 · BR-071…073 (consumed by 039–042/044) |
-| PHASE-047 (Workforce) | — | — | BR-087…BR-090 | BR-057…060 (consumed by 036/037) |
-| PHASE-048 (Talent) | G-55…G-58 | INV-033 | BR-091…BR-095 | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040) |
-| PHASE-049 (QP) | G-59…G-61 | INV-034 | BR-096…BR-099 | G-60…G-62 · INV-033 · BR-066…069 (consumed by 040/042) |
+| PHASE-046 (HR Payroll) | G-52…G-54 | INV-032 | BR-084…BR-086 | G-53…G-55 · INV-031 · BR-071…073 (consumed by 039–042/044) |
+| PHASE-047 (HR Growth) | — | — | BR-087…BR-090 | BR-057…060 (consumed by 036/037) |
+| PHASE-048 (Projects & Contracting) | G-55…G-58 | INV-033 | BR-091…BR-095 | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040) |
+| PHASE-049 (CMMS) | G-59…G-61 | INV-034 | BR-096…BR-099 | G-60…G-62 · INV-033 · BR-066…069 (consumed by 040/042) |
 | PHASE-050 (QMS) | G-62…G-63 | INV-035 | BR-100…BR-103 | G-63…G-64 · INV-034 · BR-070…073 (consumed by 042/044) |
 | PHASE-051 (FTL) | G-64…G-66 | INV-036 | BR-104…BR-107 | G-65…G-67 · INV-035 · BR-074…077 (consumed by 044) |
 | PHASE-052 (Workflow) | G-67 | INV-037 | — | G-68 · INV-036 |
-| PHASE-053 (Analytics) | G-68…G-70 | INV-038 | — | G-69…G-71 · INV-037 |
-| PHASE-054 (ZATCA-2) | G-71…G-72 | INV-039 | — | G-72…G-73 · INV-038 |
+| PHASE-053 (Accounting Depth & Treasury) | G-68…G-70 | INV-038 | — | G-69…G-71 · INV-037 |
+| PHASE-054 (Tax & Corporate Compliance) | G-71…G-72 | INV-039 | — | G-72…G-73 · INV-038 |
 | PHASE-055 (API platform) | — | INV-040 | — | INV-039 |
 | PHASE-056 (Payments) | G-73…G-74 | INV-041 | — | G-74…G-75 · INV-040 |
-| PHASE-057 (Scheduled reports) | — | — | — | none |
-| PHASE-058 (Data lifecycle) | — | INV-042 | — | INV-041 |
-| PHASE-059 (Payouts surface) | — | — | — | none |
-| PHASE-060 (Customer portal) | G-75…G-76 | INV-043 | — | G-76…G-77 · INV-042 |
-| PHASE-061 (Loyalty/gift) | G-77…G-78 | INV-044 | — | G-78…G-79 · INV-043 |
-| PHASE-062 (Label designer) | — | — | — | none |
-| PHASE-063 (Islamic finance) | G-79 | — | — | G-80 |
+| PHASE-057 (BI & Analytics) | — | — | — | none |
+| PHASE-058 (Enterprise Identity & Governance) | — | INV-042 | — | INV-041 |
+| PHASE-059 (Platform Operations & Trust) | — | — | — | none |
+| PHASE-060 (Sales & CRM Depth) | G-75…G-76 | INV-043 | — | G-76…G-77 · INV-042 |
+| PHASE-061 (POS & Retail Depth) | G-77…G-78 | INV-044 | — | G-78…G-79 · INV-043 |
+| PHASE-062 (UX Excellence & Document Design) | — | — | — | none |
+| PHASE-063 (Gulf & Arabic Differentiators) | G-79 | — | — | G-80 |
 | PHASE-064 (AI) | — | INV-045 | — | INV-044 |
 | PHASE-065…068 | — | — | — | none claimed |
 

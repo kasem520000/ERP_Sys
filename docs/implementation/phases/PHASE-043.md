@@ -167,7 +167,7 @@ PHASE-042 prerequisite.
 | T-14 | Build `/manufacturing/mps` bucket grid editor + item-card planning tab | web |
 | T-15 | NAV_ITEMS + ⌘K registration, permissions seeding, feature grants, i18n keys | web |
 | T-16 | Implement the 2 report contracts + tests + `REPORT_CATALOG.md` rows | api |
-| T-17 | Golden suites G-47/G-48/G-49 with failure packs; INV-030 suite (netting, idempotent conversion, cycle termination, allocation exactness); BR-078…063 guards | api |
+| T-17 | Golden suites G-47/G-48/G-49 with failure packs; INV-030 suite (netting, idempotent conversion, cycle termination, allocation exactness); BR-078…080 guards | api |
 | T-18 | Docs: JOURNAL_RULES §7 rows + no-golden-for-runs note, ACCOUNTING_INVARIANTS INV-030, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, module determinism note | docs |
 | T-19 | Run full local gates + OA-06 EXPLAIN budgets (explosion queries, suggestion board queries); record evidence | all |
 

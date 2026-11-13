@@ -1,6 +1,6 @@
 # PHASE-035 — Activation & Truth Restoration
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 1 / Stage 12 · **Register:** [CR-05](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE — DELIVERED 2026-11-10 (the [completion report](reports/PHASE-035-COMPLETION.md) carries the evidence, incl. the 2026-11-13 errata re-pinning the isolation baseline to 1,086) · **Wave:** 1 / Stage 12 · **Register:** [CR-05](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/PROJECT_EVALUATION_2026-11-10.md](../../planning/gap-analysis/PROJECT_EVALUATION_2026-11-10.md) §5.2/§9 · [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) H-17/H-18
 
 ## 1. Phase Overview
