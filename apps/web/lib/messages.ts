@@ -1629,6 +1629,41 @@ export function localizedManufacturingError(
       return d.mfgErrStdMissing;
     case "STANDARD_REVALUATION_ZERO":
       return d.mfgErrStdRevaluationZero;
+    // -- PHASE-043 (T-13/T-14): MRP, MPS, BOR/ATP/tolling/reservations -----
+    case "MRP_RUN_INPUT_INVALID":
+      return d.mfgErrMrpRunInput;
+    case "MRP_SUGGESTION_STATE_INVALID":
+      return d.mfgErrMrpState;
+    case "MRP_DISMISS_REASON_REQUIRED":
+      return d.mfgErrMrpDismissReason;
+    case "MRP_CONVERSION_CONFLICT":
+      return d.mfgErrMrpConversionConflict;
+    case "MRP_CONVERSION_PREREQUISITE":
+      return d.mfgErrMrpPrerequisite;
+    case "MPS_ENTRY_INVALID":
+      return d.mfgErrMpsInvalid;
+    case "MPS_FROZEN_FENCE_EDIT":
+      return d.mfgErrMpsFrozenFence;
+    case "MPS_FROZEN_REASON_REQUIRED":
+      return d.mfgErrMpsFrozenReason;
+    case "BOM_ALLOCATION_INVALID":
+      return d.mfgErrBomAllocation;
+    case "BOM_SUBSTITUTION_INVALID":
+      return d.mfgErrBomSubstitution;
+    case "BOM_OUTPUT_INVALID":
+      return d.mfgErrBomOutput;
+    case "BOR_INVALID":
+      return d.mfgErrBor;
+    case "ATP_INPUT_INVALID":
+      return d.mfgErrAtp;
+    case "TOLLING_STATE_INVALID":
+      return d.mfgErrTollingState;
+    case "TOLLING_INPUT_INVALID":
+      return d.mfgErrTollingInput;
+    case "MTO_LINK_INVALID":
+      return d.mfgErrMtoLink;
+    case "RESERVATION_POLICY_INVALID":
+      return d.mfgErrReservationPolicy;
     case "PERIOD_LOCKED":
     case "POSTING_NOT_CONFIGURED":
     case "POSTING_REJECTED":

@@ -3913,6 +3913,135 @@ export interface GenealogyBatchSummary {
   inspectionsCount: number;
 }
 
+// -- PHASE-043 (T-13/T-14): MRP, MPS & planning policies wire rows ------------------
+
+/** GET /manufacturing/mrp/runs → rows (mrp_runs; the params/stats jsonb ride verbatim). */
+export interface MrpRunRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  status: "RUNNING" | "COMPLETED" | "FAILED" | string;
+  runMode: "REGENERATIVE" | "NET_CHANGE" | string;
+  bucketSize: "DAY" | "WEEK" | string;
+  horizonBuckets: number;
+  warehouseId: string;
+  asOfDate: string;
+  scopeItemIds: string[];
+  params: Record<string, unknown>;
+  /** { items, suggestions, byType } as written by the engine, or null pre-completion. */
+  stats: Record<string, unknown> | null;
+  errorCode: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  createdBy: string | null;
+}
+
+/** One netting suggestion (mrp_suggestions; the jsonb netting drill-down rides verbatim). */
+export interface MrpSuggestionRow {
+  id: string;
+  runId: string;
+  itemId: string;
+  warehouseId: string;
+  /** TRANSFER suggestions only — the surplus source warehouse. */
+  fromWarehouseId: string | null;
+  suggestionType: "PURCHASE_ORDER" | "PRODUCTION_ORDER" | "TRANSFER" | string;
+  /** Canonical decimal string (numeric 19,6 — ADR-0009). */
+  qty: string;
+  uomId: string | null;
+  dueDate: string;
+  releaseDate: string;
+  frozenFence: boolean;
+  status: "SUGGESTED" | "ACCEPTED" | "DISMISSED" | "SUPERSEDED" | string;
+  substitutedItemId: string | null;
+  bomId: string | null;
+  netting: Record<string, unknown>;
+  dismissedReason: string | null;
+  convertedDocType: string | null;
+  convertedDocId: string | null;
+  acceptedAt: string | null;
+  acceptedBy: string | null;
+  dismissedAt: string | null;
+  dismissedBy: string | null;
+  supersededAt: string | null;
+  supersededByRunId: string | null;
+  createdAt: string;
+}
+
+/** POST /manufacturing/mrp/runs result — the completed run + its fresh suggestions. */
+export interface MrpRunResult {
+  run: MrpRunRow;
+  suggestions: readonly MrpSuggestionRow[];
+}
+
+/** GET /manufacturing/mrp/runs/:id → the run with its evidence lines + suggestions. */
+export interface MrpRunDetail {
+  run: MrpRunRow;
+  demandLines: Record<string, unknown>[];
+  supplyLines: Record<string, unknown>[];
+  suggestions: readonly MrpSuggestionRow[];
+}
+
+/** One MPS entry (mps_entries — the (warehouse, item, bucket) slot upsert row). */
+export interface MpsEntryRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  warehouseId: string;
+  itemId: string;
+  bucketStart: string;
+  /** Canonical decimal string (numeric 19,6 — ADR-0009). */
+  qty: string;
+  uomId: string;
+  status: "PLANNED" | "FIRMED" | string;
+  lastEditReason: string | null;
+  note: string | null;
+  noteAr: string | null;
+}
+
+/** GET /manufacturing/mps/readiness → the scope size + lead-time gaps. */
+export interface MpsReadinessResult {
+  itemsWithoutLeadTime: string[];
+  scopeSize: number;
+}
+
+/** GET /manufacturing/planning/policies/:itemId → the item's planning policy
+ * (the items-table planning projection — the planning tab's load + save shape). */
+export interface ItemPlanningPolicyRow {
+  id: string;
+  sku: string;
+  name: string;
+  nameAr: string | null;
+  baseUomId: string;
+  kind: string;
+  status: string;
+  trackBatch: boolean;
+  hasExpiry: boolean;
+  shelfLifeDays: number | null;
+  leadTimeDays: number | null;
+  safetyStockPolicy: "MANUAL" | "AUTO" | string;
+  safetyStockQty: string | null;
+  ssServiceLevelPct: string | null;
+  ssLookbackDays: number | null;
+  lotSizingRule: string;
+  fixedOrderQty: string | null;
+  orderMultiple: string | null;
+  periodSupplyBuckets: number | null;
+  frozenFenceDays: number;
+  slushyFenceDays: number;
+}
+
+/** GET /manufacturing/planning/lot-sizing-rules → the seeded read-only catalog. */
+export interface LotSizingRuleRow {
+  code: string;
+  name: string;
+  nameAr: string;
+  description: string;
+  descriptionAr: string;
+  /** The parameter the rule requires (qty/buckets), or null. */
+  paramRequired: string | null;
+}
+
 // -- PHASE-019 (T50): crm + projects wire rows ------------------------------------
 // (mirrors the crm store Row interfaces + the accounting ProjectRow exactly —
 // camelCase, canonical decimal strings, "STATUS" | string unions; ADR-0009)

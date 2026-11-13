@@ -1,10 +1,15 @@
 /**
  * /{locale}/inventory/items/[id] — item detail (generic-detail archetype):
- * the edit form (PATCH + version), the barcodes section, attachments and the
- * archive action. 404 → notFound; 401 → login; reference-list 403s degrade.
+ * the General tab (the edit form (PATCH + version), the barcodes section,
+ * attachments and the archive action) + the PHASE-043 Planning tab (the
+ * planning-policy editor — the manufacturing.planning_policies grant; the
+ * tab's own load degrades to its forbidden notice without it). 404 →
+ * notFound; 401 → login; reference-list 403s degrade.
  */
 import { notFound, redirect } from "next/navigation";
 import type { JSX } from "react";
+
+import { Tabs } from "@erp/ui";
 
 import { AppShell } from "../../../../../components/app-shell";
 import { ArchiveAction } from "../../../../../components/archive-action";
@@ -12,6 +17,7 @@ import { AttachmentsSection } from "../../../../../components/attachments-sectio
 import { ErrorState } from "../../../../../components/client-ui";
 import { ItemBarcodes } from "../../../../../components/item-barcodes";
 import { ItemForm } from "../../../../../components/item-form";
+import { ItemPlanning } from "../../../../../components/item-planning";
 import { RetryButton } from "../../../../../components/retry-button";
 import { getDictionary, isLocale, type Locale } from "../../../../../i18n/dictionaries";
 import type {
@@ -85,45 +91,59 @@ export default async function ItemDetailPage({
       pagePath={`inventory/items/${id}`}
       title={localizedName(detail.name, detail.nameAr, localeValue)}
     >
-      <div className="flex flex-col gap-6">
-        <div className="grid items-start gap-6 lg:grid-cols-2">
-          <ItemForm
-            locale={localeValue}
-            mode="edit"
-            item={detail}
-            uoms={uoms.ok ? uoms.data : []}
-            categories={categories.ok ? categories.data : []}
-          />
-          <div className="flex flex-col gap-6">
-            <ItemBarcodes
+      {/* PHASE-043 (T-14): the detail tabs — the existing general surface
+          (edit form + barcodes + archive + attachments) stays verbatim on the
+          general slot; the planning slot carries the planning-policy editor
+          (the manufacturing-orders data-slot pattern). */}
+      <Tabs
+        items={[
+          { value: "general", label: d.itemGeneralTab },
+          { value: "planning", label: d.mfgPlanningTab },
+        ]}
+      >
+        <div data-slot="general" className="flex flex-col gap-6 pt-4">
+          <div className="grid items-start gap-6 lg:grid-cols-2">
+            <ItemForm
               locale={localeValue}
-              itemId={id}
-              defaultUomId={detail.uomId}
+              mode="edit"
+              item={detail}
               uoms={uoms.ok ? uoms.data : []}
-              rows={barcodes.ok ? barcodes.data : []}
+              categories={categories.ok ? categories.data : []}
             />
-            <div className="flex items-center justify-end">
-              <ArchiveAction
+            <div className="flex flex-col gap-6">
+              <ItemBarcodes
                 locale={localeValue}
-                archiveEndpoint={`items/items/${id}/archive`}
-                redirectTo={`/${locale}/inventory/items`}
-                disabled={archived}
-                labels={{
-                  button: d.itemArchiveButton,
-                  confirmTitle: d.itemArchiveConfirmTitle,
-                  confirmBody: d.itemArchiveConfirmBody,
-                  successToast: d.itemArchivedToast,
-                }}
+                itemId={id}
+                defaultUomId={detail.uomId}
+                uoms={uoms.ok ? uoms.data : []}
+                rows={barcodes.ok ? barcodes.data : []}
               />
+              <div className="flex items-center justify-end">
+                <ArchiveAction
+                  locale={localeValue}
+                  archiveEndpoint={`items/items/${id}/archive`}
+                  redirectTo={`/${locale}/inventory/items`}
+                  disabled={archived}
+                  labels={{
+                    button: d.itemArchiveButton,
+                    confirmTitle: d.itemArchiveConfirmTitle,
+                    confirmBody: d.itemArchiveConfirmBody,
+                    successToast: d.itemArchivedToast,
+                  }}
+                />
+              </div>
             </div>
           </div>
+          <AttachmentsSection
+            locale={localeValue}
+            issuePath={`items/items/${id}/attachments`}
+            rows={attachments.ok ? attachments.data : []}
+          />
         </div>
-        <AttachmentsSection
-          locale={localeValue}
-          issuePath={`items/items/${id}/attachments`}
-          rows={attachments.ok ? attachments.data : []}
-        />
-      </div>
+        <div data-slot="planning" className="pt-4">
+          <ItemPlanning locale={localeValue} itemId={id} />
+        </div>
+      </Tabs>
     </AppShell>
   );
 }

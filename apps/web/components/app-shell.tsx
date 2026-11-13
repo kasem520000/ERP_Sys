@@ -173,6 +173,11 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "manufacturing/shopfloor": { group: "manufacturingNavSection", label: "mfgShopfloorTitle" },
   "manufacturing/downtime": { group: "manufacturingNavSection", label: "mfgDowntimeTitle" },
   "manufacturing/standard-costs": { group: "manufacturingNavSection", label: "mfgStdCostsTitle" },
+  // PHASE-043 (T-15): the planning surfaces — the registry rows
+  // manufacturing.mrp / manufacturing.mps (contracts NAV_ITEMS) drive the
+  // sidebar; these fallbacks cover nav-fetch failure (the rule above).
+  "manufacturing/mrp": { group: "manufacturingNavSection", label: "mfgMrpTitle" },
+  "manufacturing/mps": { group: "manufacturingNavSection", label: "mfgMpsTitle" },
   // -- PHASE-021 (T2-b): the Offline Console entry — always visible
   // (DR-P21-06; browser opens the honest ONLINE-ONLY console).
   offline: { group: "offlineNavSection", label: "offlineConsoleTitle" },

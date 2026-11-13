@@ -5804,6 +5804,104 @@ export interface Dictionary {
   mfgErrStdVersionConflict: string;
   mfgErrStdMissing: string;
   mfgErrStdRevaluationZero: string;
+  // -- PHASE-043 (T-13…T-15): MRP, MPS & the item planning tab — the mfg
+  // namespace tail (the run configuration/history, the suggestions board,
+  // the weekly bucket grid editor, the planning-policy form) --------------
+  mfgMrpTitle: string;
+  mfgMrpRunConfig: string;
+  mfgMrpRunHistory: string;
+  mfgMrpSuggestions: string;
+  mfgMrpRun: string;
+  mfgMrpBucketSize: string;
+  mfgMrpBucketDay: string;
+  mfgMrpBucketWeek: string;
+  mfgMrpHorizon: string;
+  mfgMrpMode: string;
+  mfgMrpRegenerative: string;
+  mfgMrpNetChange: string;
+  mfgMrpAllowTransfers: string;
+  mfgMrpScope: string;
+  mfgMrpScopeAll: string;
+  mfgMrpNetChangeHint: string;
+  mfgMrpStatus: string;
+  mfgMrpStatusRunning: string;
+  mfgMrpStatusCompleted: string;
+  mfgMrpStatusFailed: string;
+  mfgMrpAsOf: string;
+  mfgMrpStats: string;
+  mfgMrpStatItems: string;
+  mfgMrpStatSuggestions: string;
+  mfgMrpSuggestType: string;
+  mfgMrpPurchase: string;
+  mfgMrpProduction: string;
+  mfgMrpTransfer: string;
+  mfgMrpDue: string;
+  mfgMrpRelease: string;
+  mfgMrpQty: string;
+  mfgMrpAccept: string;
+  mfgMrpDismiss: string;
+  mfgMrpDismissReason: string;
+  mfgMrpDismissAction: string;
+  mfgMrpSuggested: string;
+  mfgMrpAccepted: string;
+  mfgMrpDismissed: string;
+  mfgMrpSuperseded: string;
+  mfgMrpConverted: string;
+  mfgMrpFrozen: string;
+  mfgMrpRunsEmpty: string;
+  mfgMrpSuggestionsEmpty: string;
+  mfgMrpRunDone: string;
+  mfgMrpAcceptedToast: string;
+  mfgMrpDismissedToast: string;
+  mfgMpsTitle: string;
+  mfgMpsGrid: string;
+  mfgMpsAddItem: string;
+  mfgMpsRemoveItem: string;
+  mfgMpsRowTotal: string;
+  mfgMpsFirm: string;
+  mfgMpsPlanned: string;
+  mfgMpsFirmed: string;
+  mfgMpsSavedToast: string;
+  mfgMpsReadiness: string;
+  mfgMpsScopeItems: string;
+  mfgMpsNoLeadTime: string;
+  mfgMpsEmpty: string;
+  mfgPlanningTab: string;
+  itemGeneralTab: string;
+  mfgPlanLoading: string;
+  mfgPlanLoadFailed: string;
+  mfgPlanLeadTime: string;
+  mfgPlanSafetyPolicy: string;
+  mfgPlanSafetyManual: string;
+  mfgPlanSafetyAuto: string;
+  mfgPlanSafetyQty: string;
+  mfgPlanServiceLevel: string;
+  mfgPlanLookback: string;
+  mfgPlanLotSizing: string;
+  mfgPlanFixedQty: string;
+  mfgPlanOrderMultiple: string;
+  mfgPlanPeriodBuckets: string;
+  mfgPlanFrozenFence: string;
+  mfgPlanSlushyFence: string;
+  mfgPlanSave: string;
+  mfgPlanSaved: string;
+  mfgErrMrpRunInput: string;
+  mfgErrMrpState: string;
+  mfgErrMrpDismissReason: string;
+  mfgErrMrpConversionConflict: string;
+  mfgErrMrpPrerequisite: string;
+  mfgErrMpsFrozenFence: string;
+  mfgErrMpsFrozenReason: string;
+  mfgErrMpsInvalid: string;
+  mfgErrBomAllocation: string;
+  mfgErrBomSubstitution: string;
+  mfgErrBomOutput: string;
+  mfgErrBor: string;
+  mfgErrAtp: string;
+  mfgErrTollingState: string;
+  mfgErrTollingInput: string;
+  mfgErrMtoLink: string;
+  mfgErrReservationPolicy: string;
 
   // -- PHASE-044 (T-14…T-16): WMS — locations, waves, cycle counts, ABC,
   // quarantine, and the PP-11 scan embeds -------------------------------------
@@ -11899,6 +11997,102 @@ const ar: Dictionary = {
   mfgErrStdMissing:
     "التجميع يتطلب تكلفة معيارية نشطة لكل مكوّن في قائمة المواد — أكملها أولاً.",
   mfgErrStdRevaluationZero: "قيمة إعادة التقييم صفر — لا يمكن ترحيل قيد فارغ.",
+  // -- PHASE-043 (T-13…T-15): تخطيط الاحتياجات والجدول الرئيسي -----------
+  mfgMrpTitle: "تخطيط متطلبات المواد (MRP)",
+  mfgMrpRunConfig: "إعدادات التشغيل",
+  mfgMrpRunHistory: "سجل التشغيلات",
+  mfgMrpSuggestions: "لوحة التوصيات",
+  mfgMrpRun: "تشغيل",
+  mfgMrpBucketSize: "حجم الدلو الزمني",
+  mfgMrpBucketDay: "يومي",
+  mfgMrpBucketWeek: "أسبوعي",
+  mfgMrpHorizon: "أفق التخطيط (عدد الدلاء)",
+  mfgMrpMode: "نمط التشغيل",
+  mfgMrpRegenerative: "إعادة توليد شاملة",
+  mfgMrpNetChange: "صافي التغيير",
+  mfgMrpAllowTransfers: "السماح بتوصيات التحويل بين المستودعات",
+  mfgMrpScope: "نطاق الأصناف",
+  mfgMrpScopeAll: "كل الأصناف (النطاق الكامل)",
+  mfgMrpNetChangeHint: "نمط صافي التغيير يشترط اختيار نطاق صريح من الأصناف.",
+  mfgMrpStatus: "الحالة",
+  mfgMrpStatusRunning: "قيد التشغيل",
+  mfgMrpStatusCompleted: "مكتمل",
+  mfgMrpStatusFailed: "فاشل",
+  mfgMrpAsOf: "تاريخ الأساس",
+  mfgMrpStats: "الإحصاءات",
+  mfgMrpStatItems: "أصناف",
+  mfgMrpStatSuggestions: "توصيات",
+  mfgMrpSuggestType: "نوع التوصية",
+  mfgMrpPurchase: "أمر شراء",
+  mfgMrpProduction: "أمر إنتاج",
+  mfgMrpTransfer: "تحويل مخزون",
+  mfgMrpDue: "تاريخ الاستحقاق",
+  mfgMrpRelease: "تاريخ الإصدار",
+  mfgMrpQty: "الكمية",
+  mfgMrpAccept: "قبول",
+  mfgMrpDismiss: "رفض",
+  mfgMrpDismissReason: "سبب الرفض",
+  mfgMrpDismissAction: "رفض التوصية",
+  mfgMrpSuggested: "مقترحة",
+  mfgMrpAccepted: "مقبولة",
+  mfgMrpDismissed: "مرفوضة",
+  mfgMrpSuperseded: "مستبدلة",
+  mfgMrpConverted: "حُوّلت إلى",
+  mfgMrpFrozen: "داخل السياج المتجمد",
+  mfgMrpRunsEmpty: "لا توجد تشغيلات بعد.",
+  mfgMrpSuggestionsEmpty: "لا توجد توصيات في النطاق المحدد.",
+  mfgMrpRunDone: "اكتمل التشغيل — {suggestions} توصية.",
+  mfgMrpAcceptedToast: "قُبلت التوصية وحُوّلت إلى مستند.",
+  mfgMrpDismissedToast: "رُفضت التوصية.",
+  mfgMpsTitle: "الجدول الرئيسي للإنتاج",
+  mfgMpsGrid: "شبكة الدلاء الأسبوعية",
+  mfgMpsAddItem: "إضافة الصنف إلى الشبكة",
+  mfgMpsRemoveItem: "إزالة الصنف",
+  mfgMpsRowTotal: "إجمالي الصنف",
+  mfgMpsFirm: "تثبيت",
+  mfgMpsPlanned: "مخطط",
+  mfgMpsFirmed: "مثبّت",
+  mfgMpsSavedToast: "تم حفظ الخلية.",
+  mfgMpsReadiness: "جاهزية البيانات",
+  mfgMpsScopeItems: "أصناف النطاق",
+  mfgMpsNoLeadTime: "أصناف بلا زمن تزود",
+  mfgMpsEmpty: "الشبكة فارغة — أضف صنفاً لبدء التخطيط.",
+  mfgPlanningTab: "التخطيط",
+  itemGeneralTab: "البيانات العامة",
+  mfgPlanLoading: "جارٍ تحميل سياسة التخطيط…",
+  mfgPlanLoadFailed: "تعذر تحميل سياسة التخطيط.",
+  mfgPlanLeadTime: "زمن التزود (يوم)",
+  mfgPlanSafetyPolicy: "سياسة مخزون الأمان",
+  mfgPlanSafetyManual: "يدوي",
+  mfgPlanSafetyAuto: "تلقائي",
+  mfgPlanSafetyQty: "كمية مخزون الأمان",
+  mfgPlanServiceLevel: "مستوى الخدمة",
+  mfgPlanLookback: "نافذة الاسترجاع (يوم)",
+  mfgPlanLotSizing: "قاعدة تحجيم الدفعة",
+  mfgPlanFixedQty: "كمية الأمر الثابتة",
+  mfgPlanOrderMultiple: "مضاعف الأمر",
+  mfgPlanPeriodBuckets: "دلاء التوريد الدوري",
+  mfgPlanFrozenFence: "السياج المتجمد (يوم)",
+  mfgPlanSlushyFence: "السياج المرن (يوم)",
+  mfgPlanSave: "حفظ سياسة التخطيط",
+  mfgPlanSaved: "تم حفظ سياسة التخطيط.",
+  mfgErrMrpRunInput: "مدخلات التشغيل غير صالحة — راجع الأفق ونطاق الأصناف.",
+  mfgErrMrpState: "حالة التوصية لا تسمح بهذا الإجراء.",
+  mfgErrMrpDismissReason: "رفض التوصية يتطلب سبباً من 1 إلى 300 حرف.",
+  mfgErrMrpConversionConflict: "تعارض في تحويل التوصية — حدّث اللوحة وأعد المحاولة.",
+  mfgErrMrpPrerequisite: "لا يمكن قبول التوصية قبل استيفاء متطلباتها المسبقة.",
+  mfgErrMpsFrozenFence: "الخلية داخل السياج المتجمد — التعديل يتطلب صلاحية تجاوز مخصصة.",
+  mfgErrMpsFrozenReason: "التعديل داخل السياج المتجمد يتطلب سبباً مكتوباً.",
+  mfgErrMpsInvalid: "مدخلات الجدول الرئيسي غير صالحة.",
+  mfgErrBomAllocation: "توزيع قائمة المواد غير صالح.",
+  mfgErrBomSubstitution: "قاعدة الإحلال في قائمة المواد غير صالحة.",
+  mfgErrBomOutput: "مخرج قائمة المواد غير صالح — يجب أن يكون صنفاً مخزنياً.",
+  mfgErrBor: "صف قائمة الموارد غير صالح.",
+  mfgErrAtp: "مدخلات استعلام الالتزام بالتسليم (ATP) غير صالحة.",
+  mfgErrTollingState: "حالة أمر التصنيع بالوكالة لا تسمح بهذا الإجراء.",
+  mfgErrTollingInput: "مدخلات أمر التصنيع بالوكالة غير صالحة.",
+  mfgErrMtoLink: "ربط أمر البيع بصنع عند الطلب غير صالح.",
+  mfgErrReservationPolicy: "سياسة حجز المخزون غير صالحة.",
 
   // PHASE-044: WMS (AR)
   navWmsLocations: "مواقع المستودع",
@@ -17998,6 +18192,102 @@ const en: Dictionary = {
   mfgErrStdMissing:
     "The roll-up needs an active standard for every BOM component — complete those first.",
   mfgErrStdRevaluationZero: "The revaluation value is zero — an empty journal cannot post.",
+  // -- PHASE-043 (T-13…T-15): MRP, MPS & the item planning tab -------------
+  mfgMrpTitle: "MRP planning",
+  mfgMrpRunConfig: "Run configuration",
+  mfgMrpRunHistory: "Run history",
+  mfgMrpSuggestions: "Suggestions board",
+  mfgMrpRun: "Run",
+  mfgMrpBucketSize: "Bucket size",
+  mfgMrpBucketDay: "Daily",
+  mfgMrpBucketWeek: "Weekly",
+  mfgMrpHorizon: "Horizon (buckets)",
+  mfgMrpMode: "Run mode",
+  mfgMrpRegenerative: "Regenerative",
+  mfgMrpNetChange: "Net change",
+  mfgMrpAllowTransfers: "Allow inter-warehouse transfer suggestions",
+  mfgMrpScope: "Item scope",
+  mfgMrpScopeAll: "All items (full scope)",
+  mfgMrpNetChangeHint: "Net-change runs require an explicit item scope.",
+  mfgMrpStatus: "Status",
+  mfgMrpStatusRunning: "Running",
+  mfgMrpStatusCompleted: "Completed",
+  mfgMrpStatusFailed: "Failed",
+  mfgMrpAsOf: "As-of date",
+  mfgMrpStats: "Statistics",
+  mfgMrpStatItems: "items",
+  mfgMrpStatSuggestions: "suggestions",
+  mfgMrpSuggestType: "Suggestion type",
+  mfgMrpPurchase: "Purchase order",
+  mfgMrpProduction: "Production order",
+  mfgMrpTransfer: "Stock transfer",
+  mfgMrpDue: "Due date",
+  mfgMrpRelease: "Release date",
+  mfgMrpQty: "Quantity",
+  mfgMrpAccept: "Accept",
+  mfgMrpDismiss: "Dismiss",
+  mfgMrpDismissReason: "Dismissal reason",
+  mfgMrpDismissAction: "Dismiss suggestion",
+  mfgMrpSuggested: "Suggested",
+  mfgMrpAccepted: "Accepted",
+  mfgMrpDismissed: "Dismissed",
+  mfgMrpSuperseded: "Superseded",
+  mfgMrpConverted: "Converted to",
+  mfgMrpFrozen: "Inside frozen fence",
+  mfgMrpRunsEmpty: "No runs yet.",
+  mfgMrpSuggestionsEmpty: "No suggestions in the current filter.",
+  mfgMrpRunDone: "Run completed — {suggestions} suggestions.",
+  mfgMrpAcceptedToast: "Suggestion accepted and converted.",
+  mfgMrpDismissedToast: "Suggestion dismissed.",
+  mfgMpsTitle: "Master production schedule",
+  mfgMpsGrid: "Weekly bucket grid",
+  mfgMpsAddItem: "Add item to grid",
+  mfgMpsRemoveItem: "Remove item",
+  mfgMpsRowTotal: "Item total",
+  mfgMpsFirm: "Firm",
+  mfgMpsPlanned: "Planned",
+  mfgMpsFirmed: "Firmed",
+  mfgMpsSavedToast: "Bucket saved.",
+  mfgMpsReadiness: "Data readiness",
+  mfgMpsScopeItems: "Scope items",
+  mfgMpsNoLeadTime: "Items without lead time",
+  mfgMpsEmpty: "The grid is empty — add an item to start scheduling.",
+  mfgPlanningTab: "Planning",
+  itemGeneralTab: "General",
+  mfgPlanLoading: "Loading the planning policy…",
+  mfgPlanLoadFailed: "Failed to load the planning policy.",
+  mfgPlanLeadTime: "Lead time (days)",
+  mfgPlanSafetyPolicy: "Safety-stock policy",
+  mfgPlanSafetyManual: "Manual",
+  mfgPlanSafetyAuto: "Auto",
+  mfgPlanSafetyQty: "Safety-stock qty",
+  mfgPlanServiceLevel: "Service level",
+  mfgPlanLookback: "Lookback window (days)",
+  mfgPlanLotSizing: "Lot-sizing rule",
+  mfgPlanFixedQty: "Fixed order qty",
+  mfgPlanOrderMultiple: "Order multiple",
+  mfgPlanPeriodBuckets: "Period supply buckets",
+  mfgPlanFrozenFence: "Frozen fence (days)",
+  mfgPlanSlushyFence: "Slushy fence (days)",
+  mfgPlanSave: "Save planning policy",
+  mfgPlanSaved: "Planning policy saved.",
+  mfgErrMrpRunInput: "Invalid run parameters — check the horizon and the item scope.",
+  mfgErrMrpState: "The suggestion's status does not allow this action.",
+  mfgErrMrpDismissReason: "Dismissing a suggestion requires a reason of 1–300 characters.",
+  mfgErrMrpConversionConflict: "Suggestion conversion conflict — refresh the board and retry.",
+  mfgErrMrpPrerequisite: "The suggestion's prerequisites are not met yet.",
+  mfgErrMpsFrozenFence: "The bucket is inside the frozen fence — editing requires the override grant.",
+  mfgErrMpsFrozenReason: "Edits inside the frozen fence require a written reason.",
+  mfgErrMpsInvalid: "Invalid master-schedule entry.",
+  mfgErrBomAllocation: "Invalid BOM allocation.",
+  mfgErrBomSubstitution: "Invalid BOM substitution rule.",
+  mfgErrBomOutput: "Invalid BOM output — it must be a stock item.",
+  mfgErrBor: "Invalid bill-of-resources row.",
+  mfgErrAtp: "Invalid ATP query input.",
+  mfgErrTollingState: "The tolling order's state does not allow this action.",
+  mfgErrTollingInput: "Invalid tolling input.",
+  mfgErrMtoLink: "Invalid make-to-order link.",
+  mfgErrReservationPolicy: "Invalid stock reservation policy.",
 
   // PHASE-044: WMS (EN)
   navWmsLocations: "Warehouse locations",

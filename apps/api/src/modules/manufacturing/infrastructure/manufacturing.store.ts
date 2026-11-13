@@ -103,6 +103,7 @@ export async function insertBom(input: {
   status: string;
   outputUomId: string;
   yieldPct: string;
+  mainAllocationPct?: string | null;
   effectiveFrom: string | null;
   note: string | null;
   noteAr: string | null;
@@ -113,10 +114,11 @@ export async function insertBom(input: {
   const id = generateUuidV7();
   await tx.execute(sql`
     INSERT INTO bills_of_materials (id, tenant_id, created_by, item_id, version_no, status,
-                                    output_uom_id, yield_pct, effective_from, note, note_ar)
+                                    output_uom_id, yield_pct, main_allocation_pct,
+                                    effective_from, note, note_ar)
     VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.itemId}, ${input.versionNo},
-            ${input.status}, ${input.outputUomId}, ${input.yieldPct}, ${input.effectiveFrom},
-            ${input.note}, ${input.noteAr})
+            ${input.status}, ${input.outputUomId}, ${input.yieldPct},
+            ${input.mainAllocationPct ?? "100"}, ${input.effectiveFrom}, ${input.note}, ${input.noteAr})
   `);
   let lineNo = 0;
   for (const line of input.lines) {
@@ -192,6 +194,7 @@ export async function patchBom(input: {
   status?: string;
   outputUomId?: string;
   yieldPct?: string;
+  mainAllocationPct?: string;
   effectiveFrom?: string | null;
   note?: string | null;
   noteAr?: string | null;
@@ -201,6 +204,7 @@ export async function patchBom(input: {
       status = COALESCE(${input.status ?? null}, status),
       output_uom_id = COALESCE(${input.outputUomId ?? null}, output_uom_id),
       yield_pct = COALESCE(${input.yieldPct ?? null}, yield_pct),
+      main_allocation_pct = COALESCE(${input.mainAllocationPct ?? null}, main_allocation_pct),
       effective_from = CASE WHEN ${input.effectiveFrom === undefined} THEN effective_from
                             ELSE ${input.effectiveFrom ?? null} END,
       note = CASE WHEN ${input.note === undefined} THEN note ELSE ${input.note ?? null} END,

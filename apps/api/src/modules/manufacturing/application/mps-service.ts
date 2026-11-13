@@ -99,15 +99,15 @@ export class MpsService {
     const fenceEnd = addDaysIso(today(), item.frozenFenceDays);
     const insideFence = input.bucketStart <= fenceEnd;
     if (insideFence) {
-      const isEdit = existing !== undefined;
-      const firming = status === "FIRMED" || existing?.status === "FIRMED";
-      // Every write touching an in-fence bucket needs the permission; a
-      // FIRMED row (or firming) needs it even more — one rule, no gaps.
+      // BR-078: EVERY write touching an in-fence bucket — a new entry or
+      // an edit, PLANNED or FIRMED — needs the permission AND a reason
+      // (adding production inside the frozen window IS an edit of the
+      // committed schedule; one rule, no gaps).
       if (!input.frozenEditPermission) {
         throw new MpsFrozenFenceEditError(input.itemId, input.bucketStart, item.frozenFenceDays);
       }
       const reason = (input.reason ?? "").trim();
-      if (reason === "" && (isEdit || firming)) {
+      if (reason === "") {
         throw new MpsFrozenReasonRequiredError();
       }
     }

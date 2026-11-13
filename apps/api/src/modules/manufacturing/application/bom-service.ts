@@ -94,6 +94,10 @@ export interface CreateBomInput {
   outputUomId: string;
   /** 0 < yield ≤ 100, ≤ 4dp (stored numeric(7,4); 80.0000 = 80%). */
   yieldPct: string;
+  /** PHASE-043 (0075, M-11): the MAIN product's joint-allocation share —
+   * 100 by default (the single-output BOM); when outputs exist,
+   * activation requires main + Σ outputs = 100 exactly (G-47). */
+  mainAllocationPct?: string | null;
   note?: string | null;
   noteAr?: string | null;
   actorId: string | null;
@@ -103,6 +107,10 @@ export interface CreateBomInput {
 export interface UpdateBomInput {
   outputUomId?: string;
   yieldPct?: string;
+  /** PHASE-043 (M-11): the main share — DRAFT-only edit (an ACTIVE BOM's
+   * allocation changes through the output replacement gate, never a bare
+   * header patch). */
+  mainAllocationPct?: string;
   note?: string | null;
   noteAr?: string | null;
   /** Full line-set replace — DRAFT only; provided line ids are preserved. */
@@ -180,6 +188,7 @@ export class BomService {
     }
     this.assertOutputUom(input.outputUomId, fg);
     const yieldPct = this.canonicalYield(input.yieldPct);
+    const mainAllocationPct = this.canonicalMainAllocation(input.mainAllocationPct ?? "100");
     const lines = await this.validateLines(input.itemId, input.lines);
 
     const versions = await store.listBomsForItem(input.itemId);
@@ -192,6 +201,7 @@ export class BomService {
         status: "DRAFT",
         outputUomId: input.outputUomId,
         yieldPct,
+        mainAllocationPct,
         effectiveFrom: null,
         note: input.note ?? null,
         noteAr: input.noteAr ?? null,
@@ -235,6 +245,10 @@ export class BomService {
     if (input.yieldPct !== undefined) {
       yieldPct = this.canonicalYield(input.yieldPct);
     }
+    let mainAllocationPct: string | undefined;
+    if (input.mainAllocationPct !== undefined) {
+      mainAllocationPct = this.canonicalMainAllocation(input.mainAllocationPct);
+    }
     if (input.lines !== undefined) {
       const lines = await this.validateLines(bom.itemId, input.lines);
       for (const line of lines) {
@@ -250,6 +264,7 @@ export class BomService {
       id,
       outputUomId: input.outputUomId,
       yieldPct,
+      mainAllocationPct,
       note: input.note,
       noteAr: input.noteAr,
     });
@@ -548,6 +563,18 @@ export class BomService {
         `outputUomId must equal the FG item's base uom (${fg.sku}: ${fg.baseUomId}) — got ${outputUomId} (no UoM conversion seam in PHASE-018)`,
       );
     }
+  }
+
+  /** PHASE-043 (M-11): 0 < main share ≤ 100 at 4dp (numeric(7,4)). */
+  private canonicalMainAllocation(raw: string): string {
+    if (!DECIMAL4_RE.test(raw)) {
+      throw new BomOutputInvalidError(`mainAllocationPct must be a decimal (≤ 4dp): ${raw}`);
+    }
+    const value = new Decimal(raw);
+    if (value.lessThanOrEqualTo(0) || value.greaterThan(100)) {
+      throw new BomOutputInvalidError(`mainAllocationPct must be 0 < pct ≤ 100: ${raw}`);
+    }
+    return value.toFixed(4);
   }
 
   private canonicalYield(raw: string): string {

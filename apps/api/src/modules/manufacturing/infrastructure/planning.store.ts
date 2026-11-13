@@ -804,11 +804,11 @@ export async function patchMrpSuggestion(input: {
       converted_doc_id = CASE WHEN ${input.convertedDocId === undefined} THEN converted_doc_id
                               ELSE ${input.convertedDocId ?? null} END,
       dismissed_at = CASE WHEN ${input.dismissedAt === true} THEN now() ELSE dismissed_at END,
-      dismissed_by = CASE WHEN ${input.dismissedBy !== undefined && input.dismissedBy !== null}
-                          THEN ${input.dismissedBy} ELSE dismissed_by END,
+      dismissed_by = CASE WHEN ${input.dismissedBy === undefined || input.dismissedBy === null}
+                          THEN dismissed_by ELSE ${input.dismissedBy ?? null} END,
       accepted_at = CASE WHEN ${input.acceptedAt === true} THEN now() ELSE accepted_at END,
-      accepted_by = CASE WHEN ${input.acceptedBy !== undefined && input.acceptedBy !== null}
-                         THEN ${input.acceptedBy} ELSE accepted_by END,
+      accepted_by = CASE WHEN ${input.acceptedBy === undefined || input.acceptedBy === null}
+                         THEN accepted_by ELSE ${input.acceptedBy ?? null} END,
       superseded_at = CASE WHEN ${input.supersededAt === true} THEN now() ELSE superseded_at END,
       superseded_by_run_id = CASE WHEN ${input.supersededByRunId === undefined} THEN superseded_by_run_id
                                   ELSE ${input.supersededByRunId ?? null} END,

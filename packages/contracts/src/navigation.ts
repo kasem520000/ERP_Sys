@@ -948,6 +948,37 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 50,
   },
+  // PHASE-043 (T-15; matrix §3.20): the planning surfaces — the MRP engine
+  // + suggestions board (manufacturing.mrp) and the master production
+  // schedule (manufacturing.mps). Feature keys are the exact 0066 §8
+  // plan-grant strings; permissions mirror the route-permissions rows the
+  // mrp/mps controllers enforce verbatim. The frozen-fence override key
+  // manufacturing.mps.frozen_edit stays DATA-DEPENDENT (resolved per
+  // request by the service — never a static row here).
+  {
+    id: "manufacturing.mrp",
+    parentGroup: "manufacturing",
+    label: { ar: "تخطيط الاحتياجات", en: "MRP" },
+    icon: "calendar-clock",
+    route: "/manufacturing/mrp",
+    featureKey: "manufacturing.mrp",
+    permission: "manufacturing.mrp",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 60,
+  },
+  {
+    id: "manufacturing.mps",
+    parentGroup: "manufacturing",
+    label: { ar: "الجدول الزمني للإنتاج", en: "Master schedule" },
+    icon: "calendar-check",
+    route: "/manufacturing/mps",
+    featureKey: "manufacturing.mps",
+    permission: "manufacturing.mps",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 70,
+  },
   {
     id: "purchasing.supplier_scorecards",
     parentGroup: "purchasing",

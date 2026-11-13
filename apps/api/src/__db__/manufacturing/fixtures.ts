@@ -31,6 +31,14 @@ import { GoodsReceiptService } from "../../modules/purchasing/application/goods-
 import { PutawayService } from "../../modules/inventory/application/putaway-service";
 import { ReservationService } from "../../modules/inventory/application/reservation-service";
 import { ReservationPolicyService } from "../../modules/manufacturing/application/reservation-policy-service";
+import { TransferService } from "../../modules/inventory/application/transfer-service";
+import { PurchaseOrderService } from "../../modules/purchasing/application/orders";
+import { MrpEngineService } from "../../modules/manufacturing/application/mrp-engine-service";
+import { MrpSuggestionsService } from "../../modules/manufacturing/application/mrp-suggestions-service";
+import { MpsService } from "../../modules/manufacturing/application/mps-service";
+import { BillOfResourcesService } from "../../modules/manufacturing/application/bill-of-resources-service";
+import { AtpService } from "../../modules/manufacturing/application/atp-service";
+import { TollingService } from "../../modules/manufacturing/application/tolling-service";
 import { ConfigRepository } from "../../modules/configuration/infrastructure/config-repository";
 import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
 import { InboxService } from "../../modules/notifications/application/inbox-service";
@@ -95,6 +103,22 @@ export const orders = new ProductionOrderService(
   shopFloor,
   reservationPolicy,
 );
+// PHASE-043: the planning surfaces — the engine (audit only), the
+// suggestions (PO service for the conversion, the production orders, the
+// transfers), MPS, the BOR rough-cut, ATP, and the tolling round trip
+// (audit + numbering + posting + the PO service for the fee PO).
+export const purchaseOrdersSvc = new PurchaseOrderService(audit, numbering);
+export const mrpEngine = new MrpEngineService(audit);
+export const mrpSuggestions = new MrpSuggestionsService(
+  audit,
+  purchaseOrdersSvc,
+  orders,
+  new TransferService(audit, posting, numbering),
+);
+export const mpsSrv = new MpsService(audit);
+export const borSrv = new BillOfResourcesService(audit);
+export const atpSrv = new AtpService();
+export const tollingSrv = new TollingService(audit, numbering, posting, purchaseOrdersSvc);
 export const workCenters = new WorkCenterService(audit);
 export const routingsSrv = new RoutingService(audit);
 export const rework = new ReworkService(audit, numbering, posting);
@@ -213,6 +237,12 @@ export interface MfgFixture {
     downtimeExpense: string;
     purchasePriceVariance: string;
     standardRevaluation: string;
+    /** PHASE-043 (0077 CoA markers): the tolling round trip — the
+     * stock-at-processor asset, the conversion-fee accrual, the yield
+     * loss (G-48's three legs). */
+    tollingMaterials: string;
+    tollingConversionPayable: string;
+    tollingYieldLoss: string;
   };
   taxCodeIds: { standard: string; notSubject: string };
   items: { flour: string; yeast: string; pack: string; dough: string; bread: string };
@@ -266,6 +296,9 @@ export async function setupMfgFixture(): Promise<MfgFixture> {
     downtimeExpense: "",
     purchasePriceVariance: "",
     standardRevaluation: "",
+    tollingMaterials: "",
+    tollingConversionPayable: "",
+    tollingYieldLoss: "",
   };
   let fiscalYearId = "";
   let branchId = "";
@@ -350,6 +383,11 @@ export async function setupMfgFixture(): Promise<MfgFixture> {
     gl.downtimeExpense = await mapPurpose("DOWNTIME_EXPENSE", "5430");
     gl.purchasePriceVariance = await mapPurpose("PURCHASE_PRICE_VARIANCE", "5990");
     gl.standardRevaluation = await mapPurpose("STANDARD_REVALUATION", "5995");
+    // PHASE-043 (0077): the tolling markers (1420/2136/5126 — the 0077
+    // template rows; the explicit belt-and-braces).
+    gl.tollingMaterials = await mapPurpose("TOLLING_MATERIALS", "1420");
+    gl.tollingConversionPayable = await mapPurpose("TOLLING_CONVERSION_PAYABLE", "2136");
+    gl.tollingYieldLoss = await mapPurpose("TOLLING_YIELD_LOSS", "5126");
 
     // Fiscal year spanning the whole manufacturing timeline.
     const existingYear = await findFiscalYearByName("FY2026");
