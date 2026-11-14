@@ -1,0 +1,86 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-14 20:57:38.332 UTC [5333] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-14 20:57:38.332 UTC [5333] LOG:  listening on IPv6 address "::1", port 38223
+2026-11-14 20:57:38.332 UTC [5333] LOG:  listening on IPv4 address "127.0.0.1", port 38223
+
+2026-11-14 20:57:38.333 UTC [5333] LOG:  listening on Unix socket "/tmp/.s.PGSQL.38223"
+
+2026-11-14 20:57:38.334 UTC [5336] LOG:  database system was shut down at 2026-11-14 20:57:38 UTC
+
+2026-11-14 20:57:38.336 UTC [5333] LOG:  database system is ready to accept connections
+
+(node:5392) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ ../../audit-evidence/phase043-hard-review/probe.spec.ts (2 tests) 1203ms
+   ✓ DEFECT 2 — the delivery identity is verified at CREATE and at POST; every allowance traces to a LIVE reservation matching item, warehouse, and beneficiary > P2: a foreign order line, an item mismatch, and a warehouse mismatch are all REJECTED at create — and a DIRECTLY-INSERTED mismatched delivery (create bypassed) is REJECTED at post with ZERO residue  348ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  20:57:37
+   Duration  7.94s (transform 1.33s, setup 0ms, collect 2.38s, tests 1.20s, environment 0ms, prepare 56ms)
+
+2026-11-14 20:57:45.394 UTC [5333] LOG:  received fast shutdown request
+2026-11-14 20:57:45.394 UTC [5333] LOG:  aborting any active transactions
+2026-11-14 20:57:45.394 UTC [5416] FATAL:  terminating connection due to administrator command
+
+2026-11-14 20:57:45.395 UTC [5415] FATAL:  terminating connection due to administrator command
+2026-11-14 20:57:45.395 UTC [5414] FATAL:  terminating connection due to administrator command
+
+2026-11-14 20:57:45.398 UTC [5333] LOG:  background worker "logical replication launcher" (PID 5339) exited with exit code 1
+
+2026-11-14 20:57:45.399 UTC [5334] LOG:  shutting down
+2026-11-14 20:57:45.400 UTC [5334] LOG:  checkpoint starting: shutdown immediate
+
+(node:5392) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:5392) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-14 20:57:45.429 UTC [5334] LOG:  checkpoint complete: wrote 3013 buffers (18.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.022 s, sync=0.007 s, total=0.030 s; sync files=2375, longest=0.001 s, average=0.001 s; distance=24666 kB, estimate=24666 kB; lsn=0/2CF53A8, redo lsn=0/2CF53A8
+
+2026-11-14 20:57:45.437 UTC [5333] LOG:  database system is shut down
+

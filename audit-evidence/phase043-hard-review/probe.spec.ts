@@ -79,7 +79,11 @@ const stockSvc = new StockService(specAudit, specPosting);
 const spec: { fixture?: MfgFixture; matItem?: string } = {};
 let chainSeq = 0;
 
-async function ensureItem(sku: string, name: string): Promise<string> {
+async function ensureItem(
+  sku: string,
+  name: string,
+  batchTracked = true,
+): Promise<string> {
   const found = await itemsStore.findItemBySku(sku);
   if (found !== undefined) return found.id;
   const uoms = await itemsStore.listUoms();
@@ -93,10 +97,10 @@ async function ensureItem(sku: string, name: string): Promise<string> {
     categoryId: null,
     taxCodeId: null,
     costingMethod: "WAC",
-    trackBatch: true,
+    trackBatch: batchTracked,
     trackSerial: false,
     trackImei: false,
-    hasExpiry: true,
+    hasExpiry: batchTracked,
     shelfLifeDays: 365,
     reorderLevel: null,
     reorderQty: null,
@@ -417,9 +421,10 @@ describe("DEFECT 1 — allow_negative_stock must NEVER disable the reservation p
 
       // (iv) THE POLICY'S DECLARED SCOPE — the UNRESERVED portion: an
       // item with NO reservation still goes negative by policy (BR-013
-      // preserved for free stock).
+      // preserved for free stock; non-batch-tracked — the negative
+      // policy's existing scope, the valuation-ledger precedent).
       const freeItem = await withTenant(TENANT_M, () =>
-        ensureItem(`M-HR-P1-FREE-${Date.now() % 100000}`, "the policy-scope free item"),
+        ensureItem(`M-HR-P1-FREE-${Date.now() % 100000}`, "the policy-scope free item", false),
       );
       await receiveAt(freeItem, f.warehouseFg, "2", `M-HR-P1-FREE-${Date.now() % 100000}`);
       await withTenant(TENANT_M, () =>

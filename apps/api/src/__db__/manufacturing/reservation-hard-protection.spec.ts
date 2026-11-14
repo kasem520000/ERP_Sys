@@ -98,11 +98,15 @@ import {
  *   direction): the OK stamp is guidance, never a guarantee —
  *   unreserved sibling demand still does not reduce the basis, a
  *   backorder remains possible, and a stock shortage NEVER blocks
- *   issuing a sales order. The sales line's ATP check now answers with
- *   an explicit protection standing: PROTECTED_BY_RESERVATION (an
- *   ACTIVE allocation feeds the line) or UNPROTECTED (the verdict is
- *   advisory only — never describe it as a guaranteed promise before
- *   an allocation protects it).
+ *   issuing a sales order. The sales line's ATP check answers with
+ *   the explicit protection standing — RELATIVE TO THE REMAINING QTY,
+ *   the hard-review round's three-valued law: FULLY_PROTECTED (an
+ *   ACTIVE allocation covers the full remaining qty), PARTIALLY_PROTECTED
+ *   (it covers part of it), or UNPROTECTED (the verdict is advisory
+ *   only — never describe it as a guaranteed promise before an
+ *   allocation protects it), with the protected/unprotected quantities
+ *   and the bilingual advisory note (see reservation-hard-review.spec
+ *   (m) — the hard-review regression pin).
  */
 
 const specAudit = new AuditService(new DrizzleAuditStore());
@@ -823,8 +827,10 @@ describe("the reservation hard protection — no other order or issue path consu
     // (j2) THE ALLOCATED PROMISE: the MTO chain line — the holder feeds
     // THIS line. The generic basis nets the holder (nothing NEW is
     // promiseable at the position: SHORT), but the line's own standing
-    // is PROTECTED_BY_RESERVATION — its promise is backed by an
-    // allocation that physically holds the stock.
+    // is FULLY_PROTECTED (the hard-review round's three-valued
+    // semantics: the ACTIVE allocation covers the FULL remaining qty)
+    // — its promise is backed by an allocation that physically holds
+    // the stock.
     const chain = await buildChain("J");
     await completeChain(chain, "10");
     const protectedResult = await withTenant(TENANT_M, () =>
@@ -835,7 +841,7 @@ describe("the reservation hard protection — no other order or issue path consu
     );
     expect(protectedResult.verdict).toBe("SHORT"); // the position is fully committed — to this very line
     expect((protectedResult as { protection?: string }).protection).toBe(
-      "PROTECTED_BY_RESERVATION",
+      "FULLY_PROTECTED",
     );
 
     // (j3) THE BACKORDER LAW: an order for an item with ZERO stock

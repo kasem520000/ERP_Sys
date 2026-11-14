@@ -1823,3 +1823,50 @@ export async function activeReservationQty(id: string): Promise<string> {
   `);
   return rows.rows[0]?.qty ?? "0";
 }
+
+/**
+ * THE ALLOWANCE IDENTITY READ (the 043 hard-review round): the LIVE
+ * reservation row by id — ACTIVE and non-expired only (the same
+ * "live" definition the reserved pool `reservedQty` nets) — carrying
+ * the IDENTITY dims (item, warehouse, holder) a beneficiary allowance
+ * must verify before counting its qty. Never trust the reservation id
+ * alone: a qty read without the identity dims let a crafted delivery
+ * count ANOTHER item's / ANOTHER warehouse's reservation as its
+ * entitlement and consume a third party's protected pool (the probe's
+ * defect 2). Undefined when the row is dead (non-ACTIVE or lapsed).
+ */
+export async function findLiveReservationRow(
+  id: string,
+): Promise<
+  | {
+      id: string;
+      itemId: string;
+      warehouseId: string;
+      qty: string;
+      holderType: string;
+      holderId: string | null;
+      expiresAt: string | null;
+      status: string;
+    }
+  | undefined
+> {
+  const rows = await tenantTx().execute<{
+    id: string;
+    itemId: string;
+    warehouseId: string;
+    qty: string;
+    holderType: string;
+    holderId: string | null;
+    expiresAt: string | null;
+    status: string;
+  }>(sql`
+    SELECT id, item_id AS "itemId", warehouse_id AS "warehouseId", qty::text AS qty,
+           holder_type AS "holderType", holder_id AS "holderId",
+           expires_at::text AS "expiresAt", status
+    FROM stock_reservations
+    WHERE id = ${id} AND status = 'ACTIVE'
+      AND (expires_at IS NULL OR expires_at > now())
+    LIMIT 1
+  `);
+  return rows.rows[0];
+}

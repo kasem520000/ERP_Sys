@@ -78,18 +78,30 @@ export class SalesOrderService {
    * the ATP service (quarantined, reserved, consignment-owned never
    * promise); this method owns the sales-side stamp.
    *
-   * THE PROTECTION STANDING (the PHASE-043 completion round — the owner's
-   * explicit direction): the verdict alone must NEVER be read as a
-   * guaranteed promise. The answer now carries the line's standing —
-   * PROTECTED_BY_RESERVATION (an ACTIVE allocation feeds this line: its
-   * own reservation or its MTO chain — stock the issue choke point now
-   * physically holds for it) or UNPROTECTED (the verdict is ADVISORY
-   * ONLY: unreserved sibling demand does not reduce the basis, a later
-   * delivery can take the stock first, and a backorder remains possible
-   * — never describe an unallocated OK as a guarantee). A shortage NEVER
-   * blocks issuing a sales order (issue() consults no ATP gate — the
-   * backorder stays a legal outcome); the bilingual advisory note states
-   * the standing verbatim for the surface that renders it.
+   * THE PROTECTION STANDING (the PHASE-043 completion round, made
+   * THREE-VALUED + QUANTIFIED by the 043 hard-review round — the
+   * owner's directive): the verdict alone must NEVER be read as a
+   * guaranteed promise. The answer carries the line's standing RELATIVE
+   * TO THE REMAINING QTY (line qty − posted delivered):
+   *   UNPROTECTED          — no allocation feeds the line: the verdict
+   *                          is ADVISORY ONLY (unreserved sibling demand
+   *                          does not reduce the basis, a later delivery
+   *                          can take the stock first, a backorder
+   *                          remains possible — never describe an
+   *                          unallocated OK as a guarantee);
+   *   PARTIALLY_PROTECTED  — an ACTIVE allocation covers PART of the
+   *                          remaining qty: the covered part is held at
+   *                          the issue choke point, the uncovered part
+   *                          is exposed exactly as UNPROTECTED above;
+   *   FULLY_PROTECTED      — the ACTIVE allocation(s) cover the FULL
+   *                          remaining qty (its own reservation or its
+   *                          MTO chain — stock the issue choke point
+   *                          physically holds for the beneficiary).
+   * The quantities ride the answer (remainingQty / protectedQty /
+   * unprotectedQty) and the BILINGUAL advisory note states the standing
+   * with its numbers verbatim — the promise-point surface renders them
+   * as-is. A shortage NEVER blocks issuing a sales order (issue()
+   * consults no ATP gate — the backorder stays a legal outcome).
    */
   async checkLineAtp(
     orderId: string,
@@ -100,8 +112,11 @@ export class SalesOrderService {
     verdict: "OK" | "SHORT";
     availableNow: string;
     suggestedDate: string | null;
-    protection: "PROTECTED_BY_RESERVATION" | "UNPROTECTED";
+    protection: "UNPROTECTED" | "PARTIALLY_PROTECTED" | "FULLY_PROTECTED";
+    remainingQty: string;
     reservedForLineQty: string;
+    protectedQty: string;
+    unprotectedQty: string;
     advisoryNote: { en: string; ar: string };
   }> {
     const order = await this.find(orderId);
@@ -110,17 +125,26 @@ export class SalesOrderService {
     if (line === undefined) {
       throw new SalesOrderNotFoundError(`sales order line ${lineId} does not belong to order ${orderId}`);
     }
-    // The line's protection standing: the qty of ACTIVE non-expired
-    // allocations feeding THIS line — its own reservation + its MTO
-    // chain (the manufacturing application surface, the deliveries
-    // precedent). This is the same entitlement the delivery post's
+    // The line's protection standing: the qty of LIVE allocations feeding
+    // THIS line — its own reservation (NEVER the id alone: the LIVE row
+    // must match the line's item, the ORDER's warehouse, and the
+    // beneficiary holder — the hard-review identity law) + its MTO chain
+    // (the manufacturing application surface, identity-complete by
+    // construction). This is the same entitlement the delivery post's
     // beneficiary allowance draws on — one definition everywhere.
     let reservedForLineQty = new Decimal(0);
     const invStore = await import("../../inventory/infrastructure/inventory.store");
     if (line.reservationId !== null) {
-      reservedForLineQty = reservedForLineQty.plus(
-        new Decimal(await invStore.activeReservationQty(line.reservationId)),
-      );
+      const own = await invStore.findLiveReservationRow(line.reservationId);
+      if (
+        own !== undefined &&
+        own.itemId === line.itemId &&
+        own.warehouseId === order.warehouseId &&
+        own.holderType === "SALES_ORDER" &&
+        own.holderId === orderId
+      ) {
+        reservedForLineQty = reservedForLineQty.plus(new Decimal(own.qty));
+      }
     }
     const { listActiveMtoReservationsForSalesLine } = await import(
       "../../manufacturing/application/production-order-service"
@@ -132,18 +156,40 @@ export class SalesOrderService {
     })) {
       reservedForLineQty = reservedForLineQty.plus(new Decimal(mto.qty));
     }
-    const protection: "PROTECTED_BY_RESERVATION" | "UNPROTECTED" =
-      reservedForLineQty.greaterThan(0) ? "PROTECTED_BY_RESERVATION" : "UNPROTECTED";
+    // The standing is judged RELATIVE TO THE REMAINING qty — the part of
+    // the line still to ship (line qty − the already-POSTED delivered
+    // qty, floored at 0). A part-shipped line's standing answers for its
+    // REMAINDER, not its original qty.
+    const alreadyDelivered = new Decimal(
+      await store.postedDeliveredQtyForOrderLine(line.id),
+    );
+    const remainingQty = Decimal.max(new Decimal(line.qty).minus(alreadyDelivered), new Decimal(0));
+    const protectedQty = Decimal.min(reservedForLineQty, remainingQty);
+    const unprotectedQty = remainingQty.minus(protectedQty);
+    const protection:
+      | "UNPROTECTED"
+      | "PARTIALLY_PROTECTED"
+      | "FULLY_PROTECTED" =
+      reservedForLineQty.lessThanOrEqualTo(0)
+        ? "UNPROTECTED"
+        : reservedForLineQty.greaterThanOrEqualTo(remainingQty)
+          ? "FULLY_PROTECTED"
+          : "PARTIALLY_PROTECTED";
     const advisoryNote =
-      protection === "PROTECTED_BY_RESERVATION"
+      protection === "FULLY_PROTECTED"
         ? {
-            en: `Protected: an ACTIVE allocation of ${reservedForLineQty.toFixed(6)} feeds this line and the issue choke point holds it for the beneficiary — no other order or issue path may consume it without the permission-gated, audited release.`,
-            ar: `محمي: يوجد تخصيص نشأ بمقدار ${reservedForLineQty.toFixed(6)} يغذّي هذا البند ونقطة الصرف تحجزه لمستفیده — لا يمكن لأي طلب آخر أو مسار صرف آخر استهلاكه دون فك حجز مصرّح به وموثّق تدقيقياً.`,
+            en: `Fully protected: an ACTIVE allocation of ${reservedForLineQty.toFixed(6)} covers the full remaining qty ${remainingQty.toFixed(6)} and the issue choke point holds it for the beneficiary — no other order or issue path may consume it without the permission-gated, audited release.`,
+            ar: `محمي بالكامل: يوجد تخصيص نشط بمقدار ${reservedForLineQty.toFixed(6)} يغطي كامل الكمية المتبقية ${remainingQty.toFixed(6)} ونقطة الصرف تحجزه لمستفیده — لا يمكن لأي طلب آخر أو مسار صرف آخر استهلاكه دون فك حجز مصرّح به وموثّق تدقيقياً.`,
           }
-        : {
-            en: `Advisory only — unprotected: no allocation protects this line yet, so the verdict is guidance, not a guarantee; another delivery can take the stock first and a backorder remains possible. Reserve the line (or link production to it) before treating the promise as protected.`,
-            ar: `استرشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد، فالنتيجة إرشادية وليست ضماناً؛ يمكن لسند تسليم آخر أخذ المخزون أولاً ويبقى تأجيل الطلب (backorder) ممكناً. احجز البند (أو اربط إنتاجاً به) قبل اعتبار الوعد محمياً.`,
-          };
+        : protection === "PARTIALLY_PROTECTED"
+          ? {
+              en: `Partially protected: ${protectedQty.toFixed(6)} of the remaining ${remainingQty.toFixed(6)} is backed by an ACTIVE allocation the issue choke point holds for the beneficiary; the remaining ${unprotectedQty.toFixed(6)} is UNPROTECTED — advisory only, another delivery can take that stock first and a backorder remains possible for it. Reserve more (or link production) before treating the uncovered part as protected.`,
+              ar: `محمي جزئيًا: ${protectedQty.toFixed(6)} من الكمية المتبقية ${remainingQty.toFixed(6)} مسنودة بتخصيص نشط تحجزه نقطة الصرف لمستفیده، بينما ${unprotectedQty.toFixed(6)} المتبقية غير محمية — نتيجة استرشادية فقط، يمكن لسند تسليم آخر أخذ هذا المخزون أولاً ويبقى تأجيل الطلب (backorder) ممكناً لها. احجز المزيد (أو اربط إنتاجاً) قبل اعتبار الجزء غير المغطى محمياً.`,
+            }
+          : {
+              en: `Advisory only — unprotected: no allocation protects this line yet, so the verdict is guidance, not a guarantee; the full remaining qty ${remainingQty.toFixed(6)} is exposed — another delivery can take the stock first and a backorder remains possible. Reserve the line (or link production to it) before treating the promise as protected.`,
+              ar: `استرشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد، فالنتيجة إرشادية وليست ضماناً؛ الكمية المتبقية بالكامل ${remainingQty.toFixed(6)} معرّضة — يمكن لسند تسليم آخر أخذ المخزون أولاً ويبقى تأجيل الطلب (backorder) ممكناً. احجز البند (أو اربط إنتاجاً به) قبل اعتبار الوعد محمياً.`,
+            };
 
     const result = await this.atp.check({
       itemId: line.itemId,
@@ -168,7 +214,10 @@ export class SalesOrderService {
         availableNow: result.availableNow,
         suggestedDate: result.suggestedDate,
         protection,
+        remainingQty: remainingQty.toFixed(6),
         reservedForLineQty: reservedForLineQty.toFixed(6),
+        protectedQty: protectedQty.toFixed(6),
+        unprotectedQty: unprotectedQty.toFixed(6),
       },
     });
     return {
@@ -177,7 +226,10 @@ export class SalesOrderService {
       availableNow: result.availableNow,
       suggestedDate: result.suggestedDate,
       protection,
+      remainingQty: remainingQty.toFixed(6),
       reservedForLineQty: reservedForLineQty.toFixed(6),
+      protectedQty: protectedQty.toFixed(6),
+      unprotectedQty: unprotectedQty.toFixed(6),
       advisoryNote,
     };
   }

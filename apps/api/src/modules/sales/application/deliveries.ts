@@ -16,6 +16,7 @@ import { PickingService } from "../../inventory/application/picking-service";
 import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
 import * as store from "../infrastructure/sales.store";
 import {
+  DeliveryLineIdentityError,
   DeliveryLineInvalidError,
   DeliveryNoteNotFoundError,
   EmptyDocumentError,
@@ -51,6 +52,68 @@ const DEL_FORMAT = { prefix: "DEL", format: "DEL-{YYYY}-{SEQ:6}", docType: "deli
 
 const QTY_RE = /^\d+(\.\d{1,6})?$/;
 const PRICE_RE = /^\d+(\.\d{1,6})?$/;
+
+/**
+ * THE DELIVERY IDENTITY CONTRACT (the 043 hard-review round — the
+ * probe's defect 2, the owner's directive): every order-line binding
+ * is verified —
+ *   1. the bound order line BELONGS to the delivery's own order
+ *      (a foreign order's line is rejected — never trusted by id);
+ *   2. the delivery line's ITEM matches the order line's item;
+ *   3. a delivery binding order lines ships from the ORDER's warehouse
+ *      (the fulfillment warehouse where its reservations live);
+ *   4. no order line is bound TWICE within one delivery (duplicates
+ *      double-count one entitlement; partial shipments are separate
+ *      deliveries);
+ * verified at CREATE and re-verified at POST (the defense-in-depth
+ * arm: a store-written / pre-fix row dies at post with ZERO residue,
+ * never at the stock plan). Pre-fix NONE of this was checked: a
+ * crafted delivery counted another item's / another warehouse's
+ * reservation as its entitlement and consumed a third party's
+ * protected pool (probe.log, defect 2).
+ */
+function verifyDeliveryLineIdentity(input: {
+  deliveryOrderId: string | null;
+  deliveryWarehouseId: string;
+  orderWarehouseId: string | null;
+  lines: readonly { orderLineId: string | null; itemId: string }[];
+  orderLineById: Map<string, { id: string; itemId: string }>;
+}): void {
+  const bound = new Set<string>();
+  for (const line of input.lines) {
+    if (line.orderLineId === null) continue;
+    if (input.deliveryOrderId === null) {
+      throw new DeliveryLineIdentityError(
+        `delivery line binds order line ${line.orderLineId} but the delivery carries no order — standalone deliveries may not bind order lines`,
+      );
+    }
+    const orderLine = input.orderLineById.get(line.orderLineId);
+    if (orderLine === undefined) {
+      throw new DeliveryLineIdentityError(
+        `order line ${line.orderLineId} does not belong to sales order ${input.deliveryOrderId} — the binding is foreign (INV-006 source chain)`,
+      );
+    }
+    if (orderLine.itemId !== line.itemId) {
+      throw new DeliveryLineIdentityError(
+        `delivery line item ${line.itemId} does not match order line ${line.orderLineId}'s item ${orderLine.itemId} — a bound line ships its order line's item only`,
+      );
+    }
+    if (
+      input.orderWarehouseId !== null &&
+      input.orderWarehouseId !== input.deliveryWarehouseId
+    ) {
+      throw new DeliveryLineIdentityError(
+        `delivery warehouse ${input.deliveryWarehouseId} does not match the order's warehouse ${input.orderWarehouseId} — a delivery binding order lines ships from the order's fulfillment warehouse`,
+      );
+    }
+    if (bound.has(line.orderLineId)) {
+      throw new DeliveryLineIdentityError(
+        `order line ${line.orderLineId} is bound by more than one delivery line — one delivery line per order line (partial shipments are separate deliveries)`,
+      );
+    }
+    bound.add(line.orderLineId);
+  }
+}
 
 export interface DeliveryLineInput {
   orderLineId: string | null;
@@ -112,6 +175,7 @@ export class DeliveryNoteService {
     }
     // Order linkage: DNs reference ISSUED orders (or stand alone — a direct
     // counter delivery is legitimate retail flow).
+    let linkedOrderWarehouseId: string | null = null;
     if (input.orderId !== null) {
       const order = await store.findSalesOrderById(input.orderId);
       if (order === undefined) {
@@ -127,7 +191,27 @@ export class DeliveryNoteService {
           `delivery customer does not match the order's customer (INV-006 source chain)`,
         );
       }
+      linkedOrderWarehouseId = order.warehouseId;
     }
+
+    // THE DELIVERY IDENTITY CONTRACT (the 043 hard-review round): every
+    // order-line binding is verified BEFORE the document exists — the
+    // bound line belongs to THIS delivery's order, carries that order
+    // line's item, ships from the order's warehouse, and binds its
+    // order line exactly once (see verifyDeliveryLineIdentity — the
+    // probe's defect 2: pre-fix a foreign order line, a mismatched
+    // item, and a wrong-warehouse delivery were all accepted, and the
+    // miscounted allowance consumed a third party's protected pool).
+    const orderLines =
+      input.orderId !== null ? await store.listSalesOrderLines(input.orderId) : [];
+    const orderLineById = new Map(orderLines.map((row) => [row.id, row]));
+    verifyDeliveryLineIdentity({
+      deliveryOrderId: input.orderId,
+      deliveryWarehouseId: input.warehouseId,
+      orderWarehouseId: linkedOrderWarehouseId,
+      lines: input.lines,
+      orderLineById,
+    });
 
     const itemsStore = await import("../../items/infrastructure/items.store");
     let totalNet = new Decimal(0);
@@ -259,21 +343,46 @@ export class DeliveryNoteService {
     const lines = await store.listDeliveryNoteLines(id);
     if (lines.length === 0) throw new EmptyDocumentError("delivery note");
 
-    // THE BENEFICIARY ALLOWANCE (the PHASE-043 completion round — the
-    // hard-protection contract's beneficiary side): per DELIVERED line,
-    // the qty of the ACTIVE reserved pool this issue is entitled to
-    // draw on — the line's OWN reservation (ACTIVE, non-expired) + the
-    // ACTIVE MTO chain reservations feeding that line. These are the
-    // EXACT rows the settlement below (step 5) retires through its
-    // conditional updates, which is what makes a stale allowance
-    // harmless: if any row flips non-ACTIVE between this read and the
-    // settlement, the settlement THROWS and the whole post rolls back
-    // (the issue with it) — the allowance can never commit an
-    // over-issue. Lines without an order line (standalone adds) and
-    // every other order's lines carry NO allowance: free stock only.
+    // THE DELIVERY IDENTITY CONTRACT, RE-VERIFIED AT POST (the 043
+    // hard-review round's defense-in-depth arm): create validated the
+    // bindings, but the post NEVER trusts the stored row — a
+    // store-written / pre-fix / rogue delivery dies HERE, before any
+    // stock plan, with zero residue. Same rules as create: the bound
+    // line belongs to THIS delivery's order, carries that order line's
+    // item, ships from the order's warehouse, binds exactly once.
+    const orderRow =
+      delivery.orderId !== null ? await store.findSalesOrderById(delivery.orderId) : undefined;
     const orderLines =
       delivery.orderId !== null ? await store.listSalesOrderLines(delivery.orderId) : [];
     const orderLineById = new Map(orderLines.map((row) => [row.id, row]));
+    verifyDeliveryLineIdentity({
+      deliveryOrderId: delivery.orderId,
+      deliveryWarehouseId: delivery.warehouseId,
+      orderWarehouseId: orderRow === undefined ? null : orderRow.warehouseId,
+      lines,
+      orderLineById,
+    });
+
+    // THE BENEFICIARY ALLOWANCE (the PHASE-043 completion round — the
+    // hard-protection contract's beneficiary side; identity-verified by
+    // the hard-review round): per DELIVERED line, the qty of the ACTIVE
+    // reserved pool this issue is entitled to draw on — the line's OWN
+    // reservation + the ACTIVE MTO chain reservations feeding that
+    // line. NEVER THE RESERVATION ID ALONE (the probe's defect 2): the
+    // own reservation counts ONLY when its LIVE row (ACTIVE,
+    // non-expired — findLiveReservationRow) matches the line's ITEM,
+    // the delivery's WAREHOUSE, and the BENEFICIARY holder (this
+    // order); a mismatched or dead row counts NOTHING (free stock
+    // only — fail-closed, never a third party's pool). The MTO chain
+    // read is identity-complete by construction (item + warehouse +
+    // the sales-line link). These are the EXACT rows the settlement
+    // below (step 5) retires through its conditional updates, which is
+    // what makes a stale allowance harmless: if any row flips
+    // non-ACTIVE between this read and the settlement, the settlement
+    // THROWS and the whole post rolls back (the issue with it) — the
+    // allowance can never commit an over-issue. Lines without an order
+    // line (standalone adds) and every other order's lines carry NO
+    // allowance: free stock only.
     const { listActiveMtoReservationsForSalesLine } = await import(
       "../../manufacturing/application/production-order-service"
     );
@@ -282,12 +391,19 @@ export class DeliveryNoteService {
     for (const line of lines) {
       if (line.orderLineId === null) continue;
       const orderLine = orderLineById.get(line.orderLineId);
-      if (orderLine === undefined) continue;
+      if (orderLine === undefined) continue; // unreachable post-validation — fail-closed
       let allowance = new Decimal(0);
       if (orderLine.reservationId !== null) {
-        allowance = allowance.plus(
-          new Decimal(await invStoreModule.activeReservationQty(orderLine.reservationId)),
-        );
+        const own = await invStoreModule.findLiveReservationRow(orderLine.reservationId);
+        if (
+          own !== undefined &&
+          own.itemId === line.itemId &&
+          own.warehouseId === delivery.warehouseId &&
+          own.holderType === "SALES_ORDER" &&
+          own.holderId === delivery.orderId
+        ) {
+          allowance = allowance.plus(new Decimal(own.qty));
+        }
       }
       for (const mto of await listActiveMtoReservationsForSalesLine({
         salesOrderLineId: line.orderLineId,

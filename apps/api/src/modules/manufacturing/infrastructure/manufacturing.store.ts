@@ -480,6 +480,7 @@ export async function listActiveMtoHolderReservationsForLine(input: {
     JOIN production_orders p ON p.id = r.holder_id
     WHERE r.holder_type = 'PRODUCTION_ORDER'
       AND r.status = 'ACTIVE'
+      AND (r.expires_at IS NULL OR r.expires_at > now())
       AND r.item_id = ${input.itemId}
       AND r.warehouse_id = ${input.warehouseId}
       AND p.sales_order_line_id = ${input.salesOrderLineId}

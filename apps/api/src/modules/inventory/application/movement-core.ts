@@ -759,11 +759,26 @@ export async function planIssue(input: {
   }
 
   // THE RESERVATION HARD PROTECTION (the PHASE-043 completion round —
-  // the owner's directive after the round-4 race fix): an issue may
-  // never take the position below the ACTIVE reserved pool it is not
-  // entitled to draw on —
-  //     onHand − qty ≥ reservedPool − allowance
-  // The pool is read INSIDE the item_stock row lock the position read
+  // the owner's directive after the round-4 race fix; REFORMULATED by
+  // the 043 hard-review round 2026-11-15): an issue may never consume
+  // the ACTIVE reserved pool it is not entitled to draw on. The
+  // protected quota for OTHERS is
+  //     protectedForOthers = max(reservedPool − allowance, 0)
+  // and the issue is rejected whenever the post-issue position would
+  // fall below it:
+  //     onHand − qty < protectedForOthers  → RESERVED_STOCK_PROTECTED
+  // THE POLICY INDEPENDENCE (the hard-review fix — the probe's defect
+  // 1): pre-fix the guard rode `!allowNegative`, so an explicit
+  // `inventory.allow_negative_stock` policy (BR-013) silently switched
+  // the WHOLE protection off — another order's delivery shipped the
+  // MTO-reserved stock under the policy (probe.log, DEL-2026-000001).
+  // Now the protected floor binds at ANY policy position: the policy
+  // governs the UNRESERVED portion only (free stock may go negative —
+  // and when protectedForOthers is 0 the pool guard imposes nothing,
+  // so BR-013's declared meaning survives intact), while the protected
+  // quota — the pool beyond this issue's own entitlement — is
+  // untouchable without the permission-gated, audited release. The
+  // pool is read INSIDE the item_stock row lock the position read
   // above already took (CC-04): every reservation CREATION takes the
   // same lock first (the choke point), so the pool cannot grow beneath
   // this issue; a concurrent release/consume only shrinks it, which
@@ -774,9 +789,7 @@ export async function planIssue(input: {
   // settlement's conditional row updates (fail-closed on non-ACTIVE /
   // over-consume → the whole issue rolls back), never by a lock —
   // round-4's lock-order star is untouched (no new lock, no new order).
-  // A negative-stock policy position exempts the guard exactly as it
-  // exempts the on-hand floor (the same declared policy).
-  if (!allowNegative) {
+  {
     const allowance = input.reservedAllowance ?? "0";
     if (!QTY_RE.test(allowance) || dec(allowance).lt(0)) {
       throw new InvalidQuantityError(
@@ -784,7 +797,8 @@ export async function planIssue(input: {
       );
     }
     const reservedPool = await store.reservedQty(input.itemId, input.warehouseId);
-    if (compareExact(subExact(subExact(onHand, qty), subExact(reservedPool, allowance)), "0") < 0) {
+    const protectedForOthers = dec(reservedPool).minus(dec(allowance));
+    if (protectedForOthers.gt(0) && dec(onHand).minus(dec(qty)).lt(protectedForOthers)) {
       throw new ReservedStockProtectedError({
         itemId: input.itemId,
         warehouseId: input.warehouseId,

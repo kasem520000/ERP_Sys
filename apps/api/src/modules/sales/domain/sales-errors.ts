@@ -91,6 +91,21 @@ export class DeliveryLineInvalidError extends DomainError {
     super("DELIVERY_LINE_INVALID", message);
   }
 }
+/**
+ * THE DELIVERY IDENTITY CONTRACT (the 043 hard-review round — the
+ * probe's defect 2): a delivery line binding an order line must belong
+ * to the delivery's OWN order, carry the order line's item, ship from
+ * the order's warehouse (for bound lines), and never bind the same
+ * order line twice — verified at CREATE and re-verified at POST (the
+ * defense-in-depth arm: a store-written / pre-fix row dies at post,
+ * never at the plan). A distinct code from DELIVERY_LINE_INVALID so
+ * surfaces can name the integrity breach exactly.
+ */
+export class DeliveryLineIdentityError extends DomainError {
+  constructor(message: string) {
+    super("DELIVERY_LINE_IDENTITY", message);
+  }
+}
 export class InvoiceLineInvalidError extends DomainError {
   constructor(message: string) {
     super("INVOICE_LINE_INVALID", message);

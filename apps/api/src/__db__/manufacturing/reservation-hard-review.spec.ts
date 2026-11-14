@@ -81,7 +81,7 @@ const stockSvc = new StockService(specAudit, specPosting);
 const spec: { fixture?: MfgFixture; matItem?: string } = {};
 let chainSeq = 0;
 
-async function ensureItem(sku: string, name: string): Promise<string> {
+async function ensureItem(sku: string, name: string, batchTracked = true): Promise<string> {
   const found = await itemsStore.findItemBySku(sku);
   if (found !== undefined) return found.id;
   const uoms = await itemsStore.listUoms();
@@ -95,10 +95,10 @@ async function ensureItem(sku: string, name: string): Promise<string> {
     categoryId: null,
     taxCodeId: null,
     costingMethod: "WAC",
-    trackBatch: true,
+    trackBatch: batchTracked,
     trackSerial: false,
     trackImei: false,
-    hasExpiry: true,
+    hasExpiry: batchTracked,
     shelfLifeDays: 365,
     reorderLevel: null,
     reorderQty: null,
@@ -397,9 +397,11 @@ describe("the hard-review regression tests — the negative-stock bypass and the
       await expect(activePoolQty(chain.fgItem, f.warehouseFg)).resolves.toBe("10.000000");
 
       // (k4) THE POLICY'S DECLARED SCOPE — free stock (no reservation)
-      // still goes negative by policy (BR-013 preserved).
+      // still goes negative by policy (BR-013 preserved; non-
+      // batch-tracked — the negative policy's existing scope, the
+      // valuation-ledger precedent).
       const freeItem = await withTenant(TENANT_M, () =>
-        ensureItem(`M-HRV-K-FREE-${Date.now() % 100000}`, "the policy-scope free item"),
+        ensureItem(`M-HRV-K-FREE-${Date.now() % 100000}`, "the policy-scope free item", false),
       );
       await receiveAt(freeItem, f.warehouseFg, "2", `M-HRV-K-FREE-${Date.now() % 100000}`);
       await withTenant(TENANT_M, () =>
@@ -904,7 +906,9 @@ describe("the hard-review regression tests — the negative-stock bypass and the
     expect(partial.advisoryNote.ar).toContain("2.000000");
     expect(partial.advisoryNote.ar).toContain("4.000000");
 
-    // (m4) THE BACKORDER LAW: zero stock still issues — no ATP gate.
+    // (m4) THE BACKORDER LAW: zero stock still issues — no ATP gate
+    // (issuedOrderLine already drove submit → approve → issue: the issue
+    // itself is the proof — a zero-stock line reached ISSUED).
     const zeroItem = await withTenant(TENANT_M, () =>
       ensureItem(`M-HRV-M-ZERO-${Date.now() % 100000}`, "the standing zero-stock item"),
     );
@@ -917,9 +921,7 @@ describe("the hard-review regression tests — the negative-stock bypass and the
     );
     expect(zeroCheck.verdict).toBe("SHORT");
     expect(zeroCheck.protection).toBe("UNPROTECTED");
-    const issuedOrder = await withTenant(TENANT_M, () =>
-      salesOrdersSvc.issue(zeroOrder.orderId, M_ACTOR),
-    );
-    expect(issuedOrder.status).toBe("ISSUED");
+    const zeroIssuedRow = await withTenant(TENANT_M, () => salesOrdersSvc.find(zeroOrder.orderId));
+    expect(zeroIssuedRow.status).toBe("ISSUED");
   });
 });

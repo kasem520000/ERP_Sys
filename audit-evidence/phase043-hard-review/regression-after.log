@@ -1,0 +1,85 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-14 20:58:17.150 UTC [5694] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-14 20:58:17.150 UTC [5694] LOG:  listening on IPv6 address "::1", port 33727
+2026-11-14 20:58:17.150 UTC [5694] LOG:  listening on IPv4 address "127.0.0.1", port 33727
+
+2026-11-14 20:58:17.151 UTC [5694] LOG:  listening on Unix socket "/tmp/.s.PGSQL.33727"
+
+2026-11-14 20:58:17.152 UTC [5697] LOG:  database system was shut down at 2026-11-14 20:58:17 UTC
+
+2026-11-14 20:58:17.154 UTC [5694] LOG:  database system is ready to accept connections
+
+(node:5753) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/__db__/manufacturing/reservation-hard-review.spec.ts (3 tests) 1645ms
+   ✓ the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (l) THE DELIVERY IDENTITY CONTRACT: a foreign order line, an item mismatch, a warehouse mismatch, and duplicate bindings are REJECTED at create AND at post (create bypassed — zero residue); partial and concurrent settlements still settle exactly; a post that fails after its plans leaves ZERO residue  516ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  20:58:16
+   Duration  8.97s (transform 1.38s, setup 0ms, collect 2.46s, tests 1.65s, environment 0ms, prepare 58ms)
+
+2026-11-14 20:58:25.070 UTC [5694] LOG:  received fast shutdown request
+2026-11-14 20:58:25.070 UTC [5694] LOG:  aborting any active transactions
+2026-11-14 20:58:25.070 UTC [5777] FATAL:  terminating connection due to administrator command
+
+2026-11-14 20:58:25.071 UTC [5775] FATAL:  terminating connection due to administrator command
+2026-11-14 20:58:25.071 UTC [5776] FATAL:  terminating connection due to administrator command
+
+2026-11-14 20:58:25.073 UTC [5694] LOG:  background worker "logical replication launcher" (PID 5700) exited with exit code 1
+
+2026-11-14 20:58:25.076 UTC [5695] LOG:  shutting down
+
+2026-11-14 20:58:25.076 UTC [5695] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-14 20:58:25.097 UTC [5695] LOG:  checkpoint complete: wrote 3024 buffers (18.5%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.015 s, sync=0.006 s, total=0.022 s; sync files=2377, longest=0.001 s, average=0.001 s; distance=24917 kB, estimate=24917 kB; lsn=0/2D33FA8, redo lsn=0/2D33FA8
+
+(node:5753) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:5753) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-14 20:58:25.106 UTC [5694] LOG:  database system is shut down
+

@@ -993,20 +993,43 @@ function runSelfTest(): boolean {
       findings043b.length === 1,
   );
 
-  // (9c) THE REAL 045 SHAPE + the same mutation: the note references
-  // G-51/G-52/INV-030/BR-068…070 (other phases' reserved / implemented
-  // ids — legitimate), the claims G-50/G-51/INV-031/BR-081…083 claim; the
-  // mutated G-50→G-44 claim is rejected while the note's references —
-  // including G-51, claimed later in the SAME unit — stay clean.
+  // (9c) THE REAL 045 SHAPE + the same mutation — SYNTHETIC FIXTURE
+  // STATE (the 043 hard-review round's fix, the probes-1/5/8 precedent):
+  // the probe previously leaned on the LIVE ledger, so it broke the
+  // moment the 043-completion round consumed BR-081 and re-coordinated
+  // the ladder (+1 through 051) — the fixture's BR-081…083 claims went
+  // stale against the real canon the day the plan moved. The classifier
+  // is a pure function over its fixture arguments; the probe now carries
+  // its own synthetic 9xx reservation world (ids no canon will ever
+  // reach) shaped EXACTLY like the real 045 posting canon (note
+  // references + claims in one unit, G-951 claimed later in the SAME
+  // unit it references): the note references G-951/G-952/INV-930/
+  // BR-968…970 (other phases' synthetic reservations — legitimate), the
+  // claims G-950/G-951/INV-931/BR-982…984 claim; the mutated G-950→G-44
+  // claim (a REAL implemented id — the live conflict-detection arm)
+  // is rejected while the note's references stay clean.
   const phase045PostingCanon = [
     "- **Posting canon** (reservations re-coordinated 2026-11-13 per",
-    "  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-51/G-52/INV-030/BR-068…070 predate the 039–042 waves' consumption of those slots): goldens G-50 (period-end leave accrual run — policy-gated) and",
-    "  G-51 (leave encashment settlement through the payroll payout machinery) added to",
+    "  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-951/G-952/INV-930/BR-968…970 predate the 939–942 waves' consumption of those slots): goldens G-950 (period-end leave accrual run — policy-gated) and",
+    "  G-951 (leave encashment settlement through the payroll payout machinery) added to",
     "  `JOURNAL_RULES.md` §7 with a note that attendance, rosters, and overtime entries",
-    "  are **not ledger documents**. Invariant INV-031 (attendance / leave exactness)",
-    "  added to `ACCOUNTING_INVARIANTS.md`; BR-081…BR-083 added to",
+    "  are **not ledger documents**. Invariant INV-931 (attendance / leave exactness)",
+    "  added to `ACCOUNTING_INVARIANTS.md`; BR-982…BR-984 added to",
     "  `BUSINESS_RULES.md`.",
   ].join("\n");
+  const st9cReserved = new Map([
+    ["G-950", "PHASE-945"],
+    ["G-951", "PHASE-945"],
+    ["INV-931", "PHASE-945"],
+    ["BR-982", "PHASE-945"],
+    ["BR-983", "PHASE-945"],
+    ["BR-984", "PHASE-945"],
+    ["G-952", "PHASE-946"],
+    ["INV-930", "PHASE-940"],
+    ["BR-968", "PHASE-940"],
+    ["BR-969", "PHASE-940"],
+    ["BR-970", "PHASE-940"],
+  ]);
   const run045 = (text: string): { claims: number; findings: Finding[] } => {
     const findings: Finding[] = [];
     let claims = 0;
@@ -1014,11 +1037,11 @@ function runSelfTest(): boolean {
       if (block.kind === "heading" || block.kind === "quote" || block.kind === "code") continue;
       const result = classifyText(
         block.text,
-        "PHASE-045",
+        "PHASE-945",
         findings,
-        `PHASE-045.md:${block.line}`,
-        RESERVED_BY,
-        RESERVATION_PHASES,
+        `synthetic:phase-945:${block.line}`,
+        st9cReserved,
+        new Set(["PHASE-945"]),
       );
       claims += result.claims;
     }
@@ -1027,12 +1050,12 @@ function runSelfTest(): boolean {
   const clean045 = run045(phase045PostingCanon);
   const mutated045 = run045(
     phase045PostingCanon.replace(
-      "slots): goldens G-50 (period-end leave accrual run — policy-gated) and",
+      "slots): goldens G-950 (period-end leave accrual run — policy-gated) and",
       "slots): goldens G-44 (period-end leave accrual run — policy-gated) and",
     ),
   );
   check(
-    "(9c) the REAL 045 shape — 6 claims / 0 findings clean; the mutated G-50→G-44 claim rejected while the note's references stay clean",
+    "(9c) the REAL 045 shape (synthetic fixture, ledger-independent) — 6 claims / 0 findings clean; the mutated G-950→G-44 claim rejected while the note's references stay clean",
     clean045.claims === 6 &&
       clean045.findings.length === 0 &&
       mutated045.findings.length === 1 &&
@@ -1040,22 +1063,39 @@ function runSelfTest(): boolean {
       mutated045.findings[0]!.detail.includes("G-44"),
   );
 
-  // (9d) THE REAL 046 SHAPE: the claim clause ends "… added to
+  // (9d) THE REAL 046 SHAPE — SYNTHETIC FIXTURE STATE (same
+  // independence as 9c): the claim clause ends "… added to
   // `JOURNAL_RULES.md` §7 as the extension of the G-29 family" — the
-  // implemented G-29 rides a CLAIM clause as a REFERENCE (the proximity
-  // demotion), the note's "…; the references to 045's delivery follow its
-  // re-coordinated G-51" keeps G-51 a reference inside the parenthetical
-  // (the `;` at depth 1 never splits), and the mutated G-52→G-44 claim is
-  // rejected with G-29 still NEVER flagged.
+  // REAL implemented G-29 rides a CLAIM clause as a REFERENCE (the
+  // proximity demotion — the live conflict-detection arm stays real),
+  // the note's "…; the references to 945's delivery follow its
+  // re-coordinated G-951" keeps G-951 a reference inside the
+  // parenthetical (the `;` at depth 1 never splits), and the mutated
+  // G-952→G-44 claim is rejected with G-29 still NEVER flagged.
   const phase046PostingCanon = [
     "- **Posting canon** (reservations re-coordinated 2026-11-13 per",
-    "  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-53…G-55/INV-031/BR-071…073 predate the 039–042/044 waves' consumption of those slots; the references to 045's delivery follow its re-coordinated G-51): goldens G-52 (statutory accrual — employee share withheld to a",
-    "  statutory payable with the remittance settlement leg), G-53 (employer contribution",
-    "  expense), G-54 (EOSB true-up — provision delta only) added to `JOURNAL_RULES.md`",
-    "  §7 as the extension of the G-29 family; invariant INV-032 (statutory exactness)",
-    "  added to `ACCOUNTING_INVARIANTS.md`; BR-084…BR-086 added to",
+    "  [../../planning/ID_LEDGER.md](../../planning/ID_LEDGER.md) — the original plan's G-953…G-955/INV-931/BR-971…973 predate the 939–942/944 waves' consumption of those slots; the references to 945's delivery follow its re-coordinated G-951): goldens G-952 (statutory accrual — employee share withheld to a",
+    "  statutory payable with the remittance settlement leg), G-953 (employer contribution",
+    "  expense), G-954 (EOSB true-up — provision delta only) added to `JOURNAL_RULES.md`",
+    "  §7 as the extension of the G-29 family; invariant INV-932 (statutory exactness)",
+    "  added to `ACCOUNTING_INVARIANTS.md`; BR-985…BR-987 added to",
     "  `BUSINESS_RULES.md`.",
   ].join("\n");
+  const st9dReserved = new Map([
+    ["G-952", "PHASE-946"],
+    ["G-953", "PHASE-946"],
+    ["G-954", "PHASE-946"],
+    ["INV-932", "PHASE-946"],
+    ["BR-985", "PHASE-946"],
+    ["BR-986", "PHASE-946"],
+    ["BR-987", "PHASE-946"],
+    ["G-951", "PHASE-945"],
+    ["G-955", "PHASE-948"],
+    ["INV-931", "PHASE-945"],
+    ["BR-971", "PHASE-940"],
+    ["BR-972", "PHASE-940"],
+    ["BR-973", "PHASE-940"],
+  ]);
   const run046 = (text: string): { claims: number; findings: Finding[] } => {
     const findings: Finding[] = [];
     let claims = 0;
@@ -1063,11 +1103,11 @@ function runSelfTest(): boolean {
       if (block.kind === "heading" || block.kind === "quote" || block.kind === "code") continue;
       const result = classifyText(
         block.text,
-        "PHASE-046",
+        "PHASE-946",
         findings,
-        `PHASE-046.md:${block.line}`,
-        RESERVED_BY,
-        RESERVATION_PHASES,
+        `synthetic:phase-946:${block.line}`,
+        st9dReserved,
+        new Set(["PHASE-946"]),
       );
       claims += result.claims;
     }
@@ -1076,12 +1116,12 @@ function runSelfTest(): boolean {
   const clean046 = run046(phase046PostingCanon);
   const mutated046 = run046(
     phase046PostingCanon.replace(
-      "G-51): goldens G-52 (statutory accrual — employee share withheld to a",
-      "G-51): goldens G-44 (statutory accrual — employee share withheld to a",
+      "G-951): goldens G-952 (statutory accrual — employee share withheld to a",
+      "G-951): goldens G-44 (statutory accrual — employee share withheld to a",
     ),
   );
   check(
-    "(9d) the REAL 046 shape — 7 claims / 0 findings clean (G-29 stays a reference inside the claim clause, G-51 a reference inside the note); the mutated G-52→G-44 claim rejected, G-29 never flagged",
+    "(9d) the REAL 046 shape (synthetic fixture, ledger-independent) — 7 claims / 0 findings clean (the implemented G-29 stays a reference inside the claim clause, G-951 a reference inside the note); the mutated G-952→G-44 claim rejected, G-29 never flagged",
     clean046.claims === 7 &&
       clean046.findings.length === 0 &&
       mutated046.findings.length === 1 &&
