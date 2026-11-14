@@ -202,6 +202,20 @@ forced the correction of three real design defects before any golden ran);
 OA-06 EXPLAIN budgets 4/4; RISK-031 deliberately still open (the aggregate probe
 is a necessary condition, never a per-batch/per-serial proof). Evidence:
 [the completion report](../implementation/phases/reports/PHASE-043-COMPLETION.md).
+**Post-closure audit-fix wave (2026-11-14 — the owner's independent audit
+of the closure raised eight items, all fixed):** the id-ledger self-test's
+state-dependence (the owner-based claim law + the CI gate), the MRP scope's
+silent demand drop (the planning closure + the substitution rewiring + the
+single-level explosion + the scoped LLC), the suggestion-conversion races
+(row-locked serialization), the MTO reservation lifecycle to the delivery
+(the per-line partial settlement + the explicit link contract), the
+over-reservation in every path (the locked creation choke point + the
+unbinned fallback), the ATP/CTP contract (six time-phased laws — the truck
+never promises), and the planning timing laws (the horizon boundary, the
+finite surplus draw, the per-date in-flight netting); five new DB spec
+files with pre/post evidence; the full DB suite re-ran at the final head
+216/216 · 3,118/3,118 EXIT=0; the evidence ledger:
+[gate-evidence/2026-11-14-post043-audit-fixes.md](../operations/gate-evidence/2026-11-14-post043-audit-fixes.md).
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)

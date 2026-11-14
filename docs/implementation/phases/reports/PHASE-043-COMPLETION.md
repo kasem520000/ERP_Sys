@@ -92,9 +92,9 @@ were granted in the plans but absent from `FEATURE_DEPS`, so every closure check
 read them as unknown-missing; §4).
 
 **Sync surface (CR-36 g / OA-02): N/A-recorded** — planning is a server-side
-batch (async runs with progress) over server-owned data with read-only boards;
-no offline/field surface is in scope. Recorded per the phase doc §5 task notes;
-the registry count is unchanged.
+batch (the SYNCHRONOUS atomic run — the deviation below) over server-owned
+data with read-only boards; no offline/field surface is in scope. Recorded
+per the phase doc §5 task notes; the registry count is unchanged.
 
 **i18n:** +95 keys/locale (5,767 = 5,767 runtime-counted — the two screens, the
 item-card planning tab, and the 17 localized error cases); parity check green.
@@ -185,6 +185,22 @@ ID_LEDGER re-coordinated (implemented G 49 · INV 30 · BR 80 — 0 errors).
   protocol (`__image_snapshots__/` is gitignored by design — a fresh clone
   writes then compares): the first run wrote the 99 ar/en baselines, the second
   compared at threshold 0 — green, with axe clean in both directions.
+- **THE POST-CLOSURE AUDIT-FIX WAVE (2026-11-14 — the owner's independent
+  audit of this closure raised eight items; items 1–7 are code+test fixes
+  at heads `817b276`…`1cdd948`, item 8 the documentation corrections):
+  the id-ledger self-test's state-dependence (the owner-based claim law);
+  the MRP scope's silent demand drop (the planning closure + the
+  substitution rewiring + the single-level explosion + the scoped LLC);
+  the conversion races (the row-locked serialized accept); the MTO
+  reservation lifecycle (the per-delivered-line partial settlement + the
+  link's explicit warehouse contract); the over-reservation in EVERY
+  creation path (the locked choke point + the unbinned fallback); the
+  ATP/CTP contract (six laws, time-phased, the truck never promises);
+  the planning timing laws (the horizon boundary, the finite surplus
+  draw, the per-date in-flight netting). Each fix carries its practical
+  PRE-fix reproduction and post-fix proof; the full evidence ledger is
+  [docs/operations/gate-evidence/2026-11-14-post043-audit-fixes.md](../../../operations/gate-evidence/2026-11-14-post043-audit-fixes.md)
+  and the gates re-ran fresh at the final head (216/216 · 3,118/3,118).**
 - **RISK-031 stays OPEN — deliberately.** MRP netting consumes the WMS supply
   fold (the bin-level on-hand qualification) as ONE input among many; the green
   nightly probe remains a NECESSARY aggregate condition, never a per-batch or
@@ -193,53 +209,63 @@ ID_LEDGER re-coordinated (implemented G 49 · INV 30 · BR 80 — 0 errors).
   per-batch/per-serial recurring detector remains future hardening exactly as
   the register records it.
 
-## 5. Gate evidence (the full sweep — fresh, this closure run)
+## 5. Gate evidence — the honest ledger
 
-- **typecheck:** 8/8 packages, zero errors. **lint:** 8/8. **boundaries
-  (dependency-cruiser):** 3,147 modules, 14,250 dependencies — no violations.
-- **unit + property:** 8/8 packages green — api **616/616** (incl. the 40 new
-  pure-kernel oracle/property tests), web 73/73, sync-core 36/36, domain-core
-  38/38.
-- **DB suite (embedded PG16, the full 79-migration chain):**
-  **210/210 files · 3,095/3,095 tests — 0 failures (EXIT=0)** (the 044 baseline
-  was 202 files / 2,979 tests; +116 across the planning family and the
-  regression base). Includes `migrations.db.spec.ts` 7/7 (apply + re-apply
-  no-op + the RLS catalog drift probe over all 79).
-- **isolation (RLS A1–A10):** identity-isolation **1,512/1,512** (+60 for the
-  10 new tenant tables) + sandbox-isolation 7/7 — inside the full run.
-- **planning goldens:** **12/12** (G-47/G-48/G-49 with their typed failure
-  packs, the BR-078 fence guards, BR-079, BR-080, the INV-030 db proofs, the
-  BOR rough-cut warning law).
-- **OA-06 EXPLAIN budgets:** **4/4** — the explosion graph load (the engine's
-  once-per-run BOM walk: both join legs index-driven — the planner's Hash Join
-  flip at the larger seeded body is asserted by the shape-invariant "both legs
-  indexed, no Seq Scan" form), the suggestions board
-  (`ix_mrp_suggestions_tenant_status`), the run-history list
-  (`ix_mrp_runs_tenant_wh_created`), and the netting drill-down
-  (`ix_mrp_demand_lines_run_item`) — seeded + ANALYZEd (the 041/042 method;
-  index-driven, zero seq-scans).
-- **build:** 8/8 packages (after the §4-(k) repair).
-- **design-system harness:** visual **16/16** (threshold 0, both directions,
-  the regenerated baselines) + perf 1/1 — axe clean on every story.
-- **web secure-headers/CSP probe:** 6/6.
-- **docs:validate:** 33/33. **i18n parity:** 5,767 = 5,767 (AR = EN; +95, the
-  operative count). **permissions drift:** **291 = 291** (matrix §3.22 = the
-  seed union — the honest count). **manifests:** 13/13 valid. **id-ledger:**
-  implemented G 49 · INV 30 · BR 80 — 0 errors, 0 warnings.
-- **report registry:** 101 contracts (the unit + wiring + golden +
-  industry-018/019 + consolidation pins re-anchored).
-- **token-contrast:** all §16 pairs pass the AA floor. **ui catalog:** 39
-  component exports ↔ 62 catalog rows — parity green.
-- **negative meta-tests:** boundary enforcement (ESLint exits 1 on the
-  violating fixture) · all four UI rules fail their fixtures · the drifting
-  i18n fixture fails the parity checker — proof complete ×3.
+**Every result below was ACTUALLY RUN** — the closure run (2026-11-13) and,
+after the owner's audit, re-run fresh at the final audit-fix head
+(2026-11-14). Nothing is inferred or transferred from another session; the
+failures encountered on the way are listed as failures. The per-command
+ledger with the pre/post evidence of every audit fix:
+[docs/operations/gate-evidence/2026-11-14-post043-audit-fixes.md](../../../operations/gate-evidence/2026-11-14-post043-audit-fixes.md).
+
+- **typecheck 8/8 · lint 8/8 · boundaries clean** (dependency-cruiser: no
+  violations — the closure session's 3,147-module count included the
+  storybook build artifacts of that environment; the clean-tree count at
+  the final head is 1,825 modules / 13,488 dependencies, also clean).
+- **unit + property:** 8/8 packages — api **616/616** (incl. the 40
+  pure-kernel oracle/property tests), web, sync-core, domain-core green.
+- **DB suite (embedded PG16, the full 79-migration chain):** the closure
+  run **210/210 · 3,095/3,095 · EXIT=0**; the audit-fix head
+  **216/216 · 3,118/3,118 · EXIT=0** (+5 audit spec files, +20 tests).
+  Includes the migrations spec 7/7 (apply + re-apply no-op + the RLS
+  catalog drift probe) and isolation **1,512/1,512**.
+- **planning goldens: 12/12** (G-47/G-48/G-49 + the failure packs,
+  BR-078/079/080, the INV-030 db proofs, the BOR warning law) — green in
+  BOTH runs.
+- **OA-06 EXPLAIN budgets: 4/4** — the explosion walk (both join legs
+  index-driven, the shape-invariant assertion), the suggestions board, the
+  run-history list, the netting drill-down.
+- **build 8/8 · web-security 6/6 · token-contrast AA · ui-catalog 39↔62 ·
+  i18n 5,767 = 5,767 · drift 291 = 291 · manifests 13/13 · id-ledger +
+  self-test 0 errors · 15/15 · docs:validate 33/33 · negatives ×3** — all
+  green in BOTH runs.
+- **design-system harness:** the closure run regenerated the gitignored
+  baselines per the documented first-run protocol, then compared green
+  (**16 + perf 1**); the audit-fix environment (a fresh clone — the
+  baselines are local by design) repeated the SAME two-run protocol:
+  first run 12 passed / 4 baseline-writes, second run **16 + perf 1,
+  EXIT=0**, axe clean both directions.
+- **report registry: 101 contracts** (the unit + wiring + industry pins
+  re-anchored in both runs).
 
 ## 6. Delivery
 
 The per-phase archive `ERP_PLATFORM_PHASE043.zip` (OA-07) accompanies this
-report. With 043 delivered, **Stage 13's "full ERP" gate condition CR-38 gains
+report. **Its purpose and inclusion rule (made explicit per the audit):** a
+review/restore snapshot of EVERY git-tracked file at the delivery head,
+built with `git archive` (byte-for-byte what git holds), EXCLUDING the root
+`ERP_PLATFORM_PHASE*.zip` archives of previous phases (nested-zip bloat and
+the circular self-inclusion — the repository carries them) and the
+gitignored artifacts (not tracked by definition). The completeness proof —
+the archive's file list equals `git ls-files` minus the excluded zips — is
+verified at build time (the diff recorded in the delivery commit). The
+delivered zip is built BEFORE its own commit and the exclusion rule governs
+any rebuild (the archive never contains itself).
+
+With 043 delivered, **Stage 13's "full ERP" gate condition CR-38 gains
 its MRP-live evidence** (record it in the gate checklist). **PHASE-045 (HR
 Core)** is the next eligible phase — its prerequisites are met, and nothing in
 HR consumes MRP directly (the payroll variable-feed discipline mirrors the
 run-snapshot pattern used here; the §8 handoff notes stand). The owner
-continues with «ابدأ تنفيذ المرحلة PHASE-045» (or any unblocked wave-2 phase).
+continues with «ابدأ تنفيذ المرحلة PHASE-045» (or any unblocked wave-2 phase)
+— **after the independent review of this audit-fix wave.**

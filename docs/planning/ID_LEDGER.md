@@ -13,9 +13,9 @@ duplicates their rows, only counts them for the operator:
 
 | Family | Canon document | Row shape | Implemented through |
 |---|---|---|---|
-| Goldens `G-xx` | [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md) §7 | `\| G-xx \| … \| PHASE-0yy \|` | G-01…G-46 (through PHASE-044) |
-| Invariants `INV-xxx` | [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md) | `\| INV-xxx \| … \|` | INV-001…INV-029 (through PHASE-044) |
-| Business rules `BR-xxx` | [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §"the register" | `\| BR-xxx \| … \|` | BR-001…BR-077 (through PHASE-044) |
+| Goldens `G-xx` | [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md) §7 | `\| G-xx \| … \| PHASE-0yy \|` | G-01…G-49 (through PHASE-043) |
+| Invariants `INV-xxx` | [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md) | `\| INV-xxx \| … \|` | INV-001…INV-030 (through PHASE-043) |
+| Business rules `BR-xxx` | [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §"the register" | `\| BR-xxx \| … \|` | BR-001…BR-080 (through PHASE-043) |
 
 ## 2. Reservations (the coordinated ladder — 2026-11-13)
 

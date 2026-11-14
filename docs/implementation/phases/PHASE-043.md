@@ -178,9 +178,10 @@ PHASE-042 prerequisite.
 
 Acceptance criteria (all must pass with recorded evidence):
 
-1. Migrations ≈ 0067…0072 apply cleanly; Drizzle mirrors + `ENTITY_CATALOG.md` parity
-   for all 6 tables (CR-36 (a)); RLS attack tests A1–A10 pass for every new tenant
-   table (CR-36 (e)).
+1. Migrations 0074–0079 apply cleanly (the planned ≈0067…0072 slots were
+   taken by PHASE-044 — the honest next slots; the numbering note); Drizzle
+   mirrors + `ENTITY_CATALOG.md` parity for the 11 tables (CR-36 (a)); RLS
+   attack tests A1–A10 pass for every new tenant table (CR-36 (e)).
 2. Net-requirements correctness proven by property tests over seeded multi-level
    fixtures: per bucket, (MPS + firm sales orders + safety stock) − (on-hand −
    reserved) − (open POs + open MOs) computes exactly; low-level-code explosion
@@ -215,8 +216,19 @@ Acceptance criteria (all must pass with recorded evidence):
   order: mitigated by a pure deterministic engine, replayable run snapshots,
   per-suggestion netting drill-down, and property tests over multi-level fixtures.
 - **Performance on deep BOM graphs** — explosion cost grows with levels and items:
-  mitigated by low-level-code memoization, async run execution with progress, OA-06
-  EXPLAIN budgets, and an explosion-depth cap with an explicit typed warning.
+  mitigated by low-level-code memoization, the synchronous atomic run (see the
+  deviation below), OA-06 EXPLAIN budgets, and an explosion-depth cap with an
+  explicit typed warning.
+
+  **Deviation (recorded honestly per the post-closure audit): the plan
+  sketched "async run execution with progress"; the DELIVERED engine runs
+  SYNCHRONOUSLY within the caller's unit of work — deliberately: the whole
+  run (row + snapshots + suggestions) commits or rolls back as ONE atomic
+  transaction (no half-written plans, ever), and the depth cap + the
+  memoized kernel bound the walk (the full DB suite's heaviest runs stay
+  in the hundreds of milliseconds). A progress-streaming async mode is
+  future work if real-world runtimes grow — it is NOT delivered and is no
+  longer described as such anywhere.
 - **Garbage-in planning data** — missing lead times or zero safety stock silently
   produce nonsense plans: mitigated by policy validation warnings, a data-readiness
   panel on the run screen, and the MRP exceptions report.
