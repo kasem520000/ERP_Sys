@@ -456,6 +456,39 @@ export async function listProductionOrders(filter: {
 }
 
 /**
+ * The ACTIVE MTO holders feeding ONE sales line — EXACT, no pagination
+ * (the round-3 probe): every ACTIVE PRODUCTION_ORDER-holder reservation
+ * whose production order is linked to the line, oldest MO first (the
+ * settlement's MTO-first contract). Pre-fix this fold composed TWO
+ * PAGINATED reads — listProductionOrders (limit 100, oldest-first) then
+ * invStore.listReservations (limit clamped to 200, NEWEST-first) — so a
+ * busy item's holder fell off EITHER page and the fold returned nothing
+ * for it: the delivery settlement retired nothing, the order's
+ * cancel/close released nothing, and the holder leaked ACTIVE forever
+ * (the round-2 item-1 leak family through the pagination door). One
+ * exact JOIN: a line's MTO chain is business-bounded, and the
+ * settlement must see ALL of it.
+ */
+export async function listActiveMtoHolderReservationsForLine(input: {
+  salesOrderLineId: string;
+  itemId: string;
+  warehouseId: string;
+}): Promise<{ id: string; qty: string; holderId: string; note: string | null }[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT r.id, r.qty::text AS "qty", r.holder_id AS "holderId", r.note
+    FROM stock_reservations r
+    JOIN production_orders p ON p.id = r.holder_id
+    WHERE r.holder_type = 'PRODUCTION_ORDER'
+      AND r.status = 'ACTIVE'
+      AND r.item_id = ${input.itemId}
+      AND r.warehouse_id = ${input.warehouseId}
+      AND p.sales_order_line_id = ${input.salesOrderLineId}
+    ORDER BY p.created_at, p.id, r.created_at
+  `);
+  return rows.rows as unknown as { id: string; qty: string; holderId: string; note: string | null }[];
+}
+
+/**
  * The single order-header mutation point. Absent values leave the column
  * untouched (COALESCE semantics — the patchJobCard pattern); the lifecycle
  * timestamps stamp via CASE on the target status exactly once, with an

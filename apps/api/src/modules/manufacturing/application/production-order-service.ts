@@ -17,7 +17,6 @@ import {
   type ReceiptPlan,
 } from "../../inventory/application/movement-core";
 import { TrackingService } from "../../inventory/application/tracking-service";
-import * as invStore from "../../inventory/infrastructure/inventory.store";
 import { InboxService } from "../../notifications/application/inbox-service";
 import {
   RESOLVE_EFFECTIVE_CONFIG_SERVICE,
@@ -1390,6 +1389,19 @@ export class ProductionOrderService {
  * line's own sales reservation). A standalone application function: the
  * sales delivery post calls it through the manufacturing application
  * surface (the AtpService precedent — never another module's store).
+ *
+ * THE EXACT READ (the round-3 probe): pre-fix this fold composed TWO
+ * PAGINATED reads — listProductionOrders (limit 100, oldest-first) then
+ * invStore.listReservations (limit 500 CLAMPED TO 200 by the store,
+ * NEWEST-first) — so a busy item's MTO holder fell off EITHER page and
+ * the fold returned NOTHING for it: the delivery settlement retired
+ * nothing, the order's cancel/close released nothing, and the holder
+ * leaked ACTIVE forever (the mto-reservation-page round-3 spec's pre-fix
+ * proof, both arms: 201 newer reservations pushed the holder off the
+ * 200-newest page; 100 filler MOs pushed the victim MO off the
+ * 100-oldest page). The read is now ONE EXACT JOIN in the manufacturing
+ * store (listActiveMtoHolderReservationsForLine) — no LIMIT, no page,
+ * the whole chain every time.
  */
 export async function listActiveMtoReservationsForSalesLine(input: {
   salesOrderLineId: string;
@@ -1398,33 +1410,5 @@ export async function listActiveMtoReservationsForSalesLine(input: {
 }): Promise<
   readonly { id: string; qty: string; holderId: string; note: string | null }[]
 > {
-  const feedingMos = await store.listProductionOrders({
-    salesOrderLineId: input.salesOrderLineId,
-    limit: 100,
-  });
-  const feedingMoIds = new Set(feedingMos.map((mo) => mo.id));
-  const active = await invStore.listReservations({
-    itemId: input.itemId,
-    warehouseId: input.warehouseId,
-    status: "ACTIVE",
-    limit: 500,
-  });
-  return active
-    .filter(
-      (row): row is (typeof active)[number] & { holderId: string } =>
-        row.holderType === "PRODUCTION_ORDER" &&
-        row.holderId !== null &&
-        feedingMoIds.has(row.holderId),
-    )
-    .sort((a, b) =>
-      feedingMos.findIndex((mo) => mo.id === a.holderId) -
-        feedingMos.findIndex((mo) => mo.id === b.holderId) ||
-      (a.note ?? "").localeCompare(b.note ?? ""),
-    )
-    .map((row) => ({
-      id: row.id,
-      qty: row.qty,
-      holderId: row.holderId,
-      note: row.note ?? null,
-    }));
+  return store.listActiveMtoHolderReservationsForLine(input);
 }
