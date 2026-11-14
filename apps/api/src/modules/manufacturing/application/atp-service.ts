@@ -16,13 +16,37 @@ import { AtpInputInvalidError } from "../domain/manufacturing-errors";
  *   − ACTIVE non-expired stock_reservations
  * (the same basis the engine's qualified on-hand uses — one truth). The
  * batch-level quarantine (item_batches.status <> 'ACTIVE') is already
- * excluded by the join. In-transit is VISIBLE but never promiseable
- * until received (BR-016's law).
+ * excluded by the join.
  *
- * CTP: the first date live supply can cover the remainder — the forward
- * scan over open POs (expected dates), open MOs (planned dates), and
- * inbound transfers (imminent — the as-of date) using the same
- * deterministic netting the engine snapshots.
+ * THE JUDGMENT CONTRACT (the 043-audit item-6 fix — time-phased, made
+ * explicit; pre-fix the verdict compared the requested qty against
+ * available-NOW only, so a promise weeks out failed even when the
+ * covering supply was already scheduled to land in time, and an
+ * undated/imminent leg could back a suggested date):
+ *
+ * 1. The basis is EXPIRY-AWARE against the promise date: an on-hand
+ *    batch whose expiry precedes the (effective) requested date cannot
+ *    back it (the engine's batch-aware-carry law, M-10 — a batch that
+ *    will be gone by then never promises).
+ * 2. The coverage at the requested date = the expiry-aware basis + the
+ *    DATED incoming legs (open POs by expected date, open MOs by
+ *    planned date) that arrive on/before the requested date and inside
+ *    the horizon. Verdict OK iff coverage ≥ the requested qty — the
+ *    trivial case is the basis alone covering.
+ * 3. In-transit transfers are VISIBLE evidence but NEVER promiseable
+ *    (BR-016's law — the pre-fix code counted them at the as-of date
+ *    against its own documentation); an undated leg never promises (a
+ *    promise needs a date). Both stay in the incoming evidence list.
+ * 4. Unreserved sibling demand (other ISSUED order lines without an
+ *    ACTIVE reservation) does NOT reduce the basis — the
+ *    soft-reservation law: only reservations hold stock; the SHORT
+ *    verdict is the line's own over-promise warning.
+ * 5. A requested date in the past is floored to the as-of date (a
+ *    promise never back-dates).
+ *
+ * CTP: the first DATED supply date the remaining shortfall is covered
+ * (deterministic order: date, then kind), within the horizon; null when
+ * the horizon cannot cover it.
  */
 
 const QTY_RE = /^\d+(\.\d{1,6})?$/;
@@ -80,13 +104,19 @@ export class AtpService {
     if (!DATE_RE.test(requestedDate) || Number.isNaN(Date.parse(`${requestedDate}T00:00:00Z`))) {
       throw new AtpInputInvalidError(`date must be an ISO date (YYYY-MM-DD): ${requestedDate}`);
     }
+    // Contract law 5: a promise never back-dates.
+    const effectiveRequested = requestedDate < asOf ? asOf : requestedDate;
     const horizonDays = input.horizonDays ?? 90;
+    const horizonEnd = addDaysIso(asOf, horizonDays);
 
     // The promiseable basis — the same qualified fold the engine uses
     // (bin AVAILABLE + tenant-owned − ACTIVE reservations), scoped to the
-    // item + warehouse.
+    // item + warehouse, EXPIRY-AWARE against the promise date (law 1: a
+    // batch whose expiry precedes the requested date never backs it).
     const onHandRows = (await store.listQualifiedOnHand(input.warehouseId)).filter(
-      (row) => row.itemId === input.itemId,
+      (row) =>
+        row.itemId === input.itemId &&
+        (row.expiresOn === null || row.expiresOn >= effectiveRequested),
     );
     const reservationRows = (await store.listActiveReservations(input.warehouseId)).filter(
       (row) => row.itemId === input.itemId,
@@ -98,23 +128,11 @@ export class AtpService {
     );
 
     const requested = new Decimal(input.qty);
-    if (availableNow.greaterThanOrEqualTo(requested)) {
-      return {
-        itemId: input.itemId,
-        warehouseId: input.warehouseId,
-        asOf,
-        requestedQty: requested.toFixed(6),
-        requestedDate,
-        availableNow: availableNow.toFixed(6),
-        suggestedDate: null,
-        verdict: "OK",
-        incoming: [],
-      };
-    }
 
-    // CTP: the forward scan over scheduled supply (deterministic order:
-    // date, then kind). Inbound transfers count at the as-of date (they
-    // are on the truck — imminent, not dated).
+    // The incoming evidence — everything scheduled (dated legs) or on the
+    // truck (transfers). Dated PO/MO legs are the PROMISEABLE supply
+    // (law 2); transfers and undated legs are visible but never promise
+    // (law 3).
     const incoming: AtpResult["incoming"] = [];
     for (const row of await store.listOpenPoSupply(input.warehouseId)) {
       if (row.itemId !== input.itemId) continue;
@@ -135,17 +153,36 @@ export class AtpService {
       return a.kind < b.kind ? -1 : 1;
     });
 
-    let remaining = requested.minus(availableNow);
+    // The CTP walk over the PROMISEABLE legs only (law 3: a DATED open-PO/
+    // open-MO leg — never an in-transit transfer (its as-of date is
+    // "on the truck", not a landing date) and never an undated leg),
+    // deterministic order, within the horizon — the earliest date the
+    // cumulative supply covers the shortfall.
+    const datedLegs = incoming.filter(
+      (leg) => leg.date !== null && leg.kind !== "INBOUND_TRANSFER",
+    );
     let suggestedDate: string | null = null;
-    for (const leg of incoming) {
-      if (remaining.lessThanOrEqualTo(0)) break;
-      if (leg.date !== null && leg.date > addDaysIso(asOf, horizonDays)) break;
-      remaining = remaining.minus(new Decimal(leg.qty));
-      if (remaining.lessThanOrEqualTo(0)) {
-        suggestedDate = leg.date ?? asOf;
-        break;
+    if (availableNow.greaterThanOrEqualTo(requested)) {
+      suggestedDate = null;
+    } else {
+      let remaining = requested.minus(availableNow);
+      for (const leg of datedLegs) {
+        if (remaining.lessThanOrEqualTo(0)) break;
+        if (leg.date! > horizonEnd) break;
+        remaining = remaining.minus(new Decimal(leg.qty));
+        if (remaining.lessThanOrEqualTo(0)) {
+          suggestedDate = leg.date;
+          break;
+        }
       }
     }
+
+    // The time-phased verdict (law 2): coverage at the requested date =
+    // the expiry-aware basis + the dated legs arriving on/before it.
+    const coverageAtRequested = datedLegs
+      .filter((leg) => leg.date! <= effectiveRequested && leg.date! <= horizonEnd)
+      .reduce((sum, leg) => sum.plus(new Decimal(leg.qty)), availableNow);
+    const verdict = coverageAtRequested.greaterThanOrEqualTo(requested) ? "OK" : "SHORT";
 
     return {
       itemId: input.itemId,
@@ -154,8 +191,11 @@ export class AtpService {
       requestedQty: requested.toFixed(6),
       requestedDate,
       availableNow: availableNow.toFixed(6),
+      // When the verdict is OK but the basis alone cannot cover, the
+      // suggested date is the earliest full-coverage DATED leg (≤ the
+      // requested date — the informative supply landing).
       suggestedDate,
-      verdict: "SHORT",
+      verdict,
       incoming,
     };
   }

@@ -43,10 +43,12 @@ export interface AtpPositionRow {
   consignmentOwned: string;
   /** on-hand − quarantined − reserved, floored at 0. */
   available: string;
-  /** Inbound supply arriving on/before as_of: open POs + open MOs
-   * (pending qty) + inbound transfers + MPS production ≤ as_of. */
+  /** The PROMISEABLE inbound supply arriving on/before as_of: DATED open
+   * POs + open MOs (pending qty) + MPS production ≤ as_of (the 043-audit
+   * item-6 law: in-transit transfers are VISIBLE but NEVER promiseable —
+   * BR-016; an undated leg never promises). */
   inbound: string;
-  /** available + inbound (the CTP at as_of). */
+  /** available + inbound (the promiseable CTP at as_of). */
   ctp: string;
 }
 
@@ -267,11 +269,6 @@ export class PlanningQueriesService {
           SELECT po.item_id, po.planned_date AS arrive_date, po.fg_warehouse_id, GREATEST(po.planned_qty - po.actual_qty, 0)
           FROM production_orders po
           WHERE po.status IN ('RELEASED', 'IN_PROGRESS') AND po.planned_date IS NOT NULL
-          UNION ALL
-          SELECT stl.item_id, CURRENT_DATE AS arrive_date, st.to_warehouse_id, stl.qty
-          FROM stock_transfers st
-          JOIN stock_transfer_lines stl ON stl.transfer_id = st.id AND stl.tenant_id = st.tenant_id
-          WHERE st.status = 'IN_TRANSIT'
           UNION ALL
           SELECT m.item_id, m.bucket_start AS arrive_date, m.warehouse_id, m.qty
           FROM mps_entries m WHERE m.status <> 'CANCELLED'

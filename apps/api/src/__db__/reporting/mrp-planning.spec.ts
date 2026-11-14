@@ -93,6 +93,24 @@ beforeAll(async () => {
     );
     await withTenant(TENANT_M, () => quarantine.transition(contentId, "QUARANTINE", { note: "REP-P043 spec hold", actorId: M_ACTOR }));
   }
+  // A second, CLEAN batch of 20 — the reservation's backing under the
+  // 043-audit item-5 over-reservation guard (creation fails closed
+  // without promiseable stock; the whole first batch is quarantined).
+  // The pinned arithmetic is PRESERVED EXACTLY: on-hand 120 −
+  // quarantined 100 − reserved 20 = available 0.
+  await withTenant(TENANT_M, () =>
+    stock.manualReceipt({
+      itemId: atpItem,
+      warehouseId: fixture.warehouseFg,
+      qty: "20",
+      unitCost: "5.00",
+      batchNo: "REP-P043-B2",
+      reason: "COUNT_GAIN",
+      counterAccountId: fixture.gl.inventoryAppreciation ?? null,
+      valueDate: new Date().toISOString().slice(0, 10),
+      actorId: M_ACTOR,
+    }),
+  );
   await withTenant(TENANT_M, () =>
     reservations.create({
       itemId: atpItem,
@@ -178,10 +196,10 @@ describe("manufacturing.atp-position — the BR-080 exclusion evidence", () => {
     const quarantined = Number(row!.values.quarantined);
     const reserved = Number(row!.values.reserved);
     const available = Number(row!.values.available);
-    expect(onHand).toBe(100);
-    expect(quarantined).toBe(100); // the whole batch held
+    expect(onHand).toBe(120); // 100 (the quarantined batch) + 20 (the reservation's clean backing)
+    expect(quarantined).toBe(100); // the whole first batch held
     expect(reserved).toBe(20);
-    expect(available).toBe(0); // max(100 − 100 − 20, 0) — floored honestly
+    expect(available).toBe(0); // max(120 − 100 − 20, 0) — floored honestly
     // The exclusion columns ride their own cells (BR-080's audit trail).
     expect(Number(row!.values.consignmentOwned)).toBeGreaterThanOrEqual(0);
     const exclusions = result.assertions.filter((assertion) =>
