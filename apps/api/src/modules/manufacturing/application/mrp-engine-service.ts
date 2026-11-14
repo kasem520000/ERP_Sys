@@ -54,7 +54,11 @@ import { MrpRunInputInvalidError, MrpRunNotFoundError } from "../domain/manufact
  * scope (every STOCK item with ANY planning signal at the warehouse);
  * NET_CHANGE requires the explicit item list — both compute the SAME
  * plan for their scope (the honest net-change contract: the scope is the
- * difference, not the algorithm). Execution is synchronous within the
+ * difference, not the algorithm), and BOTH expand the scope to the
+ * PLANNING CLOSURE (the 043-audit item-2 fix: the transitive BOM
+ * components + every substitute + the co-product outputs — a run never
+ * drops the demand its own explosion pushes onto a signal-less
+ * component). Execution is synchronous within the
  * caller's UoW (the run row carries its own lifecycle for the audit
  * trail); the depth cap + the memoized kernel bound the walk.
  */
@@ -158,15 +162,28 @@ export class MrpEngineService {
       throw new MrpRunInputInvalidError(`asOfDate must be an ISO date (YYYY-MM-DD): ${asOf}`);
     }
     let scopeItemIds: string[];
+    let requestedItemIds: string[] | null = null;
     if (input.runMode === "NET_CHANGE") {
       if (input.scopeItemIds === undefined || input.scopeItemIds.length < 1 || input.scopeItemIds.length > 200) {
         throw new MrpRunInputInvalidError(
           "NET_CHANGE runs require an explicit scope of 1..200 item ids (the honest net-change contract: the scope is the difference, not the algorithm)",
         );
       }
-      scopeItemIds = [...new Set(input.scopeItemIds)];
+      requestedItemIds = [...new Set(input.scopeItemIds)];
+      // The PLANNING CLOSURE (the 043-audit item-2 fix): the run must plan
+      // every item its scope can push demand onto — the operator's request
+      // stays ≤ 200, but the plan expands to the transitive components +
+      // substitutes + co-product outputs. Pre-fix, an explosion's demand on
+      // a signal-less component outside the scope was pushed and never
+      // consumed — the silent drop the audit reproduced in BOTH modes
+      // (deriveScopeItems requires an independent signal, so REGENERATIVE
+      // missed signal-less components too). Multi-level planning (M-07/
+      // M-08/M-09/M-11) requires the transitive plan; the operator never
+      // enumerates components by hand.
+      scopeItemIds = await this.scopeClosure(requestedItemIds);
     } else {
-      scopeItemIds = await store.deriveScopeItems(input.warehouseId);
+      const derived = await store.deriveScopeItems(input.warehouseId);
+      scopeItemIds = await this.scopeClosure(derived);
     }
     const params = {
       warehouseId: input.warehouseId,
@@ -174,6 +191,7 @@ export class MrpEngineService {
       horizonBuckets: input.horizonBuckets,
       runMode: input.runMode,
       scopeItemIds,
+      requestedItemIds,
       allowTransfers: input.allowTransfers === true,
       asOfDate: asOf,
     };
@@ -222,6 +240,51 @@ export class MrpEngineService {
       await store.patchMrpRun({ id: run.id, status: "FAILED", errorCode: code });
       throw error;
     }
+  }
+
+  /**
+   * The planning closure (the 043-audit item-2 fix): scope ∪ the transitive
+   * BOM components ∪ every substitute of every substitutable line in the
+   * reachable subgraph ∪ the co-product outputs of the reachable BOMs.
+   * Co-product outputs join as SUPPLY-ONLY members (this run's make orders
+   * add their supply — no further traversal: an output generates no demand
+   * here). Substitutes traverse further (a manufactured substitute's own
+   * components are demanded when it is planned). Reads the same graph the
+   * walk will read — one UoW, one consistent view.
+   */
+  private async scopeClosure(scopeItemIds: readonly string[]): Promise<string[]> {
+    const graphRows = await store.loadActiveBomGraph();
+    const byItem = new Map(graphRows.map((node) => [node.itemId, node]));
+    const lineIds = graphRows.flatMap((node) => node.lines.map((line) => line.lineId));
+    const substitutionRows = await store.loadSubstitutionsForLines(lineIds);
+    const outputsCache = new Map<string, Awaited<ReturnType<typeof store.listBomOutputs>>>();
+    const closure = new Set<string>(scopeItemIds);
+    const queue = [...scopeItemIds];
+    while (queue.length > 0) {
+      const node = byItem.get(queue.shift()!);
+      if (node === undefined) continue;
+      for (const line of node.lines) {
+        if (!closure.has(line.componentItemId)) {
+          closure.add(line.componentItemId);
+          queue.push(line.componentItemId);
+        }
+        for (const sub of substitutionRows.get(line.lineId) ?? []) {
+          if (!closure.has(sub.substituteItemId)) {
+            closure.add(sub.substituteItemId);
+            queue.push(sub.substituteItemId);
+          }
+        }
+      }
+      let outputs = outputsCache.get(node.bomId);
+      if (outputs === undefined) {
+        outputs = await store.listBomOutputs(node.bomId);
+        outputsCache.set(node.bomId, outputs);
+      }
+      for (const output of outputs) {
+        closure.add(output.itemId); // supply-only: no traversal
+      }
+    }
+    return [...closure];
   }
 
   /** The engine body — reads, levels, nets, writes. */
@@ -282,13 +345,24 @@ export class MrpEngineService {
     // substitute — NOT off the parent: the substitute's planning demand
     // originates at the primary's netting, so its low-level code must
     // exceed the primary's, which a sibling edge cannot guarantee).
+    // SCOPED TO THE RUN'S CLOSURE (the 043-audit item-2 hardening): a
+    // cycle ANYWHERE in the tenant's accumulated BOM graph (a cross-BOM
+    // A→B plus B→A pair — data debt the BOM activation check cannot see)
+    // used to kill EVERY run on the tenant (the LLC walk is whole-graph).
+    // The edges now come only from the closure's own members — a distant
+    // cycle no longer blocks planning of unrelated items, while a cycle
+    // INSIDE the planned subgraph still fails with the typed
+    // BomGraphCycleError (the fail-closed law, acceptance criterion 2).
+    const scopeSet = new Set(params.scopeItemIds);
     const llcEdges = new Map<string, { lines: { componentItemId: string }[] }>();
     for (const node of graphRows) {
+      if (!scopeSet.has(node.itemId)) continue;
       llcEdges.set(node.itemId, {
         lines: node.lines.map((line) => ({ componentItemId: line.componentItemId })),
       });
     }
     for (const node of graphRows) {
+      if (!scopeSet.has(node.itemId)) continue;
       for (const line of node.lines) {
         for (const sub of substitutionRows.get(line.lineId) ?? []) {
           const primary = llcEdges.get(line.componentItemId);
@@ -426,10 +500,21 @@ export class MrpEngineService {
         periodSupplyBuckets: item.periodSupplyBuckets,
       };
 
-      // Substitution (M-09): plan with the full demand, then shift the
-      // uncovered substitutable portion to the substitutes (priority
-      // order) and RE-PLAN — the substitute rows land on the substitutes'
-      // demand (they net later: the substitution edge in the leveling).
+      // Substitution (M-09 — the 043-audit item-2 rewiring): the COMPONENT
+      // plans with its full demand, then shifts the UNCOVERED substitutable
+      // portion to the substitutes (priority order) and RE-PLANS — the
+      // substitute rows land on the substitutes' demand (they net later:
+      // the substitution edge in the leveling). Pre-fix this block ran on
+      // the PARENT (keyed `node = graphNodes.get(itemId)` — the parent's
+      // own BOM) and filtered the parent's demand terms by
+      // `term.parentItemId ∈ the parent's OWN components` — a key that can
+      // never match (a term's parentItemId is its DEMANDING parent, never
+      // one of the term holder's components), so engine-level substitution
+      // never fired and only the pure kernel was tested. The wiring now
+      // keys on the CURRENT item as the COMPONENT: for every parent BOM
+      // line whose component is this item AND whose line carries
+      // substitutes, this item's uncovered explosion demand from that
+      // parent is substitution-eligible.
       let demand = [...(demandByItem.get(itemId) ?? [])];
       let plan = planItemBuckets({
         itemId,
@@ -446,62 +531,86 @@ export class MrpEngineService {
         parentItemId: string | null;
         bucketIndex: number;
       }[] = [];
-      const node = graphNodes.get(itemId);
-      if (node !== undefined) {
-        // Which demand terms trace to substitutable parent lines?
-        const substitutable = new Map<string, readonly BomSubstitute[]>();
-        for (const line of node.lines) {
+      // parentItemId → the ordered substitutes of the parent's line whose
+      // component is THIS item (a parent may substitute this component on
+      // at most one line — the BOM's one-line-per-component discipline).
+      const substitutableByParent = new Map<string, readonly BomSubstitute[]>();
+      for (const parentNode of graphNodes.values()) {
+        for (const line of parentNode.lines) {
+          if (line.componentItemId !== itemId) continue;
           const subs = substitutionsByLine.get(line.lineId);
-          if (subs !== undefined && subs.length > 0) substitutable.set(line.componentItemId, subs);
+          if (subs !== undefined && subs.length > 0) {
+            substitutableByParent.set(parentNode.itemId, subs);
+          }
         }
-        if (substitutable.size > 0) {
-          let mutated = false;
-          for (let index = 0; index < plan.buckets.length; index += 1) {
-            const bucket = plan.buckets[index]!;
-            if (new Decimal(bucket.netRequirement).lessThanOrEqualTo(0)) continue;
-            let netRemaining = new Decimal(bucket.netRequirement);
-            const candidates = demand
-              .filter((term) => term.bucketIndex === index && substitutable.has(term.parentItemId ?? ""))
-              .sort((a, b) => (a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : (a.parentItemId ?? "") < (b.parentItemId ?? "") ? -1 : 1));
-            for (const term of candidates) {
-              if (netRemaining.lessThanOrEqualTo(0)) break;
-              const substitutes = substitutable.get(term.parentItemId!)!;
-              const uncovered = Decimal.min(netRemaining, new Decimal(term.qty));
-              const split = resolveSubstitutions({
-                lineGrossQty: term.qty,
-                uncoveredQty: uncovered.toFixed(6),
-                substitutes,
+      }
+      if (substitutableByParent.size > 0) {
+        let mutated = false;
+        for (let index = 0; index < plan.buckets.length; index += 1) {
+          const bucket = plan.buckets[index]!;
+          if (new Decimal(bucket.netRequirement).lessThanOrEqualTo(0)) continue;
+          let netRemaining = new Decimal(bucket.netRequirement);
+          const candidates = demand
+            .filter(
+              (term) =>
+                term.bucketIndex === index && substitutableByParent.has(term.parentItemId ?? ""),
+            )
+            .sort((a, b) => (a.kind < b.kind ? -1 : a.kind > b.kind ? 1 : (a.parentItemId ?? "") < (b.parentItemId ?? "") ? -1 : 1));
+          for (const term of candidates) {
+            if (netRemaining.lessThanOrEqualTo(0)) break;
+            const substitutes = substitutableByParent.get(term.parentItemId!)!;
+            const uncovered = Decimal.min(netRemaining, new Decimal(term.qty));
+            const split = resolveSubstitutions({
+              lineGrossQty: term.qty,
+              uncoveredQty: uncovered.toFixed(6),
+              substitutes,
+            });
+            if (split === undefined) continue;
+            // Reduce this term by the substituted amount; the legs land
+            // on the substitutes' demand. The term KEEPS its lineage
+            // (substitutes) even when the retained qty hits zero — the
+            // snapshot row then records the resolved-away demand (a
+            // qty-0 BOM_EXPLOSION row carrying where the demand went),
+            // never a silent drop.
+            const shifted = new Decimal(term.qty).minus(new Decimal(split.primaryQty));
+            if (shifted.lessThanOrEqualTo(0)) continue;
+            term.qty = split.primaryQty;
+            const priorLegs = Array.isArray(term.substitutes)
+              ? (term.substitutes as { itemId: string; qty: string }[])
+              : [];
+            term.substitutes = [
+              ...priorLegs,
+              ...split.substituteLegs.map((leg) => ({ itemId: leg.substituteItemId, qty: leg.qty })),
+            ];
+            mutated = true;
+            netRemaining = netRemaining.minus(shifted);
+            for (const leg of split.substituteLegs) {
+              substitutionShifts.push({
+                substituteItemId: leg.substituteItemId,
+                qty: leg.qty,
+                recipeItemId: itemId,
+                parentItemId: term.parentItemId ?? null,
+                bucketIndex: index,
               });
-              if (split === undefined) continue;
-              // Reduce this term by the substituted amount; the legs land
-              // on the substitutes' demand.
-              const shifted = new Decimal(term.qty).minus(new Decimal(split.primaryQty));
-              if (shifted.lessThanOrEqualTo(0)) continue;
-              term.qty = split.primaryQty;
-              mutated = true;
-              netRemaining = netRemaining.minus(shifted);
-              for (const leg of split.substituteLegs) {
-                substitutionShifts.push({
-                  substituteItemId: leg.substituteItemId,
-                  qty: leg.qty,
-                  recipeItemId: itemId,
-                  parentItemId: term.parentItemId ?? null,
-                  bucketIndex: index,
-                });
-              }
             }
           }
-          if (mutated) {
-            demand = demand.filter((term) => new Decimal(term.qty).greaterThan(0));
-            plan = planItemBuckets({
-              itemId,
-              bucketStarts,
-              demand,
-              supply: supplyByItem.get(itemId) ?? [],
-              safetyStockQty: safety,
-              lotSizing,
-            });
-          }
+        }
+        if (mutated) {
+          // Keep the qty-0 lineage terms (the resolved-away demand record);
+          // they net as zero and ride the snapshot.
+          demand = demand.filter(
+            (term) =>
+              new Decimal(term.qty).greaterThan(0) ||
+              (Array.isArray(term.substitutes) && term.substitutes.length > 0),
+          );
+          plan = planItemBuckets({
+            itemId,
+            bucketStarts,
+            demand,
+            supply: supplyByItem.get(itemId) ?? [],
+            safetyStockQty: safety,
+            lotSizing,
+          });
         }
       }
 
@@ -509,7 +618,11 @@ export class MrpEngineService {
       // supply lines per term).
       for (const bucket of plan.buckets) {
         for (const term of bucket.demand) {
-          if (new Decimal(term.qty).lessThanOrEqualTo(0)) continue;
+          // A qty-0 term with substitution lineage STAYS (the resolved-away
+          // demand record — where the demand went); a bare qty-0 term is
+          // noise.
+          const lineage = Array.isArray(term.substitutes) ? term.substitutes.length : 0;
+          if (new Decimal(term.qty).lessThanOrEqualTo(0) && lineage === 0) continue;
           demandLineInserts.push({
             runId: run.id,
             warehouseId,
@@ -557,6 +670,8 @@ export class MrpEngineService {
 
       // The orders → suggestions (+ explosion + co-product supply).
       const surplusCache = params.allowTransfers ? await store.listWarehouseSurpluses(itemId) : [];
+      // The item's own BOM (a make vs buy decision + the explosion root).
+      const node = graphNodes.get(itemId);
       for (const order of plan.orders) {
         const dueDate = order.bucketStart;
         const leadTime = item.leadTimeDays;
@@ -631,6 +746,10 @@ export class MrpEngineService {
               rootItemId: itemId,
               rootQty: remainingQty.toFixed(6),
               resolvedSubstitutions: new Map<string, SubstitutionSplit>(),
+              // SINGLE_LEVEL (the 043-audit item-2 fix): the leveled walk
+              // explodes each manufactured component's own recipe at ITS
+              // turn — recursing here too double-counted deep components.
+              singleLevel: true,
             });
             for (const demand of exploded) {
               pushDemand(demand.itemId, {

@@ -165,6 +165,25 @@ export interface ExplodedDemand {
  * and hands them in; this walk only RECORDS the records the caller
  * resolved (every substituted net lands on the demand line, never
  * silently).
+ *
+ * The two explosion modes (the 043-audit item-2 fix):
+ * - TRANSITIVE (the default — the pure-kernel contract the property tests
+ *   pin): the walk recurses into non-phantom components that have their
+ *   own recipes, producing the FULL multi-level demand list from one
+ *   call.
+ * - SINGLE_LEVEL (`singleLevel: true` — the ENGINE's mode): the walk
+ *   recurses through PHANTOMS only (a phantom owns no MO — its components
+ *   are the parent's direct demand, however deep the phantom chain); a
+ *   non-phantom component's own recipe is NOT exploded here — the engine's
+ *   leveled walk plans that component itself at its own low-level-code
+ *   turn, and ITS make order explodes ITS components at ITS release bucket
+ *   (the time-phased per-level discipline). Pre-fix the engine called the
+ *   transitive walk AND re-exploded per level — a manufactured
+ *   intermediate's components were demanded TWICE (once at the root's
+ *   release bucket through the transitive recursion, once at the
+ *   intermediate's own release bucket through its walk turn), a latent
+ *   double count that the scope bug had masked (the dropped components
+ *   were never planned at all).
  */
 export function explodeDemand(input: {
   graph: BomGraph;
@@ -173,6 +192,9 @@ export function explodeDemand(input: {
   /** The resolved substitution splits keyed `${parentItemId}:${lineId}` —
    * produced by resolveSubstitutions; absent = no substitution. */
   resolvedSubstitutions: ReadonlyMap<string, SubstitutionSplit>;
+  /** Engine mode: explode immediate components (phantom-flattened) only —
+   * the leveled walk owns the deeper levels. Default false (transitive). */
+  singleLevel?: boolean;
 }): ExplodedDemand[] {
   const demands: ExplodedDemand[] = [];
   const root = new Decimal(input.rootQty);
@@ -241,9 +263,17 @@ export function explodeDemand(input: {
       }
       // Recurse into non-phantom components that have their own recipes —
       // substitution never recurses (the substitute's OWN recipe is not
-      // the parent's business; the primary component's chain is).
+      // the parent's business; the primary component's chain is). In
+      // SINGLE_LEVEL mode this recursion is the ENGINE's boundary: the
+      // leveled walk explodes the component's own recipe at its own turn
+      // (per-level time phasing) — recursing here too would demand the
+      // deep components twice.
       const childNode = input.graph.nodes.get(line.componentItemId);
-      if (childNode !== undefined && primaryQty.greaterThan(0)) {
+      if (
+        input.singleLevel !== true &&
+        childNode !== undefined &&
+        primaryQty.greaterThan(0)
+      ) {
         walk(
           primaryQty,
           childNode,

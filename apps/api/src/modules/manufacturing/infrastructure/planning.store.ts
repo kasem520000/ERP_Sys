@@ -268,7 +268,7 @@ export async function replaceBomSubstitutions(
     await tx.execute(sql`
       INSERT INTO bom_substitutions (id, tenant_id, bom_line_id, substitute_item_id, priority, note, created_by)
       VALUES (${newId()}, erp.current_tenant_id(), ${row.bomLineId}, ${row.substituteItemId},
-              ${row.priority}, ${row.note}, NULL)
+              ${row.priority}, ${row.note ?? null}, NULL)
     `);
   }
 }
