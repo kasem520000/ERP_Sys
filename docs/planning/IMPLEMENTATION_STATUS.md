@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-14 (the PHASE-043 completion round — the reservation hard protection delivered, RISK-032's mitigation implemented + tested, the risk open for the owner's review; PHASE-045 STARTED in parallel per the owner's directive)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the 043 HARD REVIEW — two blocking defects reproduced at the unified head 1674849 and fixed; RISK-032's reservation-side closure claim WITHDRAWN pending the review; PHASE-045 in progress in parallel)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -338,6 +338,55 @@ the remaining unreserved-demand POLICY choice and RISK-032 stay the
 owner's, RISK-031 and the async/progress deviation stay open; this head
 + its evidence go to the owner for review — 043's closure and production
 approval are NOT claimed.
+**Post-043 HARD REVIEW (2026-11-15 — the owner reopened the protection
+review against the unified head 1674849):** the owner's independent
+probe (audit-evidence/phase043-hard-review/probe.spec.ts + probe.log)
+reproduced TWO BLOCKING DEFECTS in the delivered hard protection —
+(1) THE NEGATIVE-STOCK BYPASS: planIssue's pool guard rode
+`!allowNegative`, so an explicit `inventory.allow_negative_stock`
+policy silently DISABLED the whole protection (another order's delivery
+SHIPPED the MTO-reserved stock under the policy — DEL-2026-000001 in
+probe.log); (2) THE DELIVERY IDENTITY HOLE: neither create nor post
+verified the order-line binding (a foreign order's line accepted), and
+the beneficiary allowance trusted the reservation ID ALONE
+(activeReservationQty reads qty with no item/warehouse/holder check) —
+a crafted delivery counted ANOTHER item's / ANOTHER warehouse's
+reservation as its entitlement and consumed a third party's protected
+pool. Both FIXED: the pool guard is POLICY-INDEPENDENT
+(protectedForOthers = pool − allowance binds at ANY policy position;
+the policy governs the UNRESERVED portion only — free stock still goes
+negative by BR-013, pinned); the DELIVERY IDENTITY CONTRACT (order-line
+∈ the DN's order, item match, warehouse match for bound lines, no
+duplicate bindings) is verified at CREATE and re-verified at POST (a
+store-written / rogue row dies at post with ZERO residue, never at the
+plan; typed DELIVERY_LINE_IDENTITY); the allowance counts a reservation
+only when its LIVE row (findLiveReservationRow — ACTIVE, non-expired)
+matches the line's item + the DN's warehouse + the beneficiary holder;
+the MTO chain read is expiry-aligned (the same "live" definition as the
+pool). THE ATP SEMANTICS corrected per the directive: the promise point
+answers the THREE-VALUED standing relative to the REMAINING qty
+(UNPROTECTED / PARTIALLY_PROTECTED / FULLY_PROTECTED) with the
+remaining/protected/unprotected QUANTITIES and the bilingual AR+EN
+advisory note naming the exposure; backorders stay legal (a shortage
+NEVER blocks issuing — pinned). check-id-ledger --self-test 9c/9d
+FIXED (synthetic ledger-independent fixtures, the probes-1/5/8
+precedent — the probes had leaned on the live ledger and broke when the
+ladder re-coordinated): 16/16 OK, the normal checker 0 errors. Evidence
+(each its own run): probe BEFORE (at 1674849) 2/2 FAIL → AFTER 2/2
+PASS; the regression tests (reservation-hard-review.spec k/l/m — the
+two audit tests + the ATP pin) BEFORE 3/3 FAIL → AFTER 3/3 PASS;
+targeted 15 files 140/140 (the protection/basis/overcommit/
+mto-lifecycle/mto-surplus/atp/planning-goldens/valuation +
+golden/tiers-foc/wms-picking/sync×4); the FULL DB SUITE on the unified
+head — see the round's evidence ledger for the single-run result;
+RISK-032's reservation-side closure claim WITHDRAWN (the register row
+rewritten — the reservation side is NOT closed until the independent
+review passes the fixed head); RISK-031 and the async/progress
+deviation stay open; the remaining unreserved-demand policy stays the
+owner's. The hard-review evidence ledger:
+[gate-evidence/2026-11-15-post043-hard-review.md](../operations/gate-evidence/2026-11-15-post043-hard-review.md);
+NO closure of 043 and NO production approval are claimed — the fixed
+head + its evidence go to the owner for review.
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -370,7 +419,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-043-COMPLETION.md) |
 | [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-044-COMPLETION.md) |
-| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | NOT_STARTED — PLANNED |
+| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) |
 | [PHASE-046](../implementation/phases/PHASE-046.md) | HR Payroll Compliance | 2 / 13 | 045 | NOT_STARTED — PLANNED |
 | [PHASE-047](../implementation/phases/PHASE-047.md) | HR Growth — Talent & Performance | 2 / 13 | 046 | NOT_STARTED — PLANNED |
 | [PHASE-048](../implementation/phases/PHASE-048.md) | Projects & Contracting | 2 / 13 | 036 | NOT_STARTED — PLANNED |
