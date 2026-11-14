@@ -237,7 +237,7 @@ ledger with the pre/post evidence of every audit fix:
   run-history list, the netting drill-down.
 - **build 8/8 · web-security 6/6 · token-contrast AA · ui-catalog 39↔62 ·
   i18n 5,767 = 5,767 · drift 291 = 291 · manifests 13/13 · id-ledger +
-  self-test 0 errors · 15/15 · docs:validate 33/33 · negatives ×3** — all
+  self-test 0 errors · 14/14 (corrected 2026-11-15 — a transcription error said 15; the output prints 14 probe lines) · docs:validate 33/33 · negatives ×3** — all
   green in BOTH runs.
 - **design-system harness:** the closure run regenerated the gitignored
   baselines per the documented first-run protocol, then compared green
@@ -269,3 +269,55 @@ HR consumes MRP directly (the payroll variable-feed discipline mirrors the
 run-snapshot pattern used here; the §8 handoff notes stand). The owner
 continues with «ابدأ تنفيذ المرحلة PHASE-045» (or any unblocked wave-2 phase)
 — **after the independent review of this audit-fix wave.**
+
+## 7. Audit round 2 addendum (2026-11-15)
+
+The owner's independent review of `d7a65d5` demanded six more findings be
+proven or refuted **on the live DB** before the closure can be
+re-confirmed. All six are handled; the full per-item evidence (the
+pre-fix reproductions verbatim, the fixes, the post-fix proofs, the gate
+table) lives in
+**[docs/operations/gate-evidence/2026-11-15-post043-audit-round2.md](../../../operations/gate-evidence/2026-11-15-post043-audit-round2.md)**:
+
+1. **The MTO surplus & the order-side terminations** — three leaks fixed
+   (the fully-delivered finalization releases the surplus + the
+   own-remainder; cancel/close release the MTO holders too);
+   `mto-surplus-cancel.spec` 5/5 (pre-fix 5/5 failed).
+2. **One reservation basis across every path** — the policy engine now
+   verifies on the choke point's own basis (unbinned included); the
+   batch-state exclusion (QUARANTINED/WRITTEN_OFF/expired never backs a
+   reservation) aligns reservations with ATP and the engine; consignment
+   proven excluded; **the SOFT MODEL declared** (the "hard reservation"
+   language was wrong — another order's delivery CAN physically consume
+   reserved stock; proven, asserted, documented);
+   `reservation-basis.spec` 6/6 (pre-fix 5 failed).
+3. **The CTP coverage vs batch expiry at every candidate date** — the
+   false promise (a dead batch covering a later date) and the back-dated
+   suggestion (a late open PO) fixed; `availableNow`'s semantics
+   documented and pinned; `atp-ctp-expiry.spec` 4/4 (pre-fix 2 failed).
+4. **The co-product planning order** — the OUTPUT leveling edge: a
+   co-product nets after its producer, deterministically in BOTH item-id
+   orders (the id-swap is asserted to produce the identical plan);
+   `mrp-coproduct-order.spec` 3/3 (pre-fix 3/3 failed).
+5. **The unreserved double promise** — proven and **raised as an OPEN
+   business decision** (RISK-032): the ATP "OK" is an advisory check,
+   never a protected promise; the model choice (auto-reserve / blocking
+   gate / declared soft model) awaits the owner.
+6. **The evidence corrections** — the self-test count corrected to
+   **14/14** (a transcription error said 15; §5 above is corrected in
+   place), the visual-baseline two-run distinction stands as stated, the
+   async/progress deviation stays open, **RISK-031 stays open** (now
+   joined by RISK-032).
+
+The full DB suite at this round's head: **220/221 files · 3,136/3,137
+tests** in the single full run (the one failure — the soak queue-depth
+spike under in-suite load on the 2-core sandbox — passed standalone with
+wide margin; both results reported separately, never merged), the five
+new specs 19/19, unit/typecheck/lint/depcruise/id-ledger/drift/manifests/
+docs/negatives all green (the web-side gates were not re-run — no
+web-side changes this round; `d7a65d5`'s sweep stands for them). The
+archive at this head supersedes the previous build per the same purpose
+and inclusion rule (§6).
+
+**PHASE-045 remains gated on the owner's independent review of this
+round.**

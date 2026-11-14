@@ -14,17 +14,38 @@ import { ReservationPolicyError } from "../domain/manufacturing-errors";
  * PHASE-044 strategies (FIFO/FEFO/NEAREST per warehouse, the
  * pick_strategies row; FIFO the fail-safe default).
  *
- * The engine VERIFIES then RESERVES: the strategy-ordered pickable rows
- * (AVAILABLE, tenant-owned — the same exclusion set the WMS allocator
- * and the MRP qualified on-hand use) must cover the target before the
- * item+warehouse-level stock_reservations row is created (the table has
- * no batch column by design — the allocation plan the strategy walk
- * produces rides the response so the caller and the UI can show WHICH
- * bins/batches the reservation draws from; the physical pick itself
- * stays the WMS wave allocator's business).
+ * THE UNIFIED BASIS (the 043-audit round-2 item-2 fix): the
+ * verify-then-reserve check draws on the SAME pool EVERY reservation
+ * path and EVERY availability surface uses — pickable bins (AVAILABLE,
+ * tenant-owned, the batch ACTIVE and not expired) + the UNBINNED
+ * fallback (item_stock − every bin row) − the ACTIVE non-expired
+ * reserved pool (`reservationAvailability` — one truth with
+ * ReservationService.create's choke point, the ATP basis (BR-080), and
+ * the MRP engine's qualified on-hand; pre-fix this walk counted RAW bin
+ * rows only, so an unbinned balance was invisible HERE while the choke
+ * point accepted it — the same stock, different answers — and a
+ * quarantine-held or lapsed batch was reservable while ATP refused to
+ * promise it). The allocation plan the strategy walk produces still
+ * rides the response (WHICH bins/batches the BIN-LEVEL portion draws
+ * from — informational: when the unbinned fallback covers part of the
+ * target, the plan shows the bin portion and the note names the
+ * split); the physical pick itself stays the WMS wave allocator's
+ * business.
+ *
+ * THE SOFT-MODEL DECLARATION (the 043-audit round-2 item-2 proof —
+ * reservation-basis.spec, test (c)): a reservation is an
+ * AVAILABILITY-level hold — it nets out ATP, the MRP basis, and every
+ * later reservation's capacity — but it NEVER physically locks the
+ * goods: another order's delivery can still issue the reserved stock
+ * (the issue paths check ON-HAND only). The historical "hard
+ * reservation" language was wrong and is removed; physical
+ * exclusivity is the WMS directed-pick discipline's business, and the
+ * over-commit exposure (a reservation whose stock shipped for another
+ * holder) is declared, visible in the pool, and settled at the order's
+ * termination (cancel/close/fully-delivered release the holders).
  *
  * The MTO completion (G-49) is the unconditional consumer: the finished
- * goods of a linked sales line are hard-reserved the moment they land
+ * goods of a linked sales line are reserved for it the moment they land
  * (holder PRODUCTION_ORDER, holderId = the MO id) — the reservation
  * chain the golden pins.
  */
@@ -52,9 +73,11 @@ export class ReservationPolicyService {
 
   /**
    * Verify + create one reservation for a holder. Fails closed with the
-   * typed ReservationPolicyError when the strategy-ordered pickable rows
-   * cannot cover the target (never a partial reservation — an
-   * all-or-nothing policy).
+   * typed ReservationPolicyError when the UNIFIED basis (pickable bins
+   * + the unbinned fallback − the ACTIVE reserved pool —
+   * `reservationAvailability`, the same truth the creation choke point
+   * enforces under the item_stock row lock) cannot cover the target
+   * (never a partial reservation — an all-or-nothing policy).
    */
   async reserveForHolder(input: {
     itemId: string;
@@ -76,32 +99,36 @@ export class ReservationPolicyService {
     const strategyRow = await wmsStore.findPickStrategy(input.warehouseId);
     const method = strategyRow?.method ?? "FIFO";
 
-    // The strategy-ordered availability walk (PHASE-044's own query —
-    // AVAILABLE, tenant-owned, qty > 0) + the reserved-pool subtraction
-    // (the 043-audit item-5 fix: the raw walk ignored the ACTIVE
-    // reservations already drawn against the same stock — the early
-    // message now names the honest pool; the creation choke point in
-    // ReservationService.create enforces the same invariant under the
-    // item_stock row lock either way).
+    // THE UNIFIED BASIS (the 043-audit round-2 item-2 fix): the same
+    // `reservationAvailability` the creation choke point enforces —
+    // pickable bins (batch ACTIVE, not expired) + the unbinned fallback
+    // − the ACTIVE reserved pool. Pre-fix this walk summed RAW bin rows
+    // (the item's whole bin_contents presence): an unbinned balance was
+    // invisible, and a quarantined/lapsed batch counted — different
+    // answers than ReservationService.create, ATP, and the engine on the
+    // SAME stock. The item_stock row lock at the choke point still
+    // serializes concurrent reserves; this early check gives the honest
+    // strategy-ordered message.
+    const availability = await invStore.reservationAvailability(input.itemId, input.warehouseId);
+    if (
+      availability === undefined ||
+      new Decimal(availability.available).lessThan(qty)
+    ) {
+      throw new ReservationPolicyError(
+        `the ${method} policy cannot cover ${qty.toFixed(6)} of item ${input.itemId} at warehouse ${input.warehouseId} — pickable ${availability?.pickableBins ?? "0"} (AVAILABLE, tenant-owned, batch ACTIVE and not expired) + unbinned ${availability?.unbinned ?? "0"} − reserved ${availability?.reserved ?? "0"} = available ${availability?.available ?? "0"}`,
+        { itemId: input.itemId, warehouseId: input.warehouseId, requested: qty.toFixed(6), available: availability?.available ?? "0.000000", method },
+      );
+    }
+
+    // The allocation plan: the strategy-ordered pickable walk, filled
+    // greedily — the BIN-LEVEL portion of the coverage (informational:
+    // when the unbinned fallback covers part of the target, the plan
+    // shows the bin portion; the note names the split).
     const rows = await wmsStore.listPickableRows({
       warehouseId: input.warehouseId,
       itemId: input.itemId,
       method,
     });
-    const reserved = new Decimal(
-      (await invStore.reservedQty(input.itemId, input.warehouseId)) ?? "0",
-    );
-    const available = rows
-      .reduce((sum, row) => sum.plus(new Decimal(row.qty)), new Decimal(0))
-      .minus(reserved);
-    if (available.lessThan(qty)) {
-      throw new ReservationPolicyError(
-        `the ${method} walk cannot cover ${qty.toFixed(6)} of item ${input.itemId} at warehouse ${input.warehouseId} — pickable ${rows.reduce((sum, row) => sum.plus(new Decimal(row.qty)), new Decimal(0)).toFixed(6)} (AVAILABLE, tenant-owned rows only) − reserved ${reserved.toFixed(6)} = available ${available.toFixed(6)}`,
-        { itemId: input.itemId, warehouseId: input.warehouseId, requested: qty.toFixed(6), available: available.toFixed(6), method },
-      );
-    }
-
-    // The allocation plan: the strategy order, filled greedily.
     const plan: AllocationSlice[] = [];
     let remaining = qty;
     for (const row of rows) {
@@ -116,6 +143,7 @@ export class ReservationPolicyService {
       });
       remaining = remaining.minus(take);
     }
+    const unbinnedCovered = remaining; // what the fallback carried (never negative here)
 
     const created = await this.reservations.create({
       itemId: input.itemId,
@@ -124,7 +152,11 @@ export class ReservationPolicyService {
       holderType: input.holderType,
       holderId: input.holderId,
       expiresAt: input.expiresAt ?? null,
-      note: input.note ?? `${method} allocation plan: ${plan.map((s) => `${s.binCode ?? s.binId}:${s.qty}`).join(", ")}`.slice(0, 300),
+      note:
+        input.note ??
+        `${method} allocation plan: ${plan.map((s) => `${s.binCode ?? s.binId}:${s.qty}`).join(", ")}${
+          unbinnedCovered.greaterThan(0) ? ` + unbinned:${unbinnedCovered.toFixed(6)}` : ""
+        }`.slice(0, 300),
       actorId: input.actorId,
     });
     await this.audit.record({

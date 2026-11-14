@@ -162,7 +162,7 @@ PHASE-042 prerequisite.
 | T-06 | MPS service + entries grid backend; frozen-fence edit permission + reason | api |
 | T-07 | Bill of resources service + rough-cut capacity check against PHASE-042 work-center capacities | api |
 | T-08 | ATP/CTP service + sales order line integration (S-10): promise-date suggestion, over-promise warning, hard exclusions (BR-080) | api |
-| T-09 | MTO linkage: MO ↔ sales line link, hard reservation, completion routing to sales delivery (G-49) | api |
+| T-09 | MTO linkage: MO ↔ sales line link, the availability reservation (an ATP-level hold — the soft model, declared in the round-2 audit), completion routing to sales delivery (G-49) | api |
 | T-10 | Contract manufacturing flow: stock-at-processor issue/return, conversion service PO, yield settlement (G-48) | api |
 | T-11 | By/co-product completion posting with joint allocation (G-47) + substitution records on explosion | api |
 | T-12 | Reservation policy engine (I-14) over `stock_reservations` using PHASE-044 strategies | api |

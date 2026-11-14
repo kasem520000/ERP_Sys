@@ -1103,12 +1103,19 @@ export class ProductionOrderService {
       // (QUARANTINED until inspection releases it — T39's surface).
       await this.tracking.linkBatchProduction(receiptPlan.createdBatch.id, id);
     }
-    // PHASE-043 (T-09, M-22 — G-49): the MTO hard reservation — the
-    // finished goods of a linked sales line are reserved for it the
+    // PHASE-043 (T-09, M-22 — G-49): the MTO AVAILABILITY reservation —
+    // the finished goods of a linked sales line are reserved for it the
     // moment they land (holder PRODUCTION_ORDER, holderId = the MO id);
-    // the delivery consumes the reservation. BEFORE the QC hold so the
-    // policy walk sees the available stock (a gated batch releases later
-    // and the hold is already recorded).
+    // the delivery SETTLES the reservation (partial consume, MTO-first;
+    // the fully-delivered finalization and the order's cancel/close
+    // release the remainders). The reservation is an AVAILABILITY-level
+    // hold (the soft model — reservation-basis.spec test (c) proves
+    // another order's delivery can still physically issue the stock;
+    // the historical "hard reservation" wording was wrong): it nets out
+    // ATP and every later reservation's capacity, never the physical
+    // pick. BEFORE the QC hold so the policy walk sees the available
+    // stock (a gated batch releases later and the hold is already
+    // recorded).
     let mtoReservationId: string | null = null;
     if (order.salesOrderLineId !== null) {
       const reserved = await this.reservationPolicy.reserveForHolder({
@@ -1181,10 +1188,12 @@ export class ProductionOrderService {
    *     would strand the MTO batch across warehouses;
    *   - the QUANTITY is deliberately UNCONSTRAINED at link time: a sales
    *     line may be fed by several MOs (2 × 5 for a line of 10) and an
-   *     MO may over-produce (the surplus flows to free stock); the
-   *     reservation holds the ACTUAL completed qty, and the delivery
-   *     settles the coverage per shipped unit (never a link-time
-   *     promise). */
+   *     MO may over-produce (the surplus flows to free stock — the
+   *     delivery's FULLY-DELIVERED FINALIZATION releases the remainder,
+   *     deliveries.ts step 5c, and the order's cancel/close releases it
+   *     too, orders.ts releaseOrderReservations); the reservation holds
+   *     the ACTUAL completed qty, and the delivery settles the coverage
+   *     per shipped unit (never a link-time promise). */
   async linkSalesOrder(
     id: string,
     input: { salesOrderLineId: string | null; actorId: string | null },

@@ -216,6 +216,25 @@ finite surplus draw, the per-date in-flight netting); five new DB spec
 files with pre/post evidence; the full DB suite re-ran at the final head
 216/216 · 3,118/3,118 EXIT=0; the evidence ledger:
 [gate-evidence/2026-11-14-post043-audit-fixes.md](../operations/gate-evidence/2026-11-14-post043-audit-fixes.md).
+**The 043 audit ROUND 2 (2026-11-15):** the owner's review of `d7a65d5`
+demanded six more findings be proven on the live DB — all handled: the
+MTO SURPLUS/termination leaks (the fully-delivered finalization +
+cancel/close now release the remainders — free stock, never a leaked
+holder), the UNIFIED reservation basis (the policy engine on the choke
+point's own read; the batch-state exclusion aligning reservations with
+ATP and the engine; the SOFT MODEL declared — the "hard reservation"
+language was wrong and is gone), the per-candidate-date CTP coverage
+(the dead batch never covers; the late leg floors to today), the
+CO-PRODUCT leveling edge (the plan is now position-independent — the
+id-swap asserted to produce the identical plan), the unreserved double
+promise RAISED AS RISK-032 (an open business decision — the ATP "OK" is
+advisory, never a protected promise), and the self-test count corrected
+to 14/14 (a transcription error); five new DB spec files, pre/post
+evidence per item, the full DB suite 220/221 files · 3,136/3,137 in the
+single run (the one soak queue-depth spike passed standalone — both
+results reported separately), the round-2 evidence ledger:
+[gate-evidence/2026-11-15-post043-audit-round2.md](../operations/gate-evidence/2026-11-15-post043-audit-round2.md);
+RISK-031 (and now RISK-032) stay OPEN.
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)

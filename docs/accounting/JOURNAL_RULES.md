@@ -296,7 +296,7 @@ Notes:
     validated at BOM activation — `BOM_ALLOCATION_INVALID` fails closed), G-48 through the
     tolling service's five operations (1420/2136/5126 markers seeded in 0077; existing
     tenants stay `PURPOSE_NOT_MAPPED`-closed until they map), and G-49 through the MTO
-    chain (the hard reservation holder widened in 0076 + the batch-pinned delivery
+    chain (the AVAILABILITY reservation holder widened in 0076 — an ATP-level hold, not a physical pick lock; the soft model is proven and declared in reservation-basis.spec test (c) + the batch-pinned delivery
     routing). Worked examples as pinned by the DB suites
     (`__db__/manufacturing/planning-goldens.spec.ts`): **G-47** a 60/40 split over 1,000
     WIP → main 600.0000 · co-product 400.0000, Σ = 1,000.0000 exactly, the co-product

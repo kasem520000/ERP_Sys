@@ -619,6 +619,23 @@ export async function listDeliveryNoteLines(deliveryId: string): Promise<Deliver
   return rows.rows as unknown as DeliveryNoteLineRow[];
 }
 
+/**
+ * The cumulative POSTED delivered qty for ONE sales order line (the
+ * 043-audit round-2 item-1 settlement input): Σ qty over the line's
+ * delivery-note lines whose delivery is POSTED. The CURRENT delivery is
+ * still DRAFT at settlement time — the caller adds its own line qty to
+ * this sum (the fully-delivered finalization's threshold).
+ */
+export async function postedDeliveredQtyForOrderLine(orderLineId: string): Promise<string> {
+  const rows = await tenantTx().execute(sql`
+    SELECT COALESCE(SUM(l.qty), 0)::text AS q
+    FROM delivery_note_lines l
+    JOIN delivery_notes d ON d.id = l.delivery_id AND d.tenant_id = l.tenant_id
+    WHERE l.order_line_id = ${orderLineId} AND d.status = 'POSTED'
+  `);
+  return (rows.rows as unknown as { q: string }[])[0]!.q;
+}
+
 export async function updateDeliveryNoteStatus(input: {
   id: string;
   status: string;

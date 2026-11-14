@@ -45,7 +45,12 @@ import { MrpRunInputInvalidError, MrpRunNotFoundError } from "../domain/manufact
  * The leveling: items process by ascending LOW-LEVEL CODE over the BOM
  * graph UNION the substitution edges (primary → substitute — a
  * substitute's planning demand originates at the primary's netting, so it
- * always nets after it). Phantom flattening (M-08) and substitution
+ * always nets after it) UNION the CO-PRODUCT OUTPUT edges (producer →
+ * its BOM's outputs — the round-2 item-4 fix: a co-product's planning
+ * always nets after every producer feeding it, so THIS RUN's own
+ * production suggestions count as its inbound BEFORE its coverage
+ * suggestion is issued, deterministically in both item-id orders).
+ * Phantom flattening (M-08) and substitution
  * resolution (M-09) live in the pure kernel; this service orchestrates
  * the reads, the per-item re-plan when substitution shifts demand, and
  * the snapshot writes.
@@ -387,6 +392,38 @@ export class MrpEngineService {
           } else {
             llcEdges.set(line.componentItemId, { lines: [{ componentItemId: sub.substituteItemId }] });
           }
+        }
+      }
+    }
+    // THE CO-PRODUCT LEVELING EDGE (the 043-audit round-2 item-4 fix):
+    // producer → its BOM's co/by-product outputs. The walk must net a
+    // co-product's planning AFTER every producer whose make orders feed
+    // it — the inbound from THIS RUN's own production suggestions
+    // (pushed at the producing order's due bucket) counts BEFORE the
+    // co-product's coverage suggestion is issued. Pre-fix the edge did
+    // not exist: a co-product without its own BOM sits at LLC 0 — level
+    // with a parentless producer, and the string tie-break on the item
+    // id decided the walk order, so the PLAN CHANGED with the items'
+    // id creation order (an id-first co-product planned before its
+    // producer: its independent demand generated a full coverage
+    // suggestion — a purchase/make order for goods the producer's
+    // suggestion was about to output — double-planning; a producer-first
+    // id order accidentally planned it right). A co-product WITH its own
+    // BOM sits at the same LLC as a single-level producer — the same
+    // tie-break, the same position dependence. The output edge makes
+    // the order deterministic in BOTH id orders. (A degenerate
+    // mutual-production pair — A's BOM outputs B while B's BOM consumes
+    // A — now cycles in the leveling and fails closed with the typed
+    // BomGraphCycleError, the honest treatment of degenerate data.)
+    for (const node of graphRows) {
+      if (!scopeSet.has(node.itemId)) continue;
+      const outputs = await store.listBomOutputs(node.bomId);
+      for (const output of outputs) {
+        const parentEdges = llcEdges.get(node.itemId);
+        if (parentEdges !== undefined) {
+          parentEdges.lines.push({ componentItemId: output.itemId });
+        } else {
+          llcEdges.set(node.itemId, { lines: [{ componentItemId: output.itemId }] });
         }
       }
     }

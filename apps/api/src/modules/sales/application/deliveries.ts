@@ -357,18 +357,22 @@ export class DeliveryNoteService {
       });
     }
 
-    // (5) The reservation settlement (the 043-audit item-4 fix) — per
-    // DELIVERED line, PARTIAL by the shipped qty, MTO-first. Pre-fix this
-    // step released EVERY order line's OWN reservation on ANY delivery of
-    // the order (a partial delivery un-reserved the not-yet-shipped lines'
-    // stock) and NEVER touched the MTO chain (G-49's PRODUCTION_ORDER
-    // holder reservations leaked ACTIVE forever, permanently reducing
+    // (5) The reservation settlement (the 043-audit item-4 fix + the
+    // round-2 item-1 finalization) — per DELIVERED line, PARTIAL by the
+    // shipped qty, MTO-first. Pre-fix this step released EVERY order
+    // line's OWN reservation on ANY delivery of the order (a partial
+    // delivery un-reserved the not-yet-shipped lines' stock) and NEVER
+    // touched the MTO chain (G-49's PRODUCTION_ORDER holder
+    // reservations leaked ACTIVE forever, permanently reducing
     // availability). The contract now: the shipped qty retires coverage
     // in a deterministic order — FIRST the linked MTO reservations (the
     // made-for-this-order stock, oldest MO first), THEN the line's OWN
     // sales reservation — until the shipped qty is exhausted; a remainder
     // stays ACTIVE for the still-undelivered portion; lines not in THIS
-    // delivery keep their reservations untouched.
+    // delivery keep their reservations untouched; and (5c below) when a
+    // delivery COMPLETES the line, every remaining reservation feeding
+    // it (the MTO surplus + the own remainder) RELEASES — the surplus
+    // flows to free stock, never a leaked holder.
     if (delivery.orderId !== null) {
       const reservationService = await import("../../inventory/application/reservation-service");
       const svc = new reservationService.ReservationService(this.audit);
@@ -410,6 +414,43 @@ export class DeliveryNoteService {
             actorId,
           );
           if (settled.status === "CONSUMED") {
+            await store.setOrderLineReservation(orderLine.id, null);
+          }
+        }
+
+        // (5c) THE FULLY-DELIVERED FINALIZATION (the 043-audit round-2
+        // item-1 fix): when THIS delivery completes the line (the
+        // cumulative POSTED delivered qty + this shipment ≥ the line
+        // qty), every reservation still feeding it RETIRES — the MTO
+        // SURPLUS (an over-producing MO's excess over the line: the
+        // completion holds the ACTUAL qty, the line ships only its own)
+        // and the line's OWN reservation REMAINDER (the MTO stock
+        // shipped in its place — its held stock never ships) flip
+        // RELEASED: the surplus flows to FREE stock (available to any
+        // holder again). A fully-delivered line has no still-undelivered
+        // portion left to cover; pre-fix both remainders leaked ACTIVE
+        // forever, permanently reducing availability.
+        const priorDelivered = await store.postedDeliveredQtyForOrderLine(line.orderLineId);
+        const cumulativeDelivered = new Decimal(priorDelivered).plus(new Decimal(line.qty));
+        if (cumulativeDelivered.greaterThanOrEqualTo(new Decimal(orderLine.qty))) {
+          const stillFeeding = await listActiveMtoReservationsForSalesLine({
+            salesOrderLineId: line.orderLineId,
+            itemId: line.itemId,
+            warehouseId: delivery.warehouseId,
+          });
+          for (const mto of stillFeeding) {
+            const current = await svc.find(mto.id);
+            if (current.status !== "ACTIVE") continue; // a concurrent settle won
+            await svc.release(mto.id, actorId);
+            if (orderLine.reservationId === mto.id) {
+              await store.setOrderLineReservation(orderLine.id, null);
+            }
+          }
+          if (orderLine.reservationId !== null) {
+            const own = await svc.find(orderLine.reservationId);
+            if (own.status === "ACTIVE") {
+              await svc.release(orderLine.reservationId, actorId);
+            }
             await store.setOrderLineReservation(orderLine.id, null);
           }
         }

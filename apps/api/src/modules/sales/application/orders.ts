@@ -414,15 +414,53 @@ export class SalesOrderService {
     return this.find(id);
   }
 
-  /** Release every line reservation of an order (cancel/close/delivery). */
+  /**
+   * Release EVERY reservation an order's termination touches (cancel /
+   * close — the 043-audit round-2 item-1 fix): the LINES' OWN
+   * reservations AND the MTO reservations FEEDING those lines (G-49's
+   * PRODUCTION_ORDER holders — the made-for-order stock of the linked,
+   * completed MOs). A cancelled/closed order ships nothing more, so its
+   * coverage retires entirely: the made-for-order stock returns to the
+   * FREE pool (the physical stock stays on-hand for disposition — a
+   * business decision on re-ordering/scrapping, never a leaked ACTIVE
+   * holder reducing availability forever). Pre-fix only the lines' own
+   * rows released; the MTO holders leaked.
+   */
   async releaseOrderReservations(orderId: string, actorId: string | null): Promise<void> {
+    const order = await store.findSalesOrderById(orderId);
     const lines = await store.listSalesOrderLines(orderId);
-    const active = lines.filter((line) => line.reservationId !== null);
-    if (active.length === 0) return;
+    if (order === undefined) return;
     const reservationService = await import("../../inventory/application/reservation-service");
     const svc = new reservationService.ReservationService(this.audit);
-    for (const line of active) {
-      await svc.release(line.reservationId!, actorId);
+    // The MTO chain's application surface (the deliveries.ts settlement
+    // precedent — never another module's store).
+    const { listActiveMtoReservationsForSalesLine } = await import(
+      "../../manufacturing/application/production-order-service"
+    );
+    for (const line of lines) {
+      // (a) The line's OWN reservation.
+      if (line.reservationId !== null) {
+        const own = await svc.find(line.reservationId);
+        if (own.status === "ACTIVE") {
+          await svc.release(line.reservationId, actorId);
+        }
+        await store.setOrderLineReservation(line.id, null);
+      }
+      // (b) The MTO reservations feeding this line (the completion-only
+      // holders — nothing exists for an in-progress/cancelled MO).
+      const feeding = await listActiveMtoReservationsForSalesLine({
+        salesOrderLineId: line.id,
+        itemId: line.itemId,
+        warehouseId: order.warehouseId,
+      });
+      for (const mto of feeding) {
+        const current = await svc.find(mto.id);
+        if (current.status !== "ACTIVE") continue; // a concurrent settle won
+        await svc.release(mto.id, actorId);
+        if (line.reservationId === mto.id) {
+          await store.setOrderLineReservation(line.id, null);
+        }
+      }
     }
   }
 }

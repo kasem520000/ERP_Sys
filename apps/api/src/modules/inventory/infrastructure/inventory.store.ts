@@ -1724,13 +1724,18 @@ export async function findOpeningPeriod(): Promise<
 }
 
 /**
- * The reservation-capacity read (PHASE-043 audit item 5): the honest
- * availability a NEW reservation may draw on at one (item, warehouse) —
- * pickable bins (AVAILABLE, tenant-owned, qty > 0) + the unbinned
- * fallback (item_stock − every bin row of the item-warehouse, floored at
- * 0 — quarantined bins never count, stock outside bins always does) −
- * the ACTIVE non-expired reserved pool. Undefined when no item_stock row
- * exists (nothing was ever received there — nothing to reserve).
+ * The reservation-capacity read (PHASE-043 audit item 5 + the round-2
+ * item-2 unification): the honest availability a NEW reservation may
+ * draw on at one (item, warehouse) — pickable bins (AVAILABLE,
+ * tenant-owned, qty > 0, the batch ACTIVE and NOT expired — the same
+ * exclusion set listPickableRows, the MRP qualified on-hand, and the
+ * ATP basis apply: a quarantine-held or lapsed batch never backs a
+ * reservation) + the unbinned fallback (item_stock − every bin row of
+ * the item-warehouse, floored at 0 — quarantined bins never count,
+ * stock outside bins always does; consignment never touches item_stock,
+ * so the owner's rows never enter the fallback) − the ACTIVE
+ * non-expired reserved pool. Undefined when no item_stock row exists
+ * (nothing was ever received there — nothing to reserve).
  */
 export async function reservationAvailability(
   itemId: string,
@@ -1742,8 +1747,12 @@ export async function reservationAvailability(
   const rows = await tenantTx().execute(sql`
     SELECT
       COALESCE((SELECT SUM(bc.qty) FROM bin_contents bc
+                LEFT JOIN item_batches ib ON ib.id = bc.batch_id AND ib.tenant_id = bc.tenant_id
                 WHERE bc.warehouse_id = ${warehouseId} AND bc.item_id = ${itemId}
-                  AND bc.owner_partner_id IS NULL AND bc.status = 'AVAILABLE' AND bc.qty > 0), 0)::text AS "pickableBins",
+                  AND bc.owner_partner_id IS NULL AND bc.status = 'AVAILABLE' AND bc.qty > 0
+                  AND (bc.batch_id IS NULL
+                       OR (ib.status = 'ACTIVE'
+                           AND (ib.expiry_date IS NULL OR ib.expiry_date >= CURRENT_DATE)))), 0)::text AS "pickableBins",
       COALESCE(s.qty, 0)::text AS stock,
       COALESCE((SELECT SUM(bc2.qty) FROM bin_contents bc2
                 WHERE bc2.warehouse_id = ${warehouseId} AND bc2.item_id = ${itemId}), 0)::text AS binned,

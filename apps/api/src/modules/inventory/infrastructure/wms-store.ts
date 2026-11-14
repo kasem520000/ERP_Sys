@@ -1615,6 +1615,15 @@ export async function upsertPickStrategyRow(input: {
  * tenant-owned rows with the batch dims — FIFO (received_at), FEFO (batch
  * expiry, earliest first — NULL expiries LAST, they never expire), or
  * NEAREST (the bin's pick_sequence, then received_at).
+ *
+ * THE BATCH-STATE EXCLUSION (the 043-audit round-2 item-2 fix): a row
+ * whose batch is not ACTIVE (QUARANTINED / WRITTEN_OFF — the QC gate
+ * holds the BATCH row while the bin row stays AVAILABLE) or whose batch
+ * EXPIRED (the shelf date passed, nobody wrote it off) is NOT pickable —
+ * the same exclusion set the MRP engine's qualified on-hand and the ATP
+ * basis (BR-080) apply. Pre-fix a quarantine-held or lapsed batch was
+ * allocatable here (and reservable through the policy engine) while ATP
+ * refused to promise it — three surfaces, three different answers.
  */
 export async function listPickableRows(input: {
   warehouseId: string;
@@ -1647,6 +1656,10 @@ export async function listPickableRows(input: {
       AND bc.owner_partner_id IS NULL
       AND bc.status = 'AVAILABLE'
       AND bc.qty > 0
+      AND (
+        bc.batch_id IS NULL
+        OR (bt.status = 'ACTIVE' AND (bt.expiry_date IS NULL OR bt.expiry_date >= CURRENT_DATE))
+      )
     ORDER BY ${order}
   `);
   return rows.rows as unknown as {
