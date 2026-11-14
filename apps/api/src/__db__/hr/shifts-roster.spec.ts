@@ -597,4 +597,76 @@ describe("PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern g
       ),
     ).rejects.toMatchObject({ code: "ROTATION_INVALID" });
   });
+
+  it("(f) THE DUPLICATE-EMPLOYEE REJECTION (the owner's independent review of 81f09e9): an employeeIds list naming the SAME employee twice is refused by the TYPED contract BEFORE any write — pre-fix the schema and the service both accepted it and the bulk upsert died on PostgreSQL's raw 'ON CONFLICT DO UPDATE command cannot affect row a second time' (an untyped protocol error surfaced as a 500, with the write's fate left to the transaction's rollback); the typed ROTATION_INVALID fires first and the rejected range keeps ZERO residue", async () => {
+    const f = spec.fixture!;
+    const day = await withTenant(TENANT_H, () =>
+      shiftSvc.create({
+        code: uniqueCode("DUP-DAY"),
+        name: "Duplicate-rejection day shift",
+        nameAr: "وردية رفض التكرار النهارية",
+        startTime: "07:00",
+        endTime: "15:00",
+        graceMinutes: 10,
+        breakMinutes: 30,
+        isNight: false,
+        note: null,
+        noteAr: null,
+        actorId: H_ACTOR,
+      }),
+    );
+
+    // The SAME employee twice in ONE run (H1 named at positions 1 and 3).
+    // Pre-fix this reached the bulk upsert and died on the raw ON CONFLICT
+    // DO UPDATE protocol error; post-fix it is the typed rejection.
+    const rejection = withTenant(TENANT_H, () =>
+      shiftSvc.applyRotation({
+        employeeIds: [f.employeeH1Id, f.employeeH2Id, f.employeeH1Id],
+        pattern: [day.id, day.id, day.id, day.id, day.id, null, null],
+        startDate: "2026-10-01",
+        endDate: "2026-10-07",
+        actorId: H_ACTOR,
+      }),
+    );
+    await expect(rejection).rejects.toMatchObject({ code: "ROTATION_INVALID" });
+    // And the message names the law (duplicates, not some generic shape).
+    await rejection.catch((error: { message?: string }) => {
+      expect(error.message).toContain("unique");
+    });
+
+    // ZERO RESIDUE: the typed validation fired BEFORE any write — the
+    // rejected range stays empty for BOTH employees (the fresh October
+    // range is this test's own; no other arm writes there).
+    const grid = await withTenant(TENANT_H, () =>
+      shiftSvc.readGrid({
+        from: "2026-10-01",
+        to: "2026-10-07",
+        employeeIds: [f.employeeH1Id, f.employeeH2Id],
+      }),
+    );
+    expect(grid.total).toBe(0);
+    expect(grid.rows).toHaveLength(0);
+    expect(grid.hasMore).toBe(false);
+
+    // The DEDUPED list still applies cleanly — the law rejects the
+    // malformed request, never the legitimate one.
+    const applied = await withTenant(TENANT_H, () =>
+      shiftSvc.applyRotation({
+        employeeIds: [f.employeeH1Id, f.employeeH2Id],
+        pattern: [day.id, day.id, day.id, day.id, day.id, null, null],
+        startDate: "2026-10-01",
+        endDate: "2026-10-07",
+        actorId: H_ACTOR,
+      }),
+    );
+    expect(applied.cellsWritten).toBe(14); // 2 employees × 7 days
+    const after = await withTenant(TENANT_H, () =>
+      shiftSvc.readGrid({
+        from: "2026-10-01",
+        to: "2026-10-07",
+        employeeIds: [f.employeeH1Id, f.employeeH2Id],
+      }),
+    );
+    expect(after.total).toBe(14); // ONE row per (employee, date) — never a duplicate
+  });
 });

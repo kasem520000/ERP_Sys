@@ -393,6 +393,22 @@ export class ShiftService {
     if (input.employeeIds.length > 200) {
       throw new RotationInvalidError("a rotation applies to at most 200 employees per run");
     }
+    // THE UNIQUENESS LAW (the owner's independent review of 81f09e9): a
+    // repeated employee id in ONE run would make the bulk upsert bind the
+    // SAME (employee, work_date) row twice — PostgreSQL refuses that with
+    // the raw "ON CONFLICT DO UPDATE command cannot affect row a second
+    // time" protocol error (an untyped 500, the write's fate left to the
+    // transaction's rollback). The typed contract fires BEFORE any write:
+    // the request is refused, nothing is queued, the grid keeps zero
+    // residue. The HTTP edge's schema carries the same law (a 422 naming
+    // employeeIds); this check is the layer every OTHER caller rides too.
+    const distinctEmployees = new Set(input.employeeIds);
+    if (distinctEmployees.size !== input.employeeIds.length) {
+      const duplicates = input.employeeIds.length - distinctEmployees.size;
+      throw new RotationInvalidError(
+        `the rotation's employeeIds must be unique — ${duplicates} repeated id(s) would make the bulk upsert touch the same (employee, date) rows twice (ON CONFLICT DO UPDATE cannot affect a row a second time)`,
+      );
+    }
     if (input.pattern.length !== 7 || input.pattern.some((entry) => entry === undefined)) {
       throw new RotationInvalidError(
         `the rotation pattern must be EXACTLY 7 entries (Monday…Sunday, a shift id or null): got ${input.pattern.length}`,

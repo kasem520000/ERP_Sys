@@ -1,0 +1,36 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/api
+
+ ❯ src/modules/hr/__tests__/rotation-schema.spec.ts (3 tests | 1 failed) 9ms
+   ✓ the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > accepts the legitimate body: distinct employee ids, the 7-entry pattern, ISO dates 2ms
+   × the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > rejects the SAME employee twice — the field error names employeeIds (pre-fix the schema accepted it and SQL died on the raw ON CONFLICT protocol error) 6ms
+     → expected true to be false // Object.is equality
+   ✓ the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > still enforces the standing shape bounds: empty list refused, >200 refused, non-uuid refused 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/modules/hr/__tests__/rotation-schema.spec.ts > the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > rejects the SAME employee twice — the field error names employeeIds (pre-fix the schema accepted it and SQL died on the raw ON CONFLICT protocol error)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/modules/hr/__tests__/rotation-schema.spec.ts:46:28
+     44|       validBody([EMPLOYEE_A, EMPLOYEE_B, EMPLOYEE_A]),
+     45|     );
+     46|     expect(parsed.success).toBe(false);
+       |                            ^
+     47|     if (!parsed.success) {
+     48|       const employeeIssues = parsed.error.issues.filter((issue) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  23:09:13
+   Duration  1.75s (transform 573ms, setup 0ms, collect 1.53s, tests 9ms, environment 0ms, prepare 73ms)
+

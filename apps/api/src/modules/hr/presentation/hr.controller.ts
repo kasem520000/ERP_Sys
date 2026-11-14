@@ -55,12 +55,29 @@ const shiftPatch = z.object({
   noteAr: TEXT,
 });
 
-const rotationBody = z.object({
-  employeeIds: z.array(UUID).min(1).max(200),
-  pattern: z.array(UUID.nullable()).length(7),
-  startDate: DATE,
-  endDate: DATE,
-});
+/** The rotation body schema — EXPORTED for the module's unit contract
+ * test (the duplicate-employee law, __tests__/rotation-schema.spec.ts):
+ * the schema is the HTTP edge's typed gate; the service re-verifies the
+ * same law for every caller (the defense-in-depth pair).
+ *
+ * THE UNIQUENESS LAW (the owner's independent review of 81f09e9): a
+ * repeated employee id made the request die later at the bulk upsert on
+ * PostgreSQL's raw "ON CONFLICT DO UPDATE command cannot affect row a
+ * second time" — an untyped 500. The schema now refuses the duplicate
+ * list itself: a 422 VALIDATION_ERROR with the field error naming
+ * employeeIds (the error filter's Zod mapping). */
+export const rotationBody = z
+  .object({
+    employeeIds: z.array(UUID).min(1).max(200),
+    pattern: z.array(UUID.nullable()).length(7),
+    startDate: DATE,
+    endDate: DATE,
+  })
+  .refine((body) => new Set(body.employeeIds).size === body.employeeIds.length, {
+    message:
+      "employeeIds must be unique — a repeated id would make the bulk upsert affect the same (employee, date) rows twice",
+    path: ["employeeIds"],
+  });
 
 @Controller("api/v1/hr")
 export class HrController {
