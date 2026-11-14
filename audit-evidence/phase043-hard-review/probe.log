@@ -1,0 +1,157 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-14 20:50:43.403 UTC [4079] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-14 20:50:43.403 UTC [4079] LOG:  listening on IPv6 address "::1", port 37931
+2026-11-14 20:50:43.403 UTC [4079] LOG:  listening on IPv4 address "127.0.0.1", port 37931
+
+2026-11-14 20:50:43.404 UTC [4079] LOG:  listening on Unix socket "/tmp/.s.PGSQL.37931"
+
+2026-11-14 20:50:43.405 UTC [4082] LOG:  database system was shut down at 2026-11-14 20:50:43 UTC
+
+2026-11-14 20:50:43.406 UTC [4079] LOG:  database system is ready to accept connections
+
+(node:4144) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ ../../audit-evidence/phase043-hard-review/probe.spec.ts (2 tests | 2 failed) 996ms
+   × DEFECT 1 — allow_negative_stock must NEVER disable the reservation protection (the policy governs the UNRESERVED portion only) > P1: with the policy ON, another order's delivery of the MTO-reserved stock is REJECTED, a manual issue is REJECTED, the goods stay intact — while free stock still goes negative by policy 159ms
+     → promise resolved "{ delivery: { …(19) }, …(3) }" instead of rejecting
+   × DEFECT 2 — the delivery identity is verified at CREATE and at POST; every allowance traces to a LIVE reservation matching item, warehouse, and beneficiary > P2: a foreign order line, an item mismatch, and a warehouse mismatch are all REJECTED at create — and a DIRECTLY-INSERTED mismatched delivery (create bypassed) is REJECTED at post with ZERO residue 263ms
+     → promise resolved "'01a1dbd3-be8a-7000-8236-04b6e8dcdd32'" instead of rejecting
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  ../../audit-evidence/phase043-hard-review/probe.spec.ts > DEFECT 1 — allow_negative_stock must NEVER disable the reservation protection (the policy governs the UNRESERVED portion only) > P1: with the policy ON, another order's delivery of the MTO-reserved stock is REJECTED, a manual issue is REJECTED, the goods stay intact — while free stock still goes negative by policy
+AssertionError: promise resolved "{ delivery: { …(19) }, …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "delivery": {
++     "branchId": "01a1dbd3-bb77-7000-aa1a-d865413a4e55",
++     "cogsValue": "40.0000",
++     "convertedInvoiceId": null,
++     "createdBy": "e6e6e6e6-0000-4000-8000-0000000006e1",
++     "currencyCode": "SAR",
++     "customerId": "01a1dbd3-bb8f-7000-81d7-0057c3e48207",
++     "deliveryDate": "2026-03-17",
++     "deliveryNo": "DEL-2026-000001",
++     "id": "01a1dbd3-bd6d-7000-a056-54b2874d0ad5",
++     "note": "the probe delivery (P1-thief)",
++     "noteAr": null,
++     "orderId": "01a1dbd3-bd64-7000-b2bd-bd2ee1dba820",
++     "postedJournalId": "01a1dbd3-bd7f-7001-988e-4ab4619a5a5d",
++     "salesRepId": null,
++     "status": "POSTED",
++     "totalGross": "100.0000",
++     "totalNet": "100.0000",
++     "totalTax": "0.0000",
++     "warehouseId": "01a1dbd3-bb7c-7000-90ad-1cb339b43fe8",
++   },
++   "deliveryNo": "DEL-2026-000001",
++   "idempotentReplay": false,
++   "journalEntryId": "01a1dbd3-bd7f-7001-988e-4ab4619a5a5d",
+  }
+
+ ❯ ../../audit-evidence/phase043-hard-review/probe.spec.ts:394:7
+    392|       await expect(
+    393|         withTenant(TENANT_M, () => deliveries.post(thiefNote, M_ACTOR)…
+    394|       ).rejects.toMatchObject({ code: "RESERVED_STOCK_PROTECTED" });
+       |       ^
+    395| 
+    396|       // (ii) ANOTHER ISSUE PATH — the manual issue, same law.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  ../../audit-evidence/phase043-hard-review/probe.spec.ts > DEFECT 2 — the delivery identity is verified at CREATE and at POST; every allowance traces to a LIVE reservation matching item, warehouse, and beneficiary > P2: a foreign order line, an item mismatch, and a warehouse mismatch are all REJECTED at create — and a DIRECTLY-INSERTED mismatched delivery (create bypassed) is REJECTED at post with ZERO residue
+AssertionError: promise resolved "'01a1dbd3-be8a-7000-8236-04b6e8dcdd32'" instead of rejecting
+
+- Expected: 
+Error {
+  "message": "rejected promise",
+}
+
++ Received: 
+"01a1dbd3-be8a-7000-8236-04b6e8dcdd32"
+
+ ❯ ../../audit-evidence/phase043-hard-review/probe.spec.ts:553:5
+    551|         label: "P2-foreign-line",
+    552|       }),
+    553|     ).rejects.toMatchObject({ code: "DELIVERY_LINE_IDENTITY" });
+       |     ^
+    554| 
+    555|     // (ii) ITEM MISMATCH at create: the DN binds order A's line (item
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  20:50:42
+   Duration  7.16s (transform 1.29s, setup 0ms, collect 2.36s, tests 996ms, environment 0ms, prepare 63ms)
+
+2026-11-14 20:50:49.681 UTC [4079] LOG:  received fast shutdown request
+2026-11-14 20:50:49.681 UTC [4079] LOG:  aborting any active transactions
+2026-11-14 20:50:49.681 UTC [4169] FATAL:  terminating connection due to administrator command
+2026-11-14 20:50:49.681 UTC [4167] FATAL:  terminating connection due to administrator command
+2026-11-14 20:50:49.682 UTC [4168] FATAL:  terminating connection due to administrator command
+2026-11-14 20:50:49.685 UTC [4079] LOG:  background worker "logical replication launcher" (PID 4085) exited with exit code 1
+
+2026-11-14 20:50:49.687 UTC [4080] LOG:  shutting down
+2026-11-14 20:50:49.687 UTC [4080] LOG:  checkpoint starting: shutdown immediate
+
+(node:4144) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:4144) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-14 20:50:49.707 UTC [4080] LOG:  checkpoint complete: wrote 3008 buffers (18.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.014 s, sync=0.007 s, total=0.021 s; sync files=2374, longest=0.001 s, average=0.001 s; distance=24604 kB, estimate=24604 kB; lsn=0/2CE5A20, redo lsn=0/2CE5A20
+
+2026-11-14 20:50:49.715 UTC [4079] LOG:  database system is shut down
+

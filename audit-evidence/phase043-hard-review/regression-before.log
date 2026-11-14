@@ -1,0 +1,177 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-14 20:50:59.189 UTC [4256] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-14 20:50:59.189 UTC [4256] LOG:  listening on IPv6 address "::1", port 42043
+2026-11-14 20:50:59.189 UTC [4256] LOG:  listening on IPv4 address "127.0.0.1", port 42043
+
+2026-11-14 20:50:59.190 UTC [4256] LOG:  listening on Unix socket "/tmp/.s.PGSQL.42043"
+
+2026-11-14 20:50:59.191 UTC [4259] LOG:  database system was shut down at 2026-11-14 20:50:59 UTC
+
+2026-11-14 20:50:59.193 UTC [4256] LOG:  database system is ready to accept connections
+
+(node:4315) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ src/__db__/manufacturing/reservation-hard-review.spec.ts (3 tests | 3 failed) 1071ms
+   × the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (k) THE NEGATIVE-STOCK POLICY NEVER DISABLES THE PROTECTION: with the policy ON another order's delivery and a manual issue are REJECTED; the free (unreserved) portion still goes negative by policy; the pool floor above zero still binds; the beneficiary still ships 157ms
+     → promise resolved "{ delivery: { …(19) }, …(3) }" instead of rejecting
+   × the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (l) THE DELIVERY IDENTITY CONTRACT: a foreign order line, an item mismatch, a warehouse mismatch, and duplicate bindings are REJECTED at create AND at post (create bypassed — zero residue); partial and concurrent settlements still settle exactly; a post that fails after its plans leaves ZERO residue 273ms
+     → promise resolved "'01a1dbd3-fe52-7000-a5c6-8f44760d0d96'" instead of rejecting
+   × the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (m) THE ATP PROTECTION STANDING at the promise point: UNPROTECTED vs PARTIALLY_PROTECTED vs FULLY_PROTECTED relative to the REMAINING qty, with the protected/unprotected QUANTITIES and the bilingual advisory note — and a shortage NEVER blocks issuing a sales order (the backorder law) 54ms
+     → expected undefined to be '10.000000' // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/manufacturing/reservation-hard-review.spec.ts > the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (k) THE NEGATIVE-STOCK POLICY NEVER DISABLES THE PROTECTION: with the policy ON another order's delivery and a manual issue are REJECTED; the free (unreserved) portion still goes negative by policy; the pool floor above zero still binds; the beneficiary still ships
+AssertionError: promise resolved "{ delivery: { …(19) }, …(3) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "delivery": {
++     "branchId": "01a1dbd3-fb1f-7000-afbb-64e22ec26022",
++     "cogsValue": "40.0000",
++     "convertedInvoiceId": null,
++     "createdBy": "e6e6e6e6-0000-4000-8000-0000000006e1",
++     "currencyCode": "SAR",
++     "customerId": "01a1dbd3-fb38-7000-a4d6-547e872d3436",
++     "deliveryDate": "2026-03-17",
++     "deliveryNo": "DEL-2026-000001",
++     "id": "01a1dbd3-fd15-7000-9559-02f10ab22dae",
++     "note": "the hard-review delivery (K-thief)",
++     "noteAr": null,
++     "orderId": "01a1dbd3-fd0d-7000-a6e6-7a497eaefe72",
++     "postedJournalId": "01a1dbd3-fd26-7002-a56f-d6d536a082c5",
++     "salesRepId": null,
++     "status": "POSTED",
++     "totalGross": "100.0000",
++     "totalNet": "100.0000",
++     "totalTax": "0.0000",
++     "warehouseId": "01a1dbd3-fb24-7000-8469-65688df3fd7a",
++   },
++   "deliveryNo": "DEL-2026-000001",
++   "idempotentReplay": false,
++   "journalEntryId": "01a1dbd3-fd26-7002-a56f-d6d536a082c5",
+  }
+
+ ❯ src/__db__/manufacturing/reservation-hard-review.spec.ts:378:7
+    376|       await expect(
+    377|         withTenant(TENANT_M, () => deliveries.post(thiefNote, M_ACTOR)…
+    378|       ).rejects.toMatchObject({ code: "RESERVED_STOCK_PROTECTED" });
+       |       ^
+    379| 
+    380|       // (k2) The manual issue path: same law under the policy.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__db__/manufacturing/reservation-hard-review.spec.ts > the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (l) THE DELIVERY IDENTITY CONTRACT: a foreign order line, an item mismatch, a warehouse mismatch, and duplicate bindings are REJECTED at create AND at post (create bypassed — zero residue); partial and concurrent settlements still settle exactly; a post that fails after its plans leaves ZERO residue
+AssertionError: promise resolved "'01a1dbd3-fe52-7000-a5c6-8f44760d0d96'" instead of rejecting
+
+- Expected: 
+Error {
+  "message": "rejected promise",
+}
+
++ Received: 
+"01a1dbd3-fe52-7000-a5c6-8f44760d0d96"
+
+ ❯ src/__db__/manufacturing/reservation-hard-review.spec.ts:540:5
+    538|         label: "L-foreign-line",
+    539|       }),
+    540|     ).rejects.toMatchObject({ code: "DELIVERY_LINE_IDENTITY" });
+       |     ^
+    541| 
+    542|     // (l2) ITEM MISMATCH at create — pre-fix accepted, and the post a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/__db__/manufacturing/reservation-hard-review.spec.ts > the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (m) THE ATP PROTECTION STANDING at the promise point: UNPROTECTED vs PARTIALLY_PROTECTED vs FULLY_PROTECTED relative to the REMAINING qty, with the protected/unprotected QUANTITIES and the bilingual advisory note — and a shortage NEVER blocks issuing a sales order (the backorder law)
+AssertionError: expected undefined to be '10.000000' // Object.is equality
+
+- Expected: 
+"10.000000"
+
++ Received: 
+undefined
+
+ ❯ src/__db__/manufacturing/reservation-hard-review.spec.ts:852:38
+    850|     expect(unprotected.verdict).toBe("OK");
+    851|     expect(unprotected.protection).toBe("UNPROTECTED");
+    852|     expect(unprotected.remainingQty).toBe("10.000000");
+       |                                      ^
+    853|     expect(unprotected.protectedQty).toBe("0.000000");
+    854|     expect(unprotected.unprotectedQty).toBe("10.000000");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  20:50:58
+   Duration  7.70s (transform 1.32s, setup 0ms, collect 2.38s, tests 1.07s, environment 0ms, prepare 56ms)
+
+2026-11-14 20:51:06.014 UTC [4256] LOG:  received fast shutdown request
+2026-11-14 20:51:06.014 UTC [4256] LOG:  aborting any active transactions
+2026-11-14 20:51:06.014 UTC [4339] FATAL:  terminating connection due to administrator command
+
+2026-11-14 20:51:06.016 UTC [4338] FATAL:  terminating connection due to administrator command
+
+2026-11-14 20:51:06.017 UTC [4337] FATAL:  terminating connection due to administrator command
+2026-11-14 20:51:06.021 UTC [4256] LOG:  background worker "logical replication launcher" (PID 4262) exited with exit code 1
+2026-11-14 20:51:06.023 UTC [4257] LOG:  shutting down
+2026-11-14 20:51:06.023 UTC [4257] LOG:  checkpoint starting: shutdown immediate
+
+(node:4315) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:4315) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-14 20:51:06.046 UTC [4257] LOG:  checkpoint complete: wrote 3008 buffers (18.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.016 s, sync=0.007 s, total=0.024 s; sync files=2374, longest=0.001 s, average=0.001 s; distance=24623 kB, estimate=24623 kB; lsn=0/2CEA800, redo lsn=0/2CEA800
+
+2026-11-14 20:51:06.054 UTC [4256] LOG:  database system is shut down
+
