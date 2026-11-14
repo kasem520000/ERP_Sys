@@ -60,7 +60,14 @@ import { AtpInputInvalidError } from "../domain/manufacturing-errors";
  *    never earlier than the as-of date (a LATE open PO's informative
  *    landing floors to today — the law-5 mirror), and reservations
  *    reduce the basis at every candidate date (the pool never frees
- *    by date).
+ *    by date). THE FLOOR'S COVERAGE (the round-3 edge): the floor is
+ *    applied BEFORE the coverage judgment — the candidate the promise
+ *    names is max(leg date, as-of) and the coverage answers for THAT
+ *    date, never the raw leg's (a batch alive at the raw late date but
+ *    dead by today never covers a floored-to-today candidate; an
+ *    insufficient floored candidate is refused and the walk continues
+ *    to the first date the full qty exists at or after the as-of date,
+ *    or no date at all).
  */
 
 const QTY_RE = /^\d+(\.\d{1,6})?$/;
@@ -80,8 +87,9 @@ export interface AtpResult {
   availableNow: string;
   /** The CTP scan (law 6): the earliest date the FULL requested qty
    * exists — the expiry-aware basis AT that date + the dated legs
-   * landing on/before it, floored to the as-of date; null when the
-   * horizon cannot cover it. */
+   * landing on/before it, floored to the as-of date WITH the coverage
+   * judged at the floored date (the round-3 edge: the floor precedes
+   * the judgment); null when the horizon cannot cover it. */
   suggestedDate: string | null;
   /** OK = availableNow ≥ requestedQty at the requested date; SHORT = the
    * over-promise warning (the sales line stamps it). */
@@ -193,6 +201,19 @@ export class AtpService {
     // suggested date never precedes the as-of date (a LATE open PO's
     // informative landing floors to today — law 5's mirror: a promise
     // never back-dates).
+    // THE FLOOR'S COVERAGE (the round-3 edge): the floor is applied
+    // BEFORE the coverage judgment, never after — the candidate the
+    // promise would actually NAME is max(leg date, as-of), and the
+    // coverage is recomputed against THAT floored date (the basis AND
+    // the legs landing on/before it). Pre-fix the walk judged the RAW
+    // leg date and floored the answer afterwards: a batch alive at the
+    // raw date but dead by the floored date (an expiry between the two)
+    // still "covered" the promise — demand 20 against 10 that died
+    // yesterday plus a late inbound 10 expected the day before produced
+    // TODAY as the suggestion, a date at which only 10 exist (a false
+    // promise). The floored-date candidate that cannot cover is REFUSED
+    // and the walk continues to the next leg (the first date the FULL
+    // qty exists at or after the as-of date — or no date at all).
     const datedLegs = incoming.filter(
       (leg) => leg.date !== null && leg.kind !== "INBOUND_TRANSFER",
     );
@@ -202,11 +223,14 @@ export class AtpService {
     } else {
       for (const leg of datedLegs) {
         if (leg.date! > horizonEnd) break;
-        const coverageAtLeg = datedLegs
-          .filter((other) => other.date! <= leg.date! && other.date! <= horizonEnd)
-          .reduce((sum, other) => sum.plus(new Decimal(other.qty)), basisAt(leg.date!));
-        if (coverageAtLeg.greaterThanOrEqualTo(requested)) {
-          suggestedDate = leg.date! < asOf ? asOf : leg.date!; // the floor
+        // The floor FIRST: the candidate the promise would name — never
+        // before the as-of date (law 5's mirror).
+        const candidate = leg.date! < asOf ? asOf : leg.date!;
+        const coverageAtCandidate = datedLegs
+          .filter((other) => other.date! <= candidate && other.date! <= horizonEnd)
+          .reduce((sum, other) => sum.plus(new Decimal(other.qty)), basisAt(candidate));
+        if (coverageAtCandidate.greaterThanOrEqualTo(requested)) {
+          suggestedDate = candidate;
           break;
         }
       }
@@ -229,7 +253,8 @@ export class AtpService {
       // When the verdict is OK but the basis alone cannot cover, the
       // suggested date is the earliest full-coverage DATED leg (≤ the
       // requested date — the informative supply landing; floored to the
-      // as-of date when the covering leg is a LATE one — law 6).
+      // as-of date when the covering leg is a LATE one, WITH the coverage
+      // re-judged at the floored date — law 6).
       suggestedDate,
       verdict,
       incoming,
