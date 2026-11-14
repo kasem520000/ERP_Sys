@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/web
+
+ ✓ components/__tests__/atp-promise-point.test.tsx (2 tests) 116ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  23:13:11
+   Duration  1.67s (transform 592ms, setup 0ms, collect 1.05s, tests 116ms, environment 282ms, prepare 72ms)
+

@@ -100,6 +100,19 @@ export function AtpPromisePoint({
       return;
     }
     setResults((current) => new Map(current).set(lineId, result.data));
+    // THE STAMP REFRESH (the owner's independent review of 81f09e9): the
+    // check PERSISTS the line's stamp server-side (atpStatus + promised
+    // date + suggested date — updateOrderLineAtp) and the answer carries
+    // the FRESH line row; pre-fix the panel kept rendering the stamp
+    // loaded with the order, so a line stamped OK beside a freshly
+    // computed SHORT verdict stayed "OK" until a full reload. The line
+    // row in state is replaced with the answer's — the badge, the
+    // promised date, everything reads what the check just recorded.
+    setLines((current) =>
+      current === null
+        ? current
+        : current.map((line) => (line.id === lineId ? result.data.line : line)),
+    );
   }
 
   return (

@@ -1,0 +1,19 @@
+
+> @erp/web@0.1.0 test /home/z/ERP_Sys/apps/web
+> vitest run
+
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/web
+
+ ✓ components/offline/__tests__/offline-components.test.tsx (19 tests) 142ms
+ ✓ components/__tests__/atp-promise-point.test.tsx (2 tests) 116ms
+ ✓ lib/shell/__tests__/sync-mirror.test.ts (14 tests) 50ms
+ ✓ lib/shell/__tests__/bridge.test.tsx (13 tests) 36ms
+ ✓ lib/shell/__tests__/store-client.test.ts (20 tests) 28ms
+ ✓ __tests__/local-schema-parity.test.ts (7 tests) 6ms
+
+ Test Files  6 passed (6)
+      Tests  75 passed (75)
+   Start at  23:13:57
+   Duration  5.64s (transform 1.04s, setup 0ms, collect 2.45s, tests 377ms, environment 1.73s, prepare 336ms)
+

@@ -1,0 +1,990 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/web
+
+ ❯ components/__tests__/atp-promise-point.test.tsx (2 tests | 1 failed) 1122ms
+   × AtpPromisePoint — the line's stamp refreshes after the check (the 81f09e9 review fix) > renders the stale OK stamp with the loaded line, then the check's SHORT verdict REPLACES the stamp — the badge reads what the check just recorded, not what the order load carried 1109ms
+     → Unable to find an element with the text: Last line check: Short. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33mclass[39m=[32m"rounded-lg border border-subtle bg-surface-card p-4 shadow-e1"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-md font-semibold text-gray-900"[39m
+        [36m>[39m
+          [0mPromise point · SO-203[0m
+        [36m</h2>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mt-1 text-sm text-gray-600"[39m
+      [36m>[39m
+        [0mThe unreserved portion is advisory only — another order can take the stock first and a backorder remains possible; a shortage never blocks issuing a sales order.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mt-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col gap-4"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-gray-600"[39m
+            [36m>[39m
+              [0mOrder lines[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"rounded-md border border-gray-200 p-3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mSKU-PROMISE-1[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0m10.000000[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                  [36m>[39m
+                    [0mPromised date[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-18[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-primary-200 bg-primary-50 text-primary-800"[39m
+                  [36m>[39m
+                    [0mLast line check[0m
+                    [0m: [0m
+                    [0mOK[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [0mCheck ATP[0m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"mt-3 flex flex-col gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mVerdict[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mShort[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mProtection[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mUnprotected[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-600"[39m
+                  [36m>[39m
+                    [0mEarliest cover date (CTP)[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-24[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<dl[39m
+                  [33mclass[39m=[32m"grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-5"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAvailable to promise at the requested date[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m4.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mRemaining qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAllocated to the line[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mProtected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mUnprotected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                [36m</dl>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-col gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mAdvisory note[0m
+                  [36m</span>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-5 text-yellow-900"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mAdvisory only — unprotected: no allocation protects this line yet (EN test note).[0m
+                  [36m</p>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-6 text-yellow-900"[39m
+                    [33mdir[39m=[32m"rtl"[39m
+                  [36m>[39m
+                    [0mاسترشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد (ملاحظة اختبار عربية).[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-wrap justify-end gap-2"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCancel[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33mclass[39m=[32m"rounded-lg border border-subtle bg-surface-card p-4 shadow-e1"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-md font-semibold text-gray-900"[39m
+        [36m>[39m
+          [0mPromise point · SO-203[0m
+        [36m</h2>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mt-1 text-sm text-gray-600"[39m
+      [36m>[39m
+        [0mThe unreserved portion is advisory only — another order can take the stock first and a backorder remains possible; a shortage never blocks issuing a sales order.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mt-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col gap-4"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-gray-600"[39m
+            [36m>[39m
+              [0mOrder lines[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"rounded-md border border-gray-200 p-3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mSKU-PROMISE-1[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0m10.000000[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                  [36m>[39m
+                    [0mPromised date[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-18[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-primary-200 bg-primary-50 text-primary-800"[39m
+                  [36m>[39m
+                    [0mLast line check[0m
+                    [0m: [0m
+                    [0mOK[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [0mCheck ATP[0m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"mt-3 flex flex-col gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mVerdict[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mShort[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mProtection[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mUnprotected[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-600"[39m
+                  [36m>[39m
+                    [0mEarliest cover date (CTP)[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-24[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<dl[39m
+                  [33mclass[39m=[32m"grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-5"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAvailable to promise at the requested date[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m4.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mRemaining qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAllocated to the line[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mProtected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mUnprotected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                [36m</dl>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-col gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mAdvisory note[0m
+                  [36m</span>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-5 text-yellow-900"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mAdvisory only — unprotected: no allocation protects this line yet (EN test note).[0m
+                  [36m</p>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-6 text-yellow-900"[39m
+                    [33mdir[39m=[32m"rtl"[39m
+                  [36m>[39m
+                    [0mاسترشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد (ملاحظة اختبار عربية).[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-wrap justify-end gap-2"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCancel[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ✓ AtpPromisePoint — the line's stamp refreshes after the check (the 81f09e9 review fix) > keeps the panel consultative — the advisory rule is on the surface and nothing blocks (no gate renders) 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  components/__tests__/atp-promise-point.test.tsx > AtpPromisePoint — the line's stamp refreshes after the check (the 81f09e9 review fix) > renders the stale OK stamp with the loaded line, then the check's SHORT verdict REPLACES the stamp — the badge reads what the check just recorded, not what the order load carried
+TestingLibraryElementError: Unable to find an element with the text: Last line check: Short. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33mclass[39m=[32m"rounded-lg border border-subtle bg-surface-card p-4 shadow-e1"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-md font-semibold text-gray-900"[39m
+        [36m>[39m
+          [0mPromise point · SO-203[0m
+        [36m</h2>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mt-1 text-sm text-gray-600"[39m
+      [36m>[39m
+        [0mThe unreserved portion is advisory only — another order can take the stock first and a backorder remains possible; a shortage never blocks issuing a sales order.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mt-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col gap-4"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-gray-600"[39m
+            [36m>[39m
+              [0mOrder lines[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"rounded-md border border-gray-200 p-3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mSKU-PROMISE-1[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0m10.000000[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                  [36m>[39m
+                    [0mPromised date[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-18[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-primary-200 bg-primary-50 text-primary-800"[39m
+                  [36m>[39m
+                    [0mLast line check[0m
+                    [0m: [0m
+                    [0mOK[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [0mCheck ATP[0m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"mt-3 flex flex-col gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mVerdict[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mShort[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mProtection[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mUnprotected[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-600"[39m
+                  [36m>[39m
+                    [0mEarliest cover date (CTP)[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-24[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<dl[39m
+                  [33mclass[39m=[32m"grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-5"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAvailable to promise at the requested date[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m4.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mRemaining qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAllocated to the line[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mProtected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mUnprotected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                [36m</dl>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-col gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mAdvisory note[0m
+                  [36m</span>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-5 text-yellow-900"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mAdvisory only — unprotected: no allocation protects this line yet (EN test note).[0m
+                  [36m</p>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-6 text-yellow-900"[39m
+                    [33mdir[39m=[32m"rtl"[39m
+                  [36m>[39m
+                    [0mاسترشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد (ملاحظة اختبار عربية).[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-wrap justify-end gap-2"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCancel[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<section[39m
+      [33mclass[39m=[32m"rounded-lg border border-subtle bg-surface-card p-4 shadow-e1"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+      [36m>[39m
+        [36m<h2[39m
+          [33mclass[39m=[32m"text-md font-semibold text-gray-900"[39m
+        [36m>[39m
+          [0mPromise point · SO-203[0m
+        [36m</h2>[39m
+      [36m</div>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"mt-1 text-sm text-gray-600"[39m
+      [36m>[39m
+        [0mThe unreserved portion is advisory only — another order can take the stock first and a backorder remains possible; a shortage never blocks issuing a sales order.[0m
+      [36m</p>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"mt-3"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col gap-4"[39m
+          [36m>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-gray-600"[39m
+            [36m>[39m
+              [0mOrder lines[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"rounded-md border border-gray-200 p-3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-wrap items-center justify-between gap-2"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mSKU-PROMISE-1[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"font-mono text-sm"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0m10.000000[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-500"[39m
+                  [36m>[39m
+                    [0mPromised date[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-18[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-primary-200 bg-primary-50 text-primary-800"[39m
+                  [36m>[39m
+                    [0mLast line check[0m
+                    [0m: [0m
+                    [0mOK[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+                  [33mtype[39m=[32m"button"[39m
+                [36m>[39m
+                  [0mCheck ATP[0m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"mt-3 flex flex-col gap-3"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-wrap items-center gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mVerdict[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mShort[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mProtection[0m
+                    [0m:[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"inline-flex w-fit items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs leading-4 border-subtle bg-gray-100 text-gray-600"[39m
+                  [36m>[39m
+                    [0mUnprotected[0m
+                  [36m</span>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs text-gray-600"[39m
+                  [36m>[39m
+                    [0mEarliest cover date (CTP)[0m
+                    [0m: [0m
+                    [36m<span[39m
+                      [33mdir[39m=[32m"ltr"[39m
+                    [36m>[39m
+                      [0m2026-11-24[0m
+                    [36m</span>[39m
+                  [36m</span>[39m
+                [36m</div>[39m
+                [36m<dl[39m
+                  [33mclass[39m=[32m"grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-5"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAvailable to promise at the requested date[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m4.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mRemaining qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mAllocated to the line[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mProtected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m0.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                  [36m<div>[39m
+                    [36m<dt[39m
+                      [33mclass[39m=[32m"text-gray-500"[39m
+                    [36m>[39m
+                      [0mUnprotected qty[0m
+                    [36m</dt>[39m
+                    [36m<dd>[39m
+                      [36m<span[39m
+                        [33mclass[39m=[32m"font-mono text-sm"[39m
+                        [33mdir[39m=[32m"ltr"[39m
+                      [36m>[39m
+                        [0m10.000000[0m
+                      [36m</span>[39m
+                    [36m</dd>[39m
+                  [36m</div>[39m
+                [36m</dl>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex flex-col gap-2"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    [33mclass[39m=[32m"text-xs font-medium text-gray-700"[39m
+                  [36m>[39m
+                    [0mAdvisory note[0m
+                  [36m</span>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-5 text-yellow-900"[39m
+                    [33mdir[39m=[32m"ltr"[39m
+                  [36m>[39m
+                    [0mAdvisory only — unprotected: no allocation protects this line yet (EN test note).[0m
+                  [36m</p>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"rounded-sm bg-yellow-50 p-2 text-xs leading-6 text-yellow-900"[39m
+                    [33mdir[39m=[32m"rtl"[39m
+                  [36m>[39m
+                    [0mاسترشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد (ملاحظة اختبار عربية).[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-wrap justify-end gap-2"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex select-none items-center justify-center rounded-md font-medium whitespace-nowrap outline-none transition-colors duration-150 ease-standard disabled:pointer-events-none disabled:opacity-50 bg-surface-card text-gray-800 border border-default hover:border-strong hover:bg-surface-sunken h-[var(--erp-density-control-height)] gap-2 px-3 text-sm"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mCancel[0m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</section>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ components/__tests__/atp-promise-point.test.tsx:175:25
+    173|     // Short" — and the stale OK stamp is GONE. Pre-fix the badge kept
+    174|     // rendering "Last line check: OK" beside the fresh SHORT verdict.
+    175|     expect(await screen.findByText("Last line check: Short")).toBeTrut…
+       |                         ^
+    176|     expect(screen.queryByText("Last line check: OK")).toBeNull();
+    177|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  23:12:59
+   Duration  3.11s (transform 584ms, setup 0ms, collect 1.16s, tests 1.12s, environment 577ms, prepare 64ms)
+
