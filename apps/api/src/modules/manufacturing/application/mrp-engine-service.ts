@@ -305,6 +305,22 @@ export class MrpEngineService {
     const bucketStarts = buildBuckets(asOfDate, bucketSize, params.horizonBuckets);
     const bucketOf = (date: string | null): number =>
       date === null ? 0 : bucketIndexCovering(date, bucketStarts, bucketSize);
+    // THE HORIZON BOUNDARY (the 043-audit item-7 fix): a signal dated
+    // beyond the last bucket's span used to CLAMP into the last bucket —
+    // a PO arriving after the horizon suppressed an in-horizon net
+    // requirement (the buyer never ordered — a stockout), and an
+    // MPS/sales demand beyond the horizon generated in-horizon demand
+    // (misleading, too early). Beyond-horizon signals are now OUTSIDE
+    // the plan (the horizon is the boundary; the source documents stay
+    // visible). Undated SUPPLY legs never count (the no-date-no-promise
+    // law — conservative netting never under-orders); undated DEMAND
+    // stays in the past-due fold (bucket 0 — conservative the other way).
+    const horizonLimit = addDaysIso(
+      bucketStarts[bucketStarts.length - 1]!,
+      bucketSize === "DAY" ? 1 : 7,
+    );
+    const beyondHorizon = (date: string | null): boolean =>
+      date !== null && date >= horizonLimit;
 
     // -- the reads (one pass; the snapshots ride these exact rows) -----
     const planningItems = new Map<string, store.ItemPlanningRow>();
@@ -398,6 +414,7 @@ export class MrpEngineService {
 
     for (const entry of mpsEntries) {
       if (!planningItems.has(entry.itemId)) continue;
+      if (beyondHorizon(entry.bucketStart)) continue;
       pushDemand(entry.itemId, {
         itemId: entry.itemId,
         bucketIndex: bucketOf(entry.bucketStart),
@@ -408,6 +425,7 @@ export class MrpEngineService {
     }
     for (const line of firmSales) {
       if (!planningItems.has(line.itemId)) continue;
+      if (beyondHorizon(line.demandDate)) continue;
       pushDemand(line.itemId, {
         itemId: line.itemId,
         bucketIndex: bucketOf(line.demandDate),
@@ -433,6 +451,8 @@ export class MrpEngineService {
     }
     for (const row of openPos) {
       if (!planningItems.has(row.itemId)) continue;
+      // No date or beyond the horizon: never in-horizon supply.
+      if (row.expectedDate === null || beyondHorizon(row.expectedDate)) continue;
       pushSupply(row.itemId, {
         itemId: row.itemId,
         bucketIndex: bucketOf(row.expectedDate),
@@ -443,6 +463,7 @@ export class MrpEngineService {
     }
     for (const row of openMos) {
       if (!planningItems.has(row.itemId)) continue;
+      if (row.plannedDate === null || beyondHorizon(row.plannedDate)) continue;
       pushSupply(row.itemId, {
         itemId: row.itemId,
         bucketIndex: bucketOf(row.plannedDate),
@@ -463,6 +484,7 @@ export class MrpEngineService {
     }
     for (const row of coProducts) {
       if (!planningItems.has(row.itemId)) continue;
+      if (beyondHorizon(row.plannedDate)) continue;
       pushSupply(row.itemId, {
         itemId: row.itemId,
         bucketIndex: bucketOf(row.plannedDate),
@@ -473,6 +495,7 @@ export class MrpEngineService {
     }
     for (const row of inFlight) {
       if (!planningItems.has(row.itemId)) continue;
+      if (beyondHorizon(row.dueDate)) continue;
       pushSupply(row.itemId, {
         itemId: row.itemId,
         bucketIndex: bucketOf(row.dueDate),
@@ -670,6 +693,14 @@ export class MrpEngineService {
 
       // The orders → suggestions (+ explosion + co-product supply).
       const surplusCache = params.allowTransfers ? await store.listWarehouseSurpluses(itemId) : [];
+      // The FINITE-surplus draw (the 043-audit item-7 fix): the surplus is
+      // a pool, not a fountain — every TRANSFER suggestion drawn against a
+      // source warehouse consumes from that warehouse's surplus for the
+      // LATER orders of the same item (pre-fix every order re-drew the
+      // SAME largest surplus — double-spending the source stock), and one
+      // order SPLITS across multiple source warehouses when the largest
+      // surplus cannot cover it alone.
+      const surplusDrawn = new Map<string, Decimal>();
       // The item's own BOM (a make vs buy decision + the explosion root).
       const node = graphNodes.get(itemId);
       for (const order of plan.orders) {
@@ -694,14 +725,18 @@ export class MrpEngineService {
 
         let remainingQty = new Decimal(order.qty);
         if (params.allowTransfers && surplusCache.length > 0) {
-          const top = surplusCache[0]!;
-          const transferQty = Decimal.min(remainingQty, new Decimal(top.surplusQty));
-          if (transferQty.greaterThan(0)) {
+          for (const source of surplusCache) {
+            if (remainingQty.lessThanOrEqualTo(0)) break;
+            const drawn = surplusDrawn.get(source.warehouseId) ?? new Decimal(0);
+            const effective = new Decimal(source.surplusQty).minus(drawn);
+            if (effective.lessThanOrEqualTo(0)) continue;
+            const transferQty = Decimal.min(remainingQty, effective);
+            surplusDrawn.set(source.warehouseId, drawn.plus(transferQty));
             suggestionInserts.push({
               runId: run.id,
               itemId,
               warehouseId,
-              fromWarehouseId: top.warehouseId,
+              fromWarehouseId: source.warehouseId,
               suggestionType: "TRANSFER",
               qty: transferQty.toFixed(6),
               uomId: item.baseUomId,

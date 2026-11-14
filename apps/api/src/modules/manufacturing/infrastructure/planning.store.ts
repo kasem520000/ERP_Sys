@@ -1058,9 +1058,15 @@ export async function listActiveReservations(warehouseId: string): Promise<
 export async function listInFlightConvertedSuggestions(warehouseId: string): Promise<
   { itemId: string; qty: string; suggestionType: string; dueDate: string }[]
 > {
+  // PER-SUGGESTION rows (the 043-audit item-7 fix): pre-fix this fold
+  // aggregated SUM(qty) at MIN(due_date) — two accepted orders (5 at
+  // day 10 + 5 at day 20) appeared as 10 available at day 10, so a
+  // day-15 demand of 10 looked covered and the engine under-ordered
+  // (a stockout at day 15). Each converted suggestion now lands at ITS
+  // own due date; the netting walks them bucket by bucket.
   const rows = await tenantTx().execute(sql`
-    SELECT s.item_id AS "itemId", SUM(s.qty)::text AS "qty", s.suggestion_type AS "suggestionType",
-           MIN(s.due_date)::text AS "dueDate"
+    SELECT s.item_id AS "itemId", s.qty::text AS "qty", s.suggestion_type AS "suggestionType",
+           s.due_date::text AS "dueDate"
     FROM mrp_suggestions s
     LEFT JOIN purchase_orders po ON po.id = s.converted_doc_id AND s.converted_doc_type = 'purchase_order'
     LEFT JOIN production_orders mo ON mo.id = s.converted_doc_id AND s.converted_doc_type = 'production_order'
@@ -1069,7 +1075,7 @@ export async function listInFlightConvertedSuggestions(warehouseId: string): Pro
       AND ( (s.converted_doc_type = 'purchase_order' AND po.status = 'DRAFT')
          OR (s.converted_doc_type = 'production_order' AND mo.status = 'DRAFT')
          OR (s.converted_doc_type = 'stock_transfer' AND tr.status = 'DRAFT') )
-    GROUP BY s.item_id, s.suggestion_type ORDER BY s.item_id
+    ORDER BY s.item_id, s.due_date
   `);
   return rows.rows as unknown as { itemId: string; qty: string; suggestionType: string; dueDate: string }[];
 }
