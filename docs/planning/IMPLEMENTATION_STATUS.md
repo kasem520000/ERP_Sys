@@ -235,6 +235,24 @@ single run (the one soak queue-depth spike passed standalone — both
 results reported separately), the round-2 evidence ledger:
 [gate-evidence/2026-11-15-post043-audit-round2.md](../operations/gate-evidence/2026-11-15-post043-audit-round2.md);
 RISK-031 (and now RISK-032) stay OPEN.
+**Post-043 audit round 3 (2026-11-14 — the owner's follow-up review):**
+the owner's two independently-proven defects fixed and re-proven (the
+CTP FLOOR'S COVERAGE — the suggested date's coverage is judged at the
+floored date, never the raw leg's; the CO-PRODUCT SCOPE EXPANSION — an
+output is a full planning member, its recipe's members join the
+closure), the three unproven observations tested and closed (the MTO
+DEAD-LINE GUARD — the completion never reserves for a line whose order
+died; the RESERVATION QUERY LIMITS — the settlement reads the MTO chain
+through ONE exact JOIN, never the 200/100 paginated pages, both leak
+arms proven pre-fix; the G-49 CONTRADICTION — every misstatement of the
+golden row corrected in place, marked + dated, the hard-vs-soft POLICY
+choice left open per RISK-032); six round-3 spec files 35/35, the FULL
+DB suite 222/222 files · 3,141 passed | 2 skipped (browser-env render)
+in the single run (the soak spec passed inside the run this time; the
+ga-spike environment-load sensitivity history stands), the round-3
+evidence ledger:
+[gate-evidence/2026-11-14-post043-audit-round3.md](../operations/gate-evidence/2026-11-14-post043-audit-round3.md);
+RISK-031 and RISK-032 stay OPEN; PHASE-045 NOT started.
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
