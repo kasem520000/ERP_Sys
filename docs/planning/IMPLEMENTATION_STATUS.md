@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the 043 HARD REVIEW — two blocking defects reproduced at the unified head 1674849 and fixed; RISK-032's reservation-side closure claim WITHDRAWN pending the review; PHASE-045 in progress in parallel)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the JOINT REVIEW FIXES — FEFO warehouse scope, the settlement/termination identity, the T-03 shift fixes, and the promise point UI; the full DB suite 227/227 on the unified head 75943ab; RISK-032 stays open, the 043 review stays open, PHASE-045 stays in progress)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -387,6 +387,57 @@ owner's. The hard-review evidence ledger:
 [gate-evidence/2026-11-15-post043-hard-review.md](../operations/gate-evidence/2026-11-15-post043-hard-review.md);
 NO closure of 043 and NO production approval are claimed — the fixed
 head + its evidence go to the owner for review.
+**THE JOINT REVIEW FIXES (2026-11-15 — the owner's directive after the
+independent review of a88a898):** five defects + the promise-point
+surface, all fixed with before/after evidence, then the FULL DB SUITE
+in sequence on the NEW unified head `75943ab`: (1) **THE FEFO
+WAREHOUSE-SCOPE LAW** — FEFO batch selection was computed on the
+ITEM'S CROSS-WAREHOUSE balance, not the issuing warehouse's own stock
+(the reviewer's reproduction: 10 local + 5 earlier-expiry elsewhere →
+the 10-issue planned 5 from the foreign batch and died with
+BinContentsShortError or, binless, recorded moves against a batch
+with no local stock — exactly why mto-lifecycle failed in the bundle
+while passing standalone); the FEFO fold and the explicit-batch
+on-hand bound are now WAREHOUSE-LOCAL (listFefoBatches/batchOnHand
+scoped; the foreign batch the typed BATCH_INSUFFICIENT_STOCK; the
+expiry write-off the same); pinned by fefo-warehouse-scope.spec
+BEFORE 2/2 FAIL → AFTER 2/2 PASS. (2) **THE SETTLEMENT/TERMINATION
+IDENTITY LAW** — the delivery settlement's own-reservation consume
+(5b), the fully-delivered release (5c), and the order cancel/close
+releases trusted the stored reservation id ALONE (the allowance had
+not); ONE DEFINITION EVERYWHERE now (reservation-identity.ts — live
+row + item + warehouse + beneficiary): a rogue or stale link is
+SKIPPED (fail-closed — a third party's coverage is never consumed or
+released; a dead link never blocks the post); pinned by
+reservation-hard-review.spec (n)/(o) BEFORE 2 FAIL → AFTER 5/5 PASS.
+(3–5) **THE T-03 SHIFT FIXES** (the 045 parallel track): the rotation
+write is CHUNKED (a 200×92 run = 92,000 bind params blew
+PostgreSQL's 65,535-parameter protocol limit as one INSERT — the
+pre-fix reproduction captured; now chunks of ⌊65,535/5⌋ rows on the
+same ambient transaction); the roster grid read is PAGINATED with the
+EXPLICIT truncation signal ({rows, page, pageSize, total, hasMore}
+— pre-fix a silent LIMIT 5000 hid 13,400 of an 18,400-cell grid);
+the RLS test no longer assumes the SHARED tenant A is empty (the
+boundary proven on tenant H's OWN rows by id + a dedicated isolated
+boundary tenant); pinned by shifts-roster.spec 5/5 (the full 200×92
+ceiling run + the 37-page walk retrieving all 18,400 cells).
+(6) **THE PROMISE POINT UI** (نقطة الوعد) — the sales orders
+workspace now renders the ATP answer: the verdict, the three-valued
+protection standing, the five quantities, the CTP date, and the
+BILINGUAL advisory note verbatim (EN+AR), with the
+unreserved-is-advisory + backorder-stays-legal rule on the surface
+itself (nothing blocks anything — no ATP gate exists at issue); i18n
+parity 5789=5789. **THE SHARED GATES AT THE UNIFIED HEAD** (each its
+own run): the FULL DB SUITE **227/227 files · 3,228 passed | 2
+skipped · 0 failed · 515.43s** (mto-lifecycle inside it), api
+typecheck + lint clean, web typecheck + lint clean, web unit 73/73,
+id-ledger 0 errors + self-test 16/16, permissions-drift 297=297,
+i18n parity 100%, docs:validate 33/33. The joint-review evidence
+ledger:
+[gate-evidence/2026-11-15-joint-review-fixes.md](../operations/gate-evidence/2026-11-15-joint-review-fixes.md);
+RISK-031 and RISK-032 stay OPEN, the 043 hard review stays OPEN (the
+fixes go to the reviewer), PHASE-045 stays IN_PROGRESS — **NO closure
+and NO production approval are claimed.**
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -419,7 +470,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-043-COMPLETION.md) |
 | [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-044-COMPLETION.md) |
-| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; **+ T-03 (2026-11-15): the hr module — the shift service + the roster grid + the rotation pattern generator (4/4 spec, the registry rows, the audit trail)** — [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) · [T-03 evidence](../operations/gate-evidence/2026-11-15-phase045-t03.md) |
+| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; **+ T-03 (2026-11-15): the hr module — the shift service + the roster grid + the rotation pattern generator (the registry rows, the audit trail)**; **+ the joint-review T-03 fixes (2026-11-15): the CHUNKED rotation write (the 200×92 ceiling now runs within PostgreSQL's parameter limit — pre-fix reproduction captured), the PAGINATED grid read (total + hasMore — the explicit truncation signal), and the RLS test's isolation (tenant H's own rows by id + the dedicated boundary tenant; never an emptiness assumption about the shared tenant A)** — [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) · [T-03 evidence](../operations/gate-evidence/2026-11-15-phase045-t03.md) · [joint-review evidence](../operations/gate-evidence/2026-11-15-joint-review-fixes.md) |
 | [PHASE-046](../implementation/phases/PHASE-046.md) | HR Payroll Compliance | 2 / 13 | 045 | NOT_STARTED — PLANNED |
 | [PHASE-047](../implementation/phases/PHASE-047.md) | HR Growth — Talent & Performance | 2 / 13 | 046 | NOT_STARTED — PLANNED |
 | [PHASE-048](../implementation/phases/PHASE-048.md) | Projects & Contracting | 2 / 13 | 036 | NOT_STARTED — PLANNED |
