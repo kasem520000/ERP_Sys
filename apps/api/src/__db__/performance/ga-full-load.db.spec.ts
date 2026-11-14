@@ -902,19 +902,41 @@ describe("GA full load — local harness tier (PHASE-025 T2; PERFORMANCE_TEST_PL
     // crons land on their own schedules mid-run — system payload — and are
     // drained by their own workers). The load's own async fan-out (login
     // notification emails, partner-created inbox jobs) is legitimate QUEUED
-    // work; the §4 signal is that it DRAINS, not that it is zero: two
-    // successive samples 1 s apart must not grow (the worker consumes), and
-    // the absolute depth stays bounded well under any drain-capacity
-    // concern.
+    // work; the §4 signal is that it DRAINS, not that it is zero.
+    //
+    // THE DRAIN WINDOW (the owner's independent review of 81f09e9): the
+    // pre-fix assertion read TWO adjacent 1 s samples and required
+    // B ≤ A + 1 — the owner's FULL-SUITE serial run saw a transient
+    // 5 → 7 step (the load's own login-email fan-out still landing while
+    // earlier specs' residual non-system work drained behind it) against
+    // the A + 1 = 6 ceiling, while the SAME file passed 13/13 standalone
+    // — the adjacent-pair shape conflated a one-off burst with a
+    // runaway. The signal stays honest and gains a window: sample up to
+    // 12 times, 1 s apart, and require the depth to COME BACK DOWN to
+    // the window's opening level (+1) within it. A real runaway (the
+    // consumer dead, jobs piling faster than they drain) never comes
+    // back down and fails after the window; a transient burst drains
+    // and passes. The absolute bound (≤ 50) and the dead-letter budget
+    // (failed delta = 0, asserted above) are unchanged, and the whole
+    // trace is printed for the evidence log.
     const nonSystemA = await bossNonSystemDepth();
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1000);
-    });
-    const nonSystemB = await bossNonSystemDepth();
+    const drainTrace: number[] = [nonSystemA];
+    // The opening sample itself cannot satisfy the drain condition (it
+    // defines the level) — the proof is a LATER sample at or under it.
+    let drained = false;
+    for (let sample = 0; sample < 11 && !drained; sample += 1) {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 1000);
+      });
+      const depthNow = await bossNonSystemDepth();
+      drainTrace.push(depthNow);
+      drained = depthNow <= nonSystemA + 1;
+    }
+    const nonSystemB = drainTrace[drainTrace.length - 1];
     console.log(
-      `[ga-full-load] DB-baseline pg-boss load-depth (non-system) before=${bossNonSystemBefore} after=${nonSystemA} resampled=${nonSystemB} (draining, not growing — the §4 queue-health signal)`,
+      `[ga-full-load] DB-baseline pg-boss load-depth (non-system) before=${bossNonSystemBefore} opening=${nonSystemA} drain-window=${drainTrace.join("→")} (came back down within the window — draining, not growing — the §4 queue-health signal)`,
     );
-    expect(nonSystemB).toBeLessThanOrEqual(nonSystemA + 1);
+    expect(drained).toBe(true);
     expect(nonSystemB).toBeLessThanOrEqual(50);
     // And the total (crons included) never runs away: bounded by the
     // baseline plus the registered schedule census (every registered cron
