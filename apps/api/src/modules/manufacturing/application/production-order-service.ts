@@ -1116,18 +1116,37 @@ export class ProductionOrderService {
     // pick. BEFORE the QC hold so the policy walk sees the available
     // stock (a gated batch releases later and the hold is already
     // recorded).
+    // THE DEAD-LINE GUARD (the round-3 probe): the linked line's order
+    // may have died (CANCELLED/CLOSED) between the DRAFT-time link and
+    // this completion — a dead order ships nothing, so NO holder is
+    // created for it: the made-for-order stock lands FREE (the same
+    // disposition the order's cancel/close release gives holders that
+    // already existed; the order-side terminations never see a holder
+    // that post-dates them). Pre-fix the holder was created for the
+    // dead line regardless and NOBODY could ever settle it — no
+    // delivery can post for a cancelled order (deliveries reference
+    // ISSUED orders only) and the cancel's release had already run
+    // before the holder existed: an ACTIVE row netting availability
+    // FOREVER (the mto-lifecycle round-3 test's pre-fix proof).
     let mtoReservationId: string | null = null;
+    let mtoSkipReason: string | null = null;
     if (order.salesOrderLineId !== null) {
-      const reserved = await this.reservationPolicy.reserveForHolder({
-        itemId: order.itemId,
-        warehouseId: order.fgWarehouseId,
-        qty: actualQty,
-        holderType: "PRODUCTION_ORDER",
-        holderId: id,
-        note: `MTO — production order ${order.orderNo ?? id} for sales line ${order.salesOrderLineId}`,
-        actorId: input.actorId,
-      });
-      mtoReservationId = reserved.reservationId;
+      const linkedStatus = await planningStore.findSalesOrderStatusByLine(order.salesOrderLineId);
+      if (linkedStatus === "CANCELLED" || linkedStatus === "CLOSED" || linkedStatus === undefined) {
+        mtoSkipReason =
+          linkedStatus === undefined ? "LINKED_ORDER_MISSING" : `LINKED_ORDER_${linkedStatus}`;
+      } else {
+        const reserved = await this.reservationPolicy.reserveForHolder({
+          itemId: order.itemId,
+          warehouseId: order.fgWarehouseId,
+          qty: actualQty,
+          holderType: "PRODUCTION_ORDER",
+          holderId: id,
+          note: `MTO — production order ${order.orderNo ?? id} for sales line ${order.salesOrderLineId}`,
+          actorId: input.actorId,
+        });
+        mtoReservationId = reserved.reservationId;
+      }
     }
     if (receiptPlan.createdBatch !== null && policies.qcGate === "required") {
       await this.tracking.quarantineBatch(receiptPlan.createdBatch.id);
@@ -1168,6 +1187,9 @@ export class ProductionOrderService {
         journalEntryId: posted.journalEntryId,
         coByProducts: outputLegs,
         mtoReservationId,
+        // The dead-line skip's evidence (the round-3 guard): why NO
+        // holder was created for the linked line.
+        ...(mtoSkipReason !== null ? { mtoSkipReason } : {}),
         ...(yieldVariance === undefined ? {} : { yieldVariance }),
       },
     });

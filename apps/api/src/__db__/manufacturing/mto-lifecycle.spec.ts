@@ -584,4 +584,155 @@ describe("PHASE-043 audit item 4 — the MTO chain from sales order to delivery"
       expect(active.filter((row) => row.holderId === order.id)).toHaveLength(0);
     });
   });
+
+  it("THE DEAD-LINE GUARD (the round-3 probe): the SALES ORDER cancels while the MO is in progress — the completion creates NO holder for the dead line (the made-for-order stock lands FREE; pre-fix the holder leaked ACTIVE forever: no delivery can post for a cancelled order and the cancel's release had already run)", async () => {
+    const f = spec.fixture!;
+    const s = spec.items!;
+    await withTenant(TENANT_M, async () => {
+      // A DEDICATED FG item + BOM (the surplus spec's per-scenario
+      // isolation — the availability assertions answer for THIS item
+      // alone).
+      const deadFg = await ensureItem(
+        `M-LF-DEAD-${Date.now() % 100000}`,
+        "MTO dead-line FG (round-3 probe)",
+      );
+      const draft = await boms.create({
+        itemId: deadFg,
+        outputUomId: (await itemsStore.findItemById(deadFg))!.uomId,
+        yieldPct: "100.0000",
+        mainAllocationPct: "100.0000",
+        note: "MTO dead-line BOM (round-3 probe)",
+        noteAr: null,
+        actorId: M_ACTOR,
+        lines: [{ componentItemId: s.lfMat, qtyPerOutput: "1.000000", scrapPct: "0" }],
+      });
+      const activeBom = await boms.activate(draft.id, {
+        effectiveFrom: "2026-03-01",
+        actorId: M_ACTOR,
+      });
+      // The material for the MO's consumption.
+      await stock.manualReceipt({
+        itemId: s.lfMat,
+        warehouseId: f.warehouseRaw,
+        qty: "10",
+        unitCost: "4.000000",
+        reason: "COUNT_GAIN",
+        counterAccountId: null,
+        valueDate: "2026-03-01",
+        batchNo: `M-LF-DEAD-MAT-${Date.now() % 100000}`,
+        batchExpiry: "2027-01-01",
+        actorId: M_ACTOR,
+      });
+
+      const salesOrder = await salesStore.insertSalesOrder({
+        branchId: f.branchId,
+        customerId: f.customerId,
+        salesRepId: null,
+        warehouseId: f.warehouseFg,
+        quotationId: null,
+        orderDate: "2026-03-01",
+        expectedDate: "2026-03-20",
+        currencyCode: "SAR",
+        exchangeRate: null,
+        note: "MTO dead-line order (round-3 probe)",
+        noteAr: null,
+        actorId: null,
+        totalNet: "100.0000",
+        totalTax: "0.0000",
+        totalGross: "100.0000",
+        lines: [
+          {
+            itemId: deadFg,
+            description: "dead-line FG line",
+            descriptionAr: null,
+            qty: "10",
+            unitPrice: "10.000000",
+            discountAmount: "0.000000",
+            taxCodeId: f.taxCodeIds.notSubject,
+            netAmount: "100.0000",
+            taxAmount: "0.0000",
+            note: null,
+          },
+        ],
+      });
+      await salesOrdersSvc.submit(salesOrder.id, M_ACTOR);
+      await salesOrdersSvc.approve(salesOrder.id, M_ACTOR);
+      await salesOrdersSvc.issue(salesOrder.id, M_ACTOR);
+      const line = (await salesStore.listSalesOrderLines(salesOrder.id))[0]!;
+
+      const order = await orders.create({
+        branchId: f.branchId,
+        itemId: deadFg,
+        bomId: activeBom.id,
+        plannedQty: "10",
+        plannedDate: "2026-03-18",
+        materialsWarehouseId: f.warehouseRaw,
+        fgWarehouseId: f.warehouseFg,
+        laborRate: "0",
+        overheadRate: "0",
+        costCenterId: null,
+        note: "MTO dead-line order (round-3 probe)",
+        noteAr: null,
+        actorId: M_ACTOR,
+      });
+      await orders.linkSalesOrder(order.id, { salesOrderLineId: line.id, actorId: M_ACTOR });
+      await orders.release(order.id, M_ACTOR);
+      await orders.start(order.id, M_ACTOR);
+      await orders.consume(order.id, {
+        lines: [{ itemId: s.lfMat, qty: "10" }],
+        consumedAt: "2026-03-15",
+        note: null,
+        noteAr: null,
+        actorId: M_ACTOR,
+      });
+
+      // THE ORDER DIES while the MO is in progress. The cancel's release
+      // runs — and finds NO holder to release (holders exist only from
+      // completion): clean, BY CONSTRUCTION, at this instant.
+      const cancelled = await salesOrdersSvc.cancel(
+        salesOrder.id,
+        "the customer walked away (round-3 probe)",
+        M_ACTOR,
+      );
+      expect(cancelled.status).toBe("CANCELLED");
+      const beforeCompletion = (await invStore.listReservations({
+        itemId: deadFg,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      })) as invStore.ReservationRow[];
+      expect(beforeCompletion).toHaveLength(0);
+
+      // The MO completes for the dead line.
+      const completed = await orders.complete(order.id, {
+        actualQty: "10",
+        completedAt: "2026-03-16",
+        actorId: M_ACTOR,
+      });
+      expect(completed.order.status).toBe("COMPLETED");
+
+      // THE LAW: NO holder for the dead line — the made-for-order stock
+      // lands FREE. Pre-fix: the completion reserved 10 under the
+      // PRODUCTION_ORDER holder for a CANCELLED line, and NOBODY could
+      // ever settle it (no delivery can post for a cancelled order; the
+      // cancel's release had already run before the holder existed) —
+      // an ACTIVE row netting availability FOREVER.
+      const after = (await invStore.listReservations({
+        itemId: deadFg,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      })) as invStore.ReservationRow[];
+      expect(after).toHaveLength(0);
+      // The produced 10 are FREE stock: availability recovers them all.
+      const availability = await invStore.reservationAvailability(deadFg, f.warehouseFg);
+      expect(Number(availability.available)).toBe(10);
+
+      // The control: the COMPLETION itself was never blocked by the dead
+      // link (the MO's own lifecycle is the production side's business —
+      // the goods exist; only the dead line's HOLD is refused).
+      expect(completed.order.actualQty).toBe("10.000000");
+      expect(completed.order.fgBatchId).not.toBeNull();
+    });
+  });
 });

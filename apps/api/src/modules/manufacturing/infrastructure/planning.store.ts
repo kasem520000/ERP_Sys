@@ -1398,3 +1398,17 @@ export async function findSalesOrderById(orderId: string): Promise<
     customerId: string;
   }[])[0];
 }
+
+/** The linked line's sales-order status (the MTO dead-line guard — the
+ * round-3 probe): the completion must never create the availability
+ * holder for a line whose order can no longer ship (CANCELLED/CLOSED).
+ * Undefined when the line (or its order) no longer exists — treated as
+ * dead by the caller (a ghost line ships nothing either). */
+export async function findSalesOrderStatusByLine(lineId: string): Promise<string | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT o.status
+    FROM sales_order_lines l JOIN sales_orders o ON o.id = l.order_id
+    WHERE l.id = ${lineId} LIMIT 1
+  `);
+  return (rows.rows as unknown as { status: string }[])[0]?.status;
+}
