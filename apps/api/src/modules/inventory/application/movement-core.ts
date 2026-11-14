@@ -28,6 +28,7 @@ import {
   SerialRequiredError,
   WarehouseInactiveError,
   WarehouseNotFoundError,
+  ReservedStockProtectedError,
 } from "../domain/inventory-errors";
 import { requireTenantContext } from "../../../infra/db/tenant-context";
 import { fifoConsume } from "../domain/valuation/fifo";
@@ -119,20 +120,39 @@ export async function resolveInventoryAccount(warehouseId: string): Promise<stri
 /**
  * Per-transaction pending overlay: plans don't write, so multi-line
  * documents (count approvals, transfers) must compose — each plan sees the
- * prior plans' pending qty/avg for the same position. Keyed by the ambient
- * transaction handle (one UoW = one handle), cleared implicitly at commit.
+ * prior plans' pending qty/avg for the same position. Keyed by the
+ * ambient TenantContext OBJECT (the R17-correct keying the bin-takes
+ * overlay already uses — a fresh allocation per withTenant call, so the
+ * overlay ENTRIES DIE WITH THEIR TRANSACTION, by construction).
+ *
+ * THE ROLLBACK HARDENING (the 043-completion round): pre-fix this map
+ * keyed on the drizzle tx handle, which R17 proved is STABLE across
+ * sequential withTenant units-of-work — the staged positions
+ * ACCUMULATED across transactions, defended only by "committed values
+ * converge with the DB"… which is FALSE the moment a UoW ROLLS BACK
+ * after staging (the rolled-back position stays overlaid for every
+ * later transaction in the process — poison: a later read sees stock
+ * that never landed, or misses stock that did). The hard-protection
+ * round's own rollback test (a delivery post failed at its last step
+ * after the plans staged) plus the full-suite sensitivity it exposed
+ * (a first full run failing a consume-path test that passed in every
+ * later run — the classic stale-overlay shape) made the migration
+ * non-optional: rollback support is THIS round's explicit criterion.
+ * The context object dies with the withTenant call — commit and
+ * rollback BOTH clear the overlay exactly when the transaction ends.
  */
-const overlayByTx = new WeakMap<object, Map<string, { qty: string; avgCost: string }>>();
+const overlayByContext = new WeakMap<object, Map<string, { qty: string; avgCost: string }>>();
 
 function overlayKey(itemId: string, warehouseId: string): string {
   return `${itemId}:${warehouseId}`;
 }
 
-function pendingOverlay(tx: object): Map<string, { qty: string; avgCost: string }> {
-  let map = overlayByTx.get(tx);
+function pendingOverlay(): Map<string, { qty: string; avgCost: string }> {
+  const context = requireTenantContext();
+  let map = overlayByContext.get(context);
   if (map === undefined) {
     map = new Map();
-    overlayByTx.set(tx, map);
+    overlayByContext.set(context, map);
   }
   return map;
 }
@@ -164,8 +184,7 @@ async function positionWithOverlay(
   itemId: string,
   warehouseId: string,
 ): Promise<{ qty: string; avgCost: string }> {
-  const tx = store.inventoryTx();
-  const overlay = pendingOverlay(tx);
+  const overlay = pendingOverlay();
   const pending = overlay.get(overlayKey(itemId, warehouseId));
   if (pending !== undefined) {
     return { qty: pending.qty, avgCost: pending.avgCost };
@@ -180,8 +199,7 @@ function commitOverlay(
   qty: string,
   avgCost: string,
 ): void {
-  const tx = store.inventoryTx();
-  pendingOverlay(tx).set(overlayKey(itemId, warehouseId), { qty, avgCost });
+  pendingOverlay().set(overlayKey(itemId, warehouseId), { qty, avgCost });
 }
 
 /**
@@ -688,6 +706,20 @@ export async function planIssue(input: {
   /** PHASE-044 (§2.8, T-08): the serial-ledger event override (SCRAP /
    * RETURN for the Q-board dispositions); the moveKind map stays default. */
   serialEvent?: wms.SerialMovementEvent;
+  /** THE RESERVATION HARD PROTECTION (the PHASE-043 completion round):
+   * how much of the ACTIVE reserved pool at this item+warehouse THIS
+   * issue is entitled to draw on — the beneficiary delivery's own line
+   * reservation + its ACTIVE MTO chain (computed by the caller from the
+   * SAME rows its settlement will retire, so a stale-high allowance can
+   * never commit: the settlement's conditional row updates fail closed
+   * on any row that is not ACTIVE with sufficient remaining qty, and a
+   * failure rolls the WHOLE issue back). Default 0: every other path —
+   * another order's delivery, a standalone delivery, a manual issue, a
+   * transfer out, an adjustment, a production consumption — may consume
+   * FREE STOCK ONLY. There is deliberately NO bypass parameter: taking
+   * reserved stock as anyone else requires the permission-gated,
+   * audited release first (the explicit authorized action). */
+  reservedAllowance?: string;
 }): Promise<IssuePlan> {
   const item = await requireStockItem(input.itemId);
   await requireActiveWarehouse(input.warehouseId);
@@ -724,6 +756,44 @@ export async function planIssue(input: {
       onHand,
       requested: qty,
     });
+  }
+
+  // THE RESERVATION HARD PROTECTION (the PHASE-043 completion round —
+  // the owner's directive after the round-4 race fix): an issue may
+  // never take the position below the ACTIVE reserved pool it is not
+  // entitled to draw on —
+  //     onHand − qty ≥ reservedPool − allowance
+  // The pool is read INSIDE the item_stock row lock the position read
+  // above already took (CC-04): every reservation CREATION takes the
+  // same lock first (the choke point), so the pool cannot grow beneath
+  // this issue; a concurrent release/consume only shrinks it, which
+  // relaxes this guard (fail-closed in the strict direction — the only
+  // direction that could steal another holder's coverage). The
+  // allowance is the caller's entitlement (the beneficiary delivery's
+  // own allocations); its staleness is closed by the delivery
+  // settlement's conditional row updates (fail-closed on non-ACTIVE /
+  // over-consume → the whole issue rolls back), never by a lock —
+  // round-4's lock-order star is untouched (no new lock, no new order).
+  // A negative-stock policy position exempts the guard exactly as it
+  // exempts the on-hand floor (the same declared policy).
+  if (!allowNegative) {
+    const allowance = input.reservedAllowance ?? "0";
+    if (!QTY_RE.test(allowance) || dec(allowance).lt(0)) {
+      throw new InvalidQuantityError(
+        `reservedAllowance must be a non-negative decimal (≤ 6dp): ${allowance}`,
+      );
+    }
+    const reservedPool = await store.reservedQty(input.itemId, input.warehouseId);
+    if (compareExact(subExact(subExact(onHand, qty), subExact(reservedPool, allowance)), "0") < 0) {
+      throw new ReservedStockProtectedError({
+        itemId: input.itemId,
+        warehouseId: input.warehouseId,
+        requested: qty,
+        onHand,
+        reservedPool,
+        allowance: dec(allowance).toFixed(6),
+      });
+    }
   }
 
   // Picking slices: serial units → explicit batch → FEFO → single.

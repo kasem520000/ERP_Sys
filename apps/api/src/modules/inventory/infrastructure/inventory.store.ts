@@ -1803,3 +1803,23 @@ export async function lockItemStockRow(
   `);
   return (rows.rows as unknown as { qty: string }[])[0];
 }
+
+/**
+ * One reservation's ENTITLING qty (the PHASE-043 completion round — the
+ * hard-protection allowance's own row read): the row's qty when it is
+ * ACTIVE and non-expired — the exact same liveness the pool fold
+ * (`reservedQty`) counts — else 0 (an expired-but-unswept row entitles
+ * nothing: the pool already excludes it; a partially-consumed row's qty
+ * IS its remaining coverage). The delivery settlement retires through
+ * the same rows, so the allowance and the retirement can never disagree
+ * at commit time.
+ */
+export async function activeReservationQty(id: string): Promise<string> {
+  const rows = await tenantTx().execute<{ qty: string }>(sql`
+    SELECT qty::text AS qty FROM stock_reservations
+    WHERE id = ${id} AND status = 'ACTIVE'
+      AND (expires_at IS NULL OR expires_at > now())
+    LIMIT 1
+  `);
+  return rows.rows[0]?.qty ?? "0";
+}

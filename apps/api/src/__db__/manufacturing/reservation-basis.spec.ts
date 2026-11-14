@@ -2,6 +2,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { sql } from "drizzle-orm";
 
+import { Decimal } from "@erp/domain-core";
+
 import { withTenant } from "../../infra/db/tenant-context";
 import * as itemsStore from "../../modules/items/infrastructure/items.store";
 import * as invStore from "../../modules/inventory/infrastructure/inventory.store";
@@ -47,11 +49,19 @@ import {
  *     reservation could hold stock ATP refuses to promise
  *     (listQualifiedOnHand excludes ib.status <> 'ACTIVE'), and an
  *     EXPIRED batch (never written off) counted as pickable everywhere.
- * (c) THE SOFT-MODEL PROOF: the MTO "hard reservation" language — can
- *     another order's DELIVERY physically consume MTO-reserved stock?
- *     The answer is asserted verbatim below (it can — the reservation is
- *     an ATP/availability hold, never a physical pick lock), and the
- *     concurrency dichotomy (reserve vs a concurrent issue) is pinned.
+ * (c) THE HARD-PROTECTION PROOF (rewritten in the 043-completion round —
+ *     the owner's directive; pre-completion this test pinned the SOFT
+ *     model: another order's delivery DID ship the MTO-reserved stock):
+ *     can another order's DELIVERY physically consume MTO-reserved
+ *     stock? NO — the movement core's issue choke point (planIssue)
+ *     guards the ACTIVE reserved pool (onHand − qty ≥ pool − allowance;
+ *     the delivery post is the only path carrying an allowance — the
+ *     beneficiary line's own allocations). The other order's delivery
+ *     rejects with RESERVED_STOCK_PROTECTED and the beneficiary's own
+ *     ships; the concurrency dichotomy (reserve vs a concurrent issue)
+ *     is re-pinned under the guard: exactly ONE side may take the
+ *     stock, never both (reservation-hard-protection.spec carries the
+ *     full contract).
  * (d) Consignment rows never enter the basis on ANY path (BR-076).
  *
  * THE UNIFIED BASIS (implemented + asserted): every reservation creation
@@ -348,7 +358,7 @@ describe("PHASE-043 audit round 2, item 2 — one reservation basis across every
     });
   });
 
-  it("(c) THE SOFT-MODEL PROOF: another order's delivery PHYSICALLY CONSUMES the MTO-reserved stock — the reservation is an availability hold, never a pick lock", async () => {
+  it("(c) THE HARD-PROTECTION PROOF: another order's delivery of the MTO-reserved stock is REJECTED — the reservation is a physical hold at the issue choke point; the beneficiary's own delivery ships", async () => {
     const f = spec.fixture!;
     const fg = spec.mtoFg!;
     await withTenant(TENANT_M, async () => {
@@ -439,12 +449,15 @@ describe("PHASE-043 audit round 2, item 2 — one reservation basis across every
       const atpHeld = await atpSrv.check({ itemId: fg, warehouseId: f.warehouseFg, qty: "10" });
       expect(atpHeld.verdict).toBe("SHORT");
 
-      // ANOTHER customer's order ships the SAME stock: the delivery has
-      // NO MTO link and no reservation — and it SUCCEEDS. This is the
-      // asserted soft-model truth: the reservation NEVER blocks a
-      // physical issue (planIssue checks on-hand only); it holds the
-      // PROMISE pool, not the goods. The "hard reservation" language was
-      // wrong and is corrected in the docs (this spec is the proof).
+      // ANOTHER customer's order tries to ship the SAME stock: the
+      // delivery has NO MTO link and no reservation — and it is
+      // REJECTED. This is the asserted hard-protection truth (the
+      // 043-completion round — the owner's directive; pre-completion
+      // this post SUCCEEDED and left an unbacked ACTIVE holder): the
+      // issue choke point (planIssue, inside the item_stock lock)
+      // guards the ACTIVE reserved pool — onHand − qty ≥ pool −
+      // allowance, and the thief's allowance is 0 (only the
+      // beneficiary line's own allocations carry one).
       const thief = await salesStore.insertSalesOrder({
         branchId: f.branchId,
         customerId: f.customerId,
@@ -506,14 +519,16 @@ describe("PHASE-043 audit round 2, item 2 — one reservation basis across every
           },
         ],
       });
-      await deliveries.post(note.id, M_ACTOR); // SUCCEEDS — the soft truth
+      await expect(deliveries.post(note.id, M_ACTOR)).rejects.toMatchObject({
+        code: "RESERVED_STOCK_PROTECTED",
+      });
 
-      // The post-state: the goods are GONE (on-hand 0), the MTO
-      // reservation STILL holds its (now unbacked) 10 — the honest soft
-      // state the docs must declare; the MTO order's own shipment would
-      // now fail with InsufficientStock (the exposure, named).
+      // The post-state: the goods are INTACT (on-hand 10), the MTO
+      // reservation still holds its BACKED 10 — nothing moved, nothing
+      // leaked; the thief's delivery stayed DRAFT (a rejection is a
+      // rollback, never a half-posted document).
       const stockRow = await invStore.findItemStock(fg, f.warehouseFg);
-      expect(stockRow!.qty).toBe("0.000000");
+      expect(stockRow!.qty).toBe("10.000000");
       const stillActive = await invStore.listReservations({
         itemId: fg,
         warehouseId: f.warehouseFg,
@@ -522,16 +537,58 @@ describe("PHASE-043 audit round 2, item 2 — one reservation basis across every
       });
       expect(stillActive).toHaveLength(1);
       expect(stillActive[0]!.qty).toBe("10.000000");
-      // Cancel the robbed MTO order: the settlement releases the
-      // unbacked holder (no leak) — the order-side termination law.
-      await salesOrdersSvc.cancel(mtoOrder.id, "the stock was consumed by another order", M_ACTOR);
-      const afterCancel = await invStore.listReservations({
+      const thiefRow = await deliveries.find(note.id);
+      expect(thiefRow.status).toBe("DRAFT");
+
+      // The BENEFICIARY's own delivery ships the held stock — the
+      // allowance covers the line's own MTO chain, the settlement
+      // retires the holder CONSUMED, and the made-for-order goods
+      // leave for the order they were made for.
+      const beneficiaryLine = (await salesStore.listSalesOrderLines(mtoOrder.id))[0]!;
+      const own = await deliveries.create({
+        branchId: f.branchId,
+        customerId: f.customerId,
+        salesRepId: null,
+        orderId: mtoOrder.id,
+        warehouseId: f.warehouseFg,
+        deliveryDate: "2026-03-18",
+        currencyCode: "SAR",
+        note: "the beneficiary's delivery — the hard-protection other half",
+        noteAr: null,
+        actorId: M_ACTOR,
+        lines: [
+          {
+            orderLineId: beneficiaryLine.id,
+            itemId: fg,
+            qty: "10",
+            unitPrice: "10.000000",
+            discountAmount: null,
+            batchId: null,
+            serialIds: null,
+            description: null,
+            descriptionAr: null,
+            note: null,
+          },
+        ],
+      });
+      const posted = await deliveries.post(own.id, M_ACTOR); // SUCCEEDS — the beneficiary's right
+      expect(posted.delivery.status).toBe("POSTED");
+      const afterShip = await invStore.findItemStock(fg, f.warehouseFg);
+      expect(afterShip!.qty).toBe("0.000000");
+      const consumed = await invStore.listReservations({
+        itemId: fg,
+        warehouseId: f.warehouseFg,
+        status: "CONSUMED",
+        limit: 10,
+      });
+      expect(consumed).toHaveLength(1);
+      const afterActive = await invStore.listReservations({
         itemId: fg,
         warehouseId: f.warehouseFg,
         status: "ACTIVE",
         limit: 10,
       });
-      expect(afterCancel).toHaveLength(0);
+      expect(afterActive).toHaveLength(0);
     });
   });
 
@@ -594,51 +651,68 @@ describe("PHASE-043 audit round 2, item 2 — one reservation basis across every
     ]);
 
     await withTenant(TENANT_M, async () => {
-      // THE DICHOTOMY (both arms are internally consistent — the test
-      // accepts whichever the lock order produced and asserts its exact
-      // invariants). The DELIVERY always fulfills (an issue checks
-      // ON-HAND only — 10 ≥ 6 in either lock order); the RESERVE's fate
-      // is the serialization: if the delivery's commit landed first, the
-      // reserve re-read the pool inside its lock and failed CLOSED with
-      // the typed error; if the reserve locked and committed first, it
-      // holds 6 of the 10 — and the delivery still ships 6 (the SOFT
-      // model: the reservation holds the promise pool, not the goods) —
-      // the declared, visible over-commit exposure (stock 4, pool 6).
-      expect(settled[0]!.status).toBe("fulfilled");
+      // THE DICHOTOMY UNDER THE GUARD (both arms are internally
+      // consistent — the test accepts whichever the lock order produced
+      // and asserts its exact invariants). Post-hard-protection the law
+      // is STRONGER than the pre-completion one: EXACTLY ONE side may
+      // take the stock, never both — if the delivery committed first,
+      // the reserve re-read the post-commit pool inside its lock and
+      // failed CLOSED (the typed over-book error, pool empty); if the
+      // reserve locked and committed first, the delivery's guard sees
+      // the held pool (free 4 < 6) and fails with RESERVED_STOCK_PROTECTED
+      // (pre-completion the delivery STILL SHIPPED — the soft-model
+      // over-commit the round-2 audit declared; the completion round
+      // closed it: an unbacked pool can never again be created by an
+      // issue). Either way: typed failures, never a silent over-book,
+      // never a double-spend.
+      const deliveryWon = settled[0]!.status === "fulfilled";
+      const reserveWon = settled[1]!.status === "fulfilled";
+      expect(deliveryWon || reserveWon).toBe(true);
+      expect(deliveryWon && reserveWon).toBe(false); // exactly ONE — the guard's law
       const stockRow = await invStore.findItemStock(fg, f.warehouseFg);
-      expect(stockRow!.qty).toBe("4.000000"); // 10 − the shipped 6, ALWAYS
       const active = await invStore.listReservations({
         itemId: fg,
         warehouseId: f.warehouseFg,
         status: "ACTIVE",
         limit: 10,
       });
-      if (settled[1]!.status === "rejected") {
-        // The delivery committed first: the reserve failed CLOSED — with
-        // the policy error when its early check read the post-commit
-        // pool, or with the CHOKE POINT's ReservationQtyExceedsAvailableError
-        // when the early check raced a pre-commit snapshot and the
-        // item_stock row lock caught the truth (the serialization's
-        // design — the loser never writes). Either way: typed, never a
-        // silent over-book; pool empty.
+      if (deliveryWon) {
+        // The delivery committed first: stock 10 − 6 = 4, the reserve
+        // failed CLOSED — with the policy error when its early check
+        // read the post-commit pool, or with the CHOKE POINT's
+        // ReservationQtyExceedsAvailableError when the early check raced
+        // a pre-commit snapshot and the item_stock row lock caught the
+        // truth. Either way: typed, pool empty.
+        const rejected = settled[1] as PromiseRejectedResult;
         expect(
-          settled[1]!.reason instanceof ReservationPolicyError ||
-            settled[1]!.reason instanceof ReservationQtyExceedsAvailableError,
+          rejected.reason instanceof ReservationPolicyError ||
+            rejected.reason instanceof ReservationQtyExceedsAvailableError,
         ).toBe(true);
+        expect(stockRow!.qty).toBe("4.000000");
         expect(active).toHaveLength(0);
       } else {
-        // The reserve committed first: the pool holds its 6 — drawn on
-        // stock that then physically shipped (the soft-model exposure,
-        // asserted and declared — never a silent one).
-        expect(settled[1]!.status).toBe("fulfilled");
+        // The reserve committed first: the pool holds its 6 — and the
+        // delivery REJECTED with the hard protection's typed error
+        // (free stock 4 < the issue's 6; pre-completion it shipped and
+        // left the pool unbacked — the exact exposure this round
+        // closed). The stock never moved.
+        const rejected = settled[0] as PromiseRejectedResult;
+        expect((rejected.reason as { code?: string }).code).toBe("RESERVED_STOCK_PROTECTED");
+        expect(stockRow!.qty).toBe("10.000000");
         expect(active).toHaveLength(1);
         expect(active[0]!.qty).toBe("6.000000");
         for (const row of active) await reservations.release(row.id, M_ACTOR);
       }
-      // EITHER WAY: the physical stock never went negative and no
-      // reservation ever exceeded the availability at its serialization
-      // point (the loser never wrote).
+      // EITHER WAY: the physical stock never went negative, the pool
+      // never exceeds the stock (no unbacked holder — the guard's own
+      // invariant), and no reservation ever exceeded the availability
+      // at its serialization point (the loser never wrote).
       expect(Number(stockRow!.qty)).toBeGreaterThanOrEqual(0);
+      const poolQty = active.reduce(
+        (sum, row) => sum.plus(new Decimal(row.qty)),
+        new Decimal(0),
+      );
+      expect(poolQty.lessThanOrEqualTo(new Decimal(stockRow!.qty))).toBe(true);
     });
   });
 });

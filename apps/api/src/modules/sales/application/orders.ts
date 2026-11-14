@@ -77,6 +77,19 @@ export class SalesOrderService {
    * + the CTP atp_suggested_date). The hard exclusions (BR-080) live in
    * the ATP service (quarantined, reserved, consignment-owned never
    * promise); this method owns the sales-side stamp.
+   *
+   * THE PROTECTION STANDING (the PHASE-043 completion round — the owner's
+   * explicit direction): the verdict alone must NEVER be read as a
+   * guaranteed promise. The answer now carries the line's standing —
+   * PROTECTED_BY_RESERVATION (an ACTIVE allocation feeds this line: its
+   * own reservation or its MTO chain — stock the issue choke point now
+   * physically holds for it) or UNPROTECTED (the verdict is ADVISORY
+   * ONLY: unreserved sibling demand does not reduce the basis, a later
+   * delivery can take the stock first, and a backorder remains possible
+   * — never describe an unallocated OK as a guarantee). A shortage NEVER
+   * blocks issuing a sales order (issue() consults no ATP gate — the
+   * backorder stays a legal outcome); the bilingual advisory note states
+   * the standing verbatim for the surface that renders it.
    */
   async checkLineAtp(
     orderId: string,
@@ -87,6 +100,9 @@ export class SalesOrderService {
     verdict: "OK" | "SHORT";
     availableNow: string;
     suggestedDate: string | null;
+    protection: "PROTECTED_BY_RESERVATION" | "UNPROTECTED";
+    reservedForLineQty: string;
+    advisoryNote: { en: string; ar: string };
   }> {
     const order = await this.find(orderId);
     const lines = await store.listSalesOrderLines(orderId);
@@ -94,6 +110,41 @@ export class SalesOrderService {
     if (line === undefined) {
       throw new SalesOrderNotFoundError(`sales order line ${lineId} does not belong to order ${orderId}`);
     }
+    // The line's protection standing: the qty of ACTIVE non-expired
+    // allocations feeding THIS line — its own reservation + its MTO
+    // chain (the manufacturing application surface, the deliveries
+    // precedent). This is the same entitlement the delivery post's
+    // beneficiary allowance draws on — one definition everywhere.
+    let reservedForLineQty = new Decimal(0);
+    const invStore = await import("../../inventory/infrastructure/inventory.store");
+    if (line.reservationId !== null) {
+      reservedForLineQty = reservedForLineQty.plus(
+        new Decimal(await invStore.activeReservationQty(line.reservationId)),
+      );
+    }
+    const { listActiveMtoReservationsForSalesLine } = await import(
+      "../../manufacturing/application/production-order-service"
+    );
+    for (const mto of await listActiveMtoReservationsForSalesLine({
+      salesOrderLineId: line.id,
+      itemId: line.itemId,
+      warehouseId: order.warehouseId,
+    })) {
+      reservedForLineQty = reservedForLineQty.plus(new Decimal(mto.qty));
+    }
+    const protection: "PROTECTED_BY_RESERVATION" | "UNPROTECTED" =
+      reservedForLineQty.greaterThan(0) ? "PROTECTED_BY_RESERVATION" : "UNPROTECTED";
+    const advisoryNote =
+      protection === "PROTECTED_BY_RESERVATION"
+        ? {
+            en: `Protected: an ACTIVE allocation of ${reservedForLineQty.toFixed(6)} feeds this line and the issue choke point holds it for the beneficiary — no other order or issue path may consume it without the permission-gated, audited release.`,
+            ar: `محمي: يوجد تخصيص نشأ بمقدار ${reservedForLineQty.toFixed(6)} يغذّي هذا البند ونقطة الصرف تحجزه لمستفیده — لا يمكن لأي طلب آخر أو مسار صرف آخر استهلاكه دون فك حجز مصرّح به وموثّق تدقيقياً.`,
+          }
+        : {
+            en: `Advisory only — unprotected: no allocation protects this line yet, so the verdict is guidance, not a guarantee; another delivery can take the stock first and a backorder remains possible. Reserve the line (or link production to it) before treating the promise as protected.`,
+            ar: `استرشادي فقط — غير محمي: لا يوجد تخصيص يحمي هذا البند بعد، فالنتيجة إرشادية وليست ضماناً؛ يمكن لسند تسليم آخر أخذ المخزون أولاً ويبقى تأجيل الطلب (backorder) ممكناً. احجز البند (أو اربط إنتاجاً به) قبل اعتبار الوعد محمياً.`,
+          };
+
     const result = await this.atp.check({
       itemId: line.itemId,
       warehouseId: order.warehouseId,
@@ -116,6 +167,8 @@ export class SalesOrderService {
         verdict: result.verdict,
         availableNow: result.availableNow,
         suggestedDate: result.suggestedDate,
+        protection,
+        reservedForLineQty: reservedForLineQty.toFixed(6),
       },
     });
     return {
@@ -123,6 +176,9 @@ export class SalesOrderService {
       verdict: result.verdict,
       availableNow: result.availableNow,
       suggestedDate: result.suggestedDate,
+      protection,
+      reservedForLineQty: reservedForLineQty.toFixed(6),
+      advisoryNote,
     };
   }
 

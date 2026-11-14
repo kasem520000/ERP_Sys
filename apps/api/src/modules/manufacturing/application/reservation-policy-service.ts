@@ -32,17 +32,25 @@ import { ReservationPolicyError } from "../domain/manufacturing-errors";
  * split); the physical pick itself stays the WMS wave allocator's
  * business.
  *
- * THE SOFT-MODEL DECLARATION (the 043-audit round-2 item-2 proof —
- * reservation-basis.spec, test (c)): a reservation is an
- * AVAILABILITY-level hold — it nets out ATP, the MRP basis, and every
- * later reservation's capacity — but it NEVER physically locks the
- * goods: another order's delivery can still issue the reserved stock
- * (the issue paths check ON-HAND only). The historical "hard
- * reservation" language was wrong and is removed; physical
- * exclusivity is the WMS directed-pick discipline's business, and the
- * over-commit exposure (a reservation whose stock shipped for another
- * holder) is declared, visible in the pool, and settled at the order's
- * termination (cancel/close/fully-delivered release the holders).
+ * THE HARD-PROTECTION CONTRACT (the 043-completion round — the owner's
+ * directive after accepting the round-4 race fix; it SUPERSEDES the
+ * round-2 soft-model declaration): a reservation is now BOTH an
+ * availability-level hold AND a physical protection — it nets ATP, the
+ * MRP basis, and every later reservation's capacity as before, AND the
+ * movement core's issue choke point (planIssue) refuses any issue that
+ * would take the position below the ACTIVE reserved pool unless the
+ * caller is the pool's beneficiary (the delivery post's per-line
+ * allowance — the line's own reservation + its ACTIVE MTO chain) or the
+ * reservation was first RELEASED through the permission-gated, audited
+ * route (the explicit authorized action; there is no bypass parameter
+ * on any issue path). The over-commit exposure the round-2 audit proved
+ * (another order shipping the reserved stock) is CLOSED: the pinned
+ * proof moved from reservation-basis.spec (c)'s soft-model shape to the
+ * hard-protection shape (the thief's delivery rejects with
+ * RESERVED_STOCK_PROTECTED), and reservation-hard-protection.spec pins
+ * the full contract — prevention, the beneficiary's consumption
+ * (partial/surplus/cancel/close/rollback), the concurrent races, and
+ * the audited unlock.
  *
  * The MTO completion (G-49) is the unconditional consumer: the finished
  * goods of a linked sales line are reserved for it the moment they land

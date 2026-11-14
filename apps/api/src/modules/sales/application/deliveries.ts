@@ -32,8 +32,19 @@ import { requireCustomer } from "./quotations";
  * the issue plans WITH the journal id (INV-018). Sales NEVER writes stock
  * tables itself (MODULE_BOUNDARIES). The per-line issue snapshots
  * (unit cost + value) persist at post — the credit-note re-entry
- * provenance (W-3). The order's soft reservations release once the stock
- * physically moved (they must not double-net availability).
+ * provenance (W-3).
+ *
+ * THE HARD-PROTECTION BENEFICIARY PATH (the PHASE-043 completion round):
+ * the post is the one issue path ENTITLED to draw on the ACTIVE reserved
+ * pool — per line, the beneficiary allowance (the line's OWN reservation
+ * + its ACTIVE MTO chain) rides planIssue; every OTHER path (another
+ * order's delivery, standalone deliveries, manual issues, transfers,
+ * adjustments, productions) may consume FREE STOCK ONLY, and the
+ * permission-gated, audited release is the only door to reserved stock
+ * otherwise. The settlement (step 5) retires the shipped qty through the
+ * allowance's exact rows — the verifier that makes a stale allowance
+ * harmless (a row that flipped non-ACTIVE makes the settlement throw and
+ * the WHOLE post roll back).
  */
 
 const DEL_FORMAT = { prefix: "DEL", format: "DEL-{YYYY}-{SEQ:6}", docType: "delivery_note" };
@@ -248,6 +259,46 @@ export class DeliveryNoteService {
     const lines = await store.listDeliveryNoteLines(id);
     if (lines.length === 0) throw new EmptyDocumentError("delivery note");
 
+    // THE BENEFICIARY ALLOWANCE (the PHASE-043 completion round — the
+    // hard-protection contract's beneficiary side): per DELIVERED line,
+    // the qty of the ACTIVE reserved pool this issue is entitled to
+    // draw on — the line's OWN reservation (ACTIVE, non-expired) + the
+    // ACTIVE MTO chain reservations feeding that line. These are the
+    // EXACT rows the settlement below (step 5) retires through its
+    // conditional updates, which is what makes a stale allowance
+    // harmless: if any row flips non-ACTIVE between this read and the
+    // settlement, the settlement THROWS and the whole post rolls back
+    // (the issue with it) — the allowance can never commit an
+    // over-issue. Lines without an order line (standalone adds) and
+    // every other order's lines carry NO allowance: free stock only.
+    const orderLines =
+      delivery.orderId !== null ? await store.listSalesOrderLines(delivery.orderId) : [];
+    const orderLineById = new Map(orderLines.map((row) => [row.id, row]));
+    const { listActiveMtoReservationsForSalesLine } = await import(
+      "../../manufacturing/application/production-order-service"
+    );
+    const invStoreModule = await import("../../inventory/infrastructure/inventory.store");
+    const allowanceByLine = new Map<string, string>();
+    for (const line of lines) {
+      if (line.orderLineId === null) continue;
+      const orderLine = orderLineById.get(line.orderLineId);
+      if (orderLine === undefined) continue;
+      let allowance = new Decimal(0);
+      if (orderLine.reservationId !== null) {
+        allowance = allowance.plus(
+          new Decimal(await invStoreModule.activeReservationQty(orderLine.reservationId)),
+        );
+      }
+      for (const mto of await listActiveMtoReservationsForSalesLine({
+        salesOrderLineId: line.orderLineId,
+        itemId: line.itemId,
+        warehouseId: delivery.warehouseId,
+      })) {
+        allowance = allowance.plus(new Decimal(mto.qty));
+      }
+      allowanceByLine.set(line.id, allowance.toFixed(6));
+    }
+
     // (1) Plan every issue (locks positions, CC-04, FEFO/serial binding) — NO writes.
     // PHASE-044 (T-05): when a released WAVE's tasks were scan-confirmed
     // for this delivery, the confirmed physical picks drive the issue's
@@ -267,6 +318,7 @@ export class DeliveryNoteService {
         batchId: line.batchId,
         serialIds: line.serialIds ?? [],
         directedTakes: waveTakes.get(line.lineNo),
+        reservedAllowance: allowanceByLine.get(line.id) ?? "0",
         memo: `Delivery ${delivery.deliveryNo ?? id}`,
         memoAr: `سند تسليم ${delivery.deliveryNo ?? id}`,
       });

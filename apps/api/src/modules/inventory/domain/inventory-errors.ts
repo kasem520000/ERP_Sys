@@ -1,4 +1,4 @@
-import { DomainError } from "@erp/domain-core";
+import { Decimal, DomainError } from "@erp/domain-core";
 
 /**
  * PHASE-010 inventory module domain errors. Codes are stable API contracts
@@ -580,5 +580,44 @@ export class TransitExceptionStateError extends DomainError {
 export class ReservationQtyExceedsAvailableError extends DomainError {
   constructor(message: string, details?: Record<string, unknown>) {
     super("RESERVATION_QTY_EXCEEDS_AVAILABLE", message, details);
+  }
+}
+
+/** THE RESERVATION HARD PROTECTION (the PHASE-043 completion round — the
+ * owner's directive after the round-4 race fix): an issue may never take
+ * the position below the ACTIVE reserved pool it is not entitled to draw
+ * on. The guard lives in planIssue INSIDE the item_stock row lock every
+ * issue already takes: onHand − qty ≥ reservedPool − allowance, where the
+ * allowance is the qty of the pool the issue's caller is entitled to (a
+ * beneficiary delivery's own line reservation + its ACTIVE MTO chain —
+ * every other path passes none and may consume FREE STOCK ONLY). The only
+ * door to reserved stock as anyone else is the permission-gated, audited
+ * release — there is no bypass parameter on any issue path. */
+export class ReservedStockProtectedError extends DomainError {
+  constructor(details: {
+    itemId: string;
+    warehouseId: string;
+    requested: string;
+    onHand: string;
+    reservedPool: string;
+    allowance: string;
+  }) {
+    const freeForOthers = Decimal.max(
+      new Decimal(details.onHand).minus(new Decimal(details.reservedPool)),
+      new Decimal(0),
+    ).toFixed(6);
+    super(
+      "RESERVED_STOCK_PROTECTED",
+      `issuing ${details.requested} of item ${details.itemId} at warehouse ${details.warehouseId} would consume stock held by ACTIVE reservations — on-hand ${details.onHand} − reserved ${details.reservedPool} = free ${freeForOthers} for non-beneficiary paths (this issue's allowance: ${details.allowance}); release the reservation first (the permission-gated, audited unlock) or ship through the reservation's own beneficiary`,
+      {
+        itemId: details.itemId,
+        warehouseId: details.warehouseId,
+        requested: details.requested,
+        onHand: details.onHand,
+        reservedPool: details.reservedPool,
+        allowance: details.allowance,
+        freeForOthers,
+      },
+    );
   }
 }

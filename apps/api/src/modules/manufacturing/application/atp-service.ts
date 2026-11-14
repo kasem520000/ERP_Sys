@@ -40,15 +40,22 @@ import { AtpInputInvalidError } from "../domain/manufacturing-errors";
  * 4. Unreserved sibling demand (other ISSUED order lines without an
  *    ACTIVE reservation) does NOT reduce the basis — the
  *    soft-reservation law: only reservations hold stock; the SHORT
- *    verdict is the line's own over-promise warning. *** THIS IS AN
- *    OPEN BUSINESS DECISION, NOT AN APPROVED POLICY (the round-2
- *    item-5 finding, proven in atp-unreserved-promise.spec): two
- *    UNRESERVED orders can BOTH stamp OK on the same stock — the ATP
- *    stamp is an ADVISORY availability check at check-time, never a
- *    protected promise; the first delivery to post physically wins
- *    (the soft model — reservation-basis.spec test (c)). The owner
- *    must choose: auto-reserve at issue, a blocking ATP gate, or the
- *    declared soft model (RISK-032). ***
+ *    verdict is the line's own over-promise warning. *** THE STANDING
+ *    (the 043-completion round, per the owner's explicit direction):
+ *    the verdict is ADVISORY GUIDANCE, never a guaranteed promise —
+ *    two UNRESERVED orders can BOTH stamp OK on the same stock, a
+ *    later delivery can take it first, and a BACKORDER REMAINS
+ *    POSSIBLE (a stock shortage never blocks issuing a sales order —
+ *    there is no ATP gate at issue, by design). What changed this
+ *    round: a line WITH an ACTIVE allocation is now PHYSICALLY
+ *    protected (the movement core's issue choke point holds the
+ *    reserved pool for its beneficiary — RESERVED_STOCK_PROTECTED for
+ *    everyone else), and the sales-side check (checkLineAtp) answers
+ *    with the explicit standing — PROTECTED_BY_RESERVATION vs
+ *    UNPROTECTED — plus the bilingual advisory note, so no surface can
+ *    present an unallocated OK as a guarantee. The POLICY choice
+ *    (auto-reserve at issue / a blocking gate / the declared advisory
+ *    model) remains the owner's (RISK-032, open). ***
  * 5. A requested date in the past is floored to the as-of date (a
  *    promise never back-dates).
  * 6. THE CTP WALK is expiry-aware at EVERY candidate date: the
