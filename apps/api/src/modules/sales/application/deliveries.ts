@@ -386,24 +386,24 @@ export class DeliveryNoteService {
     const { listActiveMtoReservationsForSalesLine } = await import(
       "../../manufacturing/application/production-order-service"
     );
-    const invStoreModule = await import("../../inventory/infrastructure/inventory.store");
+    const { liveOwnReservationForOrder } = await import("./reservation-identity");
     const allowanceByLine = new Map<string, string>();
     for (const line of lines) {
       if (line.orderLineId === null) continue;
       const orderLine = orderLineById.get(line.orderLineId);
       if (orderLine === undefined) continue; // unreachable post-validation — fail-closed
       let allowance = new Decimal(0);
-      if (orderLine.reservationId !== null) {
-        const own = await invStoreModule.findLiveReservationRow(orderLine.reservationId);
-        if (
-          own !== undefined &&
-          own.itemId === line.itemId &&
-          own.warehouseId === delivery.warehouseId &&
-          own.holderType === "SALES_ORDER" &&
-          own.holderId === delivery.orderId
-        ) {
-          allowance = allowance.plus(new Decimal(own.qty));
-        }
+      // The line's OWN reservation counts ONLY through the identity read
+      // (live row + item + warehouse + beneficiary — one definition
+      // everywhere, reservation-identity.ts).
+      const own = await liveOwnReservationForOrder({
+        reservationId: orderLine.reservationId,
+        orderId: delivery.orderId!,
+        itemId: line.itemId,
+        warehouseId: delivery.warehouseId,
+      });
+      if (own !== null) {
+        allowance = allowance.plus(new Decimal(own.qty));
       }
       for (const mto of await listActiveMtoReservationsForSalesLine({
         salesOrderLineId: line.orderLineId,
@@ -575,14 +575,29 @@ export class DeliveryNoteService {
         // (5b) The line's OWN sales reservation — the remainder of the
         // shipped qty retires it partially (fully consumed → the link
         // clears; a remainder stays ACTIVE for the next delivery).
+        // THE SETTLEMENT IDENTITY LAW (the joint review round,
+        // 2026-11-15): the row is re-verified LIVE + item + warehouse +
+        // BENEFICIARY through the same identity read the allowance used
+        // (reservation-identity.ts) — NEVER the reservation id alone.
+        // Pre-fix this consume trusted the stored id: a rogue or stale
+        // link CONSUMED A THIRD PARTY'S coverage while the delivery
+        // shipped free stock (allowance 0), and a link to an already-dead
+        // row made the whole post throw. Now: a mismatched or dead row
+        // is SKIPPED (fail-closed — someone else's pool is untouchable,
+        // a dead row has nothing to retire) and the delivery settles
+        // through its own entitlements only.
         if (toRetire.greaterThan(0) && orderLine.reservationId !== null) {
-          const settled = await svc.partialConsume(
-            orderLine.reservationId,
-            toRetire.toFixed(6),
-            actorId,
-          );
-          if (settled.status === "CONSUMED") {
-            await store.setOrderLineReservation(orderLine.id, null);
+          const own = await liveOwnReservationForOrder({
+            reservationId: orderLine.reservationId,
+            orderId: delivery.orderId!,
+            itemId: line.itemId,
+            warehouseId: delivery.warehouseId,
+          });
+          if (own !== null) {
+            const settled = await svc.partialConsume(own.id, toRetire.toFixed(6), actorId);
+            if (settled.status === "CONSUMED") {
+              await store.setOrderLineReservation(orderLine.id, null);
+            }
           }
         }
 
@@ -614,10 +629,19 @@ export class DeliveryNoteService {
               await store.setOrderLineReservation(orderLine.id, null);
             }
           }
+          // The own remainder's release rides the SAME identity read
+          // (the joint review round): a rogue or stale link never
+          // releases a third party's coverage — the link clears (it is
+          // stale by definition), the foreign row stays untouched.
           if (orderLine.reservationId !== null) {
-            const own = await svc.find(orderLine.reservationId);
-            if (own.status === "ACTIVE") {
-              await svc.release(orderLine.reservationId, actorId);
+            const own = await liveOwnReservationForOrder({
+              reservationId: orderLine.reservationId,
+              orderId: delivery.orderId!,
+              itemId: line.itemId,
+              warehouseId: delivery.warehouseId,
+            });
+            if (own !== null) {
+              await svc.release(own.id, actorId);
             }
             await store.setOrderLineReservation(orderLine.id, null);
           }

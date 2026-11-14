@@ -924,4 +924,228 @@ describe("the hard-review regression tests — the negative-stock bypass and the
     const zeroIssuedRow = await withTenant(TENANT_M, () => salesOrdersSvc.find(zeroOrder.orderId));
     expect(zeroIssuedRow.status).toBe("ISSUED");
   });
+
+  it("(n) THE SETTLEMENT IDENTITY (the joint review round): the delivery settlement's OWN-reservation consume (5b) and the fully-delivered finalization's release (5c) re-verify the LIVE row's identity — a rogue or stale order-line link NEVER consumes or releases a third party's coverage, and a link to a dead row never blocks the post", async () => {
+    const f = spec.fixture!;
+    const item = await withTenant(TENANT_M, () =>
+      ensureItem(`M-HRV-N-${Date.now() % 100000}`, "the settlement-identity item"),
+    );
+    // 16 on hand: 6 to back the victim's own reservation, 10 free for
+    // the attacker's two deliveries (4 + 2) and the dead-link arm (4).
+    await receiveAt(item, f.warehouseFg, "16", `M-HRV-N-${Date.now() % 100000}`);
+
+    // THE VICTIM: an ISSUED order whose line owns a LIVE 6-unit
+    // reservation (its full remaining coverage).
+    const victim = await issuedOrderLine(item, "6", f.warehouseFg, "N victim");
+    const victimReservation = await withTenant(TENANT_M, () =>
+      reservations.create({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        qty: "6",
+        holderType: "SALES_ORDER",
+        holderId: victim.orderId,
+        expiresAt: null,
+        note: "the victim's own coverage",
+        actorId: M_ACTOR,
+      }),
+    );
+    await withTenant(TENANT_M, () =>
+      salesStore.setOrderLineReservation(victim.lineId, victimReservation.id),
+    );
+
+    // THE ATTACKER: an ISSUED order whose line carries a ROGUE link to
+    // the VICTIM's reservation (the probe's direct-store-write
+    // precedent — exactly the stale/crafted link the identity law must
+    // survive).
+    const attacker = await issuedOrderLine(item, "6", f.warehouseFg, "N attacker");
+    await withTenant(TENANT_M, () =>
+      salesStore.setOrderLineReservation(attacker.lineId, victimReservation.id),
+    );
+
+    // (n1) The PARTIAL delivery (4 of 6): posts on FREE stock (the
+    // allowance's identity read already refuses the rogue link);
+    // pre-fix the settlement's (5b) consumed 4 of the VICTIM's
+    // coverage through the stored id — post-fix the victim's row is
+    // untouched at its full 6.
+    const partialNote = await draftBoundDelivery({
+      orderId: attacker.orderId,
+      warehouseId: f.warehouseFg,
+      orderLineId: attacker.lineId,
+      itemId: item,
+      qty: "4",
+      label: "N-partial",
+    });
+    await withTenant(TENANT_M, () => deliveries.post(partialNote, M_ACTOR));
+    const afterPartial = await withTenant(TENANT_M, () =>
+      invStore.listReservations({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      }),
+    );
+    const victimAfterPartial = afterPartial.find((row) => row.id === victimReservation.id);
+    expect(victimAfterPartial).toBeDefined();
+    expect(victimAfterPartial!.qty).toBe("6.000000");
+
+    // (n2) The COMPLETING delivery (the remaining 2): the (5c)
+    // finalization releases every reservation still feeding the line —
+    // pre-fix that release DESTROYED the victim's full coverage
+    // (another order's completion released a third party's row through
+    // the rogue link); post-fix the release is identity-verified and
+    // SKIPPED, the stale link clears, the victim keeps its ACTIVE 6.
+    const finalNote = await draftBoundDelivery({
+      orderId: attacker.orderId,
+      warehouseId: f.warehouseFg,
+      orderLineId: attacker.lineId,
+      itemId: item,
+      qty: "2",
+      label: "N-final",
+    });
+    await withTenant(TENANT_M, () => deliveries.post(finalNote, M_ACTOR));
+    const afterFinal = await withTenant(TENANT_M, () =>
+      invStore.listReservations({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      }),
+    );
+    const victimAfterFinal = afterFinal.find((row) => row.id === victimReservation.id);
+    expect(victimAfterFinal).toBeDefined();
+    expect(victimAfterFinal!.qty).toBe("6.000000");
+    // The attacker's stale link cleared (the line is fully delivered).
+    const attackerLine = (await withTenant(TENANT_M, () =>
+      salesStore.listSalesOrderLines(attacker.orderId),
+    )).find((row) => row.id === attacker.lineId)!;
+    expect(attackerLine.reservationId).toBeNull();
+    // The stock: 16 − 6 shipped = 10 on hand, the victim's 6 still
+    // held ACTIVE — the free pool is exactly 4.
+    await expect(onHandAt(item, f.warehouseFg)).resolves.toBe("10.000000");
+    await expect(activePoolQty(item, f.warehouseFg)).resolves.toBe("6.000000");
+
+    // (n3) THE DEAD-LINK ARM: a line whose link points at an
+    // already-CONSUMED reservation — pre-fix the (5b) consume THREW
+    // (ReservationStateError) and rolled the whole post back; post-fix
+    // the identity read sees a dead row, skips it, and the delivery
+    // posts on free stock.
+    const deadOrder = await issuedOrderLine(item, "6", f.warehouseFg, "N dead-link");
+    const deadReservation = await withTenant(TENANT_M, () =>
+      reservations.create({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        qty: "4",
+        holderType: "SALES_ORDER",
+        holderId: deadOrder.orderId,
+        expiresAt: null,
+        note: "the dead-link row",
+        actorId: M_ACTOR,
+      }),
+    );
+    // Fully consume the row up front (it is dead now).
+    await withTenant(TENANT_M, () =>
+      reservations.partialConsume(deadReservation.id, "4", M_ACTOR),
+    );
+    const deadAttacker = await issuedOrderLine(item, "4", f.warehouseFg, "N dead attacker");
+    await withTenant(TENANT_M, () =>
+      salesStore.setOrderLineReservation(deadAttacker.lineId, deadReservation.id),
+    );
+    const deadNote = await draftBoundDelivery({
+      orderId: deadAttacker.orderId,
+      warehouseId: f.warehouseFg,
+      orderLineId: deadAttacker.lineId,
+      itemId: item,
+      qty: "4",
+      label: "N-dead",
+    });
+    // Posts cleanly — free stock 4 covers it, the dead link retires
+    // nothing and blocks nothing.
+    await withTenant(TENANT_M, () => deliveries.post(deadNote, M_ACTOR));
+    await expect(onHandAt(item, f.warehouseFg)).resolves.toBe("6.000000");
+    await expect(activePoolQty(item, f.warehouseFg)).resolves.toBe("6.000000");
+  });
+
+  it("(o) THE TERMINATION IDENTITY (the joint review round): the order CANCEL and CLOSE releases re-verify the LIVE row's identity — another order's termination NEVER releases a third party's coverage through a rogue link; the stale link still clears", async () => {
+    const f = spec.fixture!;
+    const item = await withTenant(TENANT_M, () =>
+      ensureItem(`M-HRV-O-${Date.now() % 100000}`, "the termination-identity item"),
+    );
+    await receiveAt(item, f.warehouseFg, "12", `M-HRV-O-${Date.now() % 100000}`);
+
+    // The victim's LIVE 6-unit coverage.
+    const victim = await issuedOrderLine(item, "6", f.warehouseFg, "O victim");
+    const victimReservation = await withTenant(TENANT_M, () =>
+      reservations.create({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        qty: "6",
+        holderType: "SALES_ORDER",
+        holderId: victim.orderId,
+        expiresAt: null,
+        note: "the termination-identity victim coverage",
+        actorId: M_ACTOR,
+      }),
+    );
+    await withTenant(TENANT_M, () =>
+      salesStore.setOrderLineReservation(victim.lineId, victimReservation.id),
+    );
+
+    // (o1) CANCEL: the attacker's order (rogue-linked to the victim's
+    // row) cancels — pre-fix the cancel's release loop DESTROYED the
+    // victim's coverage (svc.find + status check trusted the stored
+    // id); post-fix the identity read skips the foreign row, the
+    // victim keeps its ACTIVE 6.
+    const cancelAttacker = await issuedOrderLine(item, "4", f.warehouseFg, "O cancel attacker");
+    await withTenant(TENANT_M, () =>
+      salesStore.setOrderLineReservation(cancelAttacker.lineId, victimReservation.id),
+    );
+    const cancelled = await withTenant(TENANT_M, () =>
+      salesOrdersSvc.cancel(cancelAttacker.orderId, "the termination-identity probe", M_ACTOR),
+    );
+    expect(cancelled.status).toBe("CANCELLED");
+    const afterCancel = await withTenant(TENANT_M, () =>
+      invStore.listReservations({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      }),
+    );
+    const victimAfterCancel = afterCancel.find((row) => row.id === victimReservation.id);
+    expect(victimAfterCancel).toBeDefined();
+    expect(victimAfterCancel!.qty).toBe("6.000000");
+    // The attacker's stale link cleared with its termination.
+    const cancelLine = (await withTenant(TENANT_M, () =>
+      salesStore.listSalesOrderLines(cancelAttacker.orderId),
+    )).find((row) => row.id === cancelAttacker.lineId)!;
+    expect(cancelLine.reservationId).toBeNull();
+    // The victim's OWN link is untouched.
+    const victimLine = (await withTenant(TENANT_M, () =>
+      salesStore.listSalesOrderLines(victim.orderId),
+    )).find((row) => row.id === victim.lineId)!;
+    expect(victimLine.reservationId).toBe(victimReservation.id);
+
+    // (o2) CLOSE: the same rogue link through the close path — the
+    // victim's coverage survives the attacker's close too.
+    const closeAttacker = await issuedOrderLine(item, "2", f.warehouseFg, "O close attacker");
+    await withTenant(TENANT_M, () =>
+      salesStore.setOrderLineReservation(closeAttacker.lineId, victimReservation.id),
+    );
+    const closed = await withTenant(TENANT_M, () => salesOrdersSvc.close(closeAttacker.orderId, M_ACTOR));
+    expect(closed.status).toBe("CLOSED");
+    const afterClose = await withTenant(TENANT_M, () =>
+      invStore.listReservations({
+        itemId: item,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      }),
+    );
+    const victimAfterClose = afterClose.find((row) => row.id === victimReservation.id);
+    expect(victimAfterClose).toBeDefined();
+    expect(victimAfterClose!.qty).toBe("6.000000");
+    // The full accounting: 12 on hand, 6 held by the victim, 6 free.
+    await expect(onHandAt(item, f.warehouseFg)).resolves.toBe("12.000000");
+    await expect(activePoolQty(item, f.warehouseFg)).resolves.toBe("6.000000");
+  });
 });

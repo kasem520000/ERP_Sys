@@ -133,18 +133,18 @@ export class SalesOrderService {
     // construction). This is the same entitlement the delivery post's
     // beneficiary allowance draws on — one definition everywhere.
     let reservedForLineQty = new Decimal(0);
-    const invStore = await import("../../inventory/infrastructure/inventory.store");
-    if (line.reservationId !== null) {
-      const own = await invStore.findLiveReservationRow(line.reservationId);
-      if (
-        own !== undefined &&
-        own.itemId === line.itemId &&
-        own.warehouseId === order.warehouseId &&
-        own.holderType === "SALES_ORDER" &&
-        own.holderId === orderId
-      ) {
-        reservedForLineQty = reservedForLineQty.plus(new Decimal(own.qty));
-      }
+    // The line's own reservation counts ONLY through the identity read
+    // (live row + item + the ORDER's warehouse + the beneficiary holder
+    // — one definition everywhere, reservation-identity.ts).
+    const { liveOwnReservationForOrder } = await import("./reservation-identity");
+    const ownRow = await liveOwnReservationForOrder({
+      reservationId: line.reservationId,
+      orderId,
+      itemId: line.itemId,
+      warehouseId: order.warehouseId,
+    });
+    if (ownRow !== null) {
+      reservedForLineQty = reservedForLineQty.plus(new Decimal(ownRow.qty));
     }
     const { listActiveMtoReservationsForSalesLine } = await import(
       "../../manufacturing/application/production-order-service"
@@ -568,12 +568,24 @@ export class SalesOrderService {
     const { listActiveMtoReservationsForSalesLine } = await import(
       "../../manufacturing/application/production-order-service"
     );
+    // The order-line identity read (the joint review round's law — one
+    // definition everywhere, reservation-identity.ts).
+    const { liveOwnReservationForOrder } = await import("./reservation-identity");
     for (const line of lines) {
-      // (a) The line's OWN reservation.
+      // (a) The line's OWN reservation — identity-verified, NEVER the id
+      // alone (the joint review round, 2026-11-15): a rogue or stale
+      // link (a third party's beneficiary row, a dead row) is SKIPPED —
+      // another order's cancellation must never release someone else's
+      // coverage — and the stale link still clears.
       if (line.reservationId !== null) {
-        const own = await svc.find(line.reservationId);
-        if (own.status === "ACTIVE") {
-          await svc.release(line.reservationId, actorId);
+        const own = await liveOwnReservationForOrder({
+          reservationId: line.reservationId,
+          orderId,
+          itemId: line.itemId,
+          warehouseId: order.warehouseId,
+        });
+        if (own !== null) {
+          await svc.release(own.id, actorId);
         }
         await store.setOrderLineReservation(line.id, null);
       }
