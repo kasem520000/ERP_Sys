@@ -296,6 +296,12 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "payroll.eos_provision": ["payroll.employees", "payroll.runs"],
   "payroll.cost_allocation": ["payroll.runs", "accounting.cost_centers"],
   "payroll.reports": ["payroll.runs"],
+  // PHASE-045 (CR-15 — the HR operational core): the attendance, leave,
+  // and shifts surfaces ride the payroll employees substrate (HR-13's
+  // bridge links the user; the feeds land as 046's variable lines).
+  "hr.attendance": ["payroll.employees"],
+  "hr.leave": ["payroll.employees"],
+  "hr.shifts": ["payroll.employees"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

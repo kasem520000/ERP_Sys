@@ -1,6 +1,45 @@
 # PHASE-045 — HR Core — Attendance, Leaves & Shifts
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-15](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** IN_PROGRESS — started 2026-11-14 (the owner's parallel directive: 045 runs alongside the 043-completion review; starting 045 is NOT closure of 043 and NOT production approval) · **Wave:** 2 / Stage 13 · **Register:** [CR-15](../../planning/COMPLETENESS_REGISTER.md)
+
+> **THE KICKOFF COORDINATION RECORD (2026-11-14):** scope, requirements,
+> and the implementation plan are the ones this document already carries
+> (authored 2026-11-10, reviewed against the current head at start — no
+> scope change). **The conflict check against the 043-completion fixes —
+> NO REAL CONFLICTS:** (1) migrations — the completion round took NO
+> migrations (code + docs only); the journal ended at 0079, so this
+> phase's slots are **0080…0086** (the plan's "≈ 0082…0088" predates the
+> journal's actual end — the numbering note, recorded in migrations.ts,
+> the journal, and the spec); (2) ids — BR-081 was taken by the
+> completion round (the reservation hard protection), so this phase's
+> business-rule slots are **BR-082…BR-084** (the ledger's ladder
+> re-coordinated 2026-11-14, dated notes in every post-043 phase doc);
+> G-50/G-51 and INV-031 are untouched and free; (3) shared source files
+> — the completion round touched movement-core, the inventory store,
+> deliveries, orders, and the reservation specs; the HR core touches
+> NONE of them (new tables + new services; the only shared surfaces are
+> the migration manifest/journal, schema.ts, ENTITY_CATALOG, the
+> permissions seed + drift registry, and the matrix — all coordinated in
+> this kickoff's commits); (4) the DB-suite harness boots ONE embedded
+> PostgreSQL with a shared data dir — the two phases' test runs are
+> SEQUENTIAL on one machine, never concurrent. **The parallel-work
+> protocol (the owner's rules):** separate commits and separate evidence
+> per phase; the shared gates re-run on the UNIFIED head after each
+> merge, each its own run, never combined into one success claim. **Two
+> seed-scope decisions recorded honestly:** (1) the plan's "default leave
+> types" seed item maps to the PER-TENANT first-use default (leave_types
+> is tenant-scoped — no global row exists to seed, unlike 0078's global
+> lot_sizing catalog; accrual 0.00 until the tenant configures — the
+> BR-055 no-fabricated-defaults discipline); (2) the workforce-industry
+> MANIFEST enablement ("required_feature_keys += hr.*") is DEFERRED to
+> the phase's T-15 web step — it is one coherent change with the CANONICAL
+> manifests (packages/contracts/src/industry/templates.ts — the code source
+> of truth), the specs' pinned manifest hashes, and the starter-plan
+> degradation-chain pins; the DB half alone (the 0078 §4 shape) would
+> desync the stored manifests from the canonical hash the apply service
+> verifies. The keys themselves are registered NOW (FEATURE_DEPS + the
+> `hr` module segment + the business/enterprise plan grants), so nothing
+> blocks the later enablement.
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-05 · §10 HR-01…HR-04, HR-13 · §17 N-17 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 2: الموارد البشرية»
 
 ## 1. Phase Overview
@@ -101,12 +140,16 @@ on this phase's feeds and the `employees.user_id` bridge.
 
 ## 4. Design Impact
 
-- **Migrations**: the sequence continues from PHASE-044's last journal entry (≈ 0081;
-  exact numbers taken at implementation time — planned ≈ 0082…0088): `shifts` +
-  `shift_rotations` · `attendance_records` · `overtime_rules` + `overtime_entries` ·
-  `leave_types` + `leave_balances` + `leave_requests` · `holiday_calendars` +
-  `holidays` · `employees.user_id` extension · seed migration (permissions, feature
-  grants, default leave types, import column maps — DATA-ONLY). Drizzle
+- **Migrations** (the honest next slots at implementation time — the journal
+  ended at 0079, not the plan's assumed 0081): **0080** `shifts` +
+  `shift_rotations` · **0081** `attendance_records` · **0082** `overtime_rules` +
+  `overtime_entries` · **0083** `leave_types` + `leave_balances` + `leave_requests`
+  · **0084** `holiday_calendars` + `holidays` · **0085** the `employees.user_id`
+  extension (the partial-UNIQUE bridge guard) · **0086** the seed migration
+  (permissions, feature grants, the workforce manifests — DATA-ONLY; the default
+  leave types are the PER-TENANT first-use default by the kickoff decision — the
+  table is tenant-scoped, no global row exists to seed; the import column maps
+  are the settings-registry pattern with code-level defaults, T-05). Drizzle
   `_journal.json` + `migrations.ts/spec` updated per house convention.
 - **Entities/catalog parity**: +10 tables (`shifts`, `shift_rotations`,
   `attendance_records`, `overtime_rules`, `overtime_entries`, `leave_types`,

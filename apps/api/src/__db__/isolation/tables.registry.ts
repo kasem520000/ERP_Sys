@@ -472,6 +472,24 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "mrp_suggestions" },
   { table: "contract_mfg_orders" },
   { table: "contract_mfg_moves" },
+  // PHASE-045 (CR-15 — HR Core; migrations 0080…0086; started in parallel
+  // with the 043-completion review per the owner's directive): the HR
+  // operational cluster — the shift family (templates + the employee ×
+  // date roster grid — DELETE granted: a grid cell is replaceable by
+  // design), the punch sessions (no DELETE: the operational truth;
+  // corrections arrive as new rows, BR-082), the overtime family (the
+  // pre-approval lifecycle), the leave family (per-year balance cells +
+  // the simple-approval requests), and the holiday calendars.
+  { table: "shifts", deleteGranted: true },
+  { table: "shift_rotations", deleteGranted: true },
+  { table: "attendance_records" },
+  { table: "overtime_rules" },
+  { table: "overtime_entries" },
+  { table: "leave_types" },
+  { table: "leave_balances" },
+  { table: "leave_requests" },
+  { table: "holiday_calendars", deleteGranted: true },
+  { table: "holidays", deleteGranted: true },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

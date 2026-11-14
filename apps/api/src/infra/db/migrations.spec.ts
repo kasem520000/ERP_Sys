@@ -191,7 +191,23 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // 0079_transfer_mrp_link (stock_transfers.mrp_suggestion_id — the
     // TRANSFER leg of the bidirectional conversion link, acceptance
     // criterion 3).
-    expect(files.at(-1)?.tag).toBe("0079_transfer_mrp_link");
+    //
+    // PHASE-045 (CR-15 — HR Core; started 2026-11-14 in parallel with the
+    // 043-completion review per the owner's directive; the plan's
+    // "≈ 0082…0088" predates the journal's actual 0079 end — the honest
+    // next slots): 0080_hr_shifts (shifts + the shift_rotations employee ×
+    // date roster grid), 0081_hr_attendance (attendance_records — punch
+    // sessions + the derived daily status + the import-dedupe floor),
+    // 0082_hr_overtime (overtime_rules + overtime_entries — the
+    // pre-approval lifecycle), 0083_hr_leave (leave_types +
+    // leave_balances + leave_requests — INV-031's per-year cells + the
+    // simple-approval chain), 0084_hr_holidays (the per-jurisdiction
+    // calendars), 0085_hr_identity_bridge (employees.user_id + the
+    // partial-UNIQUE guard — HR-13), 0086_hr_seeds (the DATA-ONLY seed:
+    // the SIX hr.* permission keys, the plan grants, the workforce
+    // manifests; the leave-types default is per-tenant first-use — the
+    // kickoff decision, no global row exists to seed).
+    expect(files.at(-1)?.tag).toBe("0086_hr_seeds");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

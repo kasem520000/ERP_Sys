@@ -174,6 +174,11 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // DATA-DEPENDENT frozen-fence override — granted to owner + accountant,
   // resolved per request by the MPS service against the entry's bucket).
   "apps/api/migrations/0078_mrp_seeds.sql",
+  // PHASE-045 (Blueprint v3.0 · CR-15): 0086 seeds the SIX HR-core keys
+  // (matrix §3.23; 291 → 297) — hr.attendance, hr.attendance.import,
+  // hr.shifts, hr.overtime, hr.leave, hr.self_service (the SoD-scoped
+  // self surface — the employee↔user link resolves the OWN-rows scope).
+  "apps/api/migrations/0086_hr_seeds.sql",
 ];
 
 export async function main(): Promise<void> {

@@ -437,12 +437,38 @@ export const MIGRATIONS: readonly string[] = [
   // 0079_transfer_mrp_link — stock_transfers.mrp_suggestion_id: the
   // TRANSFER leg of the bidirectional conversion link (acceptance
   // criterion 3 — the 0076 pair completed for all three document types).
+  // PHASE-045 (CR-15) — the HR Core substrate (the honest next slots:
+  // the phase plan's ≈0082…0088 predates the journal's actual 0079 end
+  // — the numbering note):
+  // 0080_hr_shifts — shifts + shift_rotations (the employee × date
+  // roster grid);
+  // 0081_hr_attendance — attendance_records (punch sessions, the
+  // derived daily status, the import-dedupe floor);
+  // 0082_hr_overtime — overtime_rules + overtime_entries (the
+  // pre-approval lifecycle, BR-084's exception surfacing);
+  // 0083_hr_leave — leave_types + leave_balances + leave_requests
+  // (INV-031's per-year balance cells + the simple-approval chain);
+  // 0084_hr_holidays — holiday_calendars + holidays (per-jurisdiction);
+  // 0085_hr_identity_bridge — employees.user_id + the partial-UNIQUE
+  // guard (HR-13, the SoD-scoped link);
+  // 0086_hr_seeds — the DATA-ONLY seed (the six hr.* permission keys +
+  // the plan grants; the workforce-manifest enablement is DEFERRED to the
+  // phase's T-15 web step — one coherent change with the canonical
+  // manifests + the hash pins; the leave-types default is per-tenant
+  // first-use, not a global row — the kickoff decisions).
   "0074_item_planning_policies",
   "0075_bom_planning",
   "0076_mrp_engine",
   "0077_contract_manufacturing",
   "0078_mrp_seeds",
   "0079_transfer_mrp_link",
+  "0080_hr_shifts",
+  "0081_hr_attendance",
+  "0082_hr_overtime",
+  "0083_hr_leave",
+  "0084_hr_holidays",
+  "0085_hr_identity_bridge",
+  "0086_hr_seeds",
 ];
 
 /**

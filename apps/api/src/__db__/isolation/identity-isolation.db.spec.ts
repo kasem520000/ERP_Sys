@@ -3055,6 +3055,104 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-045 (CR-15 — HR Core; migrations 0080…0084): the HR operational
+  // cluster — FKs at each tenant's OWN fixtures (the payroll employees
+  // c0290291… pair; the intra-cluster shift/type/calendar chains).
+  await superuser.query(
+    `INSERT INTO shifts (id, tenant_id, code, name, start_time, end_time, grace_minutes, break_minutes, is_night)
+     VALUES
+       ('71717171-0000-4000-8000-000000000001', $1, 'ISO-SHIFT', 'Isolation shift', '08:00', '16:00', 10, 30, false),
+       ('71717171-0000-4000-8000-000000000002', $2, 'ISO-SHIFT', 'Isolation shift', '08:00', '16:00', 10, 30, false)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source)
+     VALUES
+       ('72727272-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        '2027-03-01', '71717171-0000-4000-8000-000000000001', 'MANUAL'),
+       ('72727272-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        '2027-03-01', '71717171-0000-4000-8000-000000000002', 'MANUAL')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO attendance_records (id, tenant_id, employee_id, work_date, check_in, check_out, source, shift_id, derived_status, worked_minutes)
+     VALUES
+       ('73737373-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        '2027-03-01', '2027-03-01 08:05:00+00', '2027-03-01 16:00:00+00', 'MANUAL',
+        '71717171-0000-4000-8000-000000000001', 'PRESENT', 465),
+       ('73737373-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        '2027-03-01', '2027-03-01 08:05:00+00', '2027-03-01 16:00:00+00', 'MANUAL',
+        '71717171-0000-4000-8000-000000000002', 'PRESENT', 465)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO overtime_rules (id, tenant_id, code, name, tier, multiplier, pre_approval_required)
+     VALUES
+       ('74747474-0000-4000-8000-000000000001', $1, 'ISO-OT', 'Isolation overtime', 'WEEKDAY', 1.5, true),
+       ('74747474-0000-4000-8000-000000000002', $2, 'ISO-OT', 'Isolation overtime', 'WEEKDAY', 1.5, true)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO overtime_entries (id, tenant_id, employee_id, work_date, hours, rule_id, status)
+     VALUES
+       ('75757575-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        '2027-03-01', 2, '74747474-0000-4000-8000-000000000001', 'PENDING'),
+       ('75757575-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        '2027-03-01', 2, '74747474-0000-4000-8000-000000000002', 'PENDING')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO leave_types (id, tenant_id, code, name, paid, accrual_days_per_year)
+     VALUES
+       ('76767676-0000-4000-8000-000000000001', $1, 'ISO-LV', 'Isolation leave', true, 0),
+       ('76767676-0000-4000-8000-000000000002', $2, 'ISO-LV', 'Isolation leave', true, 0)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO leave_balances (id, tenant_id, employee_id, leave_type_id, year, entitlement_days, used_days, carried_forward_days)
+     VALUES
+       ('77777777-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        '76767676-0000-4000-8000-000000000001', 2027, 0, 0, 0),
+       ('77777777-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        '76767676-0000-4000-8000-000000000002', 2027, 0, 0, 0)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO leave_requests (id, tenant_id, employee_id, leave_type_id, start_date, end_date, days, status)
+     VALUES
+       ('78787878-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        '76767676-0000-4000-8000-000000000001', '2027-03-02', '2027-03-03', 2, 'PENDING'),
+       ('78787878-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        '76767676-0000-4000-8000-000000000002', '2027-03-02', '2027-03-03', 2, 'PENDING')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO holiday_calendars (id, tenant_id, jurisdiction_code, name)
+     VALUES
+       ('79797979-0000-4000-8000-000000000001', $1, 'ISO', 'Isolation calendar'),
+       ('79797979-0000-4000-8000-000000000002', $2, 'ISO', 'Isolation calendar')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO holidays (id, tenant_id, calendar_id, holiday_date, name)
+     VALUES
+       ('7a7a7a7a-0000-4000-8000-000000000001', $1, '79797979-0000-4000-8000-000000000001',
+        '2027-03-05', 'Isolation day'),
+       ('7a7a7a7a-0000-4000-8000-000000000002', $2, '79797979-0000-4000-8000-000000000002',
+        '2027-03-05', 'Isolation day')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3582,6 +3680,16 @@ const OWN_ROW: Record<string, [string, string]> = {
   mrp_suggestions: ["6e6e6e6e-0000-4000-8000-000000000001", "6e6e6e6e-0000-4000-8000-000000000002"],
   contract_mfg_orders: ["6f6f6f6f-0000-4000-8000-000000000001", "6f6f6f6f-0000-4000-8000-000000000002"],
   contract_mfg_moves: ["70707070-0000-4000-8000-000000000001", "70707070-0000-4000-8000-000000000002"],
+  shifts: ["71717171-0000-4000-8000-000000000001", "71717171-0000-4000-8000-000000000002"],
+  shift_rotations: ["72727272-0000-4000-8000-000000000001", "72727272-0000-4000-8000-000000000002"],
+  attendance_records: ["73737373-0000-4000-8000-000000000001", "73737373-0000-4000-8000-000000000002"],
+  overtime_rules: ["74747474-0000-4000-8000-000000000001", "74747474-0000-4000-8000-000000000002"],
+  overtime_entries: ["75757575-0000-4000-8000-000000000001", "75757575-0000-4000-8000-000000000002"],
+  leave_types: ["76767676-0000-4000-8000-000000000001", "76767676-0000-4000-8000-000000000002"],
+  leave_balances: ["77777777-0000-4000-8000-000000000001", "77777777-0000-4000-8000-000000000002"],
+  leave_requests: ["78787878-0000-4000-8000-000000000001", "78787878-0000-4000-8000-000000000002"],
+  holiday_calendars: ["79797979-0000-4000-8000-000000000001", "79797979-0000-4000-8000-000000000002"],
+  holidays: ["7a7a7a7a-0000-4000-8000-000000000001", "7a7a7a7a-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4467,6 +4575,36 @@ const MISMATCHED_INSERT: Record<string, string> = {
   contract_mfg_moves: `INSERT INTO contract_mfg_moves (id, tenant_id, order_id, move_kind, item_id, qty)
      VALUES ('70707070-3000-4000-8000-000000000003', $1, '6f6f6f6f-0000-4000-8000-000000000002',
              'RETURN_MATERIAL', 'babababa-0000-4000-8000-000000000002', 1)`,
+  // PHASE-045 (CR-15 — HR Core): the mismatched-tenant probes — FKs at
+  // tenant B's own fixtures so the composite tenant FKs stay satisfied and
+  // the RLS WITH CHECK is the isolated rejection.
+  shifts: `INSERT INTO shifts (id, tenant_id, code, name, start_time, end_time)
+     VALUES ('71717171-3000-4000-8000-000000000003', $1, 'ATK-SHIFT', 'Attack shift', '09:00', '17:00')`,
+  shift_rotations: `INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source)
+     VALUES ('72727272-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+             '2027-03-02', '71717171-0000-4000-8000-000000000002', 'MANUAL')`,
+  attendance_records: `INSERT INTO attendance_records (id, tenant_id, employee_id, work_date, check_in, source, shift_id, derived_status)
+     VALUES ('73737373-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+             '2027-03-02', '2027-03-02 09:00:00+00', 'MANUAL',
+             '71717171-0000-4000-8000-000000000002', 'PRESENT')`,
+  overtime_rules: `INSERT INTO overtime_rules (id, tenant_id, code, name, tier, multiplier)
+     VALUES ('74747474-3000-4000-8000-000000000003', $1, 'ATK-OT', 'Attack overtime', 'WEEKEND', 2)`,
+  overtime_entries: `INSERT INTO overtime_entries (id, tenant_id, employee_id, work_date, hours, rule_id, status)
+     VALUES ('75757575-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+             '2027-03-02', 1, '74747474-0000-4000-8000-000000000002', 'PENDING')`,
+  leave_types: `INSERT INTO leave_types (id, tenant_id, code, name, paid, accrual_days_per_year)
+     VALUES ('76767676-3000-4000-8000-000000000003', $1, 'ATK-LV', 'Attack leave', false, 0)`,
+  leave_balances: `INSERT INTO leave_balances (id, tenant_id, employee_id, leave_type_id, year, entitlement_days)
+     VALUES ('77777777-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+             '76767676-0000-4000-8000-000000000002', 2027, 5)`,
+  leave_requests: `INSERT INTO leave_requests (id, tenant_id, employee_id, leave_type_id, start_date, end_date, days, status)
+     VALUES ('78787878-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+             '76767676-0000-4000-8000-000000000002', '2027-03-04', '2027-03-05', 2, 'PENDING')`,
+  holiday_calendars: `INSERT INTO holiday_calendars (id, tenant_id, jurisdiction_code, name)
+     VALUES ('79797979-3000-4000-8000-000000000003', $1, 'ATK', 'Attack calendar')`,
+  holidays: `INSERT INTO holidays (id, tenant_id, calendar_id, holiday_date, name)
+     VALUES ('7a7a7a7a-3000-4000-8000-000000000003', $1, '79797979-0000-4000-8000-000000000002',
+             '2027-03-06', 'Attack day')`,
 };
 
 beforeAll(async () => {

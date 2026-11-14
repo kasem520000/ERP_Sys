@@ -186,8 +186,12 @@ describe("seeds (acceptance 9)", () => {
     // inventory.tracking.serial_ledger, inventory.quarantine,
     // inventory.tracking.consignment; the drift checker agrees: matrix 287
     // = seed 287) + 4 = 291 after 0078 — the four PHASE-043 planning keys
-    // (manufacturing.mrp/mps/planning_policies/mps.frozen_edit, matrix §3.22).
-    expect(result.rows[0]?.n).toBe(291);
+    // (manufacturing.mrp/mps/planning_policies/mps.frozen_edit, matrix §3.22)
+    // + 6 = 297 after 0086 — the six PHASE-045 HR-core keys
+    // (hr.attendance, hr.attendance.import, hr.shifts, hr.overtime,
+    // hr.leave, hr.self_service — matrix §3.23; the phase started
+    // 2026-11-14 in parallel with the 043-completion review).
+    expect(result.rows[0]?.n).toBe(297);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-13 (PHASE-041 — §3.19 communications hub; permission catalog 267 → 272 · PHASE-042 — §3.20 manufacturing execution; permission catalog 272 → 279 · PHASE-044 — §3.21 WMS & inventory intelligence; permission catalog 279 → 287 · PHASE-043 — §3.22 MRP & planning; permission catalog 287 → 291)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-14 (PHASE-045 started — §3.23 HR core; permission catalog 291 → 297; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -606,6 +606,43 @@ Role grants per 0078 §1: owner + accountant hold all four; the warehouse role (
 material planners' tier) holds `mrp` + `mps` — NOT the policy master data and NOT
 the frozen-fence override; the viewer role holds none (runs are operational
 screens — `oee.read` remains the viewer's manufacturing read surface).
+
+### §3.23 HR core — attendance, leaves & shifts (PHASE-045; catalog 291 → 297)
+
+The HR operational cluster (CR-15): attendance records and the device-import
+wizard, shifts and the roster grid, the overtime tiers and approvals, the leave
+family, and the employee self-service tabs. **All six keys seed in migration
+`0086` §1 — the permission catalog extends 291 → 297 (seed = mirror, zero
+drift).** The plan grants (0086 §2) put the three feature keys
+(`hr.attendance` · `hr.leave` · `hr.shifts`) on business + enterprise only — HR
+is not a starter feature; the workforce-carrying industry templates
+(food_manufacturing, manufacturing, healthcare, construction) require them by
+default (0086 §4).
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `hr.attendance` | Manage attendance records and the daily register / إدارة سجلات الحضور وسجل اليوم | owner, accountant | tenant | no (audited operational data; BR-082's immutability window — corrections arrive as new rows, never edits of committed punches) |
+| `hr.attendance.import` | Run and commit the attendance device import / تشغيل وتثبيت استيراد الحضور من الأجهزة | owner, accountant | tenant | **yes** (a committed import writes the operational truth in bulk — the preview + dedupe + anomaly quarantine + the file fingerprint on the committed-imports log make every record traceable; nothing lands silently) |
+| `hr.shifts` | Manage shifts and the roster grid / إدارة الورديات وجداول الدوام | owner, accountant | tenant | no (audited master data + the planning grid; the roster feeds the daily-status derivation) |
+| `hr.overtime` | Manage overtime rules and approve entries / إدارة قواعد العمل الإضافي واعتماد السجلات | owner, accountant | tenant | **yes** (approved overtime feeds payroll as variable lines — BR-084: a pre-approval-required rule's unapproved time surfaces as an exception, never silently fed) |
+| `hr.leave` | Manage leave types and approve requests / إدارة أنواع الإجازات واعتماد الطلبات | owner, accountant | tenant | **yes** (approval decrements the balance — INV-031's used ≤ entitlement + carried-forward at every moment; the accrual/carry-over runs are audited) |
+| `hr.self_service` | Employee self-service: own attendance, leave, and roster / الخدمة الذاتية: حضوري وإجازاتي وجدولي | owner (seeded); every linked employee at the application boundary | **self** (own rows only) | no (the SoD-scoped read surface: HR data visibility rides HR permissions, NEVER user administration — linking an employee to a user grants no HR read beyond the employee's OWN rows; the dedicated cross-employee isolation attack test pins it) |
+
+**Guarded routes** (ROUTE_PERMISSIONS, PHASE-045 — landing with the T-03…T-14
+services; the keys seed first per the docs-as-contract discipline): the
+`/api/v1/hr` family — `attendance` (GET, POST), `attendance/:id` (GET),
+`attendance/import` (POST preview/commit) — `hr.attendance` +
+`hr.attendance.import`; the `shifts` family — `shifts` (GET, POST, PATCH),
+`rosters` (GET, PUT) — `hr.shifts`; the `overtime` family — `overtime/rules`
+(GET, POST, PATCH), `overtime/entries` (GET, POST), `overtime/entries/:id/
+decide` (POST) — `hr.overtime`; the `leave` family — `leave/types` (GET, POST,
+PATCH), `leave/requests` (GET, POST), `leave/requests/:id/decide` (POST),
+`leave/balances` (GET) — `hr.leave`; the self-service tabs `me/attendance`,
+`me/leave`, `me/roster` (GET) — `hr.self_service` (the linked-employee check
+resolves the OWN-rows scope). Role grants per 0086 §1: owner holds all six;
+the accountant holds the five management keys (not the self-service scope —
+that key's grant rides the employee↔user link at the application boundary,
+seeded to the owner tier only for the drift-equality baseline).
 
 ## 4. Segregation of duties & approval limits
 

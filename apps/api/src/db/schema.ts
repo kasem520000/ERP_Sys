@@ -8956,3 +8956,345 @@ export const contractMfgMoves = pgTable(
     index("ix_contract_mfg_moves_order").on(table.tenantId, table.orderId, table.moveKind),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// PHASE-045 (CR-15) — HR Core: attendance, leaves & shifts (migrations
+// 0080…0086). The operational half of the HR gap: shifts + the roster
+// grid, punch sessions with the derived daily status, the overtime tiers
+// with pre-approval (BR-084), the leave family with per-year balance
+// cells (INV-031), per-jurisdiction holiday calendars, and the
+// employee ↔ user identity bridge (HR-13 — the SoD-scoped link).
+// ---------------------------------------------------------------------------
+
+/** Reusable shift templates (HR-04): times, grace, breaks, the night
+ * flag (the CHECK pins night ⟺ end < start — the overnight crossing). */
+export const shifts = pgTable(
+  "shifts",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    startTime: text("start_time").notNull(),
+    endTime: text("end_time").notNull(),
+    graceMinutes: integer("grace_minutes").notNull().default(0),
+    breakMinutes: integer("break_minutes").notNull().default(0),
+    isNight: boolean("is_night").notNull().default(false),
+    active: boolean("active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_shifts_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_shifts_tenant_code").on(table.tenantId, table.code),
+    index("ix_shifts_tenant_active").on(table.tenantId, table.active),
+  ],
+);
+
+/** The employee × date roster grid (HR-04): ONE row per cell (the unique
+ * — edits replace, never duplicate); ROTATION rows come from the pattern
+ * generator, MANUAL rows from the editor. */
+export const shiftRotations = pgTable(
+  "shift_rotations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    employeeId: uuid("employee_id").notNull(),
+    workDate: date("work_date").notNull(),
+    shiftId: uuid("shift_id"),
+    source: text("source").notNull().default("MANUAL"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_shift_rotations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_shift_rotations_cell").on(
+      table.tenantId,
+      table.employeeId,
+      table.workDate,
+    ),
+    index("ix_shift_rotations_tenant_date").on(table.tenantId, table.workDate),
+    index("ix_shift_rotations_tenant_employee").on(
+      table.tenantId,
+      table.employeeId,
+      table.workDate,
+    ),
+  ],
+);
+
+/** Punch sessions (HR-01/H-05): check-in/out (both nullable — a missing
+ * punch IS the record), MANUAL/IMPORT/DEVICE source, the derived daily
+ * status + minute facts. The (tenant, employee, date, check_in) unique is
+ * the import-dedupe floor; INV-031's non-overlap law is service-enforced
+ * and suite-proven. */
+export const attendanceRecords = pgTable(
+  "attendance_records",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    employeeId: uuid("employee_id").notNull(),
+    workDate: date("work_date").notNull(),
+    checkIn: timestamp("check_in", { withTimezone: true, mode: "string" }),
+    checkOut: timestamp("check_out", { withTimezone: true, mode: "string" }),
+    source: text("source").notNull().default("MANUAL"),
+    deviceRef: text("device_ref"),
+    geoLat: numeric("geo_lat", { precision: 9, scale: 6 }),
+    geoLng: numeric("geo_lng", { precision: 9, scale: 6 }),
+    shiftId: uuid("shift_id"),
+    derivedStatus: text("derived_status"),
+    lateMinutes: integer("late_minutes"),
+    earlyLeaveMinutes: integer("early_leave_minutes"),
+    workedMinutes: integer("worked_minutes"),
+    overtimeMinutes: integer("overtime_minutes"),
+    isException: boolean("is_exception").notNull().default(false),
+    importBatchId: uuid("import_batch_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_attendance_records_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_attendance_records_dedupe").on(
+      table.tenantId,
+      table.employeeId,
+      table.workDate,
+      table.checkIn,
+    ),
+    index("ix_attendance_records_tenant_date").on(table.tenantId, table.workDate),
+    index("ix_attendance_records_tenant_employee_date").on(
+      table.tenantId,
+      table.employeeId,
+      table.workDate,
+    ),
+    index("ix_attendance_records_tenant_exception").on(table.tenantId, table.workDate),
+    index("ix_attendance_records_tenant_import_batch").on(
+      table.tenantId,
+      table.importBatchId,
+    ),
+  ],
+);
+
+/** The overtime multiplier tiers (HR-03): WEEKDAY/WEEKEND/HOLIDAY, the
+ * pay multiplier (a tenant policy — never a fabricated statutory rate),
+ * the pre-approval flag (BR-084) and the per-day cap. */
+export const overtimeRules = pgTable(
+  "overtime_rules",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    tier: text("tier").notNull(),
+    multiplier: numeric("multiplier", { precision: 5, scale: 2 }).notNull(),
+    preApprovalRequired: boolean("pre_approval_required").notNull().default(true),
+    maxHoursPerDay: numeric("max_hours_per_day", { precision: 5, scale: 2 }),
+    active: boolean("active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_overtime_rules_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_overtime_rules_tenant_code").on(table.tenantId, table.code),
+    index("ix_overtime_rules_tenant_tier_active").on(
+      table.tenantId,
+      table.tier,
+      table.active,
+    ),
+  ],
+);
+
+/** Worked overtime rows (HR-03): PENDING → APPROVED/REJECTED (the
+ * simple-approval chain — PHASE-052 is the upgrade path); BR-084: an
+ * unapproved pre-approval-required entry is an EXCEPTION, never silently
+ * fed to payroll. */
+export const overtimeEntries = pgTable(
+  "overtime_entries",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    employeeId: uuid("employee_id").notNull(),
+    workDate: date("work_date").notNull(),
+    hours: numeric("hours", { precision: 7, scale: 2 }).notNull(),
+    ruleId: uuid("rule_id").notNull(),
+    status: text("status").notNull().default("PENDING"),
+    requestedBy: uuid("requested_by"),
+    decidedBy: uuid("decided_by"),
+    decidedAt: timestamp("decided_at", { withTimezone: true, mode: "string" }),
+    decisionNote: text("decision_note"),
+    isException: boolean("is_exception").notNull().default(false),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_overtime_entries_id_tenant").on(table.id, table.tenantId),
+    index("ix_overtime_entries_tenant_employee_date").on(
+      table.tenantId,
+      table.employeeId,
+      table.workDate,
+    ),
+    index("ix_overtime_entries_tenant_status").on(table.tenantId, table.status),
+    index("ix_overtime_entries_tenant_exception").on(table.tenantId, table.workDate),
+  ],
+);
+
+/** The leave catalog (HR-02): paid flag, accrual policy (days/year,
+ * monthly grant with prorated joiners), the carry-over cap. Accrual 0.00
+ * until the tenant configures (the BR-055 no-fabricated-defaults law). */
+export const leaveTypes = pgTable(
+  "leave_types",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    paid: boolean("paid").notNull().default(true),
+    accrualDaysPerYear: numeric("accrual_days_per_year", { precision: 7, scale: 2 })
+      .notNull()
+      .default("0"),
+    monthlyGrant: boolean("monthly_grant").notNull().default(false),
+    prorateJoiners: boolean("prorate_joiners").notNull().default(true),
+    carryOverCapDays: numeric("carry_over_cap_days", { precision: 7, scale: 2 })
+      .notNull()
+      .default("0"),
+    active: boolean("active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_leave_types_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_leave_types_tenant_code").on(table.tenantId, table.code),
+    index("ix_leave_types_tenant_active").on(table.tenantId, table.active),
+  ],
+);
+
+/** Per-(employee, type, YEAR) balance cells (HR-02): rows, not views —
+ * the period-close snapshot is reconstructable; INV-031: used ≤
+ * entitlement + carried-forward at every moment. */
+export const leaveBalances = pgTable(
+  "leave_balances",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    employeeId: uuid("employee_id").notNull(),
+    leaveTypeId: uuid("leave_type_id").notNull(),
+    year: integer("year").notNull(),
+    entitlementDays: numeric("entitlement_days", { precision: 7, scale: 2 })
+      .notNull()
+      .default("0"),
+    usedDays: numeric("used_days", { precision: 7, scale: 2 })
+      .notNull()
+      .default("0"),
+    carriedForwardDays: numeric("carried_forward_days", { precision: 7, scale: 2 })
+      .notNull()
+      .default("0"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_leave_balances_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_leave_balances_cell").on(
+      table.tenantId,
+      table.employeeId,
+      table.leaveTypeId,
+      table.year,
+    ),
+    index("ix_leave_balances_tenant_employee_year").on(
+      table.tenantId,
+      table.employeeId,
+      table.year,
+    ),
+  ],
+);
+
+/** The leave-request lifecycle (HR-02): PENDING → APPROVED/REJECTED/
+ * CANCELLED (the simple-approval chain — the workflow engine is
+ * PHASE-052 by decision record). */
+export const leaveRequests = pgTable(
+  "leave_requests",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    employeeId: uuid("employee_id").notNull(),
+    leaveTypeId: uuid("leave_type_id").notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    days: numeric("days", { precision: 7, scale: 2 }).notNull(),
+    status: text("status").notNull().default("PENDING"),
+    requestedBy: uuid("requested_by"),
+    decidedBy: uuid("decided_by"),
+    decidedAt: timestamp("decided_at", { withTimezone: true, mode: "string" }),
+    decisionNote: text("decision_note"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_leave_requests_id_tenant").on(table.id, table.tenantId),
+    index("ix_leave_requests_tenant_employee_status").on(
+      table.tenantId,
+      table.employeeId,
+      table.status,
+    ),
+    index("ix_leave_requests_tenant_dates").on(
+      table.tenantId,
+      table.startDate,
+      table.endDate,
+    ),
+  ],
+);
+
+/** Per-jurisdiction public-holiday calendars (HR-01/HR-04): feed the
+ * absence derivation (HOLIDAY, never ABSENT), the leave charge rules,
+ * and the overtime tier selection. */
+export const holidayCalendars = pgTable(
+  "holiday_calendars",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    jurisdictionCode: text("jurisdiction_code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    active: boolean("active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_holiday_calendars_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_holiday_calendars_tenant_jurisdiction").on(
+      table.tenantId,
+      table.jurisdictionCode,
+    ),
+  ],
+);
+
+/** The dated holiday rows: ONE per (calendar, date), bilingual. */
+export const holidays = pgTable(
+  "holidays",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    calendarId: uuid("calendar_id").notNull(),
+    holidayDate: date("holiday_date").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_holidays_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_holidays_cell").on(
+      table.tenantId,
+      table.calendarId,
+      table.holidayDate,
+    ),
+    index("ix_holidays_tenant_date").on(table.tenantId, table.holidayDate),
+  ],
+);
