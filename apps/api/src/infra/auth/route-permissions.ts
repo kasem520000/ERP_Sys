@@ -3845,6 +3845,60 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "sync.devices.revoke",
   },
 
+  // PHASE-045 (T-03 — matrix §3.24, the six 0086-seeded hr.* keys): the
+  // shift-template + roster-grid surface rides hr.shifts (the attendance
+  // and import routes land with T-04/T-05 on hr.attendance /
+  // hr.attendance.import).
+  {
+    method: "POST",
+    path: "/api/v1/hr/shifts",
+    permission: "hr.shifts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/shifts",
+    permission: "hr.shifts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/shifts/:id",
+    permission: "hr.shifts",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/shifts/:id",
+    permission: "hr.shifts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/shifts/:id/activate",
+    permission: "hr.shifts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/shifts/:id/deactivate",
+    permission: "hr.shifts",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/roster",
+    permission: "hr.shifts",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/roster/cell",
+    permission: "hr.shifts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/roster/cell/clear",
+    permission: "hr.shifts",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/roster/rotation",
+    permission: "hr.shifts",
+  },
 ];
 
 /**
