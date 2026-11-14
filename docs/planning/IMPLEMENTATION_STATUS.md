@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the JOINT REVIEW FIXES — FEFO warehouse scope, the settlement/termination identity, the T-03 shift fixes, and the promise point UI; the full DB suite 227/227 on the unified head 75943ab; RISK-032 stays open, the 043 review stays open, PHASE-045 stays in progress)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (THE 81f09e9 REVIEW ROUND — the duplicate-employee law, the promise point stamp refresh + the component's first test, the §4 queue-health drain window, RISK-032's unreserved-demand policy RECORDED AS THE OWNER'S DECIDED advisory model; the full DB suite re-run 227/227 · 3,229 passed | 2 skipped at the fixed head, the owner's failed independent run kept alongside; RISK-032 stays open for the review, the 043 review stays open, PHASE-045 stays in progress)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -438,6 +438,67 @@ ledger:
 RISK-031 and RISK-032 stay OPEN, the 043 hard review stays OPEN (the
 fixes go to the reviewer), PHASE-045 stays IN_PROGRESS — **NO closure
 and NO production approval are claimed.**
+**THE 81f09e9 REVIEW ROUND (2026-11-15 — the owner's independent
+verification passed the joint-review head, then surfaced four more
+items, all fixed with before/after evidence):** the owner verified
+`81f09e9` independently — FEFO 2/2, the settlement/cancellation
+identity 5/5, MTO 5/5, T-03 5/5, the shared gates and the archive —
+then directed: (1) **THE DUPLICATE-EMPLOYEE LAW** (045 T-03): a
+rotation whose `employeeIds` names the same employee twice was accepted
+by the zod schema and the service alike, then died at the bulk upsert
+on PostgreSQL's raw "ON CONFLICT DO UPDATE command cannot affect row a
+second time" (an untyped 500); the defense-in-depth pair now refuses it
+TYPED at BOTH layers — the HTTP edge (rotationBody's uniqueness refine
+→ 422 VALIDATION_ERROR naming employeeIds) and the service
+(ROTATION_INVALID before any write, zero residue); pinned by the new
+schema unit spec (before 1 FAIL — the schema accepted the duplicate
+list / after 3/3) and shifts-roster.spec (f) (before FAIL — the raw
+protocol error verbatim / after 6/6: typed rejection, zero residue,
+the deduped list still applying cleanly). (2) **THE PROMISE POINT
+STAMP REFRESH** (043): checkLineAtp PERSISTS the line's stamp at check
+time and the answer carries the fresh row, but the panel kept
+rendering the stamp loaded with the order (a stale OK beside a fresh
+SHORT verdict until a full reload); the line row in state is now
+replaced with the answer's — and the component got its FIRST test
+(atp-promise-point.test.tsx: before 1 FAIL — the stamp stayed OK /
+after 2/2: the badge reads what the check just recorded, the
+bilingual advisory note verbatim EN ltr + AR rtl, the consultative
+rule pinned — no gate, nothing blocks). (3) **THE §4 QUEUE-HEALTH
+DRAIN WINDOW** (performance): the owner's FULL-SUITE serial run failed
+exactly one test — the pg-boss non-system load-depth sample stepped
+5 → 7 against the A+1 = 6 ceiling — while the same file passed 13/13
+standalone; the adjacent-pair assertion conflated a transient burst
+(the load's own login-email fan-out landing while earlier specs'
+residue drained behind it) with a runaway. The signal stays honest
+and gains a window: up to 12 samples 1 s apart, the depth must COME
+BACK DOWN to the window's opening level (+1) — a real runaway never
+comes back down and still fails; the absolute bound (≤ 50), the
+dead-letter budget, and the total-depth census are unchanged.
+(4) **RISK-032's POLICY RECORDED AS DECIDED** (the register row
+rewritten): the unreserved portion is ADVISORY ONLY and a BACKORDER
+STAYS LEGAL — the owner's 2026-11-14 completion-round directive (the
+register's former option (c)), NOT an open policy question; the risk
+stays open FOR THE INDEPENDENT REVIEW's verdict on the
+reservation-side defenses, never as an undecided policy choice. THE
+TWO FULL-SUITE RESULTS, both kept (the honest-reporting rule): the
+owner's independent run at 81f09e9 — 1 failed (the queue-health
+sample 5 → 7 vs 6; the file standalone 13/13) — and THIS round's
+re-run at the fixed head: **227/227 files · 3,229 passed | 2 skipped
+· 0 failed · 527.70s** (full-db-suite-81f09e9-review-fixes.log —
+shifts-roster 6/6 inside it; the drain window 6→6). The gate was NOT
+described as green before this re-run passed it. Shared gates (each
+its own run): api typecheck + lint clean; web typecheck + lint clean;
+web unit 6/6 files · 75/75; id-ledger 0 errors / 0 warnings + the
+self-test **14/14** (the joint-review round's "16/16" was a
+transcription error — the checker source has carried exactly 14 arms
+through every head since 817b276; 9c/9d included, all OK);
+permissions-drift 297=297; i18n parity 5789=5789; docs:validate 33/33.
+The round's evidence ledger:
+[gate-evidence/2026-11-15-81f09e9-review-round.md](../operations/gate-evidence/2026-11-15-81f09e9-review-round.md);
+RISK-031 and RISK-032 stay OPEN (032 open for the review, its
+unreserved-demand policy now RECORDED AS DECIDED), the 043 hard review
+stays OPEN, PHASE-045 stays IN_PROGRESS — **NO closure of 043, NO
+closure of 045, and NO production approval are claimed.**
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -470,7 +531,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-043-COMPLETION.md) |
 | [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-044-COMPLETION.md) |
-| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; **+ T-03 (2026-11-15): the hr module — the shift service + the roster grid + the rotation pattern generator (the registry rows, the audit trail)**; **+ the joint-review T-03 fixes (2026-11-15): the CHUNKED rotation write (the 200×92 ceiling now runs within PostgreSQL's parameter limit — pre-fix reproduction captured), the PAGINATED grid read (total + hasMore — the explicit truncation signal), and the RLS test's isolation (tenant H's own rows by id + the dedicated boundary tenant; never an emptiness assumption about the shared tenant A)** — [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) · [T-03 evidence](../operations/gate-evidence/2026-11-15-phase045-t03.md) · [joint-review evidence](../operations/gate-evidence/2026-11-15-joint-review-fixes.md) |
+| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; **+ T-03 (2026-11-15): the hr module — the shift service + the roster grid + the rotation pattern generator (the registry rows, the audit trail)**; **+ the joint-review T-03 fixes (2026-11-15): the CHUNKED rotation write (the 200×92 ceiling now runs within PostgreSQL's parameter limit — pre-fix reproduction captured), the PAGINATED grid read (total + hasMore — the explicit truncation signal), and the RLS test's isolation (tenant H's own rows by id + the dedicated boundary tenant; never an emptiness assumption about the shared tenant A)**; **+ the 81f09e9 review round (2026-11-15): THE DUPLICATE-EMPLOYEE LAW — employeeIds naming the same employee twice is refused TYPED at both layers (the schema's uniqueness refine → 422 naming employeeIds; the service's ROTATION_INVALID before any write, zero residue — pre-fix the raw ON CONFLICT DO UPDATE protocol error), pinned by the schema unit spec + shifts-roster.spec (f) 6/6** — [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) · [T-03 evidence](../operations/gate-evidence/2026-11-15-phase045-t03.md) · [joint-review evidence](../operations/gate-evidence/2026-11-15-joint-review-fixes.md) · [81f09e9 round evidence](../operations/gate-evidence/2026-11-15-81f09e9-review-round.md) |
 | [PHASE-046](../implementation/phases/PHASE-046.md) | HR Payroll Compliance | 2 / 13 | 045 | NOT_STARTED — PLANNED |
 | [PHASE-047](../implementation/phases/PHASE-047.md) | HR Growth — Talent & Performance | 2 / 13 | 046 | NOT_STARTED — PLANNED |
 | [PHASE-048](../implementation/phases/PHASE-048.md) | Projects & Contracting | 2 / 13 | 036 | NOT_STARTED — PLANNED |
