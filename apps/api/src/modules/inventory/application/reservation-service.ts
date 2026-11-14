@@ -9,6 +9,7 @@ import * as store from "../infrastructure/inventory.store";
 import {
   ItemNotFoundError,
   ReservationNotFoundError,
+  ReservationQtyExceedsAvailableError,
   ReservationStateError,
   WarehouseNotFoundError,
 } from "../domain/inventory-errors";
@@ -54,6 +55,36 @@ export class ReservationService {
     if (item === undefined) throw new ItemNotFoundError(input.itemId);
     const warehouse = await store.findWarehouseById(input.warehouseId);
     if (warehouse === undefined) throw new WarehouseNotFoundError(input.warehouseId);
+    // The OVER-RESERVATION GUARD (PHASE-043 audit item 5) — the single
+    // creation choke point every path rides (the policy engine, the
+    // manual controller route, the MTO completion): lock the item_stock
+    // row FIRST (concurrent reserves of the same stock serialize here),
+    // then read the reserved pool INSIDE the lock — the loser sees the
+    // winner's committed pool and fails closed. Available = pickable bins
+    // + the unbinned fallback − the ACTIVE non-expired pool; a new
+    // reservation may never take the pool beyond it.
+    const stockRow = await store.lockItemStockRow(input.itemId, input.warehouseId);
+    if (stockRow === undefined) {
+      throw new ReservationQtyExceedsAvailableError(
+        `item ${input.itemId} has no stock row at warehouse ${input.warehouseId} — nothing to reserve`,
+        { itemId: input.itemId, warehouseId: input.warehouseId, requested: input.qty, available: "0.000000" },
+      );
+    }
+    const availability = await store.reservationAvailability(input.itemId, input.warehouseId);
+    if (
+      availability === undefined ||
+      new Decimal(availability.available).lessThan(new Decimal(input.qty))
+    ) {
+      throw new ReservationQtyExceedsAvailableError(
+        `reserving ${input.qty} of item ${input.itemId} at warehouse ${input.warehouseId} exceeds the available pool — pickable ${availability?.pickableBins ?? "0"} + unbinned ${availability?.unbinned ?? "0"} − reserved ${availability?.reserved ?? "0"} = available ${availability?.available ?? "0"}`,
+        {
+          itemId: input.itemId,
+          warehouseId: input.warehouseId,
+          requested: input.qty,
+          available: availability?.available ?? "0.000000",
+        },
+      );
+    }
     const id = generateUuidV7();
     await store.insertReservation({
       id,

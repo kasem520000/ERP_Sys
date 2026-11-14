@@ -571,3 +571,14 @@ export class TransitExceptionStateError extends DomainError {
     super("TRANSIT_EXCEPTION_INVALID", message);
   }
 }
+
+/** The over-reservation guard (PHASE-043 audit item 5): a new reservation
+ * may never take the item-warehouse's reserved pool beyond its available
+ * stock (pickable bins + the unbinned fallback − the ACTIVE non-expired
+ * reservations) — fail-closed at the single creation choke point, never a
+ * silent over-book. */
+export class ReservationQtyExceedsAvailableError extends DomainError {
+  constructor(message: string, details?: Record<string, unknown>) {
+    super("RESERVATION_QTY_EXCEEDS_AVAILABLE", message, details);
+  }
+}

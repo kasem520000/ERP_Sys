@@ -1,5 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { sql } from "drizzle-orm";
+
 import { withTenant } from "../../infra/db/tenant-context";
 import {
   I_ACTOR,
@@ -28,6 +30,16 @@ let sweepItem: string;
 beforeAll(async () => {
   fixture = await setupInventoryFixture();
   sweepItem = await ensureInventoryItem("INV-RESV-SWEEP", "Reservation sweep probe");
+  // PHASE-043 audit item 5: reservation creation now fails closed without
+  // stock at the reserved warehouse (the over-reservation guard) — the
+  // sweep's PURPOSE is the expiry state machine, so its probe item carries
+  // a standing stock row at warehouseMain (the backfill-spec pattern).
+  await withTenant(TENANT_I, async (tx) => {
+    await tx.execute(sql`
+      INSERT INTO item_stock (id, tenant_id, item_id, warehouse_id, qty, avg_cost)
+      VALUES (gen_random_uuid(), erp.current_tenant_id(), ${sweepItem}, ${fixture.warehouseMain}, 10000, 1.000000)
+      ON CONFLICT DO NOTHING`);
+  });
 });
 
 function pastDue(): string {

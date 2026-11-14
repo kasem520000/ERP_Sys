@@ -4,6 +4,7 @@ import { Decimal } from "@erp/domain-core";
 import { AuditService } from "../../audit/api/audit";
 import { ReservationService } from "../../inventory/application/reservation-service";
 import * as wmsStore from "../../inventory/infrastructure/wms-store";
+import * as invStore from "../../inventory/infrastructure/inventory.store";
 import { ReservationPolicyError } from "../domain/manufacturing-errors";
 
 /**
@@ -76,16 +77,26 @@ export class ReservationPolicyService {
     const method = strategyRow?.method ?? "FIFO";
 
     // The strategy-ordered availability walk (PHASE-044's own query —
-    // AVAILABLE, tenant-owned, qty > 0).
+    // AVAILABLE, tenant-owned, qty > 0) + the reserved-pool subtraction
+    // (the 043-audit item-5 fix: the raw walk ignored the ACTIVE
+    // reservations already drawn against the same stock — the early
+    // message now names the honest pool; the creation choke point in
+    // ReservationService.create enforces the same invariant under the
+    // item_stock row lock either way).
     const rows = await wmsStore.listPickableRows({
       warehouseId: input.warehouseId,
       itemId: input.itemId,
       method,
     });
-    const available = rows.reduce((sum, row) => sum.plus(new Decimal(row.qty)), new Decimal(0));
+    const reserved = new Decimal(
+      (await invStore.reservedQty(input.itemId, input.warehouseId)) ?? "0",
+    );
+    const available = rows
+      .reduce((sum, row) => sum.plus(new Decimal(row.qty)), new Decimal(0))
+      .minus(reserved);
     if (available.lessThan(qty)) {
       throw new ReservationPolicyError(
-        `the ${method} walk cannot cover ${qty.toFixed(6)} of item ${input.itemId} at warehouse ${input.warehouseId} — pickable ${available.toFixed(6)} (AVAILABLE, tenant-owned rows only)`,
+        `the ${method} walk cannot cover ${qty.toFixed(6)} of item ${input.itemId} at warehouse ${input.warehouseId} — pickable ${rows.reduce((sum, row) => sum.plus(new Decimal(row.qty)), new Decimal(0)).toFixed(6)} (AVAILABLE, tenant-owned rows only) − reserved ${reserved.toFixed(6)} = available ${available.toFixed(6)}`,
         { itemId: input.itemId, warehouseId: input.warehouseId, requested: qty.toFixed(6), available: available.toFixed(6), method },
       );
     }

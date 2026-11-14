@@ -111,7 +111,7 @@ async function mtoChain(qty: string): Promise<{
 }> {
   const f = spec.fixture!;
   const s = spec.items!;
-  // The material for the MO's consumption.
+  // The material for the MO's consumption…
   await stock.manualReceipt({
     itemId: s.lfMat,
     warehouseId: f.warehouseRaw,
@@ -121,6 +121,21 @@ async function mtoChain(qty: string): Promise<{
     counterAccountId: null,
     valueDate: "2026-03-01",
     batchNo: `M-LF-MAT-${Date.now() % 100000}`,
+    batchExpiry: "2027-01-01",
+    actorId: M_ACTOR,
+  });
+  // …and 5 at the FG warehouse — the second line's OWN coverage draws on
+  // it (the over-reservation guard requires real stock at the reserved
+  // warehouse — the 043-audit item-5 law).
+  await stock.manualReceipt({
+    itemId: s.lfMat,
+    warehouseId: f.warehouseFg,
+    qty: "5",
+    unitCost: "4.000000",
+    reason: "COUNT_GAIN",
+    counterAccountId: null,
+    valueDate: "2026-03-01",
+    batchNo: `M-LF-MAT-FG-${Date.now() % 100000}`,
     batchExpiry: "2027-01-01",
     actorId: M_ACTOR,
   });

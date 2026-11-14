@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 
-import { generateUuidV7 } from "@erp/domain-core";
+import { Decimal, generateUuidV7 } from "@erp/domain-core";
 
 import { type TenantDb } from "../../../infra/db/client";
 import { requireTenantContext } from "../../../infra/db/tenant-context";
@@ -1721,4 +1721,76 @@ export async function findOpeningPeriod(): Promise<
     endDate: string;
     status: string;
   }[])[0];
+}
+
+/**
+ * The reservation-capacity read (PHASE-043 audit item 5): the honest
+ * availability a NEW reservation may draw on at one (item, warehouse) —
+ * pickable bins (AVAILABLE, tenant-owned, qty > 0) + the unbinned
+ * fallback (item_stock − every bin row of the item-warehouse, floored at
+ * 0 — quarantined bins never count, stock outside bins always does) −
+ * the ACTIVE non-expired reserved pool. Undefined when no item_stock row
+ * exists (nothing was ever received there — nothing to reserve).
+ */
+export async function reservationAvailability(
+  itemId: string,
+  warehouseId: string,
+): Promise<
+  | { pickableBins: string; unbinned: string; reserved: string; available: string }
+  | undefined
+> {
+  const rows = await tenantTx().execute(sql`
+    SELECT
+      COALESCE((SELECT SUM(bc.qty) FROM bin_contents bc
+                WHERE bc.warehouse_id = ${warehouseId} AND bc.item_id = ${itemId}
+                  AND bc.owner_partner_id IS NULL AND bc.status = 'AVAILABLE' AND bc.qty > 0), 0)::text AS "pickableBins",
+      COALESCE(s.qty, 0)::text AS stock,
+      COALESCE((SELECT SUM(bc2.qty) FROM bin_contents bc2
+                WHERE bc2.warehouse_id = ${warehouseId} AND bc2.item_id = ${itemId}), 0)::text AS binned,
+      COALESCE((SELECT SUM(r.qty) FROM stock_reservations r
+                WHERE r.warehouse_id = ${warehouseId} AND r.item_id = ${itemId}
+                  AND r.status = 'ACTIVE' AND (r.expires_at IS NULL OR r.expires_at > now())), 0)::text AS reserved
+    FROM item_stock s
+    WHERE s.warehouse_id = ${warehouseId} AND s.item_id = ${itemId}
+    LIMIT 1
+  `);
+  const row = (rows.rows as unknown as {
+    pickableBins: string;
+    stock: string;
+    binned: string;
+    reserved: string;
+  }[])[0];
+  if (row === undefined) return undefined;
+  const unbinned = Decimal.max(
+    new Decimal(row.stock).minus(new Decimal(row.binned)),
+    new Decimal(0),
+  );
+  const available = new Decimal(row.pickableBins)
+    .plus(unbinned)
+    .minus(new Decimal(row.reserved));
+  return {
+    pickableBins: row.pickableBins,
+    unbinned: unbinned.toFixed(6),
+    reserved: row.reserved,
+    available: available.toFixed(6),
+  };
+}
+
+/**
+ * The reservation serialization point (PHASE-043 audit item 5): the
+ * item_stock row lock — every reservation creation locks it BEFORE
+ * reading the reserved pool, so two concurrent reserves of the same
+ * stock serialize: the loser re-reads the winner's committed pool inside
+ * its own lock and fails closed. Undefined when the row does not exist.
+ */
+export async function lockItemStockRow(
+  itemId: string,
+  warehouseId: string,
+): Promise<{ qty: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT qty::text AS qty FROM item_stock
+    WHERE warehouse_id = ${warehouseId} AND item_id = ${itemId}
+    LIMIT 1 FOR UPDATE
+  `);
+  return (rows.rows as unknown as { qty: string }[])[0];
 }
