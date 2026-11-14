@@ -721,6 +721,29 @@ export async function findMrpSuggestionById(id: string): Promise<MrpSuggestionRo
   return (rows.rows as unknown as MrpSuggestionRow[])[0];
 }
 
+/**
+ * The LOCKED read (the 043-audit item-3 fix): SELECT … FOR UPDATE inside
+ * the caller's ambient UoW. The suggestion-conversion races (accept vs
+ * accept, accept vs dismiss, accept vs the re-run supersede) serialize on
+ * this lock: the second transaction blocks at the read until the first
+ * commits, then sees the post-commit state (an ACCEPTED row replays its
+ * stored document — INV-030's idempotent law — instead of creating a
+ * second one; a DISMISSED/SUPERSEDED row is the typed state error). The
+ * unique index on the converted document is the doc→suggestion anchor
+ * (ONE document claimed by ONE suggestion) — it does NOT by itself
+ * prevent two different documents for one suggestion; the lock and the
+ * status guard do.
+ */
+export async function findMrpSuggestionByIdForUpdate(
+  id: string,
+): Promise<MrpSuggestionRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${MRP_SUGGESTION_COLUMNS} FROM mrp_suggestions WHERE id = ${id}
+    LIMIT 1 FOR UPDATE
+  `);
+  return (rows.rows as unknown as MrpSuggestionRow[])[0];
+}
+
 export async function listMrpSuggestions(filter: {
   runId?: string;
   warehouseId?: string;
@@ -793,8 +816,13 @@ export async function patchMrpSuggestion(input: {
   convertedDocId?: string | null;
   supersededAt?: boolean;
   supersededByRunId?: string | null;
-}): Promise<void> {
-  await tenantTx().execute(sql`
+  /** The optimistic guard (the 043-audit item-3 fix): the update only
+   * lands while the row still carries this status; 0 rows updated → the
+   * caller re-reads and replays/errors per the post-state. Belt-and-
+   * braces behind the FOR UPDATE lock. */
+  requireStatus?: string;
+}): Promise<boolean> {
+  const rows = await tenantTx().execute(sql`
     UPDATE mrp_suggestions SET
       status = COALESCE(${input.status ?? null}, status),
       dismissed_reason = CASE WHEN ${input.dismissedReason === undefined} THEN dismissed_reason
@@ -814,7 +842,10 @@ export async function patchMrpSuggestion(input: {
                                   ELSE ${input.supersededByRunId ?? null} END,
       version = version + 1, updated_at = now()
     WHERE id = ${input.id}
+      AND (${input.requireStatus ?? null}::text IS NULL OR status = ${input.requireStatus ?? null})
+    RETURNING id
   `);
+  return (rows.rows as unknown as { id: string }[]).length > 0;
 }
 
 /** The re-run coverage netting: supersede every still-SUGGESTED

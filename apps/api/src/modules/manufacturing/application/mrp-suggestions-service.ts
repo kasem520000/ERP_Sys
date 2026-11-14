@@ -90,7 +90,12 @@ export class MrpSuggestionsService {
   // -- dismissal (BR-079: the reason is not optional) ----------------------------------
 
   async dismiss(id: string, reason: string, actorId: string | null): Promise<store.MrpSuggestionRow> {
-    const suggestion = await this.find(id);
+    // The LOCKED read (the 043-audit item-3 fix): accept-vs-dismiss races
+    // serialize here — the loser sees the winner's post-commit state.
+    const suggestion = await store.findMrpSuggestionByIdForUpdate(id);
+    if (suggestion === undefined) {
+      throw new MrpSuggestionNotFoundError(id);
+    }
     if (suggestion.status !== "SUGGESTED") {
       throw new MrpSuggestionStateError(id, suggestion.status, "dismiss");
     }
@@ -98,13 +103,19 @@ export class MrpSuggestionsService {
     if (trimmed.length < 1 || trimmed.length > 300) {
       throw new MrpDismissReasonRequiredError();
     }
-    await store.patchMrpSuggestion({
+    const updated = await store.patchMrpSuggestion({
       id,
       status: "DISMISSED",
       dismissedReason: trimmed,
       dismissedAt: true,
       dismissedBy: actorId,
+      requireStatus: "SUGGESTED",
     });
+    if (!updated) {
+      // The state moved under us (cannot happen under the lock — the
+      // honest belt-and-braces): re-read and surface the typed state.
+      throw new MrpSuggestionStateError(id, (await this.find(id)).status, "dismiss");
+    }
     await this.audit.record({
       action: "manufacturing.mrp.suggestion_dismissed",
       entityType: "mrp_suggestion",
@@ -118,7 +129,19 @@ export class MrpSuggestionsService {
   // -- acceptance (INV-030: idempotent, exactly one document) --------------------------
 
   async accept(id: string, actorId: string | null): Promise<ConversionResult> {
-    const suggestion = await this.find(id);
+    // The LOCKED read (the 043-audit item-3 fix): two concurrent accepts
+    // serialize on the row lock — the second blocks until the first
+    // commits, then reads the post-commit state and REPLAYS the stored
+    // conversion (INV-030's idempotent law) instead of creating a second
+    // document. Pre-fix, both transactions read SUGGESTED, both created a
+    // document, and the last patch overwrote the link — two documents,
+    // one orphaned, no error (the unique index only anchors the
+    // doc→suggestion direction: ONE document claimed by ONE suggestion;
+    // it never prevented two DIFFERENT documents for one suggestion).
+    const suggestion = await store.findMrpSuggestionByIdForUpdate(id);
+    if (suggestion === undefined) {
+      throw new MrpSuggestionNotFoundError(id);
+    }
 
     // INV-030 idempotent replay: an ACCEPTED suggestion returns its stored
     // conversion — the document link is honored as-is (a vanished document
@@ -163,12 +186,16 @@ export class MrpSuggestionsService {
         );
     }
 
-    // The suggestion-side link — the partial unique index
-    // (uq_mrp_suggestions_converted_doc) makes a double conversion a
-    // constraint failure even under a concurrent retry (the typed conflict
-    // below catches the 23505 for the honest error).
+    // The suggestion-side link. The serialization is the ROW LOCK above
+    // (this whole method rides the caller's one UoW — the document
+    // creation and the link commit or roll back TOGETHER); the guarded
+    // update (status still SUGGESTED) and the partial unique index
+    // (uq_mrp_suggestions_converted_doc — the doc→suggestion anchor:
+    // one document claimed by one suggestion) are the belt-and-braces.
+    // The 23505 catch stays for any residual path.
+    let linked: boolean;
     try {
-      await store.patchMrpSuggestion({
+      linked = await store.patchMrpSuggestion({
         id,
         status: "ACCEPTED",
         convertedDocType:
@@ -180,6 +207,7 @@ export class MrpSuggestionsService {
         convertedDocId: documentId,
         acceptedAt: true,
         acceptedBy: actorId,
+        requireStatus: "SUGGESTED",
       });
     } catch (error) {
       if (isUniqueViolation(error)) {
@@ -189,6 +217,21 @@ export class MrpSuggestionsService {
         );
       }
       throw error;
+    }
+    if (!linked) {
+      // The state moved under us (cannot happen under the lock — the
+      // belt-and-braces): the document creation rolls back with this
+      // throw (one UoW), and the honest error is the post-state.
+      const after = await store.findMrpSuggestionById(id);
+      if (after !== undefined && after.status === "ACCEPTED" && after.convertedDocId !== null) {
+        return {
+          suggestion: after,
+          documentType: after.convertedDocType as ConversionResult["documentType"],
+          documentId: after.convertedDocId,
+          replay: true,
+        };
+      }
+      throw new MrpSuggestionStateError(id, after?.status ?? "UNKNOWN", "accept");
     }
     await this.audit.record({
       action: "manufacturing.mrp.suggestion_accepted",
