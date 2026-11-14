@@ -51,7 +51,7 @@ interface Pair {
 
 const spec: {
   fixture?: MfgFixture;
-  pairs?: { p1: Pair; p2: Pair; p3: Pair; p4: Pair };
+  pairs?: { p1: Pair; p2: Pair; p3: Pair; p4: Pair; p5: Pair };
 } = {};
 
 async function ensureItem(sku: string, name: string): Promise<string> {
@@ -204,7 +204,16 @@ beforeAll(async () => {
     await ensureItem("M-CP-P4-CRAW", "Co-product order co-raw P4");
     const p4 = await wirePair({ tag: "P4", coHasBom: true });
 
-    spec.pairs = { p1, p2, p3, p4 };
+    // P5 — the SCOPE-EXPANSION pair (the round-3 edge): the operator
+    // scopes the PRODUCER ALONE; the co-product's own demand and its
+    // own recipe must still plan (its own items, same isolation rule).
+    await ensureItem("M-CP-P5-CO", "Co-product order co P5 (id-first)");
+    await ensureItem("M-CP-P5-MAIN", "Co-product order main P5");
+    await ensureItem("M-CP-P5-RAW", "Co-product order raw P5");
+    await ensureItem("M-CP-P5-CRAW", "Co-product order co-raw P5");
+    const p5 = await wirePair({ tag: "P5", coHasBom: true });
+
+    spec.pairs = { p1, p2, p3, p4, p5 };
 
     // The id-order assertion inputs (the swap the audit demanded).
     expect(p2.main < p2.co).toBe(true); // P2: main id first
@@ -379,6 +388,85 @@ describe("PHASE-043 audit round 2, item 4 — the co-product plans AFTER its pro
       const crawSug = live(p.craw);
       expect(crawSug).toHaveLength(1);
       expect(Number(crawSug[0]!.qty)).toBe(4);
+      const crawDemand = (await planning.listMrpDemandLines({ runId: result.run.id })).filter(
+        (row) => row.itemId === p.craw,
+      );
+      expect(crawDemand.map((row) => [row.demandKind, row.qty, row.parentItemId])).toContainEqual([
+        "BOM_EXPLOSION",
+        "4.000000",
+        p.co,
+      ]);
+    });
+  });
+
+  it("THE SCOPE EXPANSION (the round-3 edge): the operator scopes the PRODUCER ALONE — the closure carries the co-product AND its own recipe's members; the co-product's uncovered demand plans (make 4) and its component explodes (PO 4), never silently dropped", async () => {
+    const f = spec.fixture!;
+    const p = spec.pairs!.p5; // its own pair (the other tests' MPS rows persist)
+    await withTenant(TENANT_M, async () => {
+      // The producer's 10 (MPS @ 03-10) feeds the co-supply 10 at the
+      // same bucket; the co-product carries an ADDITIONAL 14-unit demand
+      // @ 03-12 — the P4 shape, but the run is scoped to the MAIN only.
+      await seedMps(p.main, "2026-03-10", "10");
+      await seedMps(p.co, "2026-03-12", "14");
+
+      const result = await mrpEngine.run({
+        warehouseId: f.warehouseFg,
+        bucketSize: "DAY",
+        horizonBuckets: 30,
+        runMode: "NET_CHANGE",
+        scopeItemIds: [p.main], // THE ROUND-3 CASE: the producer alone
+        asOfDate: "2026-03-01",
+        actorId: M_ACTOR,
+      });
+      expect(result.run.status).toBe("COMPLETED");
+
+      // The closure EXPANDED the operator's request (the item-2 law,
+      // now through the OUTPUT edge too): the co-product AND its own
+      // recipe's raw are planning members; the params keep the request.
+      expect(result.run.scopeItemIds).toEqual(
+        expect.arrayContaining([p.main, p.co, p.raw, p.craw]),
+      );
+      expect(result.run.params.requestedItemIds).toEqual([p.main]);
+
+      const live = (itemId: string) =>
+        result.suggestions.filter((row) => row.itemId === itemId && row.status === "SUGGESTED");
+
+      // The producer: MO 10 (unchanged).
+      expect(live(p.main)).toHaveLength(1);
+      expect(live(p.main)[0]!.suggestionType).toBe("PRODUCTION_ORDER");
+      expect(Number(live(p.main)[0]!.qty)).toBe(10);
+      // The producer's raw: PO 10 (the explosion at the release bucket).
+      expect(live(p.raw)).toHaveLength(1);
+      expect(Number(live(p.raw)[0]!.qty)).toBe(10);
+      // THE LAW (the round-3 scope expansion): the co-product's own MPS
+      // demand (14) is a closure member's demand — netted against the
+      // run's own co-supply (10) → its OWN make order for exactly the
+      // uncovered 4 at ITS due date 03-12. Pre-fix the suggestion itself
+      // existed (the closure carried the co as a supply-only member)
+      // but its component's demand vanished — the silent drop.
+      const coSug = live(p.co);
+      expect(coSug).toHaveLength(1);
+      expect(coSug[0]!.suggestionType).toBe("PRODUCTION_ORDER");
+      expect(Number(coSug[0]!.qty)).toBe(4);
+      expect(coSug[0]!.dueDate).toBe("2026-03-12");
+      // …and the co-product's OWN component explodes for exactly the 4
+      // (its recipe is a full planning member of the expanded closure —
+      // pre-fix craw never joined the closure and its demand was pushed
+      // onto a walk that never visited it: PO 4 was the EXPECTATION,
+      // EMPTY was the reality).
+      const crawSug = live(p.craw);
+      expect(crawSug).toHaveLength(1);
+      expect(crawSug[0]!.suggestionType).toBe("PURCHASE_ORDER");
+      expect(Number(crawSug[0]!.qty)).toBe(4);
+      // The evidence: the co-supply line and the craw explosion demand
+      // row (parent = the CO, not the main) both ride the snapshot.
+      const coSupply = (await planning.listMrpSupplyLines({ runId: result.run.id })).filter(
+        (row) => row.itemId === p.co,
+      );
+      expect(coSupply.map((row) => [row.supplyKind, row.qty])).toContainEqual([
+        "CO_PRODUCT",
+        "10.000000",
+      ]);
       const crawDemand = (await planning.listMrpDemandLines({ runId: result.run.id })).filter(
         (row) => row.itemId === p.craw,
       );

@@ -250,12 +250,23 @@ export class MrpEngineService {
   /**
    * The planning closure (the 043-audit item-2 fix): scope ∪ the transitive
    * BOM components ∪ every substitute of every substitutable line in the
-   * reachable subgraph ∪ the co-product outputs of the reachable BOMs.
-   * Co-product outputs join as SUPPLY-ONLY members (this run's make orders
-   * add their supply — no further traversal: an output generates no demand
-   * here). Substitutes traverse further (a manufactured substitute's own
-   * components are demanded when it is planned). Reads the same graph the
-   * walk will read — one UoW, one consistent view.
+   * reachable subgraph ∪ the co-product outputs of the reachable BOMs —
+   * and the outputs are TRAVERSED like any member (the round-3 scope
+   * expansion). Co-product outputs are FULL planning members, not
+   * supply-only rows: a co-product with its own BOM and independent
+   * demand is a PRODUCER in its own right — its make order demands ITS
+   * components, so its recipe's members (components, substitutes, its
+   * own co-outputs) join the closure too (pre-fix the "supply-only: no
+   * traversal" rule silently dropped them: the operator scoped the
+   * producer alone, the co-product's own suggestion existed, but its
+   * components' explosion demand landed on items the walk never visited
+   * — the demand vanished, exactly the item-2 silent-drop family through
+   * the output edge). Substitutes traverse further (a manufactured
+   * substitute's own components are demanded when it is planned). The
+   * leveling's OUTPUT edge (round-2 item-4) still guarantees every
+   * producer nets before the co-products it feeds — traversal order in
+   * the closure never affects the plan. Reads the same graph the walk
+   * will read — one UoW, one consistent view.
    */
   private async scopeClosure(scopeItemIds: readonly string[]): Promise<string[]> {
     const graphRows = await store.loadActiveBomGraph();
@@ -286,7 +297,15 @@ export class MrpEngineService {
         outputsCache.set(node.bomId, outputs);
       }
       for (const output of outputs) {
-        closure.add(output.itemId); // supply-only: no traversal
+        // A full planning member (the round-3 scope expansion): traverse
+        // it — its own recipe's members join the plan (the Set guard
+        // keeps the traversal finite; a degenerate mutual-production
+        // pair still fails closed in the LEVELING with the typed
+        // BomGraphCycleError, never here).
+        if (!closure.has(output.itemId)) {
+          closure.add(output.itemId);
+          queue.push(output.itemId);
+        }
       }
     }
     return [...closure];
