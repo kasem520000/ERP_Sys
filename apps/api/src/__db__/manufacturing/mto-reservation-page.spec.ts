@@ -241,7 +241,7 @@ describe("PHASE-043 audit round 3 — the reservation query limits (the settleme
     const s = spec.items!;
     // tx1 — the chain: the order, the linked completed MO (the holder
     // 10 ACTIVE), and the free stock the manuals will hold against.
-    const { salesOrderId, fgLineId, holderId } = await withTenant(TENANT_M, async () => {
+    const { salesOrderId, holderId } = await withTenant(TENANT_M, async () => {
       const { salesOrderId, fgLineId } = await issuedOrder(s.a, "10");
       await stock.manualReceipt({
         itemId: s.a,

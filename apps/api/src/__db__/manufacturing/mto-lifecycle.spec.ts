@@ -726,7 +726,7 @@ describe("PHASE-043 audit item 4 — the MTO chain from sales order to delivery"
       expect(after).toHaveLength(0);
       // The produced 10 are FREE stock: availability recovers them all.
       const availability = await invStore.reservationAvailability(deadFg, f.warehouseFg);
-      expect(Number(availability.available)).toBe(10);
+      expect(availability!.available).toBe("10.000000");
 
       // The control: the COMPLETION itself was never blocked by the dead
       // link (the MO's own lifecycle is the production side's business —

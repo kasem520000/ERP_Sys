@@ -410,7 +410,7 @@ describe("G-48 tolling round trip (stock-at-processor)", () => {
 // =====================================================================================
 
 describe("G-49 MTO completion (the reservation chain)", () => {
-  it("golden: the linked sales line's FG is hard-reserved at the MO's actual cost", async () => {
+  it("golden: the linked sales line's FG is availability-reserved at the MO's actual cost (the soft model — an ATP-level hold, never a physical pick lock; the hard-vs-soft POLICY choice stays open, RISK-032)", async () => {
     const f = spec.fixture!;
     const s = spec.items!;
     await withTenant(TENANT_M, async () => {
@@ -589,6 +589,115 @@ describe("G-49 MTO completion (the reservation chain)", () => {
       await expect(attempt).rejects.toBeInstanceOf(MtoLinkInvalidError);
       // Zero residue: the order carries no link.
       expect((await orders.find(order.id)).salesOrderLineId).toBeNull();
+    });
+  });
+
+  it("THE ROUND-3 G-49 CORRECTION PROBE: the reservation holds the ACTUAL completed qty, never the PLANNED qty (planned 12, completed 9 — the ACTIVE holder holds 9; the golden row's original 'planned qty' wording was wrong, corrected in place 2026-11-14)", async () => {
+    const f = spec.fixture!;
+    await withTenant(TENANT_M, async () => {
+      // A DEDICATED FG item + BOM (the one-ACTIVE-per-item law — mtoFg's
+      // slot is taken by the golden above).
+      const uoms = await itemsStore.listUoms();
+      const pcs = uoms.find((u) => u.code === "PCS") ?? uoms[0]!;
+      const fg = await ensureItem(
+        `M-G49-ACT-${Date.now() % 100000}`,
+        "G-49 actual-vs-planned FG (round-3 probe)",
+      );
+      const mat = await ensureItem(
+        `M-G49-ACT-MAT-${Date.now() % 100000}`,
+        "G-49 actual-vs-planned material (round-3 probe)",
+      );
+      const draft = await boms.create({
+        itemId: fg,
+        outputUomId: pcs.id,
+        yieldPct: "100.0000",
+        note: "G-49 actual-vs-planned BOM (round-3 probe)",
+        noteAr: null,
+        actorId: M_ACTOR,
+        lines: [{ componentItemId: mat, qtyPerOutput: "1.000000", scrapPct: "0" }],
+      });
+      const active = await boms.activate(draft.id, { effectiveFrom: "2026-03-01", actorId: M_ACTOR });
+      await seedMaterial(mat, "12", "10.000000", `M-G49-ACT-M-${Date.now() % 100000}`);
+
+      const salesOrder = await salesStore.insertSalesOrder({
+        branchId: f.branchId,
+        customerId: f.customerId,
+        salesRepId: null,
+        warehouseId: f.warehouseFg,
+        quotationId: null,
+        orderDate: "2026-03-01",
+        expectedDate: "2026-03-15",
+        currencyCode: "SAR",
+        exchangeRate: null,
+        note: "G-49 actual-vs-planned demand (round-3 probe)",
+        noteAr: null,
+        actorId: null,
+        totalNet: "120.0000",
+        totalTax: "0.0000",
+        totalGross: "120.0000",
+        lines: [
+          {
+            itemId: fg,
+            description: "G-49 actual-vs-planned line",
+            descriptionAr: null,
+            qty: "12",
+            unitPrice: "10.000000",
+            discountAmount: "0.000000",
+            taxCodeId: f.taxCodeIds.notSubject,
+            netAmount: "120.0000",
+            taxAmount: "0.0000",
+            note: null,
+          },
+        ],
+      });
+      const salesLine = (await salesStore.listSalesOrderLines(salesOrder.id))[0]!;
+
+      const order = await orders.create({
+        branchId: f.branchId,
+        itemId: fg,
+        bomId: active.id,
+        plannedQty: "12", // PLANNED 12 …
+        plannedDate: "2026-03-10",
+        materialsWarehouseId: f.warehouseRaw,
+        fgWarehouseId: f.warehouseFg,
+        laborRate: "0",
+        overheadRate: "0",
+        costCenterId: null,
+        note: "G-49 actual-vs-planned order (round-3 probe)",
+        noteAr: null,
+        actorId: M_ACTOR,
+      });
+      await orders.linkSalesOrder(order.id, { salesOrderLineId: salesLine.id, actorId: M_ACTOR });
+      await orders.release(order.id, M_ACTOR);
+      await orders.start(order.id, M_ACTOR);
+      await orders.consume(order.id, {
+        lines: [{ itemId: mat, qty: "9" }],
+        consumedAt: "2026-03-10",
+        note: null,
+        noteAr: null,
+        actorId: M_ACTOR,
+      });
+      const completed = await orders.complete(order.id, {
+        actualQty: "9", // … but only 9 ACTUALLY made
+        completedAt: "2026-03-10",
+        actorId: M_ACTOR,
+      });
+      expect(completed.order.status).toBe("COMPLETED");
+      expect(completed.order.actualQty).toBe("9.000000");
+
+      // THE LAW: the ACTIVE holder carries the ACTUAL 9 — never the
+      // planned 12 (the golden row's original 'planned qty' wording,
+      // corrected in place 2026-11-14; the reservation's own audit note
+      // and the completion audit both carry the actual figure).
+      const invStore = await import("../../modules/inventory/infrastructure/inventory.store");
+      const holders = (await invStore.listReservations({
+        itemId: fg,
+        warehouseId: f.warehouseFg,
+        status: "ACTIVE",
+        limit: 100,
+      })).filter((row) => row.holderType === "PRODUCTION_ORDER" && row.holderId === order.id);
+      expect(holders).toHaveLength(1);
+      expect(holders[0]!.qty).toBe("9.000000");
     });
   });
 });

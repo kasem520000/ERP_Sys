@@ -583,7 +583,9 @@ manufacturing.mps.frozen_edit permission + reason, BR-078), the bill of resource
 capacity + supply feasibility against PHASE-042 work-center capacities — NOT finite scheduling),
 the ATP/CTP service consumed by sales order lines (hard exclusions — quarantined, reserved and
 consignment-owned stock never promise, BR-080), the MTO linkage (production order ↔ sales line
-with a hard reservation — G-49), and the contract manufacturing tolling round trip
+with the AVAILABILITY reservation — G-49, the soft model; wording corrected in place
+2026-11-14, audit round 3 — the original said "a hard reservation"), and the contract
+manufacturing tolling round trip
 (stock-at-processor ledger + the conversion-service PO through the 038 path — G-48). +11 tables —
 the catalog count moves 261 → 272. +3 CoA purposes (1420 TOLLING_MATERIALS · 2136
 TOLLING_CONVERSION_PAYABLE · 5126 TOLLING_YIELD_LOSS — the 0026 additive-marker pattern).
