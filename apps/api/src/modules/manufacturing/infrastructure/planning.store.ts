@@ -1400,15 +1400,34 @@ export async function findSalesOrderById(orderId: string): Promise<
 }
 
 /** The linked line's sales-order status (the MTO dead-line guard — the
- * round-3 probe): the completion must never create the availability
- * holder for a line whose order can no longer ship (CANCELLED/CLOSED).
- * Undefined when the line (or its order) no longer exists — treated as
- * dead by the caller (a ghost line ships nothing either). */
+ * round-3 probe) — a LOCKING read (the round-4 serialization protocol):
+ * `FOR UPDATE OF o` takes the sales_orders HEADER row lock and holds it
+ * to the caller's UoW commit, making that row the serialization point
+ * between the completion and the order's terminations (cancel/close lock
+ * the same row FIRST through the sales store's own locked header read):
+ * no termination can commit between this read and the holder's creation,
+ * and a termination that already holds the row blocks this read until
+ * its commit — the read then returns the POST-termination status under
+ * PostgreSQL's READ COMMITTED re-evaluation, and the guard skips. The
+ * completion must never create the availability holder for a line whose
+ * order can no longer ship (CANCELLED/CLOSED). Undefined when the line
+ * (or its order) no longer exists — treated as dead by the caller (a
+ * ghost line ships nothing either).
+ *
+ * LOCK ORDER (why this is deadlock-free): the completion acquires its
+ * item_stock rows (the receipts) BEFORE this header lock and never
+ * touches the sales order's lines or reservations; a termination
+ * acquires the header FIRST and never touches item_stock (its release
+ * path updates reservation rows and line links only). Whoever holds the
+ * header can always finish — the wait-for graph around it is a star, so
+ * no cycle can form. */
 export async function findSalesOrderStatusByLine(lineId: string): Promise<string | undefined> {
   const rows = await tenantTx().execute(sql`
     SELECT o.status
     FROM sales_order_lines l JOIN sales_orders o ON o.id = l.order_id
-    WHERE l.id = ${lineId} LIMIT 1
+    WHERE l.id = ${lineId}
+    LIMIT 1
+    FOR UPDATE OF o
   `);
   return (rows.rows as unknown as { status: string }[])[0]?.status;
 }

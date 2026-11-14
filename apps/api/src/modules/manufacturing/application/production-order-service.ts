@@ -1115,18 +1115,34 @@ export class ProductionOrderService {
     // pick. BEFORE the QC hold so the policy walk sees the available
     // stock (a gated batch releases later and the hold is already
     // recorded).
-    // THE DEAD-LINE GUARD (the round-3 probe): the linked line's order
-    // may have died (CANCELLED/CLOSED) between the DRAFT-time link and
-    // this completion — a dead order ships nothing, so NO holder is
-    // created for it: the made-for-order stock lands FREE (the same
-    // disposition the order's cancel/close release gives holders that
-    // already existed; the order-side terminations never see a holder
-    // that post-dates them). Pre-fix the holder was created for the
-    // dead line regardless and NOBODY could ever settle it — no
-    // delivery can post for a cancelled order (deliveries reference
-    // ISSUED orders only) and the cancel's release had already run
-    // before the holder existed: an ACTIVE row netting availability
+    // THE DEAD-LINE GUARD (the round-3 probe) + THE ROUND-4 SERIALIZATION
+    // PROTOCOL: the linked line's order may have died (CANCELLED/CLOSED)
+    // between the DRAFT-time link and this completion — a dead order ships
+    // nothing, so NO holder is created for it: the made-for-order stock
+    // lands FREE (the same disposition the order's cancel/close release
+    // gives holders that already existed; the order-side terminations
+    // never see a holder that post-dates them). Pre-fix the holder was
+    // created for the dead line regardless and NOBODY could ever settle
+    // it — no delivery can post for a cancelled order (deliveries
+    // reference ISSUED orders only) and the cancel's release had already
+    // run before the holder existed: an ACTIVE row netting availability
     // FOREVER (the mto-lifecycle round-3 test's pre-fix proof).
+    // ROUND 4 (the owner's proof): the read itself is now the
+    // SERIALIZATION POINT — findSalesOrderStatusByLine locks the
+    // sales_orders header row (FOR UPDATE OF o) and holds it to THIS
+    // UoW's commit, while cancel/close lock the same row FIRST (the
+    // sales store's lockSalesOrderHeader, before their status check). No
+    // termination can commit inside this read→reserve window anymore:
+    // it blocks on the row until the holder's commit, and its release
+    // loop then sees the COMMITTED holder and settles it
+    // (created-then-settled); a termination that won the row first
+    // commits before this read returns, and the read returns its
+    // POST-commit status (the skip). The lock order is deadlock-free:
+    // this UoW already holds its item_stock rows (the receipts above)
+    // and never touches the sales order's lines/reservations, while a
+    // termination holds the header and never touches item_stock — the
+    // wait-for graph around the header row is a star (the race spec's
+    // smoke test races completion+cancel+close together to prove it).
     let mtoReservationId: string | null = null;
     let mtoSkipReason: string | null = null;
     if (order.salesOrderLineId !== null) {

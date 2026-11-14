@@ -381,6 +381,32 @@ export async function findSalesOrderById(id: string): Promise<SalesOrderRow | un
   return (rows.rows as unknown as SalesOrderRow[])[0];
 }
 
+/**
+ * The LOCKED header read (the round-4 serialization protocol): SELECT …
+ * FOR UPDATE on the sales_orders header row, held to the caller's UoW
+ * commit. The order's terminations (cancel/close) acquire THIS lock
+ * FIRST — before their status check, their status write, and their
+ * reservation release — so they serialize against each other AND against
+ * the MTO completion's dead-line guard read (the planning store's
+ * findSalesOrderStatusByLine locks the same row, from the completion
+ * side, between the FG receipt and the holder creation). A termination
+ * that waits here unblocks on the other side's commit and sees its
+ * post-commit status: the loser of cancel-vs-close fails with the typed
+ * state error instead of overwriting the winner, and a completion that
+ * holds the row forces the termination's release loop to run AFTER the
+ * holder's commit — the release then sees the committed holder and
+ * settles it (never an orphan). LOCK ORDER: a termination acquires the
+ * header FIRST and never touches item_stock; the completion acquires
+ * item_stock (its receipts) BEFORE the header — the wait-for graph
+ * around the header row is a star, so no deadlock cycle can form.
+ */
+export async function lockSalesOrderHeader(id: string): Promise<SalesOrderRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ORDER_COLUMNS} FROM sales_orders WHERE id = ${id} LIMIT 1 FOR UPDATE
+  `);
+  return (rows.rows as unknown as SalesOrderRow[])[0];
+}
+
 export async function listSalesOrders(filter: {
   status?: string;
   customerId?: string;

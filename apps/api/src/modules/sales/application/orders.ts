@@ -378,7 +378,21 @@ export class SalesOrderService {
   }
 
   async close(id: string, actorId: string | null) {
-    const order = await this.find(id);
+    // THE ROUND-4 SERIALIZATION PROTOCOL: the locked header read FIRST —
+    // the sales_orders header row is the serialization point between the
+    // order's terminations (cancel/close — mutually, through this lock)
+    // and the MTO completion's dead-line guard read (the planning store's
+    // findSalesOrderStatusByLine locks the same row from the completion
+    // side). Holding it from BEFORE the status check to the UoW's commit
+    // means: a completion that already passed its guard read has its
+    // holder COMMITTED before this close's release loop runs (the loop
+    // sees it and releases it — created-then-settled, never an orphan);
+    // a close that gets here first forces the completion's guard read to
+    // wait and read the post-close status (LINKED_ORDER_CLOSED — the
+    // holder is never created); and a racing cancel fails with the typed
+    // state error here instead of overwriting the winner's status.
+    const order = await store.lockSalesOrderHeader(id);
+    if (order === undefined) throw new SalesOrderNotFoundError(id);
     if (order.status !== "ISSUED") {
       throw new SalesDocumentStateError(
         `sales order ${id} is ${order.status} — only ISSUED orders close`,
@@ -396,7 +410,16 @@ export class SalesOrderService {
   }
 
   async cancel(id: string, reason: string, actorId: string | null) {
-    const order = await this.find(id);
+    // THE ROUND-4 SERIALIZATION PROTOCOL (the close comment's contract,
+    // verbatim): the locked header read FIRST — the row is shared with
+    // the completion's dead-line guard and with every other termination.
+    // Pre-fix this was a plain read: a cancel could commit inside the
+    // completion's guard-read→holder-creation window (the owner's round-4
+    // proof — the order ended CANCELLED with an ACTIVE MTO holder nobody
+    // could ever settle), and a racing close could overwrite the cancel's
+    // status (both effects landed). The lock closes both doors.
+    const order = await store.lockSalesOrderHeader(id);
+    if (order === undefined) throw new SalesOrderNotFoundError(id);
     if (order.status === "CLOSED" || order.status === "CANCELLED") {
       throw new SalesDocumentStateError(
         `sales order ${id} is ${order.status} — only open orders cancel`,
