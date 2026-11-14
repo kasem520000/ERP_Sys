@@ -51,6 +51,13 @@ function isoDate(date: string, what: string): string {
   return date;
 }
 
+/** An integer query param with a fallback (parseInt — exact integer
+ * parsing, never float rounding — ADR-0009's blanket law). */
+function intParam(value: number | undefined, fallback: number): number {
+  const parsed = Number.parseInt(String(value ?? fallback), 10);
+  return Number.isNaN(parsed) ? fallback : parsed;
+}
+
 function addDaysIso(date: string, days: number): string {
   // Exact UTC-midnight arithmetic (date-only strings parse at 00:00Z —
   // the day multiple needs no rounding; ADR-0009's decimal law is about
@@ -304,11 +311,29 @@ export class ShiftService {
     return { cleared };
   }
 
+  /** THE PAGINATED GRID READ (the joint review round, 2026-11-15): the
+   * grid is bounded per page, and the page carries `total` + `hasMore`
+   * — the EXPLICIT truncation signal. Pre-fix the read was a silent
+   * LIMIT 5000: a full-year grid for 200 employees (73,200 cells)
+   * returned 5,000 rows with NO indication anything was lost, and NO
+   * way to retrieve the rest. Now a caller walks `page` until
+   * `hasMore` flips false and retrieves EVERY result; the default page
+   * size stays a sane 500, the ceiling 5,000 per page. */
   async readGrid(input: {
     from: string;
     to: string;
     employeeIds?: readonly string[];
-  }): Promise<store.RosterCellRow[]> {
+    /** 1-based; default 1. */
+    page?: number;
+    /** default 500, max 5000. */
+    pageSize?: number;
+  }): Promise<{
+    rows: store.RosterCellRow[];
+    page: number;
+    pageSize: number;
+    total: number;
+    hasMore: boolean;
+  }> {
     isoDate(input.from, "from");
     isoDate(input.to, "to");
     if (input.to < input.from) {
@@ -319,12 +344,29 @@ export class ShiftService {
         `the grid range is too wide (max ${MAX_GRID_DAYS} days): ${input.from} → ${input.to}`,
       );
     }
-    return store.listRosterCells({
+    const page = Math.max(intParam(input.page, 1), 1);
+    const pageSize = Math.min(Math.max(intParam(input.pageSize, 500), 1), 5000);
+    // Sequential on the ambient tenant transaction (one connection —
+    // never two in-flight statements on it).
+    const rows = await store.listRosterCells({
       from: input.from,
       to: input.to,
       employeeIds: input.employeeIds,
-      limit: 5000,
+      limit: pageSize,
+      offset: (page - 1) * pageSize,
     });
+    const total = await store.countRosterCells({
+      from: input.from,
+      to: input.to,
+      employeeIds: input.employeeIds,
+    });
+    return {
+      rows,
+      page,
+      pageSize,
+      total,
+      hasMore: page * pageSize < total,
+    };
   }
 
   // -- the rotation pattern generator ----------------------------------------------

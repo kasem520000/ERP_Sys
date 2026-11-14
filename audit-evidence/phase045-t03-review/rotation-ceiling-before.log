@@ -1,0 +1,10 @@
+2026-11-14 22:08:59.536 UTC [19145] ERROR:  bind message has 26464 parameter formats but 0 parameters
+ ❯ src/__db__/hr/shifts-roster.spec.ts (5 tests | 1 failed | 4 skipped) 1409ms
+   ↓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (c) THE ROTATION GENERATOR: the Monday…Sunday pattern writes per employee × date (null = an explicit day off), PRESERVES manual cells, and is idempotent
+   × PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell 997ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__db__/hr/shifts-roster.spec.ts > PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell
+Caused by: error: bind message has 26464 parameter formats but 0 parameters
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Duration  8.53s (transform 502ms, setup 0ms, collect 1.13s, tests 1.41s, environment 0ms, prepare 55ms)

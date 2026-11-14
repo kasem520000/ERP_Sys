@@ -17,6 +17,13 @@ import { ShiftService } from "../../modules/hr/application/shift-service";
 
 export const TENANT_H = "7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a";
 export const H_ACTOR = "7a7a7a7a-0000-4000-8000-0000000007a1";
+/** THE ISOLATED BOUNDARY TENANT (the joint review round, 2026-11-15):
+ * the tenant-boundary test NEVER assumes a SHARED tenant (TENANT_A is
+ * seeded and used by many suites — its emptiness is nobody's
+ * guarantee) — the empty-world assertion answers on THIS dedicated
+ * tenant, empty BY CONSTRUCTION (nobody else writes to it), plus the
+ * by-ID checks against tenant H's own rows. */
+export const TENANT_H_RLS = "7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7c7c";
 
 const audit = new AuditService(new DrizzleAuditStore());
 
@@ -38,9 +45,10 @@ export async function setupHrFixture(): Promise<HrFixture> {
   await seedTenants(suClient as never);
   await suClient.query(
     `INSERT INTO tenants (id, name, name_ar, base_currency, country_code, timezone) VALUES
-       ($1, 'Tenant H (hr core)', 'المستأجر هـ', 'SAR', 'SA', 'Asia/Riyadh')
+       ($1, 'Tenant H (hr core)', 'المستأجر هـ', 'SAR', 'SA', 'Asia/Riyadh'),
+       ($2, 'Tenant H-RLS (hr boundary)', 'المستأجر هـ للفصل', 'SAR', 'SA', 'Asia/Riyadh')
      ON CONFLICT (id) DO NOTHING`,
-    [TENANT_H],
+    [TENANT_H, TENANT_H_RLS],
   );
   await suClient.query(
     `INSERT INTO users (id, email, full_name, password_hash, status) VALUES

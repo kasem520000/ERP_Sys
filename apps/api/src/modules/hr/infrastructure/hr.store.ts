@@ -209,6 +209,7 @@ export async function listRosterCells(filter: {
   to: string;
   employeeIds?: readonly string[];
   limit: number;
+  offset?: number;
 }): Promise<RosterCellRow[]> {
   const employeeFilter =
     filter.employeeIds === undefined || filter.employeeIds.length === 0
@@ -225,9 +226,35 @@ export async function listRosterCells(filter: {
     WHERE r.work_date >= ${filter.from}::date AND r.work_date <= ${filter.to}::date
       AND ${employeeFilter}
     ORDER BY r.work_date, e.code
-    LIMIT ${filter.limit}
+    LIMIT ${filter.limit} OFFSET ${filter.offset ?? 0}
   `);
   return rows.rows as unknown as RosterCellRow[];
+}
+
+/** The TOTAL row count of a grid read with the SAME filters (the
+ * pagination contract's explicit truncation signal — the joint review
+ * round, 2026-11-15: a page carries `total` and `hasMore`, so a caller
+ * can ALWAYS retrieve every result instead of silently losing rows
+ * beyond a fixed LIMIT). */
+export async function countRosterCells(filter: {
+  from: string;
+  to: string;
+  employeeIds?: readonly string[];
+}): Promise<number> {
+  const employeeFilter =
+    filter.employeeIds === undefined || filter.employeeIds.length === 0
+      ? sql`true`
+      : sql`r.employee_id IN (${sql.join(
+          filter.employeeIds.map((id) => sql`${id}::uuid`),
+          sql`, `,
+        )})`;
+  const rows = await tenantTx().execute<{ n: number }>(sql`
+    SELECT count(*)::int AS n
+    FROM shift_rotations r
+    WHERE r.work_date >= ${filter.from}::date AND r.work_date <= ${filter.to}::date
+      AND ${employeeFilter}
+  `);
+  return rows.rows[0]!.n;
 }
 
 /** The editor's cell write: INSERT-or-REPLACE, source = MANUAL (a
@@ -270,7 +297,25 @@ export async function deleteRosterCell(employeeId: string, workDate: string): Pr
 /** The rotation generator's bulk write: source = ROTATION, and an
  * existing MANUAL cell is PRESERVED (the DO UPDATE's WHERE arm — the
  * human's explicit edit beats the pattern). Returns the ids actually
- * written; the caller derives the preserved count. */
+ * written; the caller derives the preserved count.
+ *
+ * THE CHUNKED WRITE (the joint review round, 2026-11-15): a full run at
+ * the declared ceiling — 200 employees × 92 days = 18,400 cells —
+ * binds 5 parameters per row (id, employee, date, shift, created_by) =
+ * 92,000 bind parameters, FAR beyond PostgreSQL's wire-protocol limit
+ * of 65,535 per statement (the pre-fix single INSERT failed at the
+ * ceiling with a bind-message protocol error). The write is now
+ * CHUNKED: every statement stays under the limit, and every chunk
+ * rides the SAME ambient transaction (tenantTx) — the whole rotation
+ * still commits or rolls back as ONE unit. */
+/** The chunk ceiling: floor(65,535 / 5) = 13,107 rows per statement —
+ * 5 bind parameters per rotation row (id, employee, date, shift,
+ * created_by) against PostgreSQL's 65,535-parameter wire-protocol
+ * limit (a compile-time constant: the integer arithmetic is documented
+ * here, never done with float rounding at runtime — ADR-0009's
+ * blanket law). */
+const ROTATION_CHUNK_ROWS = 13_107;
+
 export async function bulkUpsertRotationCells(
   cells: readonly {
     employeeId: string;
@@ -280,18 +325,23 @@ export async function bulkUpsertRotationCells(
   }[],
 ): Promise<string[]> {
   if (cells.length === 0) return [];
-  const values = cells.map(
-    (cell) => sql`(${generateUuidV7()}, erp.current_tenant_id(), ${cell.employeeId},
-                   ${cell.workDate}::date, ${cell.shiftId}, 'ROTATION', NULL, ${cell.createdBy})`,
-  );
-  const rows = await tenantTx().execute<{ id: string }>(sql`
-    INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source, note, created_by)
-    VALUES ${sql.join(values, sql`, `)}
-    ON CONFLICT ("tenant_id", "employee_id", "work_date") DO UPDATE SET
-      shift_id = EXCLUDED.shift_id, source = 'ROTATION', updated_at = now(),
-      version = shift_rotations.version + 1
-    WHERE shift_rotations.source <> 'MANUAL'
-    RETURNING id
-  `);
-  return rows.rows.map((row) => row.id);
+  const written: string[] = [];
+  for (let start = 0; start < cells.length; start += ROTATION_CHUNK_ROWS) {
+    const chunk = cells.slice(start, start + ROTATION_CHUNK_ROWS);
+    const values = chunk.map(
+      (cell) => sql`(${generateUuidV7()}, erp.current_tenant_id(), ${cell.employeeId},
+                     ${cell.workDate}::date, ${cell.shiftId}, 'ROTATION', NULL, ${cell.createdBy})`,
+    );
+    const rows = await tenantTx().execute<{ id: string }>(sql`
+      INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source, note, created_by)
+      VALUES ${sql.join(values, sql`, `)}
+      ON CONFLICT ("tenant_id", "employee_id", "work_date") DO UPDATE SET
+        shift_id = EXCLUDED.shift_id, source = 'ROTATION', updated_at = now(),
+        version = shift_rotations.version + 1
+      WHERE shift_rotations.source <> 'MANUAL'
+      RETURNING id
+    `);
+    written.push(...rows.rows.map((row) => row.id));
+  }
+  return written;
 }

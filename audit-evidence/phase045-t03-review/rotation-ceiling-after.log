@@ -1,0 +1,5 @@
+ ✓ src/__db__/hr/shifts-roster.spec.ts (5 tests) 8586ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  8428ms
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Duration  14.80s (transform 440ms, setup 0ms, collect 1.09s, tests 8.59s, environment 0ms, prepare 55ms)

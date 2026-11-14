@@ -164,11 +164,24 @@ export class HrController {
     @Query("from") from: string,
     @Query("to") to: string,
     @Query("employeeId") employeeId?: string,
+    @Query("page") page?: string,
+    @Query("pageSize") pageSize?: string,
   ) {
     requireIdentity(request);
     const employeeIds =
       employeeId === undefined || employeeId === "" ? undefined : [employeeId];
-    return envelope(this.shifts.readGrid({ from, to, employeeIds }));
+    // The paginated read (the joint review round): every page carries
+    // total + hasMore — the explicit truncation signal — so a client
+    // can always retrieve the FULL grid.
+    return envelope(
+      this.shifts.readGrid({
+        from,
+        to,
+        employeeIds,
+        ...(page === undefined || page === "" ? {} : { page: Number(page) }),
+        ...(pageSize === undefined || pageSize === "" ? {} : { pageSize: Number(pageSize) }),
+      }),
+    );
   }
 
   @Put("roster/cell")
