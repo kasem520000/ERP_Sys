@@ -976,17 +976,37 @@ export async function linkBatchProduction(
   `);
 }
 
-/** Batch on-hand: Σ IN − Σ OUT over stock_moves (the append-only ledger IS the truth). */
-export async function batchOnHand(batchId: string): Promise<string> {
+/** Batch on-hand: Σ IN − Σ OUT over stock_moves (the append-only ledger IS
+ * the truth). With `warehouseId` the fold is scoped to THAT warehouse —
+ * the FEFO warehouse-scope law (the 045/043 joint review round): batch
+ * selection is computed on the ISSUING WAREHOUSE'S OWN stock, never the
+ * item's cross-warehouse balance. Without it the answer stays the
+ * batch's TOTAL across warehouses (the tracking surfaces' cross-section
+ * view). */
+export async function batchOnHand(batchId: string, warehouseId?: string): Promise<string> {
   const rows = await tenantTx().execute(sql`
-    SELECT COALESCE(SUM(CASE WHEN direction = 'IN' THEN qty ELSE -qty END), 0)::text AS q
-    FROM stock_moves WHERE batch_id = ${batchId}
+    SELECT COALESCE(SUM(CASE WHEN direction = 'IN' THEN qty ELSE -qty END), 0.000000)::text AS q
+    FROM stock_moves
+    WHERE batch_id = ${batchId}
+      AND (${warehouseId ?? null}::uuid IS NULL OR warehouse_id = ${warehouseId ?? null})
   `);
   return (rows.rows as unknown as { q: string }[])[0]!.q;
 }
 
-/** FEFO candidates: live batches with on-hand, earliest expiry first (BR-017). */
-export async function listFefoBatches(itemId: string): Promise<
+/** FEFO candidates: live batches with on-hand AT THE ISSUING WAREHOUSE,
+ * earliest expiry first (BR-017). THE WAREHOUSE-SCOPE LAW (the 045/043
+ * joint review round, 2026-11-15): pre-fix the on-hand fold spanned
+ * EVERY warehouse of the item, so an issue planned slices from batches
+ * that had stock ONLY at sister warehouses — the plan then died at the
+ * bin allocation (BinContentsShortError: the foreign batch has no bins
+ * at the issuing warehouse) or, binless, RECORDED stock_moves against a
+ * batch that does not exist locally. The fold now scopes to the issuing
+ * warehouse: a batch with no local stock is never listed, never picked,
+ * never written. */
+export async function listFefoBatches(
+  itemId: string,
+  warehouseId: string,
+): Promise<
   { id: string; batchNo: string; expiryDate: string | null; onHand: string }[]
 > {
   const rows = await tenantTx().execute(sql`
@@ -994,7 +1014,9 @@ export async function listFefoBatches(itemId: string): Promise<
     FROM item_batches b
     LEFT JOIN (
       SELECT batch_id, SUM(CASE WHEN direction = 'IN' THEN qty ELSE -qty END) AS on_hand
-      FROM stock_moves WHERE batch_id IS NOT NULL GROUP BY batch_id
+      FROM stock_moves
+      WHERE batch_id IS NOT NULL AND warehouse_id = ${warehouseId}
+      GROUP BY batch_id
     ) o ON o.batch_id = b.id
     WHERE b.item_id = ${itemId} AND b.status = 'ACTIVE' AND COALESCE(o.on_hand, '0') > 0
     ORDER BY b.expiry_date NULLS LAST, b.created_at

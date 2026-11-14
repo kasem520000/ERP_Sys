@@ -91,7 +91,13 @@ export class TrackingService {
     actorId: string | null;
   }) {
     const batch = await this.findBatch(input.batchId);
-    const onHand = await store.batchOnHand(batch.id);
+    // The write-off's on-hand is WAREHOUSE-LOCAL (the FEFO
+    // warehouse-scope law, the 045/043 joint review round): a batch
+    // whose remaining stock sits at sister warehouses is not written
+    // off HERE — the typed rejection names the local fold, and the
+    // other warehouses' stock stays on their books for their own
+    // disposition.
+    const onHand = await store.batchOnHand(batch.id, input.warehouseId);
     if (new Decimal(onHand).lte(0)) {
       const { BatchNotOnHandError } = await import("../domain/inventory-errors");
       throw new BatchNotOnHandError({ batchNo: batch.batchNo, onHand, requested: "any" });

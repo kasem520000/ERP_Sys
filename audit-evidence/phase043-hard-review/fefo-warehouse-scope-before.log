@@ -1,0 +1,76 @@
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+This user must also own the server process.
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+Data page checksums are disabled.
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+Success. You can now start the database server using:
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+ ❯ src/__db__/inventory/fefo-warehouse-scope.spec.ts (2 tests | 2 failed) 377ms
+   × FEFO batch selection is computed on the ISSUING WAREHOUSE's stock, never the cross-warehouse balance > THE CROSS-WAREHOUSE TRAP: 10 local (later expiry) + 5 in another warehouse (earlier expiry) — an issue of 10 at the local warehouse takes ALL 10 from the LOCAL batch (no BinContentsShortError, no move recorded against the foreign batch) 79ms
+     → bin contents hold 5.000000 of the item in this warehouse but 10.000000 were requested (INV-029)
+   × FEFO batch selection is computed on the ISSUING WAREHOUSE's stock, never the cross-warehouse balance > THE EXPLICIT-BATCH BOUND IS WAREHOUSE-LOCAL TOO: naming the foreign batch (5 across warehouses, 0 at the issuing one) is the typed BATCH_INSUFFICIENT_STOCK — never a cross-warehouse issue 68ms
+     → expected BinContentsShortError: bin contents hold … { …(2) } to match object { code: 'BATCH_INSUFFICIENT_STOCK' }
+(6 matching properties omitted from actual)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/__db__/inventory/fefo-warehouse-scope.spec.ts > FEFO batch selection is computed on the ISSUING WAREHOUSE's stock, never the cross-warehouse balance > THE CROSS-WAREHOUSE TRAP: 10 local (later expiry) + 5 in another warehouse (earlier expiry) — an issue of 10 at the local warehouse takes ALL 10 from the LOCAL batch (no BinContentsShortError, no move recorded against the foreign batch)
+BinContentsShortError: bin contents hold 5.000000 of the item in this warehouse but 10.000000 were requested (INV-029)
+ ❯ planIssue src/modules/inventory/application/movement-core.ts:953:13
+    951|     }
+    952|     if (binShortfall.gt(0) && !policyNegative) {
+    953|       throw new BinContentsShortError({
+       |             ^
+    954|         itemId: item.id,
+    955|         warehouseId: input.warehouseId,
+ ❯ StockService.manualIssue src/modules/inventory/application/stock-service.ts:265:18
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/inventory/fefo-warehouse-scope.spec.ts:102:19
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+ FAIL  src/__db__/inventory/fefo-warehouse-scope.spec.ts > FEFO batch selection is computed on the ISSUING WAREHOUSE's stock, never the cross-warehouse balance > THE EXPLICIT-BATCH BOUND IS WAREHOUSE-LOCAL TOO: naming the foreign batch (5 across warehouses, 0 at the issuing one) is the typed BATCH_INSUFFICIENT_STOCK — never a cross-warehouse issue
+AssertionError: expected BinContentsShortError: bin contents hold … { …(2) } to match object { code: 'BATCH_INSUFFICIENT_STOCK' }
+(6 matching properties omitted from actual)
+- Expected
++ Received
+- {
+-   "code": "BATCH_INSUFFICIENT_STOCK",
++ BinContentsShortError {
++   "code": "BIN_CONTENTS_SHORT",
+  }
+ ❯ src/__db__/inventory/fefo-warehouse-scope.spec.ts:176:5
+    174|     // move record). Post-fix the bound is the LOCAL fold: 0 at the
+    175|     // issuing warehouse → the typed rejection.
+    176|     await expect(
+       |     ^
+    177|       withTenant(TENANT_I, () =>
+    178|         stock.manualIssue({
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  21:57:39
+   Duration  6.71s (transform 762ms, setup 0ms, collect 1.54s, tests 377ms, environment 0ms, prepare 56ms)

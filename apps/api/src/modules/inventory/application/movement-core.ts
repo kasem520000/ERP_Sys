@@ -810,8 +810,10 @@ export async function planIssue(input: {
     }
   }
 
-  // Picking slices: serial units → explicit batch → FEFO → single.
-  const rawSlices = await resolveIssueSlices(item, input, qty);
+  // Picking slices: serial units → explicit batch → FEFO → single —
+  // every batch decision on the ISSUING warehouse's own stock (the
+  // warehouse-scope law, resolveIssueSlices).
+  const rawSlices = await resolveIssueSlices(item, input, qty, input.warehouseId);
   const slices: IssuePlan["slices"] = [];
   let totalValue = new Decimal(0);
   for (const raw of rawSlices) {
@@ -1077,11 +1079,21 @@ export async function applySerialFlips(
   }
 }
 
-/** Picking slices (BR-017 FEFO / BR-018 serial / explicit batch / single). */
+/** Picking slices (BR-017 FEFO / BR-018 serial / explicit batch / single).
+ * THE WAREHOUSE-SCOPE LAW (the 045/043 joint review round, 2026-11-15):
+ * every batch decision — the FEFO auto-pick AND the explicit-batch
+ * on-hand bound — is computed on the ISSUING WAREHOUSE'S OWN ledger
+ * fold, never on the item's cross-warehouse balance (pre-fix the FEFO
+ * list spanned every warehouse: an issue planned slices from batches
+ * with stock ONLY at sister warehouses and then died at the bin
+ * allocation with BinContentsShortError — or, binless, recorded moves
+ * against a batch that does not exist locally; the explicit-batch bound
+ * likewise accepted a foreign batch's cross-warehouse total). */
 async function resolveIssueSlices(
   item: { id: string; trackBatch: boolean; trackSerial: boolean },
   input: { batchId?: string | null; serialIds?: string[]; allowQuarantinedBatch?: boolean },
   qty: string,
+  warehouseId: string,
 ): Promise<{ qty: string; batchId: string | null; serialId: string | null }[]> {
   if (item.trackSerial) {
     return (input.serialIds ?? []).map((serialId) => ({
@@ -1106,7 +1118,10 @@ async function resolveIssueSlices(
     if (batch.status === "QUARANTINED" && input.allowQuarantinedBatch !== true) {
       throw new BatchQuarantinedError(batch.batchNo);
     }
-    const onHandBatch = await store.batchOnHand(batch.id);
+    // The on-hand bound is WAREHOUSE-LOCAL: a batch whose stock sits only
+    // at sister warehouses has 0 here — the typed rejection, never a
+    // cross-warehouse issue.
+    const onHandBatch = await store.batchOnHand(batch.id, warehouseId);
     if (compareExact(onHandBatch, qty) < 0) {
       throw new BatchNotOnHandError({
         batchNo: batch.batchNo,
@@ -1116,8 +1131,10 @@ async function resolveIssueSlices(
     }
     return [{ qty, batchId: batch.id, serialId: null }];
   }
-  // FEFO: earliest expiry first (BR-017), then creation order.
-  const fefo = await store.listFefoBatches(item.id);
+  // FEFO: earliest expiry first (BR-017), then creation order — over the
+  // batches with on-hand AT THE ISSUING WAREHOUSE (the warehouse-scope
+  // law above).
+  const fefo = await store.listFefoBatches(item.id, warehouseId);
   const slices: { qty: string; batchId: string | null; serialId: string | null }[] = [];
   let remaining = dec(qty);
   for (const batch of fefo) {
