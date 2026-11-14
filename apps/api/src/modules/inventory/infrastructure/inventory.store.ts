@@ -1452,6 +1452,28 @@ export async function consumeReservation(id: string): Promise<boolean> {
   return rows.rows.length > 0;
 }
 
+/** The PARTIAL consume (the 043-audit item-4 fix): retire `qty` of an
+ * ACTIVE reservation's coverage — the shipped amount. A remainder stays
+ * ACTIVE at (qty − shipped); a fully covered row flips CONSUMED keeping
+ * its reserved qty as the historical record (consumeReservation's
+ * semantic — the positive-qty check holds on both arms). One UPDATE:
+ * every SET expression reads the OLD row (PostgreSQL semantics). */
+export async function partiallyConsumeReservation(
+  id: string,
+  qty: string,
+): Promise<{ status: string; remainingQty: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    UPDATE stock_reservations SET
+      qty = CASE WHEN qty <= ${qty}::numeric THEN qty ELSE qty - ${qty}::numeric END,
+      status = CASE WHEN qty <= ${qty}::numeric THEN 'CONSUMED' ELSE status END,
+      consumed_at = CASE WHEN qty <= ${qty}::numeric THEN now() ELSE consumed_at END,
+      updated_at = now(), version = version + 1
+    WHERE id = ${id} AND status = 'ACTIVE'
+    RETURNING id, status, qty::text AS "remainingQty"
+  `);
+  return (rows.rows as unknown as { status: string; remainingQty: string }[])[0];
+}
+
 /** Active (non-expired) reserved qty per item-warehouse — the availability net. */
 export async function reservedQty(itemId: string, warehouseId: string): Promise<string> {
   const rows = await tenantTx().execute(sql`

@@ -1372,3 +1372,23 @@ export async function sumContractMfgValues(orderId: string): Promise<
   }
   return out;
 }
+
+/** The sales order header read for the MTO link's warehouse contract
+ * (043-audit item 4) — the manufacturing-side mirror of
+ * findSalesOrderLine: the planning module reads the sales surface through
+ * its own thin, named queries (never the sales store). */
+export async function findSalesOrderById(orderId: string): Promise<
+  | { id: string; warehouseId: string; status: string; customerId: string }
+  | undefined
+> {
+  const rows = await tenantTx().execute(sql`
+    SELECT o.id, o.warehouse_id AS "warehouseId", o.status, o.customer_id AS "customerId"
+    FROM sales_orders o WHERE o.id = ${orderId} LIMIT 1
+  `);
+  return (rows.rows as unknown as {
+    id: string;
+    warehouseId: string;
+    status: string;
+    customerId: string;
+  }[])[0];
+}

@@ -107,6 +107,39 @@ export class ReservationService {
   }
 
   /**
+   * The PARTIAL consume (the 043-audit item-4 fix): retire exactly `qty` of
+   * an ACTIVE reservation's coverage — the shipped amount. A remainder
+   * stays ACTIVE at (qty − shipped) for the still-undelivered portion; a
+   * fully covered row flips CONSUMED. The delivery path settles per
+   * DELIVERED line through this (never a whole-order release).
+   */
+  async partialConsume(
+    id: string,
+    qty: string,
+    actorId: string | null,
+  ): Promise<{ status: string; remainingQty: string }> {
+    const reservation = await this.find(id);
+    if (reservation.status !== "ACTIVE") {
+      throw new ReservationStateError(`reservation ${id} is not ACTIVE`);
+    }
+    if (!/^\d+(\.\d+)?$/.test(qty) || new Decimal(qty).lessThanOrEqualTo(0)) {
+      throw new ReservationStateError(`a partial consume needs a positive qty — got ${qty}`);
+    }
+    const result = await store.partiallyConsumeReservation(id, qty);
+    if (result === undefined) {
+      throw new ReservationStateError(`reservation ${id} is not ACTIVE`);
+    }
+    await this.audit.record({
+      action: "inventory.reservation_partially_consumed",
+      entityType: "stock_reservation",
+      entityId: id,
+      actorId: actorId ?? undefined,
+      after: { consumedQty: qty, remainingQty: result.remainingQty, status: result.status },
+    });
+    return result;
+  }
+
+  /**
    * Expiry sweep (§2.13): flip lapsed ACTIVE rows to RELEASED. Availability
    * ignores them either way (expires_at <= now()); the sweep keeps the
    * pool honest and the volume bounded. The scheduled job (and the nightly

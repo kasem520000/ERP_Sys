@@ -440,12 +440,15 @@ export async function findProductionOrderById(id: string): Promise<ProductionOrd
 export async function listProductionOrders(filter: {
   status?: string;
   itemId?: string;
+  /** The MTO link (043-audit item 4): the sales line's feeding orders. */
+  salesOrderLineId?: string;
   limit: number;
 }): Promise<ProductionOrderRow[]> {
   const rows = await tenantTx().execute(sql`
     SELECT ${ORDER_COLUMNS} FROM production_orders
     WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
       AND (${filter.itemId ?? null}::uuid IS NULL OR item_id = ${filter.itemId ?? null})
+      AND (${filter.salesOrderLineId ?? null}::uuid IS NULL OR sales_order_line_id = ${filter.salesOrderLineId ?? null})
     ORDER BY created_at, id
     LIMIT ${filter.limit}
   `);

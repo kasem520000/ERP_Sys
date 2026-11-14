@@ -17,6 +17,7 @@ import {
   type ReceiptPlan,
 } from "../../inventory/application/movement-core";
 import { TrackingService } from "../../inventory/application/tracking-service";
+import * as invStore from "../../inventory/infrastructure/inventory.store";
 import { InboxService } from "../../notifications/application/inbox-service";
 import {
   RESOLVE_EFFECTIVE_CONFIG_SERVICE,
@@ -1170,8 +1171,20 @@ export class ProductionOrderService {
   // -- MTO link (PHASE-043 T-09, M-22 — DRAFT-only binding) -------------------------
 
   /** Bind a production order to its driving sales order line (the MTO
-   * link — G-49's reservation chain). DRAFT-only (a released order's
-   * demand is frozen); the line's item must equal the order's item. */
+   * link — G-49's reservation chain). The business contract (the
+   * 043-audit item-4 review, made explicit):
+   *   - DRAFT-only (a released order's demand is frozen);
+   *   - the line's ITEM must equal the order's item;
+   *   - the sales order's WAREHOUSE must equal the order's FG warehouse —
+   *     the completion routes the produced batch to the FG warehouse and
+   *     the delivery ships from the sales order's; a mismatched link
+   *     would strand the MTO batch across warehouses;
+   *   - the QUANTITY is deliberately UNCONSTRAINED at link time: a sales
+   *     line may be fed by several MOs (2 × 5 for a line of 10) and an
+   *     MO may over-produce (the surplus flows to free stock); the
+   *     reservation holds the ACTUAL completed qty, and the delivery
+   *     settles the coverage per shipped unit (never a link-time
+   *     promise). */
   async linkSalesOrder(
     id: string,
     input: { salesOrderLineId: string | null; actorId: string | null },
@@ -1190,6 +1203,18 @@ export class ProductionOrderService {
       if (line.itemId !== order.itemId) {
         throw new MtoLinkInvalidError(
           `sales order line ${input.salesOrderLineId} is for item ${line.itemId} — the MTO link requires the order's item ${order.itemId}`,
+        );
+      }
+      // The warehouse leg of the contract: the produced batch must land
+      // where the delivery ships from (the 043-audit item-4 fix — a
+      // mismatched pair stranded the MTO chain across warehouses).
+      const salesOrder = await planningStore.findSalesOrderById(line.orderId);
+      if (salesOrder === undefined) {
+        throw new MtoLinkInvalidError(`sales order ${line.orderId} of line ${input.salesOrderLineId} no longer exists`);
+      }
+      if (salesOrder.warehouseId !== order.fgWarehouseId) {
+        throw new MtoLinkInvalidError(
+          `sales order line ${input.salesOrderLineId} ships from warehouse ${salesOrder.warehouseId} — the MTO link requires the order's FG warehouse ${order.fgWarehouseId} (the completion routes the batch there)`,
         );
       }
     }
@@ -1321,4 +1346,54 @@ export class ProductionOrderService {
       throw new ProductionOrderInputInvalidError(`${what} must be an ISO date (YYYY-MM-DD): ${value}`);
     }
   }
+}
+
+// -- the MTO reservation query (PHASE-043 audit item 4) ------------------------------
+
+/**
+ * The ACTIVE MTO reservations feeding a sales line — the delivery
+ * settlement's input (G-49's chain must never leak an ACTIVE holder after
+ * the goods shipped). Every ACTIVE `PRODUCTION_ORDER`-holder reservation
+ * at (itemId, warehouseId) whose production order is linked to the sales
+ * line, oldest MO first (the made-for-this-order stock retires before the
+ * line's own sales reservation). A standalone application function: the
+ * sales delivery post calls it through the manufacturing application
+ * surface (the AtpService precedent — never another module's store).
+ */
+export async function listActiveMtoReservationsForSalesLine(input: {
+  salesOrderLineId: string;
+  itemId: string;
+  warehouseId: string;
+}): Promise<
+  readonly { id: string; qty: string; holderId: string; note: string | null }[]
+> {
+  const feedingMos = await store.listProductionOrders({
+    salesOrderLineId: input.salesOrderLineId,
+    limit: 100,
+  });
+  const feedingMoIds = new Set(feedingMos.map((mo) => mo.id));
+  const active = await invStore.listReservations({
+    itemId: input.itemId,
+    warehouseId: input.warehouseId,
+    status: "ACTIVE",
+    limit: 500,
+  });
+  return active
+    .filter(
+      (row): row is (typeof active)[number] & { holderId: string } =>
+        row.holderType === "PRODUCTION_ORDER" &&
+        row.holderId !== null &&
+        feedingMoIds.has(row.holderId),
+    )
+    .sort((a, b) =>
+      feedingMos.findIndex((mo) => mo.id === a.holderId) -
+        feedingMos.findIndex((mo) => mo.id === b.holderId) ||
+      (a.note ?? "").localeCompare(b.note ?? ""),
+    )
+    .map((row) => ({
+      id: row.id,
+      qty: row.qty,
+      holderId: row.holderId,
+      note: row.note ?? null,
+    }));
 }

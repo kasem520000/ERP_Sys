@@ -357,17 +357,61 @@ export class DeliveryNoteService {
       });
     }
 
-    // (5) The order's soft reservations release — stock physically moved.
+    // (5) The reservation settlement (the 043-audit item-4 fix) — per
+    // DELIVERED line, PARTIAL by the shipped qty, MTO-first. Pre-fix this
+    // step released EVERY order line's OWN reservation on ANY delivery of
+    // the order (a partial delivery un-reserved the not-yet-shipped lines'
+    // stock) and NEVER touched the MTO chain (G-49's PRODUCTION_ORDER
+    // holder reservations leaked ACTIVE forever, permanently reducing
+    // availability). The contract now: the shipped qty retires coverage
+    // in a deterministic order — FIRST the linked MTO reservations (the
+    // made-for-this-order stock, oldest MO first), THEN the line's OWN
+    // sales reservation — until the shipped qty is exhausted; a remainder
+    // stays ACTIVE for the still-undelivered portion; lines not in THIS
+    // delivery keep their reservations untouched.
     if (delivery.orderId !== null) {
-      const ordersServiceModule = await import("./orders");
-      void ordersServiceModule;
-      const orderLines = await store.listSalesOrderLines(delivery.orderId);
       const reservationService = await import("../../inventory/application/reservation-service");
       const svc = new reservationService.ReservationService(this.audit);
-      for (const orderLine of orderLines) {
-        if (orderLine.reservationId !== null) {
-          await svc.release(orderLine.reservationId, actorId);
-          await store.setOrderLineReservation(orderLine.id, null);
+      const orderLines = await store.listSalesOrderLines(delivery.orderId);
+      const orderLineById = new Map(orderLines.map((row) => [row.id, row]));
+      for (const line of lines) {
+        if (line.orderLineId === null) continue;
+        const orderLine = orderLineById.get(line.orderLineId);
+        if (orderLine === undefined) continue;
+        let toRetire = new Decimal(line.qty);
+        // (5a) The MTO chain: ACTIVE PRODUCTION_ORDER reservations of the
+        // completed MOs linked to THIS sales line (G-49's holders) —
+        // through the manufacturing application surface (the AtpService
+        // precedent; never another module's store).
+        const { listActiveMtoReservationsForSalesLine } = await import(
+          "../../manufacturing/application/production-order-service"
+        );
+        const mtoReservations = await listActiveMtoReservationsForSalesLine({
+          salesOrderLineId: line.orderLineId,
+          itemId: line.itemId,
+          warehouseId: delivery.warehouseId,
+        });
+        for (const mto of mtoReservations) {
+          if (toRetire.lessThanOrEqualTo(0)) break;
+          const take = Decimal.min(toRetire, new Decimal(mto.qty));
+          const settled = await svc.partialConsume(mto.id, take.toFixed(6), actorId);
+          toRetire = toRetire.minus(take);
+          if (settled.status === "CONSUMED" && orderLine.reservationId === mto.id) {
+            await store.setOrderLineReservation(orderLine.id, null);
+          }
+        }
+        // (5b) The line's OWN sales reservation — the remainder of the
+        // shipped qty retires it partially (fully consumed → the link
+        // clears; a remainder stays ACTIVE for the next delivery).
+        if (toRetire.greaterThan(0) && orderLine.reservationId !== null) {
+          const settled = await svc.partialConsume(
+            orderLine.reservationId,
+            toRetire.toFixed(6),
+            actorId,
+          );
+          if (settled.status === "CONSUMED") {
+            await store.setOrderLineReservation(orderLine.id, null);
+          }
         }
       }
     }
