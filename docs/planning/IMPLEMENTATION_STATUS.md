@@ -253,6 +253,36 @@ ga-spike environment-load sensitivity history stands), the round-3
 evidence ledger:
 [gate-evidence/2026-11-14-post043-audit-round3.md](../operations/gate-evidence/2026-11-14-post043-audit-round3.md);
 RISK-031 and RISK-032 stay OPEN; PHASE-045 NOT started.
+**Post-043 audit round 4 (2026-11-14 — the owner's race proof):** the
+owner verified the round-3 head independently (35/35 + the owner's own
+222-file/3,141-pass bundle), then PROVED the CANCEL/COMPLETE RACE — the
+dead-line guard's plain status read left a window between the read and
+the holder's creation, and a cancellation committing inside it left the
+order CANCELLED with an ACTIVE MTO holder nobody could settle. Fixed by
+THE SERIALIZATION PROTOCOL: the sales_orders header row is the
+serialization point — the completion's guard read is now a LOCKING read
+(FOR UPDATE, held to its UoW's commit) and cancel/close lock the same
+row FIRST (before their status check/write/release), with a
+deadlock-free lock order (the wait-for graph around the row is a star;
+the smoke test races completion+cancel+close together — one termination
+effect, the loser the typed error, no deadlock, never an orphan; the
+pre-fix smoke had BOTH terminations landing, the second overwriting the
+first). The new mto-cancel-complete-race.spec (the deterministic
+overlap harness + both winning orders + close + the smoke): pre-fix 3
+failed | 2 passed (both orphan arms verbatim), post-fix 5/5. The
+delivery archive REBUILT at this head (the owner found the round-3 zip
+stale at its 2b1f20f build head — 2 missing files, 14 different —
+confirmed by the same comm comparison, corrected, and the rebuild rule
+now runs with every delivery). Gates (each its own run): manufacturing +
+sales + inventory 61 files 381/381; the FULL DB SUITE in ONE run
+(502.97s): 223/223 files · 3,146 passed | 2 skipped (browser-env
+render) — 0 failed; api typecheck + eslint (changed files) clean;
+docs:validate 33/33; id-ledger + self-test 0 errors / 14/14. The
+round-4 evidence ledger:
+[gate-evidence/2026-11-14-post043-audit-round4.md](../operations/gate-evidence/2026-11-14-post043-audit-round4.md);
+the hard-vs-soft reservation POLICY and RISK-032 remain the owner's,
+RISK-031 and the async/progress deviation stay open; PHASE-045 NOT
+started — this head awaits the owner's review.
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
