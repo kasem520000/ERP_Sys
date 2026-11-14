@@ -84,6 +84,7 @@ export default async function SalesQuotesPage({
         canConvertQuotes={permissions.includes("sales.quotations.convert")}
         canCreateOrders={permissions.includes("sales.orders.create")}
         canApproveOrders={permissions.includes("sales.orders.approve")}
+        canViewOrders={permissions.includes("sales.orders.view")}
       />
     );
   }

@@ -2091,6 +2091,51 @@ export interface SalesOrderRow {
   createdBy: string | null;
 }
 
+/** A sales order line (GET sales/sales-orders/:id — findWithLines). */
+export interface SalesOrderLineRow {
+  id: string;
+  lineNo: number;
+  itemId: string;
+  description: string | null;
+  descriptionAr: string | null;
+  qty: string;
+  unitPrice: string;
+  discountAmount: string;
+  taxCodeId: string | null;
+  netAmount: string;
+  taxAmount: string;
+  reservationId: string | null;
+  promisedDate: string | null;
+  atpStatus: string | null;
+  atpSuggestedDate: string | null;
+}
+
+/** The order header + its lines (the promise point's read). */
+export interface SalesOrderWithLines extends SalesOrderRow {
+  lines: SalesOrderLineRow[];
+}
+
+/**
+ * THE PROMISE POINT'S ATP ANSWER (POST sales-orders/:id/lines/:lineId/atp
+ * — the joint review round): the verdict, the THREE-VALUED protection
+ * standing RELATIVE TO THE REMAINING qty, the protected/unprotected
+ * QUANTITIES, and the BILINGUAL advisory note. The unreserved portion
+ * is ADVISORY ONLY and a BACKORDER STAYS LEGAL (no ATP gate exists at
+ * issue — the note says so; nothing here blocks anything).
+ */
+export interface SalesOrderLineAtpResult {
+  line: SalesOrderLineRow;
+  verdict: "OK" | "SHORT";
+  availableNow: string;
+  suggestedDate: string | null;
+  protection: "UNPROTECTED" | "PARTIALLY_PROTECTED" | "FULLY_PROTECTED";
+  remainingQty: string;
+  reservedForLineQty: string;
+  protectedQty: string;
+  unprotectedQty: string;
+  advisoryNote: { en: string; ar: string };
+}
+
 /** Delivery notes (DRAFT → POSTED; G-03 COGS without AR). */
 export interface DeliveryNoteRow {
   id: string;

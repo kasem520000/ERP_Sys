@@ -27,6 +27,7 @@ import type {
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedName, localizedSalesError, salesStatusLabel } from "../lib/messages";
+import { AtpPromisePoint } from "./atp-promise-point";
 import { Card } from "./card";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
@@ -69,6 +70,7 @@ export function SalesQuotes({
   canConvertQuotes,
   canCreateOrders,
   canApproveOrders,
+  canViewOrders,
 }: {
   locale: Locale;
   initialQuotes: readonly QuotationRow[];
@@ -83,6 +85,7 @@ export function SalesQuotes({
   canConvertQuotes: boolean;
   canCreateOrders: boolean;
   canApproveOrders: boolean;
+  canViewOrders: boolean;
 }): JSX.Element {
   const d = getDictionary(locale);
   const router = useRouter();
@@ -111,6 +114,9 @@ export function SalesQuotes({
   const [acceptWarehouseId, setAcceptWarehouseId] = useState("");
   const [cancelTarget, setCancelTarget] = useState<{ kind: "quote" | "order"; id: string } | null>(null);
   const [cancelReason, setCancelReason] = useState("");
+  // THE PROMISE POINT (the joint review round): the order whose lines'
+  // ATP standing is on display.
+  const [promiseOrder, setPromiseOrder] = useState<SalesOrderRow | null>(null);
 
   const customerNameById = useMemo(() => {
     const map = new Map<string, string>();
@@ -599,6 +605,22 @@ export function SalesQuotes({
           rows={[...orders]}
           rowKey={(row) => row.id}
           rowActions={[
+            // THE PROMISE POINT (the joint review round): every order
+            // row opens its lines' ATP standing — the route's own
+            // permission (sales.orders.view) gates the load.
+            ...(canViewOrders
+              ? [
+                  {
+                    id: "promise",
+                    label: d.salesPromisePoint,
+                    onSelect: (row: SalesOrderRow) => {
+                      setError(null);
+                      setNotice(null);
+                      setPromiseOrder(row);
+                    },
+                  },
+                ]
+              : []),
             ...(canCreateOrders
               ? [
                   {
@@ -688,6 +710,15 @@ export function SalesQuotes({
             </Button>
           </div>
         </Card>
+      )}
+
+      {promiseOrder !== null && (
+        <AtpPromisePoint
+          locale={locale}
+          order={promiseOrder}
+          items={items}
+          onClose={() => setPromiseOrder(null)}
+        />
       )}
 
       {cancelTarget !== null && (

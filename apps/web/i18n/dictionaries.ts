@@ -1834,6 +1834,28 @@ export interface Dictionary {
   salesCancelReason: string;
   salesReserve: string;
   salesAcceptWarehouse: string;
+  salesPromisePoint: string;
+  salesPromiseLines: string;
+  salesPromiseCheck: string;
+  salesPromiseVerdict: string;
+  salesPromiseVerdictOk: string;
+  salesPromiseVerdictShort: string;
+  salesPromiseProtection: string;
+  salesPromiseUnprotected: string;
+  salesPromisePartiallyProtected: string;
+  salesPromiseFullyProtected: string;
+  salesPromiseAvailable: string;
+  salesPromiseRemaining: string;
+  salesPromiseAllocated: string;
+  salesPromiseProtectedQty: string;
+  salesPromiseUnprotectedQty: string;
+  salesPromiseSuggested: string;
+  salesPromiseNote: string;
+  salesPromiseAdvisoryRule: string;
+  salesPromiseLoading: string;
+  salesPromiseLoadFailed: string;
+  salesPromisePromisedDate: string;
+  salesPromiseStamped: string;
   salesNewDelivery: string;
   salesDeliveryNo: string;
   salesDeliveryDate: string;
@@ -7973,6 +7995,29 @@ const ar: Dictionary = {
   salesCancelReason: "سبب الإلغاء",
   salesReserve: "حجز المخزون",
   salesAcceptWarehouse: "مستودع التحويل",
+  salesPromisePoint: "نقطة الوعد",
+  salesPromiseLines: "بنود الأمر",
+  salesPromiseCheck: "فحص الالتزام (ATP)",
+  salesPromiseVerdict: "النتيجة",
+  salesPromiseVerdictOk: "متوفر",
+  salesPromiseVerdictShort: "أقل من المطلوب",
+  salesPromiseProtection: "حالة الحماية",
+  salesPromiseUnprotected: "غير محمي",
+  salesPromisePartiallyProtected: "محمي جزئيًا",
+  salesPromiseFullyProtected: "محمي بالكامل",
+  salesPromiseAvailable: "المتاح للوعد عند التاريخ المطلوب",
+  salesPromiseRemaining: "الكمية المتبقية",
+  salesPromiseAllocated: "المخصص للبند",
+  salesPromiseProtectedQty: "الكمية المحمية",
+  salesPromiseUnprotectedQty: "الكمية غير المحمية",
+  salesPromiseSuggested: "أقرب تاريخ تغطية (CTP)",
+  salesPromiseNote: "التنبيه الاسترشادي",
+  salesPromiseAdvisoryRule:
+    "الجزء غير المحجوز استرشادي فقط — يمكن لطلب آخر أخذ المخزون أولًا ويبقى تأجيل الطلب (backorder) ممكنًا؛ النقص لا يمنع إصدار أمر البيع أبدًا.",
+  salesPromiseLoading: "جارٍ تحميل البنود…",
+  salesPromiseLoadFailed: "تعذر تحميل بنود الأمر",
+  salesPromisePromisedDate: "تاريخ الوعد",
+  salesPromiseStamped: "آخر فحص للبند",
   salesNewDelivery: "سند تسليم جديد",
   salesDeliveryNo: "رقم السند",
   salesDeliveryDate: "تاريخ التسليم",
@@ -14159,6 +14204,29 @@ const en: Dictionary = {
   salesCancelReason: "Cancel reason",
   salesReserve: "Reserve stock",
   salesAcceptWarehouse: "Conversion warehouse",
+  salesPromisePoint: "Promise point",
+  salesPromiseLines: "Order lines",
+  salesPromiseCheck: "Check ATP",
+  salesPromiseVerdict: "Verdict",
+  salesPromiseVerdictOk: "OK",
+  salesPromiseVerdictShort: "Short",
+  salesPromiseProtection: "Protection",
+  salesPromiseUnprotected: "Unprotected",
+  salesPromisePartiallyProtected: "Partially protected",
+  salesPromiseFullyProtected: "Fully protected",
+  salesPromiseAvailable: "Available to promise at the requested date",
+  salesPromiseRemaining: "Remaining qty",
+  salesPromiseAllocated: "Allocated to the line",
+  salesPromiseProtectedQty: "Protected qty",
+  salesPromiseUnprotectedQty: "Unprotected qty",
+  salesPromiseSuggested: "Earliest cover date (CTP)",
+  salesPromiseNote: "Advisory note",
+  salesPromiseAdvisoryRule:
+    "The unreserved portion is advisory only — another order can take the stock first and a backorder remains possible; a shortage never blocks issuing a sales order.",
+  salesPromiseLoading: "Loading lines…",
+  salesPromiseLoadFailed: "Could not load the order lines",
+  salesPromisePromisedDate: "Promised date",
+  salesPromiseStamped: "Last line check",
   salesNewDelivery: "New delivery note",
   salesDeliveryNo: "Delivery no.",
   salesDeliveryDate: "Delivery date",
