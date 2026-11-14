@@ -37,12 +37,12 @@ In scope:
 1. **Letters of credit (L-01, H-08)**: `letters_of_credit` + `lc_amendments`
    (value/validity/document changes) + `lc_documents` (the documents checklist with
    presented/verified status and discrepancy notes); margin deposit and retirement
-   postings per G-64; expiry/discrepancy alerts at 30/14/7/1 days (BR-104).
+   postings per G-64; expiry/discrepancy alerts at 30/14/7/1 days (BR-105).
 2. **Documentary collections (L-02)**: `documentary_collections` — D/P and D/A terms,
    the documents set, status and settlement linkage.
 3. **Incoterms (L-03)**: `incoterms` registry (2020 set seeded, tenant-extensible) with
    selection on purchase and sales orders plus risk hints — the carriage/insurance/duty
-   ownership matrix shown at selection time (BR-105).
+   ownership matrix shown at selection time (BR-106).
 4. **Transport documents (L-04, L-05, L-13)**: `bills_of_lading` (sea/air/road — the
    document types cover multimodal trade) and `packing_lists` tied to shipments and
    receipts.
@@ -59,9 +59,9 @@ In scope:
    status on the linked trade documents.
 8. **Bonded warehouse (L-14)**: `bonded_warehouse_moves` — duty-suspended stock flag;
    moves inside the bond post no duty (G-66); release into free circulation triggers
-   duty recognition (BR-106).
+   duty recognition (BR-107).
 9. **Duty drawback (L-12)**: `duty_drawback_claims` — export-evidence linkage, claimed
-   amounts, status workflow; submission requires the linked export evidence (BR-107).
+   amounts, status workflow; submission requires the linked export evidence (BR-108).
 10. **Integration**: LC fees post to financial charges through the existing bank-charge
     discipline; FX applies at the contract rate through the existing FX discipline;
     customs duties and import taxes flow into the existing landed-cost allocation on
@@ -117,7 +117,7 @@ cost machinery rather than replacing it.
   G-65 (customs duty + import VAT capitalization into landed cost), G-66 (bonded
   transfer — physical move without duty recognition, duty on release from bond);
   `ACCOUNTING_INVARIANTS.md` gains INV-036 (declaration completeness);
-  `BUSINESS_RULES.md` gains BR-104…BR-107.
+  `BUSINESS_RULES.md` gains BR-105…BR-108 (reservations re-coordinated 2026-11-14 per the ID_LEDGER — the original plan's BR-104…107 predate the 043-completion round's consumption of BR-081).
 - **Seeds**: Incoterms 2020 set and an HS-code starter set (tenant-extensible by design,
   with a documented accuracy disclaimer — the tenant owns final classification).
 - **Jobs**: a `trade-expiry-sweep` (LC validity + document checklist due dates) on the
@@ -139,13 +139,13 @@ cost machinery rather than replacing it.
 | T-03 | Migration `0093` (declarations + lines, HS registry, bonded moves, drawback claims) | api |
 | T-04 | Migration `0094` (tracking events + grants + Incoterms/HS seeds) | api |
 | T-05 | LC API: lifecycle with amendments, checklist states, discrepancy notes; G-64 margin/retirement postings | api |
-| T-06 | LC fee postings to financial charges + `trade-expiry-sweep` job (BR-104) | api |
+| T-06 | LC fee postings to financial charges + `trade-expiry-sweep` job (BR-105) | api |
 | T-07 | Documentary collections API with settlement linkage | api |
-| T-08 | Incoterms registry + PO/SO selector with the risk-hint matrix (BR-105) | api |
+| T-08 | Incoterms registry + PO/SO selector with the risk-hint matrix (BR-106) | api |
 | T-09 | Transport documents API: bills of lading (multimodal types), packing lists, shipment linkage | api |
 | T-10 | Customs API: declarations + lines, HS registry extension, duty computation into landed costs (G-65, INV-036) | api |
-| T-11 | Bonded warehouse API: duty-suspended moves (G-66), release triggers duty recognition (BR-106) | api |
-| T-12 | Duty drawback API: export-evidence gate (BR-107) + claim workflow | api |
+| T-11 | Bonded warehouse API: duty-suspended moves (G-66), release triggers duty recognition (BR-107) | api |
+| T-12 | Duty drawback API: export-evidence gate (BR-108) + claim workflow | api |
 | T-13 | Shipment tracking API: milestone events → document status transitions | api |
 | T-14 | `/trade/lc`, `/trade/customs`, `/trade/shipments` screens + Incoterms reference page + certificate prints | web |
 | T-15 | Report contracts ×4 + `REPORT_CATALOG.md` rows + catalog↔registry check extension | api |
@@ -162,18 +162,18 @@ Acceptance criteria (all must pass with recorded evidence):
    tenant-extensible.
 2. The LC lifecycle runs end-to-end — issue, amend, track the documents checklist with
    discrepancies, retire — with G-64 posting balanced margin/retirement entries and LC
-   fees posting to financial charges; expiry alerts fire at 30/14/7/1 days (BR-104).
+   fees posting to financial charges; expiry alerts fire at 30/14/7/1 days (BR-105).
 3. Customs declarations compute duties and import VAT per line and flow into the
    existing landed-cost allocation (G-65); INV-036 holds — no landed-cost allocation on
    an import receipt without a completed declaration reference, and every allocated duty
    ties to a declaration line.
 4. Bonded moves post no duty on movement (G-66); release into free circulation
-   recognizes duty exactly once (BR-106); duty-suspended stock is visibly flagged and
+   recognizes duty exactly once (BR-107); duty-suspended stock is visibly flagged and
    blocked from customer issue while suspended.
-5. Duty drawback claims cannot submit without linked export evidence (BR-107); the
+5. Duty drawback claims cannot submit without linked export evidence (BR-108); the
    claim workflow records claimed amounts and status transitions.
 6. Incoterm selection is mandatory on trade-flagged purchase/sales orders and renders
-   the carriage/insurance/duty risk-hint matrix (BR-105); the registry page lists the
+   the carriage/insurance/duty risk-hint matrix (BR-106); the registry page lists the
    seeded set and accepts tenant additions.
 7. Shipment tracking events drive document status transitions (booked → departed →
    arrived → cleared → delivered) on the linked bills of lading, packing lists and

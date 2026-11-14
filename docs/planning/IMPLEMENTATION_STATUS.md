@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-043 COMPLETE — Wave 2's third phase: 035…044 delivered; PHASE-045 (HR Core) next)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-14 (the PHASE-043 completion round — the reservation hard protection delivered, RISK-032's mitigation implemented + tested, the risk open for the owner's review; PHASE-045 STARTED in parallel per the owner's directive)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -283,6 +283,61 @@ round-4 evidence ledger:
 the hard-vs-soft reservation POLICY and RISK-032 remain the owner's,
 RISK-031 and the async/progress deviation stay open; PHASE-045 NOT
 started — this head awaits the owner's review.
+**Post-043 COMPLETION ROUND (2026-11-14 — the owner's hard-protection
+directive):** the owner accepted the round-4 race fix for the reviewed
+cases and directed the original phase criterion be made REAL: the MTO
+reservation physically protected (no other order or issue path consumes
+the reserved quantity without an explicit authorized action; the correct
+beneficiary consumes it with partial/cancel/close/surplus/concurrency/
+rollback support; any unlock permission-gated + audited), ATP for
+unreserved demand ADVISORY (never a guaranteed promise; backorders stay
+possible; a shortage never blocks issuing a sales order), RISK-032 open
+until the mitigation is implemented AND tested (it is, this round — the
+risk stays open for the owner's review), RISK-031 open with its
+documented limits, async/progress stays declared future work, PHASE-045
+STARTED IN PARALLEL per the owner's directive (starting 045 is not
+043-closure nor production approval). Delivered — BR-081 (the
+reservation hard protection): planIssue's guard inside the item_stock
+row lock (onHand − qty ≥ reservedPool − allowance; the pool read under
+the lock — creations serialize on the same lock, releases only shrink
+it: fail-closed in the strict direction; NO new lock, NO new lock order
+— round-4's star preserved); the delivery post carries the ONLY
+allowance (per line: the line's OWN ACTIVE non-expired reservation + its
+ACTIVE MTO chain — the exact rows the settlement retires, so a stale
+allowance can never commit: the settlement's conditional row updates
+fail closed and the whole post rolls back); every other path (another
+order's delivery, standalone, manual issue, transfer out, adjustment,
+production consumption) may consume FREE STOCK ONLY (typed
+RESERVED_STOCK_PROTECTED with machine-readable detail); NO bypass
+parameter anywhere — the only door to reserved stock as anyone else is
+the permission-gated, audited release; checkLineAtp answers the explicit
+protection standing (PROTECTED_BY_RESERVATION vs UNPROTECTED + the
+bilingual advisory note; a zero-stock order still ISSUES — the backorder
+law, pinned); THE ROLLBACK HARDENING found while proving the rollback
+criterion: the pending-position overlay's tx-handle keying (R17's own
+finding) let a rolled-back UoW poison later transactions' staged
+positions — now keyed on the TenantContext object (entries die with
+their transaction). The new reservation-hard-protection.spec (10
+deterministic tests): PRE-FIX at d817f84 8 failed | 2 passed (the thief
+posts RESOLVED — the steal, verbatim in the ledger), POST-FIX 10/10;
+reservation-basis.spec (c) rewritten to the hard truth and its (c,
+race) dichotomy re-pinned (exactly ONE side may take the stock); the
+round-4 race spec 5/5 (the star untouched). Gates (each its own run):
+manufacturing + sales + inventory 62 files 391/391; the FULL DB SUITE —
+run 1 (pre-hardening) 2 mto-lifecycle consume-path failures (verbatim
+not captured; never reproduced standalone ×5 nor in any later run),
+runs 2–3 (same tree) 224/224 · 3,156 | 2 skipped green, run 4 (the
+FINAL HEAD, post-hardening) 224/224 files · 3,156 passed | 2 skipped —
+0 failed (508.01s); api typecheck clean; eslint (changed files) clean;
+docs:validate 33/33; id-ledger 0 errors (implemented: G 49 · INV 30 ·
+BR 81; the ladder re-coordinated — every post-043 phase's BR slots
+shifted +1, dated notes in every phase doc). The completion-round
+evidence ledger:
+[gate-evidence/2026-11-14-post043-completion-hard-protection.md](../operations/gate-evidence/2026-11-14-post043-completion-hard-protection.md);
+the remaining unreserved-demand POLICY choice and RISK-032 stay the
+owner's, RISK-031 and the async/progress deviation stay open; this head
++ its evidence go to the owner for review — 043's closure and production
+approval are NOT claimed.
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)

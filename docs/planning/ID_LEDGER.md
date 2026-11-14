@@ -15,7 +15,7 @@ duplicates their rows, only counts them for the operator:
 |---|---|---|---|
 | Goldens `G-xx` | [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md) §7 | `\| G-xx \| … \| PHASE-0yy \|` | G-01…G-49 (through PHASE-043) |
 | Invariants `INV-xxx` | [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md) | `\| INV-xxx \| … \|` | INV-001…INV-030 (through PHASE-043) |
-| Business rules `BR-xxx` | [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §"the register" | `\| BR-xxx \| … \|` | BR-001…BR-080 (through PHASE-043) |
+| Business rules `BR-xxx` | [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §"the register" | `\| BR-xxx \| … \|` | BR-001…BR-081 (through the PHASE-043 completion round) |
 
 ## 2. Reservations (the coordinated ladder — 2026-11-13)
 
@@ -39,13 +39,13 @@ corrections never move a slot.)*
 | Phase | Goldens | Invariants | Business rules | Was (the stale plan) |
 |---|---|---|---|---|
 | ~~PHASE-043 (MRP)~~ **DELIVERED 2026-11-13** — its slots are now IMPLEMENTED (G-47…G-49 · INV-030 · BR-078…080; see §1) and no longer reservations | — | — | — | G-44…G-46 · INV-028 · BR-061…063 (all consumed by 039–044) |
-| PHASE-045 (HR Core) | G-50…G-51 | INV-031 | BR-081…BR-083 | G-51…G-52 · INV-030 · BR-068…070 (consumed by 039–042) |
-| PHASE-046 (HR Payroll) | G-52…G-54 | INV-032 | BR-084…BR-086 | G-53…G-55 · INV-031 · BR-071…073 (consumed by 039–042/044) |
-| PHASE-047 (HR Growth) | — | — | BR-087…BR-090 | BR-057…060 (consumed by 036/037) |
-| PHASE-048 (Projects & Contracting) | G-55…G-58 | INV-033 | BR-091…BR-095 | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040) |
-| PHASE-049 (CMMS) | G-59…G-61 | INV-034 | BR-096…BR-099 | G-60…G-62 · INV-033 · BR-066…069 (consumed by 040/042) |
-| PHASE-050 (QMS) | G-62…G-63 | INV-035 | BR-100…BR-103 | G-63…G-64 · INV-034 · BR-070…073 (consumed by 042/044) |
-| PHASE-051 (FTL) | G-64…G-66 | INV-036 | BR-104…BR-107 | G-65…G-67 · INV-035 · BR-074…077 (consumed by 044) |
+| PHASE-045 (HR Core) | G-50…G-51 | INV-031 | BR-082…BR-084 | ~~BR-081…BR-083~~ (BR-081 taken by the 043-completion round — the reservation hard protection, re-coordinated 2026-11-14; the original plan's BR-068…070 were already consumed by 039–042) |
+| PHASE-046 (HR Payroll) | G-52…G-54 | INV-032 | BR-085…BR-087 | G-53…G-55 · INV-031 · BR-071…073 (consumed by 039–042/044); ~~BR-084…086~~ shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| PHASE-047 (HR Growth) | — | — | BR-088…BR-091 | BR-057…060 (consumed by 036/037); ~~BR-087…090~~ shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| PHASE-048 (Projects & Contracting) | G-55…G-58 | INV-033 | BR-092…BR-096 | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| PHASE-049 (CMMS) | G-59…G-61 | INV-034 | BR-097…BR-100 | G-60…G-62 · INV-033 · BR-066…069 (consumed by 040/042); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| PHASE-050 (QMS) | G-62…G-63 | INV-035 | BR-101…BR-104 | G-63…G-64 · INV-034 · BR-070…073 (consumed by 042/044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| PHASE-051 (FTL) | G-64…G-66 | INV-036 | BR-105…BR-108 | G-65…G-67 · INV-035 · BR-074…077 (consumed by 044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | PHASE-052 (Workflow) | G-67 | INV-037 | — | G-68 · INV-036 |
 | PHASE-053 (Accounting Depth & Treasury) | G-68…G-70 | INV-038 | — | G-69…G-71 · INV-037 |
 | PHASE-054 (Tax & Corporate Compliance) | G-71…G-72 | INV-039 | — | G-72…G-73 · INV-038 |
@@ -68,8 +68,10 @@ ends at G-49 (PHASE-043 delivered 2026-11-13); 045 takes 50–51, 046 52–54,
 implemented ends at INV-030 (PHASE-043 delivered); 045 031, 046 032, 048 033,
 049 034, 050 035, 051 036, 052 037, 053 038, 054 039, 055 040, 056 041, 058 042,
 060 043, 061 044, 064 045 — contiguous. Business rules — implemented ends at
-BR-080 (PHASE-043 delivered); 045 081–083, 046 084–086, 047 087–090, 048 091–095,
-049 096–099, 050 100–103, 051 104–107 — contiguous.
+BR-081 (the PHASE-043 completion round delivered — the reservation hard
+protection); 045 082–084, 046 085–087, 047 088–091, 048 092–096,
+049 097–100, 050 101–104, 051 105–108 — contiguous (every phase after 043
+shifted +1 by the completion round's BR-081, re-coordinated 2026-11-14).
 
 ## 3. Cross-references (forward references between future phases)
 

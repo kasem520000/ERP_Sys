@@ -1,6 +1,6 @@
 # PHASE-043 — Manufacturing II — MRP & Planning
 
-> **Status:** COMPLETE 2026-11-13 (Blueprint v3.0) — [the completion report](reports/PHASE-043-COMPLETION.md) · **Wave:** 2 / Stage 13 · **Register:** [CR-13](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE 2026-11-13 (Blueprint v3.0) — [the completion report](reports/PHASE-043-COMPLETION.md); the completion round (2026-11-14) delivered the reservation hard protection (BR-081) per the owner's directive — the head + evidence under the owner's review · **Wave:** 2 / Stage 13 · **Register:** [CR-13](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-03 · §7 M-01, M-05…M-11, M-21/M-22/M-24/M-25 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 1: التصنيع»
 
 ## 1. Phase Overview
@@ -162,7 +162,7 @@ PHASE-042 prerequisite.
 | T-06 | MPS service + entries grid backend; frozen-fence edit permission + reason | api |
 | T-07 | Bill of resources service + rough-cut capacity check against PHASE-042 work-center capacities | api |
 | T-08 | ATP/CTP service + sales order line integration (S-10): promise-date suggestion, over-promise warning, hard exclusions (BR-080) | api |
-| T-09 | MTO linkage: MO ↔ sales line link, the availability reservation (an ATP-level hold — the soft model, declared in the round-2 audit), completion routing to sales delivery (G-49) | api |
+| T-09 | MTO linkage: MO ↔ sales line link, the reservation (a PHYSICAL hold since the completion round — BR-081: planIssue's guard holds the ACTIVE reserved pool for the beneficiary; the pre-completion soft model was declared in the round-2 audit and closed by the owner's completion-round directive), completion routing to sales delivery (G-49) | api |
 | T-10 | Contract manufacturing flow: stock-at-processor issue/return, conversion service PO, yield settlement (G-48) | api |
 | T-11 | By/co-product completion posting with joint allocation (G-47) + substitution records on explosion | api |
 | T-12 | Reservation policy engine (I-14) over `stock_reservations` using PHASE-044 strategies | api |
@@ -197,7 +197,12 @@ Acceptance criteria (all must pass with recorded evidence):
    warns; quarantined, reserved, and consignment-owned stock are excluded by hard
    rule (BR-080) — asserted by tests.
 6. MTO linkage end-to-end: MO completion routes to the linked sales delivery and
-   carries the MO actual cost (G-49 golden green with failure pack).
+   carries the MO actual cost (G-49 golden green with failure pack); the made-
+   for-order stock is PHYSICALLY held for the linked line (BR-081 — the
+   completion round's hard protection: no other order or issue path consumes it
+   without the permission-gated, audited release; reservation-hard-protection.spec
+   pins prevention, the beneficiary's partial/surplus/cancel/rollback, the
+   races, and the unlock).
 7. Contract manufacturing round trip green (G-48): stock-at-processor balances to
    zero on full return, conversion fee posts through AP, yield loss posts explicitly.
 8. By/co-product completion (G-47): Σ allocated costs = actual WIP consumed exactly;

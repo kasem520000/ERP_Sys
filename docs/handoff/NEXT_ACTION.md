@@ -1,17 +1,24 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-13 (PHASE-043 COMPLETE — Wave 2's third phase; PHASE-045 (HR Core) is next; STOPPED awaiting the owner's go per the standing rule)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-14 (the PHASE-043 completion round delivered the reservation hard protection (BR-081) — the head + evidence under the owner's review; PHASE-045 (HR Core) STARTED in parallel per the owner's directive — starting 045 is not 043-closure nor production approval)
 
 ## The single next action
 
-**PHASE-043 is COMPLETE and pushed** — the triple flip is done (the phase doc
-header, the IMPLEMENTATION_STATUS row + header + narrative entry, and
-[the completion report](../implementation/phases/reports/PHASE-043-COMPLETION.md)
-with the CR-48 code-evidence checklist). **Execution is stopped here per the
-owner's standing rule** — the next phase awaits the owner's go.
+**PHASE-043's completion round is delivered and pushed** — the reservation
+hard protection (BR-081) is implemented + tested (the 10-test deterministic
+spec, the before/after runs, the flipped pins, the rollback hardening); the
+head + its evidence ledger await the owner's review. The remaining
+unreserved-demand POLICY choice stays the owner's (RISK-032, open); RISK-031
+and the async/progress deviation stay open.
 
-**Start PHASE-045 (HR Core — Attendance, Leaves & Shifts)** — «ابدأ تنفيذ
-المرحلة PHASE-045» — when the owner gives the go. Its prerequisite (035 ✓) has
+**PHASE-045 (HR Core — Attendance, Leaves & Shifts) is STARTED** per the
+owner's 2026-11-14 parallel directive (its kickoff + implementation carry
+their own evidence and separate commits; the two phases' migrations, ids,
+and shared files are coordinated through the ID_LEDGER — this round took
+BR-081 and shifted every post-043 phase's BR slots +1, dated notes in every
+phase doc; the DB test runs are sequential — the embedded-PG harness shares
+one data dir, so the phases' suites never run concurrently on one machine).
+Starting 045 is NOT closure of 043 and NOT production approval. Its prerequisite (035 ✓) has
 been satisfied since Wave 1; nothing in HR consumes MRP directly (the payroll
 variable-feed discipline mirrors the run-snapshot pattern 043 delivered — the
 PHASE-043.md §8 handoff notes). Read [PHASE-045.md](../implementation/phases/PHASE-045.md)
