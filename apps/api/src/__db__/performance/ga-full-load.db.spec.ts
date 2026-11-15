@@ -905,39 +905,58 @@ describe("GA full load — local harness tier (PHASE-025 T2; PERFORMANCE_TEST_PL
     // work; the §4 signal is that it DRAINS, not that it is zero.
     //
     // THE DRAIN WINDOW (the owner's independent review of 81f09e9): the
-    // pre-fix assertion read TWO adjacent 1 s samples and required
+    // pre-fix assertion read TWO ADJACENT 1 s samples and required
     // B ≤ A + 1 — the owner's FULL-SUITE serial run saw a transient
     // 5 → 7 step (the load's own login-email fan-out still landing while
     // earlier specs' residual non-system work drained behind it) against
     // the A + 1 = 6 ceiling, while the SAME file passed 13/13 standalone
     // — the adjacent-pair shape conflated a one-off burst with a
-    // runaway. The signal stays honest and gains a window: sample up to
-    // 12 times, 1 s apart, and require the depth to COME BACK DOWN to
-    // the window's opening level (+1) within it. A real runaway (the
-    // consumer dead, jobs piling faster than they drain) never comes
-    // back down and fails after the window; a transient burst drains
-    // and passes. The absolute bound (≤ 50) and the dead-letter budget
-    // (failed delta = 0, asserted above) are unchanged, and the whole
-    // trace is printed for the evidence log.
+    // runaway. The fix gave the signal a window: sample up to 12 times,
+    // 1 s apart, and require the depth to COME BACK DOWN to the window's
+    // opening level (+1) within it.
+    //
+    // THE FULL-WINDOW LAW (the owner's independent review of c537113):
+    // that window loop still BROKE at the FIRST sample that came back
+    // down — one good sample could close the window before a later
+    // escalation appeared (a 6→6 dip at sample two proved nothing about
+    // samples three to twelve). The window is now observed TO THE END,
+    // no early exit, and the verdict is made on the WHOLE trace:
+    // (1) the ABSOLUTE bound (≤ 50) rides EVERY sample, not just the
+    // last; (2) the drain must be SUSTAINED AT THE CLOSE — the window's
+    // LAST TWO samples both at or under the opening level (+1) — so a
+    // lone good sample, whenever it lands, is never the proof, and an
+    // escalation still in flight at the close fails honestly. A real
+    // runaway (the consumer dead, jobs piling faster than they drain)
+    // never ends the window drained; a transient burst drains and holds
+    // by the close. The dead-letter budget (failed delta = 0, asserted
+    // above) is unchanged, and the whole trace prints for the evidence
+    // log.
     const nonSystemA = await bossNonSystemDepth();
     const drainTrace: number[] = [nonSystemA];
-    // The opening sample itself cannot satisfy the drain condition (it
-    // defines the level) — the proof is a LATER sample at or under it.
-    let drained = false;
-    for (let sample = 0; sample < 11 && !drained; sample += 1) {
+    for (let sample = 0; sample < 11; sample += 1) {
       await new Promise((resolve) => {
         setTimeout(resolve, 1000);
       });
-      const depthNow = await bossNonSystemDepth();
-      drainTrace.push(depthNow);
-      drained = depthNow <= nonSystemA + 1;
+      drainTrace.push(await bossNonSystemDepth());
     }
-    const nonSystemB = drainTrace[drainTrace.length - 1];
+    const ABSOLUTE_BOUND = 50;
+    const absoluteBreaches = drainTrace
+      .map((depthNow, index) => ({ depthNow, index }))
+      .filter((entry) => entry.depthNow > ABSOLUTE_BOUND);
+    const openingCeiling = nonSystemA + 1;
+    const closeSamples = drainTrace.slice(-2);
+    const sustainedClose = closeSamples.every((depthNow) => depthNow <= openingCeiling);
     console.log(
-      `[ga-full-load] DB-baseline pg-boss load-depth (non-system) before=${bossNonSystemBefore} opening=${nonSystemA} drain-window=${drainTrace.join("→")} (came back down within the window — draining, not growing — the §4 queue-health signal)`,
+      `[ga-full-load] DB-baseline pg-boss load-depth (non-system) before=${bossNonSystemBefore} opening=${nonSystemA} drain-window=${drainTrace.join("→")} (the FULL window, no early exit — absolute bound ≤${ABSOLUTE_BOUND} on EVERY sample: ${absoluteBreaches.length === 0 ? "none breached" : `BREACHED at ${absoluteBreaches.map((b) => `#${b.index}=${b.depthNow}`).join(", ")}`}; sustained close: last two [${closeSamples.join(", ")}] vs ceiling ${openingCeiling} — ${sustainedClose ? "drained and holding" : "NOT drained at the window's close"} — the §4 queue-health signal)`,
     );
-    expect(drained).toBe(true);
-    expect(nonSystemB).toBeLessThanOrEqual(50);
+    expect(
+      absoluteBreaches,
+      `the pg-boss non-system depth breached the absolute bound (≤ ${ABSOLUTE_BOUND}): ${absoluteBreaches.map((b) => `sample #${b.index}=${b.depthNow}`).join(", ")}`,
+    ).toEqual([]);
+    expect(
+      sustainedClose,
+      `the drain was not SUSTAINED at the window's close: last two samples [${closeSamples.join(", ")}] vs the opening ceiling ${openingCeiling} (opening=${nonSystemA}) — a lone good sample mid-window is never the proof; a real runaway never ends the window drained, and a burst still in flight at the close fails honestly`,
+    ).toBe(true);
     // And the total (crons included) never runs away: bounded by the
     // baseline plus the registered schedule census (every registered cron
     // firing at most once per minute of run window — a generous ceiling).
