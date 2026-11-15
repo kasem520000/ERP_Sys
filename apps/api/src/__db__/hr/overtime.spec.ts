@@ -71,6 +71,14 @@ beforeAll(async () => {
   );
   await su.end();
 
+  // THE IDEMPOTENT WORLD (the serial suite's alphabetical order runs
+  // the holiday spec first — its HOLIDAY/WEEKDAY rules would make this
+  // spec's tier arms ambiguous): deactivate every pre-existing ACTIVE
+  // rule on the three tiers BEFORE creating this spec's own.
+  const preexisting = await withTenant(TENANT_H, () => overtimeSvc.listRules({ active: true, limit: 500 }));
+  for (const rule of preexisting) {
+    await withTenant(TENANT_H, () => overtimeSvc.setRuleActive(rule.id, false, H_ACTOR));
+  }
   const weekday = await withTenant(TENANT_H, () =>
     overtimeSvc.createRule({
       code: uniqueCode("OT-WD"),

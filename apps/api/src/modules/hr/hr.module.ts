@@ -3,6 +3,7 @@ import { Module } from "@nestjs/common";
 import { AuditModule } from "../audit/audit.module";
 import { AttendanceImportService } from "./application/attendance-import-service";
 import { LeaveService } from "./application/leave-service";
+import { HolidayService } from "./application/holiday-service";
 import { AttendanceService } from "./application/attendance-service";
 import { OvertimeService } from "./application/overtime-service";
 import { ShiftService } from "./application/shift-service";
@@ -10,6 +11,7 @@ import { AttendanceImportController } from "./presentation/attendance-import.con
 import { AttendanceController } from "./presentation/attendance.controller";
 import { HrController } from "./presentation/hr.controller";
 import { LeaveController } from "./presentation/leave.controller";
+import { HolidayController } from "./presentation/holiday.controller";
 import { OvertimeController } from "./presentation/overtime.controller";
 
 /**
@@ -33,8 +35,8 @@ import { OvertimeController } from "./presentation/overtime.controller";
  */
 @Module({
   imports: [AuditModule],
-  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController],
-  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService],
-  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService],
+  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController],
+  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService],
+  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService],
 })
 export class HrModule {}

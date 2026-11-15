@@ -4103,6 +4103,51 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/leave/rollover",
     permission: "hr.leave",
   },
+
+  // PHASE-045 (T-08 — matrix §3.23): the holiday-calendars surface
+  // rides hr.attendance (the register's absence derivation is the
+  // primary consumer; the overtime HOLIDAY tier follows the same
+  // calendar — no dedicated key was seeded and none is invented).
+  {
+    method: "POST",
+    path: "/api/v1/hr/holiday-calendars",
+    permission: "hr.attendance",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/holiday-calendars",
+    permission: "hr.attendance",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/holiday-calendars/:id",
+    permission: "hr.attendance",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/holiday-calendars/:id/activate",
+    permission: "hr.attendance",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/holiday-calendars/:id/deactivate",
+    permission: "hr.attendance",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/holiday-calendars/:id/holidays",
+    permission: "hr.attendance",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/hr/holiday-calendars/:id/holidays/:holidayId",
+    permission: "hr.attendance",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/holidays",
+    permission: "hr.attendance",
+  },
 ];
 
 /**
