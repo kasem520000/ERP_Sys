@@ -241,12 +241,28 @@ export class RunService {
         durationMs: Date.now() - started,
         ok: false,
       });
-      await store.failRun(
-        input.runId,
-        error instanceof Error ? error.message.slice(0, 120) : "REPORT_RUN_FAILED",
-        { message: error instanceof Error ? error.message : String(error) },
-        Date.now() - started,
-      );
+      // PHASE-043 59085a0 review round (the owner's full-suite run): the
+      // failure record must never MASK the real error. When the compute
+      // fails with a QUERY error, the ambient UoW is ABORTED (any pg error
+      // aborts its transaction — the trial-balance statement_timeout 57014
+      // case); the in-tx failRun UPDATE then dies with 25P02 "current
+      // transaction is aborted", which would REPLACE the true error in the
+      // caller's output and record nothing. Attempt the in-tx write only
+      // while the UoW can still take it; when it cannot, skip it — the
+      // caller's rollback removes the whole attempt either way, and the
+      // worker path records the terminal state AFTER the rollback
+      // (recordJobFailureAfterRollback). ALWAYS rethrow the ORIGINAL error.
+      try {
+        await store.failRun(
+          input.runId,
+          error instanceof Error ? error.message.slice(0, 120) : "REPORT_RUN_FAILED",
+          { message: error instanceof Error ? error.message : String(error) },
+          Date.now() - started,
+        );
+      } catch {
+        // The ambient transaction is aborted — the write is impossible;
+        // never let the recording failure replace the compute failure.
+      }
       throw error;
     }
   }
@@ -338,5 +354,41 @@ export class RunService {
   }
 }
 
+
+/**
+ * The worker's failure envelope (the 59085a0 round — the PHASE-013
+ * failRunIsolated precedent extended to COMPUTE failures): after the
+ * caller's withTenant UoW rolled back, record the terminal FAILED state on
+ * an isolated connection. Inside the UoW the write is impossible for two
+ * distinct reasons — an aborted transaction rejects it (25P02), and even a
+ * live UoW holds the run row's lock from markRunning, so an isolated write
+ * would block on its own lock until the statement_timeout — so the
+ * recording belongs AFTER the rollback, where the lock is released. The
+ * write is CONDITIONAL (never touches a row already in a terminal state:
+ * FORBIDDEN_AT_RUN's authoritative record, or a racing redelivery's
+ * SUCCEEDED). Best-effort by design: the original error is primary and is
+ * always rethrown by the caller. One definition, used by the pg-boss
+ * handler (reporting.module) and pinned by the runs spec's worker-shape
+ * regression.
+ */
+export async function recordJobFailureAfterRollback(input: {
+  tenantId: string;
+  runId: string;
+  reportKey: string;
+  error: unknown;
+}): Promise<void> {
+  const message = input.error instanceof Error ? input.error.message : String(input.error);
+  try {
+    await store.failRunIsolatedIfActive({
+      tenantId: input.tenantId,
+      runId: input.runId,
+      errorCode:
+        input.error instanceof Error ? input.error.message.slice(0, 120) : "REPORT_RUN_FAILED",
+      errorDetail: { reportKey: input.reportKey, message },
+    });
+  } catch {
+    // Best-effort: the caller's original error stays the primary signal.
+  }
+}
 
 export { REPORT_JOB_QUEUE };

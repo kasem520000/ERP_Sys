@@ -162,7 +162,7 @@ nothing in the panel blocks anything (no ATP gate exists at issue).
 | web typecheck | `tsc --noEmit -p tsconfig.json` | **clean (exit 0)** |
 | web lint | `eslint .` | **clean (exit 0)** |
 | web unit | `vitest run` | **5/5 files · 73/73** |
-| id-ledger + self-test | `pnpm run check:id-ledger` + `--self-test` | **0 errors / 0 warnings; self-test 16/16 OK (9c/9d included)** |
+| id-ledger + self-test | `pnpm run check:id-ledger` + `--self-test` | **0 errors / 0 warnings; self-test 14/14 OK (9c/9d included)** — corrected in place 2026-11-15 (the 59085a0 review round): the original cell said "16/16 OK (9c/9d included)", a transcription error (exactly 14 arms at this and every relevant head since 817b276; the 81f09e9 round already flagged it in its own ledger) |
 | permissions drift | `pnpm run check:permissions-drift` | **OK — matrix 297 = seed 297** |
 | i18n parity | `pnpm run check:i18n-parity` | **ar=5789 = en=5789, 100%, no empty values** |
 | docs validation | `pnpm run docs:validate` | **33/33 checks passed** |

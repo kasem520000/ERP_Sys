@@ -45,6 +45,12 @@ const SEED_PATHS = [
   // T-19 gate re-run): 0078's four planning keys joined the matrix §3.22
   // and the checker's list together — 287 → 291.
   join(process.cwd(), "migrations", "0078_mrp_seeds.sql"), // PHASE-043 the four planning keys
+  // 59085a0 review-round repair (the 044/043 precedent, caught by the
+  // round's shared-gates sweep — the unit gate failed while the CLI
+  // checker passed 297 = 297): PHASE-045 (CR-15) seeded the six HR-core
+  // keys in 0086 and joined them to the CLI list (matrix §3.23,
+  // 291 → 297) — the spec's copy was never extended.
+  join(process.cwd(), "migrations", "0086_hr_seeds.sql"), // PHASE-045 the six HR-core keys
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

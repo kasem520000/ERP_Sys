@@ -16,6 +16,7 @@ import { getBoss } from "../../infra/jobs/boss";
 import { effectivePermissions } from "../identity/infrastructure/identity.store";
 import {
   RunService,
+  recordJobFailureAfterRollback,
   REPORT_JOB_QUEUE,
   REPORT_JOB_ENQUEUER_TOKEN,
   type ReportJobEnqueuer,
@@ -247,20 +248,38 @@ export class ReportingModule implements OnModuleDestroy, OnModuleInit {
       const boss = getBoss();
       await boss.send(input.queue, input.payload as never, { jobId: input.jobId } as never);
     });
-    await withTenant(payload.tenantId, async () => {
-      const permissions = await effectivePermissions(
-        payload.userId ?? "00000000-0000-0000-0000-000000000000",
-        payload.tenantId,
-      );
-      await runs.executeJob({
+    try {
+      await withTenant(payload.tenantId, async () => {
+        const permissions = await effectivePermissions(
+          payload.userId ?? "00000000-0000-0000-0000-000000000000",
+          payload.tenantId,
+        );
+        await runs.executeJob({
+          runId: payload.runId,
+          reportKey: payload.reportKey,
+          permissions,
+          tenantId: payload.tenantId,
+          userId: payload.userId,
+          baseCurrency: await ownTenantBaseCurrency(),
+          effectiveBranchIds: null,
+        });
+      });
+    } catch (error) {
+      // The 59085a0 round (the owner's full-suite failure): a compute
+      // failure rolls the worker's UoW back — together with the in-tx
+      // FAILED write — leaving the row QUEUED forever (pg-boss retrying
+      // into the same wall; the PHASE-013 "stayed QUEUED" disease, now on
+      // the compute path too). Record the terminal state AFTER the
+      // rollback, when the row lock is released, on an isolated
+      // connection; never overwrite an already-terminal row; the error
+      // still propagates so pg-boss's retry semantics stay intact.
+      await recordJobFailureAfterRollback({
+        tenantId: payload.tenantId,
         runId: payload.runId,
         reportKey: payload.reportKey,
-        permissions,
-        tenantId: payload.tenantId,
-        userId: payload.userId,
-        baseCurrency: await ownTenantBaseCurrency(),
-        effectiveBranchIds: null,
+        error,
       });
-    });
+      throw error;
+    }
   }
 }

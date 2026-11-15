@@ -156,7 +156,11 @@ like the real 045/046 posting-canon paragraphs, with the REAL
 conflict-detection arms preserved (the mutated G-44 claims are real
 implemented ids — the stale-claim rejection still fires; the
 implemented G-29 still rides the claim clause as a proximity-demoted
-reference and is never flagged). **Self-test 16/16 OK; the normal
+reference and is never flagged). **Self-test 14/14 OK — corrected in
+place 2026-11-15 (the 59085a0 review round): this ledger's original
+text said "16/16", a transcription error (the checker source has
+carried exactly 14 self-test arms at this and every relevant head
+since 817b276; the 81f09e9 round already flagged it once); the normal
 checker 0 errors / 0 warnings** (implemented: G 49 · INV 30 · BR 81).
 
 ## Item 3 — the evidence runs (each its own run, never combined)
@@ -170,7 +174,7 @@ checker 0 errors / 0 warnings** (implemented: G 49 · INV 30 · BR 81).
 | Targeted 1 — the reservation/ATP/valuation cluster | `vitest run --config vitest.db.config.ts reservation-hard-protection reservation-basis reservation-overcommit mto-lifecycle mto-surplus-cancel atp-unreserved-promise planning-goldens inventory/valuation-ledger` | **8 files · 51/51 PASSED** |
 | Targeted 2 — the delivery-path cluster | `… sales/golden distribution/tiers-foc inventory/wms-picking sync/policies sync/desktop-intents sync/push sync/field-intents` | **7 files · 89/89 PASSED** |
 | api typecheck | `tsc --noEmit -p tsconfig.json` (apps/api) | **clean (exit 0)** |
-| check-id-ledger + self-test | `pnpm run check:id-ledger -- --self-test` | **0 errors / 0 warnings · self-test 16/16** |
+| check-id-ledger + self-test | `pnpm run check:id-ledger -- --self-test` | **0 errors / 0 warnings · self-test 14/14** (corrected in place 2026-11-15, the 59085a0 round: the original cell said "16/16" — a transcription error; 14 arms at this head, all OK) |
 
 **The FULL DB SUITE (one serial run, the unified head):**
 `pnpm --filter @erp/api exec vitest run --config vitest.db.config.ts` —

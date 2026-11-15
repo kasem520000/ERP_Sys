@@ -238,6 +238,38 @@ export async function failRunIsolated(input: {
   });
 }
 
+/**
+ * The 59085a0 round (compute failures, the worker path): the same isolated
+ * failure write, CONDITIONAL on the row still being in a live state — the
+ * post-rollback recording (recordJobFailureAfterRollback) must never
+ * overwrite a row that already reached a terminal state: FORBIDDEN_AT_RUN's
+ * authoritative record (written pre-lock by failRunIsolated), or a racing
+ * redelivery's SUCCEEDED outcome.
+ */
+export async function failRunIsolatedIfActive(input: {
+  tenantId: string;
+  runId: string;
+  errorCode: string;
+  errorDetail: Record<string, unknown>;
+}): Promise<void> {
+  await getDb().transaction(async (tx) => {
+    await tx.execute(sql`SELECT set_config('erp.tenant_id', ${input.tenantId}, true)`);
+    await tx.execute(sql`
+      UPDATE report_runs SET
+        status = 'FAILED',
+        stage = 'failed',
+        started_at = COALESCE(started_at, now()),
+        finished_at = now(),
+        duration_ms = 0,
+        error_code = ${input.errorCode},
+        error_detail = ${JSON.stringify(input.errorDetail)}::jsonb,
+        artifacts = NULL
+      WHERE id = ${input.runId}
+        AND status IN ('QUEUED', 'RUNNING')
+    `);
+  });
+}
+
 export async function storeArtifacts(
   runId: string,
   artifacts: readonly unknown[],

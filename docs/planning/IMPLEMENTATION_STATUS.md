@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (THE c537113 REVIEW ROUND — the case law of the duplicate-employee rejection (case-varied uuids are duplicates, typed at both layers), the §4 queue-health FULL WINDOW (no early exit; the absolute bound on every sample; the drain sustained at the close), the promise point's five-quantities-under-their-labels + three-protection-standings pins, and the RISK-032 TEXT UNIFICATION (the unreserved-demand policy is DECIDED — advisory only, backorder legal — and the risk stays open ONLY for the reservation-defense review, never as a policy question; every stale "open decision" phrasing corrected in place and dated); the full DB suite re-run at the fixed head recorded in the round's evidence ledger; the 043 review stays open, PHASE-045 stays in progress)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (THE 59085a0 REVIEW ROUND — the ga-full-load group-run diagnosis: the measured 4.8× shared-context factor confined to the TB/IS/BS full-scan family, the previous report's group success explained by the faster sandbox + the warmed timing-cache file order, NO limit loosened and the standalone never counted for the group; the report failure path fixed per the contract — the ORIGINAL error always surfaces, the pg-boss worker records the terminal FAILED after its UoW rolls back (failRunIsolatedIfActive, conditional), pinned 2 new regressions (pre-fix 5/7 → post 7/7); the 16/16→14/14 self-test claims corrected with dated notes at five sites; the pre-existing permissions-drift spec gap repaired (0086_hr_seeds); the full suite re-run at the fixed head 227/227 · 3,232 passed | 2 skipped · 0 failed, the standalone 13/13 reported separately; the 043 review stays open, PHASE-045 stays in progress)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -383,7 +383,10 @@ advisory note naming the exposure; backorders stay legal (a shortage
 NEVER blocks issuing — pinned). check-id-ledger --self-test 9c/9d
 FIXED (synthetic ledger-independent fixtures, the probes-1/5/8
 precedent — the probes had leaned on the live ledger and broke when the
-ladder re-coordinated): 16/16 OK, the normal checker 0 errors. Evidence
+ladder re-coordinated): 14/14 OK, the normal checker 0 errors
+(dated correction 2026-11-15, the 59085a0 round: this entry's
+original text said "16/16 OK" — a transcription error; exactly 14
+arms at this and every relevant head since 817b276, all OK). Evidence
 (each its own run): probe BEFORE (at 1674849) 2/2 FAIL → AFTER 2/2
 PASS; the regression tests (reservation-hard-review.spec k/l/m — the
 two audit tests + the ATP pin) BEFORE 3/3 FAIL → AFTER 3/3 PASS;
@@ -445,7 +448,10 @@ parity 5789=5789. **THE SHARED GATES AT THE UNIFIED HEAD** (each its
 own run): the FULL DB SUITE **227/227 files · 3,228 passed | 2
 skipped · 0 failed · 515.43s** (mto-lifecycle inside it), api
 typecheck + lint clean, web typecheck + lint clean, web unit 73/73,
-id-ledger 0 errors + self-test 16/16, permissions-drift 297=297,
+id-ledger 0 errors + self-test 14/14 (dated correction 2026-11-15,
+the 59085a0 round: this entry's original text said "self-test 16/16"
+— a transcription error; exactly 14 arms at this and every relevant
+head since 817b276, all OK), permissions-drift 297=297,
 i18n parity 100%, docs:validate 33/33. The joint-review evidence
 ledger:
 [gate-evidence/2026-11-15-joint-review-fixes.md](../operations/gate-evidence/2026-11-15-joint-review-fixes.md);
@@ -577,6 +583,82 @@ reservation-defense review only — its policy RECORDED AS DECIDED
 everywhere it is stated), the 043 hard review stays OPEN, PHASE-045
 stays IN_PROGRESS — **NO closure of 043, NO closure of 045, and NO
 production approval are claimed.**
+**THE 59085a0 REVIEW ROUND (2026-11-15 — the owner's independent
+full-serial DB run surfaced two ga-full-load failures and a docs
+error, all diagnosed and fixed with before/after evidence):** the
+owner's run: 227 files · 3,228 passed | 2 failed | 2 skipped — the
+trial-balance compute ending at the 15s statement_timeout with the
+FAILED recording dying on the aborted transaction, the §4
+pool-saturation test falling at the same report query, and the file
+passing 13/13 standalone (standard-statement p95 3,718ms, pool 8/20,
+zero waiters). **(1) THE GROUP-RUN DIAGNOSIS (no loosening, no skip,
+the standalone never counted for the group):** the controlled
+measurement on a 2-vCPU/4GB sandbox — group p95 7,640ms vs standalone
+1,605ms, a **4.8× shared-context factor confined to the TB/IS/BS
+full-scan family** (T-01/T-02/T-08/§4-pool all ~1.0×; the plans
+IDENTICAL between contexts — cost 19,131 vs the previous session's
+19,648 — the slowdown is execution-environment: the embedded PG's
+WAL-driven checkpoint (~247MB apart) lands adjacent to the ga window
+in the group run and after the tests standalone); the previous
+report's group success rode a ~2.2–2.3× faster sandbox AND the
+warmed vitest timing-cache file order (soak-first —
+`node_modules/.vite/vitest` never ships in the zip/clone; a fresh
+checkout runs size-descending, and the 81f09e9 run — fresh order,
+faster sandbox — was already at 7,676ms p95, 77% of budget); the
+owner's machine (standalone 3,718ms ≈ 2.3× this sandbox) × the 4.8×
+group factor ≈ 17.8s > the 15s timeout — the observed 57014, fully
+explained. **(2) THE FAILURE PATH UNDER AN ABORTED TRANSACTION (the
+owner's contract question — YES, required, and fixed):** any pg query
+error aborts the withTenant UoW; the pre-fix executeInline catch
+called failRun ON the aborted tx → 25P02 "current transaction is
+aborted" REPLACED the true error in the output and recorded nothing;
+per REPORTING_ARCHITECTURE §12 ("Worker crash → run marked FAILED";
+"Storage failure → Run marked failed") and the PHASE-013
+failRunIsolated precedent (whose own law — the failure record must
+survive the caller's rollback — had covered only FORBIDDEN_AT_RUN),
+the fix: the catch's in-tx write can never REPLACE the original error
+(skipped when the UoW is dead, the ORIGINAL always rethrown), and the
+pg-boss worker (reporting.module handleReportJob) now records the
+terminal FAILED AFTER its UoW rolls back — recordJobFailureAfterRollback
+→ failRunIsolatedIfActive, an isolated connection, CONDITIONAL on the
+row still being QUEUED/RUNNING (FORBIDDEN_AT_RUN's authoritative
+record and a racing redelivery's SUCCEEDED are never overwritten);
+the inline path's semantics deliberately unchanged (a failed
+first-run leaves no row; the synchronous error is the "user told"
+channel). Pinned by two regressions in runs.spec — before the fix
+5/7 (the mask + the lost terminal state), after 7/7 (the ORIGINAL
+error surfaces, the worker shape records FAILED with the original
+error as its code, a later recording never overwrites, zero residue
+behind a failed first-run); the neighborhood (exports/golden/asof +
+jobs) 16/16. **(3) THE 14/14 SELF-TEST CORRECTIONS:** the 16/16
+claims corrected with DATED notes (the G-49 in-place precedent) at
+five sites — the RISK-032 register row's evidence sentence, both
+sites of the post043-hard-review ledger, the joint-review ledger's
+gate table, and the two historical round entries here; the checker
+has carried exactly 14 arms since 817b276 — verified live 14/14 OK.
+**(4) THE PRE-EXISTING UNIT-GATE REPAIR (found by the round's
+shared-gates sweep):** permissions-drift.spec's SEED_PATHS copy never
+got PHASE-045's 0086_hr_seeds.sql (the CLI list has it — script
+297=297 while the spec failed at the pristine head, verified by
+stash); repaired with the 044/043 dated-precedence comment; the
+Playwright headless shell installed for this environment (the same
+browser-env class as the DB suite's 2 known skips). THE SHARED GATES
+AT THE FIXED HEAD (each its own run; the DB runs strictly serial):
+**THE FULL DB SUITE — 227/227 files · 3,232 passed | 2 skipped · 0
+failed · 541.02s** (full-db-suite-59085a0-round.log, the 2 new
+regressions inside; T-04 standard p95 8,083ms — passes on this
+sandbox at the budget edge, the group factor persists BY DESIGN — the
+fix is correctness, not timing); **the standalone 13/13 · p95
+1,676ms · pool 8/20 · 0 waiters — reported separately, never counted
+for the group**; api typecheck + lint clean; api unit 54 files ·
+621/621; web typecheck + lint clean; web unit 6/6 · 77/77; id-ledger
+0 errors + self-test 14/14; permissions-drift 297=297; i18n parity
+5789=5789; docs:validate 33/33. The round's evidence ledger:
+[gate-evidence/2026-11-15-59085a0-review-round.md](../operations/gate-evidence/2026-11-15-59085a0-review-round.md);
+RISK-031 and RISK-032 stay OPEN (032 open for the
+reservation-defense review only), the 043 hard review stays OPEN,
+PHASE-045 stays IN_PROGRESS — **NO closure of 043, NO closure of 045,
+and NO production approval are claimed.**
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)

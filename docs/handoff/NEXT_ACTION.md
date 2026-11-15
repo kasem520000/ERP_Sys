@@ -1,6 +1,6 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the c537113 review round — the case law of the duplicate-employee rejection, the §4 queue-health full window, the promise point's five-quantities/three-standings pins, and the RISK-032 text unification: the unreserved-demand policy is DECIDED (advisory only + backorder legal) and the risk stays open ONLY for the reservation-defense review)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the 59085a0 review round — the ga-full-load group-run diagnosis: the measured 4.8× shared-context factor on the TB/IS/BS family, the failure path fixed per the contract (the ORIGINAL error always surfaces; the pg-boss worker records the terminal FAILED after the UoW rollback), the 16/16→14/14 self-test corrections dated at five sites, the full suite re-run at the fixed head 227/227 · 3,232 passed | 2 skipped · 0 failed with the standalone 13/13 reported separately; RISK-032 stays open ONLY for the reservation-defense review — its policy stays DECIDED)
 
 ## The single next action
 
