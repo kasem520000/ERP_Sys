@@ -216,6 +216,7 @@ harness.
   advisory) stays the owner's; the owner's 2026-11-14 parallel-start
   directive recorded (045-start blocker lifted; starting 045 is not
   043-closure nor production approval).
+  **[Corrected 2026-11-15 (the c537113 round): that "remaining policy choice" was DECIDED by the owner's own 2026-11-14 directive carried by this very round — unreserved ATP ADVISORY ONLY, a backorder LEGAL; RISK-032 open for the reservation-defense review only, never as a policy question.]
 - RISK-031: unchanged — open with its documented limits.
 - The async/progress deviation: unchanged — declared future work, never
   described as delivered.
@@ -225,6 +226,8 @@ harness.
 
 **THE OWNER'S OPEN DECISIONS, UNTOUCHED:** the remaining
 unreserved-demand POLICY choice stays the owner's (RISK-032, open).
+
+> **[Corrected 2026-11-15 (the c537113 round) — the unreserved-demand policy is DECIDED, not open:** the owner's 2026-11-14 completion-round directive (reaffirmed by every round since): the unreserved portion is ADVISORY ONLY and a BACKORDER STAYS LEGAL — no ATP gate exists at issue; the (a)/(b) alternatives (auto-reserve at issue; a blocking gate) are off the table unless the owner reopens the decision. RISK-032 stays open ONLY for the independent review's verdict on the reservation-side defenses, never as a policy question.]
 RISK-031 stays open with its documented limits. The async/progress mode
 stays declared future work. PHASE-045 is STARTED per the owner's
 parallel directive (its kickoff artifacts carry their own evidence) —

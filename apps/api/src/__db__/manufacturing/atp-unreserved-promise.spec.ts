@@ -20,7 +20,8 @@ import {
 
 /**
  * PHASE-043 audit round 2, item 5 — the UNRESERVED double promise, made
- * explicit and raised as an OPEN business decision.
+ * explicit and raised at the time as an OPEN business decision (DECIDED
+ * since — the owner's 2026-11-14 directive: the advisory model).
  *
  * The audit's question: what happens when two customers request the SAME
  * quantity from limited stock WITHOUT reserving? The code documents law 4
@@ -39,14 +40,16 @@ import {
  *   from the pool (asserted here: the moment one line reserves, the
  *   other's re-check flips SHORT).
  *
- * The business decision this exposes is OPEN (RISK-032 in the risk
- * register — NOT approved by documentation): the platform must choose
- * between (a) auto-reserving at order issue when stock allows (the
- * protected-promise model), (b) a blocking ATP gate at issue (reject or
- * warn on SHORT), or (c) accepting the soft model with the exposure
- * named to the operator at the point of promise. Until the owner
- * decides, the behavior stays exactly as asserted here — visible,
- * tested, and never described as a guarantee.
+ * The business decision this exposes is DECIDED (the owner's
+ * 2026-11-14 completion-round directive, recorded in RISK-032's row:
+ * the former option (c)): the platform KEEPS the soft model with the
+ * exposure named to the operator at the point of promise — the
+ * unreserved portion is ADVISORY ONLY and a BACKORDER STAYS LEGAL; the
+ * (a) auto-reserve and (b) blocking-gate alternatives are off the
+ * table unless the owner reopens the decision. The behavior stays
+ * exactly as asserted here — visible, tested, and never described as
+ * a guarantee; RISK-032 itself stays open ONLY for the review of the
+ * reservation-side defenses, never as a policy question.
  */
 
 const specAudit = new AuditService(new DrizzleAuditStore());
@@ -155,7 +158,7 @@ beforeAll(async () => {
   });
 });
 
-describe("PHASE-043 audit round 2, item 5 — the unreserved double promise (an OPEN business decision, not an approved policy)", () => {
+describe("PHASE-043 audit round 2, item 5 — the unreserved double promise (the policy is DECIDED: the advisory model — unreserved ATP advisory only, backorder legal; RISK-032 open for the reservation-defense review only)", () => {
   it("TWO customers, the SAME 10 units, NO reservations: BOTH stamp OK — the exposure proven verbatim (OK is an advisory check, never a protected promise)", async () => {
     const f = spec.fixture!;
     await withTenant(TENANT_M, async () => {

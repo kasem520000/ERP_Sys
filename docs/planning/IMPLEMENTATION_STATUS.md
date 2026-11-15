@@ -1,6 +1,6 @@
 # Implementation Status
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (THE 81f09e9 REVIEW ROUND — the duplicate-employee law, the promise point stamp refresh + the component's first test, the §4 queue-health drain window, RISK-032's unreserved-demand policy RECORDED AS THE OWNER'S DECIDED advisory model; the full DB suite re-run 227/227 · 3,229 passed | 2 skipped at the fixed head, the owner's failed independent run kept alongside; RISK-032 stays open for the review, the 043 review stays open, PHASE-045 stays in progress)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (THE c537113 REVIEW ROUND — the case law of the duplicate-employee rejection (case-varied uuids are duplicates, typed at both layers), the §4 queue-health FULL WINDOW (no early exit; the absolute bound on every sample; the drain sustained at the close), the promise point's five-quantities-under-their-labels + three-protection-standings pins, and the RISK-032 TEXT UNIFICATION (the unreserved-demand policy is DECIDED — advisory only, backorder legal — and the risk stays open ONLY for the reservation-defense review, never as a policy question; every stale "open decision" phrasing corrected in place and dated); the full DB suite re-run at the fixed head recorded in the round's evidence ledger; the 043 review stays open, PHASE-045 stays in progress)
 
 Single source of truth for what is **actually implemented** (vs. documented vs. planned).
 Agents MUST keep this in sync with reality; the roadmap describes intent, this file
@@ -227,8 +227,11 @@ language was wrong and is gone), the per-candidate-date CTP coverage
 (the dead batch never covers; the late leg floors to today), the
 CO-PRODUCT leveling edge (the plan is now position-independent — the
 id-swap asserted to produce the identical plan), the unreserved double
-promise RAISED AS RISK-032 (an open business decision — the ATP "OK" is
-advisory, never a protected promise), and the self-test count corrected
+promise RAISED AS RISK-032 (an open business decision at the time — the ATP "OK" is
+advisory, never a protected promise; that policy was subsequently DECIDED — the
+owner's 2026-11-14 directive: unreserved ATP advisory only, a backorder stays
+legal — and RISK-032 now stays open for the reservation-defense review only,
+never as a policy question), and the self-test count corrected
 to 14/14 (a transcription error); five new DB spec files, pre/post
 evidence per item, the full DB suite 220/221 files · 3,136/3,137 in the
 single run (the one soak queue-depth spike passed standalone — both
@@ -246,7 +249,10 @@ died; the RESERVATION QUERY LIMITS — the settlement reads the MTO chain
 through ONE exact JOIN, never the 200/100 paginated pages, both leak
 arms proven pre-fix; the G-49 CONTRADICTION — every misstatement of the
 golden row corrected in place, marked + dated, the hard-vs-soft POLICY
-choice left open per RISK-032); six round-3 spec files 35/35, the FULL
+choice left open per RISK-032 at the time — the policy was subsequently
+DECIDED (the owner's 2026-11-14 directive: unreserved ATP advisory only,
+a backorder stays legal); RISK-032's openness is the reservation-defense
+review only; six round-3 spec files 35/35, the FULL
 DB suite 222/222 files · 3,141 passed | 2 skipped (browser-env render)
 in the single run (the soak spec passed inside the run this time; the
 ga-spike environment-load sensitivity history stands), the round-3
@@ -280,7 +286,10 @@ render) — 0 failed; api typecheck + eslint (changed files) clean;
 docs:validate 33/33; id-ledger + self-test 0 errors / 14/14. The
 round-4 evidence ledger:
 [gate-evidence/2026-11-14-post043-audit-round4.md](../operations/gate-evidence/2026-11-14-post043-audit-round4.md);
-the hard-vs-soft reservation POLICY and RISK-032 remain the owner's,
+the hard-vs-soft reservation POLICY and RISK-032 remain the owner's
+(at the time — the policy was subsequently DECIDED, the owner's 2026-11-14
+directive: unreserved ATP advisory only, a backorder stays legal; RISK-032
+stays open for the reservation-defense review only),
 RISK-031 and the async/progress deviation stay open; PHASE-045 NOT
 started — this head awaits the owner's review.
 **Post-043 COMPLETION ROUND (2026-11-14 — the owner's hard-protection
@@ -335,7 +344,10 @@ shifted +1, dated notes in every phase doc). The completion-round
 evidence ledger:
 [gate-evidence/2026-11-14-post043-completion-hard-protection.md](../operations/gate-evidence/2026-11-14-post043-completion-hard-protection.md);
 the remaining unreserved-demand POLICY choice and RISK-032 stay the
-owner's, RISK-031 and the async/progress deviation stay open; this head
+owner's (the policy was DECIDED this round by the owner's own directive —
+unreserved ATP advisory only, a backorder stays legal; RISK-032 stays open
+for the review of the reservation-side defenses only, never as a policy
+question), RISK-031 and the async/progress deviation stay open; this head
 + its evidence go to the owner for review — 043's closure and production
 approval are NOT claimed.
 **Post-043 HARD REVIEW (2026-11-15 — the owner reopened the protection
@@ -383,7 +395,9 @@ RISK-032's reservation-side closure claim WITHDRAWN (the register row
 rewritten — the reservation side is NOT closed until the independent
 review passes the fixed head); RISK-031 and the async/progress
 deviation stay open; the remaining unreserved-demand policy stays the
-owner's. The hard-review evidence ledger:
+owner's (as everywhere: DECIDED by the owner's 2026-11-14 directive —
+unreserved ATP advisory only, a backorder stays legal; RISK-032 open for
+the reservation-defense review only). The hard-review evidence ledger:
 [gate-evidence/2026-11-15-post043-hard-review.md](../operations/gate-evidence/2026-11-15-post043-hard-review.md);
 NO closure of 043 and NO production approval are claimed — the fixed
 head + its evidence go to the owner for review.

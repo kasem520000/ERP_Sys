@@ -1,15 +1,18 @@
 # Next Action
 
-> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-14 (the PHASE-043 completion round delivered the reservation hard protection (BR-081) — the head + evidence under the owner's review; PHASE-045 (HR Core) STARTED in parallel per the owner's directive — starting 045 is not 043-closure nor production approval)
+> **Status:** LIVING DOCUMENT — updated at every phase completion · **Updated:** 2026-11-15 (the c537113 review round — the case law of the duplicate-employee rejection, the §4 queue-health full window, the promise point's five-quantities/three-standings pins, and the RISK-032 text unification: the unreserved-demand policy is DECIDED (advisory only + backorder legal) and the risk stays open ONLY for the reservation-defense review)
 
 ## The single next action
 
-**PHASE-043's completion round is delivered and pushed** — the reservation
-hard protection (BR-081) is implemented + tested (the 10-test deterministic
-spec, the before/after runs, the flipped pins, the rollback hardening); the
-head + its evidence ledger await the owner's review. The remaining
-unreserved-demand POLICY choice stays the owner's (RISK-032, open); RISK-031
-and the async/progress deviation stay open.
+**PHASE-043's protection review is OPEN at the delivery head** — the
+hard protection (BR-081), its hard-review/joint-review/81f09e9/c537113
+fix rounds, and the evidence ledgers await the owner's independent
+verdict. **The unreserved-demand POLICY IS DECIDED (the owner's
+2026-11-14 directive, reaffirmed by every round since): the unreserved
+portion is ADVISORY ONLY and a BACKORDER STAYS LEGAL — no ATP gate
+exists at issue.** RISK-032 stays open ONLY for the review of the
+reservation-side defenses, never as a policy question; RISK-031 and the
+async/progress deviation stay open.
 
 **PHASE-045 (HR Core — Attendance, Leaves & Shifts) is STARTED** per the
 owner's 2026-11-14 parallel directive (its kickoff + implementation carry

@@ -53,9 +53,12 @@ import { AtpInputInvalidError } from "../domain/manufacturing-errors";
  *    everyone else), and the sales-side check (checkLineAtp) answers
  *    with the explicit standing — PROTECTED_BY_RESERVATION vs
  *    UNPROTECTED — plus the bilingual advisory note, so no surface can
- *    present an unallocated OK as a guarantee. The POLICY choice
- *    (auto-reserve at issue / a blocking gate / the declared advisory
- *    model) remains the owner's (RISK-032, open). ***
+ *    present an unallocated OK as a guarantee. THE POLICY IS DECIDED
+ *    (the owner's 2026-11-14 completion-round directive, reaffirmed by
+ *    every round since): the unreserved portion is ADVISORY ONLY and a
+ *    BACKORDER STAYS LEGAL — no ATP gate exists at issue, by design.
+ *    RISK-032 stays open ONLY for the review of the reservation-side
+ *    defenses, never as a policy question. ***
  * 5. A requested date in the past is floored to the as-of date (a
  *    promise never back-dates).
  * 6. THE CTP WALK is expiry-aware at EVERY candidate date: the

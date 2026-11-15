@@ -198,7 +198,9 @@ harness.
 soft-model POLICY choice and RISK-032 remain the owner's (the round-3
 description corrections state what IS shipped and pinned, never what
 should be — a description change is not a standard change). RISK-031
-and the async/progress deviation remain open and stated. PHASE-045 is
+and the async/progress deviation remain open and stated.
+
+> **[Corrected 2026-11-15 (the c537113 round) — the unreserved-demand policy is DECIDED, not open:** the owner's 2026-11-14 completion-round directive (reaffirmed by every round since): the unreserved portion is ADVISORY ONLY and a BACKORDER STAYS LEGAL — no ATP gate exists at issue; the (a)/(b) alternatives (auto-reserve at issue; a blocking gate) are off the table unless the owner reopens the decision. RISK-032 stays open ONLY for the independent review's verdict on the reservation-side defenses, never as a policy question.] PHASE-045 is
 NOT started — this head awaits the owner's review.
 
 **RISK-031 and RISK-032 remain OPEN. PHASE-045 is NOT started. Nothing

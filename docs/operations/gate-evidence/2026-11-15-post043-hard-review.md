@@ -190,6 +190,7 @@ environmental set, unchanged).
   review passes the fixed head.** The unreserved-demand POLICY choice
   remains the owner's (auto-reserve at issue / a blocking gate / the
   declared advisory model).
+  **[Corrected 2026-11-15 (the c537113 round): that choice is DECIDED — the owner's 2026-11-14 directive: the unreserved portion ADVISORY ONLY, a backorder LEGAL; RISK-032 stays open for the reservation-defense review only, never as a policy question.]
 - **IMPLEMENTATION_STATUS:** the hard-review entry appended (the probe
   results, the fixes, the evidence links); the PHASE-045 row corrected
   to IN_PROGRESS (the substrate was delivered 2026-11-14 — the row had

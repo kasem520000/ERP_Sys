@@ -183,6 +183,8 @@ POLICY choice itself — RISK-032 remains open exactly as round 2 left
 it; the corrections state what IS shipped and pinned, never what should
 be.
 
+> **[Corrected 2026-11-15 (the c537113 round) — the unreserved-demand policy is DECIDED, not open:** the owner's 2026-11-14 completion-round directive (reaffirmed by every round since): the unreserved portion is ADVISORY ONLY and a BACKORDER STAYS LEGAL — no ATP gate exists at issue; the (a)/(b) alternatives (auto-reserve at issue; a blocking gate) are off the table unless the owner reopens the decision. RISK-032 stays open ONLY for the independent review's verdict on the reservation-side defenses, never as a policy question.]
+
 ## Item 6 — the owner's full-suite run notes (recorded, not attributed to the project per the owner's instruction)
 
 - `ga-spike` failed in the owner's independent full-suite run then

@@ -410,7 +410,7 @@ describe("G-48 tolling round trip (stock-at-processor)", () => {
 // =====================================================================================
 
 describe("G-49 MTO completion (the reservation chain)", () => {
-  it("golden: the linked sales line's FG is availability-reserved at the MO's actual cost (the soft model — an ATP-level hold, never a physical pick lock; the hard-vs-soft POLICY choice stays open, RISK-032)", async () => {
+  it("golden: the linked sales line's FG is availability-reserved at the MO's actual cost (the soft model — an ATP-level hold, never a physical pick lock; the unreserved-demand policy is DECIDED — advisory only, backorder legal; RISK-032 open for the reservation-defense review only)", async () => {
     const f = spec.fixture!;
     const s = spec.items!;
     await withTenant(TENANT_M, async () => {
