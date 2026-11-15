@@ -94,3 +94,34 @@ export class AttendanceImmutableError extends DomainError {
     super("ATTENDANCE_IMMUTABLE", message);
   }
 }
+
+/**
+ * PHASE-045 (T-05 — the device import) domain errors: the generic CSV
+ * adapter's typed refusals (the file/mapping shape), the fingerprint
+ * floor (the same file never commits twice), and the quarantine
+ * review's lifecycle conflicts — all BEFORE any write, the T-04
+ * contract.
+ */
+export class AttendanceImportInvalidError extends DomainError {
+  constructor(message: string) {
+    super("ATTENDANCE_IMPORT_INVALID", message);
+  }
+}
+export class AttendanceImportAlreadyCommittedError extends DomainError {
+  constructor(message: string) {
+    super("ATTENDANCE_IMPORT_ALREADY_COMMITTED", message);
+  }
+}
+export class AttendanceAnomalyNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("ATTENDANCE_ANOMALY_NOT_FOUND", `import anomaly ${id} does not exist in this tenant`);
+  }
+}
+export class AttendanceAnomalyResolvedError extends DomainError {
+  constructor(id: string, status: string) {
+    super(
+      "ATTENDANCE_ANOMALY_RESOLVED",
+      `import anomaly ${id} is already ${status} — only a PENDING anomaly can be resolved`,
+    );
+  }
+}

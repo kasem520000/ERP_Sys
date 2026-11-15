@@ -3929,6 +3929,47 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/attendance/derive",
     permission: "hr.attendance",
   },
+
+  // PHASE-045 (T-05 — the 0086 seed's split): the DEVICE-IMPORT WIZARD
+  // (preview, commit, the column mapping) rides hr.attendance.import
+  // ("run the device-import wizard"); the REVIEW surface (the import
+  // log + the anomaly quarantine + the resolve action) rides
+  // hr.attendance (the register's management key).
+  {
+    method: "POST",
+    path: "/api/v1/hr/attendance/import/preview",
+    permission: "hr.attendance.import",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/attendance/import/commit",
+    permission: "hr.attendance.import",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/attendance/import/mapping",
+    permission: "hr.attendance.import",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/attendance/import/mapping",
+    permission: "hr.attendance.import",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/attendance/import/batches",
+    permission: "hr.attendance",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/attendance/import/anomalies",
+    permission: "hr.attendance",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/attendance/import/anomalies/:id/resolve",
+    permission: "hr.attendance",
+  },
 ];
 
 /**

@@ -490,6 +490,12 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "leave_requests" },
   { table: "holiday_calendars", deleteGranted: true },
   { table: "holidays", deleteGranted: true },
+  // PHASE-045 T-05 (migration 0087, added 2026-11-15): the device-import
+  // cluster — the import LOG (append-only: no UPDATE, no DELETE — the
+  // fingerprint floor's evidence) and the anomaly QUARANTINE (no DELETE:
+  // the quarantine is the evidence; the resolution is the UPDATE).
+  { table: "attendance_import_batches" },
+  { table: "attendance_import_anomalies" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

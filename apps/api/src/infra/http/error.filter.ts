@@ -386,7 +386,14 @@ import { AgencyTokenInvalidError } from "../../modules/sales/domain/sales-errors
 // shape as the 59085a0 round's permissions-drift spec repair); the
 // codes never changed, only the HTTP status now matches the A-series
 // 404 convention every other not-found in the house follows.
+// PHASE-045 (T-05 — the device import): the quarantine not-found joins
+// the 404 family; the fingerprint floor (the same file never commits
+// twice) and the resolve-on-resolved anomaly are 409 lifecycle
+// conflicts (the payroll state-conflict precedent).
 import {
+  AttendanceAnomalyNotFoundError as HrAttendanceAnomalyNotFoundError,
+  AttendanceAnomalyResolvedError as HrAttendanceAnomalyResolvedError,
+  AttendanceImportAlreadyCommittedError,
   AttendanceRecordNotFoundError as HrAttendanceRecordNotFoundError,
   EmployeeNotFoundError as HrEmployeeNotFoundError,
   ShiftNotFoundError,
@@ -692,14 +699,26 @@ function domainStatus(error: DomainError): number {
   // repair: ShiftNotFoundError + the hr EmployeeNotFoundError rendered
   // 422 from T-03's landing until this row (2026-11-15) — codes stable,
   // statuses corrected to the house 404 convention; T-04's
-  // AttendanceRecordNotFoundError lands with its correct status from
-  // the start.
+  // AttendanceRecordNotFoundError and T-05's AttendanceAnomalyNotFoundError
+  // land with their correct status from the start.
   if (
     error instanceof HrEmployeeNotFoundError ||
     error instanceof ShiftNotFoundError ||
-    error instanceof HrAttendanceRecordNotFoundError
+    error instanceof HrAttendanceRecordNotFoundError ||
+    error instanceof HrAttendanceAnomalyNotFoundError
   ) {
     return HttpStatus.NOT_FOUND;
+  }
+  // PHASE-045 (T-05): the device-import lifecycle conflicts — the
+  // fingerprint floor (the same file never commits twice) and a
+  // resolve attempt on an already-resolved anomaly — 409 (the payroll
+  // state-conflict precedent); the import shape family
+  // (ATTENDANCE_IMPORT_INVALID) falls through to the 422 default.
+  if (
+    error instanceof AttendanceImportAlreadyCommittedError ||
+    error instanceof HrAttendanceAnomalyResolvedError
+  ) {
+    return HttpStatus.CONFLICT;
   }
   // SF-027-001: the fixed_assets 404s + 409s (the policy/validation family
   // falls through to the 422 default — PERIOD_LOCKED, CATEGORY_NOT_USABLE,

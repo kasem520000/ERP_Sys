@@ -68,6 +68,12 @@ const NO_UPDATE_GRANT = new Set([
   // PHASE-014 (migration 0021): the append-only billing trail (grants +
   // guard trigger — the audit_events pattern).
   "billing_events",
+  // PHASE-045 T-05 (migration 0087, added 2026-11-15): the import LOG
+  // is append-only by grants (SELECT/INSERT — no UPDATE, no DELETE —
+  // the fingerprint floor's evidence never rewrites). The anomaly
+  // QUARANTINE carries UPDATE (the resolution write) so it is NOT in
+  // this set.
+  "attendance_import_batches",
   // PHASE-023 (migration 0035): the certificate usage audit is
   // INSERT + SELECT only (grants) — every decrypt/sign is append-only
   // history; retention is the DELETE-granted sweep.
@@ -3152,6 +3158,29 @@ async function seedFixtures(superuser: {
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
+  // PHASE-045 T-05 (migration 0087): the import log + the quarantine.
+  await superuser.query(
+    `INSERT INTO attendance_import_batches (id, tenant_id, file_name, file_sha256, file_size,
+                                            row_count, imported_count, quarantine_count, mapping)
+     VALUES
+       ('7b7b7b7b-0000-4000-8000-000000000001', $1, 'iso-a.csv',
+        repeat('a', 64), 10, 5, 4, 1, '{}'::jsonb),
+       ('7b7b7b7b-0000-4000-8000-000000000002', $2, 'iso-b.csv',
+        repeat('b', 64), 10, 5, 4, 1, '{}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO attendance_import_anomalies (id, tenant_id, batch_id, line_no, employee_code,
+                                               reason, raw_line)
+     VALUES
+       ('7c7c7c7c-0000-4000-8000-000000000001', $1, '7b7b7b7b-0000-4000-8000-000000000001',
+        3, 'ISO-UNKNOWN', 'INVALID_ROW', 'ISO-UNKNOWN,garbage,in'),
+       ('7c7c7c7c-0000-4000-8000-000000000002', $2, '7b7b7b7b-0000-4000-8000-000000000002',
+        3, 'ISO-UNKNOWN', 'INVALID_ROW', 'ISO-UNKNOWN,garbage,in')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
 
   // -- seedFixtures end --
 
@@ -3690,6 +3719,8 @@ const OWN_ROW: Record<string, [string, string]> = {
   leave_requests: ["78787878-0000-4000-8000-000000000001", "78787878-0000-4000-8000-000000000002"],
   holiday_calendars: ["79797979-0000-4000-8000-000000000001", "79797979-0000-4000-8000-000000000002"],
   holidays: ["7a7a7a7a-0000-4000-8000-000000000001", "7a7a7a7a-0000-4000-8000-000000000002"],
+  attendance_import_batches: ["7b7b7b7b-0000-4000-8000-000000000001", "7b7b7b7b-0000-4000-8000-000000000002"],
+  attendance_import_anomalies: ["7c7c7c7c-0000-4000-8000-000000000001", "7c7c7c7c-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4605,6 +4636,15 @@ const MISMATCHED_INSERT: Record<string, string> = {
   holidays: `INSERT INTO holidays (id, tenant_id, calendar_id, holiday_date, name)
      VALUES ('7a7a7a7a-3000-4000-8000-000000000003', $1, '79797979-0000-4000-8000-000000000002',
              '2027-03-06', 'Attack day')`,
+  // PHASE-045 T-05 (migration 0087): the import log + the quarantine —
+  // FKs at tenant B's own fixtures so the composite tenant FK stays
+  // satisfied and the RLS WITH CHECK is the isolated rejection.
+  attendance_import_batches: `INSERT INTO attendance_import_batches (id, tenant_id, file_name, file_sha256,
+                                                                    file_size, row_count, imported_count, quarantine_count, mapping)
+     VALUES ('7b7b7b7b-3000-4000-8000-000000000003', $1, 'ATK.csv', repeat('c', 64), 1, 1, 0, 0, '{}'::jsonb)`,
+  attendance_import_anomalies: `INSERT INTO attendance_import_anomalies (id, tenant_id, batch_id, line_no, raw_line, reason)
+     VALUES ('7c7c7c7c-3000-4000-8000-000000000003', $1, '7b7b7b7b-0000-4000-8000-000000000002',
+             4, 'ATK row', 'INVALID_ROW')`,
 };
 
 beforeAll(async () => {

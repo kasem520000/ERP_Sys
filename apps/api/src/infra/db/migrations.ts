@@ -455,7 +455,12 @@ export const MIGRATIONS: readonly string[] = [
   // the plan grants; the workforce-manifest enablement is DEFERRED to the
   // phase's T-15 web step — one coherent change with the canonical
   // manifests + the hash pins; the leave-types default is per-tenant
-  // first-use, not a global row — the kickoff decisions).
+  // first-use, not a global row — the kickoff decisions);
+  // 0087_hr_attendance_import — attendance_import_batches (the import
+  // log: the file fingerprint floor — the same file never commits
+  // twice) + attendance_import_anomalies (the quarantine: every refused
+  // line with its raw evidence + the typed reason, PENDING review —
+  // T-05, N-17).
   "0074_item_planning_policies",
   "0075_bom_planning",
   "0076_mrp_engine",
@@ -469,6 +474,7 @@ export const MIGRATIONS: readonly string[] = [
   "0084_hr_holidays",
   "0085_hr_identity_bridge",
   "0086_hr_seeds",
+  "0087_hr_attendance_import",
 ];
 
 /**

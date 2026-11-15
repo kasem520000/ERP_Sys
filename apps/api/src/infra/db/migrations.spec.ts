@@ -204,10 +204,12 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // simple-approval chain), 0084_hr_holidays (the per-jurisdiction
     // calendars), 0085_hr_identity_bridge (employees.user_id + the
     // partial-UNIQUE guard — HR-13), 0086_hr_seeds (the DATA-ONLY seed:
-    // the SIX hr.* permission keys, the plan grants, the workforce
-    // manifests; the leave-types default is per-tenant first-use — the
-    // kickoff decision, no global row exists to seed).
-    expect(files.at(-1)?.tag).toBe("0086_hr_seeds");
+    // the SIX hr.* permission keys, the plan grants; the leave-types
+    // default is per-tenant first-use — the kickoff decision, no global
+    // row exists to seed), 0087_hr_attendance_import (T-05, added
+    // 2026-11-15: attendance_import_batches — the file-fingerprint import
+    // log — + attendance_import_anomalies — the anomaly quarantine).
+    expect(files.at(-1)?.tag).toBe("0087_hr_attendance_import");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

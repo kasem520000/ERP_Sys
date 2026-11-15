@@ -9298,3 +9298,81 @@ export const holidays = pgTable(
     index("ix_holidays_tenant_date").on(table.tenantId, table.holidayDate),
   ],
 );
+
+/** The device-import log (T-05, N-17): one row per COMMITTED import —
+ * the source file's sha256 FINGERPRINT (the same file never commits
+ * twice — the UNIQUE floor), the counts, the mapping the import was
+ * interpreted with, and the file's device identity. An IMPORT record's
+ * traceability is its import_batch_id → this row (the 0081 CHECK binds
+ * device_ref to source='DEVICE' only). */
+export const attendanceImportBatches = pgTable(
+  "attendance_import_batches",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    fileName: text("file_name").notNull(),
+    fileSha256: char("file_sha256", { length: 64 }).notNull(),
+    fileSize: integer("file_size").notNull(),
+    rowCount: integer("row_count").notNull(),
+    importedCount: integer("imported_count").notNull(),
+    quarantineCount: integer("quarantine_count").notNull(),
+    deviceRef: text("device_ref"),
+    mapping: jsonb("mapping").notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_attendance_import_batches_id_tenant").on(
+      table.id,
+      table.tenantId,
+    ),
+    uniqueIndex("uq_attendance_import_batches_fingerprint").on(
+      table.tenantId,
+      table.fileSha256,
+    ),
+    index("ix_attendance_import_batches_tenant_created").on(
+      table.tenantId,
+      table.createdAt,
+    ),
+  ],
+);
+
+/** The anomaly quarantine (T-05): every refused import line with its
+ * RAW evidence + the typed reason, PENDING review — nothing lands
+ * silently; the resolve action (REJECT or IMPORT-with-corrections) is
+ * the reviewer's explicit act. */
+export const attendanceImportAnomalies = pgTable(
+  "attendance_import_anomalies",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    batchId: uuid("batch_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    employeeCode: text("employee_code"),
+    punchAt: text("punch_at"),
+    direction: text("direction"),
+    reason: text("reason").notNull(),
+    detail: text("detail"),
+    rawLine: text("raw_line").notNull(),
+    status: text("status").notNull().default("PENDING"),
+    resolutionNote: text("resolution_note"),
+    resolvedBy: uuid("resolved_by"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex("uq_attendance_import_anomalies_id_tenant").on(
+      table.id,
+      table.tenantId,
+    ),
+    index("ix_attendance_import_anomalies_batch").on(
+      table.tenantId,
+      table.batchId,
+    ),
+    index("ix_attendance_import_anomalies_tenant_status").on(
+      table.tenantId,
+      table.status,
+    ),
+  ],
+);
