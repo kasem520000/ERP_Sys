@@ -6427,3 +6427,294 @@ export interface WmsAbcRecomputeResult {
   c: number;
   totalConsumption: string;
 }
+
+// -- PHASE-045 (T-12/T-13): the HR wire types ----------------------------------------
+// Mirrors of the hr module's rows (attendance.controller.ts,
+// attendance-import.controller.ts, leave.controller.ts, hr.controller.ts —
+// the store SELECT aliases, camelCase, EXACT).
+
+/** GET hr/attendance/register?date= → the day's rows (punch sessions +
+ * derived markers; the absence marker carries null punches). */
+export interface AttendanceRecordRow {
+  id: string;
+  employeeId: string;
+  employeeCode: string;
+  employeeName: string;
+  workDate: string;
+  checkIn: string | null;
+  checkOut: string | null;
+  source: string;
+  deviceRef: string | null;
+  geoLat: number | null;
+  geoLng: number | null;
+  shiftId: string | null;
+  shiftCode: string | null;
+  derivedStatus: string | null;
+  lateMinutes: number | null;
+  earlyLeaveMinutes: number | null;
+  workedMinutes: number | null;
+  overtimeMinutes: number | null;
+  isException: boolean;
+  importBatchId: string | null;
+  note: string | null;
+}
+
+/** The joint-review pagination law: every page carries total + hasMore —
+ * the explicit truncation signal (the exceptions/batches/anomalies/
+ * requests/roster reads). */
+export interface AttendanceExceptionsPage {
+  rows: readonly AttendanceRecordRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** The device-import column mapping (GET/PUT hr/attendance/import/mapping;
+ * the same shape rides preview/commit as `mapping`). */
+export interface AttendanceImportMapping {
+  /** 0-based column index of the employee CODE. */
+  employeeCode: number;
+  /** 0-based column index of the punch timestamp. */
+  timestamp: number;
+  /** 0-based column index of the direction (IN/OUT), or null for a
+   * direction-less file (alternating pairing). */
+  direction: number | null;
+  /** 0-based column index of the device ref, or null. */
+  deviceRef: number | null;
+  timestampFormat: "ISO" | "DMY" | "MDY";
+  skipHeader: boolean;
+  delimiter: "," | ";" | "\t";
+}
+
+/** GET hr/attendance/import/mapping → the effective mapping (defaults or
+ * the stored tenant setting). */
+export interface AttendanceImportMappingRead {
+  mapping: AttendanceImportMapping;
+  stored: boolean;
+}
+
+/** A preview's paired session (the import pipeline's wall-clock space). */
+export interface AttendanceImportSession {
+  employeeId: string;
+  workDate: string;
+  checkInNaive: string;
+  checkOutNaive: string | null;
+  lineIn: number;
+  lineOut: number | null;
+  deviceRef: string | null;
+}
+
+/** A preview's quarantined line (the analysis anomaly — the commit's
+ * quarantine rows carry the persisted shape below). */
+export interface AttendanceImportPreviewAnomaly {
+  lineNo: number;
+  employeeCode: string | null;
+  punchAt: string | null;
+  direction: string | null;
+  reason: string;
+  detail: string | null;
+  rawLine: string;
+}
+
+/** POST hr/attendance/import/preview → the analysis alone (ZERO writes). */
+export interface ImportPreviewResult {
+  fingerprint: string;
+  rowCount: number;
+  sessions: readonly AttendanceImportSession[];
+  anomalies: readonly AttendanceImportPreviewAnomaly[];
+  mappingUsed: AttendanceImportMapping;
+}
+
+/** POST hr/attendance/derive → the run stats. */
+export interface AttendanceDeriveResult {
+  days: number;
+  rowsUpdated: number;
+  absentSynthesized: number;
+}
+
+/** hr/attendance/import/batches rows (the import log). */
+export interface ImportBatchRow {
+  id: string;
+  fileName: string;
+  fileSha256: string;
+  fileSize: number;
+  rowCount: number;
+  importedCount: number;
+  quarantineCount: number;
+  deviceRef: string | null;
+  mapping: unknown;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+}
+
+/** POST hr/attendance/import/commit → the batch + the quarantine count. */
+export interface ImportCommitResult extends ImportBatchRow {
+  anomalies: number;
+}
+
+/** The batches log page (the joint-review pagination law). */
+export interface ImportBatchesPage {
+  rows: readonly ImportBatchRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** The anomaly quarantine rows (hr/attendance/import/anomalies). */
+export interface ImportAnomalyRow {
+  id: string;
+  batchId: string;
+  lineNo: number;
+  employeeCode: string | null;
+  punchAt: string | null;
+  direction: string | null;
+  reason: string;
+  detail: string | null;
+  rawLine: string;
+  status: string;
+  resolutionNote: string | null;
+  resolvedBy: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+}
+
+/** The anomaly quarantine page (status filter PENDING/RESOLVED/REJECTED). */
+export interface ImportAnomaliesPage {
+  rows: readonly ImportAnomalyRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** GET/POST hr/leave/types → leave_types rows (decimal days as strings —
+ * ADR-0009's exact-decimal law). */
+export interface LeaveTypeRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  paid: boolean;
+  accrualDaysPerYear: string;
+  monthlyGrant: boolean;
+  prorateJoiners: boolean;
+  carryOverCapDays: string;
+  active: boolean;
+  note: string | null;
+  noteAr: string | null;
+}
+
+/** GET hr/leave/balances → the balance cells (SQL numeric — exact). */
+export interface LeaveBalanceRow {
+  employeeId: string;
+  employeeCode: string;
+  employeeName: string;
+  leaveTypeId: string;
+  leaveTypeCode: string;
+  year: number;
+  entitlementDays: string;
+  usedDays: string;
+  carriedForwardDays: string;
+  /** entitlement + carried − used. */
+  remainingDays: string;
+}
+
+/** GET/POST hr/leave/requests → leave_requests rows (joined dims). */
+export interface LeaveRequestRow {
+  id: string;
+  employeeId: string;
+  employeeCode: string;
+  employeeName: string;
+  leaveTypeId: string;
+  leaveTypeCode: string;
+  startDate: string;
+  endDate: string;
+  days: string;
+  status: string;
+  requestedBy: string | null;
+  decidedBy: string | null;
+  decidedAt: string | null;
+  decisionNote: string | null;
+  note: string | null;
+}
+
+/** GET hr/leave/requests → the requests page (status filter + the
+ * joint-review pagination law). */
+export interface LeaveRequestsPage {
+  rows: readonly LeaveRequestRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** POST hr/leave/accrual → the entitlement recompute stats. */
+export interface LeaveAccrualResult {
+  cellsWritten: number;
+  employees: number;
+  entitlements: readonly { employeeCode: string; entitlementDays: string }[];
+}
+
+/** POST hr/leave/rollover → the carry-over run stats. */
+export interface LeaveRolloverResult {
+  cellsWritten: number;
+  truncatedCount: number;
+  truncatedDays: string;
+}
+
+/** GET/POST hr/shifts → shift templates rows (the roster's shift axis).
+ * Named HrShiftRow — the wire already carries a treasury ShiftRow. */
+export interface HrShiftRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  startTime: string;
+  endTime: string;
+  graceMinutes: number;
+  breakMinutes: number;
+  isNight: boolean;
+  active: boolean;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/roster → one grid cell (an employee × date roster row; the
+ * source is ROTATION | MANUAL per the upsert path). */
+export interface RosterCellRow {
+  id: string;
+  employeeId: string;
+  employeeCode: string;
+  employeeName: string;
+  workDate: string;
+  shiftId: string | null;
+  shiftCode: string | null;
+  shiftName: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  isNight: boolean | null;
+  source: string;
+  note: string | null;
+}
+
+/** GET hr/roster → the paginated grid (the joint-review pagination law:
+ * walk pages until hasMore flips false). */
+export interface RosterPage {
+  rows: readonly RosterCellRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** POST hr/roster/rotation → the rotation run stats. */
+export interface RosterRotationResult {
+  cellsWritten: number;
+  manualPreserved: number;
+  days: number;
+}

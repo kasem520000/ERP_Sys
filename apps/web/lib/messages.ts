@@ -2681,3 +2681,123 @@ export function localizedOnboardingError(
       return localizedApiError(d, error, retryAfterSeconds);
   }
 }
+
+// -- PHASE-045 (T-12/T-13): HR — attendance, leave, shifts & roster -------------------
+
+/** PHASE-045: the derived day-status label map (the derivation law's
+ * six verdicts; null renders the honest em-dash caller-side). */
+export function localizedHrAttendanceStatus(d: Dictionary, status: string | null): string {
+  if (status === null) return "—";
+  const map: Record<string, string> = {
+    PRESENT: d.hrStatusPresent,
+    LATE: d.hrStatusLate,
+    ABSENT: d.hrStatusAbsent,
+    MISSING_PUNCH: d.hrStatusMissingPunch,
+    HOLIDAY: d.hrStatusHoliday,
+    ON_LEAVE: d.hrStatusOnLeave,
+  };
+  return map[status] ?? status;
+}
+
+/** PHASE-045: the leave request lifecycle label map. */
+export function localizedHrLeaveStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    PENDING: d.hrLeaveStatusPending,
+    APPROVED: d.hrLeaveStatusApproved,
+    REJECTED: d.hrLeaveStatusRejected,
+    CANCELLED: d.hrLeaveStatusCancelled,
+  };
+  return map[status] ?? status;
+}
+
+/** PHASE-045: the import-anomaly quarantine status label map. */
+export function localizedHrAnomalyStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    PENDING: d.hrAnomalyPending,
+    RESOLVED: d.hrAnomalyResolved,
+    REJECTED: d.hrAnomalyRejected,
+  };
+  return map[status] ?? status;
+}
+
+/** PHASE-045: the import-anomaly reason label map (the eight typed
+ * quarantine reasons — INVALID_ROW through SESSION_OVERLAP). */
+export function localizedHrAnomalyReason(d: Dictionary, reason: string): string {
+  const map: Record<string, string> = {
+    UNKNOWN_EMPLOYEE: d.hrReasonUnknownEmployee,
+    INVALID_ROW: d.hrReasonInvalidRow,
+    OUT_OF_RANGE: d.hrReasonOutOfRange,
+    DUPLICATE_IN_FILE: d.hrReasonDuplicateInFile,
+    ALREADY_IMPORTED: d.hrReasonAlreadyImported,
+    DOUBLE_PUNCH_IN: d.hrReasonDoublePunchIn,
+    ORPHAN_PUNCH_OUT: d.hrReasonOrphanPunchOut,
+    SESSION_OVERLAP: d.hrReasonSessionOverlap,
+  };
+  return map[reason] ?? reason;
+}
+
+/** PHASE-045: the punch-source label map (MANUAL/DEVICE). */
+export function localizedHrPunchSource(d: Dictionary, source: string): string {
+  if (source === "DEVICE") return d.hrSourceDevice;
+  return d.hrSourceManual;
+}
+
+/** PHASE-045: the roster cell's provenance label map (ROTATION/MANUAL). */
+export function localizedHrRosterSource(d: Dictionary, source: string): string {
+  if (source === "MANUAL") return d.hrRosterSourceManual;
+  return d.hrRosterSourceRotation;
+}
+
+/** PHASE-045: the HR typed-error map (hr-errors.ts + leave-errors.ts —
+ * the budgeting/payroll precedent). The A7-sensitive not-founds render
+ * one honest message; unknown codes fall back to the generic mapper. */
+export function localizedHrError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "SHIFT_NOT_FOUND":
+    case "HR_EMPLOYEE_NOT_FOUND":
+    case "ATTENDANCE_RECORD_NOT_FOUND":
+    case "ATTENDANCE_ANOMALY_NOT_FOUND":
+    case "LEAVE_TYPE_NOT_FOUND":
+    case "LEAVE_REQUEST_NOT_FOUND":
+      return d.hrErrNotFound;
+    case "SHIFT_CODE_TAKEN":
+      return d.hrErrShiftCodeTaken;
+    case "SHIFT_INVALID":
+    case "ROSTER_CELL_INVALID":
+    case "ROTATION_INVALID":
+      return d.hrErrRosterInvalid;
+    case "SHIFT_INACTIVE":
+      return d.hrErrShiftInactive;
+    case "LEAVE_TYPE_INACTIVE":
+      return d.hrErrLeaveTypeInactive;
+    case "ATTENDANCE_RECORD_INVALID":
+    case "LEAVE_TYPE_INVALID":
+    case "LEAVE_REQUEST_INVALID":
+    case "LEAVE_ACCRUAL_INVALID":
+      return d.hrErrShapeInvalid;
+    case "ATTENDANCE_SESSION_OVERLAP":
+      return d.hrErrPunchOverlap;
+    case "ATTENDANCE_DUPLICATE_PUNCH":
+      return d.hrErrDuplicatePunch;
+    case "ATTENDANCE_IMMUTABLE":
+      return d.hrErrImmutable;
+    case "ATTENDANCE_IMPORT_INVALID":
+      return d.hrErrImportInvalid;
+    case "ATTENDANCE_IMPORT_ALREADY_COMMITTED":
+      return d.hrErrImportAlreadyCommitted;
+    case "ATTENDANCE_ANOMALY_RESOLVED":
+      return d.hrErrAnomalyResolved;
+    case "LEAVE_REQUEST_DECIDED":
+      return d.hrErrLeaveDecided;
+    case "LEAVE_BALANCE_INSUFFICIENT":
+      return d.hrErrBalanceInsufficient;
+    case "LEAVE_SPAN_OVERLAP":
+      return d.hrErrLeaveOverlap;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}

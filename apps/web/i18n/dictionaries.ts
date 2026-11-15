@@ -6186,6 +6186,230 @@ export interface Dictionary {
   wmsErrCcState: string;
   wmsErrCcThreshold: string;
   wmsErrAbcThreshold: string;
+
+  // PHASE-045 (T-12/T-13): HR — attendance register + exception board +
+  // the device-import wizard, the leave screen, the shifts/roster screen.
+  // Titles & sections
+  hrAttendanceTitle: string;
+  hrAttendanceImportTitle: string;
+  hrLeaveTitle: string;
+  hrShiftsTitle: string;
+  hrAttendanceRegister: string;
+  hrExceptionBoard: string;
+  hrImportWizard: string;
+  hrImportBatchesLog: string;
+  hrImportQuarantine: string;
+  hrLeaveRequests: string;
+  hrLeaveBalances: string;
+  hrLeaveTypesSection: string;
+  hrShiftTemplates: string;
+  hrRosterEditor: string;
+  hrRotationTitle: string;
+  // Column labels
+  hrColEmployee: string;
+  hrColDate: string;
+  hrColStatus: string;
+  hrColCheckIn: string;
+  hrColCheckOut: string;
+  hrColShift: string;
+  hrColLate: string;
+  hrColEarlyLeave: string;
+  hrColWorked: string;
+  hrColOvertime: string;
+  hrColSource: string;
+  hrColNote: string;
+  hrColDays: string;
+  hrColEntitlement: string;
+  hrColUsed: string;
+  hrColCarried: string;
+  hrColRemaining: string;
+  hrColCode: string;
+  hrColName: string;
+  hrColNameAr: string;
+  hrColPaid: string;
+  // Derived day statuses
+  hrStatusPresent: string;
+  hrStatusLate: string;
+  hrStatusAbsent: string;
+  hrStatusMissingPunch: string;
+  hrStatusHoliday: string;
+  hrStatusOnLeave: string;
+  // Leave request statuses
+  hrLeaveStatusPending: string;
+  hrLeaveStatusApproved: string;
+  hrLeaveStatusRejected: string;
+  hrLeaveStatusCancelled: string;
+  // Anomaly statuses
+  hrAnomalyPending: string;
+  hrAnomalyResolved: string;
+  hrAnomalyRejected: string;
+  // Anomaly reasons
+  hrReasonUnknownEmployee: string;
+  hrReasonInvalidRow: string;
+  hrReasonOutOfRange: string;
+  hrReasonDuplicateInFile: string;
+  hrReasonAlreadyImported: string;
+  hrReasonDoublePunchIn: string;
+  hrReasonOrphanPunchOut: string;
+  hrReasonSessionOverlap: string;
+  // Sources & provenance
+  hrSourceManual: string;
+  hrSourceDevice: string;
+  hrRosterSourceRotation: string;
+  hrRosterSourceManual: string;
+  // Filters & pagination
+  hrFilterDate: string;
+  hrFilterFrom: string;
+  hrFilterTo: string;
+  hrApplyBtn: string;
+  hrPageOf: string;
+  hrTotalRows: string;
+  // Manual capture + checkout (BR-082)
+  hrCaptureTitle: string;
+  hrCaptureWorkDate: string;
+  hrCaptureCheckIn: string;
+  hrCaptureCheckOut: string;
+  hrCaptureDeviceRef: string;
+  hrCaptureBtn: string;
+  hrCaptureDone: string;
+  hrCheckoutBtn: string;
+  hrCheckoutAt: string;
+  hrCheckoutDone: string;
+  hrTimeHint: string;
+  // Derivation run
+  hrDeriveTitle: string;
+  hrDeriveBtn: string;
+  hrDeriveDone: string;
+  // Empty states
+  hrRegisterEmpty: string;
+  hrExceptionsEmpty: string;
+  hrEmployeePoolEmpty: string;
+  // Import wizard
+  hrImportStepUpload: string;
+  hrImportStepPreview: string;
+  hrImportStepCommit: string;
+  hrImportFileLabel: string;
+  hrImportPasteLabel: string;
+  hrImportFileName: string;
+  hrImportDeviceRef: string;
+  hrImportPreviewBtn: string;
+  hrImportPreviewRowCount: string;
+  hrImportPreviewSessions: string;
+  hrImportPreviewAnomalies: string;
+  hrImportPreviewFingerprint: string;
+  hrImportCommitBtn: string;
+  hrImportCommitted: string;
+  hrImportMappingTitle: string;
+  hrImportColEmployeeCode: string;
+  hrImportColTimestamp: string;
+  hrImportColDirection: string;
+  hrImportColDeviceRef: string;
+  hrImportColNone: string;
+  hrImportTimestampFormat: string;
+  hrImportSkipHeader: string;
+  hrImportDelimiter: string;
+  hrImportDelimiterComma: string;
+  hrImportDelimiterSemicolon: string;
+  hrImportDelimiterTab: string;
+  hrImportMappingSaveBtn: string;
+  hrImportMappingSaved: string;
+  hrImportMappingDefault: string;
+  hrImportMappingStored: string;
+  hrImportSessionsColLines: string;
+  hrImportAnomaliesColLine: string;
+  hrImportAnomaliesColReason: string;
+  hrImportAnomaliesColDetail: string;
+  hrImportAnomaliesColRaw: string;
+  hrImportRejectBtn: string;
+  hrImportImportBtn: string;
+  hrImportResolveEmployee: string;
+  hrImportResolveCheckIn: string;
+  hrImportResolveCheckOut: string;
+  hrImportResolveNote: string;
+  hrImportResolvedToast: string;
+  hrImportNoContent: string;
+  hrImportColFile: string;
+  hrImportColRowCount: string;
+  hrImportColImported: string;
+  hrImportColQuarantined: string;
+  hrImportColCreatedAt: string;
+  hrImportBatchesEmpty: string;
+  hrImportAnomaliesEmpty: string;
+  hrImportWizardForbidden: string;
+  // Leave
+  hrLeaveNewRequest: string;
+  hrLeaveTypeLabel: string;
+  hrLeaveStartDate: string;
+  hrLeaveEndDate: string;
+  hrLeaveSubmitBtn: string;
+  hrLeaveRequestCreated: string;
+  hrLeaveApproveBtn: string;
+  hrLeaveRejectBtn: string;
+  hrLeaveCancelRequestBtn: string;
+  hrLeaveDecidedToast: string;
+  hrLeaveRequestsEmpty: string;
+  hrLeaveBalancesEmpty: string;
+  hrLeaveNewType: string;
+  hrLeaveAccrualDays: string;
+  hrLeaveMonthlyGrant: string;
+  hrLeaveProrateJoiners: string;
+  hrLeaveCarryCap: string;
+  hrLeaveTypeSavedToast: string;
+  hrActivateBtn: string;
+  hrDeactivateBtn: string;
+  hrLeaveAccrualTitle: string;
+  hrLeaveAccrualBtn: string;
+  hrLeaveAccrualAsOfMonth: string;
+  hrLeaveAccrualDone: string;
+  hrLeaveRolloverTitle: string;
+  hrLeaveRolloverFromYear: string;
+  hrLeaveRolloverToYear: string;
+  hrLeaveRolloverBtn: string;
+  hrLeaveRolloverDone: string;
+  hrLeaveTypesEmpty: string;
+  hrLeaveYearLabel: string;
+  // Shifts & roster
+  hrShiftNew: string;
+  hrShiftStart: string;
+  hrShiftEnd: string;
+  hrShiftGrace: string;
+  hrShiftBreak: string;
+  hrShiftNight: string;
+  hrShiftSavedToast: string;
+  hrShiftsEmpty: string;
+  hrShiftActive: string;
+  hrShiftInactive: string;
+  hrRosterGridHint: string;
+  hrRosterTruncated: string;
+  hrRosterCellTitle: string;
+  hrRosterCellClearOption: string;
+  hrRosterCellSetBtn: string;
+  hrRosterCellClearBtn: string;
+  hrRosterCellSetToast: string;
+  hrRosterCellClearedToast: string;
+  hrRosterEmpty: string;
+  hrRotationEmployees: string;
+  hrRotationDayOff: string;
+  hrRotationPatternHint: string;
+  hrRotationApplyBtn: string;
+  hrRotationDone: string;
+  hrRotationEmployeesRequired: string;
+  // HR errors
+  hrErrNotFound: string;
+  hrErrShiftCodeTaken: string;
+  hrErrRosterInvalid: string;
+  hrErrShiftInactive: string;
+  hrErrLeaveTypeInactive: string;
+  hrErrShapeInvalid: string;
+  hrErrPunchOverlap: string;
+  hrErrDuplicatePunch: string;
+  hrErrImmutable: string;
+  hrErrImportInvalid: string;
+  hrErrImportAlreadyCommitted: string;
+  hrErrAnomalyResolved: string;
+  hrErrLeaveDecided: string;
+  hrErrBalanceInsufficient: string;
+  hrErrLeaveOverlap: string;
 }
 
 const ar: Dictionary = {
@@ -12390,6 +12614,214 @@ const ar: Dictionary = {
   wmsErrCcState: "حالة مستند الجرد لا تسمح بهذا الإجراء.",
   wmsErrCcThreshold: "الفروق تتجاوز عتبة الاعتماد — يلزم اعتماد المشرف.",
   wmsErrAbcThreshold: "حدود ABC غير صالحة (يجب 0 < أ < ب ≤ 1).",
+
+  // PHASE-045 (T-12/T-13): HR — الحضور والاستيراد والإجازات والورديات.
+  hrAttendanceTitle: "الحضور والغياب",
+  hrAttendanceImportTitle: "استيراد بصمات الأجهزة",
+  hrLeaveTitle: "الإجازات",
+  hrShiftsTitle: "الورديات وجدول التشغيل",
+  hrAttendanceRegister: "سجل اليوم",
+  hrExceptionBoard: "لوحة الاستثناءات",
+  hrImportWizard: "معالج الاستيراد",
+  hrImportBatchesLog: "سجل دفعات الاستيراد",
+  hrImportQuarantine: "قائمة العزل",
+  hrLeaveRequests: "طلبات الإجازة",
+  hrLeaveBalances: "أرصدة الإجازات",
+  hrLeaveTypesSection: "أنواع الإجازات",
+  hrShiftTemplates: "قوالب الورديات",
+  hrRosterEditor: "محرر جدول التشغيل",
+  hrRotationTitle: "مولّد التدوير الأسبوعي",
+  hrColEmployee: "الموظف",
+  hrColDate: "التاريخ",
+  hrColStatus: "الحالة",
+  hrColCheckIn: "الحضور",
+  hrColCheckOut: "الانصراف",
+  hrColShift: "الوردية",
+  hrColLate: "التأخير (د)",
+  hrColEarlyLeave: "خروج مبكر (د)",
+  hrColWorked: "العمل الفعلي (د)",
+  hrColOvertime: "العمل الإضافي (د)",
+  hrColSource: "المصدر",
+  hrColNote: "ملاحظة",
+  hrColDays: "الأيام",
+  hrColEntitlement: "الاستحقاق (يوم)",
+  hrColUsed: "المستخدم (يوم)",
+  hrColCarried: "المنقول (يوم)",
+  hrColRemaining: "المتبقي (يوم)",
+  hrColCode: "الرمز",
+  hrColName: "الاسم",
+  hrColNameAr: "الاسم (عربي)",
+  hrColPaid: "مدفوعة",
+  hrStatusPresent: "حاضر",
+  hrStatusLate: "متأخر",
+  hrStatusAbsent: "غائب",
+  hrStatusMissingPunch: "بصمة ناقصة",
+  hrStatusHoliday: "عطلة رسمية",
+  hrStatusOnLeave: "في إجازة",
+  hrLeaveStatusPending: "قيد الانتظار",
+  hrLeaveStatusApproved: "معتمدة",
+  hrLeaveStatusRejected: "مرفوضة",
+  hrLeaveStatusCancelled: "ملغاة",
+  hrAnomalyPending: "قيد المراجعة",
+  hrAnomalyResolved: "معالجة",
+  hrAnomalyRejected: "مرفوضة",
+  hrReasonUnknownEmployee: "موظف غير معروف",
+  hrReasonInvalidRow: "سطر غير صالح",
+  hrReasonOutOfRange: "خارج النطاق الزمني",
+  hrReasonDuplicateInFile: "تكرار داخل الملف",
+  hrReasonAlreadyImported: "مستوردة مسبقاً",
+  hrReasonDoublePunchIn: "حضور مزدوج",
+  hrReasonOrphanPunchOut: "انصراف يتيم",
+  hrReasonSessionOverlap: "تعارض الجلسات",
+  hrSourceManual: "يدوي",
+  hrSourceDevice: "جهاز",
+  hrRosterSourceRotation: "تدوير",
+  hrRosterSourceManual: "يدوي",
+  hrFilterDate: "تاريخ السجل",
+  hrFilterFrom: "من تاريخ",
+  hrFilterTo: "إلى تاريخ",
+  hrApplyBtn: "تطبيق",
+  hrPageOf: "صفحة {current} من {total}",
+  hrTotalRows: "الإجمالي: {count}",
+  hrCaptureTitle: "تسجيل بصمة يدوية",
+  hrCaptureWorkDate: "يوم العمل",
+  hrCaptureCheckIn: "وقت الحضور",
+  hrCaptureCheckOut: "وقت الانصراف (اختياري)",
+  hrCaptureDeviceRef: "مرجع الجهاز",
+  hrCaptureBtn: "سجّل البصمة",
+  hrCaptureDone: "سُجلت البصمة وأُعيد اشتقاق اليوم.",
+  hrCheckoutBtn: "أغلق الجلسة",
+  hrCheckoutAt: "وقت الانصراف",
+  hrCheckoutDone: "أُغلقت الجلسة.",
+  hrTimeHint: "صيغة 24 ساعة HH:MM",
+  hrDeriveTitle: "اشتقاق أحكام الأيام",
+  hrDeriveBtn: "نفّذ الاشتقاق",
+  hrDeriveDone: "اشتُقت {days} يوماً: حُدّثت {rows} صفوفاً ووُلّدت {absent} علامة غياب.",
+  hrRegisterEmpty: "لا سجلات لهذا اليوم.",
+  hrExceptionsEmpty: "لا استثناءات في هذه الفترة.",
+  hrEmployeePoolEmpty: "دليل الموظفين غير متاح — تعذّر تحميل قائمة الموظفين.",
+  hrImportStepUpload: "ملف البصمات",
+  hrImportStepPreview: "المعاينة",
+  hrImportStepCommit: "التنفيذ",
+  hrImportFileLabel: "ملف CSV من الجهاز",
+  hrImportPasteLabel: "أو الصق محتوى الملف",
+  hrImportFileName: "اسم الملف",
+  hrImportDeviceRef: "مرجع الجهاز الافتراضي (اختياري)",
+  hrImportPreviewBtn: "عاين",
+  hrImportPreviewRowCount: "أسطر البيانات",
+  hrImportPreviewSessions: "جلسات ستُستورد",
+  hrImportPreviewAnomalies: "أسطر ستُحجز",
+  hrImportPreviewFingerprint: "بصمة الملف (SHA-256)",
+  hrImportCommitBtn: "نفّذ الاستيراد",
+  hrImportCommitted: "استُوردت {imported} جلسة وحُجز {quarantined} سطراً.",
+  hrImportMappingTitle: "تعيين الأعمدة",
+  hrImportColEmployeeCode: "عمود رقم الموظف",
+  hrImportColTimestamp: "عمود الوقت",
+  hrImportColDirection: "عمود الاتجاه (اختياري)",
+  hrImportColDeviceRef: "عمود الجهاز (اختياري)",
+  hrImportColNone: "غير موجود",
+  hrImportTimestampFormat: "صيغة الوقت",
+  hrImportSkipHeader: "تجاوز سطر العناوين",
+  hrImportDelimiter: "الفاصل",
+  hrImportDelimiterComma: "فاصلة (,)",
+  hrImportDelimiterSemicolon: "فاصلة منقوطة (;)",
+  hrImportDelimiterTab: "علامة جدولة",
+  hrImportMappingSaveBtn: "احفظ التعيين افتراضياً",
+  hrImportMappingSaved: "حُفظ تعيين الأعمدة.",
+  hrImportMappingDefault: "التعيين الحالي هو الافتراضي النظامي (لا تفضيل محفوظ بعد).",
+  hrImportMappingStored: "التعيين الحالي محفوظ تفضيلاً لهذا النطاق.",
+  hrImportSessionsColLines: "الأسطر",
+  hrImportAnomaliesColLine: "السطر",
+  hrImportAnomaliesColReason: "السبب",
+  hrImportAnomaliesColDetail: "التفصيل",
+  hrImportAnomaliesColRaw: "السطر الأصلي",
+  hrImportRejectBtn: "ارفض السطر",
+  hrImportImportBtn: "استورد مصحّحة",
+  hrImportResolveEmployee: "الموظف الصحيح",
+  hrImportResolveCheckIn: "الحضور الصحيح (YYYY-MM-DD HH:MM)",
+  hrImportResolveCheckOut: "الانصراف الصحيح (اختياري)",
+  hrImportResolveNote: "ملاحظة القرار (اختياري)",
+  hrImportResolvedToast: "عولجت الحالة المحجوزة.",
+  hrImportNoContent: "اختر ملفاً أو الصق المحتوى أولاً.",
+  hrImportColFile: "الملف",
+  hrImportColRowCount: "عدد الأسطر",
+  hrImportColImported: "المستوردة",
+  hrImportColQuarantined: "المحجوزة",
+  hrImportColCreatedAt: "وقت الاستيراد",
+  hrImportBatchesEmpty: "لا دفعات استيراد بعد.",
+  hrImportAnomaliesEmpty: "لا حالات في العزل.",
+  hrImportWizardForbidden: "لا تملك صلاحية تشغيل معالج الاستيراد — يمكنك مراجعة السجل والعزل فقط.",
+  hrLeaveNewRequest: "طلب إجازة جديد",
+  hrLeaveTypeLabel: "نوع الإجازة",
+  hrLeaveStartDate: "تاريخ البداية",
+  hrLeaveEndDate: "تاريخ النهاية",
+  hrLeaveSubmitBtn: "أنشئ الطلب",
+  hrLeaveRequestCreated: "أُنشئ طلب الإجازة.",
+  hrLeaveApproveBtn: "اعتمد",
+  hrLeaveRejectBtn: "ارفض",
+  hrLeaveCancelRequestBtn: "ألغِ الطلب",
+  hrLeaveDecidedToast: "حُدّثت حالة الطلب.",
+  hrLeaveRequestsEmpty: "لا طلبات في هذه الفترة.",
+  hrLeaveBalancesEmpty: "لا أرصدة لهذه السنة.",
+  hrLeaveNewType: "نوع إجازة جديد",
+  hrLeaveAccrualDays: "الاستحقاق السنوي (يوم)",
+  hrLeaveMonthlyGrant: "منحة شهرية",
+  hrLeaveProrateJoiners: "تناسب مع تاريخ التعيين",
+  hrLeaveCarryCap: "سقف النقل (يوم)",
+  hrLeaveTypeSavedToast: "حُفظ نوع الإجازة.",
+  hrActivateBtn: "فعّل",
+  hrDeactivateBtn: "أوقف",
+  hrLeaveAccrualTitle: "تشغيل سياسة الاستحقاق",
+  hrLeaveAccrualBtn: "نفّذ الاستحقاق",
+  hrLeaveAccrualAsOfMonth: "حتى شهر (اختياري)",
+  hrLeaveAccrualDone: "كُتبت {cells} خلية استحقاق لـ {employees} موظف.",
+  hrLeaveRolloverTitle: "نقل الأرصدة بين السنوات",
+  hrLeaveRolloverFromYear: "من سنة",
+  hrLeaveRolloverToYear: "إلى سنة",
+  hrLeaveRolloverBtn: "نفّذ النقل",
+  hrLeaveRolloverDone: "نُقلت {cells} خلية؛ قُصّت {count} حالة بمقدار {days} يوماً.",
+  hrLeaveTypesEmpty: "لا أنواع إجازات بعد.",
+  hrLeaveYearLabel: "سنة الأرصدة",
+  hrShiftNew: "وردية جديدة",
+  hrShiftStart: "بداية الوردية",
+  hrShiftEnd: "نهاية الوردية",
+  hrShiftGrace: "سماح التأخير (دقيقة)",
+  hrShiftBreak: "الاستراحة (دقيقة)",
+  hrShiftNight: "وردية ليلية",
+  hrShiftSavedToast: "حُفظت الوردية.",
+  hrShiftsEmpty: "لا ورديات بعد.",
+  hrShiftActive: "نشطة",
+  hrShiftInactive: "موقوفة",
+  hrRosterGridHint: "انقر خلية لتحريرها: اختر الوردية أو امسحها.",
+  hrRosterTruncated: "عُرض جزء من الشبكة ({cells} خلية) — ضيّق الفترة.",
+  hrRosterCellTitle: "خلية الجدول",
+  hrRosterCellClearOption: "بدون وردية",
+  hrRosterCellSetBtn: "اضبط الخلية",
+  hrRosterCellClearBtn: "امسح الخلية",
+  hrRosterCellSetToast: "ضُبطت الخلية.",
+  hrRosterCellClearedToast: "مُسحت الخلية.",
+  hrRosterEmpty: "لا خلايا في هذه الفترة.",
+  hrRotationEmployees: "الموظفون",
+  hrRotationDayOff: "راحة",
+  hrRotationPatternHint: "نمط الأسبوع من الاثنين إلى الأحد؛ «راحة» تعني بلا وردية.",
+  hrRotationApplyBtn: "طبّق التدوير",
+  hrRotationDone: "كُتبت {cells} خلية؛ حُفظ {manual} خلية يدوية.",
+  hrRotationEmployeesRequired: "اختر موظفاً واحداً على الأقل.",
+  hrErrNotFound: "السجل غير موجود في هذا النطاق.",
+  hrErrShiftCodeTaken: "رمز الوردية مستخدم مسبقاً في هذا النطاق.",
+  hrErrRosterInvalid: "بيانات الوردية أو الجدول غير صالحة.",
+  hrErrShiftInactive: "الوردية موقوفة — فعّلها قبل جدولتها.",
+  hrErrLeaveTypeInactive: "نوع الإجازة موقوف — فعّله قبل طلبه.",
+  hrErrShapeInvalid: "بيانات غير صالحة — راجع الحقول المطلوبة.",
+  hrErrPunchOverlap: "تتعارض الجلسة مع جلسة قائمة لنفس الموظف في اليوم نفسه.",
+  hrErrDuplicatePunch: "توجد جلسة لنفس الموظف تبدأ في اللحظة نفسها.",
+  hrErrImmutable: "البصمة المرتكبة غير قابلة للتعديل — يُسجَّل التصحيح كبصمة جديدة.",
+  hrErrImportInvalid: "ملف الاستيراد أو تعيين الأعمدة غير صالح.",
+  hrErrImportAlreadyCommitted: "هذا الملف بعينه استُورد مسبقاً.",
+  hrErrAnomalyResolved: "الحالة المحجوزة عولجت مسبقاً.",
+  hrErrLeaveDecided: "الطلب محسوم مسبقاً — لا يُعالَج إلا الطلب قيد الانتظار.",
+  hrErrBalanceInsufficient: "رصيد الإجازة لا يكفي لاعتماد الطلب.",
+  hrErrLeaveOverlap: "يتقاطع امتداد الإجازة مع إجازة قائمة لهذا الموظف.",
 };
 
 const en: Dictionary = {
@@ -18608,6 +19040,214 @@ const en: Dictionary = {
   wmsErrCcState: "The cycle-count document's state does not allow this action.",
   wmsErrCcThreshold: "Variances exceed the approval threshold — a supervisor approval is required.",
   wmsErrAbcThreshold: "Invalid ABC thresholds (must satisfy 0 < aPct < bPct ≤ 1).",
+
+  // PHASE-045 (T-12/T-13): HR — attendance, import, leave, shifts & roster.
+  hrAttendanceTitle: "Attendance",
+  hrAttendanceImportTitle: "Device punch import",
+  hrLeaveTitle: "Leave",
+  hrShiftsTitle: "Shifts & roster",
+  hrAttendanceRegister: "Daily register",
+  hrExceptionBoard: "Exception board",
+  hrImportWizard: "Import wizard",
+  hrImportBatchesLog: "Import batches log",
+  hrImportQuarantine: "Quarantine",
+  hrLeaveRequests: "Leave requests",
+  hrLeaveBalances: "Leave balances",
+  hrLeaveTypesSection: "Leave types",
+  hrShiftTemplates: "Shift templates",
+  hrRosterEditor: "Roster editor",
+  hrRotationTitle: "Weekly rotation generator",
+  hrColEmployee: "Employee",
+  hrColDate: "Date",
+  hrColStatus: "Status",
+  hrColCheckIn: "Check-in",
+  hrColCheckOut: "Check-out",
+  hrColShift: "Shift",
+  hrColLate: "Late (min)",
+  hrColEarlyLeave: "Early leave (min)",
+  hrColWorked: "Worked (min)",
+  hrColOvertime: "Overtime (min)",
+  hrColSource: "Source",
+  hrColNote: "Note",
+  hrColDays: "Days",
+  hrColEntitlement: "Entitlement (days)",
+  hrColUsed: "Used (days)",
+  hrColCarried: "Carried (days)",
+  hrColRemaining: "Remaining (days)",
+  hrColCode: "Code",
+  hrColName: "Name",
+  hrColNameAr: "Name (Arabic)",
+  hrColPaid: "Paid",
+  hrStatusPresent: "Present",
+  hrStatusLate: "Late",
+  hrStatusAbsent: "Absent",
+  hrStatusMissingPunch: "Missing punch",
+  hrStatusHoliday: "Holiday",
+  hrStatusOnLeave: "On leave",
+  hrLeaveStatusPending: "Pending",
+  hrLeaveStatusApproved: "Approved",
+  hrLeaveStatusRejected: "Rejected",
+  hrLeaveStatusCancelled: "Cancelled",
+  hrAnomalyPending: "Pending review",
+  hrAnomalyResolved: "Resolved",
+  hrAnomalyRejected: "Rejected",
+  hrReasonUnknownEmployee: "Unknown employee",
+  hrReasonInvalidRow: "Invalid row",
+  hrReasonOutOfRange: "Outside the import horizon",
+  hrReasonDuplicateInFile: "Duplicate within the file",
+  hrReasonAlreadyImported: "Already imported",
+  hrReasonDoublePunchIn: "Double punch-in",
+  hrReasonOrphanPunchOut: "Orphan punch-out",
+  hrReasonSessionOverlap: "Session overlap",
+  hrSourceManual: "Manual",
+  hrSourceDevice: "Device",
+  hrRosterSourceRotation: "Rotation",
+  hrRosterSourceManual: "Manual",
+  hrFilterDate: "Register date",
+  hrFilterFrom: "From date",
+  hrFilterTo: "To date",
+  hrApplyBtn: "Apply",
+  hrPageOf: "Page {current} of {total}",
+  hrTotalRows: "Total: {count}",
+  hrCaptureTitle: "Manual punch capture",
+  hrCaptureWorkDate: "Work date",
+  hrCaptureCheckIn: "Check-in time",
+  hrCaptureCheckOut: "Check-out time (optional)",
+  hrCaptureDeviceRef: "Device ref",
+  hrCaptureBtn: "Capture punch",
+  hrCaptureDone: "Punch captured — the day was re-derived.",
+  hrCheckoutBtn: "Close session",
+  hrCheckoutAt: "Check-out time",
+  hrCheckoutDone: "Session closed.",
+  hrTimeHint: "24-hour HH:MM",
+  hrDeriveTitle: "Derive day verdicts",
+  hrDeriveBtn: "Run derivation",
+  hrDeriveDone: "Derived {days} days: {rows} rows updated, {absent} absence markers synthesized.",
+  hrRegisterEmpty: "No records for this day.",
+  hrExceptionsEmpty: "No exceptions in this range.",
+  hrEmployeePoolEmpty: "The employee directory is unavailable — the employee list could not be loaded.",
+  hrImportStepUpload: "Punch file",
+  hrImportStepPreview: "Preview",
+  hrImportStepCommit: "Commit",
+  hrImportFileLabel: "Device CSV file",
+  hrImportPasteLabel: "Or paste the file content",
+  hrImportFileName: "File name",
+  hrImportDeviceRef: "Default device ref (optional)",
+  hrImportPreviewBtn: "Preview",
+  hrImportPreviewRowCount: "Data rows",
+  hrImportPreviewSessions: "Sessions to import",
+  hrImportPreviewAnomalies: "Lines to quarantine",
+  hrImportPreviewFingerprint: "File fingerprint (SHA-256)",
+  hrImportCommitBtn: "Commit the import",
+  hrImportCommitted: "Imported {imported} sessions; {quarantined} lines quarantined.",
+  hrImportMappingTitle: "Column mapping",
+  hrImportColEmployeeCode: "Employee-code column",
+  hrImportColTimestamp: "Timestamp column",
+  hrImportColDirection: "Direction column (optional)",
+  hrImportColDeviceRef: "Device-ref column (optional)",
+  hrImportColNone: "Not present",
+  hrImportTimestampFormat: "Timestamp format",
+  hrImportSkipHeader: "Skip the header row",
+  hrImportDelimiter: "Delimiter",
+  hrImportDelimiterComma: "Comma (,)",
+  hrImportDelimiterSemicolon: "Semicolon (;)",
+  hrImportDelimiterTab: "Tab",
+  hrImportMappingSaveBtn: "Save mapping as the default",
+  hrImportMappingSaved: "Column mapping saved.",
+  hrImportMappingDefault: "The current mapping is the system default (no stored preference yet).",
+  hrImportMappingStored: "The current mapping is stored as this tenant's preference.",
+  hrImportSessionsColLines: "Lines",
+  hrImportAnomaliesColLine: "Line",
+  hrImportAnomaliesColReason: "Reason",
+  hrImportAnomaliesColDetail: "Detail",
+  hrImportAnomaliesColRaw: "Raw line",
+  hrImportRejectBtn: "Reject line",
+  hrImportImportBtn: "Import corrected",
+  hrImportResolveEmployee: "Correct employee",
+  hrImportResolveCheckIn: "Correct check-in (YYYY-MM-DD HH:MM)",
+  hrImportResolveCheckOut: "Correct check-out (optional)",
+  hrImportResolveNote: "Resolution note (optional)",
+  hrImportResolvedToast: "Quarantined line resolved.",
+  hrImportNoContent: "Choose a file or paste the content first.",
+  hrImportColFile: "File",
+  hrImportColRowCount: "Rows",
+  hrImportColImported: "Imported",
+  hrImportColQuarantined: "Quarantined",
+  hrImportColCreatedAt: "Imported at",
+  hrImportBatchesEmpty: "No import batches yet.",
+  hrImportAnomaliesEmpty: "Nothing in quarantine.",
+  hrImportWizardForbidden: "You cannot run the import wizard — review of the log and quarantine only.",
+  hrLeaveNewRequest: "New leave request",
+  hrLeaveTypeLabel: "Leave type",
+  hrLeaveStartDate: "Start date",
+  hrLeaveEndDate: "End date",
+  hrLeaveSubmitBtn: "Create request",
+  hrLeaveRequestCreated: "Leave request created.",
+  hrLeaveApproveBtn: "Approve",
+  hrLeaveRejectBtn: "Reject",
+  hrLeaveCancelRequestBtn: "Cancel request",
+  hrLeaveDecidedToast: "Request updated.",
+  hrLeaveRequestsEmpty: "No requests in this range.",
+  hrLeaveBalancesEmpty: "No balances for this year.",
+  hrLeaveNewType: "New leave type",
+  hrLeaveAccrualDays: "Accrual per year (days)",
+  hrLeaveMonthlyGrant: "Monthly grant",
+  hrLeaveProrateJoiners: "Prorate joiners",
+  hrLeaveCarryCap: "Carry-over cap (days)",
+  hrLeaveTypeSavedToast: "Leave type saved.",
+  hrActivateBtn: "Activate",
+  hrDeactivateBtn: "Deactivate",
+  hrLeaveAccrualTitle: "Run the accrual policy",
+  hrLeaveAccrualBtn: "Run accrual",
+  hrLeaveAccrualAsOfMonth: "As of month (optional)",
+  hrLeaveAccrualDone: "Wrote {cells} balance cells for {employees} employees.",
+  hrLeaveRolloverTitle: "Carry-over rollover",
+  hrLeaveRolloverFromYear: "From year",
+  hrLeaveRolloverToYear: "To year",
+  hrLeaveRolloverBtn: "Run rollover",
+  hrLeaveRolloverDone: "Rolled over {cells} cells; {count} capped by {days} days.",
+  hrLeaveTypesEmpty: "No leave types yet.",
+  hrLeaveYearLabel: "Balances year",
+  hrShiftNew: "New shift",
+  hrShiftStart: "Shift start",
+  hrShiftEnd: "Shift end",
+  hrShiftGrace: "Late grace (minutes)",
+  hrShiftBreak: "Break (minutes)",
+  hrShiftNight: "Night shift",
+  hrShiftSavedToast: "Shift saved.",
+  hrShiftsEmpty: "No shifts yet.",
+  hrShiftActive: "Active",
+  hrShiftInactive: "Inactive",
+  hrRosterGridHint: "Click a cell to edit it: pick a shift or clear it.",
+  hrRosterTruncated: "Partial grid ({cells} cells) — narrow the range.",
+  hrRosterCellTitle: "Roster cell",
+  hrRosterCellClearOption: "No shift",
+  hrRosterCellSetBtn: "Set cell",
+  hrRosterCellClearBtn: "Clear cell",
+  hrRosterCellSetToast: "Cell updated.",
+  hrRosterCellClearedToast: "Cell cleared.",
+  hrRosterEmpty: "No roster cells in this range.",
+  hrRotationEmployees: "Employees",
+  hrRotationDayOff: "Day off",
+  hrRotationPatternHint: "The weekly pattern, Monday…Sunday; 'Day off' means no shift.",
+  hrRotationApplyBtn: "Apply rotation",
+  hrRotationDone: "Wrote {cells} cells; {manual} manual cells preserved.",
+  hrRotationEmployeesRequired: "Select at least one employee.",
+  hrErrNotFound: "The record does not exist in this tenant.",
+  hrErrShiftCodeTaken: "That shift code is already used in this tenant.",
+  hrErrRosterInvalid: "The shift or roster payload is invalid.",
+  hrErrShiftInactive: "The shift is inactive — reactivate it before rostering it.",
+  hrErrLeaveTypeInactive: "The leave type is inactive — reactivate it before requesting leave under it.",
+  hrErrShapeInvalid: "Invalid payload — review the required fields.",
+  hrErrPunchOverlap: "The session overlaps an existing session of this employee-day.",
+  hrErrDuplicatePunch: "A session for this employee already opens at that exact timestamp.",
+  hrErrImmutable: "A committed punch is immutable — corrections arrive as new rows.",
+  hrErrImportInvalid: "The import file or column mapping is invalid.",
+  hrErrImportAlreadyCommitted: "This exact file was already committed.",
+  hrErrAnomalyResolved: "The quarantined line is already resolved.",
+  hrErrLeaveDecided: "The request is already decided — only a PENDING request can be acted on.",
+  hrErrBalanceInsufficient: "The leave balance is insufficient for this approval.",
+  hrErrLeaveOverlap: "The span overlaps an existing leave of this employee.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };
