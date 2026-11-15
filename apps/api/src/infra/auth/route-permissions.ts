@@ -3970,6 +3970,70 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/attendance/import/anomalies/:id/resolve",
     permission: "hr.attendance",
   },
+
+  // PHASE-045 (T-06 — matrix §3.23): the overtime surface rides
+  // hr.overtime — the tier rules, the tier match, the weekend setting,
+  // and the entries' simple-approval lifecycle.
+  {
+    method: "POST",
+    path: "/api/v1/hr/overtime/rules",
+    permission: "hr.overtime",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/overtime/rules",
+    permission: "hr.overtime",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/overtime/rules/:id",
+    permission: "hr.overtime",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/overtime/rules/:id/activate",
+    permission: "hr.overtime",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/overtime/rules/:id/deactivate",
+    permission: "hr.overtime",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/overtime/tier",
+    permission: "hr.overtime",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/overtime/weekend",
+    permission: "hr.overtime",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/overtime/weekend",
+    permission: "hr.overtime",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/overtime/entries",
+    permission: "hr.overtime",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/overtime/entries/:id/approve",
+    permission: "hr.overtime",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/overtime/entries/:id/reject",
+    permission: "hr.overtime",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/overtime/entries",
+    permission: "hr.overtime",
+  },
 ];
 
 /**

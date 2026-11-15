@@ -3,10 +3,12 @@ import { Module } from "@nestjs/common";
 import { AuditModule } from "../audit/audit.module";
 import { AttendanceImportService } from "./application/attendance-import-service";
 import { AttendanceService } from "./application/attendance-service";
+import { OvertimeService } from "./application/overtime-service";
 import { ShiftService } from "./application/shift-service";
 import { AttendanceImportController } from "./presentation/attendance-import.controller";
 import { AttendanceController } from "./presentation/attendance.controller";
 import { HrController } from "./presentation/hr.controller";
+import { OvertimeController } from "./presentation/overtime.controller";
 
 /**
  * HR module (PHASE-045 — HR Core: attendance, leaves & shifts). T-03
@@ -15,8 +17,11 @@ import { HrController } from "./presentation/hr.controller";
  * capture, the derived daily status (roster + holiday + leave), the
  * exception computation, and BR-082's immutability window; T-05 adds
  * the device-agnostic CSV import — preview/commit with the file
- * fingerprint, the anomaly quarantine, and the mapping setting; the
- * overtime/leave services (T-06/T-07) land in this module as the phase
+ * fingerprint, the anomaly quarantine, and the mapping setting; T-06
+ * adds the overtime engine — the multiplier-tier rules, the tier
+ * matching (the tenant's weekend setting — never a fabricated
+ * default), BR-084's pre-approval enforcement, and the per-day cap;
+ * the leave service (T-07) lands in this module as the phase
  * proceeds.
  *
  * Dependencies (DEPENDENCY_RULES §2): audit only — attendance, shifts,
@@ -27,8 +32,8 @@ import { HrController } from "./presentation/hr.controller";
  */
 @Module({
   imports: [AuditModule],
-  controllers: [HrController, AttendanceController, AttendanceImportController],
-  providers: [ShiftService, AttendanceService, AttendanceImportService],
-  exports: [ShiftService, AttendanceService, AttendanceImportService],
+  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController],
+  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService],
+  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService],
 })
 export class HrModule {}
