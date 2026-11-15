@@ -4034,6 +4034,75 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/overtime/entries",
     permission: "hr.overtime",
   },
+
+  // PHASE-045 (T-07 — matrix §3.23): the leave surface rides hr.leave —
+  // the type catalog, the balance cells, the request lifecycle (the
+  // simple-approval chain), the accrual policy run, and the rollover.
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/types",
+    permission: "hr.leave",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/leave/types",
+    permission: "hr.leave",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/leave/types/:id",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/types/:id/activate",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/types/:id/deactivate",
+    permission: "hr.leave",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/leave/balances",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/requests",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/requests/:id/approve",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/requests/:id/reject",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/requests/:id/cancel",
+    permission: "hr.leave",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/leave/requests",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/accrual",
+    permission: "hr.leave",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/rollover",
+    permission: "hr.leave",
+  },
 ];
 
 /**
