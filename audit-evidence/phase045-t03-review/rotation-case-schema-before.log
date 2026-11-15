@@ -1,0 +1,38 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/api
+
+ ❯ src/modules/hr/__tests__/rotation-schema.spec.ts (5 tests | 1 failed) 10ms
+   ✓ the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > accepts the legitimate body: distinct employee ids, the 7-entry pattern, ISO dates 2ms
+   ✓ the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > rejects the SAME employee twice — the field error names employeeIds (pre-fix the schema accepted it and SQL died on the raw ON CONFLICT protocol error) 1ms
+   ✓ the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > still enforces the standing shape bounds: empty list refused, >200 refused, non-uuid refused 0ms
+   × the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > rejects the SAME employee across HEX CASE (the c537113 review): 018f… and 018F… are ONE uuid to PostgreSQL, so the case-varied pair is a DUPLICATE — pre-fix the textual Set saw two 'distinct' strings and the request died later at the raw ON CONFLICT protocol error; the field error still names employeeIds and the message the uniqueness law 6ms
+     → expected true to be false // Object.is equality
+   ✓ the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > accepts a MIXED-CASE list of genuinely DISTINCT employees — the normalization exists to catch the case-varied duplicate, never to reject a legitimate mixed-case list 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/modules/hr/__tests__/rotation-schema.spec.ts > the rotation body schema — employeeIds must be UNIQUE (the duplicate-employee law) > rejects the SAME employee across HEX CASE (the c537113 review): 018f… and 018F… are ONE uuid to PostgreSQL, so the case-varied pair is a DUPLICATE — pre-fix the textual Set saw two 'distinct' strings and the request died later at the raw ON CONFLICT protocol error; the field error still names employeeIds and the message the uniqueness law
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/modules/hr/__tests__/rotation-schema.spec.ts:85:28
+     83|       validBody([EMPLOYEE_A, EMPLOYEE_B, EMPLOYEE_A.toUpperCase()]),
+     84|     );
+     85|     expect(parsed.success).toBe(false);
+       |                            ^
+     86|     if (!parsed.success) {
+     87|       const employeeIssues = parsed.error.issues.filter((issue) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  00:23:23
+   Duration  1.44s (transform 494ms, setup 0ms, collect 1.24s, tests 10ms, environment 0ms, prepare 58ms)
+

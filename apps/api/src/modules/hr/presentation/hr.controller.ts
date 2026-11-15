@@ -65,7 +65,15 @@ const shiftPatch = z.object({
  * PostgreSQL's raw "ON CONFLICT DO UPDATE command cannot affect row a
  * second time" — an untyped 500. The schema now refuses the duplicate
  * list itself: a 422 VALIDATION_ERROR with the field error naming
- * employeeIds (the error filter's Zod mapping). */
+ * employeeIds (the error filter's Zod mapping).
+ *
+ * THE CASE LAW (the owner's independent review of c537113): the check
+ * normalizes each uuid to its CANONICAL LOWERCASE form BEFORE comparing
+ * — PostgreSQL's uuid type is case-insensitive (018F… and 018f… are ONE
+ * value), so a case-sensitive Set would wave the case-varied duplicate
+ * through and the bulk upsert would still touch the same (employee,
+ * date) row twice, dying on the SAME raw protocol error. A mixed-case
+ * list of genuinely DISTINCT employees stays legitimate. */
 export const rotationBody = z
   .object({
     employeeIds: z.array(UUID).min(1).max(200),
@@ -73,11 +81,15 @@ export const rotationBody = z
     startDate: DATE,
     endDate: DATE,
   })
-  .refine((body) => new Set(body.employeeIds).size === body.employeeIds.length, {
-    message:
-      "employeeIds must be unique — a repeated id would make the bulk upsert affect the same (employee, date) rows twice",
-    path: ["employeeIds"],
-  });
+  .refine(
+    (body) =>
+      new Set(body.employeeIds.map((id) => id.toLowerCase())).size === body.employeeIds.length,
+    {
+      message:
+        "employeeIds must be unique — a repeated id (any hex-case spelling of it) would make the bulk upsert affect the same (employee, date) rows twice",
+      path: ["employeeIds"],
+    },
+  );
 
 @Controller("api/v1/hr")
 export class HrController {

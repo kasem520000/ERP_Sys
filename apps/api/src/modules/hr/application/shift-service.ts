@@ -402,11 +402,19 @@ export class ShiftService {
     // the request is refused, nothing is queued, the grid keeps zero
     // residue. The HTTP edge's schema carries the same law (a 422 naming
     // employeeIds); this check is the layer every OTHER caller rides too.
-    const distinctEmployees = new Set(input.employeeIds);
+    //
+    // THE CASE LAW (the owner's independent review of c537113): the ids
+    // are NORMALIZED to their canonical lowercase form BEFORE the
+    // comparison — PostgreSQL's uuid type is case-insensitive (018F… and
+    // 018f… are ONE value), so a textual Set would wave the case-varied
+    // duplicate through to the same raw protocol error. This stays an
+    // INDEPENDENT defense: the service never trusts the HTTP edge's
+    // normalization — every caller gets the same typed refusal.
+    const distinctEmployees = new Set(input.employeeIds.map((id) => id.toLowerCase()));
     if (distinctEmployees.size !== input.employeeIds.length) {
       const duplicates = input.employeeIds.length - distinctEmployees.size;
       throw new RotationInvalidError(
-        `the rotation's employeeIds must be unique — ${duplicates} repeated id(s) would make the bulk upsert touch the same (employee, date) rows twice (ON CONFLICT DO UPDATE cannot affect a row a second time)`,
+        `the rotation's employeeIds must be unique (case-insensitive uuid comparison) — ${duplicates} repeated id(s) would make the bulk upsert touch the same (employee, date) rows twice (ON CONFLICT DO UPDATE cannot affect a row a second time)`,
       );
     }
     if (input.pattern.length !== 7 || input.pattern.some((entry) => entry === undefined)) {

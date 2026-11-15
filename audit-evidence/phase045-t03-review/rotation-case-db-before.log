@@ -1,0 +1,337 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-15 00:23:51.072 UTC [12893] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-15 00:23:51.072 UTC [12893] LOG:  listening on IPv6 address "::1", port 39747
+2026-11-15 00:23:51.072 UTC [12893] LOG:  listening on IPv4 address "127.0.0.1", port 39747
+
+2026-11-15 00:23:51.072 UTC [12893] LOG:  listening on Unix socket "/tmp/.s.PGSQL.39747"
+
+2026-11-15 00:23:51.073 UTC [12896] LOG:  database system was shut down at 2026-11-15 00:23:51 UTC
+
+2026-11-15 00:23:51.075 UTC [12893] LOG:  database system is ready to accept connections
+
+2026-11-15 00:24:03.541 UTC [12973] ERROR:  ON CONFLICT DO UPDATE command cannot affect row a second time
+2026-11-15 00:24:03.541 UTC [12973] HINT:  Ensure that no rows proposed for insertion within the same command have duplicate constrained values.
+2026-11-15 00:24:03.541 UTC [12973] STATEMENT:  
+	      INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source, note, created_by)
+	      VALUES ($1, erp.current_tenant_id(), $2,
+	                     $3::date, $4, 'ROTATION', NULL, $5), ($6, erp.current_tenant_id(), $7,
+	                     $8::date, $9, 'ROTATION', NULL, $10), ($11, erp.current_tenant_id(), $12,
+	                     $13::date, $14, 'ROTATION', NULL, $15), ($16, erp.current_tenant_id(), $17,
+	                     $18::date, $19, 'ROTATION', NULL, $20), ($21, erp.current_tenant_id(), $22,
+	                     $23::date, $24, 'ROTATION', NULL, $25), ($26, erp.current_tenant_id(), $27,
+	                     $28::date, $29, 'ROTATION', NULL, $30), ($31, erp.current_tenant_id(), $32,
+	                     $33::date, $34, 'ROTATION', NULL, $35), ($36, erp.current_tenant_id(), $37,
+	                     $38::date, $39, 'ROTATION', NULL, $40), ($41, erp.current_tenant_id(), $42,
+	                     $43::date, $44, 'ROTATION', NULL, $45), ($46, erp.current_tenant_id(), $47,
+	                     $48::date, $49, 'ROTATION', NULL, $50), ($51, erp.current_tenant_id(), $52,
+	                     $53::date, $54, 'ROTATION', NULL, $55), ($56, erp.current_tenant_id(), $57,
+	                     $58::date, $59, 'ROTATION', NULL, $60), ($61, erp.current_tenant_id(), $62,
+	                     $63::date, $64, 'ROTATION', NULL, $65), ($66, erp.current_tenant_id(), $67,
+	                     $68::date, $69, 'ROTATION', NULL, $70), ($71, erp.current_tenant_id(), $72,
+	                     $73::date, $74, 'ROTATION', NULL, $75), ($76, erp.current_tenant_id(), $77,
+	                     $78::date, $79, 'ROTATION', NULL, $80), ($81, erp.current_tenant_id(), $82,
+	                     $83::date, $84, 'ROTATION', NULL, $85), ($86, erp.current_tenant_id(), $87,
+	                     $88::date, $89, 'ROTATION', NULL, $90), ($91, erp.current_tenant_id(), $92,
+	                     $93::date, $94, 'ROTATION', NULL, $95), ($96, erp.current_tenant_id(), $97,
+	                     $98::date, $99, 'ROTATION', NULL, $100), ($101, erp.current_tenant_id(), $102,
+	                     $103::date, $104, 'ROTATION', NULL, $105)
+	      ON CONFLICT ("tenant_id", "employee_id", "work_date") DO UPDATE SET
+	        shift_id = EXCLUDED.shift_id, source = 'ROTATION', updated_at = now(),
+	        version = shift_rotations.version + 1
+	      WHERE shift_rotations.source <> 'MANUAL'
+	      RETURNING id
+	    
+
+ ❯ src/__db__/hr/shifts-roster.spec.ts (7 tests | 1 failed) 8634ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (a) THE SHIFT TEMPLATE: create/find/list with the bilingual name; the code is unique; deactivation filters the active list and blocks rostering 30ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (b) THE ROSTER GRID: one cell per (employee, date) — an edit REPLACES; the grid read joins the shift dims; clear removes the cell 24ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (c) THE ROTATION GENERATOR: the Monday…Sunday pattern writes per employee × date (null = an explicit day off), PRESERVES manual cells, and is idempotent 38ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (d) THE TENANT BOUNDARY (rewritten per the joint review round): NO assumption that a SHARED tenant is empty — the isolation is proven on TENANT H's OWN rows (by id, against the shared seeded tenant A AND against a dedicated ISOLATED tenant, empty by construction) 13ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  8458ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (f) THE DUPLICATE-EMPLOYEE REJECTION (the owner's independent review of 81f09e9): an employeeIds list naming the SAME employee twice is refused by the TYPED contract BEFORE any write — pre-fix the schema and the service both accepted it and the bulk upsert died on PostgreSQL's raw 'ON CONFLICT DO UPDATE command cannot affect row a second time' (an untyped protocol error surfaced as a 500, with the write's fate left to the transaction's rollback); the typed ROTATION_INVALID fires first and the rejected range keeps ZERO residue 10ms
+   × PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (g) THE CASE-VARIANT DUPLICATE REJECTION (the owner's independent review of c537113): the SAME employee named twice with DIFFERENT HEX CASE (018f… and 018F… — ONE uuid to PostgreSQL) is refused by the TYPED contract BEFORE any write — pre-fix the uniqueness check was TEXTUAL, the case-varied pair passed as 'distinct' (both here and at the HTTP schema), and the bulk upsert died on the SAME raw 'ON CONFLICT DO UPDATE command cannot affect row a second time' protocol error; post-fix the typed ROTATION_INVALID fires first, nothing reaches the write, the rejected range keeps ZERO residue — and a MIXED-CASE list of genuinely distinct employees still applies 19ms
+     → expected Error: Failed query: 
+      INSERT INTO s… { …(2) } to match object { code: 'ROTATION_INVALID' }
+(21 matching properties omitted from actual)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/hr/shifts-roster.spec.ts > PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (g) THE CASE-VARIANT DUPLICATE REJECTION (the owner's independent review of c537113): the SAME employee named twice with DIFFERENT HEX CASE (018f… and 018F… — ONE uuid to PostgreSQL) is refused by the TYPED contract BEFORE any write — pre-fix the uniqueness check was TEXTUAL, the case-varied pair passed as 'distinct' (both here and at the HTTP schema), and the bulk upsert died on the SAME raw 'ON CONFLICT DO UPDATE command cannot affect row a second time' protocol error; post-fix the typed ROTATION_INVALID fires first, nothing reaches the write, the rejected range keeps ZERO residue — and a MIXED-CASE list of genuinely distinct employees still applies
+AssertionError: expected Error: Failed query: 
+      INSERT INTO s… { …(2) } to match object { code: 'ROTATION_INVALID' }
+(21 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "ROTATION_INVALID",
++ DrizzleQueryError {
++   "message": "Failed query: 
++       INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source, note, created_by)
++       VALUES ($1, erp.current_tenant_id(), $2,
++                      $3::date, $4, 'ROTATION', NULL, $5), ($6, erp.current_tenant_id(), $7,
++                      $8::date, $9, 'ROTATION', NULL, $10), ($11, erp.current_tenant_id(), $12,
++                      $13::date, $14, 'ROTATION', NULL, $15), ($16, erp.current_tenant_id(), $17,
++                      $18::date, $19, 'ROTATION', NULL, $20), ($21, erp.current_tenant_id(), $22,
++                      $23::date, $24, 'ROTATION', NULL, $25), ($26, erp.current_tenant_id(), $27,
++                      $28::date, $29, 'ROTATION', NULL, $30), ($31, erp.current_tenant_id(), $32,
++                      $33::date, $34, 'ROTATION', NULL, $35), ($36, erp.current_tenant_id(), $37,
++                      $38::date, $39, 'ROTATION', NULL, $40), ($41, erp.current_tenant_id(), $42,
++                      $43::date, $44, 'ROTATION', NULL, $45), ($46, erp.current_tenant_id(), $47,
++                      $48::date, $49, 'ROTATION', NULL, $50), ($51, erp.current_tenant_id(), $52,
++                      $53::date, $54, 'ROTATION', NULL, $55), ($56, erp.current_tenant_id(), $57,
++                      $58::date, $59, 'ROTATION', NULL, $60), ($61, erp.current_tenant_id(), $62,
++                      $63::date, $64, 'ROTATION', NULL, $65), ($66, erp.current_tenant_id(), $67,
++                      $68::date, $69, 'ROTATION', NULL, $70), ($71, erp.current_tenant_id(), $72,
++                      $73::date, $74, 'ROTATION', NULL, $75), ($76, erp.current_tenant_id(), $77,
++                      $78::date, $79, 'ROTATION', NULL, $80), ($81, erp.current_tenant_id(), $82,
++                      $83::date, $84, 'ROTATION', NULL, $85), ($86, erp.current_tenant_id(), $87,
++                      $88::date, $89, 'ROTATION', NULL, $90), ($91, erp.current_tenant_id(), $92,
++                      $93::date, $94, 'ROTATION', NULL, $95), ($96, erp.current_tenant_id(), $97,
++                      $98::date, $99, 'ROTATION', NULL, $100), ($101, erp.current_tenant_id(), $102,
++                      $103::date, $104, 'ROTATION', NULL, $105)
++       ON CONFLICT (\"tenant_id\", \"employee_id\", \"work_date\") DO UPDATE SET
++         shift_id = EXCLUDED.shift_id, source = 'ROTATION', updated_at = now(),
++         version = shift_rotations.version + 1
++       WHERE shift_rotations.source <> 'MANUAL'
++       RETURNING id
++     
++ params: 01a1dc96-f6d4-7000-a5b5-50a0f4b4b343,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-02,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7001-b879-da7f5fc5c59d,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-03,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7002-b1c6-a3aed623cbcb,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-04,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7003-86b7-f487a3fac0cb,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-05,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7004-8cdc-2a6f992b63ae,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-06,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7005-897e-9b005ebc0d8a,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-07,,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7006-8b54-1920faf22536,2907b8f0-9684-4bc2-9351-df7e0648c7c9,2026-11-08,,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7007-96a8-558e4eee710d,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-02,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7008-a29d-1ac45cb34012,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-03,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7009-a063-bfb9f9962c21,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-04,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-700a-86c2-6d1b63dbea76,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-05,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-700b-904e-845650694bf7,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-06,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-700c-9a64-5fc249c40173,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-07,,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-700d-937c-a98252772821,de6df779-a11e-4a1f-b24e-a8f1fe8489c1,2026-11-08,,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-700e-988e-53ed88b51f46,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-02,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-700f-80b9-21ad70c03673,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-03,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7010-bc69-67ef4023f002,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-04,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7011-a781-07376211f592,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-05,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7012-bdb0-0c2ca74795b0,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-06,01a1dc96-f6d1-7000-a137-ffc2841e0e2b,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7013-be9c-0a5f630b473b,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-07,,7a7a7a7a-0000-4000-8000-0000000007a1,01a1dc96-f6d4-7014-b0cd-1938973ccd10,2907B8F0-9684-4bc2-9351-df7e0648c7c9,2026-11-08,,7a7a7a7a-0000-4000-8000-0000000007a1",
++   "cause": error {
++     "message": "ON CONFLICT DO UPDATE command cannot affect row a second time",
++     "length": 239,
++     "name": "error",
++     "severity": "ERROR",
++     "code": "21000",
++     "detail": undefined,
++     "hint": "Ensure that no rows proposed for insertion within the same command have duplicate constrained values.",
++     "position": undefined,
++     "internalPosition": undefined,
++     "internalQuery": undefined,
++     "where": undefined,
++     "schema": undefined,
++     "table": undefined,
++     "column": undefined,
++     "dataType": undefined,
++     "constraint": undefined,
++     "file": "nodeModifyTable.c",
++     "line": "2624",
++     "routine": "ExecOnConflictUpdate",
++   },
++   "query": "
++       INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source, note, created_by)
++       VALUES ($1, erp.current_tenant_id(), $2,
++                      $3::date, $4, 'ROTATION', NULL, $5), ($6, erp.current_tenant_id(), $7,
++                      $8::date, $9, 'ROTATION', NULL, $10), ($11, erp.current_tenant_id(), $12,
++                      $13::date, $14, 'ROTATION', NULL, $15), ($16, erp.current_tenant_id(), $17,
++                      $18::date, $19, 'ROTATION', NULL, $20), ($21, erp.current_tenant_id(), $22,
++                      $23::date, $24, 'ROTATION', NULL, $25), ($26, erp.current_tenant_id(), $27,
++                      $28::date, $29, 'ROTATION', NULL, $30), ($31, erp.current_tenant_id(), $32,
++                      $33::date, $34, 'ROTATION', NULL, $35), ($36, erp.current_tenant_id(), $37,
++                      $38::date, $39, 'ROTATION', NULL, $40), ($41, erp.current_tenant_id(), $42,
++                      $43::date, $44, 'ROTATION', NULL, $45), ($46, erp.current_tenant_id(), $47,
++                      $48::date, $49, 'ROTATION', NULL, $50), ($51, erp.current_tenant_id(), $52,
++                      $53::date, $54, 'ROTATION', NULL, $55), ($56, erp.current_tenant_id(), $57,
++                      $58::date, $59, 'ROTATION', NULL, $60), ($61, erp.current_tenant_id(), $62,
++                      $63::date, $64, 'ROTATION', NULL, $65), ($66, erp.current_tenant_id(), $67,
++                      $68::date, $69, 'ROTATION', NULL, $70), ($71, erp.current_tenant_id(), $72,
++                      $73::date, $74, 'ROTATION', NULL, $75), ($76, erp.current_tenant_id(), $77,
++                      $78::date, $79, 'ROTATION', NULL, $80), ($81, erp.current_tenant_id(), $82,
++                      $83::date, $84, 'ROTATION', NULL, $85), ($86, erp.current_tenant_id(), $87,
++                      $88::date, $89, 'ROTATION', NULL, $90), ($91, erp.current_tenant_id(), $92,
++                      $93::date, $94, 'ROTATION', NULL, $95), ($96, erp.current_tenant_id(), $97,
++                      $98::date, $99, 'ROTATION', NULL, $100), ($101, erp.current_tenant_id(), $102,
++                      $103::date, $104, 'ROTATION', NULL, $105)
++       ON CONFLICT (\"tenant_id\", \"employee_id\", \"work_date\") DO UPDATE SET
++         shift_id = EXCLUDED.shift_id, source = 'ROTATION', updated_at = now(),
++         version = shift_rotations.version + 1
++       WHERE shift_rotations.source <> 'MANUAL'
++       RETURNING id
++     ",
++   "params": [
++     "01a1dc96-f6d4-7000-a5b5-50a0f4b4b343",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-02",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7001-b879-da7f5fc5c59d",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-03",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7002-b1c6-a3aed623cbcb",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-04",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7003-86b7-f487a3fac0cb",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-05",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7004-8cdc-2a6f992b63ae",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-06",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7005-897e-9b005ebc0d8a",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-07",
++     null,
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7006-8b54-1920faf22536",
++     "2907b8f0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-08",
++     null,
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7007-96a8-558e4eee710d",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-02",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7008-a29d-1ac45cb34012",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-03",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7009-a063-bfb9f9962c21",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-04",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-700a-86c2-6d1b63dbea76",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-05",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-700b-904e-845650694bf7",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-06",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-700c-9a64-5fc249c40173",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-07",
++     null,
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-700d-937c-a98252772821",
++     "de6df779-a11e-4a1f-b24e-a8f1fe8489c1",
++     "2026-11-08",
++     null,
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-700e-988e-53ed88b51f46",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-02",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-700f-80b9-21ad70c03673",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-03",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7010-bc69-67ef4023f002",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-04",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7011-a781-07376211f592",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-05",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7012-bdb0-0c2ca74795b0",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-06",
++     "01a1dc96-f6d1-7000-a137-ffc2841e0e2b",
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7013-be9c-0a5f630b473b",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-07",
++     null,
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++     "01a1dc96-f6d4-7014-b0cd-1938973ccd10",
++     "2907B8F0-9684-4bc2-9351-df7e0648c7c9",
++     "2026-11-08",
++     null,
++     "7a7a7a7a-0000-4000-8000-0000000007a1",
++   ],
+  }
+
+ ❯ src/__db__/hr/shifts-roster.spec.ts:707:5
+    705|       }),
+    706|     );
+    707|     await expect(rejection).rejects.toMatchObject({ code: "ROTATION_IN…
+       |     ^
+    708|     await rejection.catch((error: { message?: string }) => {
+    709|       expect(error.message).toContain("unique");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  00:23:50
+   Duration  13.27s (transform 406ms, setup 0ms, collect 1.05s, tests 8.63s, environment 0ms, prepare 54ms)
+
+2026-11-15 00:24:03.572 UTC [12893] LOG:  received fast shutdown request
+2026-11-15 00:24:03.572 UTC [12893] LOG:  aborting any active transactions
+2026-11-15 00:24:03.572 UTC [12973] FATAL:  terminating connection due to administrator command
+2026-11-15 00:24:03.574 UTC [12893] LOG:  background worker "logical replication launcher" (PID 12899) exited with exit code 1
+2026-11-15 00:24:03.575 UTC [12894] LOG:  shutting down
+
+2026-11-15 00:24:03.576 UTC [12894] LOG:  checkpoint starting: shutdown immediate
+
+(node:12952) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:12952) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-15 00:24:03.603 UTC [12894] LOG:  checkpoint complete: wrote 4136 buffers (25.2%); 0 WAL file(s) added, 0 removed, 3 recycled; write=0.020 s, sync=0.008 s, total=0.028 s; sync files=2372, longest=0.001 s, average=0.001 s; distance=52570 kB, estimate=52570 kB; lsn=0/4835260, redo lsn=0/4835260
+
+2026-11-15 00:24:03.612 UTC [12893] LOG:  database system is shut down
+

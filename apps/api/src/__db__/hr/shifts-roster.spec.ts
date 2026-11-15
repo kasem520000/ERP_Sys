@@ -669,4 +669,88 @@ describe("PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern g
     );
     expect(after.total).toBe(14); // ONE row per (employee, date) — never a duplicate
   });
+
+  it("(g) THE CASE-VARIANT DUPLICATE REJECTION (the owner's independent review of c537113): the SAME employee named twice with DIFFERENT HEX CASE (018f… and 018F… — ONE uuid to PostgreSQL) is refused by the TYPED contract BEFORE any write — pre-fix the uniqueness check was TEXTUAL, the case-varied pair passed as 'distinct' (both here and at the HTTP schema), and the bulk upsert died on the SAME raw 'ON CONFLICT DO UPDATE command cannot affect row a second time' protocol error; post-fix the typed ROTATION_INVALID fires first, nothing reaches the write, the rejected range keeps ZERO residue — and a MIXED-CASE list of genuinely distinct employees still applies", async () => {
+    const f = spec.fixture!;
+    const day = await withTenant(TENANT_H, () =>
+      shiftSvc.create({
+        code: uniqueCode("CASE-DAY"),
+        name: "Case-rejection day shift",
+        nameAr: "وردية رفض حالة الأحرف النهارية",
+        startTime: "06:00",
+        endTime: "14:00",
+        graceMinutes: 10,
+        breakMinutes: 20,
+        isNight: false,
+        note: null,
+        noteAr: null,
+        actorId: H_ACTOR,
+      }),
+    );
+
+    // H1 in canonical lowercase, then the SAME H1 with the first hex
+    // segments uppercased — one uuid to PostgreSQL, two "distinct"
+    // strings to a case-sensitive Set (the pre-fix hole).
+    const h1Upper = `${f.employeeH1Id.slice(0, 14).toUpperCase()}${f.employeeH1Id.slice(14)}`;
+    expect(h1Upper).not.toBe(f.employeeH1Id); // genuinely case-varied, not a no-op
+    // …and it IS the same employee to the database (the uuid is
+    // case-insensitive on lookup — the existence check finds H1).
+    const rejection = withTenant(TENANT_H, () =>
+      shiftSvc.applyRotation({
+        employeeIds: [f.employeeH1Id, f.employeeH2Id, h1Upper],
+        pattern: [day.id, day.id, day.id, day.id, day.id, null, null],
+        startDate: "2026-11-02",
+        endDate: "2026-11-08",
+        actorId: H_ACTOR,
+      }),
+    );
+    await expect(rejection).rejects.toMatchObject({ code: "ROTATION_INVALID" });
+    await rejection.catch((error: { message?: string }) => {
+      expect(error.message).toContain("unique");
+    });
+
+    // NOTHING REACHED THE WRITE — the rejected November range stays
+    // empty for BOTH employees (this test's own fresh range; no other
+    // arm writes there).
+    const grid = await withTenant(TENANT_H, () =>
+      shiftSvc.readGrid({
+        from: "2026-11-02",
+        to: "2026-11-08",
+        employeeIds: [f.employeeH1Id, f.employeeH2Id],
+      }),
+    );
+    expect(grid.total).toBe(0);
+    expect(grid.rows).toHaveLength(0);
+    expect(grid.hasMore).toBe(false);
+
+    // THE VALID LIST STILL APPLIES — the same employees, the same
+    // range, but with H1 spelled in the case-varied form ALONE (a
+    // legitimate mixed-case spelling of a genuinely distinct list):
+    // 14 cells, one row per (employee, date), zero residue of the
+    // rejected attempt.
+    const applied = await withTenant(TENANT_H, () =>
+      shiftSvc.applyRotation({
+        employeeIds: [h1Upper, f.employeeH2Id.toUpperCase()],
+        pattern: [day.id, day.id, day.id, day.id, day.id, null, null],
+        startDate: "2026-11-02",
+        endDate: "2026-11-08",
+        actorId: H_ACTOR,
+      }),
+    );
+    expect(applied.cellsWritten).toBe(14); // 2 employees × 7 days
+    const after = await withTenant(TENANT_H, () =>
+      shiftSvc.readGrid({
+        from: "2026-11-02",
+        to: "2026-11-08",
+        employeeIds: [f.employeeH1Id, f.employeeH2Id],
+      }),
+    );
+    expect(after.total).toBe(14); // ONE row per (employee, date) — the case-varied spelling wrote the same two employees
+    // PostgreSQL canonicalizes on read — the rows carry the canonical
+    // lowercase ids, so the read sees both employees exactly once.
+    const h1Rows = after.rows.filter((cell) => cell.employeeId === f.employeeH1Id);
+    const h2Rows = after.rows.filter((cell) => cell.employeeId === f.employeeH2Id);
+    expect(h1Rows).toHaveLength(7);
+    expect(h2Rows).toHaveLength(7);
+  });
 });

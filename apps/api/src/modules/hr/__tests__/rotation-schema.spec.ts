@@ -13,6 +13,16 @@ import { rotationBody } from "../presentation/hr.controller";
  * mapping), and the SERVICE re-verifies the same law for every caller
  * (ROTATION_INVALID — pinned in __db__/hr/shifts-roster.spec.ts (f)):
  * the defense-in-depth pair, one law at both layers.
+ *
+ * THE CASE LAW (the owner's independent review of c537113): the
+ * uniqueness check was TEXTUAL, so the SAME uuid spelled once in
+ * lowercase hex and once in uppercase hex passed as "distinct" — then
+ * died at the bulk upsert on the SAME raw ON CONFLICT protocol error
+ * (PostgreSQL's uuid type is case-insensitive: 018F… and 018f… are ONE
+ * value, so the upsert still touched the same row twice). The check now
+ * NORMALIZES to the canonical lowercase form BEFORE comparing — a
+ * case-varied duplicate is a DUPLICATE, while a mixed-case list of
+ * genuinely DISTINCT employees stays legitimate.
  */
 
 const EMPLOYEE_A = "018f3a7a-7a7a-7000-8000-000000000001";
@@ -65,5 +75,44 @@ describe("the rotation body schema — employeeIds must be UNIQUE (the duplicate
     expect(
       rotationBody.safeParse(validBody(["not-a-uuid", EMPLOYEE_B])).success,
     ).toBe(false);
+  });
+
+  it("rejects the SAME employee across HEX CASE (the c537113 review): 018f… and 018F… are ONE uuid to PostgreSQL, so the case-varied pair is a DUPLICATE — pre-fix the textual Set saw two 'distinct' strings and the request died later at the raw ON CONFLICT protocol error; the field error still names employeeIds and the message the uniqueness law", () => {
+    // The SAME uuid as EMPLOYEE_A, every hex letter uppercased.
+    const parsed = rotationBody.safeParse(
+      validBody([EMPLOYEE_A, EMPLOYEE_B, EMPLOYEE_A.toUpperCase()]),
+    );
+    expect(parsed.success).toBe(false);
+    if (!parsed.success) {
+      const employeeIssues = parsed.error.issues.filter((issue) =>
+        issue.path.includes("employeeIds"),
+      );
+      expect(employeeIssues.length).toBeGreaterThan(0);
+      const messages = employeeIssues.map((issue) => issue.message).join(" ");
+      expect(messages).toContain("unique");
+    }
+
+    // And with a PARTIAL case mix (only some segments uppercased) — the
+    // normalization must be total, never a full-uppercase special case.
+    const partiallyCased = `${EMPLOYEE_A.slice(0, 14).toUpperCase()}${EMPLOYEE_A.slice(14)}`;
+    const partial = rotationBody.safeParse(
+      validBody([partiallyCased, EMPLOYEE_B, EMPLOYEE_A]),
+    );
+    expect(partial.success).toBe(false);
+    if (!partial.success) {
+      const employeeIssues = partial.error.issues.filter((issue) =>
+        issue.path.includes("employeeIds"),
+      );
+      expect(employeeIssues.length).toBeGreaterThan(0);
+      const messages = employeeIssues.map((issue) => issue.message).join(" ");
+      expect(messages).toContain("unique");
+    }
+  });
+
+  it("accepts a MIXED-CASE list of genuinely DISTINCT employees — the normalization exists to catch the case-varied duplicate, never to reject a legitimate mixed-case list", () => {
+    const parsed = rotationBody.safeParse(
+      validBody([EMPLOYEE_A.toUpperCase(), EMPLOYEE_B.toLowerCase()]),
+    );
+    expect(parsed.success).toBe(true);
   });
 });
