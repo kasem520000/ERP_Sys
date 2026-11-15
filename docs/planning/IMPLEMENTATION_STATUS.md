@@ -513,6 +513,70 @@ RISK-031 and RISK-032 stay OPEN (032 open for the review, its
 unreserved-demand policy now RECORDED AS DECIDED), the 043 hard review
 stays OPEN, PHASE-045 stays IN_PROGRESS — **NO closure of 043, NO
 closure of 045, and NO production approval are claimed.**
+**THE c537113 REVIEW ROUND (2026-11-15 — the owner's independent
+verification passed the 81f09e9 delivery, then surfaced four more
+items, all fixed with before/after evidence):** (1) **THE CASE LAW OF
+THE DUPLICATE-EMPLOYEE REJECTION** (045 T-03): the round-1 uniqueness
+check was TEXTUAL, so the SAME employee named twice with DIFFERENT
+HEX CASE (018f… and 018F… — ONE uuid to PostgreSQL) passed BOTH
+layers as 'distinct', then died at the bulk upsert on the SAME raw
+'ON CONFLICT DO UPDATE command cannot affect row a second time'
+protocol error; the fix NORMALIZES each uuid to its canonical
+lowercase form BEFORE the comparison at BOTH layers — the schema's
+refine (the 422 still naming employeeIds) and the service's
+independent defense (the typed ROTATION_INVALID before any write) —
+pinned by the schema spec 5/5 (before 1 FAIL: the schema accepted the
+case-varied duplicate) and shifts-roster.spec (g) 7/7 (before FAIL:
+the raw protocol error verbatim; after: the typed rejection, ZERO
+residue, the mixed-case valid list applying cleanly — 14 cells). (2)
+**THE §4 QUEUE-HEALTH FULL WINDOW** (performance): the drain-window
+loop still BROKE at the first good sample — one good sample could
+close the window before a later escalation appeared (a 6→6 dip at
+sample two proved nothing about samples three to twelve); the window
+is now observed TO THE END, no early exit, the ABSOLUTE bound (≤ 50)
+rides EVERY sample, and the drain must be SUSTAINED AT THE CLOSE (the
+last TWO samples both ≤ opening + 1) — the dead-letter budget and the
+census bound unchanged; standalone 13/13 with the FULL 12-sample trace
+(6→6→5→5→4→4→3→3→2→1→1→0). (3) **THE PROMISE POINT'S FIVE QUANTITIES
+UNDER THEIR LABELS + THE THREE PROTECTION STANDINGS, PINNED** (043):
+the component test now verifies each of the five quantities under its
+exact label (Available to promise at the requested date / Remaining
+qty / Allocated to the line / Protected qty / Unprotected qty — a
+label-scoped dt→dd lookup) and pins ALL THREE standings on ONE
+surface (UNPROTECTED / PARTIALLY_PROTECTED / FULLY_PROTECTED, each on
+its own line with its own quantities); AND STILL NO GATE — with two
+fresh SHORT verdicts rendered, no blocking action exists (the decided
+policy: advisory only, backorder legal, a shortage never gates
+issuing); the 81f09e9 stamp-refresh + consultative arms kept
+unchanged; the component spec 4/4, web unit 6/6 · 77/77 (was 75/75).
+(4) **THE RISK-032 TEXT UNIFICATION** (governance): every reference
+still describing the unreserved-demand policy as an OPEN decision now
+records the SETTLED law (advisory only + backorder legal — the owner's
+2026-11-14 directive) with RISK-032 open ONLY for the
+reservation-defense review — JOURNAL_RULES G-49 corrected in place +
+dated, NEXT_ACTION, five historical round entries here, the
+code-level statements (atp-service law 4, the unreserved-promise
+spec, the planning-goldens title), the four historical gate-evidence
+ledgers annotated, the register row extended. THE WORK CONSTRAINTS
+HOLD: the settled policy unchanged; allow_negative_stock still cannot
+bypass the reserved-quota protection (the policy-independent
+protectedForOthers floor stands); the hard reservation's consumption
+stays only through explicit, authorized, audited paths. THE SHARED
+GATES AT THE UNIFIED HEAD (each its own run): **THE FULL DB SUITE —
+227/227 files · 3,230 passed | 2 skipped · 0 failed · 526.43s** (the
+ACTUAL project files only, no review probe inside the test set — the
+owner's explicit condition; the drain window inside the serial run:
+6→5→5→4→4→3→3→2→2→1→1→0, sustained close [1, 0]; shifts-roster 7/7;
+the 2 skips the known browser-env render set), api typecheck + lint
+clean, web typecheck + lint clean, web unit 6/6 · 77/77, id-ledger 0
+errors + self-test 14/14, permissions-drift 297=297, i18n parity
+5789=5789, docs:validate 33/33. The round's evidence ledger:
+[gate-evidence/2026-11-15-c537113-review-round.md](../operations/gate-evidence/2026-11-15-c537113-review-round.md);
+RISK-031 and RISK-032 stay OPEN (032 open for the
+reservation-defense review only — its policy RECORDED AS DECIDED
+everywhere it is stated), the 043 hard review stays OPEN, PHASE-045
+stays IN_PROGRESS — **NO closure of 043, NO closure of 045, and NO
+production approval are claimed.**
 **Roadmap v3.1 (2026-11-11 — CR-41…CR-48):** the gap-consolidation wave added 43
 new gaps (L1-01…L1-23, L2-01…L2-20 — evidence in
 [../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md](../planning/gap-analysis/GAP_ANALYSIS_LAYER1_23_GAPS.md)
@@ -545,7 +609,7 @@ document; this ledger tracks status only. Effort figures are planning estimates.
 | [PHASE-042](../implementation/phases/PHASE-042.md) | Manufacturing I — Routing & Work Centers (+ the L2-12 standard-costing layer) | 2 / 13 | 036 ✓ | **COMPLETE 2026-11-12** — [report](../implementation/phases/reports/PHASE-042-COMPLETION.md) |
 | [PHASE-043](../implementation/phases/PHASE-043.md) | Manufacturing II — MRP & Planning | 2 / 13 | 042, 044, 038 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-043-COMPLETION.md) |
 | [PHASE-044](../implementation/phases/PHASE-044.md) | WMS & Inventory Intelligence | 2 / 13 | 035 | **COMPLETE 2026-11-13** — [report](../implementation/phases/reports/PHASE-044-COMPLETION.md) |
-| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; **+ T-03 (2026-11-15): the hr module — the shift service + the roster grid + the rotation pattern generator (the registry rows, the audit trail)**; **+ the joint-review T-03 fixes (2026-11-15): the CHUNKED rotation write (the 200×92 ceiling now runs within PostgreSQL's parameter limit — pre-fix reproduction captured), the PAGINATED grid read (total + hasMore — the explicit truncation signal), and the RLS test's isolation (tenant H's own rows by id + the dedicated boundary tenant; never an emptiness assumption about the shared tenant A)**; **+ the 81f09e9 review round (2026-11-15): THE DUPLICATE-EMPLOYEE LAW — employeeIds naming the same employee twice is refused TYPED at both layers (the schema's uniqueness refine → 422 naming employeeIds; the service's ROTATION_INVALID before any write, zero residue — pre-fix the raw ON CONFLICT DO UPDATE protocol error), pinned by the schema unit spec + shifts-roster.spec (f) 6/6** — [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) · [T-03 evidence](../operations/gate-evidence/2026-11-15-phase045-t03.md) · [joint-review evidence](../operations/gate-evidence/2026-11-15-joint-review-fixes.md) · [81f09e9 round evidence](../operations/gate-evidence/2026-11-15-81f09e9-review-round.md) |
+| [PHASE-045](../implementation/phases/PHASE-045.md) | HR Core — Attendance, Leaves & Shifts | 2 / 13 | 035 | **IN_PROGRESS 2026-11-14** — the substrate delivered (migrations 0080–0086: the shift/attendance/overtime/leave/holiday families + the employee↔user bridge + the seeds; the Drizzle mirrors, the catalog/matrix/registry coordination) per the owner's parallel-start directive; **+ T-03 (2026-11-15): the hr module — the shift service + the roster grid + the rotation pattern generator (the registry rows, the audit trail)**; **+ the joint-review T-03 fixes (2026-11-15): the CHUNKED rotation write (the 200×92 ceiling now runs within PostgreSQL's parameter limit — pre-fix reproduction captured), the PAGINATED grid read (total + hasMore — the explicit truncation signal), and the RLS test's isolation (tenant H's own rows by id + the dedicated boundary tenant; never an emptiness assumption about the shared tenant A)**; **+ the 81f09e9 review round (2026-11-15): THE DUPLICATE-EMPLOYEE LAW — employeeIds naming the same employee twice is refused TYPED at both layers (the schema's uniqueness refine → 422 naming employeeIds; the service's ROTATION_INVALID before any write, zero residue — pre-fix the raw ON CONFLICT DO UPDATE protocol error), pinned by the schema unit spec + shifts-roster.spec (f) 6/6; **+ the c537113 round (2026-11-15): THE CASE LAW — the SAME employee named twice with DIFFERENT HEX CASE is ONE uuid to PostgreSQL, and the case-varied duplicate is refused TYPED at both layers (the ids normalized to canonical lowercase BEFORE the uniqueness comparison; the service stays an independent defense), pinned by the schema spec 5/5 + shifts-roster.spec (f)+(g) 7/7 (zero residue; the mixed-case valid list still applies)** — [start evidence](../operations/gate-evidence/2026-11-14-phase045-start-substrate.md) · [T-03 evidence](../operations/gate-evidence/2026-11-15-phase045-t03.md) · [joint-review evidence](../operations/gate-evidence/2026-11-15-joint-review-fixes.md) · [81f09e9 round evidence](../operations/gate-evidence/2026-11-15-81f09e9-review-round.md) |
 | [PHASE-046](../implementation/phases/PHASE-046.md) | HR Payroll Compliance | 2 / 13 | 045 | NOT_STARTED — PLANNED |
 | [PHASE-047](../implementation/phases/PHASE-047.md) | HR Growth — Talent & Performance | 2 / 13 | 046 | NOT_STARTED — PLANNED |
 | [PHASE-048](../implementation/phases/PHASE-048.md) | Projects & Contracting | 2 / 13 | 036 | NOT_STARTED — PLANNED |
