@@ -398,6 +398,15 @@ import {
   EmployeeNotFoundError as HrEmployeeNotFoundError,
   ShiftNotFoundError,
 } from "../../modules/hr/domain/hr-errors";
+// PHASE-045 (T-09 — the identity bridge): the user not-found joins the
+// 404 family (A7 parity); the already-linked/not-linked lifecycle
+// conflicts are 409; the not-a-member shape and the TERMINATED
+// lifecycle refusal fall through to the 422 default by design.
+import {
+  BridgeAlreadyLinkedError,
+  BridgeNotLinkedError,
+  BridgeUserNotFoundError,
+} from "../../modules/hr/domain/bridge-errors";
 
 /**
  * ERROR_MODEL exception filter: the single error envelope —
@@ -717,6 +726,23 @@ function domainStatus(error: DomainError): number {
   if (
     error instanceof AttendanceImportAlreadyCommittedError ||
     error instanceof HrAttendanceAnomalyResolvedError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-045 (T-09 — the identity bridge): the bridge user not-found
+  // is 404 (A7 parity — no existence disclosure); the already-linked
+  // guard (both arms: the employee carries a link / the user is taken —
+  // the 0085 partial-UNIQUE floor) and the unlink-of-unlinked are 409
+  // lifecycle conflicts (the bridge state is explicit, never
+  // idempotently silent); the not-a-member shape (BRIDGE_USER_NOT_MEMBER)
+  // and the TERMINATED refusal (BRIDGE_INVALID) fall through to the 422
+  // default.
+  if (error instanceof BridgeUserNotFoundError) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (
+    error instanceof BridgeAlreadyLinkedError ||
+    error instanceof BridgeNotLinkedError
   ) {
     return HttpStatus.CONFLICT;
   }

@@ -379,7 +379,7 @@ truth: [TABLES/notes-installments.md](TABLES/notes-installments.md).
 
 | Entity | Purpose | Key fields | Phase | OC |
 |--------|---------|-----------|-------|----|
-| `employees` | Payroll employees (financial scope only) | code, name, name_ar, national_id, hire_date, termination_date?, contract_type, basic_salary, salary_structure_id, branch_id, cost_center_id?, bank fields, status | 029 | no |
+| `employees` | Payroll employees (financial scope only) | code, name, name_ar, national_id, hire_date, termination_date?, contract_type, basic_salary, salary_structure_id, branch_id, cost_center_id?, bank fields, status, user_id? (045 T-09, migration 0085 — the HR-13 identity bridge: ONE user ↔ ONE employee per tenant, the partial-UNIQUE guard, ON DELETE SET NULL; the audited link/unlink rides payroll.employees.manage, the SoD law — linking grants nothing) | 029 (+045 attr) | no |
 | `salary_structures` | Salary component templates | name, name_ar, currency, status ACTIVE/ARCHIVED | 029 | no |
 | `salary_components` | Structure lines | structure_id, key, name, name_ar, kind ALLOWANCE/DEDUCTION/EMPLOYER_CONTRIBUTION, calc FIXED/PERCENT_OF_BASIC/PERCENT_OF_GROSS, amount, rate, gl_account_id, is_eos_base | 029 | no |
 | `payroll_runs` | Monthly payroll batches | fiscal_period_id, status DRAFT/PENDING_APPROVAL/POSTED, gross_total, deductions_total, net_total, journal_entry_id | 029 | no |

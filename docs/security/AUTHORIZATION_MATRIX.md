@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-14 (PHASE-045 started — §3.23 HR core; permission catalog 291 → 297; the phase runs in parallel with the 043-completion review per the owner's directive)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; catalog stays 297; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -639,7 +639,16 @@ decide` (POST) — `hr.overtime`; the `leave` family — `leave/types` (GET, POS
 PATCH), `leave/requests` (GET, POST), `leave/requests/:id/decide` (POST),
 `leave/balances` (GET) — `hr.leave`; the self-service tabs `me/attendance`,
 `me/leave`, `me/roster` (GET) — `hr.self_service` (the linked-employee check
-resolves the OWN-rows scope). Role grants per 0086 §1: owner holds all six;
+resolves the OWN-rows scope); **the employee ↔ user identity bridge (T-09,
+2026-11-15)** — `employees/:id/link-user` + `employees/:id/unlink-user`
+(POST) ride `payroll.employees.manage` and `employees/:id/bridge` (GET)
+rides `payroll.employees.view` — employee-MASTER maintenance on the payroll
+keys, NEVER an hr.* key and NEVER a user-administration key (the SoD law:
+linking an employee to a user grants NOTHING — the bridge writes no
+permission and opens no read; the T-09 attack test pins
+effectivePermissions identical before/after the link and a
+user-administration role — `identity.users.manage` + `identity.roles.assign`
+— holding no hr.*/payroll.employees.* key). Role grants per 0086 §1: owner holds all six;
 the accountant holds the five management keys (not the self-service scope —
 that key's grant rides the employee↔user link at the application boundary,
 seeded to the owner tier only for the drift-equality baseline).

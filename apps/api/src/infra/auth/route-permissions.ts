@@ -4148,6 +4148,28 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/holidays",
     permission: "hr.attendance",
   },
+
+  // PHASE-045 (T-09 — matrix §3.23's dated note): the employee ↔ user
+  // identity bridge (HR-13) — employee-MASTER maintenance riding the
+  // payroll employee keys (the link writes employees.user_id), NEVER an
+  // hr.* key and NEVER a user-administration key: the SoD law — linking
+  // an employee to a user grants nothing; HR data visibility rides HR
+  // permissions only (the dedicated attack test pins it).
+  {
+    method: "POST",
+    path: "/api/v1/hr/employees/:id/link-user",
+    permission: "payroll.employees.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/employees/:id/unlink-user",
+    permission: "payroll.employees.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/employees/:id/bridge",
+    permission: "payroll.employees.view",
+  },
 ];
 
 /**

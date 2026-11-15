@@ -6752,12 +6752,24 @@ export const employees = pgTable(
     status: text("status").notNull().default("ACTIVE"),
     note: text("note"),
     noteAr: text("note_ar"),
+    // PHASE-045 (T-09, migration 0085): the employee ↔ user identity
+    // bridge (HR-13) — the one-to-one link guarded by the partial UNIQUE
+    // below (one user maps to at most ONE employee per tenant); ON
+    // DELETE SET NULL (deactivating a user unlinks, never destroys the
+    // HR record); employees without a user stay valid (field workforce).
+    userId: uuid("user_id"),
   },
   (table) => [
     uniqueIndex("uq_employees_id_tenant").on(table.id, table.tenantId),
     uniqueIndex("uq_employees_tenant_code").on(table.tenantId, table.code),
     index("ix_employees_tenant_status").on(table.tenantId, table.status),
     index("ix_employees_tenant_structure").on(table.tenantId, table.salaryStructureId),
+    uniqueIndex("uq_employees_tenant_user")
+      .on(table.tenantId, table.userId)
+      .where(sql`${table.userId} IS NOT NULL`),
+    index("ix_employees_tenant_user")
+      .on(table.tenantId, table.userId)
+      .where(sql`${table.userId} IS NOT NULL`),
   ],
 );
 
