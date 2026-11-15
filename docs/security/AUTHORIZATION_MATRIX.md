@@ -648,7 +648,12 @@ linking an employee to a user grants NOTHING — the bridge writes no
 permission and opens no read; the T-09 attack test pins
 effectivePermissions identical before/after the link and a
 user-administration role — `identity.users.manage` + `identity.roles.assign`
-— holding no hr.*/payroll.employees.* key). Role grants per 0086 §1: owner holds all six;
+— holding no hr.*/payroll.employees.* key); **the payroll variable feeds (T-10,
+2026-11-15)** — `feeds/variable` (GET) rides `payroll.runs.view` — the
+PAYROLL PREPARATION read (the per-pay-period overtime/absence/late feeds
++ the leave balance snapshot, PHASE-046's variable-component inputs); the
+consumer-side handoff of the hr cluster's facts, granting no hr management
+surface. Role grants per 0086 §1: owner holds all six;
 the accountant holds the five management keys (not the self-service scope —
 that key's grant rides the employee↔user link at the application boundary,
 seeded to the owner tier only for the drift-equality baseline).

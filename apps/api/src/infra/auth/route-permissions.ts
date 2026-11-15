@@ -4170,6 +4170,18 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/employees/:id/bridge",
     permission: "payroll.employees.view",
   },
+
+  // PHASE-045 (T-10 — matrix §3.23's dated note): the payroll variable
+  // feeds — the per-pay-period overtime / absence / late feeds + the
+  // leave balance snapshot (PHASE-046's variable-component inputs). The
+  // feed is the PAYROLL PREPARATION read: it rides payroll.runs.view
+  // (the payroll_officer's run-surface key) — the consumer-side handoff
+  // of the hr cluster's facts; it grants no hr management surface.
+  {
+    method: "GET",
+    path: "/api/v1/hr/feeds/variable",
+    permission: "payroll.runs.view",
+  },
 ];
 
 /**

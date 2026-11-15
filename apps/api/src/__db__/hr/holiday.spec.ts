@@ -51,6 +51,18 @@ function uniqueCode(prefix: string): string {
 beforeAll(async () => {
   await setupHrFixture();
   const su: Client = await superuserClient();
+  // THE WEEKEND-SETTING RESET (the T-10 round, 2026-11-15 — the
+  // overtime spec's own beforeAll pattern): the overtime spec's tier
+  // arm SAVES the Saudi weekend [4,5] and does not restore it; when the
+  // serial order runs overtime BEFORE this spec, the post-deactivation
+  // arm's date (2026-06-26, a FRIDAY) would resolve the WEEKEND tier —
+  // which this spec's world (WEEKDAY + HOLIDAY rules only) cannot
+  // answer. The reset makes THIS spec's world idempotent regardless of
+  // who ran before (the dated-row + rule deactivation laws below).
+  await su.query(
+    `DELETE FROM tenant_settings WHERE tenant_id = $1 AND key = 'hr.overtime.weekend_days'`,
+    [TENANT_H],
+  );
   const employeeRows = await su.query<{ id: string }>(
     `INSERT INTO employees (id, tenant_id, code, name, name_ar, hire_date, contract_type, basic_salary, created_by) VALUES
        (gen_random_uuid(), $1, 'EMP-K1', 'Karim Al-Calendar', 'كريم التقويم', '2026-01-01', 'FULL_TIME', 8000, $2)

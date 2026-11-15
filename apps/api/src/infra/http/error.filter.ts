@@ -407,6 +407,10 @@ import {
   BridgeNotLinkedError,
   BridgeUserNotFoundError,
 } from "../../modules/hr/domain/bridge-errors";
+// PHASE-045 (T-10 — the variable feeds): the pay-period not-found is
+// 404 (A7 parity — fiscal_periods is tenant-RLS'd); the feed shape
+// family (FEED_INVALID) falls through to the 422 default.
+import { FeedPeriodNotFoundError } from "../../modules/hr/domain/feed-errors";
 
 /**
  * ERROR_MODEL exception filter: the single error envelope —
@@ -745,6 +749,11 @@ function domainStatus(error: DomainError): number {
     error instanceof BridgeNotLinkedError
   ) {
     return HttpStatus.CONFLICT;
+  }
+  // PHASE-045 (T-10): the variable feed's pay-period not-found — 404
+  // (A7 parity); FEED_INVALID falls through to the 422 default.
+  if (error instanceof FeedPeriodNotFoundError) {
+    return HttpStatus.NOT_FOUND;
   }
   // SF-027-001: the fixed_assets 404s + 409s (the policy/validation family
   // falls through to the 422 default — PERIOD_LOCKED, CATEGORY_NOT_USABLE,
