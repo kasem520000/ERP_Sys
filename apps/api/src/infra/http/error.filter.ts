@@ -411,6 +411,11 @@ import {
 // 404 (A7 parity — fiscal_periods is tenant-RLS'd); the feed shape
 // family (FEED_INVALID) falls through to the 422 default.
 import { FeedPeriodNotFoundError } from "../../modules/hr/domain/feed-errors";
+// PHASE-045 (T-11 — the goldens G-50/G-51): the posting families
+// (LEAVE_ACCRUAL_POSTING_DISABLED · LEAVE_ACCRUAL_PERIOD_INVALID ·
+// LEAVE_ENCASHMENT_INSUFFICIENT · LEAVE_ENCASHMENT_INVALID) fall
+// through to the 422 default BY DESIGN — no imports needed; the
+// not-founds reuse the 404 rows (leave type / employee / period).
 
 /**
  * ERROR_MODEL exception filter: the single error envelope —
@@ -755,6 +760,11 @@ function domainStatus(error: DomainError): number {
   if (error instanceof FeedPeriodNotFoundError) {
     return HttpStatus.NOT_FOUND;
   }
+  // PHASE-045 (T-11 — G-50/G-51): the posting families fall through to
+  // the 422 default BY DESIGN — the policy-disabled gate (the BR-055
+  // discipline), the monthly-period law, the encashment's INV-031
+  // refusal, and the shape laws are validation/policy refusals, never
+  // lifecycle conflicts; the not-founds reuse the 404 rows above.
   // SF-027-001: the fixed_assets 404s + 409s (the policy/validation family
   // falls through to the 422 default — PERIOD_LOCKED, CATEGORY_NOT_USABLE,
   // NBV_FLOOR_VIOLATION, SELF_APPROVAL_BLOCKED, … exactly as the 026

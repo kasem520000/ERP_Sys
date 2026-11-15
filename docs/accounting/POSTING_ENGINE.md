@@ -165,10 +165,15 @@ shapes are normative in [JOURNAL_RULES.md](JOURNAL_RULES.md) §7.
 | `PAYROLL_RUN` | payroll (PHASE-029) | `post` · `payout` | Payroll run posting — G-29; payroll payout — G-30 |
 | `EOS_SETTLEMENT` | payroll (PHASE-029) | `post` | EOS settlement with residual — G-31 |
 | `CONSOLIDATION_ELIMINATION` | consolidation (PHASE-034) | `post` | Elimination in the parent's consolidation books only — G-32 |
+| `leave_accrual_run` | hr (PHASE-045, T-11) | `post_{YYYYMM}` | G-50 — the period-end leave-accrual posting (policy-gated `hr.leave_accrual_posting`, default off — the BR-055 discipline): DR `SALARIES_EXPENSE` · CR `SALARIES_PAYABLE` at the monthly slice (accrual_days/12 × basic/30); exactly-once per (leave type, period month) |
+| `leave_encashment` | hr (PHASE-045, T-11) | `post` | G-51 — the leave encashment settlement through the payroll payout machinery: DR `SALARIES_PAYABLE` · CR CASH + the treasury movement (`cash_movements.source_type = 'payroll_payout'`, the existing kind); INV-031 at the encash boundary; each encashment mints its own key |
 
 The `budgeting` module (PHASE-028) intentionally registers **no** source type: budgets are
 not ledger documents (advisory controls only, BR-051 — see
-[DOCUMENT_LIFECYCLE.md](DOCUMENT_LIFECYCLE.md) §3).
+[DOCUMENT_LIFECYCLE.md](DOCUMENT_LIFECYCLE.md) §3). The same law holds for the rest of the
+hr cluster (PHASE-045): attendance records, rosters, and overtime entries register **no**
+source types — they are operational rows feeding the variable lines PHASE-046 consumes
+(the T-10 feed service), never ledger documents.
 
 ## 5. Sequencing example (credit invoice with goods)
 

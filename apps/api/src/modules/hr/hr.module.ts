@@ -1,9 +1,12 @@
 import { Module } from "@nestjs/common";
 
+import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
+import { ConfigurationModule } from "../configuration/configuration.module";
 import { AttendanceImportService } from "./application/attendance-import-service";
 import { BridgeService } from "./application/bridge-service";
 import { FeedService } from "./application/feed-service";
+import { LeavePostingService } from "./application/leave-posting-service";
 import { LeaveService } from "./application/leave-service";
 import { HolidayService } from "./application/holiday-service";
 import { AttendanceService } from "./application/attendance-service";
@@ -14,6 +17,7 @@ import { AttendanceController } from "./presentation/attendance.controller";
 import { BridgeController } from "./presentation/bridge.controller";
 import { FeedController } from "./presentation/feed.controller";
 import { HrController } from "./presentation/hr.controller";
+import { LeavePostingController } from "./presentation/leave-posting.controller";
 import { LeaveController } from "./presentation/leave.controller";
 import { HolidayController } from "./presentation/holiday.controller";
 import { OvertimeController } from "./presentation/overtime.controller";
@@ -35,12 +39,16 @@ import { OvertimeController } from "./presentation/overtime.controller";
  * and rosters are operational rows, NEVER ledger documents (the posting
  * canon's note); the employees substrate (the 029 payroll baseline) is
  * READ under RLS (the hr store, the manufacturing-store cross-module-
- * read precedent).
+ * read precedent). T-11's G-50/G-51 goldens add the ACCOUNTING +
+ * CONFIGURATION imports (PostingService + the effective-config policy
+ * seam) — the plan's posting-canon extension (JOURNAL_RULES §7), the
+ * payroll module's own dependency shape; the leave family's ONLY
+ * ledger surfaces.
  */
 @Module({
-  imports: [AuditModule],
-  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController],
-  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService],
-  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService],
+  imports: [AuditModule, AccountingModule, ConfigurationModule],
+  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController],
+  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService],
+  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService],
 })
 export class HrModule {}

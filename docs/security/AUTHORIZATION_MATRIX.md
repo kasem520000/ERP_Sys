@@ -653,7 +653,11 @@ user-administration role — `identity.users.manage` + `identity.roles.assign`
 PAYROLL PREPARATION read (the per-pay-period overtime/absence/late feeds
 + the leave balance snapshot, PHASE-046's variable-component inputs); the
 consumer-side handoff of the hr cluster's facts, granting no hr management
-surface. Role grants per 0086 §1: owner holds all six;
+surface; **the goldens G-50/G-51 (T-11, 2026-11-15)** —
+`leave/accrual/posting` + `leave/encashment` (POST) ride
+`payroll.runs.post` (the ledger-writing key, the SoD three-way split:
+create ≠ approve ≠ post — the leave family's ONLY ledger surfaces).
+Role grants per 0086 §1: owner holds all six;
 the accountant holds the five management keys (not the self-service scope —
 that key's grant rides the employee↔user link at the application boundary,
 seeded to the owner tier only for the drift-equality baseline).

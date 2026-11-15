@@ -284,6 +284,17 @@ export const POLICY_REGISTRY: Readonly<Record<string, PolicyDefinition>> = Objec
     description:
       "PHASE-042 BR-070: work-center downtime records are record-only by default ('off' — the closed row carries ended_at + duration with cost_amount/journal_id NULL); with 'post' the close computes the idle-capacity cost (duration/60 × the center's fixed+var hourly rates) and posts the G-42 journal DR DOWNTIME_EXPENSE · CR PRODUCTION_OVERHEAD (idle capacity absorbed against applied overhead). Posting is the explicit opt-in.",
   } satisfies PolicyDefinition),
+  // --- hr core (PHASE-045) ----------------------------------------------------
+  leave_accrual_posting: Object.freeze({
+    key: "leave_accrual_posting",
+    valueType: "enum",
+    enumValues: Object.freeze(["off", "post"]),
+    default: "off",
+    module: "hr",
+    settingsKey: "hr.leave_accrual_posting",
+    description:
+      "PHASE-045 G-50 (the BR-055 no-fabricated-defaults discipline): the period-end leave-accrual posting is OFF by default — the leave balances carry the days, never an invented ledger effect; with 'post' the leave officer may post the period's earned-leave value (DR SALARIES_EXPENSE · CR SALARIES_PAYABLE — the payroll family's canonical pair, no new purposes — at the monthly slice accrual_days/12 × basic/30 for every employee hired on or before the period's end and not terminated before its start; exactly-once per (type, period month) under INV-013).",
+  } satisfies PolicyDefinition),
   // --- inventory intelligence (PHASE-044) ------------------------------------
   quarantine_posting: Object.freeze({
     key: "quarantine_posting",

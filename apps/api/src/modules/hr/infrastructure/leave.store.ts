@@ -423,3 +423,50 @@ export async function countLeaveRequests(filter: {
   `);
   return rows.rows[0]!.n;
 }
+
+// -- the golden G-50/G-51 reads (T-11) --------------------------------------------
+
+/** The accrual ROSTER (G-50): every employee who earns the period's
+ * monthly slice — hired on or before the period's END (the hire month
+ * counts fully — the T-07 convention), not terminated before the
+ * period's START (TERMINATED is terminal; a termination inside the
+ * period earns its month — the same hire-month symmetry), carrying the
+ * basic salary for the daily-rate valuation. */
+export async function listAccrualRoster(periodStart: string, periodEnd: string): Promise<
+  { id: string; code: string; name: string; basicSalary: string; status: string }[]
+> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, code, name, basic_salary::text AS "basicSalary", status
+    FROM employees
+    WHERE hire_date <= ${periodEnd}::date
+      AND (termination_date IS NULL OR termination_date >= ${periodStart}::date)
+      AND status IN ('ACTIVE', 'SUSPENDED')
+    ORDER BY code
+  `);
+  return rows.rows as unknown as {
+    id: string;
+    code: string;
+    name: string;
+    basicSalary: string;
+    status: string;
+  }[];
+}
+
+/** The encashment's employee read (G-51): the ACTIVE employee with the
+ * basic salary for the daily-rate valuation (TERMINATED employees
+ * encash through the EOS machinery — the 029 G-31 world, never here). */
+export async function findEncashableEmployee(
+  id: string,
+): Promise<{ id: string; code: string; name: string; basicSalary: string; status: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, code, name, basic_salary::text AS "basicSalary", status
+    FROM employees WHERE id = ${id}::uuid LIMIT 1
+  `);
+  return (rows.rows as unknown as {
+    id: string;
+    code: string;
+    name: string;
+    basicSalary: string;
+    status: string;
+  }[])[0];
+}

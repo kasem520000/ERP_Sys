@@ -486,6 +486,13 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-042 §2.7 (BR-070): downtime records are record-only by default ('off' — the availability input of OEE, no ledger effect); 'post' makes closing a record post the non-value cost leg (G-42: DR DOWNTIME_EXPENSE · CR PRODUCTION_OVERHEAD at the work center's rates × idle hours) — the explicit opt-in.",
   }),
+  "hr.leave_accrual_posting": Object.freeze({
+    key: "hr.leave_accrual_posting",
+    schema: z.enum(["off", "post"]),
+    default: "off",
+    description:
+      "PHASE-045 (G-50, BR-055 discipline): the period-end leave-accrual posting is OFF by default — no fabricated ledger effect; 'post' lets the leave officer post the period's earned-leave value (DR SALARIES_EXPENSE · CR SALARIES_PAYABLE at the monthly slice days × basic/30 — the 029 EOS daily-rate convention) through the engine, exactly-once per (type, period month).",
+  }),
   // PHASE-019 professional-services keys (the §9 policy surface; the
   // professional_services manifest sets the six as L1 defaults via
   // workflow_policies, and the crm services read them from the resolved

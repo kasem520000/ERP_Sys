@@ -4182,6 +4182,23 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/feeds/variable",
     permission: "payroll.runs.view",
   },
+
+  // PHASE-045 (T-11 — matrix §3.23's dated note): the goldens G-50/G-51
+  // — the leave family's ONLY ledger surfaces (the period-end accrual
+  // posting, policy-gated; the encashment settlement through the payout
+  // machinery). Both are POSTING acts riding payroll.runs.post (the
+  // ledger-writing key, the SoD three-way split: create ≠ approve ≠
+  // post), never an hr.* management key.
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/accrual/posting",
+    permission: "payroll.runs.post",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/leave/encashment",
+    permission: "payroll.runs.post",
+  },
 ];
 
 /**
