@@ -378,6 +378,20 @@ import {
 // rejection — 401-shaped like every credential error (ERROR_MODEL §2).
 import { AgencyTokenInvalidError } from "../../modules/sales/domain/sales-errors";
 
+// PHASE-045 (T-04 — the hr core): the attendance not-found (404; A7
+// parity) + THE DATED T-03 REPAIR (2026-11-15): the T-03 hr error family
+// landed without its filter rows, so ShiftNotFoundError and the hr
+// EmployeeNotFoundError fell through to the 422 default — a not-found
+// rendering as 422. Surfaced by T-04's shared-gates sweep (the same
+// shape as the 59085a0 round's permissions-drift spec repair); the
+// codes never changed, only the HTTP status now matches the A-series
+// 404 convention every other not-found in the house follows.
+import {
+  AttendanceRecordNotFoundError as HrAttendanceRecordNotFoundError,
+  EmployeeNotFoundError as HrEmployeeNotFoundError,
+  ShiftNotFoundError,
+} from "../../modules/hr/domain/hr-errors";
+
 /**
  * ERROR_MODEL exception filter: the single error envelope —
  * `{ error: { code, message, details, traceId, retryable } }`. Codes are
@@ -672,6 +686,20 @@ function domainStatus(error: DomainError): number {
     error instanceof EosSettlementExceedsBalanceError
   ) {
     return HttpStatus.CONFLICT;
+  }
+  // PHASE-045 hr not-founds (404; A7 parity — identical shape for
+  // unknown-vs-foreign ids, no existence disclosure). The dated T-03
+  // repair: ShiftNotFoundError + the hr EmployeeNotFoundError rendered
+  // 422 from T-03's landing until this row (2026-11-15) — codes stable,
+  // statuses corrected to the house 404 convention; T-04's
+  // AttendanceRecordNotFoundError lands with its correct status from
+  // the start.
+  if (
+    error instanceof HrEmployeeNotFoundError ||
+    error instanceof ShiftNotFoundError ||
+    error instanceof HrAttendanceRecordNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
   }
   // SF-027-001: the fixed_assets 404s + 409s (the policy/validation family
   // falls through to the 422 default — PERIOD_LOCKED, CATEGORY_NOT_USABLE,

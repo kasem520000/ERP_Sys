@@ -3899,6 +3899,36 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/roster/rotation",
     permission: "hr.shifts",
   },
+
+  // PHASE-045 (T-04 — matrix §3.23): the attendance surface rides
+  // hr.attendance — session capture, the one-shot checkout (BR-082),
+  // the daily register, the exception board, and the derivation run.
+  // The DEVICE-import pipeline (T-05) lands on hr.attendance.import.
+  {
+    method: "POST",
+    path: "/api/v1/hr/attendance/records",
+    permission: "hr.attendance",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/attendance/records/:id/checkout",
+    permission: "hr.attendance",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/attendance/register",
+    permission: "hr.attendance",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/attendance/exceptions",
+    permission: "hr.attendance",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/attendance/derive",
+    permission: "hr.attendance",
+  },
 ];
 
 /**
