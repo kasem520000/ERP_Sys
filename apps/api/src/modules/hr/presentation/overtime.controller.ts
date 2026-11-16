@@ -72,11 +72,11 @@ export class OvertimeController {
 
   @Post("overtime/rules")
   @RequirePermissions("hr.overtime")
-  createRule(@Req() request: Request, @Body() body: unknown) {
+  async createRule(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = ruleBody.parse(body);
     return envelope(
-      this.overtime.createRule({
+      await this.overtime.createRule({
         code: input.code,
         name: input.name,
         nameAr: input.nameAr ?? null,
@@ -93,7 +93,7 @@ export class OvertimeController {
 
   @Get("overtime/rules")
   @RequirePermissions("hr.overtime")
-  listRules(
+  async listRules(
     @Req() request: Request,
     @Query("active") active?: string,
     @Query("limit") limit?: string,
@@ -102,7 +102,7 @@ export class OvertimeController {
     const activeFilter =
       active === undefined || active === "" ? undefined : active === "true";
     return envelope(
-      this.overtime.listRules({
+      await this.overtime.listRules({
         ...(activeFilter === undefined ? {} : { active: activeFilter }),
         limit: Math.min(Math.max(Number(limit ?? "100") || 100, 1), 500),
       }),
@@ -111,11 +111,11 @@ export class OvertimeController {
 
   @Put("overtime/rules/:id")
   @RequirePermissions("hr.overtime")
-  updateRule(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async updateRule(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const patch = rulePatch.parse(body);
     return envelope(
-      this.overtime.updateRule(
+      await this.overtime.updateRule(
         id,
         {
           ...(patch.name === undefined ? {} : { name: patch.name }),
@@ -133,51 +133,51 @@ export class OvertimeController {
 
   @Post("overtime/rules/:id/activate")
   @RequirePermissions("hr.overtime")
-  activateRule(@Req() request: Request, @Param("id") id: string) {
+  async activateRule(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.overtime.setRuleActive(id, true, identity.userId));
+    return envelope(await this.overtime.setRuleActive(id, true, identity.userId));
   }
 
   @Post("overtime/rules/:id/deactivate")
   @RequirePermissions("hr.overtime")
-  deactivateRule(@Req() request: Request, @Param("id") id: string) {
+  async deactivateRule(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.overtime.setRuleActive(id, false, identity.userId));
+    return envelope(await this.overtime.setRuleActive(id, false, identity.userId));
   }
 
   // -- the tier match + the weekend setting ------------------------------------------------
 
   @Get("overtime/tier")
   @RequirePermissions("hr.overtime")
-  resolveTier(@Req() request: Request, @Query("date") date: string) {
+  async resolveTier(@Req() request: Request, @Query("date") date: string) {
     requireIdentity(request);
-    return envelope(this.overtime.resolveTier(date));
+    return envelope(await this.overtime.resolveTier(date));
   }
 
   @Get("overtime/weekend")
   @RequirePermissions("hr.overtime")
-  weekend(@Req() request: Request) {
+  async weekend(@Req() request: Request) {
     requireIdentity(request);
-    return envelope(this.overtime.weekendDays());
+    return envelope(await this.overtime.weekendDays());
   }
 
   @Put("overtime/weekend")
   @RequirePermissions("hr.overtime")
-  saveWeekend(@Req() request: Request, @Body() body: unknown) {
+  async saveWeekend(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = weekendBody.parse(body);
-    return envelope(this.overtime.saveWeekendDays(input.weekendDays, identity.userId));
+    return envelope(await this.overtime.saveWeekendDays(input.weekendDays, identity.userId));
   }
 
   // -- the entries --------------------------------------------------------------------------
 
   @Post("overtime/entries")
   @RequirePermissions("hr.overtime")
-  createEntry(@Req() request: Request, @Body() body: unknown) {
+  async createEntry(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = entryBody.parse(body);
     return envelope(
-      this.overtime.createEntry({
+      await this.overtime.createEntry({
         employeeId: input.employeeId,
         workDate: input.workDate,
         hours: input.hours,
@@ -190,27 +190,27 @@ export class OvertimeController {
 
   @Post("overtime/entries/:id/approve")
   @RequirePermissions("hr.overtime")
-  approve(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async approve(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z.object({ note: TEXT }).parse(body);
     return envelope(
-      this.overtime.decide(id, { approve: true, note: input.note ?? null, actorId: identity.userId }),
+      await this.overtime.decide(id, { approve: true, note: input.note ?? null, actorId: identity.userId }),
     );
   }
 
   @Post("overtime/entries/:id/reject")
   @RequirePermissions("hr.overtime")
-  reject(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async reject(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z.object({ note: TEXT }).parse(body);
     return envelope(
-      this.overtime.decide(id, { approve: false, note: input.note ?? null, actorId: identity.userId }),
+      await this.overtime.decide(id, { approve: false, note: input.note ?? null, actorId: identity.userId }),
     );
   }
 
   @Get("overtime/entries")
   @RequirePermissions("hr.overtime")
-  listEntries(
+  async listEntries(
     @Req() request: Request,
     @Query("from") from: string,
     @Query("to") to: string,
@@ -224,7 +224,7 @@ export class OvertimeController {
     const employeeIds =
       employeeId === undefined || employeeId === "" ? undefined : [employeeId];
     return envelope(
-      this.overtime.listEntries({
+      await this.overtime.listEntries({
         from,
         to,
         employeeIds,

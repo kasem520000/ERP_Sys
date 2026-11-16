@@ -89,11 +89,11 @@ export class AttendanceController {
 
   @Post("attendance/records")
   @RequirePermissions("hr.attendance")
-  capture(@Req() request: Request, @Body() body: unknown) {
+  async capture(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = captureBody.parse(body);
     return envelope(
-      this.attendance.capture({
+      await this.attendance.capture({
         employeeId: input.employeeId,
         workDate: input.workDate,
         checkIn: input.checkIn,
@@ -110,22 +110,22 @@ export class AttendanceController {
 
   @Post("attendance/records/:id/checkout")
   @RequirePermissions("hr.attendance")
-  checkout(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async checkout(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z.object({ checkOut: INSTANT }).parse(body);
-    return envelope(this.attendance.checkout(id, input.checkOut, identity.userId));
+    return envelope(await this.attendance.checkout(id, input.checkOut, identity.userId));
   }
 
   @Get("attendance/register")
   @RequirePermissions("hr.attendance")
-  register(@Req() request: Request, @Query("date") date: string) {
+  async register(@Req() request: Request, @Query("date") date: string) {
     requireIdentity(request);
-    return envelope(this.attendance.register(date));
+    return envelope(await this.attendance.register(date));
   }
 
   @Get("attendance/exceptions")
   @RequirePermissions("hr.attendance")
-  exceptions(
+  async exceptions(
     @Req() request: Request,
     @Query("from") from: string,
     @Query("to") to: string,
@@ -137,7 +137,7 @@ export class AttendanceController {
     const employeeIds =
       employeeId === undefined || employeeId === "" ? undefined : [employeeId];
     return envelope(
-      this.attendance.exceptions({
+      await this.attendance.exceptions({
         from,
         to,
         employeeIds,
@@ -149,11 +149,11 @@ export class AttendanceController {
 
   @Post("attendance/derive")
   @RequirePermissions("hr.attendance")
-  derive(@Req() request: Request, @Body() body: unknown) {
+  async derive(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = deriveBody.parse(body);
     return envelope(
-      this.attendance.deriveDays({
+      await this.attendance.deriveDays({
         from: input.from,
         to: input.to,
         employeeIds: input.employeeIds,

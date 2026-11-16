@@ -4199,6 +4199,65 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/leave/encashment",
     permission: "payroll.runs.post",
   },
+
+  // PHASE-045 (T-14 — matrix §3.23 + the 0086 seed note): the employee
+  // self-service plane — the OWN-ROWS reads (summary, attendance
+  // calendar, roster, the leave world) + the two narrow writes
+  // (create-own-request, cancel-own-PENDING). Every row rides
+  // hr.self_service marked self: true — runtime-granted to every
+  // authenticated user (the SELF_SCOPE_KEYS mechanism), the ownership
+  // boundary being the identity bridge (the employee scope resolved
+  // from the acting user; an unlinked user is the typed
+  // HR_SELF_NOT_LINKED refusal). Approve/reject stay on /hr/leave
+  // under hr.leave — this plane grants NO management surface.
+  {
+    method: "GET",
+    path: "/api/v1/hr/self/summary",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/self/attendance",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/self/roster",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/self/leave/types",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/self/leave/balances",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/self/leave/requests",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/self/leave/requests",
+    permission: "hr.self_service",
+    self: true,
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/self/leave/requests/:id/cancel",
+    permission: "hr.self_service",
+    self: true,
+  },
 ];
 
 /**

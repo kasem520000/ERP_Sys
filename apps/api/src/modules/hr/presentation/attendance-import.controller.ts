@@ -84,11 +84,11 @@ export class AttendanceImportController {
 
   @Post("attendance/import/preview")
   @RequirePermissions("hr.attendance.import")
-  preview(@Req() request: Request, @Body() body: unknown) {
+  async preview(@Req() request: Request, @Body() body: unknown) {
     requireIdentity(request);
     const input = previewBody.parse(body);
     return envelope(
-      this.imports.preview({
+      await this.imports.preview({
         content: input.content,
         ...(input.mapping === undefined ? {} : { mapping: input.mapping as ImportMapping }),
       }),
@@ -97,11 +97,11 @@ export class AttendanceImportController {
 
   @Post("attendance/import/commit")
   @RequirePermissions("hr.attendance.import")
-  commit(@Req() request: Request, @Body() body: unknown) {
+  async commit(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = commitBody.parse(body);
     return envelope(
-      this.imports.commit({
+      await this.imports.commit({
         content: input.content,
         fileName: input.fileName,
         ...(input.mapping === undefined ? {} : { mapping: input.mapping as ImportMapping }),
@@ -114,31 +114,31 @@ export class AttendanceImportController {
 
   @Get("attendance/import/mapping")
   @RequirePermissions("hr.attendance.import")
-  getMapping(@Req() request: Request) {
+  async getMapping(@Req() request: Request) {
     requireIdentity(request);
-    return envelope(this.imports.effectiveMapping());
+    return envelope(await this.imports.effectiveMapping());
   }
 
   @Put("attendance/import/mapping")
   @RequirePermissions("hr.attendance.import")
-  saveMapping(@Req() request: Request, @Body() body: unknown) {
+  async saveMapping(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = importMappingBody.parse(body);
-    return envelope(this.imports.saveMapping(input as ImportMapping, identity.userId));
+    return envelope(await this.imports.saveMapping(input as ImportMapping, identity.userId));
   }
 
   // -- the review surface (hr.attendance) ----------------------------------------------
 
   @Get("attendance/import/batches")
   @RequirePermissions("hr.attendance")
-  batches(
+  async batches(
     @Req() request: Request,
     @Query("page") page?: string,
     @Query("pageSize") pageSize?: string,
   ) {
     requireIdentity(request);
     return envelope(
-      this.imports.batches({
+      await this.imports.batches({
         ...(page === undefined || page === "" ? {} : { page: Number(page) }),
         ...(pageSize === undefined || pageSize === "" ? {} : { pageSize: Number(pageSize) }),
       }),
@@ -147,7 +147,7 @@ export class AttendanceImportController {
 
   @Get("attendance/import/anomalies")
   @RequirePermissions("hr.attendance")
-  anomalies(
+  async anomalies(
     @Req() request: Request,
     @Query("batchId") batchId?: string,
     @Query("status") status?: string,
@@ -156,7 +156,7 @@ export class AttendanceImportController {
   ) {
     requireIdentity(request);
     return envelope(
-      this.imports.anomalies({
+      await this.imports.anomalies({
         ...(batchId === undefined || batchId === "" ? {} : { batchId }),
         ...(status === undefined || status === "" ? {} : { status }),
         ...(page === undefined || page === "" ? {} : { page: Number(page) }),
@@ -167,11 +167,11 @@ export class AttendanceImportController {
 
   @Post("attendance/import/anomalies/:id/resolve")
   @RequirePermissions("hr.attendance")
-  resolve(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async resolve(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = resolveBody.parse(body);
     return envelope(
-      this.imports.resolve({
+      await this.imports.resolve({
         anomalyId: id,
         action: input.action,
         ...(input.employeeId === undefined ? {} : { employeeId: input.employeeId }),

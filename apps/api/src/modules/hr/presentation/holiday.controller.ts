@@ -55,11 +55,11 @@ export class HolidayController {
 
   @Post("holiday-calendars")
   @RequirePermissions("hr.attendance")
-  createCalendar(@Req() request: Request, @Body() body: unknown) {
+  async createCalendar(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = calendarBody.parse(body);
     return envelope(
-      this.holidays.createCalendar({
+      await this.holidays.createCalendar({
         jurisdictionCode: input.jurisdictionCode,
         name: input.name,
         nameAr: input.nameAr ?? null,
@@ -72,22 +72,22 @@ export class HolidayController {
 
   @Get("holiday-calendars")
   @RequirePermissions("hr.attendance")
-  listCalendars(@Req() request: Request, @Query("active") active?: string) {
+  async listCalendars(@Req() request: Request, @Query("active") active?: string) {
     requireIdentity(request);
     const activeFilter =
       active === undefined || active === "" ? undefined : active === "true";
     return envelope(
-      this.holidays.listCalendars(activeFilter === undefined ? {} : { active: activeFilter }),
+      await this.holidays.listCalendars(activeFilter === undefined ? {} : { active: activeFilter }),
     );
   }
 
   @Put("holiday-calendars/:id")
   @RequirePermissions("hr.attendance")
-  updateCalendar(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async updateCalendar(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const patch = calendarPatch.parse(body);
     return envelope(
-      this.holidays.updateCalendar(
+      await this.holidays.updateCalendar(
         id,
         {
           ...(patch.name === undefined ? {} : { name: patch.name }),
@@ -102,25 +102,25 @@ export class HolidayController {
 
   @Post("holiday-calendars/:id/activate")
   @RequirePermissions("hr.attendance")
-  activateCalendar(@Req() request: Request, @Param("id") id: string) {
+  async activateCalendar(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.holidays.setCalendarActive(id, true, identity.userId));
+    return envelope(await this.holidays.setCalendarActive(id, true, identity.userId));
   }
 
   @Post("holiday-calendars/:id/deactivate")
   @RequirePermissions("hr.attendance")
-  deactivateCalendar(@Req() request: Request, @Param("id") id: string) {
+  async deactivateCalendar(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.holidays.setCalendarActive(id, false, identity.userId));
+    return envelope(await this.holidays.setCalendarActive(id, false, identity.userId));
   }
 
   @Post("holiday-calendars/:id/holidays")
   @RequirePermissions("hr.attendance")
-  upsertHoliday(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async upsertHoliday(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = holidayBody.parse(body);
     return envelope(
-      this.holidays.upsertHoliday({
+      await this.holidays.upsertHoliday({
         calendarId: id,
         holidayDate: input.holidayDate,
         name: input.name,
@@ -132,14 +132,14 @@ export class HolidayController {
 
   @Delete("holiday-calendars/:id/holidays/:holidayId")
   @RequirePermissions("hr.attendance")
-  removeHoliday(@Req() request: Request, @Param("id") _id: string, @Param("holidayId") holidayId: string) {
+  async removeHoliday(@Req() request: Request, @Param("id") _id: string, @Param("holidayId") holidayId: string) {
     const identity = requireIdentity(request);
-    return envelope(this.holidays.removeHoliday(holidayId, identity.userId));
+    return envelope(await this.holidays.removeHoliday(holidayId, identity.userId));
   }
 
   @Get("holidays")
   @RequirePermissions("hr.attendance")
-  listHolidays(
+  async listHolidays(
     @Req() request: Request,
     @Query("calendarId") calendarId?: string,
     @Query("from") from: string = "2000-01-01",
@@ -147,7 +147,7 @@ export class HolidayController {
   ) {
     requireIdentity(request);
     return envelope(
-      this.holidays.listHolidays({
+      await this.holidays.listHolidays({
         ...(calendarId === undefined || calendarId === "" ? {} : { calendarId }),
         from,
         to,

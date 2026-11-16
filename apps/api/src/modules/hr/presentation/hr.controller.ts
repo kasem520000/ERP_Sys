@@ -100,11 +100,11 @@ export class HrController {
   @Post("shifts")
   @RequirePermissions("hr.shifts")
   @HttpCode(HttpStatus.CREATED)
-  createShift(@Req() request: Request, @Body() body: unknown) {
+  async createShift(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = shiftBody.parse(body);
     return envelope(
-      this.shifts.create({
+      await this.shifts.create({
         code: input.code,
         name: input.name,
         nameAr: input.nameAr ?? null,
@@ -122,7 +122,7 @@ export class HrController {
 
   @Get("shifts")
   @RequirePermissions("hr.shifts")
-  listShifts(
+  async listShifts(
     @Req() request: Request,
     @Query("active") active?: string,
     @Query("limit") limit?: string,
@@ -131,7 +131,7 @@ export class HrController {
     const activeFilter =
       active === undefined || active === "" ? undefined : active === "true";
     return envelope(
-      this.shifts.list({
+      await this.shifts.list({
         ...(activeFilter === undefined ? {} : { active: activeFilter }),
         limit: Math.min(Math.max(Number(limit ?? "100") || 100, 1), 500),
       }),
@@ -140,18 +140,18 @@ export class HrController {
 
   @Get("shifts/:id")
   @RequirePermissions("hr.shifts")
-  findShift(@Req() request: Request, @Param("id") id: string) {
+  async findShift(@Req() request: Request, @Param("id") id: string) {
     requireIdentity(request);
-    return envelope(this.shifts.find(id));
+    return envelope(await this.shifts.find(id));
   }
 
   @Put("shifts/:id")
   @RequirePermissions("hr.shifts")
-  updateShift(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async updateShift(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const patch = shiftPatch.parse(body);
     return envelope(
-      this.shifts.update(
+      await this.shifts.update(
         id,
         {
           ...(patch.code === undefined ? {} : { code: patch.code }),
@@ -172,23 +172,23 @@ export class HrController {
 
   @Post("shifts/:id/activate")
   @RequirePermissions("hr.shifts")
-  activateShift(@Req() request: Request, @Param("id") id: string) {
+  async activateShift(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.shifts.setActive(id, true, identity.userId));
+    return envelope(await this.shifts.setActive(id, true, identity.userId));
   }
 
   @Post("shifts/:id/deactivate")
   @RequirePermissions("hr.shifts")
-  deactivateShift(@Req() request: Request, @Param("id") id: string) {
+  async deactivateShift(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.shifts.setActive(id, false, identity.userId));
+    return envelope(await this.shifts.setActive(id, false, identity.userId));
   }
 
   // -- the roster grid -----------------------------------------------------------
 
   @Get("roster")
   @RequirePermissions("hr.shifts")
-  readGrid(
+  async readGrid(
     @Req() request: Request,
     @Query("from") from: string,
     @Query("to") to: string,
@@ -203,7 +203,7 @@ export class HrController {
     // total + hasMore — the explicit truncation signal — so a client
     // can always retrieve the FULL grid.
     return envelope(
-      this.shifts.readGrid({
+      await this.shifts.readGrid({
         from,
         to,
         employeeIds,
@@ -215,7 +215,7 @@ export class HrController {
 
   @Put("roster/cell")
   @RequirePermissions("hr.shifts")
-  setCell(@Req() request: Request, @Body() body: unknown) {
+  async setCell(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z
       .object({
@@ -226,7 +226,7 @@ export class HrController {
       })
       .parse(body);
     return envelope(
-      this.shifts.setRosterCell({
+      await this.shifts.setRosterCell({
         employeeId: input.employeeId,
         workDate: input.workDate,
         shiftId: input.shiftId,
@@ -238,21 +238,21 @@ export class HrController {
 
   @Post("roster/cell/clear")
   @RequirePermissions("hr.shifts")
-  clearCell(@Req() request: Request, @Body() body: unknown) {
+  async clearCell(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z
       .object({ employeeId: UUID, workDate: DATE })
       .parse(body);
     return envelope(
-      this.shifts.clearRosterCell(input.employeeId, input.workDate, identity.userId),
+      await this.shifts.clearRosterCell(input.employeeId, input.workDate, identity.userId),
     );
   }
 
   @Post("roster/rotation")
   @RequirePermissions("hr.shifts")
-  applyRotation(@Req() request: Request, @Body() body: unknown) {
+  async applyRotation(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = rotationBody.parse(body);
-    return envelope(this.shifts.applyRotation({ ...input, actorId: identity.userId }));
+    return envelope(await this.shifts.applyRotation({ ...input, actorId: identity.userId }));
   }
 }

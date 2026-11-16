@@ -36,11 +36,11 @@ export class BridgeController {
   @Post("employees/:id/link-user")
   @HttpCode(HttpStatus.OK)
   @RequirePermissions("payroll.employees.manage")
-  linkUser(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async linkUser(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = linkBody.parse(body);
     return envelope(
-      this.bridge.link({
+      await this.bridge.link({
         employeeId: UUID.parse(id),
         userId: input.userId,
         actorId: identity.userId,
@@ -51,17 +51,17 @@ export class BridgeController {
   @Post("employees/:id/unlink-user")
   @HttpCode(HttpStatus.OK)
   @RequirePermissions("payroll.employees.manage")
-  unlinkUser(@Req() request: Request, @Param("id") id: string) {
+  async unlinkUser(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
     return envelope(
-      this.bridge.unlink({ employeeId: UUID.parse(id), actorId: identity.userId }),
+      await this.bridge.unlink({ employeeId: UUID.parse(id), actorId: identity.userId }),
     );
   }
 
   @Get("employees/:id/bridge")
   @RequirePermissions("payroll.employees.view")
-  getBridge(@Req() request: Request, @Param("id") id: string) {
+  async getBridge(@Req() request: Request, @Param("id") id: string) {
     requireIdentity(request);
-    return envelope(this.bridge.get(UUID.parse(id)));
+    return envelope(await this.bridge.get(UUID.parse(id)));
   }
 }

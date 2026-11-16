@@ -84,11 +84,11 @@ export class LeaveController {
 
   @Post("leave/types")
   @RequirePermissions("hr.leave")
-  createType(@Req() request: Request, @Body() body: unknown) {
+  async createType(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = typeBody.parse(body);
     return envelope(
-      this.leave.createType({
+      await this.leave.createType({
         code: input.code,
         name: input.name,
         nameAr: input.nameAr ?? null,
@@ -106,7 +106,7 @@ export class LeaveController {
 
   @Get("leave/types")
   @RequirePermissions("hr.leave")
-  listTypes(
+  async listTypes(
     @Req() request: Request,
     @Query("active") active?: string,
     @Query("limit") limit?: string,
@@ -115,7 +115,7 @@ export class LeaveController {
     const activeFilter =
       active === undefined || active === "" ? undefined : active === "true";
     return envelope(
-      this.leave.listTypes({
+      await this.leave.listTypes({
         ...(activeFilter === undefined ? {} : { active: activeFilter }),
         limit: Math.min(Math.max(Number(limit ?? "100") || 100, 1), 500),
       }),
@@ -124,11 +124,11 @@ export class LeaveController {
 
   @Put("leave/types/:id")
   @RequirePermissions("hr.leave")
-  updateType(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async updateType(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const patch = typePatch.parse(body);
     return envelope(
-      this.leave.updateType(
+      await this.leave.updateType(
         id,
         {
           ...(patch.name === undefined ? {} : { name: patch.name }),
@@ -148,30 +148,30 @@ export class LeaveController {
 
   @Post("leave/types/:id/activate")
   @RequirePermissions("hr.leave")
-  activateType(@Req() request: Request, @Param("id") id: string) {
+  async activateType(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.leave.setTypeActive(id, true, identity.userId));
+    return envelope(await this.leave.setTypeActive(id, true, identity.userId));
   }
 
   @Post("leave/types/:id/deactivate")
   @RequirePermissions("hr.leave")
-  deactivateType(@Req() request: Request, @Param("id") id: string) {
+  async deactivateType(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
-    return envelope(this.leave.setTypeActive(id, false, identity.userId));
+    return envelope(await this.leave.setTypeActive(id, false, identity.userId));
   }
 
   // -- the balances ------------------------------------------------------------------------
 
   @Get("leave/balances")
   @RequirePermissions("hr.leave")
-  balances(
+  async balances(
     @Req() request: Request,
     @Query("employeeId") employeeId?: string,
     @Query("year") year?: string,
   ) {
     requireIdentity(request);
     return envelope(
-      this.leave.balances({
+      await this.leave.balances({
         ...(employeeId === undefined || employeeId === "" ? {} : { employeeId }),
         ...(year === undefined || year === "" ? {} : { year: Number(year) }),
       }),
@@ -182,11 +182,11 @@ export class LeaveController {
 
   @Post("leave/requests")
   @RequirePermissions("hr.leave")
-  createRequest(@Req() request: Request, @Body() body: unknown) {
+  async createRequest(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = requestBody.parse(body);
     return envelope(
-      this.leave.createRequest({
+      await this.leave.createRequest({
         employeeId: input.employeeId,
         leaveTypeId: input.leaveTypeId,
         startDate: input.startDate,
@@ -199,31 +199,31 @@ export class LeaveController {
 
   @Post("leave/requests/:id/approve")
   @RequirePermissions("hr.leave")
-  approve(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async approve(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z.object({ note: TEXT }).parse(body);
-    return envelope(this.leave.approve(id, input.note ?? null, identity.userId));
+    return envelope(await this.leave.approve(id, input.note ?? null, identity.userId));
   }
 
   @Post("leave/requests/:id/reject")
   @RequirePermissions("hr.leave")
-  reject(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async reject(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z.object({ note: TEXT }).parse(body);
-    return envelope(this.leave.decideAgainst(id, "REJECTED", input.note ?? null, identity.userId));
+    return envelope(await this.leave.decideAgainst(id, "REJECTED", input.note ?? null, identity.userId));
   }
 
   @Post("leave/requests/:id/cancel")
   @RequirePermissions("hr.leave")
-  cancel(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+  async cancel(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = z.object({ note: TEXT }).parse(body);
-    return envelope(this.leave.decideAgainst(id, "CANCELLED", input.note ?? null, identity.userId));
+    return envelope(await this.leave.decideAgainst(id, "CANCELLED", input.note ?? null, identity.userId));
   }
 
   @Get("leave/requests")
   @RequirePermissions("hr.leave")
-  listRequests(
+  async listRequests(
     @Req() request: Request,
     @Query("from") from: string,
     @Query("to") to: string,
@@ -236,7 +236,7 @@ export class LeaveController {
     const employeeIds =
       employeeId === undefined || employeeId === "" ? undefined : [employeeId];
     return envelope(
-      this.leave.listRequests({
+      await this.leave.listRequests({
         from,
         to,
         employeeIds,
@@ -251,11 +251,11 @@ export class LeaveController {
 
   @Post("leave/accrual")
   @RequirePermissions("hr.leave")
-  runAccrual(@Req() request: Request, @Body() body: unknown) {
+  async runAccrual(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = accrualBody.parse(body);
     return envelope(
-      this.leave.runAccrual({
+      await this.leave.runAccrual({
         leaveTypeId: input.leaveTypeId,
         year: input.year,
         ...(input.asOfMonth === undefined ? {} : { asOfMonth: input.asOfMonth }),
@@ -266,11 +266,11 @@ export class LeaveController {
 
   @Post("leave/rollover")
   @RequirePermissions("hr.leave")
-  rollover(@Req() request: Request, @Body() body: unknown) {
+  async rollover(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = rolloverBody.parse(body);
     return envelope(
-      this.leave.rollover({
+      await this.leave.rollover({
         leaveTypeId: input.leaveTypeId,
         fromYear: input.fromYear,
         toYear: input.toYear,

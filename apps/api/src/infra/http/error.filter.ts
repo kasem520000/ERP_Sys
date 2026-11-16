@@ -765,6 +765,13 @@ function domainStatus(error: DomainError): number {
   // discipline), the monthly-period law, the encashment's INV-031
   // refusal, and the shape laws are validation/policy refusals, never
   // lifecycle conflicts; the not-founds reuse the 404 rows above.
+  // PHASE-045 (T-14): the self-service plane's one law of its own —
+  // HR_SELF_NOT_LINKED (the acting user is nobody's employee in this
+  // tenant) — likewise falls through to the 422 default BY DESIGN: it
+  // is a state precondition (the BRIDGE_USER_NOT_MEMBER precedent),
+  // never a not-found (the summary route renders the same state as
+  // `employee: null` — the scoped routes' typed refusal is defense in
+  // depth, never the page's only gate).
   // SF-027-001: the fixed_assets 404s + 409s (the policy/validation family
   // falls through to the 422 default — PERIOD_LOCKED, CATEGORY_NOT_USABLE,
   // NBV_FLOOR_VIOLATION, SELF_APPROVAL_BLOCKED, … exactly as the 026

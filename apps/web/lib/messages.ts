@@ -2797,6 +2797,8 @@ export function localizedHrError(
       return d.hrErrBalanceInsufficient;
     case "LEAVE_SPAN_OVERLAP":
       return d.hrErrLeaveOverlap;
+    case "HR_SELF_NOT_LINKED":
+      return d.hrErrSelfNotLinked;
     default:
       return localizedApiError(d, error, retryAfterSeconds);
   }

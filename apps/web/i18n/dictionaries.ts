@@ -6410,6 +6410,21 @@ export interface Dictionary {
   hrErrLeaveDecided: string;
   hrErrBalanceInsufficient: string;
   hrErrLeaveOverlap: string;
+  // PHASE-045 (T-14): the employee self-service tabs (own attendance
+  // calendar, own leave request + balance, own roster — gated by
+  // hr.self_service's runtime grant + the identity bridge).
+  hrSelfTitle: string;
+  hrSelfNotLinkedTitle: string;
+  hrSelfNotLinkedBody: string;
+  hrSelfTabAttendance: string;
+  hrSelfTabLeave: string;
+  hrSelfTabRoster: string;
+  hrSelfCalendarTitle: string;
+  hrSelfRosterTitle: string;
+  hrSelfEmpty: string;
+  hrSelfNoTypes: string;
+  hrSelfCancelledToast: string;
+  hrErrSelfNotLinked: string;
 }
 
 const ar: Dictionary = {
@@ -12822,6 +12837,19 @@ const ar: Dictionary = {
   hrErrLeaveDecided: "الطلب محسوم مسبقاً — لا يُعالَج إلا الطلب قيد الانتظار.",
   hrErrBalanceInsufficient: "رصيد الإجازة لا يكفي لاعتماد الطلب.",
   hrErrLeaveOverlap: "يتقاطع امتداد الإجازة مع إجازة قائمة لهذا الموظف.",
+  // PHASE-045 (T-14): الخدمة الذاتية للموظف
+  hrSelfTitle: "الخدمة الذاتية",
+  hrSelfNotLinkedTitle: "لا يوجد ملف موظف مرتبط بحسابك",
+  hrSelfNotLinkedBody: "تحلّ شاشات الخدمة الذاتية هويتك الوظيفية عبر ربط الموظف بالمستخدم. حسابك غير مرتبط بملف موظف في هذا المستأجر — تواصل مع الموارد البشرية لإجراء الربط، أو استخدم شاشات الموارد البشرية إن كانت لديك صلاحياتها.",
+  hrSelfTabAttendance: "حضوري",
+  hrSelfTabLeave: "إجازاتي",
+  hrSelfTabRoster: "جدولي",
+  hrSelfCalendarTitle: "تقويم حضوري",
+  hrSelfRosterTitle: "جدول دوامي (للقراءة)",
+  hrSelfEmpty: "لا توجد سجلات في هذه الفترة.",
+  hrSelfNoTypes: "لا توجد أنواع إجازات مفعّلة — راجع الموارد البشرية.",
+  hrSelfCancelledToast: "تم إلغاء الطلب.",
+  hrErrSelfNotLinked: "لا يوجد ملف موظف مرتبط بحسابك في هذا المستأجر — تحلّ الخدمة الذاتية هويتك عبر ربط الموظف بالمستخدم.",
 };
 
 const en: Dictionary = {
@@ -19248,6 +19276,19 @@ const en: Dictionary = {
   hrErrLeaveDecided: "The request is already decided — only a PENDING request can be acted on.",
   hrErrBalanceInsufficient: "The leave balance is insufficient for this approval.",
   hrErrLeaveOverlap: "The span overlaps an existing leave of this employee.",
+  // PHASE-045 (T-14): the employee self-service tabs
+  hrSelfTitle: "Self-service",
+  hrSelfNotLinkedTitle: "No employee file is linked to your account",
+  hrSelfNotLinkedBody: "The self-service surfaces resolve your employment identity through the employee ↔ user link. Your account carries no employee file in this tenant — ask HR to link it, or use the HR screens if you hold their permissions.",
+  hrSelfTabAttendance: "My attendance",
+  hrSelfTabLeave: "My leave",
+  hrSelfTabRoster: "My roster",
+  hrSelfCalendarTitle: "My attendance calendar",
+  hrSelfRosterTitle: "My roster (read-only)",
+  hrSelfEmpty: "No records in this window.",
+  hrSelfNoTypes: "No active leave types — ask HR.",
+  hrSelfCancelledToast: "The request was cancelled.",
+  hrErrSelfNotLinked: "No employee file is linked to your account in this tenant — the self-service surfaces resolve your identity through the employee ↔ user link.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

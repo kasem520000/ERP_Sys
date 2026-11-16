@@ -49,11 +49,11 @@ export class LeavePostingController {
   @Post("accrual/posting")
   @HttpCode(HttpStatus.OK)
   @RequirePermissions("payroll.runs.post")
-  postAccrual(@Req() request: Request, @Body() body: unknown) {
+  async postAccrual(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = accrualBody.parse(body);
     return envelope(
-      this.postings.postAccrual({
+      await this.postings.postAccrual({
         leaveTypeId: input.leaveTypeId,
         periodId: input.periodId,
         actorId: identity.userId,
@@ -65,11 +65,11 @@ export class LeavePostingController {
   @Post("encashment")
   @HttpCode(HttpStatus.OK)
   @RequirePermissions("payroll.runs.post")
-  encash(@Req() request: Request, @Body() body: unknown) {
+  async encash(@Req() request: Request, @Body() body: unknown) {
     const identity = requireIdentity(request);
     const input = encashBody.parse(body);
     return envelope(
-      this.postings.encash({
+      await this.postings.encash({
         employeeId: input.employeeId,
         leaveTypeId: input.leaveTypeId,
         days: input.days,

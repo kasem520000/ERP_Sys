@@ -6718,3 +6718,51 @@ export interface RosterRotationResult {
   manualPreserved: number;
   days: number;
 }
+
+/** PHASE-045 (T-14): the self-service employee card — the identity the
+ * bridge resolves for the acting user (GET hr/self/summary → employee
+ * or the honest null when the account is nobody's employee here). */
+export interface SelfEmployeeCard {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  status: string;
+}
+
+/** GET hr/self/summary. */
+export interface SelfSummary {
+  employee: SelfEmployeeCard | null;
+}
+
+/** GET hr/self/attendance → the OWN calendar over a bounded window
+ * (the register's columns, own rows only). */
+export interface SelfAttendanceRead {
+  employee: SelfEmployeeCard;
+  from: string;
+  to: string;
+  rows: readonly AttendanceRecordRow[];
+}
+
+/** GET hr/self/roster → the OWN roster page (read-only; the joint-
+ * review pagination law). */
+export interface SelfRosterPage {
+  employee: SelfEmployeeCard;
+  from: string;
+  to: string;
+  rows: readonly RosterCellRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}
+
+/** GET hr/self/leave/requests → the OWN requests page. */
+export interface SelfLeaveRequestsPage {
+  employee: SelfEmployeeCard;
+  rows: readonly LeaveRequestRow[];
+  page: number;
+  pageSize: number;
+  total: number;
+  hasMore: boolean;
+}

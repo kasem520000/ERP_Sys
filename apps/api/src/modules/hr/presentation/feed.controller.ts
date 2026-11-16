@@ -32,7 +32,7 @@ export class FeedController {
 
   @Get("variable")
   @RequirePermissions("payroll.runs.view")
-  variableFeed(
+  async variableFeed(
     @Req() request: Request,
     @Query("periodId") periodId?: string,
     @Query("employeeId") employeeId?: string,
@@ -42,7 +42,7 @@ export class FeedController {
       throw new FeedInvalidError("periodId is required");
     }
     return envelope(
-      this.feeds.variableFeed({
+      await this.feeds.variableFeed({
         periodId,
         ...(employeeId === undefined || employeeId === "" ? {} : { employeeId }),
         actorId: identity.userId,

@@ -42,6 +42,16 @@ const SELF_SCOPE_KEYS = new Set([
   // plain identity.devices.manage routes (list/get/patch) carry no self
   // flag, so they stay admin-only.
   "identity.devices.manage",
+  // PHASE-045 (T-14 — matrix §3.23 + the 0086 seed note): the employee
+  // self-service plane — runtime-granted to EVERY authenticated user
+  // (an employee needs no hr.leave to see their own balance); the
+  // OWNERSHIP boundary is the identity bridge itself: the employee
+  // scope is resolved from the acting user (never a client-supplied
+  // id), and an unlinked user is the typed HR_SELF_NOT_LINKED
+  // refusal. The key is seeded to the owner template only (0086) —
+  // the drift equality is what matters; the every-user grant lives
+  // HERE at the application boundary, exactly as the seed documents.
+  "hr.self_service",
 ]);
 
 @Injectable()

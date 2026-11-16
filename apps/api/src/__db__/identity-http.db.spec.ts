@@ -307,3 +307,86 @@ async function countDeniedAudit(): Promise<number> {
   await su.end();
   return result.rows[0]?.n ?? 0;
 }
+
+describe("PHASE-045 T-14 — the self-service plane (HTTP level: the runtime grant + the bridge ownership boundary)", () => {
+  it("a viewer with ZERO hr.* template grants reads their own summary — the hr.self_service runtime grant (the 0086 seed note) + the bridge-resolved own card", async () => {
+    // The fixture employee, linked to the VIEWER user (the viewer role
+    // is the cloned viewer template — 49 view-class keys, NO hr.* key;
+    // the runtime grant at the guard is the ONLY way this 200s).
+    const su = await superuserClient();
+    const employeeCode = `HTTP-SELF-${generateUuidV7().slice(0, 8)}`;
+    await su.query(
+      `INSERT INTO employees (id, tenant_id, code, name, hire_date, contract_type, basic_salary, created_by, user_id)
+       VALUES (gen_random_uuid(), $1, $2, 'Http Self Employee', '2026-01-01', 'FULL_TIME', 8000, $3, $4)
+       ON CONFLICT (tenant_id, code) DO NOTHING`,
+      [tenantId, employeeCode, owner.userId, viewer.userId],
+    );
+    await su.end();
+
+    const own = await get("/api/v1/hr/self/summary", {
+      "x-session-token": viewer.token,
+    });
+    expect(own.status).toBe(200); // NOT 403 — the runtime grant admitted a zero-grant user
+    const ownBody = (await own.json()) as {
+      data: { employee: { code: string; id: string } | null };
+    };
+    expect(ownBody.data.employee).not.toBeNull();
+    expect(ownBody.data.employee!.code).toBe(employeeCode);
+
+    // The owner (in this tenant) carries no link — the honest null.
+    const unlinked = await get("/api/v1/hr/self/summary", {
+      "x-session-token": owner.token,
+    });
+    expect(unlinked.status).toBe(200);
+    const unlinkedBody = (await unlinked.json()) as { data: { employee: unknown } };
+    expect(unlinkedBody.data.employee).toBeNull();
+
+    // THE ENVELOPE LAW (the T-14 repair): an hr read must deliver its
+    // RESOLVED payload — the pre-T-14 `envelope(promise)` shape handed
+    // Express a nested Promise, which serializes as `data: {}` (found
+    // by this spec's first run; every hr controller site now awaits
+    // inside envelope(...)). The owner holds hr.leave — the type
+    // catalog read answers a REAL array (empty here, an array never
+    // `{}`).
+    const types = await get("/api/v1/hr/leave/types", {
+      "x-session-token": owner.token,
+    });
+    expect(types.status).toBe(200);
+    const typesBody = (await types.json()) as { data: unknown };
+    expect(Array.isArray(typesBody.data)).toBe(true);
+
+    // And an hr ERROR path renders the typed envelope (not a swallowed
+    // rejection after a 200): a foreign/unknown shift id is the 404
+    // A7 shape.
+    const notFound = await post(
+      "/api/v1/hr/shifts",
+      {
+        code: `HTTP-SHIFT-${generateUuidV7().slice(0, 8)}`,
+        name: "Http Shift",
+        startTime: "08:00",
+        endTime: "16:00",
+        graceMinutes: 15,
+        breakMinutes: 30,
+        isNight: false,
+      },
+      { "x-session-token": owner.token },
+    );
+    expect(notFound.status).toBe(201);
+    const shiftBody = (await notFound.json()) as { data: { id: string } };
+    expect(typeof shiftBody.data.id).toBe("string");
+
+    const foreignShift = await get(`/api/v1/hr/shifts/00000000-0000-4000-8000-0000000005ff`, {
+      "x-session-token": owner.token,
+    });
+    expect(foreignShift.status).toBe(404);
+    const foreignBody = (await foreignShift.json()) as { error: { code: string } };
+    expect(foreignBody.error.code).toBe("SHIFT_NOT_FOUND");
+  });
+
+  it("anonymous stays 401 on the self plane (the grant is runtime, never anonymous)", async () => {
+    const response = await get("/api/v1/hr/self/summary");
+    expect(response.status).toBe(401);
+    const body = (await response.json()) as { error: { code: string } };
+    expect(body.error.code).toBe("UNAUTHENTICATED");
+  });
+});

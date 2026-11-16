@@ -371,6 +371,27 @@ export async function listRegisterRows(date: string): Promise<AttendanceRecordRo
   return rows.rows as unknown as AttendanceRecordRow[];
 }
 
+/** The self-service calendar read (T-14): ONE employee's rows over a
+ * range — the register's columns, the employee's own days only (the
+ * bridge resolver hands the id; a client NEVER supplies it), ordered
+ * for a calendar walk (date, then punch order). */
+export async function listOwnCalendarRows(filter: {
+  employeeId: string;
+  from: string;
+  to: string;
+}): Promise<AttendanceRecordRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${ATTENDANCE_COLUMNS}
+    FROM attendance_records a
+    JOIN employees e ON e.id = a.employee_id
+    LEFT JOIN shifts s ON s.id = a.shift_id
+    WHERE a.employee_id = ${filter.employeeId}::uuid
+      AND a.work_date >= ${filter.from}::date AND a.work_date <= ${filter.to}::date
+    ORDER BY a.work_date, a.check_in NULLS FIRST, a.created_at
+  `);
+  return rows.rows as unknown as AttendanceRecordRow[];
+}
+
 export async function listExceptionRows(filter: {
   from: string;
   to: string;
