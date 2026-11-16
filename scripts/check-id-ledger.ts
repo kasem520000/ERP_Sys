@@ -882,17 +882,21 @@ function runSelfTest(): boolean {
   );
 
   // (7) A reference to an EXISTING id under a DIFFERENT OWNER: the ledger's
-  // cross-ref table row claiming G-51 for PHASE-046 while §2 reserves it
-  // for PHASE-045 — the owner-mismatch finding, never a pass.
+  // cross-ref table row claiming G-52 for PHASE-047 while §2 reserves it
+  // for PHASE-046 — the owner-mismatch finding, never a pass.
+  // (Fixture drift note: pre-045-delivery this probe pinned G-51 for
+  // PHASE-046 vs PHASE-045's reservation; PHASE-045's 2026-11-16 delivery
+  // flipped G-50/G-51 to implemented, so the probe moved to the next
+  // reserved golden — G-52, reserved for PHASE-046.)
   const ownerMismatch = checkCrossRefs(
-    [{ inPhase: "PHASE-047", refs: ["G-51"], ownedBy: "PHASE-046" }],
+    [{ inPhase: "PHASE-047", refs: ["G-52"], ownedBy: "PHASE-047" }],
     RESERVED_BY,
   );
   check(
     "(7) existing id referenced under a different owner — the cross-ref owner mismatch is flagged",
     ownerMismatch.length === 1 &&
       ownerMismatch[0]!.kind === "cross-ref-owner-mismatch" &&
-      ownerMismatch[0]!.detail.includes("owned by PHASE-045"),
+      ownerMismatch[0]!.detail.includes("owned by PHASE-046"),
   );
 
   // (8) A claim of an IMPLEMENTED id under a different meaning — the

@@ -551,3 +551,25 @@ template's `required_feature_keys` gains all six keys (the manufacturing block:
 food-manufacturing tenant requires the execution keys by default; the docs manifest
 mirror + the contracts verbatim transcription move with the seed (the byte/hash pins
 re-anchored — the 039 re-pin procedure).
+
+## 28. Module: hr (PHASE-045)
+
+The HR core (CR-15, migrations `0080`–`0088`): shifts, rosters/rotations,
+attendance with the device-agnostic import, overtime tiers, the leave family,
+holiday calendars, and the employee ↔ user identity bridge — the operational
+workforce truth feeding PHASE-046's payroll compliance engine as variable
+lines. Numbering follows §27's precedent (appended after the maintenance
+protocol so existing references stay stable). The three template-composable
+keys are enabled on the workforce industry templates by migration 0088
+(restaurant · automotive · food_manufacturing · healthcare — the matrix §3.23
+note; business + enterprise plan grants since 0086 §2 — HR is not a starter
+feature). Attendance, rosters, and overtime entries are NOT ledger documents
+(the posting-canon note — the golden G-50/G-51 leave postings are the
+family's only ledger surfaces).
+
+| Feature key | Feature (EN · AR) | Scope | Priority | Phase | Permission(s) | Depends on |
+|------------|-------------------|-------|----------|-------|---------------|------------|
+| `hr.attendance` | Attendance core · نواة الحضور | **SHIPPED PHASE-045** (HR-01/H-05 operational, N-17): punch sessions (MANUAL/IMPORT/DEVICE sources, geo coordinates, BR-082's immutability window — check_out fills exactly once, corrections arrive as new rows), the DERIVED daily status (HOLIDAY > ON_LEAVE > ABSENT/MISSING_PUNCH/LATE/PRESENT with the exact minute facts — the roster shift's instants in the tenant's timezone, the night crossing on +1), the exception board (ABSENT/MISSING_PUNCH/LATE), the idempotent derive run, and the generic device import (the ZKTeco-style CSV adapter + configurable mapping, preview → dedupe → anomaly quarantine → commit with the file's sha256 fingerprint — the same file never commits twice); the `/hr/attendance` register + exception board + import wizard; plan grants: **business + enterprise** (0086 §2) | 4 | 045 | `hr.attendance` (register/derive/exception review) · `hr.attendance.import` (the import commit) | `payroll.employees` |
+| `hr.leave` | Leave family · عائلة الإجازات | **SHIPPED PHASE-045** (HR-02): the type catalog (paid flag, the accrual policy — 0.00 until configured, BR-055; monthly grant + joiner proration; the carry-over cap), per-year balance cells (rows, not views — reconstructable; INV-031 at the approve boundary, BR-083's start-year charge), the request lifecycle with the simple approval (PENDING → APPROVED/REJECTED/CANCELLED — the full workflow engine is PHASE-052 by decision record), the accrual run + the rollover (the truncation audited), and the golden G-50 accrual posting + G-51 encashment (policy-gated, the payroll payout machinery); the `/hr/leave` board; plan grants: **business + enterprise** | 4 | 045 | `hr.leave` | `payroll.employees` |
+| `hr.shifts` | Shifts & rosters · الورديات والجداول | **SHIPPED PHASE-045** (HR-04): shift templates (start/end, grace period, breaks, the night flag, bilingual), the employee × date roster grid (ONE row per cell — edits replace), the weekly rotation pattern generator (the chunked write — 200 employees × 92 days within the protocol limit), and the holiday calendars per jurisdiction (bilingual, feeding the absence derivation + the overtime HOLIDAY tier); the `/hr/shifts` roster editor; plan grants: **business + enterprise** | 4 | 045 | `hr.shifts` | `payroll.employees` |
+| (the overtime + self-service planes ride the module's own keys) | Overtime engine + self-service · محرك الإضافي والخدمة الذاتية | **SHIPPED PHASE-045** (HR-03/HR-13): the overtime tier rules (WEEKDAY/WEEKEND/HOLIDAY — the holiday-calendar integration; NO fabricated weekend default, BR-055), the multiplier application in SQL numeric (BR-084's pre-approval feeding law + the per-day sanctionable cap), and the employee self-service tabs (own attendance calendar, own leave request + balance, own roster — `hr.self_service` runtime-granted to every linked account through the employee ↔ user bridge, the SoD-scoped read surface: HR data visibility rides HR permissions, never user administration) | 4 | 045 | `hr.overtime` · `hr.self_service` | `hr.attendance`, `hr.leave` |

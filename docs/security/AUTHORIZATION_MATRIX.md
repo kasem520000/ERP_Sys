@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; catalog stays 297; the phase runs in parallel with the 043-completion review per the owner's directive)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -656,7 +656,13 @@ consumer-side handoff of the hr cluster's facts, granting no hr management
 surface; **the goldens G-50/G-51 (T-11, 2026-11-15)** —
 `leave/accrual/posting` + `leave/encashment` (POST) ride
 `payroll.runs.post` (the ledger-writing key, the SoD three-way split:
-create ≠ approve ≠ post — the leave family's ONLY ledger surfaces).
+create ≠ approve ≠ post — the leave family's ONLY ledger surfaces); **the three report
+contracts (T-16, 2026-11-16)** — `hr.attendance-register`, `hr.leave-balances`, and
+`hr.overtime-summary` ride the module's OWN keys (`hr.attendance`, `hr.leave`,
+`hr.overtime` — the REPORT_CATALOG §12 module-register convention; no new permission,
+no new route — the /reports workspace's run service re-checks the contract's
+requiredPermission per run, and the exports additionally need
+`reporting.reports.export`).
 Role grants per 0086 §1: owner holds all six;
 the accountant holds the five management keys (not the self-service scope —
 that key's grant rides the employee↔user link at the application boundary,

@@ -26,7 +26,7 @@ Arabic is canonical; English is full parity.
 | 8 | التقارير / Reports | bar-chart | Saved reports, all catalog reports, VAT returns, exports, consolidated statements (القوائم الموحدة) | reporting |
 | 9 | الجهات / Partners | users | Customers, suppliers, credit terms, statements, balances | partners |
 | 10 | الإعدادات / Settings | settings | Branches/warehouses, users & roles, tax codes, numbering, branding, subscription, industry template | tenancy, identity, tax |
-| 11 | الموظفون والرواتب / HR & Payroll | users-round | Employees, salary structures, payroll runs, loans | payroll |
+| 11 | الموظفون والرواتب / HR & Payroll | users-round | Employees, salary structures, payroll runs, loans, attendance & exceptions (الحضور والغياب), leaves (الإجازات), shifts & roster (الورديات), self-service (الخدمة الذاتية) | payroll, hr |
 
 Group visibility = entitlement AND at least one child visible (never an empty group).
 Industry templates (PHASE-015) may add template-specific items (e.g., job cards under
@@ -65,6 +65,10 @@ precedent).
 | `payroll.salary-structures` | 11 الموظفون والرواتب | هياكل الرواتب / Salary structures | `payroll.salary_structures` | `payroll.salary_structures.manage` (view implied) | List + Search (§2) + Create/Edit Form (§3) |
 | `payroll.runs` | 11 الموظفون والرواتب | تشغيلات الرواتب / Payroll runs | `payroll.runs` | `payroll.runs.view` | List + Search (§2); pending approvals surface in Approval Queue (§6) |
 | `payroll.loans` | 11 الموظفون والرواتب | سلف الموظفين / Employee loans | `payroll.loans` | `payroll.loans.manage` (view implied) | List + Search (§2) |
+| `hr.attendance` | 11 الموظفون والرواتب | الحضور والغياب / Attendance | `hr.attendance` | `hr.attendance` | List + Search (§2) — route `/hr/attendance` (the daily register + the exception board; the import wizard at `/hr/attendance/import` under `hr.attendance.import`); **PHASE-045** |
+| `hr.leave` | 11 الموظفون والرواتب | الإجازات / Leave | `hr.leave` | `hr.leave` | List + Search (§2) — route `/hr/leave` (requests + balances + the type catalog); **PHASE-045** |
+| `hr.shifts` | 11 الموظفون والرواتب | الورديات وجدول التشغيل / Shifts & roster | `hr.shifts` | `hr.shifts` | Settings-style workspace — route `/hr/shifts` (the shift templates + the roster editor grid + the rotation generator); **PHASE-045** |
+| `hr.self` | 11 الموظفون والرواتب | الخدمة الذاتية / Self-service | `hr.attendance` | — (deliberately NONE — the runtime-granted plane) | List + Search (§2) — route `/hr/self` (own attendance calendar, own leave + balance, own roster); `hr.self_service` is runtime-granted to every authenticated linked account (SELF_SCOPE_KEYS) and `effectivePermissions` never carries it, so a permission-gated item would render for owners only and hide the tab from the employees it exists for; unlinked accounts click through to the honest not-linked state; **PHASE-045** |
 
 ### 1.2 PHASE-035 registry additions (Blueprint v3.0 — activation)
 
@@ -384,3 +388,4 @@ hard-coded listeners in screens). POS terminal profiles define their own F-key m
 | Custom-fields manager (definitions + picklists + per-entity form designer) under الإعدادات; typed values render on the six first-wave entity forms | PHASE-036 |
 | Manufacturing execution group (group 5, الإنتاج والتصنيع) + its five items (work centers, routings, shop-floor terminal, downtime log, standard costs); the Operations tab + rework ride the existing orders screen | PHASE-042 |
 | WMS surfaces under المخزون (location tree, pick waves, cycle counts, ABC, quarantine board) + the PP-11 scan embeds on the existing receipt/delivery/transfer/count screens | PHASE-044 |
+| The HR core surfaces under الموظفون والرواتب: attendance & exceptions + the device-import wizard, leaves, shifts & roster, self-service | PHASE-045 — **LIVE** (delivered 2026-11-16: `/hr/attendance` (the daily register + the exception board + the capture card + BR-082's checkout dialog + the derive run), `/hr/attendance/import` (the 3-step wizard + the batches log + the anomaly quarantine), `/hr/leave` (requests + decisions + the create form + balances + the type catalog + the accrual/rollover runs), `/hr/shifts` (the templates + the roster editor grid + the 7-slot rotation generator), `/hr/self` (MY ATTENDANCE / MY LEAVE / MY ROSTER — `hr.self_service` runtime-granted through the employee ↔ user bridge, the honest not-linked state); the three reports ride the `/reports` workspace registry (registry 101 → 104); the workforce industry templates carry the hr block since migration 0088) |
