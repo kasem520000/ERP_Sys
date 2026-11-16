@@ -1,33 +1,60 @@
-# NEXT ACTION — post-PHASE-045 (REOPENED for the owner's concurrency review round)
+# NEXT ACTION — PHASE-046 IN PROGRESS (the owner's approval + corrections received)
 
-**THE CURRENT STATE (2026-11-16):** PHASE-045 is **IN_PROGRESS — REOPENED**.
-T-01…T-19 remain delivered (the completion report
-`docs/implementation/phases/reports/PHASE-045-COMPLETION.md` stands as the
-delivery evidence), but the owner's review of the closure head `fd61ff2`
-found five REAL check-then-write races (proven with two-transaction DB
-tests): attendance overlap + duplicate ABSENT markers, leave-span overlap,
-balance over-consumption (used=30.00 on 20.00), the encashment cap bypass
-(used=25.00 on 20.00), and the employee↔user bridge's silent link
-replacement. **T-20 (delivered, awaiting the owner's re-review)** fixes all
-five with the HR shared atomicity floor
-(`apps/api/src/modules/hr/infrastructure/atomic.ts` — transaction-scoped
-advisory gates before every guard read: the attendance-day gate across
-capture/import/correction/checkout/derivation, the leave-span gate at both
-doors, the balance-cell gate across approval/encashment/accrual/rollover
-with `used_days` as the source of truth under the lock, and the bridge's
-conditional compare-and-set with the typed `BRIDGE_ALREADY_LINKED`), pinned
-by the PERMANENT two-transaction race suite
-`apps/api/src/__db__/hr/hr-writer-races.spec.ts` 16/16 (the mfg harness
-idiom + no-illegal-state assertions, the integrated encash-then-approval
-test included). Evidence:
-[gate-evidence/2026-11-16-phase045-t20.md](../docs/operations/gate-evidence/2026-11-16-phase045-t20.md)
-— the full local gates re-run in the prepared fresh environment, THE FULL DB
-SUITE 240/240 files · 3,329/3,329 · 0 failed · 0 skipped (serially in four
-invocations; the one machine-load p95 failure of the first 119-file attempt
-kept honestly in the log, the spec green in isolation and in the re-split
-batch). **The phase stays OPEN for the owner's re-review — the completion
-declaration is NOT production approval; PHASE-043 and RISK-031/RISK-032
-stay OPEN.**
+**THE CURRENT STATE (2026-11-16):** PHASE-045 is **ACCEPTED & CLOSED** by
+the owner (content head `248039e` / delivery head `d74edaa`; the five
+concurrency defects confirmed fixed; DB suite 240/240 · 3,329/3,329;
+archives byte-verified; the three final-audit documentation remarks are
+NON-BLOCKING and fold into PHASE-046's W-7/T-15 — their text is an open
+input, no PHASE-045 task opens). **PHASE-046 (HR Payroll Compliance —
+GOSI/PIT/EOSB, CR-16) is APPROVED with corrections** — the owner approved
+the MASTER-PLAN (`agent-ctx/PHASE-046-MASTER-PLAN.md`, delivered at main
+c71aa9d5) with these binding amendments:
+
+1. **GOSI correction (W-1, before the W-2 engine specs and the W-6 golden
+   pinning):** the `GOSI-OH` row applies to **ALL** (employee 0%, employer
+   2%); Saudi = employer 11.75% total (9% pension + 0.75% SANED + 2% OH),
+   employee 9.75%; non-Saudi = OH-only (employer 2%, employee 0). The
+   ruleset/seed + the canonical unit + the tests + the affected examples
+   all move together — not the example alone. The OH wage cap is verified
+   against the official schedule with the citation (expected 45,000 — pin
+   what the official source confirms). The Saudi worked example: employer
+   total 1,410.0000; the salary journal DR SALARIES_EXPENSE 12,000 · DR
+   EMPLOYER_CONTRIBUTIONS 1,410 · CR DEDUCTIONS_PAYABLE 2,580 · CR
+   SALARIES_PAYABLE 10,830; the remittance settlement 2,580; non-Saudi OH
+   240.0000 unchanged.
+2. **`employees.nationality` (D-02) APPROVED** — NULL fails closed with the
+   specified warning; the field joins the PII inventory.
+3. **The D-01/D-11 work-basis text + every affected example** update in the
+   same change, with the OH rate+cap citation attached.
+4. **The T-20 pinned technical notes — BEFORE the payroll writers adopt the
+   floor** (these are NOT the §7(b) documentation remarks; they are not
+   deferred, not resolved by W-7):
+   - UUID canonicalization before the lock-key derivation + TWO permanent
+     DB tests (overlapping attendance + overlapping leave in parallel, the
+     SAME uuid in two letter cases — the illegal state must not save);
+   - the day-import × overlapping-derivation deadlock probability: no
+     lock-set expansion after a partial set is reserved in-transaction, the
+     acquisition order guaranteed at the DB level (not app-side sorting
+     alone), re-tested as two transactions on days 22/24 and 23/24 with the
+     range derivation 22–24 — no 40P01, correct final state;
+   - the race-suite sync hardening: `anyLockWaiter()` (whole-DB ungranted
+     lock) becomes bound to the intended transaction/lock or a test
+     barrier — no false-positive greens.
+5. **Tag `phase/046`** (not `phase-046`); the waves/gates per the plan with
+   no softening; separate evidence per step; PHASE-043 and
+   RISK-031/RISK-032 stay OPEN — NOT production adoption.
+
+**W-0 (delivered 2026-11-16):** the clean-environment baseline proof on the
+untouched `d74edaa` head — typecheck 8/8, lint 8/8, depcruise clean
+(1,908 modules · 14,140 deps), unit 8/8 packages (1,542 tests; the missing
+chromium headless-shell 1248 installed here for the zatca-qr-decode spec),
+and THE FULL DB SUITE 240/240 files · 3,329/3,329 · 0 failed · 0 skipped
+(chunked foreground invocations; the two load-shaped performance assertions
+re-proven green in the isolated perf chunk per the T-20 runbook precedent —
+both failing logs kept). Evidence:
+[gate-evidence/2026-11-16-phase046-w0.md](../docs/operations/gate-evidence/2026-11-16-phase046-w0.md)
++ `audit-evidence/phase046-w0/`. **Next: the T-20 pinned notes (item 4
+above), then W-1.**
 
 The delivered substrate (context for the re-review): migrations
 `0080`–`0088` (schema_version 88; the shift/attendance/overtime/leave/
@@ -46,15 +73,18 @@ Permissions 297=297; i18n 6,007=6,007; report registry 104; DB suite
 240/240 files · 3,329/3,329; api unit 626/626; docs 33/33; typecheck/lint
 8/8; OA-06 budgets 6/6. The OA-07 archive is `ERP_PLATFORM_PHASE045.zip`.
 
-**Next eligible ON THE OWNER'S RE-APPROVAL of T-20: PHASE-046 (HR Payroll
-Compliance — GOSI/PIT/EOSB, CR-16)** — prerequisites: PHASE-045 re-approved
-(its only hard prerequisite is this phase; the roadmap's hard ordering "045
-before 046 before 047" holds). Start with
-`docs/implementation/phases/PHASE-046.md` (T-01…T-16: the statutory
-contribution profiles under the REQUIRES_VERIFICATION discipline, the PIT
-withholding engine, the EOSB automation with the 029 provision true-up, the
-variable-line consumption, the GOSI remittance export; goldens G-52…G-54,
-INV-032, BR-085…087 — the id-ledger's coordinated slots).
+**PHASE-046 (HR Payroll Compliance — GOSI/PIT/EOSB, CR-16) IS APPROVED**
+(its only hard prerequisite PHASE-045 is accepted; the roadmap's hard
+ordering "045 before 046 before 047" holds). The MASTER-PLAN
+(`agent-ctx/PHASE-046-MASTER-PLAN.md`, at main c71aa9d5) governs with the
+owner's five binding amendments recorded in the header above. The canon
+spine stays `docs/implementation/phases/PHASE-046.md` (T-01…T-16; goldens
+G-52…G-54, INV-032, BR-085…087 — the id-ledger's coordinated slots).
+**The immediate work order: the T-20 pinned technical notes first (the
+UUID canonicalization + the two mixed-case permanent DB tests; the
+lock-set-expansion/deadlock fix proven by the 22/24 × 23/24 × 22–24
+three-way duel — no 40P01; the anyLockWaiter() hardening), then W-1 with
+the GOSI corrections.**
 
 Key handoffs from 045 (read the PHASE-045 completion report first):
 
