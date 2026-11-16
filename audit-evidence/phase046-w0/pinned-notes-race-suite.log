@@ -1,0 +1,162 @@
+
+ RUN  v3.2.7 /home/z/erp-work/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+
+Success. You can now start the database server using:
+
+    '/home/z/erp-work/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-16 20:09:32.020 UTC [15841] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-16 20:09:32.020 UTC [15841] LOG:  listening on IPv6 address "::1", port 38973
+2026-11-16 20:09:32.020 UTC [15841] LOG:  listening on IPv4 address "127.0.0.1", port 38973
+
+2026-11-16 20:09:32.020 UTC [15841] LOG:  listening on Unix socket "/tmp/.s.PGSQL.38973"
+
+2026-11-16 20:09:32.021 UTC [15844] LOG:  database system was shut down at 2026-11-16 20:09:31 UTC
+
+2026-11-16 20:09:32.023 UTC [15841] LOG:  database system is ready to accept connections
+
+2026-11-16 20:09:52.290 UTC [15922] ERROR:  canceling statement due to statement timeout
+2026-11-16 20:09:52.290 UTC [15922] CONTEXT:  while inserting index tuple (0,62) in relation "leave_balances"
+2026-11-16 20:09:52.290 UTC [15922] STATEMENT:  
+	    INSERT INTO leave_balances (id, tenant_id, employee_id, leave_type_id, year)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3, $4)
+	    ON CONFLICT ("tenant_id", "employee_id", "leave_type_id", "year") DO NOTHING
+	  
+
+2026-11-16 20:09:52.605 UTC [15928] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-16 20:09:52.605 UTC [15928] STATEMENT:  
+	    UPDATE employees SET user_id = $1::uuid, updated_at = now(), version = version + 1
+	    WHERE id = $2::uuid AND user_id IS NULL
+	    RETURNING id
+	  
+
+ ❯ src/__db__/hr/hr-writer-races.spec.ts (20 tests | 2 failed) 16289ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the attendance family > (1) MANUAL CAPTURE — two overlapping sessions for one employee-day: the loser blocks on the day lock, then refuses typed; never two overlapping sessions 41ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the attendance family > (2) IMPORT COMMIT — a manual capture racing the import's floor read: the capture blocks on the file's day lock, then refuses typed; the overlap never lands 56ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the attendance family > (3) THE CORRECTION (anomaly-resolve IMPORT) — a manual capture racing the corrected session's floor read: blocked, then typed; the correction lands exactly once 61ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the attendance family > (4) CHECKOUT — a sibling capture racing the one-shot fill: blocked, then typed; the session never closes INTO an overlap 66ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the attendance family > (5) THE DERIVATION — two concurrent runs over one rostered punchless day: the loser blocks, re-reads the winner's marker, and synthesizes NOTHING — exactly one ABSENT marker 39ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the attendance family > (6) THE CAPTURE SMOKE — two overlapping captures in flight together: no deadlock, exactly ONE accepted, the loser typed, the day disjoint 26ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the leave span law > (7) REQUEST CREATION — two overlapping requests at once: the loser blocks on the span lock, then refuses typed; exactly one request exists 40ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the leave span law > (8) THE APPROVE-BOUNDARY OVERLAP — a request seeded behind the create-boundary check is refused at APPROVAL (the law's second door) 34ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (9) DOUBLE APPROVE — two 15-day approvals on a 20-day cell: the loser blocks on the cell lock, re-reads used=15.00, refuses typed; used lands at 15.00 never 30.00 62ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (10) ENCASH THEN APPROVE (the owner's integrated scenario) — a committed 10.00-day cashout rides used_days; a 15.00-day approval on the 20.00 cell is the typed refusal, never used=25.00 45ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (11) ENCASH VS APPROVE, CONCURRENT — a real G-51 cashout racing a real approval on one cell: the approval blocks on the cell lock, re-reads used=10.00, refuses typed 60ms
+   × PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (12) ACCRUAL RECOMPUTE — a lowering run racing an approval: the run blocks on the cell lock, re-reads used=15.00, and is the typed INV-031 preservation refusal; the entitlement is never lowered under a committed charge 15063ms
+     → the pre-fix shape reproduced: the accrual run settled inside the window on a stale used_days — (fulfilled): expected 'slipped' to be 'blocked' // Object.is equality
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (13) CARRY-OVER ROLLOVER — a re-run that would lower a toYear cell's carried under its consumed opening carry: blocked, re-read under the lock, the typed preservation refusal; carried stays 10.00 155ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (14) THE BALANCE SMOKE — approval + approval + encashment in flight together on one 20.00 cell: no deadlock, exactly ONE wins, the losers typed, INV-031 holds 42ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the employee ↔ user bridge > (15) TWO USERS, ONE EMPLOYEE — the second concurrent link waits on the row lock, matches ZERO rows, and renders the typed refusal; the first link survives, exactly ONE link event, NO unlink event 58ms
+   ✓ PHASE-045 T-20 — the owner's concurrency review round: the employee ↔ user bridge > (16) ONE USER, TWO EMPLOYEES — the second concurrent link waits on the 0085 unique floor and renders the SAME typed refusal; the user maps to exactly ONE employee 50ms
+   ✓ PHASE-046 — the owner's pinned notes on the T-20 floor: the canonical key law (note a) > (17) MIXED-CASE ATTENDANCE — the same employee-day raced through two letter cases of the SAME uuid: ONE canonical gate, the loser blocks on it, then refuses typed; the overlap never lands 56ms
+   ✓ PHASE-046 — the owner's pinned notes on the T-20 floor: the canonical key law (note a) > (18) MIXED-CASE LEAVE — two overlapping requests for the same employee, one arm naming the uuid in UPPERCASE: ONE canonical span gate, the loser blocks on it, then refuses typed; exactly one request exists 41ms
+   × PHASE-046 — the owner's pinned notes on the T-20 floor: the no-expansion law + the DB-guaranteed order (note b) > (19) THE TWO-IMPORT × RANGE-DERIVATION DEADLOCK DUEL — import A on days {22, 24}, import B on days {23, 24}, and the derivation of the range 22–24 all in flight together: NO 40P01 anywhere, every arm settles, the final state is exact 34ms
+     → expected +0 to be 2 // Object.is equality
+   ✓ PHASE-046 — the owner's pinned notes on the T-20 floor: the no-expansion law + the DB-guaranteed order (note b) > (20) THE RESERVATION LEDGER — re-entry and strictly-ascending expansion are the only legal in-transaction shapes; a backwards expansion is the typed refusal BEFORE any lock statement, and the transaction stays usable 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/hr/hr-writer-races.spec.ts > PHASE-045 T-20 — the owner's concurrency review round: the balance cell (used_days is the source of truth) > (12) ACCRUAL RECOMPUTE — a lowering run racing an approval: the run blocks on the cell lock, re-reads used=15.00, and is the typed INV-031 preservation refusal; the entitlement is never lowered under a committed charge
+AssertionError: the pre-fix shape reproduced: the accrual run settled inside the window on a stale used_days — (fulfilled): expected 'slipped' to be 'blocked' // Object.is equality
+
+Expected: "blocked"
+Received: "slipped"
+
+ ❯ src/__db__/hr/hr-writer-races.spec.ts:1218:7
+    1216|       arm.observation.value!.shape,
+    1217|       `the pre-fix shape reproduced: the accrual run settled inside th…
+    1218|     ).toBe("blocked");
+       |       ^
+    1219|     expect(loserCode(arm)).toBe("LEAVE_ACCRUAL_INVALID");
+    1220| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__db__/hr/hr-writer-races.spec.ts > PHASE-046 — the owner's pinned notes on the T-20 floor: the no-expansion law + the DB-guaranteed order (note b) > (19) THE TWO-IMPORT × RANGE-DERIVATION DEADLOCK DUEL — import A on days {22, 24}, import B on days {23, 24}, and the derivation of the range 22–24 all in flight together: NO 40P01 anywhere, every arm settles, the final state is exact
+AssertionError: expected +0 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ src/__db__/hr/hr-writer-races.spec.ts:1710:35
+    1708|     const importB = outcomes[1]!;
+    1709|     const derive = outcomes[2]!;
+    1710|     expect(importA.importedCount).toBe(2);
+       |                                   ^
+    1711|     expect(importB.importedCount).toBe(2);
+    1712|     expect(derive.absentSynthesized).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 18 passed (20)
+   Start at  20:09:31
+   Duration  21.49s (transform 820ms, setup 0ms, collect 1.72s, tests 16.29s, environment 0ms, prepare 52ms)
+
+2026-11-16 20:09:52.810 UTC [15841] LOG:  received fast shutdown request
+
+2026-11-16 20:09:52.810 UTC [15841] LOG:  aborting any active transactions
+2026-11-16 20:09:52.810 UTC [15959] FATAL:  terminating connection due to administrator command
+2026-11-16 20:09:52.811 UTC [15928] FATAL:  terminating connection due to administrator command
+2026-11-16 20:09:52.812 UTC [15841] LOG:  background worker "logical replication launcher" (PID 15847) exited with exit code 1
+
+2026-11-16 20:09:52.813 UTC [15927] FATAL:  terminating connection due to administrator command
+
+2026-11-16 20:09:52.814 UTC [15922] FATAL:  terminating connection due to administrator command
+
+2026-11-16 20:09:52.819 UTC [15842] LOG:  shutting down
+
+2026-11-16 20:09:52.819 UTC [15842] LOG:  checkpoint starting: shutdown immediate
+
+(node:15900) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:15900) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-16 20:09:52.839 UTC [15842] LOG:  checkpoint complete: wrote 2767 buffers (16.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.014 s, sync=0.007 s, total=0.020 s; sync files=2388, longest=0.001 s, average=0.001 s; distance=24528 kB, estimate=24528 kB; lsn=0/2CD2AA0, redo lsn=0/2CD2AA0
+
+2026-11-16 20:09:52.846 UTC [15841] LOG:  database system is shut down
+

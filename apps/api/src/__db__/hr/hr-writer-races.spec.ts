@@ -3,6 +3,10 @@ import type { Client } from "pg";
 import { sql } from "drizzle-orm";
 
 import { requireTenantContext, withTenant } from "../../infra/db/tenant-context";
+import {
+  hrAtomicKeys,
+  lockHrKeys,
+} from "../../modules/hr/infrastructure/atomic";
 import { AuditService } from "../../modules/audit/api/audit";
 import { DrizzleAuditStore } from "../../modules/audit/infrastructure/drizzle-audit.store";
 import { PostingService } from "../../modules/accounting/application/posting-service";
@@ -115,16 +119,48 @@ async function q<T extends Record<string, unknown> = Record<string, unknown>>(
 
 // -- the deterministic duel harness (the mfg race precedent) ---------------------------
 
-/** Is ANY lock in the cluster ungranted (someone waiting)? pg_locks is
- * world-readable; in the single-fork sequential suite the only possible
- * waiter during the window is the raced loser. */
-async function anyLockWaiter(): Promise<boolean> {
+/** THE HARDENED WAITER PROOF (the owner's pinned note c, PHASE-046's
+ * approval round, 2026-11-16): the window's "blocked" classification
+ * is BOUND to the intended lock or the intended transaction — never
+ * to "any ungranted lock in the cluster". An advisory duel proves
+ * the loser waits on THE raced key (the advisory lock tag derived
+ * from the composed key inside PostgreSQL, the same
+ * hashtextextended the floor hashes with); a row-lock duel (the
+ * bridge's conditional write) proves the loser waits on THE WINNER'S
+ * transaction id, captured from the winner's own UoW at the split.
+ * An unrelated wait elsewhere in the cluster can no longer pass for
+ * the proof — the false-positive class is closed. */
+async function advisoryWaiterOn(composedKey: string): Promise<boolean> {
   return withTenant(TENANT_CC, async () => {
     const rows = await requireTenantContext().tx!.execute<{ n: number }>(
-      sql`SELECT count(*)::int AS n FROM pg_locks WHERE granted = false`,
+      sql`SELECT count(*)::int AS n FROM pg_locks
+           WHERE locktype = 'advisory' AND NOT granted
+             AND classid = ((hashtextextended(${composedKey}, 0) >> 32) & 4294967295)::oid
+             AND objid = (hashtextextended(${composedKey}, 0) & 4294967295)::oid`,
     );
     return rows.rows[0]!.n > 0;
   });
+}
+
+async function winnerTxWaiter(xactId: string): Promise<boolean> {
+  return withTenant(TENANT_CC, async () => {
+    const rows = await requireTenantContext().tx!.execute<{ n: number }>(
+      sql`SELECT count(*)::int AS n FROM pg_locks
+           WHERE locktype = 'transactionid' AND NOT granted
+             AND transactionid::text = ${xactId}`,
+    );
+    return rows.rows[0]!.n > 0;
+  });
+}
+
+type ExpectedWait =
+  | { kind: "advisory"; key: string }
+  | { kind: "winner-tx"; xactId: string };
+
+async function boundWaiter(expected: ExpectedWait): Promise<boolean> {
+  return expected.kind === "advisory"
+    ? advisoryWaiterOn(expected.key)
+    : winnerTxWaiter(expected.xactId);
 }
 
 interface WindowObservation {
@@ -136,9 +172,13 @@ interface WindowObservation {
 /** Watch the loser inside the winner's read→write window and classify
  * the world deterministically: "slipped" — the loser SETTLED (fulfilled
  * or refused) inside the window, the pre-fix shape (the owner's proof);
- * "blocked" — the loser is WAITING on a lock the winner's UoW holds,
- * the post-fix shape (the serialization engaged). */
-async function observeTheWindow(loser: Promise<unknown>): Promise<WindowObservation> {
+ * "blocked" — the loser is WAITING on the lock this duel races (the
+ * expected wait's OWN tag / the winner's OWN transaction), the
+ * post-fix shape (the serialization engaged). */
+async function observeTheWindow(
+  loser: Promise<unknown>,
+  expected: ExpectedWait,
+): Promise<WindowObservation> {
   let settled = false;
   let loserError: unknown;
   loser.then(
@@ -155,12 +195,12 @@ async function observeTheWindow(loser: Promise<unknown>): Promise<WindowObservat
     if (settled) {
       return { shape: "slipped", loserError };
     }
-    if (await anyLockWaiter()) {
+    if (await boundWaiter(expected)) {
       return { shape: "blocked" };
     }
     if (Date.now() > deadline) {
       throw new Error(
-        "harness: the loser neither settled nor blocked within 15s — the window is not the raced one",
+        "harness: the loser neither settled nor blocked on the raced lock within 15s — the window is not the raced one",
       );
     }
     await new Promise((resolve) => setTimeout(resolve, 25));
@@ -177,10 +217,13 @@ interface DuelArm {
 
 /** Arm the duel: the spied write arm runs the REAL function, and with
  * the winner's gates held and its write uncommitted, the loser starts
- * in its own UoW and the window is classified. */
+ * in its own UoW and the window is classified against the EXPECTED
+ * wait (the raced key's advisory tag, or the winner's transaction id
+ * for the bridge's row-lock duels). */
 function armDuelSpy<A extends unknown[], R>(
   spy: MockInstance<(...args: A) => Promise<R>>,
   real: (...args: A) => Promise<R>,
+  expectation: { advisoryKey: string } | { winnerTx: true },
   runLoser: () => Promise<unknown>,
 ): DuelArm {
   const arm: DuelArm = {
@@ -199,9 +242,22 @@ function armDuelSpy<A extends unknown[], R>(
   };
   spy.mockImplementationOnce(async (...args: A) => {
     const value = await real(...args);
+    let expected: ExpectedWait;
+    if ("advisoryKey" in expectation) {
+      expected = { kind: "advisory", key: expectation.advisoryKey };
+    } else {
+      // The winner's transaction id, read from the winner's own UoW
+      // at the split (the write arm has run — the xid is assigned).
+      const xactId = (
+        await requireTenantContext().tx!.execute<{ xid: string }>(
+          sql`SELECT pg_current_xact_id()::text AS xid`,
+        )
+      ).rows[0]!.xid;
+      expected = { kind: "winner-tx", xactId };
+    }
     const loser = runLoser();
     arm.loser.promise = loser;
-    arm.observation.value = await observeTheWindow(loser);
+    arm.observation.value = await observeTheWindow(loser, expected);
     return value;
   });
   return arm;
@@ -312,12 +368,15 @@ interface ConcFixture {
   a3: string;
   a4: string;
   a5: string;
+  a6: string;
+  a7: string;
   b2: string;
   b3: string;
   b4: string;
   b5: string;
   b6: string;
   b7: string;
+  b8: string;
   c1: string;
   c2: string;
   c3: string;
@@ -373,12 +432,18 @@ beforeAll(async () => {
        (gen_random_uuid(), $1, 'CC-A3', 'Aref Al-Correction', '2026-01-01', 'FULL_TIME', 8000, $2),
        (gen_random_uuid(), $1, 'CC-A4', 'Aziz Al-Absent', '2026-01-01', 'FULL_TIME', 8000, $2),
        (gen_random_uuid(), $1, 'CC-A5', 'Alaa Al-Smoke', '2026-01-01', 'FULL_TIME', 8000, $2),
+       -- A6/B8 carry FIXED letter-bearing uuids: the mixed-case duels'
+       -- toUpperCase() must be a REAL case variant on every run (the
+       -- shifts-roster all-digit-hex flake precedent).
+       ('0a0b0c0d-0e0f-4a0b-8a0b-0c0d0e0fa106', $1, 'CC-A6', 'Ammar Al-Case', '2026-01-01', 'FULL_TIME', 8000, $2),
+       (gen_random_uuid(), $1, 'CC-A7', 'Anas Al-Deadlock', '2026-01-01', 'FULL_TIME', 8000, $2),
        (gen_random_uuid(), $1, 'CC-B2', 'Bilal Al-Balance', '2026-01-01', 'FULL_TIME', 9000, $2),
        (gen_random_uuid(), $1, 'CC-B3', 'Bassam Al-Cashout', '2026-01-01', 'FULL_TIME', 9000, $2),
        (gen_random_uuid(), $1, 'CC-B4', 'Buthaina Al-Duel', '2026-01-01', 'FULL_TIME', 9000, $2),
        (gen_random_uuid(), $1, 'CC-B5', 'Bakr Al-Accrual', '2026-01-01', 'FULL_TIME', 9000, $2),
        (gen_random_uuid(), $1, 'CC-B6', 'Bashir Al-Rollover', '2026-01-01', 'FULL_TIME', 9000, $2),
        (gen_random_uuid(), $1, 'CC-B7', 'Bayan Al-Smoke', '2026-01-01', 'FULL_TIME', 9000, $2),
+       ('0a0b0c0d-0e0f-4b0b-8b0b-0c0d0e0fb108', $1, 'CC-B8', 'Banan Al-Case', '2026-01-01', 'FULL_TIME', 9000, $2),
        (gen_random_uuid(), $1, 'CC-C1', 'Camel Al-Link', '2026-01-01', 'FULL_TIME', 8000, $2),
        (gen_random_uuid(), $1, 'CC-C2', 'Dina Al-First', '2026-01-01', 'FULL_TIME', 8000, $2),
        (gen_random_uuid(), $1, 'CC-C3', 'Faris Al-Second', '2026-01-01', 'FULL_TIME', 8000, $2)
@@ -497,12 +562,15 @@ beforeAll(async () => {
     a3: byCode.get("CC-A3")!,
     a4: byCode.get("CC-A4")!,
     a5: byCode.get("CC-A5")!,
+    a6: byCode.get("CC-A6")!,
+    a7: byCode.get("CC-A7")!,
     b2: byCode.get("CC-B2")!,
     b3: byCode.get("CC-B3")!,
     b4: byCode.get("CC-B4")!,
     b5: byCode.get("CC-B5")!,
     b6: byCode.get("CC-B6")!,
     b7: byCode.get("CC-B7")!,
+    b8: byCode.get("CC-B8")!,
     c1: byCode.get("CC-C1")!,
     c2: byCode.get("CC-C2")!,
     c3: byCode.get("CC-C3")!,
@@ -525,11 +593,15 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the attendanc
     const f = spec.fixture!;
     const real = attendanceStore.insertAttendanceRecord;
     const spy = vi.spyOn(attendanceStore, "insertAttendanceRecord");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        attendanceSvc.capture({
-          employeeId: f.a1,
-          workDate: "2026-11-02",
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.attendanceDay(f.a1, "2026-11-02")}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          attendanceSvc.capture({
+            employeeId: f.a1,
+            workDate: "2026-11-02",
           checkIn: "2026-11-02T10:00:00+03:00",
           checkOut: "2026-11-02T13:00:00+03:00",
           source: "MANUAL",
@@ -583,11 +655,15 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the attendanc
     ].join("\n");
     const real = importStore.insertImportedRecord;
     const spy = vi.spyOn(importStore, "insertImportedRecord");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        attendanceSvc.capture({
-          employeeId: f.a2,
-          workDate: "2026-11-03",
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.attendanceDay(f.a2, "2026-11-03")}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          attendanceSvc.capture({
+            employeeId: f.a2,
+            workDate: "2026-11-03",
           checkIn: "2026-11-03T10:00:00+03:00",
           checkOut: "2026-11-03T14:00:00+03:00",
           source: "MANUAL",
@@ -654,11 +730,15 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the attendanc
 
     const real = importStore.insertImportedRecord;
     const spy = vi.spyOn(importStore, "insertImportedRecord");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        attendanceSvc.capture({
-          employeeId: f.a3,
-          workDate: "2026-11-04",
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.attendanceDay(f.a3, "2026-11-04")}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          attendanceSvc.capture({
+            employeeId: f.a3,
+            workDate: "2026-11-04",
           checkIn: "2026-11-04T10:00:00+03:00",
           checkOut: "2026-11-04T14:00:00+03:00",
           source: "MANUAL",
@@ -719,11 +799,15 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the attendanc
     );
     const real = attendanceStore.fillAttendanceCheckOut;
     const spy = vi.spyOn(attendanceStore, "fillAttendanceCheckOut");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        attendanceSvc.capture({
-          employeeId: f.a1,
-          workDate: "2026-11-06",
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.attendanceDay(f.a1, "2026-11-06")}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          attendanceSvc.capture({
+            employeeId: f.a1,
+            workDate: "2026-11-06",
           checkIn: "2026-11-06T12:00:00+03:00",
           checkOut: "2026-11-06T18:00:00+03:00",
           source: "MANUAL",
@@ -763,10 +847,14 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the attendanc
     const f = spec.fixture!;
     const real = attendanceStore.insertDerivedAbsenceRow;
     const spy = vi.spyOn(attendanceStore, "insertDerivedAbsenceRow");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        attendanceSvc.deriveDays({
-          from: "2026-11-05",
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.attendanceDay(f.a4, "2026-11-05")}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          attendanceSvc.deriveDays({
+            from: "2026-11-05",
           to: "2026-11-05",
           employeeIds: [f.a4],
           actorId: H_ACTOR,
@@ -847,12 +935,16 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the leave spa
     const f = spec.fixture!;
     const real = leaveStore.insertLeaveRequest;
     const spy = vi.spyOn(leaveStore, "insertLeaveRequest");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        leaveSvc.createRequest({
-          employeeId: f.b2,
-          leaveTypeId: f.leaveTypeId,
-          startDate: "2026-11-05",
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.leaveSpan(f.b2)}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          leaveSvc.createRequest({
+            employeeId: f.b2,
+            leaveTypeId: f.leaveTypeId,
+            startDate: "2026-11-05",
           endDate: "2026-11-10",
           note: null,
           actorId: H_ACTOR,
@@ -947,8 +1039,11 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the balance c
     );
     const real = leaveStore.incrementUsedDays;
     const spy = vi.spyOn(leaveStore, "incrementUsedDays");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () => leaveSvc.approve(requestB.id, null, H_ACTOR)),
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.balanceCell(f.b2, f.leaveTypeId, 2026)}` },
+      () => withTenant(TENANT_CC, () => leaveSvc.approve(requestB.id, null, H_ACTOR)),
     );
     let winner: Awaited<ReturnType<typeof leaveSvc.approve>> | undefined;
     try {
@@ -1027,8 +1122,11 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the balance c
     );
     const real = leaveStore.incrementUsedDays;
     const spy = vi.spyOn(leaveStore, "incrementUsedDays");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () => leaveSvc.approve(request.id, null, H_ACTOR)),
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.balanceCell(f.b4, f.leaveTypeId, 2026)}` },
+      () => withTenant(TENANT_CC, () => leaveSvc.approve(request.id, null, H_ACTOR)),
     );
     let winner: Awaited<ReturnType<typeof postingSvc.encash>> | undefined;
     try {
@@ -1098,10 +1196,23 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the balance c
 
     const real = leaveStore.incrementUsedDays;
     const spy = vi.spyOn(leaveStore, "incrementUsedDays");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        leaveSvc.runAccrual({ leaveTypeId: type.id, year: 2026, actorId: H_ACTOR }),
-      ),
+    // The loser's serialization point is the WINNER'S TRANSACTION: the
+    // accrual's ensureBalanceCell(b5) probes the cell's unique index and
+    // waits on the winner's uncommitted UPDATE (the row's in-progress
+    // version) BEFORE the run ever reaches its advisory bulk arm — the
+    // bound-waiter hardening exposed what the old any-ungranted-lock
+    // check masked: this duel's "blocked" was always the winner's ROW
+    // lock, and the post-window legs still prove the cell gate's law
+    // (after the winner commits, the run re-reads used=15.00 UNDER the
+    // cell lock and refuses typed).
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { winnerTx: true },
+      () =>
+        withTenant(TENANT_CC, () =>
+          leaveSvc.runAccrual({ leaveTypeId: type.id, year: 2026, actorId: H_ACTOR }),
+        ),
     );
     let winner: Awaited<ReturnType<typeof leaveSvc.approve>> | undefined;
     try {
@@ -1195,10 +1306,14 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the balance c
 
     const real = leaveStore.incrementUsedDays;
     const spy = vi.spyOn(leaveStore, "incrementUsedDays");
-    const arm = armDuelSpy(spy, real, () =>
-      withTenant(TENANT_CC, () =>
-        leaveSvc.rollover({ leaveTypeId: type.id, fromYear: 2026, toYear: 2027, actorId: H_ACTOR }),
-      ),
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.balanceCell(f.b6, type.id, 2026)}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          leaveSvc.rollover({ leaveTypeId: type.id, fromYear: 2026, toYear: 2027, actorId: H_ACTOR }),
+        ),
     );
     let winner: Awaited<ReturnType<typeof leaveSvc.approve>> | undefined;
     try {
@@ -1301,7 +1416,7 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the employee 
     const f = spec.fixture!;
     const real = bridgeStore.linkUser;
     const spy = vi.spyOn(bridgeStore, "linkUser");
-    const arm = armDuelSpy(spy, real, () =>
+    const arm = armDuelSpy(spy, real, { winnerTx: true }, () =>
       withTenant(TENANT_CC, () =>
         bridgeSvc.link({ employeeId: f.c1, userId: f.u2, actorId: H_ACTOR }),
       ),
@@ -1341,7 +1456,7 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the employee 
     const f = spec.fixture!;
     const real = bridgeStore.linkUser;
     const spy = vi.spyOn(bridgeStore, "linkUser");
-    const arm = armDuelSpy(spy, real, () =>
+    const arm = armDuelSpy(spy, real, { winnerTx: true }, () =>
       withTenant(TENANT_CC, () =>
         bridgeSvc.link({ employeeId: f.c3, userId: f.u3, actorId: H_ACTOR }),
       ),
@@ -1374,5 +1489,271 @@ describe("PHASE-045 T-20 — the owner's concurrency review round: the employee 
       [TENANT_CC, f.c3],
     );
     expect(rows[0]!.userId).toBeNull();
+  });
+});
+
+// -- the PHASE-046 pinned-note round (the owner's approval, 2026-11-16) ----------------
+// Three technical notes pinned on the T-20 floor BEFORE the payroll
+// writers adopt it, each with its permanent proof:
+//   (a) THE CANONICAL KEY LAW — the same uuid in two letter cases is
+//       ONE entity to PostgreSQL and must be ONE lock key (17)+(18);
+//   (b) THE NO-EXPANSION LAW + the DB-guaranteed order — the
+//       import's whole derive window reserves up front (the internal
+//       derivation is pure re-entry), so the two-import +
+//       range-derivation interleaving can never wait in a cycle (19)
+//       and the ledger refuses the backwards expansion outright (20);
+//   (c) THE BOUND WAITER PROOF — every duel above classifies its
+//       window against the raced lock's OWN advisory tag (or the
+//       winner's OWN transaction id), never "any ungranted lock".
+
+describe("PHASE-046 — the owner's pinned notes on the T-20 floor: the canonical key law (note a)", () => {
+  it("(17) MIXED-CASE ATTENDANCE — the same employee-day raced through two letter cases of the SAME uuid: ONE canonical gate, the loser blocks on it, then refuses typed; the overlap never lands", async () => {
+    const f = spec.fixture!;
+    const real = attendanceStore.insertAttendanceRecord;
+    const spy = vi.spyOn(attendanceStore, "insertAttendanceRecord");
+    // The loser names the employee in UPPERCASE — the SAME uuid to
+    // PostgreSQL (the c537113 case law), and pre-fix a DIFFERENT lock
+    // key (the case-sensitive side door around the day gate).
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.attendanceDay(f.a6, "2026-11-08")}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          attendanceSvc.capture({
+            employeeId: f.a6.toUpperCase(),
+            workDate: "2026-11-08",
+            checkIn: "2026-11-08T10:00:00+03:00",
+            checkOut: "2026-11-08T13:00:00+03:00",
+            source: "MANUAL",
+            deviceRef: null,
+            geoLat: null,
+            geoLng: null,
+            note: null,
+            actorId: H_ACTOR,
+          }),
+        ),
+    );
+    let winner: Awaited<ReturnType<typeof attendanceSvc.capture>> | undefined;
+    try {
+      winner = await withTenant(TENANT_CC, () =>
+        attendanceSvc.capture({
+          employeeId: f.a6,
+          workDate: "2026-11-08",
+          checkIn: "2026-11-08T09:00:00+03:00",
+          checkOut: "2026-11-08T12:00:00+03:00",
+          source: "MANUAL",
+          deviceRef: null,
+          geoLat: null,
+          geoLng: null,
+          note: null,
+          actorId: H_ACTOR,
+        }),
+      );
+    } finally {
+      await arm.finish();
+    }
+    expect(Date.parse(winner!.checkIn!)).toBe(Date.parse("2026-11-08T09:00:00+03:00"));
+    expect(
+      arm.observation.value!.shape,
+      `the pre-fix shape reproduced (the case-variant side door): the uppercase loser settled inside the window — ${loserCode(arm)}`,
+    ).toBe("blocked");
+    expect(loserCode(arm)).toBe("ATTENDANCE_SESSION_OVERLAP");
+
+    // NO ILLEGAL STATE: exactly ONE session (both writers named the
+    // same employee — PostgreSQL stored the same uuid), pairwise
+    // disjoint.
+    const sessions = await sessionRows(f.a6, "2026-11-08");
+    expect(sessions).toHaveLength(1);
+    expect(Date.parse(sessions[0]!.checkIn)).toBe(Date.parse("2026-11-08T09:00:00+03:00"));
+    expect(await overlapCount(f.a6, "2026-11-08")).toBe(0);
+  });
+
+  it("(18) MIXED-CASE LEAVE — two overlapping requests for the same employee, one arm naming the uuid in UPPERCASE: ONE canonical span gate, the loser blocks on it, then refuses typed; exactly one request exists", async () => {
+    const f = spec.fixture!;
+    const real = leaveStore.insertLeaveRequest;
+    const spy = vi.spyOn(leaveStore, "insertLeaveRequest");
+    const arm = armDuelSpy(
+      spy,
+      real,
+      { advisoryKey: `${TENANT_CC}|${hrAtomicKeys.leaveSpan(f.b8)}` },
+      () =>
+        withTenant(TENANT_CC, () =>
+          leaveSvc.createRequest({
+            employeeId: f.b8.toUpperCase(),
+            leaveTypeId: f.leaveTypeId,
+            startDate: "2026-12-07",
+            endDate: "2026-12-11",
+            note: null,
+            actorId: H_ACTOR,
+          }),
+        ),
+    );
+    let winner: Awaited<ReturnType<typeof leaveSvc.createRequest>> | undefined;
+    try {
+      winner = await withTenant(TENANT_CC, () =>
+        leaveSvc.createRequest({
+          employeeId: f.b8,
+          leaveTypeId: f.leaveTypeId,
+          startDate: "2026-12-05",
+          endDate: "2026-12-09",
+          note: null,
+          actorId: H_ACTOR,
+        }),
+      );
+    } finally {
+      await arm.finish();
+    }
+    expect(winner!.status).toBe("PENDING");
+    expect(
+      arm.observation.value!.shape,
+      `the pre-fix shape reproduced (the case-variant side door): the uppercase loser settled inside the window — ${loserCode(arm)}`,
+    ).toBe("blocked");
+    expect(loserCode(arm)).toBe("LEAVE_SPAN_OVERLAP");
+
+    // NO ILLEGAL STATE: exactly one request (PENDING) for the
+    // employee — the two-leaves-at-once law held through the case
+    // variant.
+    const requests = await leaveRequestStates(f.b8);
+    expect(requests).toHaveLength(1);
+    expect(requests[0]!.status).toBe("PENDING");
+  });
+});
+
+describe("PHASE-046 — the owner's pinned notes on the T-20 floor: the no-expansion law + the DB-guaranteed order (note b)", () => {
+  it("(19) THE TWO-IMPORT × RANGE-DERIVATION DEADLOCK DUEL — import A on days {22, 24}, import B on days {23, 24}, and the derivation of the range 22–24 all in flight together: NO 40P01 anywhere, every arm settles, the final state is exact", async () => {
+    const f = spec.fixture!;
+    // Committed anchor sessions on each of the three days (07:00→07:30)
+    // — the derivation's universe is non-empty from the start, so the
+    // range arm always contends on all three day keys.
+    for (const day of ["2026-10-22", "2026-10-23", "2026-10-24"]) {
+      await withTenant(TENANT_CC, () =>
+        attendanceSvc.capture({
+          employeeId: f.a7,
+          workDate: day,
+          checkIn: `${day}T07:00:00+03:00`,
+          checkOut: `${day}T07:30:00+03:00`,
+          source: "MANUAL",
+          deviceRef: null,
+          geoLat: null,
+          geoLng: null,
+          note: null,
+          actorId: H_ACTOR,
+        }),
+      );
+    }
+    // Import A: days 22 + 24 (the owner's first transaction). Its
+    // window reservation is the whole span {22, 23, 24} — the
+    // internal derivation below is pure re-entry, never a backwards
+    // expansion.
+    const fileA = [
+      "User ID,Timestamp,Direction,Device",
+      `CC-A7,2026-10-22 08:00:00,in,${unique("ZK-DL-A")}`,
+      `CC-A7,2026-10-22 12:00:00,out,${unique("ZK-DL-A")}`,
+      `CC-A7,2026-10-24 08:00:00,in,${unique("ZK-DL-A")}`,
+      `CC-A7,2026-10-24 12:00:00,out,${unique("ZK-DL-A")}`,
+    ].join("\n");
+    // Import B: days 23 + 24 (the owner's second transaction) — its
+    // day-24 session is disjoint from A's (14:00→18:00).
+    const fileB = [
+      "User ID,Timestamp,Direction,Device",
+      `CC-A7,2026-10-23 08:00:00,in,${unique("ZK-DL-B")}`,
+      `CC-A7,2026-10-23 12:00:00,out,${unique("ZK-DL-B")}`,
+      `CC-A7,2026-10-24 14:00:00,in,${unique("ZK-DL-B")}`,
+      `CC-A7,2026-10-24 18:00:00,out,${unique("ZK-DL-B")}`,
+    ].join("\n");
+
+    const settled = await Promise.allSettled([
+      withTenant(TENANT_CC, () =>
+        importSvc.commit({
+          content: fileA,
+          fileName: `${unique("cc-deadlock-a")}.csv`,
+          mapping: DEFAULT_IMPORT_MAPPING,
+          deviceRef: null,
+          note: null,
+          actorId: H_ACTOR,
+        }),
+      ),
+      withTenant(TENANT_CC, () =>
+        importSvc.commit({
+          content: fileB,
+          fileName: `${unique("cc-deadlock-b")}.csv`,
+          mapping: DEFAULT_IMPORT_MAPPING,
+          deviceRef: null,
+          note: null,
+          actorId: H_ACTOR,
+        }),
+      ),
+      withTenant(TENANT_CC, () =>
+        attendanceSvc.deriveDays({
+          from: "2026-10-22",
+          to: "2026-10-24",
+          employeeIds: [f.a7],
+          actorId: H_ACTOR,
+        }),
+      ),
+    ]);
+
+    // NO 40P01: every arm settled FULFILLED (a deadlock victim would
+    // reject with PostgreSQL's 40P01; a race loser would reject with
+    // its own typed code — none is acceptable here: the sessions are
+    // pairwise disjoint, so nothing refuses).
+    const failures = settled
+      .map((outcome, index) => ({ outcome, arm: ["importA{22,24}", "importB{23,24}", "derive 22–24"][index] }))
+      .filter(({ outcome }) => outcome.status === "rejected");
+    for (const { outcome, arm } of failures) {
+      const reason = (outcome as { status: "rejected"; reason: { code?: string; message?: string } }).reason;
+      throw new Error(
+        `the three-way deadlock duel: the ${arm} arm rejected with ${reason.code ?? "(no code)"}: ${reason.message ?? ""} — the no-expansion law or the DB-guaranteed order is broken (the owner's pinned note b)`,
+      );
+    }
+    const outcomes = settled.map((outcome) => {
+      if (outcome.status === "rejected") {
+        throw new Error("unreachable — failures handled above");
+      }
+      return outcome.value as { importedCount: number; absentSynthesized?: number };
+    });
+    const importA = outcomes[0]!;
+    const importB = outcomes[1]!;
+    const derive = outcomes[2]!;
+    expect(importA.importedCount).toBe(2);
+    expect(importB.importedCount).toBe(2);
+    expect(derive.absentSynthesized).toBe(0);
+
+    // THE FINAL STATE IS EXACT: the anchors + both files' sessions,
+    // pairwise disjoint on every day.
+    expect(await sessionRows(f.a7, "2026-10-22")).toHaveLength(2);
+    expect(await sessionRows(f.a7, "2026-10-23")).toHaveLength(2);
+    expect(await sessionRows(f.a7, "2026-10-24")).toHaveLength(3);
+    expect(await overlapCount(f.a7, "2026-10-22")).toBe(0);
+    expect(await overlapCount(f.a7, "2026-10-23")).toBe(0);
+    expect(await overlapCount(f.a7, "2026-10-24")).toBe(0);
+  });
+
+  it("(20) THE RESERVATION LEDGER — re-entry and strictly-ascending expansion are the only legal in-transaction shapes; a backwards expansion is the typed refusal BEFORE any lock statement, and the transaction stays usable", async () => {
+    await withTenant(TENANT_CC, async () => {
+      // One whole-set call with several keys (the approve shape) —
+      // legal, one sorted acquisition.
+      await lockHrKeys(["zz-floor-law|a", "zz-floor-law|c", "zz-floor-law|b"]);
+      // Re-entry of a held key is a no-op (advisory xact locks are
+      // re-entrant — the capture's own post-write derive shape).
+      await lockHrKeys(["zz-floor-law|b"]);
+      // Strictly-ascending expansion is legal — provably equivalent
+      // to one sorted union call.
+      await lockHrKeys(["zz-floor-law|d"]);
+      // The backwards expansion is the typed refusal, fired BEFORE
+      // any lock statement (the 40P01 recipe is unrepresentable).
+      await expect(lockHrKeys(["zz-floor-law|aa"])).rejects.toMatchObject({
+        code: "hr/lock-order-violation",
+      });
+      // The guard fired before any statement — the transaction is
+      // still usable, and the ascending shape still works after it.
+      await lockHrKeys(["zz-floor-law|e"]);
+      // A mixed call (one held key + one backwards new key) is the
+      // same typed refusal.
+      await expect(lockHrKeys(["zz-floor-law|c", "zz-floor-law|ab"])).rejects.toMatchObject({
+        code: "hr/lock-order-violation",
+      });
+    });
   });
 });

@@ -53,8 +53,46 @@ and THE FULL DB SUITE 240/240 files · 3,329/3,329 · 0 failed · 0 skipped
 re-proven green in the isolated perf chunk per the T-20 runbook precedent —
 both failing logs kept). Evidence:
 [gate-evidence/2026-11-16-phase046-w0.md](../docs/operations/gate-evidence/2026-11-16-phase046-w0.md)
-+ `audit-evidence/phase046-w0/`. **Next: the T-20 pinned notes (item 4
-above), then W-1.**
++ `audit-evidence/phase046-w0/`. **Next: W-1 (the GOSI corrections +
+the migrations).**
+
+**The T-20 pinned technical notes (delivered 2026-11-16, the second
+W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE
+CANONICAL KEY LAW — `canonicalUuid()` in `atomic.ts` normalizes every
+uuid component of every lock key (upper/mixed case and the undashed
+32-hex spelling are ONE key; a non-uuid fails loud), pinned by the
+permanent duels 17 (mixed-case attendance — one canonical day gate, the
+overlap never lands) and 18 (mixed-case leave — one canonical span gate,
+exactly one request); (b) THE NO-EXPANSION LAW + THE DB-GUARANTEED ORDER
+— the lock statement sorts the keys INSIDE PostgreSQL (`ORDER BY k
+COLLATE "C"` in a MATERIALIZED CTE — byte order, the same total order as
+the TypeScript ledger) and the per-transaction RESERVATION LEDGER
+refuses any key at-or-before the held maximum with the typed
+`hr/lock-order-violation` (re-entry + strictly-ascending expansion are
+the legal shapes); the leave approve restructured to ONE whole-set call
+(`lockLeaveApproval` — span + start-year cell together) and THE IMPORT
+COMMIT NOW RESERVES ITS WHOLE DERIVE WINDOW UP FRONT (the file's
+min…max dates × the file's employees — the internal derivation is pure
+re-entry; pre-fix a file holding {22,24} deriving 23 against a
+concurrent {23,24} import was the exact 40P01 recipe), pinned by the
+permanent duel 19 (import A {22,24} × import B {23,24} × derivation
+22–24 in flight — no 40P01, all arms fulfilled, the final state exact)
+and duel 20 (the ledger's legal/illegal shapes); (c) THE BOUND WAITER
+PROOF — anyLockWaiter() (any ungranted lock in the cluster) is replaced
+by per-duel bound expectations (the raced key's own advisory tag
+computed in-database, or the winner's own xact id for the bridge's
+row-lock duels) — and the hardening honestly found that duel (12) had
+always been proving the winner's ROW lock (the accrual's
+ensureBalanceCell index probe), now recorded truthfully as winner-tx;
+the ledger also caught self-service.spec's fixture-batching two
+employees' writers into one UoW (restructured to the production shape —
+one writer per UoW). Evidence:
+[gate-evidence/2026-11-16-phase046-t20-pinned-notes.md](../docs/operations/gate-evidence/2026-11-16-phase046-t20-pinned-notes.md)
+— typecheck/lint 8/8, depcruise clean, api unit 626/626, the race suite
+**20/20**, the hr folder 13/13 · 83/83, payroll+isolation+spoof 10/10 ·
+1,649/1,649, and THE FULL DB SUITE **240/240 files · 3,333/3,333 · 0
+failed · 0 skipped** (3,329 + the 4 new permanent tests). **The floor is
+ready for W-3's payroll adoption (D-09).**
 
 The delivered substrate (context for the re-review): migrations
 `0080`–`0088` (schema_version 88; the shift/attendance/overtime/leave/

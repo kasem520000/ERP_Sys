@@ -677,20 +677,44 @@ export class AttendanceImportService {
       throw new AttendanceImportInvalidError("fileName is required (1–200 chars) — the import log's identity");
     }
     const parsed = await this.analyzeParsed(input.content, input.mapping);
-    // THE SHARED ATOMICITY FLOOR (T-20): every employee-day the file
-    // would touch locks BEFORE the DB floors read — the same day lock
-    // the manual capture, the checkout, the correction, and the
-    // derivation run take. A concurrent writer that commits while we
-    // waited is visible to the floors below (its session quarantines
-    // as SESSION_OVERLAP / ALREADY_IMPORTED exactly as if it had been
-    // committed before the file arrived); one queued behind us sees
-    // our rows when it unblocks. The locks hold to this UoW's commit.
-    await atomic.lockAttendanceEmployeeDays(
-      parsed.sessions.map((session) => ({
-        employeeId: session.employeeId,
-        workDate: session.workDate,
-      })),
-    );
+    // THE SHARED ATOMICITY FLOOR (T-20, hardened by PHASE-046's pinned
+    // note b — the owner's deadlock round): the WHOLE derive window
+    // reserves BEFORE the DB floors read — the file's min…max dates ×
+    // the file's employees, not just the file's own (employee, day)
+    // pairs. The internal derivation run below locks ITS universe
+    // (the roster's days + the rows' days inside the same window);
+    // with the window pre-reserved that acquisition is pure RE-ENTRY
+    // (advisory xact locks are re-entrant — the reservation ledger's
+    // legal shape), so this UoW never expands its lock set after a
+    // partial reservation. Pre-fix, a file holding {22, 24} whose
+    // derive then wanted 23 — against a concurrent import holding
+    // {23} and wanting 24 — was the exact 40P01 wait-cycle recipe
+    // (the owner's two-import + range-derivation duel pins it). The
+    // window is bounded by the import horizon (today − 400d …
+    // tomorrow), so the superset is one sorted bulk acquisition. A
+    // concurrent writer that commits while we waited is visible to
+    // the floors below (its session quarantines as SESSION_OVERLAP /
+    // ALREADY_IMPORTED exactly as if it had been committed before the
+    // file arrived); one queued behind us sees our rows when it
+    // unblocks. The locks hold to this UoW's commit.
+    const windowPairs: { employeeId: string; workDate: string }[] = [];
+    if (parsed.sessions.length > 0) {
+      const from = parsed.sessions.reduce(
+        (min, session) => (session.workDate < min ? session.workDate : min),
+        parsed.sessions[0]!.workDate,
+      );
+      const to = parsed.sessions.reduce(
+        (max, session) => (session.workDate > max ? session.workDate : max),
+        parsed.sessions[0]!.workDate,
+      );
+      const windowEmployees = [...new Set(parsed.sessions.map((session) => session.employeeId))];
+      for (let day = from; day <= to; day = addDaysIso(day, 1)) {
+        for (const employeeId of windowEmployees) {
+          windowPairs.push({ employeeId, workDate: day });
+        }
+      }
+    }
+    await atomic.lockAttendanceEmployeeDays(windowPairs);
     const analysis = await this.applyDbFloors(parsed.sessions, parsed.anomalies);
     const mappingUsed =
       input.mapping === undefined ? (await this.effectiveMapping()).mapping : input.mapping;

@@ -185,12 +185,24 @@ beforeAll(async () => {
       actorId: H_ACTOR,
     });
 
-    // The attendance days: S1 carries a closed session + an open one;
-    // S2 carries one closed session (present in the table, invisible
-    // on S1's plane).
+    return {
+      activeType,
+      inactiveType,
+      rosterDate,
+    };
+  });
+
+  // The attendance days: S1 carries a closed session + an open one;
+  // S2 carries one closed session (present in the table, invisible
+  // on S1's plane). THE NO-EXPANSION LAW (the PHASE-046 pinned-note
+  // round): each capture runs in its OWN UoW — the production shape
+  // (one request, one transaction); a second employee's day keys
+  // inside one transaction would expand the reserved set backwards
+  // (uuid order), which the floor's reservation ledger refuses.
+  await withTenant(TENANT_H, async () => {
     await attendanceSvc.capture({
       employeeId: employeeS1Id,
-      workDate: rosterDate,
+      workDate: fixture.rosterDate,
       checkIn: "2026-10-05T05:00:00Z",
       checkOut: "2026-10-05T13:00:00Z",
       source: "MANUAL",
@@ -200,6 +212,8 @@ beforeAll(async () => {
       note: null,
       actorId: H_ACTOR,
     });
+  });
+  await withTenant(TENANT_H, async () => {
     await attendanceSvc.capture({
       employeeId: employeeS1Id,
       workDate: "2026-10-06",
@@ -212,9 +226,11 @@ beforeAll(async () => {
       note: null,
       actorId: H_ACTOR,
     });
+  });
+  await withTenant(TENANT_H, async () => {
     await attendanceSvc.capture({
       employeeId: employeeS2Id,
-      workDate: rosterDate,
+      workDate: fixture.rosterDate,
       checkIn: "2026-10-05T06:00:00Z",
       checkOut: "2026-10-05T14:00:00Z",
       source: "MANUAL",
@@ -224,49 +240,57 @@ beforeAll(async () => {
       note: null,
       actorId: H_ACTOR,
     });
+  });
 
-    // The leave world: the accrual run gives the year's entitlements
-    // (ALL active employees — the colleague's cell exists too); S2
-    // carries an APPROVED request (used days on its cell); S1 carries
-    // a PENDING one (the cancel arm's target) — everything visible
-    // under hr.leave, only the own rows on the self plane.
+  // The leave world — each writer in its OWN UoW (the no-expansion
+  // law above): the accrual run gives the year's entitlements (ALL
+  // active employees — the colleague's cell exists too); S2 carries
+  // an APPROVED request (used days on its cell); S1 carries a PENDING
+  // one (the cancel arm's target) — everything visible under
+  // hr.leave, only the own rows on the self plane.
+  await withTenant(TENANT_H, async () => {
     await leaveSvc.runAccrual({
-      leaveTypeId: activeType.id,
+      leaveTypeId: fixture.activeType.id,
       year: 2026,
       actorId: H_ACTOR,
     });
-    const otherRequest = await leaveSvc.createRequest({
+  });
+  const otherRequest = await withTenant(TENANT_H, async () =>
+    leaveSvc.createRequest({
       employeeId: employeeS2Id,
-      leaveTypeId: activeType.id,
+      leaveTypeId: fixture.activeType.id,
       startDate: "2026-11-02",
       endDate: "2026-11-04",
       note: null,
       actorId: H_ACTOR,
-    });
+    }),
+  );
+  await withTenant(TENANT_H, async () => {
     await leaveSvc.approve(otherRequest.id, null, H_ACTOR);
-    const ownRequest = await leaveSvc.createRequest({
+  });
+  const ownRequest = await withTenant(TENANT_H, async () =>
+    leaveSvc.createRequest({
       employeeId: employeeS1Id,
-      leaveTypeId: activeType.id,
+      leaveTypeId: fixture.activeType.id,
       startDate: "2026-11-09",
       endDate: "2026-11-10",
       note: "own pending request",
       actorId: H_ACTOR,
-    });
+    }),
+  );
 
-    return {
-      employeeS1Id,
-      employeeS2Id,
-      userLinked: linked.id,
-      userUnlinked: unlinked.id,
-      activeTypeId: activeType.id,
-      activeTypeCode: activeType.code,
-      inactiveTypeId: inactiveType.id,
-      ownPendingRequestId: ownRequest.id,
-      otherEmployeeRequestId: otherRequest.id,
-      rosterDate,
-    };
-  });
-  spec.fixture = fixture;
+  spec.fixture = {
+    employeeS1Id,
+    employeeS2Id,
+    userLinked: linked.id,
+    userUnlinked: unlinked.id,
+    activeTypeId: fixture.activeType.id,
+    activeTypeCode: fixture.activeType.code,
+    inactiveTypeId: fixture.inactiveType.id,
+    ownPendingRequestId: ownRequest.id,
+    otherEmployeeRequestId: otherRequest.id,
+    rosterDate: fixture.rosterDate,
+  };
 });
 
 describe("PHASE-045 T-14 — the employee self-service plane: the scope law, the not-linked law, the write law", () => {

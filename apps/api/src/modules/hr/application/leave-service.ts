@@ -324,12 +324,16 @@ export class LeaveService {
     if (request === undefined) throw new LeaveRequestNotFoundError(id);
     if (request.status !== "PENDING") throw new LeaveRequestDecidedError(id, request.status);
     const year = Number(request.startDate.slice(0, 4));
-    // THE SPAN LOCK FIRST (T-20) — then the span law re-checked at the
-    // approve boundary (excluding this request's own span — it always
-    // overlaps itself). A request that slipped past the create-boundary
-    // check (or was seeded behind it) is refused HERE, never approved
-    // into an overlap.
-    await atomic.lockLeaveSpan(request.employeeId);
+    // THE APPROVAL'S WHOLE SET IN ONE CALL (T-20, restructured by the
+    // PHASE-046 pinned-note round): the span gate AND the start-year
+    // cell gate together — the floor's NO-EXPANSION law (an
+    // in-transaction lock-set expansion is the 40P01 deadlock recipe
+    // the ledger now refuses). The span law is re-checked at the
+    // approve boundary UNDER both locks (excluding this request's own
+    // span — it always overlaps itself): a request that slipped past
+    // the create-boundary check (or was seeded behind it) is refused
+    // HERE, never approved into an overlap.
+    await atomic.lockLeaveApproval(request.employeeId, request.leaveTypeId, year);
     const overlap = await store.findOverlappingLeave(
       request.employeeId,
       request.startDate,
@@ -342,11 +346,11 @@ export class LeaveService {
       );
     }
     await store.ensureBalanceCell(request.employeeId, request.leaveTypeId, year);
-    // THE CELL LOCK (T-20): the approval, the encashment (G-51), the
+    // The cap check and the increment below are one atomic step under
+    // the same acquisition: the approval, the encashment (G-51), the
     // accrual recompute, and the carry-over rollover ALL serialize on
-    // the (employee, type, year) cell — the cap check and the
-    // increment below are one atomic step under the lock.
-    await atomic.lockBalanceCell(request.employeeId, request.leaveTypeId, year);
+    // the (employee, type, year) cell — used_days is the source of
+    // truth under the lock.
     const cell = await store.findBalanceCell(request.employeeId, request.leaveTypeId, year);
     // INV-031 — exact scaled-integer comparison (never float) against
     // the CELL (used_days: the source of truth — leaves + encashments).
