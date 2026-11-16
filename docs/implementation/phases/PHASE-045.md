@@ -1,6 +1,10 @@
 # PHASE-045 — HR Core — Attendance, Leaves & Shifts
 
-> **Status:** IN_PROGRESS — started 2026-11-14 (the owner's parallel directive: 045 runs alongside the 043-completion review; starting 045 is NOT closure of 043 and NOT production approval) · **Wave:** 2 / Stage 13 · **Register:** [CR-15](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** **COMPLETE 2026-11-16** (all 19 tasks delivered T-01…T-19; the acceptance evidence in
+> [reports/PHASE-045-COMPLETION.md](reports/PHASE-045-COMPLETION.md) — the triple flip per CR-48.
+> Completing 045 is NOT closure of the 043 hard review and NOT production approval — RISK-031/RISK-032 stay OPEN) ·
+> **Started:** 2026-11-14 (the owner's parallel directive: 045 ran alongside the 043-completion review) ·
+> **Wave:** 2 / Stage 13 · **Register:** [CR-15](../../planning/COMPLETENESS_REGISTER.md)
 
 > **THE KICKOFF COORDINATION RECORD (2026-11-14):** scope, requirements,
 > and the implementation plan are the ones this document already carries
