@@ -1,0 +1,35 @@
+# PHASE-045 T-19 — the static gates (each its own run, 2026-11-16)
+
+## typecheck (turbo, 8 packages)
+  Tasks:    8 successful, 8 total
+## lint (turbo, 8 packages)
+  Tasks:    8 successful, 8 total
+## boundaries (dependency-cruiser)
+  ✔ no dependency violations found (1903 modules, 14103 dependencies cruised)
+## docs:validate
+  33/33 checks passed.
+## i18n parity (web)
+  == i18n key parity: ar=6007 keys, en=6007 keys ==
+## permissions drift
+  [permissions-drift] OK — matrix 297 keys, seed 297 keys
+## manifests
+  OK — 13 manifest(s) valid against §3; ids unique; versions semver; required_feature_keys non-empty.
+## capabilities matrix
+  capabilities matrix and fixture agree: every implemented claim carries a gate, every ✓ row has a fixture row, every deferral is annotated.
+## id-ledger
+  [check-id-ledger] 0 errors, 0 warning(s) — OK
+## id-ledger --self-test
+  [check-id-ledger] self-test (1) conflicting claim — a phase claiming another phase's reserved ids (synthetic fixture, ledger-independent): OK ✓
+  [check-id-ledger] self-test (2) legitimate reference — PHASE-046 referencing the implemented G-13/G-14: OK ✓
+  [check-id-ledger] self-test (3) range extraction from actual text — .., en-dash, em-dash, and … all expand: OK ✓
+## desktop-shell
+  ○ export not built (run pnpm --filter @erp/web build:desktop) — PASS with note
+  check:desktop-shell: PASS — shell sources structurally valid
+## mobile-shell
+  check:mobile-shell: PASS — mobile shell + screen surface structurally valid
+## history-secrets
+  check-history-secrets: 0 violation(s) · 1600 allowlisted fixture hit(s) across 11 documented allowlist paths
+## mobile i18n parity
+  == mobile i18n parity: ar=371 keys, en=371 keys ==
+## zatca-qr-decode (environment replay after the playwright install)
+  Tests  3 passed (3)

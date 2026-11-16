@@ -11,6 +11,7 @@ import {
   AttendanceSessionOverlapError,
   EmployeeNotFoundError,
 } from "../domain/hr-errors";
+import { classifyCaptureConflict } from "../domain/attendance-classification";
 import * as attendance from "../infrastructure/attendance.store";
 import { employeeExists } from "../infrastructure/hr.store";
 
@@ -186,27 +187,27 @@ export class AttendanceService {
         `checkOut must fall on ${workDate} or the day after (the tenant's timezone — the operational day's envelope): ${checkOut}`,
       );
     }
-    // INV-031 + the dedupe floor, BEFORE any write.
+    // INV-031 + the dedupe floor, BEFORE any write. The classification
+    // itself is the domain law (order-independent by construction — the
+    // T-19 review round: listDerivationRows carries no ORDER BY, so a
+    // single interleaved pass let PostgreSQL's heap order pick the typed
+    // code; the exact-match floor now decides over the whole day first,
+    // the import path's proven shape).
     const dayRows = await attendance.listDerivationRows({
       from: workDate,
       to: workDate,
       employeeIds: [input.employeeId],
     });
-    for (const row of dayRows) {
-      if (row.checkInMs === checkInMs) {
-        throw new AttendanceDuplicatePunchError(
-          `a session for this employee already opens at ${checkIn} on ${workDate} — the same employee + timestamp is ONE session (the 0081 dedupe floor)`,
-        );
-      }
-      if (row.checkInMs !== null) {
-        const existingEnd = row.checkOutMs ?? Number.POSITIVE_INFINITY;
-        const newEnd = checkOutMs ?? Number.POSITIVE_INFINITY;
-        if (row.checkInMs < newEnd && checkInMs < existingEnd) {
-          throw new AttendanceSessionOverlapError(
-            `the session [${checkIn} → ${checkOut ?? "open"}] overlaps an existing session of this employee-day (INV-031: attendance intervals never overlap per employee-day)`,
-          );
-        }
-      }
+    const conflict = classifyCaptureConflict(dayRows, checkInMs, checkOutMs);
+    if (conflict === "DUPLICATE_PUNCH") {
+      throw new AttendanceDuplicatePunchError(
+        `a session for this employee already opens at ${checkIn} on ${workDate} — the same employee + timestamp is ONE session (the 0081 dedupe floor)`,
+      );
+    }
+    if (conflict === "SESSION_OVERLAP") {
+      throw new AttendanceSessionOverlapError(
+        `the session [${checkIn} → ${checkOut ?? "open"}] overlaps an existing session of this employee-day (INV-031: attendance intervals never overlap per employee-day)`,
+      );
     }
     const created = await attendance.insertAttendanceRecord({
       employeeId: input.employeeId,

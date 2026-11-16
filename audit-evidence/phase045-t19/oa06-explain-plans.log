@@ -1,0 +1,53 @@
+stdout | src/__db__/hr/oa06-plan-dump.spec.ts > OA-06 PLAN DUMP (temporary) > P1 the daily register walk (tenant + one date, the punch order) rides ix_attendance_records_tenant_date — no seq-scan
+
+===== PLAN =====
+Limit  (cost=176.96..177.26 rows=120 width=64)
+  ->  Sort  (cost=176.96..177.26 rows=120 width=64)
+        Sort Key: check_in NULLS FIRST, created_at
+        ->  Index Scan using ix_attendance_records_tenant_date on attendance_records  (cost=0.29..172.82 rows=120 width=64)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (work_date = '2026-08-15'::date))
+===== END PLAN =====
+--
+stdout | src/__db__/hr/oa06-plan-dump.spec.ts > OA-06 PLAN DUMP (temporary) > P2 the exception board (tenant + date range + is_exception) rides the PARTIAL ix_attendance_records_tenant_exception — no seq-scan
+
+===== PLAN =====
+Limit  (cost=230.73..231.23 rows=200 width=55)
+  ->  Sort  (cost=230.73..231.24 rows=206 width=55)
+        Sort Key: work_date, check_in NULLS FIRST
+        ->  Bitmap Heap Scan on attendance_records  (cost=6.79..222.81 rows=206 width=55)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (work_date >= '2026-08-01'::date) AND (work_date <= '2026-08-31'::date) AND is_exception)
+              ->  Bitmap Index Scan on ix_attendance_records_tenant_exception  (cost=0.00..6.74 rows=206 width=0)
+--
+stdout | src/__db__/hr/oa06-plan-dump.spec.ts > OA-06 PLAN DUMP (temporary) > P3 the employee-day derivation/dedupe lookup (tenant + employee + date range) rides ix_attendance_records_tenant_employee_date — no seq-scan
+
+===== PLAN =====
+Index Scan using ix_attendance_records_tenant_employee_date on attendance_records  (cost=0.29..10.10 rows=2 width=39)
+  Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '7fbd4d78-4394-43ae-b308-5df4996add23'::uuid) AND (work_date >= '2026-08-01'::date) AND (work_date <= '2026-08-01'::date))
+===== END PLAN =====
+
+stdout | src/__db__/hr/oa06-plan-dump.spec.ts > OA-06 PLAN DUMP (temporary) > P4 the balance cell (tenant + employee + type + year — the approve-boundary cap check) rides uq_leave_balances_cell — no seq-scan
+
+===== PLAN =====
+Limit  (cost=0.28..8.31 rows=1 width=30)
+  ->  Index Scan using uq_leave_balances_cell on leave_balances  (cost=0.28..8.31 rows=1 width=30)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '7fbd4d78-4394-43ae-b308-5df4996add23'::uuid) AND (leave_type_id = 'ab5c2f3d-0fe9-4711-8c32-b7eb0ed0ec98'::uuid) AND (year = 2026))
+===== END PLAN =====
+
+stdout | src/__db__/hr/oa06-plan-dump.spec.ts > OA-06 PLAN DUMP (temporary) > P5 the per-employee balance panel (tenant + employee + year) rides ix_leave_balances_tenant_employee_year — no seq-scan
+
+===== PLAN =====
+Bitmap Heap Scan on leave_balances  (cost=4.32..10.51 rows=3 width=50)
+  Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '7fbd4d78-4394-43ae-b308-5df4996add23'::uuid) AND (year = 2027))
+  ->  Bitmap Index Scan on ix_leave_balances_tenant_employee_year  (cost=0.00..4.32 rows=3 width=0)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '7fbd4d78-4394-43ae-b308-5df4996add23'::uuid) AND (year = 2027))
+===== END PLAN =====
+
+stdout | src/__db__/hr/oa06-plan-dump.spec.ts > OA-06 PLAN DUMP (temporary) > P6 the tenant-year snapshot walk (the T-10 feed / T-16 report shape) rides the tenant prefix of the composite — no seq-scan
+
+===== PLAN =====
+Limit  (cost=42.17..42.62 rows=180 width=46)
+  ->  Sort  (cost=42.17..42.62 rows=180 width=46)
+        Sort Key: employee_id, leave_type_id
+        ->  Bitmap Heap Scan on leave_balances b  (cost=23.93..35.43 rows=180 width=46)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (year = 2026))
+              ->  Bitmap Index Scan on ix_leave_balances_tenant_employee_year  (cost=0.00..23.88 rows=180 width=0)
