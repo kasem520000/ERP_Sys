@@ -18,6 +18,8 @@ the template runs in back-office mode (invoices + expiry-sensitive stock). Manif
 
 ## Manifest
 
+> **PHASE-045 (0088):** the workforce enablement — `required_feature_keys` gains `hr.attendance` · `hr.leave` · `hr.shifts` (the HR operational core rides the workforce-carrying templates by default; the byte-true mirror is [manifests/manifest.restaurant.json](manifests/manifest.restaurant.json)).
+
 ```json
 {
   "id": "industry.restaurant",
@@ -29,7 +31,8 @@ the template runs in back-office mode (invoices + expiry-sensitive stock). Manif
     "inventory.multi_warehouse", "inventory.batch_tracking" ,
     "items.composite_products", "inventory.stock_counts", "pos.terminals", "pos.sales",
     "pos.offline_queue", "pos.table_service", "pos.receipts",
-    "treasury.cashier_shifts"
+    "treasury.cashier_shifts",
+    "hr.attendance", "hr.leave", "hr.shifts"
   ],
   "default_modules_enabled": ["accounting", "partners", "items", "inventory", "sales",
     "purchasing", "treasury", "tax", "reporting", "pos", "configuration"],

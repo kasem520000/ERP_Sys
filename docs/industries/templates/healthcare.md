@@ -20,6 +20,8 @@ only* (no clinical data — ED-07), insurers are partners with **per-claim open 
 
 ## Manifest
 
+> **PHASE-045 (0088):** the workforce enablement — `required_feature_keys` gains `hr.attendance` · `hr.leave` · `hr.shifts` (the HR operational core rides the workforce-carrying templates by default; the byte-true mirror is [manifests/manifest.healthcare.json](manifests/manifest.healthcare.json)).
+
 ```json
 {
   "id": "industry.healthcare",
@@ -29,7 +31,8 @@ only* (no clinical data — ED-07), insurers are partners with **per-claim open 
   "required_feature_keys": [
     "industry.template_engine", "partners.directory", "partners.statements",
     "sales.invoices", "sales.credit_limits", "notes.received",
-    "inventory.batch_tracking", "crm.service_orders"
+    "inventory.batch_tracking", "crm.service_orders",
+    "hr.attendance", "hr.leave", "hr.shifts"
   ],
   "default_modules_enabled": ["accounting", "partners", "items", "inventory", "sales",
     "purchasing", "treasury", "tax", "reporting", "crm", "notes", "configuration"],

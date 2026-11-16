@@ -18,6 +18,8 @@ next-day markdown discipline. Delivered with PHASE-018 — seeded at v1.0.0 by m
 
 ## Manifest
 
+> **PHASE-045 (0088):** the workforce enablement — `required_feature_keys` gains `hr.attendance` · `hr.leave` · `hr.shifts`; the excerpt also catches up with the 0066 manufacturing-execution keys (the byte-true mirror is [manifests/manifest.food_manufacturing.json](manifests/manifest.food_manufacturing.json)).
+
 ```json
 {
   "id": "industry.food_manufacturing",
@@ -27,9 +29,14 @@ next-day markdown discipline. Delivered with PHASE-018 — seeded at v1.0.0 by m
   "required_feature_keys": [
     "industry.template_engine", "manufacturing.bom",
     "manufacturing.production_orders", "manufacturing.qc",
-    "manufacturing.batch_genealogy", "inventory.multi_warehouse",
+    "manufacturing.batch_genealogy", "manufacturing.routing",
+    "manufacturing.work_centers", "manufacturing.shopfloor",
+    "manufacturing.rework", "manufacturing.downtime",
+    "manufacturing.standard_costs",
+    "inventory.multi_warehouse",
     "inventory.batch_tracking" , "inventory.stock_counts",
-    "items.price_lists", "purchasing.landed_costs"
+    "items.price_lists", "purchasing.landed_costs",
+    "hr.attendance", "hr.leave", "hr.shifts"
   ],
   "default_modules_enabled": ["accounting", "partners", "items", "inventory", "sales",
     "purchasing", "treasury", "tax", "reporting", "manufacturing", "configuration"],

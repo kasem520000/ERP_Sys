@@ -13,7 +13,10 @@
     "sales.quotations",
     "sales.job_cards",
     "sales.reps",
-    "treasury.cashier_shifts"
+    "treasury.cashier_shifts",
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts"
   ],
   "default_modules_enabled": [
     "accounting",

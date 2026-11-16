@@ -42,7 +42,10 @@ import {
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   "industry.retail": "sha256:ac0a93342ae85cd9b870c96b2bf63cb13e5e815477ebd9d9679f08700080cbba",
   "industry.grocery": "sha256:c6ef7c8a82bdc3817e46e9068892e550ea2bbacb1583d0954f5c86704e29525e",
-  "industry.restaurant": "sha256:e187c90342250bf0a99497c27e7cb97ec7ce0b7420f76e1b3d1aab1b6954b127",
+  // PHASE-045 (0088): the restaurant pin re-pinned — required_feature_keys
+  // gains the hr block (the workforce-industry enablement; canonical +
+  // stored + docs mirror + pins moved together, the 0066 §9 procedure).
+  "industry.restaurant": "sha256:894b764f81702ff27a2f877d61915e3a56cd2abeddb2a4e4fbb2b546f84a025d",
 });
 
 interface GoldenTenant {

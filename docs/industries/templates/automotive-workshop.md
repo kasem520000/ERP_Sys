@@ -17,6 +17,8 @@ is a **job card بطاقة عمل** combining parts and labor. Ships in PHASE-01
 
 ## Manifest
 
+> **PHASE-045 (0088):** the workforce enablement — `required_feature_keys` gains `hr.attendance` · `hr.leave` · `hr.shifts` (the HR operational core rides the workforce-carrying templates by default; the byte-true mirror is [manifests/manifest.automotive.json](manifests/manifest.automotive.json)).
+
 ```json
 {
   "id": "industry.automotive",
@@ -26,7 +28,8 @@ is a **job card بطاقة عمل** combining parts and labor. Ships in PHASE-01
   "required_feature_keys": [
     "industry.template_engine", "items.barcodes", "items.price_lists",
     "inventory.multi_warehouse", "inventory.serial_tracking", "inventory.reservations",
-    "sales.quotations", "sales.job_cards", "sales.reps", "treasury.cashier_shifts"
+    "sales.quotations", "sales.job_cards", "sales.reps", "treasury.cashier_shifts",
+    "hr.attendance", "hr.leave", "hr.shifts"
   ],
   "default_modules_enabled": ["accounting", "partners", "items", "inventory", "sales",
     "purchasing", "treasury", "tax", "reporting", "configuration"],

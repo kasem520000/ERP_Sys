@@ -16,7 +16,10 @@
     "pos.offline_queue",
     "pos.table_service",
     "pos.receipts",
-    "treasury.cashier_shifts"
+    "treasury.cashier_shifts",
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts"
   ],
   "default_modules_enabled": [
     "accounting",

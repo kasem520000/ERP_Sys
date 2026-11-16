@@ -475,6 +475,7 @@ export const MIGRATIONS: readonly string[] = [
   "0085_hr_identity_bridge",
   "0086_hr_seeds",
   "0087_hr_attendance_import",
+  "0088_hr_workforce_enablement",
 ];
 
 /**

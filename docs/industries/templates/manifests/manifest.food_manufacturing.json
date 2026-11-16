@@ -19,7 +19,10 @@
     "inventory.batch_tracking",
     "inventory.stock_counts",
     "items.price_lists",
-    "purchasing.landed_costs"
+    "purchasing.landed_costs",
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts"
   ],
   "default_modules_enabled": [
     "accounting",

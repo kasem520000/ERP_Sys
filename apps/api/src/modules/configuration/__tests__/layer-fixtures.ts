@@ -250,6 +250,20 @@ const BUSINESS_KEYS: readonly string[] = [
   "inventory.wms", "inventory.putaway", "inventory.picking",
   "inventory.cycle_counts", "inventory.abc", "inventory.serial_ledger",
   "inventory.quarantine", "inventory.consignment",
+  // PHASE-045 transcription of the 0086 §2 plan grants (the three HR-core
+  // feature keys → business + enterprise, the 0026/0066/0071 precedent;
+  // starter does NOT get them — HR is not a starter feature): the
+  // workforce-carrying templates' (0088: industry.restaurant +
+  // industry.automotive + industry.food_manufacturing + industry.healthcare)
+  // REQUIRED chains resolve through exactly these grants — the workforce
+  // manifest enablement. (The grants seeded at 0086; the fixture
+  // transcription lands with 0088 — the first consumer — honestly noted.)
+  // payroll.employees rides along for the BR-040 closure (FEATURE_DEPS: the
+  // hr keys sit on the employees substrate — granted to business +
+  // enterprise by 0043, transcribed here for the same closure reason the
+  // 0071 wave transcribed only its consumer set).
+  "hr.attendance", "hr.leave", "hr.shifts",
+  "payroll.employees",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

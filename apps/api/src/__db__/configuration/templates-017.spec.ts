@@ -61,7 +61,10 @@ import {
  *  and the contracts verbatim copy moved together (the 039 re-pin
  *  procedure). */
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
-  "industry.automotive": "sha256:047d5671387ae1872ca8dd2bb6f7235758caa392b7c4441429fc0aadef734172",
+  // PHASE-045 (0088): the automotive pin re-pinned — required_feature_keys
+  // gains the hr block (the workforce-industry enablement; canonical +
+  // stored + docs mirror + pins moved together, the 0066 §9 procedure).
+  "industry.automotive": "sha256:c26469ce109cfdb909ceff876eee3aec46d8d2f903c4aacbf3d222f6b029348f",
   "industry.distribution": "sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d",
 });
 

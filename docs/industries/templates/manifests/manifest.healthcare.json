@@ -11,7 +11,10 @@
     "sales.credit_limits",
     "notes.received",
     "inventory.batch_tracking",
-    "crm.service_orders"
+    "crm.service_orders",
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts"
   ],
   "default_modules_enabled": [
     "accounting",

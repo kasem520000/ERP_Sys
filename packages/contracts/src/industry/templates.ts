@@ -568,6 +568,14 @@ export const RESTAURANT_MANIFEST: IndustryTemplateManifest = deepFreeze({
     "pos.table_service",
     "pos.receipts",
     "treasury.cashier_shifts",
+    // PHASE-045 (T-15 — the workforce-industry enablement, the deferred
+    // kickoff decision): the HR operational core rides the workforce-
+    // carrying templates by default (business + enterprise carry the keys
+    // via 0086 §2 — a starter-plan apply lists them in the missing chain).
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts",
+  
   ],
   default_modules_enabled: [
     "accounting",
@@ -826,6 +834,14 @@ export const AUTOMOTIVE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     "sales.job_cards",
     "sales.reps",
     "treasury.cashier_shifts",
+    // PHASE-045 (T-15 — the workforce-industry enablement, the deferred
+    // kickoff decision): the HR operational core rides the workforce-
+    // carrying templates by default (business + enterprise carry the keys
+    // via 0086 §2 — a starter-plan apply lists them in the missing chain).
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts",
+  
   ],
   default_modules_enabled: [
     "accounting",
@@ -1364,6 +1380,14 @@ export const FOOD_MANUFACTURING_TEMPLATE_MANIFEST: IndustryTemplateManifest = de
     "inventory.stock_counts",
     "items.price_lists",
     "purchasing.landed_costs",
+    // PHASE-045 (T-15 — the workforce-industry enablement, the deferred
+    // kickoff decision): the HR operational core rides the workforce-
+    // carrying templates by default (business + enterprise carry the keys
+    // via 0086 §2 — a starter-plan apply lists them in the missing chain).
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts",
+  
   ],
   default_modules_enabled: [
     "accounting",
@@ -3066,6 +3090,14 @@ export const HEALTHCARE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     "notes.received",
     "inventory.batch_tracking",
     "crm.service_orders",
+    // PHASE-045 (T-15 — the workforce-industry enablement, the deferred
+    // kickoff decision): the HR operational core rides the workforce-
+    // carrying templates by default (business + enterprise carry the keys
+    // via 0086 §2 — a starter-plan apply lists them in the missing chain).
+    "hr.attendance",
+    "hr.leave",
+    "hr.shifts",
+  
   ],
   default_modules_enabled: [
     "accounting",

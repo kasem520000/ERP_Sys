@@ -208,8 +208,13 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // default is per-tenant first-use — the kickoff decision, no global
     // row exists to seed), 0087_hr_attendance_import (T-05, added
     // 2026-11-15: attendance_import_batches — the file-fingerprint import
-    // log — + attendance_import_anomalies — the anomaly quarantine).
-    expect(files.at(-1)?.tag).toBe("0087_hr_attendance_import");
+    // log — + attendance_import_anomalies — the anomaly quarantine),
+    // 0088_hr_workforce_enablement (T-15, added 2026-11-16: the
+    // workforce-industry MANIFEST ENABLEMENT — the deferred kickoff
+    // decision's coherent change: the four workforce templates'
+    // required_feature_keys gain the hr block; canonical + stored +
+    // docs mirrors + pins moved together, the 0066 §9 precedent).
+    expect(files.at(-1)?.tag).toBe("0088_hr_workforce_enablement");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

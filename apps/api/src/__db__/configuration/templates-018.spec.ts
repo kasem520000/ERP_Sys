@@ -64,7 +64,14 @@ import {
  *  gains the six manufacturing-execution keys (the manifest enablement);
  *  the migration seed, the docs mirror, and the contracts verbatim copy
  *  moved together (the 039 re-pin procedure). */
-const KNOWN_HASH = "sha256:e4deacf39de5ed835a9da66400b49d2faa216f34fe7bfa49264fd58095253ca0";
+/**
+ *  PHASE-045 (0088): re-pinned — the manifest's required_feature_keys
+ *  gains the hr block (the workforce-industry enablement, the deferred
+ *  kickoff decision's coherent change: the migration seed, the docs
+ *  mirror, and the contracts verbatim copy moved together — the 0066
+ *  §9 re-pin procedure).
+ */
+const KNOWN_HASH = "sha256:8b16536f5dc84bc7a7bbe9c5a47cc37db200dea002aa8ebf425fbe26d8663377";
 
 /** The 0026 plan-grant manufacturing set (the "manufacturing add-on"). */
 const MANUFACTURING_KEYS: readonly string[] = [
@@ -674,8 +681,11 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
   it("starter-plan degradation: the full missing chain blocks the apply (guided plan selection)", async () => {
     // Starter carries none of the manufacturing keys: the REQUIRED
     // capabilities block, the required_feature_keys backstop adds the
-    // uncovered intake/inventory keys, and BR-040 closure contributes
-    // nothing beyond them (the starter set is itself closure-valid).
+    // uncovered intake/inventory keys + the hr block (the 0088
+    // workforce enablement — HR is not a starter feature, 0086 §2),
+    // and BR-040 closure adds the hr keys' own dependency
+    // payroll.employees (FEATURE_DEPS — the employees substrate; the
+    // starter set carries no hr/payroll surface at all).
     await expect(
       withTenant(starterTenant, () =>
         applyService.apply(starterOwner, {
@@ -687,6 +697,9 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
       code: "configuration/template-prerequisites-blocked",
       templateKey: "industry.food_manufacturing",
       missingChain: [
+        "hr.attendance",
+        "hr.leave",
+        "hr.shifts",
         "industry.template_engine",
         "inventory.batch_tracking",
         "inventory.stock_counts",
@@ -700,6 +713,7 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
         "manufacturing.shopfloor",
         "manufacturing.standard_costs",
         "manufacturing.work_centers",
+        "payroll.employees",
         "purchasing.landed_costs",
       ],
       guidance: {

@@ -98,7 +98,11 @@ import { TaxResolverService } from "../../modules/tax/application/tax-resolver-s
  *  docs mirror docs/industries/templates/manifests/manifest.healthcare.json
  *  with the ar.aging pin reconciliation). */
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
-  "industry.healthcare": "sha256:f8b707e6981379e392038849853a7a6b1d8312fe140ced388e83fc910510947e",
+  // PHASE-045 (0088): re-pinned — the healthcare manifest's
+// required_feature_keys gains the hr block (the workforce-industry
+// enablement; the migration seed, the docs mirror, and the contracts
+// verbatim moved together — the 0066 §9 re-pin procedure).
+  "industry.healthcare": "sha256:b00e2e1aeeefc631d29d3fe08d7aef60423ca8b77be0954367caa9bc36a4daeb",
 });
 
 // -- tenant A: the healthcare apply + the claim-capture legs ------------------

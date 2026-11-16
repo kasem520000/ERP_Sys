@@ -1441,6 +1441,67 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 40,
   },
+  // PHASE-045 (T-15): the HR operational core's four screens — the
+  // attendance register (with the device-import wizard), the leave
+  // screen, the shifts/roster editor, and the employee self-service
+  // tabs. The three management items ride the exact 0086-seeded keys
+  // (feature + permission, matrix §3.23); the SELF-SERVICE item is the
+  // runtime-granted plane's nav shape: featureKey on the hr core's
+  // presence signal (the three keys travel together on plans and
+  // templates) and NO permission key — hr.self_service is
+  // SELF_SCOPE_KEYS runtime-granted to EVERY authenticated user (the
+  // 0086 seed note; the ownership boundary is the identity bridge, not
+  // a template grant), and effectivePermissions never carries it — a
+  // permission-gated item would render for owners only and hide the
+  // tab from the employees it exists for. Unlinked accounts click
+  // through to the honest not-linked state (the page's own law).
+  {
+    id: "hr.attendance",
+    parentGroup: "hr",
+    label: { ar: "الحضور والغياب", en: "Attendance" },
+    icon: "clock",
+    route: "/hr/attendance",
+    featureKey: "hr.attendance",
+    permission: "hr.attendance",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 50,
+  },
+  {
+    id: "hr.leave",
+    parentGroup: "hr",
+    label: { ar: "الإجازات", en: "Leave" },
+    icon: "calendar-check",
+    route: "/hr/leave",
+    featureKey: "hr.leave",
+    permission: "hr.leave",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 60,
+  },
+  {
+    id: "hr.shifts",
+    parentGroup: "hr",
+    label: { ar: "الورديات وجدول التشغيل", en: "Shifts & roster" },
+    icon: "calendar-clock",
+    route: "/hr/shifts",
+    featureKey: "hr.shifts",
+    permission: "hr.shifts",
+    branchScoped: false,
+    archetype: "settings",
+    order: 70,
+  },
+  {
+    id: "hr.self",
+    parentGroup: "hr",
+    label: { ar: "الخدمة الذاتية", en: "Self-service" },
+    icon: "calendar",
+    route: "/hr/self",
+    featureKey: "hr.attendance",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 80,
+  },
 ];
 
 /**

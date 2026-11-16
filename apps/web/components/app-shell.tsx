@@ -255,6 +255,15 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "sales/returns": { group: "navSales", label: "returnsNav" },
   "sales/dunning": { group: "navSales", label: "dunningNav" },
   "purchasing/returns": { group: "navPurchasing", label: "supplierReturnsNav" },
+  // -- PHASE-045 (T-15): the HR operational core's four screens (the
+  // registry rows hr.attendance / hr.leave / hr.shifts / hr.self drive
+  // the sidebar + ⌘K; these fallbacks cover nav-fetch failure — the
+  // support-sessions rule, crumbs only).
+  "hr/attendance": { group: "navHr", label: "hrAttendanceTitle" },
+  "hr/attendance/import": { group: "navHr", label: "hrAttendanceImportTitle" },
+  "hr/leave": { group: "navHr", label: "hrLeaveTitle" },
+  "hr/shifts": { group: "navHr", label: "hrShiftsTitle" },
+  "hr/self": { group: "navHr", label: "hrSelfTitle" },
 };
 
 /**
