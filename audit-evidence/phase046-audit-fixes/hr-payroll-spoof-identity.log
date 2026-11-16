@@ -1,0 +1,138 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-16 22:19:41.507 UTC [10982] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-16 22:19:41.507 UTC [10982] LOG:  listening on IPv6 address "::1", port 43681
+2026-11-16 22:19:41.507 UTC [10982] LOG:  listening on IPv4 address "127.0.0.1", port 43681
+
+2026-11-16 22:19:41.507 UTC [10982] LOG:  listening on Unix socket "/tmp/.s.PGSQL.43681"
+
+2026-11-16 22:19:41.508 UTC [10985] LOG:  database system was shut down at 2026-11-16 22:19:41 UTC
+
+2026-11-16 22:19:41.510 UTC [10982] LOG:  database system is ready to accept connections
+
+2026-11-16 22:19:47.341 UTC [11069] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-16 22:19:47.341 UTC [11069] STATEMENT:  
+	    UPDATE employees SET user_id = $1::uuid, updated_at = now(), version = version + 1
+	    WHERE id = $2::uuid AND user_id IS NULL
+	    RETURNING id
+	  
+
+ ✓ src/__db__/hr/hr-writer-races.spec.ts (20 tests) 1293ms
+2026-11-16 22:19:47.870 UTC [11125] ERROR:  permission denied for table payroll_run_lines
+2026-11-16 22:19:47.870 UTC [11125] STATEMENT:  UPDATE payroll_run_lines SET net_amount = 99999 WHERE run_id = $1
+
+ ✓ src/__db__/payroll/payroll-rules.spec.ts (14 tests) 638ms
+{"level":40,"time":1794867589350,"service":"erp-api","module":"identity","user_id":"01a1e671-ee96-7000-bd6a-9f826d2f2e66","msg":"temporary lockout engaged (R-01)"}
+{"level":40,"time":1794867589479,"service":"erp-api","module":"identity","email_hash":"405489a6a8e8","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589731,"service":"erp-api","module":"identity","email_hash":"fe90e9be6563","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589733,"service":"erp-api","module":"identity","email_hash":"236f1b9d195a","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589734,"service":"erp-api","module":"identity","email_hash":"0b62835181c6","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589735,"service":"erp-api","module":"identity","email_hash":"1c3ae17b41ed","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589736,"service":"erp-api","module":"identity","email_hash":"f794a635dbba","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589736,"service":"erp-api","module":"identity","email_hash":"a0a18e76e0be","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589737,"service":"erp-api","module":"identity","email_hash":"6411faf0d2b7","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589738,"service":"erp-api","module":"identity","email_hash":"3bea867b9b16","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589738,"service":"erp-api","module":"identity","email_hash":"3b789b5ed688","msg":"login attempt for unknown email"}
+{"level":40,"time":1794867589739,"service":"erp-api","module":"identity","email_hash":"2b71691224f2","msg":"login attempt for unknown email"}
+{"level":30,"time":1794867590674,"service":"erp-api","module":"identity","user_id":"01a1e671-f58d-7000-923e-a31d94222698","msg":"password reset consumed; all sessions revoked"}
+ ✓ src/__db__/identity-flows.db.spec.ts (21 tests) 4124ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > progressive lockout: N failures → temporary lock, never permanent; counters reset on success (R-01)  836ms
+   ✓ TOTP MFA (M-06, M-07, acceptance 3) > enroll → verify confirms; same-code replay rejected; recovery codes single-use  505ms
+ ✓ src/__db__/hr/shifts-roster.spec.ts (7 tests) 8484ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  8405ms
+ ✓ src/__db__/hr/inv031.spec.ts (7 tests) 5696ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (P2) the balance-cap property matrix — 12 generated configurations through the real engine, INV-031 after every step  5081ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (BR-083) the year-crossing span charges the START year's cell ONLY — the next year stays untouched  312ms
+ ✓ src/__db__/hr/attendance.spec.ts (5 tests) 169ms
+ ✓ src/__db__/hr/leave.spec.ts (5 tests) 1517ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (b) THE ACCRUAL RUN — the annual grant with joiner proration (the mid-year hire), the monthly vesting, idempotence, and the INV-031 preservation  782ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (d) THE CARRY-OVER ROLLOVER — min(remaining, cap) with the truncation audited; a 0-cap carries nothing; idempotent  678ms
+ ✓ src/__db__/hr/overtime.spec.ts (4 tests) 69ms
+ ✓ src/__db__/hr/self-service.spec.ts (11 tests) 260ms
+ ✓ src/__db__/hr/attendance-import.spec.ts (5 tests) 68ms
+(node:11041) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/__db__/hr/leave-posting.spec.ts (3 tests) 170ms
+ ✓ src/__db__/hr/feed.spec.ts (4 tests) 424ms
+ ✓ src/__db__/hr/holiday.spec.ts (3 tests) 80ms
+2026-11-16 22:20:09.912 UTC [11221] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-16 22:20:09.912 UTC [11221] DETAIL:  Key (tenant_id, user_id)=(7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a, 01a1e672-40fd-7000-8ba1-ee962e4ef6c1) already exists.
+2026-11-16 22:20:09.912 UTC [11221] STATEMENT:  UPDATE employees SET user_id = $1, updated_at = now(), version = version + 1
+	          WHERE id = $2 AND tenant_id = $3
+
+ ✓ src/__db__/hr/bridge.spec.ts (3 tests) 70ms
+ ✓ src/__db__/hr/oa06-budgets.spec.ts (6 tests) 361ms
+ ✓ src/__db__/payroll/spoof.spec.ts (5 tests) 18ms
+
+ Test Files  16 passed (16)
+      Tests  123 passed (123)
+   Start at  22:19:40
+   Duration  29.66s (transform 1.22s, setup 0ms, collect 2.37s, tests 23.44s, environment 0ms, prepare 54ms)
+
+2026-11-16 22:20:10.322 UTC [10982] LOG:  received fast shutdown request
+
+2026-11-16 22:20:10.322 UTC [10982] LOG:  aborting any active transactions
+2026-11-16 22:20:10.322 UTC [11102] FATAL:  terminating connection due to administrator command
+2026-11-16 22:20:10.322 UTC [11068] FATAL:  terminating connection due to administrator command
+2026-11-16 22:20:10.324 UTC [11063] FATAL:  terminating connection due to administrator command
+
+2026-11-16 22:20:10.326 UTC [10982] LOG:  background worker "logical replication launcher" (PID 10988) exited with exit code 1
+2026-11-16 22:20:10.327 UTC [11069] FATAL:  terminating connection due to administrator command
+
+2026-11-16 22:20:10.334 UTC [10983] LOG:  shutting down
+2026-11-16 22:20:10.334 UTC [10983] LOG:  checkpoint starting: shutdown immediate
+
+(node:11041) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:11041) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-16 22:20:10.364 UTC [10983] LOG:  checkpoint complete: wrote 5787 buffers (35.3%); 0 WAL file(s) added, 0 removed, 4 recycled; write=0.023 s, sync=0.007 s, total=0.030 s; sync files=2423, longest=0.001 s, average=0.001 s; distance=73592 kB, estimate=73592 kB; lsn=0/5CBC960, redo lsn=0/5CBC960
+
+2026-11-16 22:20:10.372 UTC [10982] LOG:  database system is shut down
+

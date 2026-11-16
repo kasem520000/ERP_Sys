@@ -116,6 +116,72 @@ transaction).
 
 ## The evidence (all in this environment, this session)
 
+**THE RACE-SUITE EVIDENCE RECORD (corrected 2026-11-16, the
+audit-reconciliation round — the summary row below previously cited
+`pinned-notes-race-suite.log` as the 20/20 evidence; that log is the kept
+INTERMEDIATE DISCOVERY RUN):** the race suite's standalone green artifact is
+`audit-evidence/phase046-audit-fixes/race-suite-standalone-20-20.log` —
+`hr-writer-races.spec.ts` STANDALONE, **20/20 green** (re-run 2026-11-16
+22:14 UTC at the audit-fix head; the race-relevant code is untouched by the
+fix wave — the duels, the harness, `atomic.ts`, and the import service are
+byte-identical to `e6f7cfe`). `pinned-notes-race-suite.log` (in
+`phase046-w0/`) is now labeled in the inventory as the kept intermediate
+discovery run: **18/20 — duels (12) and (19) failed, ended 20:09**; the final
+green of that wave's run was the chunked batch (`pinned-notes-suite-chunk-01.log`,
+started 20:24:15 — the race spec green 20/20 within the 49-file batch). No
+result was replaced by an older green log; every intermediate state is kept.
+
+**WHAT ACTUALLY CHANGED between the 20:09 discovery run and the 20:24+
+green chunks — the fixed-vs-flaky record for the two failed duels**
+(the intermediate 20:09 code state was never committed; the reconstruction
+below is from the discovery log's own stack frames + line arithmetic against
+the committed `e6f7cfe`, and every claim it makes is evidenced by the log):
+
+- **Duel (12) ACCRUAL RECOMPUTE — a TEST EXPECTATION change, NOT a
+  production fix, and NOT flakiness.** At 20:09 the duel failed with
+  `shape='slipped'` — but the DB log proves the loser was BLOCKED the entire
+  15s window: `canceling statement due to statement timeout … while
+  inserting index tuple … in relation "leave_balances"` (the accrual's
+  `ensureBalanceCell` INSERT…ON CONFLICT probe waiting on the winner's
+  uncommitted UPDATE — the winner's ROW lock — canceled exactly at the
+  window deadline, 20:09:52.290, 15.06s into the duel). The then-current
+  waiter expectation was still bound to the cell's ADVISORY lock tag, which
+  never fired (the loser never got past the row lock to reach the advisory
+  arm); the rejection surfaced as "(fulfilled)" in `loserCode()` because the
+  drizzle wrapper hides the pg SQLSTATE from `.code`. **The fix:** the
+  duel's expectation re-bound from `{ advisoryKey: cellKey }` to
+  `{ winnerTx: true }` — the winner's own transaction id, captured from the
+  winner's UoW at the split — proving the wait the loser ACTUALLY does; plus
+  the 9-line comment block at the spec's lines 1199–1207 (the line shift
+  1218→1227 in the discovery log's stack frame is exactly those 9 lines).
+  **No production code changed for duel (12)** — the production INV-031
+  preservation (the re-read of used=15.00 under the cell lock and the typed
+  `LEAVE_ACCRUAL_INVALID` refusal) was already correct and stayed; the duel
+  had been asserting the wrong serialization point. The failure was
+  deterministic under the old expectation: the row lock structurally always
+  precedes the advisory arm in the accrual path.
+- **Duel (19) THE TWO-IMPORT × RANGE-DERIVATION DEADLOCK — a PRODUCTION
+  CODE fix, NOT a test change, and NOT flakiness.** At 20:09 the duel failed
+  fast (`expected +0 to be 2` at line 1710 — import A's arm did not fulfill:
+  its recorded importedCount was 0): the pre-fix import commit locked only
+  the file's OWN pairs, so import A holding {22,24} whose internal
+  derivation wanted 23 (a BACKWARDS expansion) against import B holding
+  {23} wanting {24} was the owner's exact 40P01 wait-cycle recipe — the
+  arm died as the deadlock victim. **The fix (production, named):**
+  `apps/api/src/modules/hr/application/attendance-import-service.ts` — the
+  commit's lock acquisition replaced: it now reserves the WHOLE derive
+  window up front (the file's min…max dates × the file's employees, bounded
+  by the import horizon today−400d…tomorrow) in ONE sorted bulk call, so
+  the internal `deriveDays` acquisition is pure re-entry; backed by
+  `apps/api/src/modules/hr/infrastructure/atomic.ts` — the DB-guaranteed
+  acquisition order (the MATERIALIZED-CTE `ORDER BY k COLLATE "C"`
+  lock statement) and the per-transaction reservation ledger (the typed
+  `hr/lock-order-violation` on any at-or-before-the-held-maximum
+  expansion). **The duel's test code was UNCHANGED** (its assertion moved
+  1710→1719 — exactly the 9-line duel-(12) comment block above it); the
+  duel was written to the post-fix expectation and failed at 20:09 because
+  the production code was not there yet.
+
 | Gate | Result |
 |---|---|
 | `pnpm --filter @erp/api typecheck` | clean |
@@ -123,7 +189,7 @@ transaction).
 | `pnpm typecheck` / `pnpm lint` | **8/8 packages** green |
 | `pnpm lint:depcruise` | clean — 1,908 modules · 14,142 dependencies |
 | `pnpm --filter @erp/api test` (unit) | **626/626** |
-| The race suite | **20/20** (16 original duels on the hardened bound-proof harness + 17/18/19/20) — `pinned-notes-race-suite.log` |
+| The race suite (STANDALONE) | **20/20** (16 original duels on the hardened bound-proof harness + 17/18/19/20) — `audit-evidence/phase046-audit-fixes/race-suite-standalone-20-20.log` (the corrected citation; the 20:24 batch green: `pinned-notes-suite-chunk-01.log`) |
 | The hr folder | 13/13 files · 83/83 |
 | payroll + isolation + spoof folders | 10/10 files · 1,649/1,649 |
 | **THE FULL DB SUITE** (chunked, serial, foreground) | **240/240 files · 3,333/3,333 tests · 0 failed · 0 skipped** (3,329 + the 4 new permanent tests) — logs `pinned-notes-suite-chunk-*.log` |

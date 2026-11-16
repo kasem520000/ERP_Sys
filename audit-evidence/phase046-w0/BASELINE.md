@@ -64,6 +64,22 @@ result transferred from a previous green log (the standing rule).
 (For the record, the superseded groupings — `chunk-03.log` and `chunk-03b.log`
 — are retained as the honest history of the two load-sensitivity finds above.)
 
+## The pinned-notes wave logs (the T-20 pinned technical notes, e6f7cfe — kept in this folder; labeled 2026-11-16, the audit-reconciliation round)
+
+| Log | What it is |
+|---|---|
+| `pinned-notes-race-suite.log` | **The kept INTERMEDIATE DISCOVERY RUN** of `hr-writer-races.spec.ts` standalone — **18/20 (duels (12) and (19) failed), started 20:09:31, ended 20:09:52**. NOT the 20/20 evidence. The final standalone green artifact is `../phase046-audit-fixes/race-suite-standalone-20-20.log` (re-run 2026-11-16 22:14 UTC at the audit-fix head); the wave's own final green was the batch run below. The two failures' fixed-vs-flaky record: duel (12) — a TEST EXPECTATION re-binding (advisory-tag → winner-tx; the loser was provably blocked on the winner's row lock the whole window — the statement-timeout cancel in this log is the evidence; no production change); duel (19) — a PRODUCTION fix (the import commit's whole-derive-window reservation, attendance-import-service.ts + atomic.ts; the duel's test code unchanged). Full record: the T-20 pinned-notes gate doc. |
+| `pinned-notes-suite-chunk-00.log` | The chunked FULL DB SUITE run, chunk 00 — 45 files · 331 tests green (started 20:22:53) |
+| `pinned-notes-suite-chunk-01.log` | Chunk 01 — 49 files · 331 tests green (started 20:24:15); **contains the race spec's green 20/20 within the batch** — the wave's final race-suite green |
+| `pinned-notes-suite-chunk-02.log` | Chunk 02 — 43 files · 1,868 tests green (started 20:25:48) |
+| `pinned-notes-suite-chunk-03c.log` | Chunk 03c — 44 files · 336 tests green (started 20:26:47) |
+| `pinned-notes-suite-chunk-perf.log` | The isolated performance chunk — 5 files · 21 tests green (started 20:28:37) |
+| `pinned-notes-suite-chunk-04.log` | Chunk 04 — 54 files · 446 tests green (started 20:27:28) |
+| `typecheck.log` / `lint.log` / `depcruise.log` / `unit.log` / `unit-full.log` / `unit-api-rerun.log` | The W-0 static + unit gates (see the table above) |
+
+Chunk totals: 45+49+43+44+5+54 = **240 files · 331+331+1,868+336+21+446 =
+3,333 tests · 0 failed · 0 skipped** (3,329 + the 4 new permanent duels).
+
 ## Baseline moved
 
 migrations 88 (journal idx 87) · catalog 284 tables · permissions 297 · report

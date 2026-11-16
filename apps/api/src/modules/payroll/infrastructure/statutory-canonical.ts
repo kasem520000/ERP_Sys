@@ -20,16 +20,23 @@ import { generateUuidV7 } from "@erp/domain-core";
  * → Saudi totals: employer 11.75% (9% + 0.75% + 2%), employee 9.75%;
  *   the non-Saudi arm is OH-only (employer 2%, employee 0).
  *
- * The verification records carry the honest provenance (the dispatch +
- * the corroborating published implementations of the Social Insurance
- * Law, Royal Decree M/33 — the contributory-wage cap 45,000 per Part 1
- * Art. 8(2)); the official-table citations are the STATUTORY
- * VERIFICATION REGISTER's open item for the owner's at-review
- * confirmation (gosi.gov.sa was unreachable from the delivery sandbox —
- * the fetch attempts are recorded there). The KSA EOSB tiers carry the
- * labor-law award (the per-year fold). AE/EG/JO seed as 0-rate
- * REQUIRES_VERIFICATION placeholders — the blocked-state surface, never
- * a guessed rate (BR-085/BR-055).
+ * THE CITATION RECORD (0093, the reserved slot — the audit-reconciliation
+ * round, 2026-11-16): CITATION = the PwC source "Saudi Arabia: Individual —
+ * Other taxes" (https://taxsummaries.pwc.com/saudi-arabia/individual/
+ * other-taxes, fetched 2026-11-16 21:34 UTC by the owner's verifier), which
+ * independently corroborates the corrected schedule — OH on ALL (inside
+ * the Saudi employer's 11.75%), non-Saudi OH-only, employee 9.75%, the
+ * SAR 45,000 ceiling on basic + housing. DECISION RECORD = the owner's
+ * PHASE-046 approval dispatch (2026-11-16) — why the correction happened,
+ * no longer presented as the citation itself. The STATUTORY VERIFICATION
+ * REGISTER's open items are EXACTLY TWO: the SANED-specific 15,000 ceiling
+ * (PwC does not state it; the owner's confirmation pending — the D-01
+ * dual-cap basis) and the EOSB official text (Labor Law M/51 Art. 84 —
+ * the 15/30-days tiers; unreachable from both environments, all Saudi gov
+ * domains TCP-blocked). The GOSI rates and the 45,000 ceiling are CLOSED.
+ * The KSA EOSB tiers carry the labor-law award (the per-year fold).
+ * AE/EG/JO seed as 0-rate REQUIRES_VERIFICATION placeholders — the
+ * blocked-state surface, never a guessed rate (BR-085/BR-055).
  */
 
 export interface CanonicalContributionRow {
@@ -76,12 +83,14 @@ export interface CanonicalEosbRuleRow {
   readonly reviewNote: string | null;
 }
 
-const GOSI_SOURCE_NAME =
-  "GOSI official contribution schedule — the Social Insurance Law (Royal Decree M/33, as amended)";
-const GOSI_SOURCE_REF =
-  "The owner's PHASE-046 approval dispatch (2026-11-16): the corrected OH row on ALL (0%/2%), the Saudi split employer 11.75% (9% pension + 0.75% SANED + 2% OH) / employee 9.75%; corroborated by published implementations of the schedule (the contributory-wage cap 45,000 per the Law Part 1 Art. 8(2))";
-const GOSI_OPEN_ITEM_NOTE =
-  "gosi.gov.sa unreachable from the delivery sandbox — the official-table citation is the statutory verification register's open item; any correction lands as a seed edit before the gates (the plan §7(c) law).";
+const GOSI_CITATION_NAME =
+  'PwC Worldwide Tax Summaries — Saudi Arabia: Individual — Other taxes (https://taxsummaries.pwc.com/saudi-arabia/individual/other-taxes — fetched 2026-11-16 21:34 UTC by the owner\'s verifier; page title "Saudi Arabia - Individual - Other taxes")';
+const GOSI_CITATION_VERBATIM =
+  'Verbatim: "Social insurance contributions are paid monthly based on the monthly basic salary plus housing (paid or in kind) with an upper limit of SAR 45,000, are computed at 2% for non-Saudi employees (note that this is not social insurance, it is occupational hazard), and are paid by the employer. For Saudi employees, the rate is 21.5% and is paid by both the employee (9.75% = 9% social insurance + 0.75% unemployment insurance [SANED]) and the employer (11.75% = 9% social insurance + 2% occupational hazard + 0.75% unemployment insurance [SANED])."';
+const GOSI_DECISION_RECORD =
+  "DECISION RECORD: the owner's PHASE-046 approval dispatch (2026-11-16) is why the schedule was corrected (the GOSI-OH row on ALL at 0%/2%; the Saudi employer total 11.75% / employee 9.75%; the non-Saudi arm OH-only) — recorded as the decision record, no longer presented as the citation (0093, the reserved slot: the PwC source independently corroborates the corrected schedule).";
+const GOSI_OPEN_ITEMS_NOTE =
+  "The statutory verification register's open items are exactly two: the SANED-specific 15,000 ceiling (PwC does not state it; the owner's confirmation pending — the plan's D-01 dual-cap basis) and the EOSB official text (Labor Law M/51 Art. 84 — the 15/30-days tiers; unreachable from both environments, all Saudi gov domains TCP-blocked).";
 const EOSB_SOURCE_NAME =
   "Saudi Labor Law (Royal Decree M/51, as amended) — the end-of-service award";
 const EOSB_SOURCE_REF =
@@ -103,9 +112,9 @@ export const CANONICAL_CONTRIBUTION_ROWS: readonly CanonicalContributionRow[] = 
     appliesTo: "CITIZEN",
     effectiveFrom: "2020-01-01",
     status: "VERIFIED",
-    sourceName: GOSI_SOURCE_NAME,
-    sourceRef: GOSI_SOURCE_REF,
-    reviewNote: `The dual-cap law's pension arm. ${GOSI_OPEN_ITEM_NOTE}`,
+    sourceName: GOSI_CITATION_NAME,
+    sourceRef: `${GOSI_CITATION_VERBATIM} — the pension arm: employee 9% + employer 9% of the monthly basic + housing, ceiling SAR 45,000`,
+    reviewNote: `CITATION CLOSED (0093): the GOSI rates and the 45,000 contributory-wage ceiling are CLOSED by the PwC source. ${GOSI_DECISION_RECORD} ${GOSI_OPEN_ITEMS_NOTE}`,
   }),
   Object.freeze({
     jurisdictionCode: "SA",
@@ -120,9 +129,9 @@ export const CANONICAL_CONTRIBUTION_ROWS: readonly CanonicalContributionRow[] = 
     appliesTo: "CITIZEN",
     effectiveFrom: "2020-01-01",
     status: "VERIFIED",
-    sourceName: GOSI_SOURCE_NAME,
-    sourceRef: `${GOSI_SOURCE_REF}; the SANED 15,000 ceiling per the plan's dual-cap basis (D-01)`,
-    reviewNote: `The dual-cap law's SANED arm — the reason the schedule is a ROW-SET. ${GOSI_OPEN_ITEM_NOTE}`,
+    sourceName: GOSI_CITATION_NAME,
+    sourceRef: `${GOSI_CITATION_VERBATIM} — the SANED arm: employee 0.75% + employer 0.75% (the unemployment insurance inside the 21.5% Saudi total)`,
+    reviewNote: `CITATION CLOSED for the RATES (0093): PwC corroborates 0.75% + 0.75% and states the general SAR 45,000 contributory ceiling — but does NOT state the SANED-specific 15,000 ceiling, the row's one open item (the owner's confirmation pending). The dual-cap law's SANED arm — the reason the schedule is a ROW-SET. ${GOSI_DECISION_RECORD} ${GOSI_OPEN_ITEMS_NOTE}`,
   }),
   Object.freeze({
     jurisdictionCode: "SA",
@@ -137,10 +146,9 @@ export const CANONICAL_CONTRIBUTION_ROWS: readonly CanonicalContributionRow[] = 
     appliesTo: "ALL",
     effectiveFrom: "2020-01-01",
     status: "VERIFIED",
-    sourceName: GOSI_SOURCE_NAME,
-    sourceRef:
-      "The owner's PHASE-046 approval dispatch (2026-11-16), verbatim: the GOSI-OH row applies to ALL — employee share zero, employer share 2%; the non-Saudi arm is OH-only; the Saudi employer total 11.75% includes this 2%",
-    reviewNote: `The OH wage cap pinned at 45,000 (the owner's expected value; corroborated — the same contributory-wage ceiling as the pension arm per the Law Part 1 Art. 8(2)). ${GOSI_OPEN_ITEM_NOTE}`,
+    sourceName: GOSI_CITATION_NAME,
+    sourceRef: `${GOSI_CITATION_VERBATIM} — the occupational-hazard arm: 2% computed for non-Saudi employees and paid by the employer (OH-only for the non-Saudi arm); the 2% inside the Saudi employer's 11.75%; the SAR 45,000 upper limit on basic + housing`,
+    reviewNote: `CITATION CLOSED (0093): the OH rate (employer-only 2%, on ALL) and the 45,000 ceiling are CLOSED by the PwC source. ${GOSI_DECISION_RECORD} ${GOSI_OPEN_ITEMS_NOTE}`,
   }),
   // The AE/EG/JO blocked-state placeholders (one row per jurisdiction).
   ...(["AE", "EG", "JO"] as const).map((code) =>

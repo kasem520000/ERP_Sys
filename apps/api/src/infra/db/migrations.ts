@@ -480,6 +480,19 @@ export const MIGRATIONS: readonly string[] = [
   "0090_payroll_eosb",
   "0091_payroll_run_statutory",
   "0092_payroll_statutory_seeds",
+  // PHASE-046 (the audit-reconciliation round, 2026-11-16): 0093_-
+  // statutory_gosi_citation (THE RESERVED SLOT's exact purpose — DATA-ONLY:
+  // the GOSI citation record reclassification. CITATION = the PwC source
+  // "Saudi Arabia: Individual — Other taxes" fetched 2026-11-16 21:34 UTC by
+  // the owner's verifier, which independently corroborates the corrected
+  // schedule 0092 seeded — OH on ALL inside the Saudi employer's 11.75%,
+  // non-Saudi OH-only, employee 9.75%, the SAR 45,000 ceiling on basic +
+  // housing; DECISION RECORD = the owner's PHASE-046 approval dispatch
+  // (2026-11-16), no longer presented as the citation itself. The register's
+  // open items narrow to exactly two: the SANED-specific 15,000 ceiling (PwC
+  // does not state it) + the EOSB official text (Labor Law M/51 Art. 84).
+  // 0089–0092 stay byte-stable).
+  "0093_statutory_gosi_citation",
 ];
 
 /**

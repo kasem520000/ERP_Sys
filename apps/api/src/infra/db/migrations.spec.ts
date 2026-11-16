@@ -226,7 +226,16 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // CANONICAL STATUTORY MATERIALIZATION for every existing tenant —
     // the owner's corrected GOSI schedule VERIFIED + the AE/EG/JO
     // REQUIRES_VERIFICATION placeholders, D-11).
-    expect(files.at(-1)?.tag).toBe("0092_payroll_statutory_seeds");
+    // PHASE-046 (the audit-reconciliation round, 2026-11-16): 0093_-
+    // statutory_gosi_citation — the RESERVED SLOT consumed by its exact
+    // purpose: the DATA-ONLY GOSI citation reclassification (CITATION = the
+    // PwC "Saudi Arabia: Individual — Other taxes" source fetched 2026-11-16
+    // 21:34 UTC by the owner's verifier, corroborating the corrected
+    // schedule + the 45,000 ceiling; DECISION RECORD = the owner's dispatch,
+    // no longer presented as the citation; the register's open items narrow
+    // to exactly two — the SANED 15,000 ceiling + the EOSB official text;
+    // 0089–0092 byte-stable).
+    expect(files.at(-1)?.tag).toBe("0093_statutory_gosi_citation");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

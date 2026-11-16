@@ -1,7 +1,6 @@
 # PHASE-045 — HR Core — Attendance, Leaves & Shifts
 
-> **Status:** **IN_PROGRESS — REOPENED 2026-11-16 for the owner's concurrency review round (T-20 delivered; awaiting the owner's re-review)** — T-01…T-19 remain delivered (the acceptance evidence in
-> [reports/PHASE-045-COMPLETION.md](reports/PHASE-045-COMPLETION.md) stands); the owner's five two-transaction race findings (attendance overlap + duplicate ABSENT markers, leave-span overlap, balance over-consumption, the encashment cap bypass, the bridge's silent link replacement) are fixed by the shared atomicity floor and pinned by the permanent two-transaction suite — the completion declaration is NOT production approval and the phase stays OPEN for re-review. PHASE-043's hard review and RISK-031/RISK-032 stay OPEN) ·
+> **Status:** **COMPLETE 2026-11-16 — ACCEPTED & CLOSED by the owner** — the owner's acceptance dispatch (2026-11-16), verbatim: "PHASE-045 is ACCEPTED and CLOSED at content head `248039e` / delivery head `d74edaa`" (the five concurrency defects confirmed fixed; DB suite 240/240 files · 3,329/3,329 green; the OA-07 archives byte-verified 0 mismatches; the three final-audit documentation remarks are non-blocking and fold into PHASE-046's W-7/T-15). The T-20 reopen round's delivery (the shared atomicity floor + the permanent two-transaction race suite over the owner's five race findings — attendance overlap + duplicate ABSENT markers, leave-span overlap, balance over-consumption, the encashment cap bypass, the bridge's silent link replacement) is part of the accepted state. **Closure re-affirmed by the owner 2026-11-16, with the note that duel (12)'s vacuous pass — discovered in the `e6f7cfe` hardening — was replaced by a truthful proof while the cell-gate law stayed pinned by the post-window legs; the final state is strictly stronger than the accepted state. No reopen.** PHASE-043's hard review and RISK-031/RISK-032 stay OPEN (not closed by this phase) ·
 > **Started:** 2026-11-14 (the owner's parallel directive: 045 ran alongside the 043-completion review) ·
 > **Wave:** 2 / Stage 13 · **Register:** [CR-15](../../planning/COMPLETENESS_REGISTER.md)
 
@@ -273,6 +272,26 @@ Acceptance criteria (all must pass with recorded evidence):
 
 ## 8. Completion and Handoff
 
+- **ACCEPTANCE RECORD (2026-11-16):** the owner's acceptance dispatch, verbatim:
+  "PHASE-045 is ACCEPTED and CLOSED at content head `248039e` / delivery head
+  `d74edaa`" — acknowledged; the five T-20 concurrency defects confirmed fixed
+  (the full DB suite 240/240 files · 3,329/3,329 green; the OA-07 archives
+  byte-verified, 0 mismatches); the three final-audit documentation remarks are
+  non-blocking and fold into PHASE-046's W-7/T-15. **Closure re-affirmed by the
+  owner 2026-11-16 (the audit-reconciliation round), with the note that duel
+  (12)'s vacuous pass — discovered in the `e6f7cfe` hardening (PHASE-046's T-20
+  pinned-notes wave, delivered after this acceptance) — was replaced by a
+  truthful proof while the cell-gate law stayed pinned by the duel's post-window
+  legs; the final state is strictly stronger than the accepted state. No
+  reopen.** The acceptance history documents the vacuous-pass replacement
+  explicitly: the accepted state's race suite proved 16/16 with duel (12)'s
+  waiter check bound to `anyLockWaiter()` (any ungranted lock cluster-wide —
+  the check could pass vacuously); the `e6f7cfe` hardening re-bound every duel
+  to its intended lock/transaction, and duel (12)'s true serialization point
+  (the winner's row lock — the accrual's `ensureBalanceCell` index probe) is
+  now recorded truthfully, with the cell-gate law still pinned by the
+  post-window legs (the re-read of used=15.00 under the cell lock and the typed
+  `LEAVE_ACCRUAL_INVALID` refusal).
 - Completion report: `docs/implementation/phases/reports/PHASE-045-COMPLETION.md`
   (evidence per acceptance criterion, gate outputs, golden pack results, import
   fixture results, OA-06 EXPLAIN evidence).

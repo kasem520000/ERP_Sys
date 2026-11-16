@@ -23,17 +23,27 @@ employer 2%); Saudi = employer 11.75% total (9% pension + 0.75% SANED +
 2% OH), employee 9.75%; non-Saudi = OH-only (employer 2%, employee 0).
 The ruleset/seed + the canonical unit + the tests + the affected
 examples all moved together (W-1, migration 0092 + statutory-canonical.ts).
-The OH wage cap verified against the official schedule with the
-citation: pinned **45,000** (the owner's expected value — the same
-contributory-wage ceiling as the pension arm per the Social Insurance
-Law, Royal Decree M/33, Part 1 Art. 8(2), corroborated by published
-implementations; gosi.gov.sa unreachable from the delivery sandbox —
-the fetch attempts + the open item recorded in the verification
-register). The Saudi worked example (employer total **1,410.0000**;
-the salary journal DR SALARIES_EXPENSE 12,000 · DR
-EMPLOYER_CONTRIBUTIONS 1,410 · CR DEDUCTIONS_PAYABLE 2,580 · CR
-SALARIES_PAYABLE 10,830; the remittance settlement 2,580; non-Saudi OH
-240.0000) supersedes the pre-approval figures in §4 below.
+The OH wage cap: pinned **45,000** — **the citation CLOSED 2026-11-16**
+(the audit-reconciliation round): the owner's verifier fetched PwC
+Worldwide Tax Summaries — "Saudi Arabia: Individual — Other taxes"
+(https://taxsummaries.pwc.com/saudi-arabia/individual/other-taxes,
+2026-11-16 21:34 UTC), which states verbatim the SAR 45,000 upper limit on
+basic + housing, the 2% employer-paid non-Saudi occupational-hazard rate,
+and the Saudi split employer 11.75% (9% + 2% OH + 0.75% SANED) / employee
+9.75% — independently corroborating the corrected schedule. The record
+reclassified in **migration 0093** (the reserved slot's exact purpose,
+DATA-ONLY, 0089–0092 byte-stable): CITATION = the PwC source; DECISION
+RECORD = the owner's 2026-11-16 dispatch (why the correction happened —
+no longer presented as the citation itself). The register's open items
+NARROW to exactly two: the SANED-specific 15,000 ceiling (PwC does not
+state it; the owner's confirmation pending) and the EOSB official text
+(Labor Law M/51 Art. 84 — the 15/30-days tiers; unreachable from both
+environments). The GOSI rates + the 45,000 ceiling are CLOSED. The Saudi
+worked example (employer total **1,410.0000**; the salary journal DR
+SALARIES_EXPENSE 12,000 · DR EMPLOYER_CONTRIBUTIONS 1,410 · CR
+DEDUCTIONS_PAYABLE 2,580 · CR SALARIES_PAYABLE 10,830; the remittance
+settlement 2,580; non-Saudi OH 240.0000) supersedes the pre-approval
+figures in §4 below.
 2. **`employees.nationality` (D-02) APPROVED** — NULL fails closed with
 the unpricedNationality warning; registered in the PII inventory
 (DATA_PROTECTION §3, W-1).

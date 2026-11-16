@@ -95,6 +95,50 @@ entitlements + tenancy 5 files · 1,642/1,642, hr/payroll/spoof/identity
 capabilities agree. **Next: W-2 — the engines (statutory-profile-service,
 pit-engine, eosb-service, the error taxonomy, the unit specs).**
 
+**The audit-reconciliation fix wave (delivered 2026-11-16 — the four
+adopted findings, BEFORE W-2):** (1) the race-suite evidence corrected —
+the STANDALONE 20/20 artifact re-proven
+(`audit-evidence/phase046-audit-fixes/race-suite-standalone-20-20.log`),
+`pinned-notes-race-suite.log` labeled as the kept INTERMEDIATE DISCOVERY RUN
+(18/20 — duels (12) and (19) failed, ended 20:09), and the fixed-vs-flaky
+record stated: duel (12) = a TEST-EXPECTATION re-binding only (advisory-tag
+→ winner-tx; the loser was provably blocked on the winner's row lock the
+whole window — the log's statement-timeout cancel is the evidence; no
+production change; deterministic under the old expectation, not flaky),
+duel (19) = a PRODUCTION fix (the import commit's whole-derive-window
+reservation — attendance-import-service.ts backed by atomic.ts's
+DB-guaranteed order + the reservation ledger; the duel's test code
+unchanged). (2) THE GOSI CITATION CLOSED — the PwC source (Saudi Arabia:
+Individual — Other taxes, fetched by the owner's verifier 2026-11-16 21:34
+UTC) independently corroborates the corrected schedule + the SAR 45,000
+ceiling; **migration 0093** (the reserved slot, DATA-ONLY, 0089–0092
+byte-stable) reclassifies the three GOSI rows' verification records
+(CITATION = PwC; DECISION RECORD = the owner's dispatch) + the canonical
+source + the journal/manifest/spec pins — the 93-chain re-proven 7/7 from
+zero; the register's open items narrow to EXACTLY TWO (the SANED 15,000
+ceiling + the EOSB official text, Labor Law M/51 Art. 84). **+ THE HONEST
+RLS FINDING (proven by probe)**: under FORCE RLS erp_migrate sees no
+tenants and no cross-tenant rows — every per-tenant migration sweep
+(incl. 0092 §3's existing-tenant materialization) is a silent no-op on
+tenant-ful databases; 0093 repairs the GOSI family through a temporary
+self-dropped migration-plane policy gate (verified end-to-end:
+materialization + reclassification + idempotence + the policy set
+restored); the older sweeps (0009 et al.) recorded for the owner, NOT
+redesigned here. (3) PHASE-045 reconciled — the phase doc's header flipped
+to ACCEPTED & CLOSED (the owner's acceptance dispatch cited verbatim) + the
+closure re-affirmed (duel (12)'s vacuous pass → the truthful proof, strictly
+stronger, no reopen) + the status header's stale REOPENED text reconciled.
+(4) the W-1 evidence doc's scope labeled (TARGETED suites at cc2f2f3; the
+full DB suite runs at W-7's final head). Gates: typecheck/lint 8/8,
+depcruise clean (1,909 · 14,146), unit 626/626 (the first attempt's one red
+= the known chromium-1248 env-prep gap, re-run green), migrations 7/7 (the
+93-chain), the affected DB groups 5 files · 1,642/1,642 + 16 files ·
+123/123, the race suite standalone 20/20, docs 33/33, drift 300, manifests
+13/13, i18n parity, capabilities agree, id-ledger 0 errors. Evidence:
+[gate-evidence/2026-11-16-phase046-audit-fixes.md](../docs/operations/gate-evidence/2026-11-16-phase046-audit-fixes.md)
++ `audit-evidence/phase046-audit-fixes/`. **The work order stands: W-2
+next — the engines, the taxonomy, the unit specs.**
+
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE
 CANONICAL KEY LAW — `canonicalUuid()` in `atomic.ts` normalizes every
