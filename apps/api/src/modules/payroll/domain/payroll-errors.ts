@@ -153,6 +153,19 @@ export class LoanScheduleImmutableError extends DomainError {
 
 // -- 422 validation ---------------------------------------------------------------
 
+/** PHASE-046 (D-02): a non-null nationality that is not an UPPERCASE
+ * ISO-3166 alpha-2 code (the 0089 CHECK is length-only; the service owns
+ * the alphabet law so the CITIZEN/NON_CITIZEN split never sees garbage). */
+export class EmployeeNationalityInvalidError extends DomainError {
+  constructor(code: string, nationality: string) {
+    super(
+      "EMPLOYEE_NATIONALITY_INVALID",
+      `Employee ${code}: nationality "${nationality}" is not an UPPERCASE ISO-3166 alpha-2 code (null is legal — the fail-closed state)`,
+      { code, nationality },
+    );
+  }
+}
+
 /** A structure currency ≠ the tenant base currency (typed — the G-29 base discipline). */
 export class StructureCurrencyError extends DomainError {
   constructor(details: { structureId: string; currency: string; base: string }) {

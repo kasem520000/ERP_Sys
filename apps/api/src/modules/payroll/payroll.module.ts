@@ -6,10 +6,13 @@ import { getBoss } from "../../infra/jobs/boss";
 import { ApprovalWorkflow } from "./application/approval-workflow";
 import { EmployeeService } from "./application/employee-service";
 import { EosService } from "./application/eos-service";
+import { EosbService } from "./application/eosb-service";
 import { LoanService } from "./application/loan-service";
+import { PitEngine } from "./application/pit-engine";
 import { PayoutService } from "./application/payout-service";
 import { RunCalculationService } from "./application/run-calculation-service";
 import { RunPostingService } from "./application/run-posting-service";
+import { StatutoryProfileService } from "./application/statutory-profile-service";
 import { StructureService } from "./application/structure-service";
 import { registerPayrollJobs } from "./infrastructure/run-calculation.job";
 import { PayrollController } from "./presentation/payroll.controller";
@@ -48,8 +51,12 @@ import { PayrollController } from "./presentation/payroll.controller";
     PayoutService,
     LoanService,
     EosService,
+    // PHASE-046 (W-2): the statutory-compliance engines (T-03/T-04/T-06).
+    StatutoryProfileService,
+    PitEngine,
+    EosbService,
   ],
-  exports: [EmployeeService, RunCalculationService, EosService],
+  exports: [EmployeeService, RunCalculationService, EosService, StatutoryProfileService, PitEngine, EosbService],
 })
 export class PayrollModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {

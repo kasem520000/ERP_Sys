@@ -136,8 +136,40 @@ depcruise clean (1,909 · 14,146), unit 626/626 (the first attempt's one red
 123/123, the race suite standalone 20/20, docs 33/33, drift 300, manifests
 13/13, i18n parity, capabilities agree, id-ledger 0 errors. Evidence:
 [gate-evidence/2026-11-16-phase046-audit-fixes.md](../docs/operations/gate-evidence/2026-11-16-phase046-audit-fixes.md)
-+ `audit-evidence/phase046-audit-fixes/`. **The work order stands: W-2
-next — the engines, the taxonomy, the unit specs.**
++ `audit-evidence/phase046-audit-fixes/`.
+
+**W-2 (delivered 2026-11-16 — The engines, T-03+T-04+T-06):** the PURE
+statutory math (`domain/statutory-math.ts`) pinned by the unit spec FIRST
+**25/25** (the GOSI worked example employee 1,170.0000/employer
+1,410.0000; the dual-cap clamp 45,000/15,000/45,000; the PIT example
+3,000.0000 → 2,600.0000; the EOSB fold 135 days → 40,500.0000); the typed
+error taxonomy (the 404 A7 family + the 409 verify-CAS/SoD family + the
+422 fail-closed family, registered in-phase); the **statutory-profile-
+service** (the effective-dated resolution — expired/future never match,
+RETIRED neither prices nor blocks; the BR-085 typed refusal audited in its
+OWN UoW — the evidence survives the caller's rollback; the verify CAS +
+SoD + the citation + the audit trail); the **pit-engine** (the
+SET-CONSISTENT tiling validation typed; the honest no-bracket zero state;
+BR-085); the **eosb-service** (the contract-aware tier resolution —
+contract rows REPLACE the default set; the 029 eosBase snapshot; THE
+STANDING PROVISION = the 029 balance + the accumulated true-up deltas —
+the zero-delta no-journal law; BR-087's guards; the G-54 delta-only
+posting + the release mirror; the reconciliation view); the statutory
+store; employees.nationality + pit_exemptions exposed (the ISO-3166
+alphabet law); the DB specs: statutory 7/7 + pit 6/6 + eosb 9/9 **on the
+DEDICATED EOSB TENANT** (the race-suite precedent — no PAY-world
+pollution; the termination sequence: run → provision 900 → terminate →
+true-up +48,600 → G-31 settles 900 green → further true-ups refuse).
+Gates: typecheck/lint 8/8, depcruise clean (1,919 · 14,219), api unit
+**651/651** (626 + 25), the new specs 3 files · 22/22, the payroll+hr
+regression 18 files · 124/124 (the 029 goldens + spoof + the hr specs all
+green with the engines in the tree), isolation+entitlements+tenancy+
+migrations+identity 6 files · 1,663/1,663. Evidence:
+[gate-evidence/2026-11-16-phase046-w2.md](../docs/operations/gate-evidence/2026-11-16-phase046-w2.md)
++ `audit-evidence/phase046-w2/`. **Next: W-3 — the run integration + the
+floor (the run-calculation extension, the G-52/G-53 legs through the G-29
+machinery, the remittance settlement + the statutory_summary liability,
+the run gate in atomic.ts (D-09), the feed-called-ONCE boundary).**
 
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE

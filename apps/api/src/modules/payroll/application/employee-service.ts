@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 
 import { AuditService } from "../../audit/api/audit";
 import {
+  EmployeeNationalityInvalidError,
   EmployeeNotFoundError,
   EmployeeStatusError,
   PayrollCodeConflictError,
@@ -124,6 +125,9 @@ export class EmployeeService {
     name: string;
     nameAr?: string | null;
     nationalId?: string | null;
+    /** PHASE-046 (D-02): ISO-3166 alpha-2 uppercase; null = the statutory fail-closed state. */
+    nationality?: string | null;
+    pitExemptions?: { personalAllowance?: string; dependents?: string; other?: string } | null;
     hireDate: string;
     contractType: store.ContractType;
     basicSalary: string;
@@ -141,6 +145,7 @@ export class EmployeeService {
     if ((await store.findEmployeeByCode(input.code)) !== undefined) {
       throw new PayrollCodeConflictError({ entity: "employee", code: input.code });
     }
+    assertNationality(input.nationality, input.code);
     if (input.salaryStructureId !== undefined && input.salaryStructureId !== null) {
       const structure = await store.findStructureById(input.salaryStructureId);
       if (structure === undefined) throw new StructureNotFoundError(input.salaryStructureId);
@@ -181,6 +186,9 @@ export class EmployeeService {
     if (patch.salaryStructureId !== undefined && patch.salaryStructureId !== null) {
       const structure = await store.findStructureById(patch.salaryStructureId);
       if (structure === undefined) throw new StructureNotFoundError(patch.salaryStructureId);
+    }
+    if (patch.nationality !== undefined) {
+      assertNationality(patch.nationality, id);
     }
     if (patch.status !== undefined && patch.status !== employee.status) {
       this.assertStatusTransition(employee.status, patch.status);
@@ -294,5 +302,21 @@ export class EmployeeService {
       },
     });
     return updated;
+  }
+}
+
+/**
+ * PHASE-046 (D-02): the nationality shape law — null is LEGAL (the
+ * statutory fail-closed state: no lines + the explicit warning at
+ * resolution time); a non-null value must be an UPPERCASE ISO-3166
+ * alpha-2 code (the 0089 CHECK is length-only; the service owns the
+ * alphabet law so the CITIZEN/NON_CITIZEN split can never see garbage).
+ */
+function assertNationality(nationality: string | null | undefined, code: string): void {
+  if (nationality === null || nationality === undefined) {
+    return; // the fail-closed null state is legal by design (D-02)
+  }
+  if (!/^[A-Z]{2}$/.test(nationality)) {
+    throw new EmployeeNationalityInvalidError(code, nationality);
   }
 }

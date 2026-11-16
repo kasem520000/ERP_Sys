@@ -51,6 +51,10 @@ export interface EmployeeRow {
   name: string;
   nameAr: string | null;
   nationalId: string | null;
+  /** PHASE-046 (D-02): ISO-3166 alpha-2 — NULL fails closed at the statutory resolution (never a guessed rate). */
+  nationality: string | null;
+  /** PHASE-046 (D-03): the PIT exemption overrides (absent fields = the bracket set's defaults). */
+  pitExemptions: { personalAllowance?: string; dependents?: string; other?: string } | null;
   hireDate: string;
   terminationDate: string | null;
   terminationReason: string | null;
@@ -81,6 +85,8 @@ interface EmployeeSqlRow {
   name: string;
   name_ar: string | null;
   national_id: string | null;
+  nationality: string | null;
+  pit_exemptions: { personalAllowance?: string; dependents?: string; other?: string } | null;
   hire_date: string;
   termination_date: string | null;
   termination_reason: string | null;
@@ -112,6 +118,8 @@ function mapEmployee(row: EmployeeSqlRow): EmployeeRow {
     name: row.name,
     nameAr: row.name_ar,
     nationalId: row.national_id,
+    nationality: row.nationality,
+    pitExemptions: row.pit_exemptions ?? null,
     hireDate: typeof row.hire_date === "string" ? row.hire_date.slice(0, 10) : String(row.hire_date).slice(0, 10),
     terminationDate:
       row.termination_date === null
@@ -142,7 +150,7 @@ function mapEmployee(row: EmployeeSqlRow): EmployeeRow {
   };
 }
 
-const EMPLOYEE_COLUMNS = sql`id, code, name, name_ar, national_id, hire_date, termination_date,
+const EMPLOYEE_COLUMNS = sql`id, code, name, name_ar, national_id, nationality, pit_exemptions, hire_date, termination_date,
   termination_reason, contract_type, basic_salary, salary_structure_id, branch_id, cost_center_id,
   project_id, bank_name, bank_iban, bank_account, eos_settled_amount,
   eos_settlement_journal_entry_id, eos_settled_at, status, note, note_ar,
@@ -153,6 +161,8 @@ export interface CreateEmployeeInput {
   name: string;
   nameAr?: string | null;
   nationalId?: string | null;
+  nationality?: string | null;
+  pitExemptions?: { personalAllowance?: string; dependents?: string; other?: string } | null;
   hireDate: string;
   contractType: ContractType;
   basicSalary: string;
@@ -170,11 +180,13 @@ export interface CreateEmployeeInput {
 
 export async function insertEmployee(input: CreateEmployeeInput): Promise<EmployeeRow> {
   const rows = await tenantTx().execute(sql`
-    INSERT INTO employees (id, tenant_id, code, name, name_ar, national_id, hire_date,
+    INSERT INTO employees (id, tenant_id, code, name, name_ar, national_id, nationality, pit_exemptions, hire_date,
       contract_type, basic_salary, salary_structure_id, branch_id, cost_center_id, project_id,
       bank_name, bank_iban, bank_account, note, note_ar, created_by)
     VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.code}, ${input.name},
-      ${input.nameAr ?? null}, ${input.nationalId ?? null}, ${input.hireDate}, ${input.contractType},
+      ${input.nameAr ?? null}, ${input.nationalId ?? null}, ${input.nationality ?? null},
+      ${input.pitExemptions === undefined || input.pitExemptions === null ? null : JSON.stringify(input.pitExemptions)}::jsonb,
+      ${input.hireDate}, ${input.contractType},
       ${input.basicSalary}, ${input.salaryStructureId ?? null}, ${input.branchId ?? null},
       ${input.costCenterId ?? null}, ${input.projectId ?? null}, ${input.bankName ?? null},
       ${input.bankIban ?? null}, ${input.bankAccount ?? null}, ${input.note ?? null},
@@ -209,6 +221,8 @@ export interface EmployeeUpdatePatch {
   name?: string;
   nameAr?: string | null;
   nationalId?: string | null;
+  nationality?: string | null;
+  pitExemptions?: { personalAllowance?: string; dependents?: string; other?: string } | null;
   contractType?: ContractType;
   basicSalary?: string;
   salaryStructureId?: string | null;
@@ -237,6 +251,8 @@ export async function updateEmployee(
       name = coalesce(${patch.name ?? null}, name),
       name_ar = ${patch.nameAr === undefined ? sql`name_ar` : sql`${patch.nameAr}`},
       national_id = ${patch.nationalId === undefined ? sql`national_id` : sql`${patch.nationalId}`},
+      nationality = ${patch.nationality === undefined ? sql`nationality` : sql`${patch.nationality}`},
+      pit_exemptions = ${patch.pitExemptions === undefined ? sql`pit_exemptions` : patch.pitExemptions === null ? sql`NULL` : sql`${JSON.stringify(patch.pitExemptions)}::jsonb`},
       contract_type = coalesce(${patch.contractType ?? null}, contract_type),
       basic_salary = coalesce(${patch.basicSalary ?? null}, basic_salary),
       salary_structure_id = ${patch.salaryStructureId === undefined ? sql`salary_structure_id` : sql`${patch.salaryStructureId}`},

@@ -283,6 +283,22 @@ import {
   StructureNotActiveError,
   StructureNotFoundError,
 } from "../../modules/payroll/domain/payroll-errors";
+// PHASE-046 (W-2, in-phase): the statutory-compliance taxonomy
+// (statutory-errors.ts — the SF-027-001 lesson: registration is
+// in-phase): 404 not-founds (A7 parity — unknown == foreign
+// profile/bracket/rule/calculation ids); 409 lifecycle conflicts (the
+// verify CAS loss + the SoD law, D-10); the 422 fail-closed family
+// (BR-085's REQUIRES_VERIFICATION gate, the bracket set-consistency
+// law, the EOSB no-rule/fail-closed shapes, D-02's nationality laws)
+// falls through to the 422 default by design.
+import {
+  EosbCalculationNotFoundError,
+  EosbRuleNotFoundError,
+  PitBracketNotFoundError,
+  StatutoryAlreadyVerifiedError,
+  StatutoryProfileNotFoundError,
+  StatutoryVerifySoDError,
+} from "../../modules/payroll/domain/statutory-errors";
 // SF-027-001 (the honest 026 gap repair): the fixed_assets error classes
 // were never registered in domainStatus (verified at 027 HEAD — they
 // surfaced over HTTP with the 422 fallback while the codes stayed typed at
@@ -696,7 +712,12 @@ function domainStatus(error: DomainError): number {
     error instanceof ComponentAccountNotFoundError ||
     error instanceof RunNotFoundError ||
     error instanceof LoanNotFoundError ||
-    error instanceof LoanLineNotFoundError
+    error instanceof LoanLineNotFoundError ||
+    // PHASE-046 statutory (in-phase): A7 parity.
+    error instanceof StatutoryProfileNotFoundError ||
+    error instanceof PitBracketNotFoundError ||
+    error instanceof EosbRuleNotFoundError ||
+    error instanceof EosbCalculationNotFoundError
   ) {
     return HttpStatus.NOT_FOUND;
   }
@@ -708,7 +729,12 @@ function domainStatus(error: DomainError): number {
     error instanceof StructureInUseError ||
     error instanceof StructureNotActiveError ||
     error instanceof PayrollCodeConflictError ||
-    error instanceof EosSettlementExceedsBalanceError
+    error instanceof EosSettlementExceedsBalanceError ||
+    // PHASE-046 statutory (in-phase): the verify CAS loss (one flip per
+    // row — the concurrent loser) + the SoD law (the verifier ≠ the last
+    // editor, D-10) — the self-approval conflict precedent.
+    error instanceof StatutoryAlreadyVerifiedError ||
+    error instanceof StatutoryVerifySoDError
   ) {
     return HttpStatus.CONFLICT;
   }

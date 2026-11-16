@@ -1,0 +1,55 @@
+
+> erp-platform@0.1.0 lint /home/z/ERP_Sys
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/desktop:lint: cache hit, replaying logs a6099b63915858e5
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/ERP_Sys/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/domain-core:lint: cache hit, replaying logs 98bc5742081b521a
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/ERP_Sys/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/ui:lint: cache hit, replaying logs 9d181dd8ef8dc67c
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/ERP_Sys/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/contracts:lint: cache hit, replaying logs 56213ec401a9e6a1
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/ERP_Sys/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/sync-core:lint: cache hit, replaying logs 75d1c734aa3ead42
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/ERP_Sys/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/api:lint: cache miss, executing 17d65e66107003cb
+@erp/mobile:lint: cache hit, replaying logs 825d8d884577fae0
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/ERP_Sys/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/web:lint: cache hit, replaying logs 0e0a3ba3f0c3e7e9
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/ERP_Sys/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/ERP_Sys/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    7 cached, 8 total
+  Time:    19.254s 
+

@@ -48,6 +48,21 @@ export async function ownTenantBaseCurrency(): Promise<string> {
   return row.base_currency;
 }
 
+/** Own tenant's ISO country code (PHASE-046: the statutory jurisdiction —
+ * the CITIZEN/NON_CITIZEN resolution anchor, D-01; the same RLS
+ * id-variant shape as ownTenantBaseCurrency). */
+export async function ownTenantCountryCode(): Promise<string> {
+  const tx = tenantTx();
+  const result = await tx.execute(
+    sql`SELECT country_code FROM tenants WHERE id = erp.current_tenant_id()`,
+  );
+  const row = (result.rows as unknown as { country_code: string }[])[0];
+  if (row === undefined) {
+    throw new Error("own tenant row not visible under the current scope");
+  }
+  return row.country_code;
+}
+
 /**
  * Own tenant's display name pair (PHASE-037: the ZATCA QR seller name —
  * Arabic-first per the house convention; the EN name is the fallback).
