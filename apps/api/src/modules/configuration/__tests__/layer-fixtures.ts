@@ -264,6 +264,20 @@ const BUSINESS_KEYS: readonly string[] = [
   // 0071 wave transcribed only its consumer set).
   "hr.attendance", "hr.leave", "hr.shifts",
   "payroll.employees",
+  // PHASE-046 transcription of the 0092 §2 plan grants (the two
+  // compliance feature keys → business + enterprise, the 0026/0066/0071/
+  // 0086 precedent; starter does NOT get them): the L4 layer folds plan
+  // feature_keys, so every business/enterprise row moves with the grants
+  // (the same re-pin procedure). The entitlements note documents the
+  // market/jurisdiction dimension: the plan tier grants the CAPABILITY;
+  // the jurisdiction's verified profile set decides whether it posts.
+  // The 029 dependency substrate (salary_structures + runs +
+  // eos_provision — granted to business + enterprise by 0043) transcribes
+  // with them: the new keys' BR-040 closures resolve through it, the same
+  // closure-driven transcription the 0086 wave applied for
+  // payroll.employees (the fixtures mirror only what a consumer needs).
+  "payroll.salary_structures", "payroll.runs", "payroll.eos_provision",
+  "payroll.statutory", "payroll.eosb",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

@@ -472,6 +472,15 @@ country-specific contribution rates are fabricated — components are tenant-con
 | `payroll.eos_provision` | End-of-service provision · مخصص نهاية الخدمة | EOS accrual per tenant policy table — no jurisdiction rates fabricated (BR-055); settlement at termination per golden G-31 | 4 | 029 | (posts via `payroll.runs.post`) | `payroll.employees`, `payroll.runs` |
 | `payroll.cost_allocation` | Payroll cost allocation · توزيع تكلفة الرواتب | Allocation of run expense to cost centers/projects/branches on run lines | 4 | 029 | (allocation on run lines under `payroll.runs.post`) | `payroll.runs`, `accounting.cost_centers` |
 | `payroll.reports` | Payroll reports · تقارير الرواتب | Payroll register, cost summary, EOS-provision reports (`payroll.register`, `payroll.cost-summary`, `payroll.eos-provision`); sensitivity-critical reads | 4 | 029 | (reads under `payroll.runs.view`) | `payroll.runs` |
+| `payroll.statutory` | Statutory compliance — GOSI/PIT · الامتثال القانوني — التأمينات والضريبة | The statutory contribution ROW-SETS per jurisdiction (GOSI's corrected schedule VERIFIED on KSA: pension 9%/9% · SANED 0.75%/0.75% · OH 0%/2% on ALL — Saudi employer 11.75%/employee 9.75%, non-Saudi OH-only) + the PIT bracket sets + the remittance-ready export, all under the REQUIRES_VERIFICATION discipline (BR-085 — only VERIFIED rows post; AE/EG/JO stay blocked until the owner's official confirmations) | 4 | 046 | `payroll.statutory`, `payroll.statutory.verify` (owner-only) | `payroll.runs` |
+| `payroll.eosb` | EOSB automation — end of service · أتمتة نهاية الخدمة | The service-year tier computation (the KSA fold: 0–5 × 15 days + >5 × 30 days per year of service) + the delta-only provision true-up (BR-087 — G-54) + the entitlement/provision reconciliation; the G-31 settlement path untouched | 4 | 046 | `payroll.eosb` (the true-up POST rides `payroll.runs.post`) | `payroll.eos_provision` |
+
+**PHASE-046 entitlements note (the market/jurisdiction dimension):** the plan tier grants the
+CAPABILITY; the jurisdiction's VERIFIED profile set decides whether it posts — a
+business-plan KSA tenant gets GOSI out of the box (the platform-carried citation is the
+seed's verification record), while a business-plan AE/EG/JO tenant stays blocked until the
+owner's official-schedule confirmations land as verified rows (the statutory verification
+register records every open item). No plan tier fabricates a jurisdiction fact.
 
 ## 24. Module: consolidation
 

@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -667,6 +667,40 @@ Role grants per 0086 §1: owner holds all six;
 the accountant holds the five management keys (not the self-service scope —
 that key's grant rides the employee↔user link at the application boundary,
 seeded to the owner tier only for the drift-equality baseline).
+
+### §3.24 HR payroll compliance — GOSI / PIT / EOSB (PHASE-046; catalog 297 → 300)
+
+The compliance cluster (CR-16): the statutory contribution profiles + the PIT
+bracket sets + the EOSB tiers (the REQUIRES_VERIFICATION discipline — BR-085),
+the remittance export, and the EOSB true-up views. **All three keys seed in
+migration `0092` §1 — the permission catalog extends 297 → 300 (seed =
+mirror, zero drift).** The plan grants (0092 §2) put the two feature keys
+(`payroll.statutory` · `payroll.eosb`) on business + enterprise only (the
+0043/0086 precedent); the entitlements note documents the market/jurisdiction
+dimension — the plan tier grants the CAPABILITY, the jurisdiction's verified
+profile set decides whether it posts.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `payroll.statutory` | Manage statutory contribution profiles, PIT brackets, and the remittance export / إدارة ملفات المساهمات القانونية وشرائح الضريبة وتصدير الترحيلات | owner, accountant, payroll_officer | tenant | **yes** (editing a statutory row changes legal withholdings — every edit stamps `updated_by` and the VERIFICATION act requires a DIFFERENT hand; the export is read-only + audited) |
+| `payroll.eosb` | Manage EOSB tiers and view the entitlement/provision reconciliation / إدارة طبقات نهاية الخدمة وعرض مطابقة المخصص | owner, accountant, payroll_officer | tenant | **yes** (the tier set drives the end-of-service liability — the BR-087 delta-only true-up; the true-up POSTING act itself rides `payroll.runs.post`, never this key) |
+| `payroll.statutory.verify` | Verify a statutory row (the BR-085 gate) / اعتماد صف قانوني (بوابة التحقق) | owner | tenant | **yes** (the act unblocks LEGAL POSTINGS — owner-only by design, SoD-bound: the verifier must differ from the row's last editor (`updated_by` compare, the BR-034 pattern), the flip is a compare-and-set (a concurrent second verify is the typed STATUTORY_ALREADY_VERIFIED), and every verification is audited `payroll.statutory_verified` with the source fields) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — landing with the W-2/W-4 services per
+the keys-seed-first discipline, the §3.23 precedent): the `/api/v1/payroll`
+family — `statutory/profiles`, `statutory/brackets`, `statutory/eosb-rules`
+(GET, POST, PATCH) and `statutory/:kind/:id/verify` (POST) —
+`payroll.statutory` (the verify route additionally requires
+`payroll.statutory.verify`, checked at the route + re-checked in the
+service); the remittance export `statutory/remittance-export` (POST) —
+`payroll.statutory`; the EOSB reconciliation views `eosb/calculations`,
+`eosb/reconciliation` (GET) — `payroll.eosb`; the true-up trigger posts
+through the EXISTING `payroll.runs.post` (the ledger act rides the ledger
+key — the G-50/G-51 law); the run screen's statutory columns ride
+`payroll.runs.view`.
+Role grants per 0092 §1: owner holds all three; the accountant and the
+payroll_officer hold the two management keys (never the verify key — the
+SoD three-way split: edit ≠ verify ≠ post).
 
 ## 4. Segregation of duties & approval limits
 

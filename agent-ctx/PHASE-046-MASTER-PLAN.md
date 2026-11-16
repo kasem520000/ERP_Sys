@@ -11,7 +11,44 @@ writer; the permanent two-transaction race-suite pattern; JOURNAL_RULES §7 +
 INV-031 + BR-082…084 as delivered canon) → the ID_LEDGER's coordinated slots
 (**G-52…G-54 · INV-032 · BR-085…BR-087**) → this plan.
 
-**Status: FOR OWNER REVIEW — no implementation code before approval.**
+**Status: APPROVED 2026-11-16 (the owner's dispatch, with five binding amendments
+recorded in §1a below) — W-0 + the T-20 pinned notes DELIVERED; W-1 IN
+PROGRESS.**
+
+## 1a. The owner's approval amendments (binding — recorded 2026-11-16)
+
+1. **THE GOSI CORRECTION (W-1, before the W-2 engine specs and the W-6
+golden pinning):** the `GOSI-OH` row applies to **ALL** (employee 0%,
+employer 2%); Saudi = employer 11.75% total (9% pension + 0.75% SANED +
+2% OH), employee 9.75%; non-Saudi = OH-only (employer 2%, employee 0).
+The ruleset/seed + the canonical unit + the tests + the affected
+examples all moved together (W-1, migration 0092 + statutory-canonical.ts).
+The OH wage cap verified against the official schedule with the
+citation: pinned **45,000** (the owner's expected value — the same
+contributory-wage ceiling as the pension arm per the Social Insurance
+Law, Royal Decree M/33, Part 1 Art. 8(2), corroborated by published
+implementations; gosi.gov.sa unreachable from the delivery sandbox —
+the fetch attempts + the open item recorded in the verification
+register). The Saudi worked example (employer total **1,410.0000**;
+the salary journal DR SALARIES_EXPENSE 12,000 · DR
+EMPLOYER_CONTRIBUTIONS 1,410 · CR DEDUCTIONS_PAYABLE 2,580 · CR
+SALARIES_PAYABLE 10,830; the remittance settlement 2,580; non-Saudi OH
+240.0000) supersedes the pre-approval figures in §4 below.
+2. **`employees.nationality` (D-02) APPROVED** — NULL fails closed with
+the unpricedNationality warning; registered in the PII inventory
+(DATA_PROTECTION §3, W-1).
+3. **The D-01/D-11 work-basis text + every affected example** updated
+in the same W-1 change (migration 0092's verification records + this
+§1a + the ENTITY_CATALOG rows carry the corrected basis + the OH
+rate/cap citation).
+4. **The T-20 pinned technical notes** — delivered BEFORE the floor's
+payroll adoption (2026-11-16, gate-evidence
+2026-11-16-phase046-t20-pinned-notes.md): the canonical key law +
+duels 17/18; the no-expansion law + the DB-guaranteed order + duels
+19/20 (the import's whole-window reservation); the bound waiter proof
+(duel 12's true serialization point honestly re-recorded). NOT the
+§7(b) documentation remarks — those stay the W-7/T-15 open input.
+5. **Tag `phase/046`** (not `phase-046`).
 
 ## 0. Inputs consumed (the plan-first reads, all done)
 

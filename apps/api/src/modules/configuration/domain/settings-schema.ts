@@ -493,6 +493,27 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-045 (G-50, BR-055 discipline): the period-end leave-accrual posting is OFF by default — no fabricated ledger effect; 'post' lets the leave officer post the period's earned-leave value (DR SALARIES_EXPENSE · CR SALARIES_PAYABLE at the monthly slice days × basic/30 — the 029 EOS daily-rate convention) through the engine, exactly-once per (type, period month).",
   }),
+  // PHASE-046 (D-08 — the variable-line knobs, the BR-055 discipline): the
+  // two deduction gates are OFF by default — no employee's pay is docked
+  // until the tenant explicitly turns the gate on. The overtime hourly
+  // divisor (payroll.variable.overtime_hours_per_day) is a TENANT SETTING
+  // with NO default (the hr.overtime.weekend_days precedent): while unset
+  // the overtime line lands UNPRICED with an explicit run warning, never
+  // a fabricated rate.
+  "payroll.variable.absence_deduction": Object.freeze({
+    key: "payroll.variable.absence_deduction",
+    schema: z.enum(["off", "on"]),
+    default: "off",
+    description:
+      "PHASE-046 (D-08, BR-055): the absence deduction is OFF by default — the feed's absenceDays never dock pay until the tenant turns the gate on (then: absenceDays × basic/30, exact 4dp, folded into the INV-025 deductions).",
+  }),
+  "payroll.variable.late_deduction": Object.freeze({
+    key: "payroll.variable.late_deduction",
+    schema: z.enum(["off", "on"]),
+    default: "off",
+    description:
+      "PHASE-046 (D-08, BR-055): the late-arrival deduction is OFF by default — the feed's lateMinutes never dock pay until the tenant turns the gate on (then: lateMinutes × basic/30/hoursPerDay/60, exact 4dp, folded into the INV-025 deductions).",
+  }),
   // PHASE-019 professional-services keys (the §9 policy surface; the
   // professional_services manifest sets the six as L1 defaults via
   // workflow_policies, and the crm services read them from the resolved

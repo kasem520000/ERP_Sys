@@ -50,7 +50,11 @@ const SEED_PATHS = [
   // checker passed 297 = 297): PHASE-045 (CR-15) seeded the six HR-core
   // keys in 0086 and joined them to the CLI list (matrix §3.23,
   // 291 → 297) — the spec's copy was never extended.
-  join(process.cwd(), "migrations", "0086_hr_seeds.sql"), // PHASE-045 the six HR-core keys
+  join(process.cwd(), "migrations", "0086_hr_seeds.sql"), // PHASE-045 the six HR-core keys (291 → 297)
+  // PHASE-046 (CR-16, W-1): 0092 seeds the three compliance keys and
+  // joins both lists together (matrix §3.24, 297 → 300) — the 0086
+  // lesson applied: the spec's copy extends in the SAME change.
+  join(process.cwd(), "migrations", "0092_payroll_statutory_seeds.sql"), // PHASE-046 the three compliance keys (297 → 300)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

@@ -179,6 +179,12 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // hr.shifts, hr.overtime, hr.leave, hr.self_service (the SoD-scoped
   // self surface — the employee↔user link resolves the OWN-rows scope).
   "apps/api/migrations/0086_hr_seeds.sql",
+  // PHASE-046 (Blueprint v3.0 · CR-16): 0092 seeds the THREE compliance
+  // keys (matrix §3.24; 297 → 300) — payroll.statutory, payroll.eosb
+  // (owner + accountant + payroll_officer) and payroll.statutory.verify
+  // (owner-only — the BR-085 verification act, SoD-bound: the verifier ≠
+  // the row's last editor).
+  "apps/api/migrations/0092_payroll_statutory_seeds.sql",
 ];
 
 export async function main(): Promise<void> {

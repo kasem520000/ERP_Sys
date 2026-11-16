@@ -296,6 +296,13 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "payroll.eos_provision": ["payroll.employees", "payroll.runs"],
   "payroll.cost_allocation": ["payroll.runs", "accounting.cost_centers"],
   "payroll.reports": ["payroll.runs"],
+  // PHASE-046 (Blueprint v3.0 · CR-16): the compliance cluster — the
+  // statutory row-sets (profiles + PIT brackets + the remittance export)
+  // and the EOSB automation (tiers + calculations + the true-up). Both
+  // sit on the 029 substrate: statutory rides the runs, EOSB rides the
+  // eos_provision mechanism it true-ups.
+  "payroll.statutory": ["payroll.runs"],
+  "payroll.eosb": ["payroll.eos_provision"],
   // PHASE-045 (CR-15 — the HR operational core): the attendance, leave,
   // and shifts surfaces ride the payroll employees substrate (HR-13's
   // bridge links the user; the feeds land as 046's variable lines).

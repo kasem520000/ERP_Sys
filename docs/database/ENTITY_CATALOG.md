@@ -1,6 +1,6 @@
 # Entity Catalog
 
-> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-15 (PHASE-045 T-05 — the attendance device-import cluster: `attendance_import_batches` + `attendance_import_anomalies`, 282 → 284 domain rows; the phase runs in parallel with the 043 review per the owner's directive)
+> **Status:** STABLE · **Owner:** Database Architecture · **Updated:** 2026-11-16 (PHASE-046 W-1 — the payroll compliance cluster: `statutory_contribution_profiles` + `payroll_tax_brackets` + `eosb_rules` + `eosb_calculations`, 284 → 288 domain rows; the employees nationality/PIT-exemptions extension + the run/line statutory breakdown columns as additive extension notes) · 2026-11-15 (PHASE-045 T-05 — the attendance device-import cluster: `attendance_import_batches` + `attendance_import_anomalies`, 282 → 284 domain rows; the phase runs in parallel with the 043 review per the owner's directive)
 
 All planned entities grouped by owning module, with the phase that introduces them and
 key relationships. This is the catalog-level map; column-level specifications for core
@@ -632,6 +632,27 @@ G-47/G-48/G-49).
 Diagram note: the PHASE-045 identity bridge (`employees.user_id` + the partial-UNIQUE
 (tenant, user) guard — HR-13, ON DELETE SET NULL, the SoD-scoped link) is an additive
 column on the existing `employees` catalog row — no new entity row (MIGRATION_STRATEGY §6).
+
+## HR payroll compliance — GOSI / PIT / EOSB (PHASE-046 — migrations `0089_payroll_statutory.sql` … `0092_payroll_statutory_seeds.sql`, schema_version 92)
+
+| Entity | Purpose | Key fields / relationships | Phase | OC |
+|--------|---------|---------------------------|-------|----|
+| `statutory_contribution_profiles` | The statutory contribution ROW-SET per jurisdiction (D-01, HR-11/X-02/IN-06): one row per contribution component — the LAW is a row-set (GOSI's three branches each carry their own rate pair and wage-base cap: the owner's corrected schedule — GOSI-PENSION 9%/9% CITIZEN base 1,500…45,000 · GOSI-SANED 0.75%/0.75% CITIZEN base 1,500…15,000 · GOSI-OH 0%/2% ALL base 1,500…45,000; Saudi employer total 11.75%, employee 9.75%; non-Saudi = OH-only); contributory_keys jsonb = the structure component keys counting toward the wage base beyond basic (DATA — the KSA contributory wage is basic + HOUSING); the REQUIRES_VERIFICATION discipline (BR-085): only VERIFIED rows select for posting, the verify act is a permission-gated CAS with the SoD verifier-≠-last-editor law, and the verification record (source_name/source_ref/verified_by/verified_at/review_note) is the citation trail — the verification trail is evidence: NO delete grant | tenant_id, jurisdiction_code (2–8) + code (the (tenant, jurisdiction, code) UNIQUE), name/name_ar, employee_rate + employer_rate numeric(7,4) (CHECK 0–100), base_min?/base_max? (CHECK coherent), contributory_keys jsonb, applies_to (ALL/CITIZEN/NON_CITIZEN), effective_from/effective_to? (CHECK), status (REQUIRES_VERIFICATION/VERIFIED/RETIRED) + the verification record + updated_by (the SoD axis), the VERIFIED ⟺ verified-at+source CHECK; tenant+jurisdiction+status+effective index; grants SELECT/INSERT/UPDATE | 046 | no |
+| `payroll_tax_brackets` | The marginal PIT bracket row-sets (D-03, X-02): effective-dated sets per jurisdiction; the SET-level exemption defaults (personal_allowance_default, per_dependent_allowance) ride the set and are validated SET-CONSISTENT by the service (the typed PitBracketSetInvalid refusal); a jurisdiction with NO verified brackets computes zero PIT with an honest no-bracket state (KSA seeds NO rows — no employee PIT in KSA; AE/EG/JO seed 0-rate REQUIRES_VERIFICATION placeholders — the blocked-state surface, never a guessed rate) | tenant_id, jurisdiction_code + code + effective_from + sort (the set-sort UNIQUE), floor (CHECK ≥ 0) + ceiling? (CHECK > floor; NULL = the open top), rate numeric(7,4) (CHECK 0–100), personal_allowance_default + per_dependent_allowance (CHECK ≥ 0), effective_from/effective_to?, status + the verification record + updated_by; tenant+jurisdiction+effective+sort index; grants SELECT/INSERT/UPDATE (no DELETE — the evidence discipline) | 046 | no |
+| `eosb_rules` | The end-of-service tier rows (D-04, HR-12): from_years/to_years (NULL = open top) × days_per_year with the optional contract_type override (NULL = all — the tenant-configurable axis); the KSA seed (VERIFIED, the labor-law award): 0–5 years → 15 days/year, > 5 → 30 — the per-year tier fold (7 years × eosBase 9,000 → 5×15 + 2×30 = 135 days → 40,500.0000) | tenant_id, jurisdiction_code, from_years (CHECK ≥ 0) + to_years? (CHECK > from), days_per_year (CHECK 0–366), contract_type?, effective_from/effective_to?, status + the verification record; the COALESCE(contract_type,'') expression-unique per (tenant, jurisdiction, effective_from, from_years); grants SELECT/INSERT/UPDATE/DELETE (master data) | 046 | no |
+| `eosb_calculations` | The per-employee EOSB computation evidence (D-04): kind TERMINATION/PERIOD_TRUE_UP/OPENING; the tier breakdown + the wage-base snapshot (the 029 eosBase frozen at calculation time); entitlement, standing provision balance, and the SIGNED delta (= entitlement − provision, the CHECK — BR-087's delta-only true-up: positive accrues, negative releases, zero posts nothing); the G-31 settlement path untouched — the true-up aligns the provision, then G-31 settles exactly as shipped | tenant_id, employee_id (composite FK CASCADE), kind (CHECK), service_years (CHECK ≥ 0), tier_breakdown + wage_base_snapshot jsonb, entitlement_amount + provision_balance (CHECK ≥ 0) + delta (CHECK = entitlement − provision), journal_entry_id? (⟺ POSTED), status (COMPUTED/POSTED), run_id?/fiscal_period_id? (composite FKs), entry_date; employee+kind and journal indexes; grants SELECT/INSERT/UPDATE (no DELETE — the evidence discipline) | 046 | no |
+
+Diagram note: the PHASE-046 `employees` extension (D-02 — `nationality` char(2) ISO-3166
+alpha-2, the GOSI citizen split's resolution axis, NULL FAIL-CLOSED with the explicit
+unpricedNationality run warning, registered in the PII inventory; `pit_exemptions` jsonb
+— the per-employee PIT exemption overrides) and the run-family extension columns
+(migration 0091 — `payroll_run_lines`: statutory_employee_share/statutory_employer_share/
+pit_withheld/variable_overtime_amount/variable_absence_amount/variable_late_amount + the
+statutory/variable BREAKDOWN jsonb; `payroll_runs`: the six statutory/variable totals +
+statutory_summary jsonb + eosb_trueup_total) are additive columns on existing catalog
+rows — breakdowns of the totals the 029 family already holds, never parallel totals (the
+INV-025 fold extends by construction; the CHECKs are not widened) — no new entity rows
+(MIGRATION_STRATEGY §6).
 
 Diagram note: the PHASE-043 items-table extension (lead_time_days, safety_stock_policy/qty,
 ss_service_level_pct, ss_lookback_days, lot_sizing_rule + its operand columns, frozen/slushy

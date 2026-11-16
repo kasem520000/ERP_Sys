@@ -616,6 +616,34 @@
       "when": 1796630400000,
       "tag": "0088_hr_workforce_enablement",
       "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1796716800000,
+      "tag": "0089_payroll_statutory",
+      "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1796803200000,
+      "tag": "0090_payroll_eosb",
+      "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1796889600000,
+      "tag": "0091_payroll_run_statutory",
+      "breakpoints": true
+    },
+    {
+      "idx": 91,
+      "version": "7",
+      "when": 1796976000000,
+      "tag": "0092_payroll_statutory_seeds",
+      "breakpoints": true
     }
   ],
   "version": "7"

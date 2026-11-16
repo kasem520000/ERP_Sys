@@ -6758,6 +6758,16 @@ export const employees = pgTable(
     // DELETE SET NULL (deactivating a user unlinks, never destroys the
     // HR record); employees without a user stay valid (field workforce).
     userId: uuid("user_id"),
+    // PHASE-046 (D-02, migration 0089 — the owner-approved addition):
+    // ISO-3166 alpha-2 — the GOSI citizen split's resolution axis. NULL
+    // is FAIL-CLOSED (no statutory lines + the explicit
+    // unpricedNationality run warning — never a guessed rate, BR-055);
+    // registered in the PII inventory (DATA_PROTECTION §3).
+    nationality: char("nationality", { length: 2 }),
+    // PHASE-046 (D-03): per-employee PIT exemption overrides
+    // {personalAllowance?, dependents?, other?} — absent keys fall back
+    // to the bracket set's defaults, never fabricated values.
+    pitExemptions: jsonb("pit_exemptions"),
   },
   (table) => [
     uniqueIndex("uq_employees_id_tenant").on(table.id, table.tenantId),
@@ -6809,6 +6819,32 @@ export const payrollRuns = pgTable(
     reversalJournalEntryId: uuid("reversal_journal_entry_id"),
     reversedAt: timestamp("reversed_at", { withTimezone: true, mode: "string" }),
     reversedBy: uuid("reversed_by"),
+    // PHASE-046 (D-05, migration 0091): the statutory/variable BREAKDOWN
+    // totals — additive columns, never parallel totals (the INV-025 fold
+    // extends by construction; the CHECKs are not widened).
+    statutoryEmployeeTotal: numeric("statutory_employee_total", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    statutoryEmployerTotal: numeric("statutory_employer_total", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    pitTotal: numeric("pit_total", { precision: 19, scale: 4 }).notNull(),
+    variableOvertimeTotal: numeric("variable_overtime_total", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    variableAbsenceTotal: numeric("variable_absence_total", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    variableLateTotal: numeric("variable_late_total", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    statutorySummary: jsonb("statutory_summary"),
+    eosbTrueupTotal: numeric("eosb_trueup_total", { precision: 19, scale: 4 }).notNull(),
     note: text("note"),
     noteAr: text("note_ar"),
   },
@@ -6848,6 +6884,35 @@ export const payrollRunLines = pgTable(
     costCenterId: uuid("cost_center_id"),
     projectId: uuid("project_id"),
     branchId: uuid("branch_id"),
+    // PHASE-046 (D-05, migration 0091): the statutory + variable BREAKDOWN
+    // columns — additive, DEFAULT 0 / NULL jsonb; the INV-025 fold extends
+    // by construction (deductions += employee share + PIT + the gated
+    // variable deductions; employer-side += the employer share + variable
+    // overtime); the CHECKs are not widened (breakdowns, never parallel
+    // totals). Missing rate facts surface as explicit run warnings.
+    statutoryEmployeeShare: numeric("statutory_employee_share", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    statutoryEmployerShare: numeric("statutory_employer_share", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    pitWithheld: numeric("pit_withheld", { precision: 19, scale: 4 }).notNull(),
+    variableOvertimeAmount: numeric("variable_overtime_amount", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    variableAbsenceAmount: numeric("variable_absence_amount", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    variableLateAmount: numeric("variable_late_amount", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    statutoryBreakdown: jsonb("statutory_breakdown"),
+    variableBreakdown: jsonb("variable_breakdown"),
   },
   (table) => [
     uniqueIndex("uq_payroll_run_lines_id_tenant").on(table.id, table.tenantId),
@@ -9385,6 +9450,208 @@ export const attendanceImportAnomalies = pgTable(
     index("ix_attendance_import_anomalies_tenant_status").on(
       table.tenantId,
       table.status,
+    ),
+  ],
+);
+
+// -- PHASE-046 (CR-16 — HR Payroll Compliance; migrations 0089/0090) -------------------
+
+/** Statutory contribution profiles (D-01): a TENANT-SCOPED ROW-SET per
+ * jurisdiction — one row per contribution component, because the LAW is
+ * a row-set (GOSI's three branches each carry their own rate pair and
+ * wage-base cap: pension/OH at 45,000 · SANED at 15,000 — the dual-cap
+ * law a single rate-pair row could not express). The owner's corrected
+ * schedule (2026-11-16): GOSI-PENSION 9%/9% CITIZEN · GOSI-SANED
+ * 0.75%/0.75% CITIZEN · GOSI-OH 0%/2% ALL (the Saudi employer total
+ * 11.75%, the employee 9.75%; the non-Saudi arm OH-only).
+ * contributory_keys jsonb = the structure component keys counting
+ * toward the wage base beyond basic_salary (DATA, never hard-coded).
+ * The verification vocabulary (REQUIRES_VERIFICATION / VERIFIED /
+ * RETIRED) + the record fields carry BR-085; NO delete grant — the
+ * verification trail is evidence. */
+export const statutoryContributionProfiles = pgTable(
+  "statutory_contribution_profiles",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    jurisdictionCode: text("jurisdiction_code").notNull(),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    employeeRate: numeric("employee_rate", { precision: 7, scale: 4 }).notNull(),
+    employerRate: numeric("employer_rate", { precision: 7, scale: 4 }).notNull(),
+    baseMin: numeric("base_min", { precision: 19, scale: 4 }),
+    baseMax: numeric("base_max", { precision: 19, scale: 4 }),
+    contributoryKeys: jsonb("contributory_keys").notNull(),
+    appliesTo: text("applies_to").notNull().default("ALL"),
+    effectiveFrom: date("effective_from").notNull(),
+    effectiveTo: date("effective_to"),
+    status: text("status").notNull().default("REQUIRES_VERIFICATION"),
+    sourceName: text("source_name"),
+    sourceRef: text("source_ref"),
+    verifiedBy: uuid("verified_by"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true, mode: "string" }),
+    reviewNote: text("review_note"),
+    updatedBy: uuid("updated_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_statutory_contribution_profiles_id_tenant").on(
+      table.id,
+      table.tenantId,
+    ),
+    uniqueIndex("uq_statutory_contribution_profiles_tenant_jurisdiction_code").on(
+      table.tenantId,
+      table.jurisdictionCode,
+      table.code,
+    ),
+    index("ix_statutory_contribution_profiles_tenant_jurisdiction_status").on(
+      table.tenantId,
+      table.jurisdictionCode,
+      table.status,
+      table.effectiveFrom,
+    ),
+  ],
+);
+
+/** Payroll tax brackets (D-03): effective-dated marginal bracket row-sets
+ * per jurisdiction; the SET-level exemption defaults
+ * (personal_allowance_default, per_dependent_allowance) ride the set and
+ * are validated SET-CONSISTENT by the service (the typed
+ * PitBracketSetInvalid refusal). A jurisdiction with NO verified
+ * brackets computes zero PIT with an honest no-bracket state (KSA seeds
+ * no rows — no employee PIT in KSA). The same verification vocabulary
+ * and no-delete evidence discipline as the profiles. */
+export const payrollTaxBrackets = pgTable(
+  "payroll_tax_brackets",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    jurisdictionCode: text("jurisdiction_code").notNull(),
+    code: text("code").notNull(),
+    floor: numeric("floor", { precision: 19, scale: 4 }).notNull(),
+    ceiling: numeric("ceiling", { precision: 19, scale: 4 }),
+    rate: numeric("rate", { precision: 7, scale: 4 }).notNull(),
+    sort: integer("sort").notNull(),
+    personalAllowanceDefault: numeric("personal_allowance_default", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    perDependentAllowance: numeric("per_dependent_allowance", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    effectiveFrom: date("effective_from").notNull(),
+    effectiveTo: date("effective_to"),
+    status: text("status").notNull().default("REQUIRES_VERIFICATION"),
+    sourceName: text("source_name"),
+    sourceRef: text("source_ref"),
+    verifiedBy: uuid("verified_by"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true, mode: "string" }),
+    reviewNote: text("review_note"),
+    updatedBy: uuid("updated_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_payroll_tax_brackets_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_payroll_tax_brackets_set_sort").on(
+      table.tenantId,
+      table.jurisdictionCode,
+      table.code,
+      table.effectiveFrom,
+      table.sort,
+    ),
+    index("ix_payroll_tax_brackets_tenant_jurisdiction_effective").on(
+      table.tenantId,
+      table.jurisdictionCode,
+      table.effectiveFrom,
+      table.sort,
+    ),
+  ],
+);
+
+/** EOSB rules (D-04): the service-year tier rows per jurisdiction —
+ * from_years/to_years (NULL = the open top) × days_per_year with the
+ * optional contract_type override (NULL = all). The KSA seed: 0–5 years
+ * → 15 days/year; > 5 → 30 days/year (the per-year tier fold: 7 years ×
+ * eosBase 9,000 → 5×15 + 2×30 = 135 days → 40,500.0000). Master data —
+ * DELETE granted (the shifts precedent). */
+export const eosbRules = pgTable(
+  "eosb_rules",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    jurisdictionCode: text("jurisdiction_code").notNull(),
+    fromYears: numeric("from_years", { precision: 7, scale: 2 }).notNull(),
+    toYears: numeric("to_years", { precision: 7, scale: 2 }),
+    daysPerYear: numeric("days_per_year", { precision: 7, scale: 2 }).notNull(),
+    contractType: text("contract_type"),
+    effectiveFrom: date("effective_from").notNull(),
+    effectiveTo: date("effective_to"),
+    status: text("status").notNull().default("REQUIRES_VERIFICATION"),
+    sourceName: text("source_name"),
+    sourceRef: text("source_ref"),
+    verifiedBy: uuid("verified_by"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true, mode: "string" }),
+    reviewNote: text("review_note"),
+    updatedBy: uuid("updated_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_eosb_rules_id_tenant").on(table.id, table.tenantId),
+    index("ix_eosb_rules_tenant_jurisdiction_effective").on(
+      table.tenantId,
+      table.jurisdictionCode,
+      table.effectiveFrom,
+    ),
+  ],
+);
+
+/** EOSB calculations (D-04): the per-employee computation evidence —
+ * kind TERMINATION / PERIOD_TRUE_UP / OPENING; the tier breakdown + the
+ * wage-base snapshot (the 029 eosBase concept frozen at calculation
+ * time); entitlement, standing provision balance, and the SIGNED delta
+ * (entitlement − provision — BR-087's delta-only true-up: positive
+ * accrues DR EOS_PROVISION_EXPENSE · CR EOS_PROVISION, negative is the
+ * release mirror, zero posts nothing). The G-31 settlement path is
+ * untouched. The evidence discipline: SELECT/INSERT/UPDATE, no DELETE. */
+export const eosbCalculations = pgTable(
+  "eosb_calculations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    employeeId: uuid("employee_id").notNull(),
+    kind: text("kind").notNull(),
+    serviceYears: numeric("service_years", { precision: 7, scale: 2 }).notNull(),
+    tierBreakdown: jsonb("tier_breakdown").notNull(),
+    wageBaseSnapshot: jsonb("wage_base_snapshot").notNull(),
+    entitlementAmount: numeric("entitlement_amount", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    provisionBalance: numeric("provision_balance", {
+      precision: 19,
+      scale: 4,
+    }).notNull(),
+    delta: numeric("delta", { precision: 19, scale: 4 }).notNull(),
+    journalEntryId: uuid("journal_entry_id"),
+    status: text("status").notNull().default("COMPUTED"),
+    runId: uuid("run_id"),
+    fiscalPeriodId: uuid("fiscal_period_id"),
+    entryDate: date("entry_date").notNull(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_eosb_calculations_id_tenant").on(table.id, table.tenantId),
+    index("ix_eosb_calculations_tenant_employee_kind").on(
+      table.tenantId,
+      table.employeeId,
+      table.kind,
+    ),
+    index("ix_eosb_calculations_tenant_journal").on(
+      table.tenantId,
+      table.journalEntryId,
     ),
   ],
 );

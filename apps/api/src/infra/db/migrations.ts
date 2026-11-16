@@ -476,6 +476,10 @@ export const MIGRATIONS: readonly string[] = [
   "0086_hr_seeds",
   "0087_hr_attendance_import",
   "0088_hr_workforce_enablement",
+  "0089_payroll_statutory",
+  "0090_payroll_eosb",
+  "0091_payroll_run_statutory",
+  "0092_payroll_statutory_seeds",
 ];
 
 /**

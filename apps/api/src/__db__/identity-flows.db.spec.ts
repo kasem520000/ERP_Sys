@@ -126,7 +126,7 @@ beforeAll(() => {
 });
 
 describe("seeds (acceptance 9)", () => {
-  it("permissions catalog = 245 keys matching AUTHORIZATION_MATRIX (drift green)", async () => {
+  it("permissions catalog = 300 keys matching AUTHORIZATION_MATRIX (drift green)", async () => {
     const su = await superuserClient();
     const result = await su.query<{ n: number }>("SELECT count(*)::int AS n FROM permissions");
     await su.end();
@@ -190,8 +190,11 @@ describe("seeds (acceptance 9)", () => {
     // + 6 = 297 after 0086 — the six PHASE-045 HR-core keys
     // (hr.attendance, hr.attendance.import, hr.shifts, hr.overtime,
     // hr.leave, hr.self_service — matrix §3.23; the phase started
-    // 2026-11-14 in parallel with the 043-completion review).
-    expect(result.rows[0]?.n).toBe(297);
+    // 2026-11-14 in parallel with the 043-completion review)
+    // + 3 = 300 after 0092 — the three PHASE-046 compliance keys
+    // (payroll.statutory, payroll.eosb, payroll.statutory.verify —
+    // matrix §3.24; the drift CLI agrees: matrix 300 = seed 300).
+    expect(result.rows[0]?.n).toBe(300);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

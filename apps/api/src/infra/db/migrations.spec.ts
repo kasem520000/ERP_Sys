@@ -214,7 +214,19 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // decision's coherent change: the four workforce templates'
     // required_feature_keys gain the hr block; canonical + stored +
     // docs mirrors + pins moved together, the 0066 §9 precedent).
-    expect(files.at(-1)?.tag).toBe("0088_hr_workforce_enablement");
+    // PHASE-046 (CR-16 — HR Payroll Compliance, W-1 added 2026-11-16;
+    // the plan's "≈ 0089…0093" narrowed to the honest 0089…0092 + 0093
+    // reserved): 0089_payroll_statutory (statutory_contribution_profiles
+    // + payroll_tax_brackets + the employees nationality/pit_exemptions
+    // extension — D-01/D-02/D-03), 0090_payroll_eosb (eosb_rules +
+    // eosb_calculations — D-04), 0091_payroll_run_statutory (the run/line
+    // statutory breakdown extension columns — D-05, additive only),
+    // 0092_payroll_statutory_seeds (the DATA-ONLY seed: the THREE
+    // compliance permission keys 297 → 300, the two plan grants, and the
+    // CANONICAL STATUTORY MATERIALIZATION for every existing tenant —
+    // the owner's corrected GOSI schedule VERIFIED + the AE/EG/JO
+    // REQUIRES_VERIFICATION placeholders, D-11).
+    expect(files.at(-1)?.tag).toBe("0092_payroll_statutory_seeds");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

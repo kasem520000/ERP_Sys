@@ -10,6 +10,13 @@ import {
 import * as store from "../infrastructure/tenancy.store";
 import { systemClock } from "../../identity/api/identity";
 import { getOwnTenant, seedMasterDataBasics } from "../infrastructure/tenancy.store";
+// PHASE-046 (D-11): the canonical statutory set materializes for NEW
+// tenants at the same provisioning site (the rates are jurisdiction
+// facts the platform carries — one source: statutory-canonical.ts, the
+// same rows the 0092 seed materialized for existing tenants). The
+// payroll module's infrastructure surface, imported the way the master-
+// data basics ride the tenancy store — never an ad hoc SQL copy.
+import { materializeCanonicalStatutorySet } from "../../payroll/infrastructure/statutory-canonical";
 
 /**
  * `provisionWorkspace` onboarding backend (PHASE-004 §2.3/T5): produces
@@ -93,6 +100,13 @@ export class OnboardingService {
     // 1b. PHASE-006 master-data basics: common units + NET-N terms (the
     // migration-0009 contract; idempotent per natural key like every step).
     await seedMasterDataBasics();
+
+    // 1c. PHASE-046 (D-11) — the canonical statutory set: the GOSI
+    // row-set (VERIFIED — the owner's corrected schedule) + the KSA EOSB
+    // tiers + the AE/EG/JO REQUIRES_VERIFICATION placeholders,
+    // materialized idempotently for the new tenant (the 0092 seed's
+    // existing-tenant sweep is the same canonical source).
+    await materializeCanonicalStatutorySet();
 
     // 2. CoA template instantiation (code-ordered so parents insert first).
     const template = await store.listCoaTemplate();

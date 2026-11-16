@@ -53,8 +53,47 @@ and THE FULL DB SUITE 240/240 files · 3,329/3,329 · 0 failed · 0 skipped
 re-proven green in the isolated perf chunk per the T-20 runbook precedent —
 both failing logs kept). Evidence:
 [gate-evidence/2026-11-16-phase046-w0.md](../docs/operations/gate-evidence/2026-11-16-phase046-w0.md)
-+ `audit-evidence/phase046-w0/`. **Next: W-1 (the GOSI corrections +
-the migrations).**
++ `audit-evidence/phase046-w0/`.
+
+**W-1 (delivered 2026-11-16 — Foundation):** migrations **0089–0092** (the
+journal's honest slots; 0093 reserved) — `statutory_contribution_profiles`
+(the D-01 row-set) + `payroll_tax_brackets` (D-03) + `eosb_rules`/
+`eosb_calculations` (D-04) + the employees extension (`nationality` D-02
+FAIL-CLOSED + PII-registered; `pit_exemptions`) + the run/line statutory
+breakdown columns (D-05, additive only) + the DATA-ONLY seed 0092 (the 3
+permission keys 297 → 300 + role grants + the 2 plan grants + THE CANONICAL
+STATUTORY MATERIALIZATION for every existing tenant). **THE OWNER'S
+CORRECTED GOSI SCHEDULE seeded VERIFIED**: GOSI-PENSION 9%/9% CITIZEN
+1,500…45,000 · GOSI-SANED 0.75%/0.75% CITIZEN 1,500…15,000 (the dual-cap
+law) · **GOSI-OH 0%/2% ALL** 1,500…**45,000** → Saudi employer 11.75% /
+employee 9.75%, non-Saudi OH-only; contributory = basic + HOUSING; NO KSA
+PIT rows (the honest no-bracket state); KSA EOSB tiers VERIFIED (0–5 × 15 +
+>5 × 30 days); AE/EG/JO = 0-rate REQUIRES_VERIFICATION placeholders (the
+blocked-state surface, never a guessed rate). The OH cap 45,000 pinned
+corroborated (Royal Decree M/33 Part 1 Art. 8(2) + published
+implementations); gosi.gov.sa unreachable from this sandbox — the honest
+note + the register's open item recorded in every verification record.
+The code mirrors: Drizzle +4 tables + the extensions; tables.registry +4
+(the A-suite auto-extended, the isolation fixtures extended the 0087
+pattern); statutory-canonical.ts (D-11's ONE source) + the tenancy
+onboarding hook (step 1c); FEATURE_DEPS +2 + the layer-fixtures
+transcription (the BR-040 closure surfaced the un-mirrored 029 substrate —
+salary_structures/runs/eos_provision transcribed with the 0092 grants) +
+**ALL 37 golden pins re-pinned** (41/41); the two variable-knob policy keys
+(absence/late — enum off/on, default off; the overtime divisor rides tenant
+settings with NO default, the weekend_days precedent); matrix §3.24 + the
+drift lists + the identity-flows 300-pin moved together; ENTITY_CATALOG
+284 → 288 + the extension notes; FEATURE_CATALOG §22 + the entitlements
+note; the PII inventory row; the MASTER-PLAN §1a records the approval
+amendments + the corrected worked example (employer 1,410.0000 ·
+DEDUCTIONS_PAYABLE 2,580 · the remittance 2,580 · non-Saudi OH 240.0000).
+Evidence: [gate-evidence/2026-11-16-phase046-w1.md](../docs/operations/gate-evidence/2026-11-16-phase046-w1.md)
+— typecheck/lint 8/8, depcruise clean (1,909 · 14,146), api unit 626/626,
+migrations 7/7 (the 92-chain, check:rls clean at 288), isolation +
+entitlements + tenancy 5 files · 1,642/1,642, hr/payroll/spoof/identity
+178/178, drift 300 = 300, manifests 13/13, docs 33/33, i18n parity,
+capabilities agree. **Next: W-2 — the engines (statutory-profile-service,
+pit-engine, eosb-service, the error taxonomy, the unit specs).**
 
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE

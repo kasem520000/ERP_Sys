@@ -496,6 +496,17 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   // the quarantine is the evidence; the resolution is the UPDATE).
   { table: "attendance_import_batches" },
   { table: "attendance_import_anomalies" },
+  // PHASE-046 (CR-16 — HR Payroll Compliance; migrations 0089/0090): the
+  // statutory cluster — the contribution profiles + the PIT brackets (the
+  // verification trail is evidence: NO delete grant — retirement is
+  // status RETIRED, BR-085), the EOSB tiers (master data — DELETE
+  // granted, the shifts precedent), and the EOSB calculations (the
+  // computation evidence: SELECT/INSERT/UPDATE only). Four tables — the
+  // auto-generated A-suite extends by +24.
+  { table: "statutory_contribution_profiles" },
+  { table: "payroll_tax_brackets" },
+  { table: "eosb_rules", deleteGranted: true },
+  { table: "eosb_calculations" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

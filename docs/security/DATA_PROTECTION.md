@@ -53,6 +53,7 @@ buggy module produces redacted output (fail-closed, OBSERVABILITY.md §redaction
 | Partner contact person, phone, email, address | partners module | trading documents, statements | Business necessity standard |
 | Partner tax registration number (e.g., VAT number) | partners / tax | tax invoices, e-invoicing payloads | Required for B2B tax invoices per pack rules |
 | **National ID / personal identity numbers** | partners (conditional) | **Collected ONLY where a jurisdiction pack's verified e-invoicing requirements demand it** ([../localization/E_INVOICING_ARCHITECTURE.md](../localization/E_INVOICING_ARCHITECTURE.md)) | Pack-controlled field gating; masked in UI except where printing requires; excluded from logs always; legal basis documented in pack compliance matrix |
+| **Employee nationality** (ISO-3166 alpha-2) | payroll (`employees.nationality`, PHASE-046 D-02 — the owner-approved addition) | The statutory citizen split's resolution axis (GOSI: CITIZEN rows match only nationals of the tenant's jurisdiction) | Minimal 2-char code — never a full identity document; NULL is FAIL-CLOSED (no statutory lines + the explicit unpricedNationality run warning); read-restricted to the payroll/HR permission planes; excluded from logs (pino allow-list) |
 | Device identifiers | sync/identity | device registration & revocation | Device id + attestation metadata only |
 | IP addresses | request logs (transient) | security/abuse detection | Short hot retention (30d), then aggregated |
 

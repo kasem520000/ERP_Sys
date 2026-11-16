@@ -3182,6 +3182,58 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-046 (CR-16, migrations 0089/0090): the statutory cluster —
+  // the contribution profiles + the PIT brackets + the EOSB tiers + the
+  // EOSB calculations (kind PERIOD_TRUE_UP, delta = entitlement −
+  // provision per the CHECK).
+  await superuser.query(
+    `INSERT INTO statutory_contribution_profiles (id, tenant_id, jurisdiction_code, code, name,
+                                                   employee_rate, employer_rate, applies_to,
+                                                   effective_from, status)
+     VALUES
+       ('7d7d7d7d-0000-4000-8000-000000000001', $1, 'SA', 'ISO-GOSI', 'Isolation profile',
+        5, 5, 'ALL', '2020-01-01', 'REQUIRES_VERIFICATION'),
+       ('7d7d7d7d-0000-4000-8000-000000000002', $2, 'SA', 'ISO-GOSI', 'Isolation profile',
+        5, 5, 'ALL', '2020-01-01', 'REQUIRES_VERIFICATION')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO payroll_tax_brackets (id, tenant_id, jurisdiction_code, code, floor, rate, sort,
+                                        effective_from, status)
+     VALUES
+       ('7e7e7e7e-0000-4000-8000-000000000001', $1, 'SA', 'ISO-PIT', 0, 0, 1,
+        '2020-01-01', 'REQUIRES_VERIFICATION'),
+       ('7e7e7e7e-0000-4000-8000-000000000002', $2, 'SA', 'ISO-PIT', 0, 0, 1,
+        '2020-01-01', 'REQUIRES_VERIFICATION')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO eosb_rules (id, tenant_id, jurisdiction_code, from_years, to_years, days_per_year,
+                              effective_from, status)
+     VALUES
+       ('7f7f7f7f-0000-4000-8000-000000000001', $1, 'SA', 0, 5, 15,
+        '2020-01-01', 'REQUIRES_VERIFICATION'),
+       ('7f7f7f7f-0000-4000-8000-000000000002', $2, 'SA', 0, 5, 15,
+        '2020-01-01', 'REQUIRES_VERIFICATION')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO eosb_calculations (id, tenant_id, employee_id, kind, service_years,
+                                     tier_breakdown, wage_base_snapshot,
+                                     entitlement_amount, provision_balance, delta,
+                                     entry_date, status)
+     VALUES
+       ('80808080-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        'PERIOD_TRUE_UP', 3, '[]'::jsonb, '{}'::jsonb, 900, 600, 300, '2027-01-31', 'COMPUTED'),
+       ('80808080-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        'PERIOD_TRUE_UP', 3, '[]'::jsonb, '{}'::jsonb, 900, 600, 300, '2027-01-31', 'COMPUTED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3721,6 +3773,10 @@ const OWN_ROW: Record<string, [string, string]> = {
   holidays: ["7a7a7a7a-0000-4000-8000-000000000001", "7a7a7a7a-0000-4000-8000-000000000002"],
   attendance_import_batches: ["7b7b7b7b-0000-4000-8000-000000000001", "7b7b7b7b-0000-4000-8000-000000000002"],
   attendance_import_anomalies: ["7c7c7c7c-0000-4000-8000-000000000001", "7c7c7c7c-0000-4000-8000-000000000002"],
+  statutory_contribution_profiles: ["7d7d7d7d-0000-4000-8000-000000000001", "7d7d7d7d-0000-4000-8000-000000000002"],
+  payroll_tax_brackets: ["7e7e7e7e-0000-4000-8000-000000000001", "7e7e7e7e-0000-4000-8000-000000000002"],
+  eosb_rules: ["7f7f7f7f-0000-4000-8000-000000000001", "7f7f7f7f-0000-4000-8000-000000000002"],
+  eosb_calculations: ["80808080-0000-4000-8000-000000000001", "80808080-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4645,6 +4701,26 @@ const MISMATCHED_INSERT: Record<string, string> = {
   attendance_import_anomalies: `INSERT INTO attendance_import_anomalies (id, tenant_id, batch_id, line_no, raw_line, reason)
      VALUES ('7c7c7c7c-3000-4000-8000-000000000003', $1, '7b7b7b7b-0000-4000-8000-000000000002',
              4, 'ATK row', 'INVALID_ROW')`,
+  // PHASE-046 (CR-16): the statutory cluster — $1 declares the OTHER
+  // tenant while the FK parents (the employee below) belong to tenant B,
+  // so the composite FK passes and the RLS WITH CHECK is the isolated
+  // rejection (the 0087 pattern).
+  statutory_contribution_profiles: `INSERT INTO statutory_contribution_profiles (id, tenant_id, jurisdiction_code, code, name,
+      employee_rate, employer_rate, applies_to, effective_from, status)
+     VALUES ('7d7d7d7d-3000-4000-8000-000000000003', $1, 'SA', 'ATK', 'Attack profile',
+      1, 1, 'ALL', '2020-01-01', 'REQUIRES_VERIFICATION')`,
+  payroll_tax_brackets: `INSERT INTO payroll_tax_brackets (id, tenant_id, jurisdiction_code, code, floor, rate, sort,
+      effective_from, status)
+     VALUES ('7e7e7e7e-3000-4000-8000-000000000003', $1, 'SA', 'ATK', 0, 0, 1,
+      '2020-01-01', 'REQUIRES_VERIFICATION')`,
+  eosb_rules: `INSERT INTO eosb_rules (id, tenant_id, jurisdiction_code, from_years, to_years, days_per_year,
+      effective_from, status)
+     VALUES ('7f7f7f7f-3000-4000-8000-000000000003', $1, 'SA', 0, 5, 15,
+      '2020-01-01', 'REQUIRES_VERIFICATION')`,
+  eosb_calculations: `INSERT INTO eosb_calculations (id, tenant_id, employee_id, kind, service_years,
+      tier_breakdown, wage_base_snapshot, entitlement_amount, provision_balance, delta, entry_date, status)
+     VALUES ('80808080-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+      'PERIOD_TRUE_UP', 3, '[]'::jsonb, '{}'::jsonb, 900, 600, 300, '2027-01-31', 'COMPUTED')`,
 };
 
 beforeAll(async () => {

@@ -295,6 +295,27 @@ export const POLICY_REGISTRY: Readonly<Record<string, PolicyDefinition>> = Objec
     description:
       "PHASE-045 G-50 (the BR-055 no-fabricated-defaults discipline): the period-end leave-accrual posting is OFF by default — the leave balances carry the days, never an invented ledger effect; with 'post' the leave officer may post the period's earned-leave value (DR SALARIES_EXPENSE · CR SALARIES_PAYABLE — the payroll family's canonical pair, no new purposes — at the monthly slice accrual_days/12 × basic/30 for every employee hired on or before the period's end and not terminated before its start; exactly-once per (type, period month) under INV-013).",
   } satisfies PolicyDefinition),
+  // --- payroll compliance (PHASE-046) ----------------------------------------
+  variable_absence_deduction: Object.freeze({
+    key: "variable_absence_deduction",
+    valueType: "enum",
+    enumValues: Object.freeze(["off", "on"]),
+    default: "off",
+    module: "payroll",
+    settingsKey: "payroll.variable.absence_deduction",
+    description:
+      "PHASE-046 D-08 (BR-055): the absence deduction gate is OFF by default — the T-10 feed's absenceDays never dock pay until the tenant turns it on (then: absenceDays × basic/30, exact 4dp, inside the INV-025 fold). The overtime hourly divisor rides the TENANT SETTINGS surface instead (payroll.variable.overtime_hours_per_day — no platform default: unset = the UNPRICED line + the explicit run warning, the hr.overtime.weekend_days precedent).",
+  } satisfies PolicyDefinition),
+  variable_late_deduction: Object.freeze({
+    key: "variable_late_deduction",
+    valueType: "enum",
+    enumValues: Object.freeze(["off", "on"]),
+    default: "off",
+    module: "payroll",
+    settingsKey: "payroll.variable.late_deduction",
+    description:
+      "PHASE-046 D-08 (BR-055): the late-arrival deduction gate is OFF by default — the feed's lateMinutes never dock pay until the tenant turns it on (then: lateMinutes × basic/30/hoursPerDay/60, exact 4dp, inside the INV-025 fold). MISSING_PUNCH days are informational ONLY (their own count in the breakdown, never deducted — the T-10 law).",
+  } satisfies PolicyDefinition),
   // --- inventory intelligence (PHASE-044) ------------------------------------
   quarantine_posting: Object.freeze({
     key: "quarantine_posting",
