@@ -174,6 +174,12 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   // exceptions + ATP/CTP contracts' read permission — the same key the
   // /manufacturing/mrp routes ride).
   "manufacturing.mrp",
+  // PHASE-045 (0086 seed, matrix §3.23): the hr report keys (the §12
+  // module-register convention — the three workforce registers ride the
+  // module's own read keys the /hr routes ride).
+  "hr.attendance",
+  "hr.leave",
+  "hr.overtime",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

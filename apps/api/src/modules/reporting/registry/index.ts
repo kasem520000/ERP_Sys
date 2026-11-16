@@ -161,6 +161,14 @@ import {
 // ATP/CTP position register with the BR-080 exclusion evidence).
 import { manufacturingMrpExceptionsContract } from "./manufacturing/mrp-exceptions.contract";
 import { manufacturingAtpPositionContract } from "./manufacturing/atp-position.contract";
+// PHASE-045 · the hr set (REPORT_CATALOG §9's PHASE-045 rows — the
+// workforce registers: the attendance register with the derivation's
+// verdicts + minute facts, the leave balance cells with the INV-031
+// render-time cap re-check, and the overtime folds with BR-084's
+// feeding law as first-class columns).
+import { hrAttendanceRegisterContract } from "./hr/attendance-register.contract";
+import { hrLeaveBalancesContract } from "./hr/leave-balances.contract";
+import { hrOvertimeSummaryContract } from "./hr/overtime-summary.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -327,6 +335,17 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   manufacturingCostVarianceContract,
   manufacturingMrpExceptionsContract,
   manufacturingAtpPositionContract,
+  // §9 workforce — PHASE-045 rows (REPORT_CATALOG §9's PHASE-045
+  // additions): the hr set — the attendance register (punch sessions +
+  // the derived day verdicts with the status-vocabulary +
+  // session-shape block-on-fail checks), the leave balances (per-year
+  // cells with the leave-inv031-balance-cap render-time re-check), and
+  // the overtime summary (per-employee/rule folds with BR-084's feeding
+  // split — the pre-approval-required pending hours surface as the
+  // never-fed exception column).
+  hrAttendanceRegisterContract,
+  hrLeaveBalancesContract,
+  hrOvertimeSummaryContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

@@ -153,6 +153,14 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // MRP exceptions + ATP position contracts both gate on the mrp key the
   // /manufacturing/mrp routes ride (the same §12 convention).
   "manufacturing.mrp",
+  // PHASE-045 (0086 seed, matrix §3.23): the hr report keys — the three
+  // workforce registers ride the module's own read keys (the same §12
+  // convention): the attendance register on hr.attendance, the leave
+  // balances on hr.leave, and the overtime summary on hr.overtime (the
+  // keys the /hr routes ride).
+  "hr.attendance",
+  "hr.leave",
+  "hr.overtime",
 ]);
 
 @Module({

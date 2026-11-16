@@ -21,6 +21,7 @@ import { TreasuryQueriesService } from "../../treasury/application/treasury-quer
 import { SourcingQueriesService } from "./sourcing/sourcing-queries";
 import { ReturnsDunningQueriesService } from "./sales/returns-dunning-queries";
 import { CommunicationQueriesService } from "./communication/outbound-delivery-queries";
+import { HrQueriesService } from "./hr/hr-queries";
 import { ManufacturingExecutionQueriesService } from "./manufacturing/queries";
 import { PlanningQueriesService } from "./manufacturing/planning-queries";
 import { WmsQueriesService } from "./operational/wms-queries";
@@ -76,6 +77,10 @@ export interface ReportingServices {
   returnsDunning: ReturnsDunningQueriesService;
   /** PHASE-041 · the communication query surface (the outbound delivery log over the send ledger). */
   communication: CommunicationQueriesService;
+  /** PHASE-045 · the hr query surface (the attendance register with the
+   * derived day verdicts, the per-year leave balance cells with the
+   * INV-031 cap re-check, the overtime folds with BR-084's feeding split). */
+  hr: HrQueriesService;
   /** PHASE-043 · the planning query surface (the MRP exceptions view + the
    * ATP/CTP positions with the BR-080 evidence). */
   planningQueries: PlanningQueriesService;
@@ -121,6 +126,7 @@ export function reportingServices(): ReportingServices {
       sourcing: new SourcingQueriesService(),
       returnsDunning: new ReturnsDunningQueriesService(),
       communication: new CommunicationQueriesService(),
+      hr: new HrQueriesService(),
       planningQueries: new PlanningQueriesService(),
       manufacturingExecution: new ManufacturingExecutionQueriesService(),
       wmsQueries: new WmsQueriesService(),

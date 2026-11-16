@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-13 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-16 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -28,13 +28,13 @@ flowchart LR
   R --> X["Tax §6<br/>VAT return · treatments · e-invoice log"]
   R --> P["Platform §7<br/>audit · activity · runs · usage"]
   R -. "namespaced extension" .-> IND["Industry reports §8<br/>industries templates"]
-  R --> F2["Financial depth §9<br/>assets · notes · installments · budgets · payroll"]
+  R --> F2["Financial depth §9<br/>assets · notes · installments · budgets · payroll · hr workforce"]
   R --> C["Consolidation §10<br/>consolidated TB/IS/BS · eliminations"]
   F --> AC["accounting module query services"]
   SP --> SALES["sales · purchasing · inventory query services"]
   T --> TR["treasury query services"]
   X --> TAX["tax summaries + GL tie"]
-  F2 --> FD["fixed_assets · notes · installments · budgeting · payroll query services"]
+  F2 --> FD["fixed_assets · notes · installments · budgeting · payroll · hr query services"]
   C --> CONS["consolidation runs + member GL read models"]
 ```
 
@@ -318,7 +318,7 @@ dual mode (routing-less orders show zeros). Numbering note (the 0064 D-1 precede
 the PHASE-042 document planned these four contracts over migrations ≈0060…0066 — they
 land as migrations 0065/0066 with the contracts at registry 91 → 95.
 
-## 9. Financial depth (v2.0 — fixed assets, notes, installments, budgeting, payroll)
+## 9. Financial depth (v2.0 — fixed assets, notes, installments, budgeting, payroll · v3.0 — the hr workforce registers)
 
 Added by Blueprint v2.0 ([../EXPANSION_REGISTER.md](../EXPANSION_REGISTER.md) §J —
 catalog 50 → 67). Provenance = owning module + owned tables (rule §16); permissions per
@@ -347,6 +347,31 @@ assert INV-024 (custody equals journal effects — COLLECTED/DISCOUNTED/RETURNED
 zero `NOTES_RECEIVABLE` balance); `payroll.register` shows employee-level amounts — every
 run is audited and the permission is not granted to `viewer`-derived templates by default
 ([AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.14).
+
+**Shipped (PHASE-045, category `hr`)** — the three workforce registers over the
+PHASE-013 engine (registry 101 → 104; permissions reuse the 0086-seeded module keys —
+the §12 module-register convention, matrix §3.23): attendance, rosters, and overtime
+entries are **not ledger documents** (the posting-canon note — the golden G-50/G-51
+leave postings are the family's only ledger surfaces); the registers are the
+PHASE-046 variable-feed inputs:
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `hr.attendance-register` | Attendance Register / سجل الحضور اليومي | hr · `hrQueries.attendanceRegister` · attendance_records (+ shifts join; the day verdicts derived from roster + holidays + leaves — the T-04 law) | dateFrom/To, employeeId, status (PRESENT/LATE/ABSENT/MISSING_PUNCH/HOLIDAY/ON_LEAVE), exceptionsOnly | `hr.attendance` | PDF · XLSX · CSV | PHASE-045 |
+| `hr.leave-balances` | Leave Balances / أرصدة الإجازات | hr · `hrQueries.leaveBalances` · leave_balances, leave_types (+ leave_requests pending-span days) | year, employeeId, leaveTypeId | `hr.leave` | PDF · XLSX · CSV | PHASE-045 |
+| `hr.overtime-summary` | Overtime Summary / ملخص العمل الإضافي | hr · `hrQueries.overtimeSummary` · overtime_entries, overtime_rules (BR-084's feeding law as first-class columns) | dateFrom/To, employeeId, tier (WEEKDAY/WEEKEND/HOLIDAY) | `hr.overtime` | PDF · XLSX · CSV | PHASE-045 |
+
+Notes: `hr.attendance-register` carries the `attendance-status-vocabulary` +
+`attendance-session-shape` block-on-fail assertions (the six-verdict derivation law +
+INV-031's interval leg — a closed session runs forward with non-negative worked
+minutes); `hr.leave-balances` carries `leave-inv031-balance-cap` (used ≤ entitlement +
+carried-forward on every cell — INV-031's balance law re-checked at render time; the
+approve-boundary enforcement is the writer's law, this is the reader's independent
+re-check); `hr.overtime-summary` carries `overtime-feed-law` + `overtime-hours-shape`
+(BR-084's feeding fold — the pre-approval-required PENDING hours surface as the
+never-fed exception column; REJECTED never feeds; hours positive — INV-031's
+non-negative leg). Employee rows carry code + display names only (the payroll
+register's PII law).
 
 ## 10. Consolidation (v2.0 — multi-entity)
 
@@ -403,7 +428,8 @@ Standard parameters and their widgets:
   [AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) (§3.11–§3.15):
   `fixed_assets.reports.view`, `budgeting.reports.view`, `payroll.reports.view`,
   `consolidation.reports.view`; notes and installment operational registers reuse the
-  module read permissions `notes.notes.view` and `installments.plans.view`.
+  module read permissions `notes.notes.view` and `installments.plans.view`; the PHASE-045
+  hr registers reuse `hr.attendance`, `hr.leave`, and `hr.overtime` (§3.23).
 - Every permission must exist in the role matrix before the report's phase completes
   ([../security/AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md)).
 
@@ -441,6 +467,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-042 | the four manufacturing-execution contracts added (§8: work-center-utilization over the OEE daily view, downtime-analysis by work center × reason, the rework-cost register, and the cost-variance rollup over the frozen operation variances + yield variance); registry 91 → 95 |
 | PHASE-044 | the four WMS intelligence contracts added (§4: the bin-contents register with BR-076's owner visibility + the INV-029 fold tie, the cycle-count variance register over the §2.6 document family, the ABC classification over the latest generation, and the slow-movement intelligence view with the ABC class + bin spread — the slotting-hint angle); registry 95 → 99 |
 | PHASE-043 | the two planning contracts added (§7: the MRP exceptions view over the five documented exception classes — the data-readiness defects the run screen's panel mirrors + the latest run's uncovered residuals and frozen-fence suggestions, and the ATP/CTP position register with the BR-080 hard-exclusion evidence as first-class columns — quarantined/reserved/consignment-owned shown but never counted); registry 99 → 101 |
+| PHASE-045 | the three hr workforce contracts added (§9: the attendance register over the derived day verdicts + minute facts with the status-vocabulary/session-shape block-on-fail checks, the leave balance cells with the render-time INV-031 cap re-check + the pending-span days, and the overtime folds with BR-084's feeding law as first-class columns — the never-fed pre-approval exception hours); registry 101 → 104 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 

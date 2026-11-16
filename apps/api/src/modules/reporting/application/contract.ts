@@ -20,7 +20,8 @@ export type ReportCategory =
   | "treasury"
   | "tax"
   | "platform"
-  | "industry";
+  | "industry"
+  | "hr"; // PHASE-045: the workforce registers (attendance / leave balances / overtime)
 
 export type DataSourceModule =
   | "accounting"
@@ -44,7 +45,8 @@ export type DataSourceModule =
   | "budgeting" // PHASE-028: the budgeting query surface (budget vs actual / variance analysis)
   | "payroll" // PHASE-029: the payroll query surface (register / cost summary / EOS provision)
   | "communication" // PHASE-041: the communication query surface (the outbound delivery log)
-  | "consolidation"; // PHASE-034: the consolidation query surface (consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots)
+  | "consolidation" // PHASE-034: the consolidation query surface (consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots)
+  | "hr"; // PHASE-045: the hr query surface (attendance register / leave balances / overtime summary)
 
 export interface DataSourceDecl {
   readonly module: DataSourceModule;
@@ -238,6 +240,16 @@ export interface ReportParams {
   readonly matchResult?: string;
   /** PHASE-038 (sourcing): the RFQ of `purchasing.rfq-award-matrix`. */
   readonly rfqId?: string;
+  /** PHASE-045 (hr): the employee filter of the three hr registers. */
+  readonly employeeId?: string;
+  /** PHASE-045 (hr): the leave type of `hr.leave-balances`. */
+  readonly leaveTypeId?: string;
+  /** PHASE-045 (hr): the balance year of `hr.leave-balances`. */
+  readonly year?: number;
+  /** PHASE-045 (hr): the overtime tier filter of `hr.overtime-summary`. */
+  readonly tier?: "WEEKDAY" | "WEEKEND" | "HOLIDAY";
+  /** PHASE-045 (hr): the exceptions-only filter of `hr.attendance-register`. */
+  readonly exceptionsOnly?: boolean;
   [key: string]: unknown;
 }
 

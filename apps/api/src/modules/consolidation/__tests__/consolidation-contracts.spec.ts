@@ -89,6 +89,11 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   // PHASE-043 (0078 seed, matrix §3.22): the planning reports' key — both
   // manufacturing.mrp-exceptions and manufacturing.atp-position ride it.
   "manufacturing.mrp",
+  // PHASE-045 (0086 seed, matrix §3.23): the hr report keys — the three
+  // workforce registers ride the module's own read keys.
+  "hr.attendance",
+  "hr.leave",
+  "hr.overtime",
   "crm.contracts.manage",
   "fixed_assets.reports.view",
   "notes.notes.view",
@@ -120,12 +125,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(101); // PHASE-043: +2 planning rows (99 → 101)
+    expect(result.count).toBe(104); // PHASE-045: +3 hr registers (101 → 104)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(101); // PHASE-043: +2 planning rows (99 → 101)
+    expect(snapshot).toHaveLength(104); // PHASE-045: +3 hr registers (101 → 104)
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();
