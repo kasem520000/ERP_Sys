@@ -1,35 +1,60 @@
-# NEXT ACTION — post-PHASE-045
+# NEXT ACTION — post-PHASE-045 (REOPENED for the owner's concurrency review round)
 
-PHASE-045 (HR Core — Attendance, Leaves & Shifts) is COMPLETE — the audit's
-operational HR gap (HR scored 26%) is closed: migrations `0080`–`0088`
-(schema_version 88; the shift/attendance/overtime/leave/holiday families +
-the employee↔user bridge + the seeds + the import log + the workforce
-manifests), +12 RLS'd tables, the roster grid with the rotation generator,
-the DERIVED daily status (HOLIDAY > ON_LEAVE > ABSENT/MISSING_PUNCH/LATE/
-PRESENT — the day is the unit, INV-031's non-overlap at every capture, the
-T-19 classification law order-independent), the device-agnostic import
-(the sha256 fingerprint floor — the same file never commits twice), the
-overtime engine (BR-084's feeding law), the leave family (the simple
-approval — DR-045-01, PHASE-052 is the upgrade path), the identity bridge
-(the SoD law pinned: linking grants nothing), the variable feeds +
-leave-balance snapshots, the goldens G-50/G-51, and the web plane (four
-office boards + the self-service tabs). CURRENT_SHIPPED_PHASE =
-"PHASE-045" (permissions 297=297; i18n 6,007=6,007; report registry 104;
-ENTITY_CATALOG's HR section; DB suite 239/239 files · 3,313/3,313; api
-unit 626/626; docs 33/33; typecheck/lint 8/8; OA-06 budgets 6/6). The
-completion report is
-`docs/implementation/phases/reports/PHASE-045-COMPLETION.md`; the archive
-is `ERP_PLATFORM_PHASE045.zip` (OA-07).
+**THE CURRENT STATE (2026-11-16):** PHASE-045 is **IN_PROGRESS — REOPENED**.
+T-01…T-19 remain delivered (the completion report
+`docs/implementation/phases/reports/PHASE-045-COMPLETION.md` stands as the
+delivery evidence), but the owner's review of the closure head `fd61ff2`
+found five REAL check-then-write races (proven with two-transaction DB
+tests): attendance overlap + duplicate ABSENT markers, leave-span overlap,
+balance over-consumption (used=30.00 on 20.00), the encashment cap bypass
+(used=25.00 on 20.00), and the employee↔user bridge's silent link
+replacement. **T-20 (delivered, awaiting the owner's re-review)** fixes all
+five with the HR shared atomicity floor
+(`apps/api/src/modules/hr/infrastructure/atomic.ts` — transaction-scoped
+advisory gates before every guard read: the attendance-day gate across
+capture/import/correction/checkout/derivation, the leave-span gate at both
+doors, the balance-cell gate across approval/encashment/accrual/rollover
+with `used_days` as the source of truth under the lock, and the bridge's
+conditional compare-and-set with the typed `BRIDGE_ALREADY_LINKED`), pinned
+by the PERMANENT two-transaction race suite
+`apps/api/src/__db__/hr/hr-writer-races.spec.ts` 16/16 (the mfg harness
+idiom + no-illegal-state assertions, the integrated encash-then-approval
+test included). Evidence:
+[gate-evidence/2026-11-16-phase045-t20.md](../docs/operations/gate-evidence/2026-11-16-phase045-t20.md)
+— the full local gates re-run in the prepared fresh environment, THE FULL DB
+SUITE 240/240 files · 3,329/3,329 · 0 failed · 0 skipped (serially in four
+invocations; the one machine-load p95 failure of the first 119-file attempt
+kept honestly in the log, the spec green in isolation and in the re-split
+batch). **The phase stays OPEN for the owner's re-review — the completion
+declaration is NOT production approval; PHASE-043 and RISK-031/RISK-032
+stay OPEN.**
 
-**Next eligible: PHASE-046 (HR Payroll Compliance — GOSI/PIT/EOSB, CR-16)**
-— prerequisites: PHASE-045 COMPLETE ✓ (its only hard prerequisite is this
-phase; the roadmap's hard ordering "045 before 046 before 047" holds).
-Start with `docs/implementation/phases/PHASE-046.md` (T-01…T-16: the
-statutory contribution profiles under the REQUIRES_VERIFICATION
-discipline, the PIT withholding engine, the EOSB automation with the 029
-provision true-up, the variable-line consumption, the GOSI remittance
-export; goldens G-52…G-54, INV-032, BR-085…087 — the id-ledger's
-coordinated slots).
+The delivered substrate (context for the re-review): migrations
+`0080`–`0088` (schema_version 88; the shift/attendance/overtime/leave/
+holiday families + the employee↔user bridge + the seeds + the import log +
+the workforce manifests), +12 RLS'd tables, the roster grid with the
+rotation generator, the DERIVED daily status (HOLIDAY > ON_LEAVE >
+ABSENT/MISSING_PUNCH/LATE/PRESENT — the day is the unit, INV-031's
+non-overlap at every capture, the T-19 classification law
+order-independent), the device-agnostic import (the sha256 fingerprint
+floor — the same file never commits twice), the overtime engine (BR-084's
+feeding law), the leave family (the simple approval — DR-045-01, PHASE-052
+is the upgrade path), the identity bridge (the SoD law pinned: linking
+grants nothing), the variable feeds + leave-balance snapshots, the goldens
+G-50/G-51, and the web plane (four office boards + the self-service tabs).
+Permissions 297=297; i18n 6,007=6,007; report registry 104; DB suite
+240/240 files · 3,329/3,329; api unit 626/626; docs 33/33; typecheck/lint
+8/8; OA-06 budgets 6/6. The OA-07 archive is `ERP_PLATFORM_PHASE045.zip`.
+
+**Next eligible ON THE OWNER'S RE-APPROVAL of T-20: PHASE-046 (HR Payroll
+Compliance — GOSI/PIT/EOSB, CR-16)** — prerequisites: PHASE-045 re-approved
+(its only hard prerequisite is this phase; the roadmap's hard ordering "045
+before 046 before 047" holds). Start with
+`docs/implementation/phases/PHASE-046.md` (T-01…T-16: the statutory
+contribution profiles under the REQUIRES_VERIFICATION discipline, the PIT
+withholding engine, the EOSB automation with the 029 provision true-up, the
+variable-line consumption, the GOSI remittance export; goldens G-52…G-54,
+INV-032, BR-085…087 — the id-ledger's coordinated slots).
 
 Key handoffs from 045 (read the PHASE-045 completion report first):
 

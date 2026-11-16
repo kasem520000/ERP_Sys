@@ -27,6 +27,7 @@ import {
 } from "../domain/leave-errors";
 import { FeedPeriodNotFoundError } from "../domain/feed-errors";
 import { EmployeeNotFoundError } from "../domain/hr-errors";
+import * as atomic from "../infrastructure/atomic";
 import * as store from "../infrastructure/leave.store";
 
 /**
@@ -61,6 +62,14 @@ import * as store from "../infrastructure/leave.store";
  * The charge lands on the entry date's year cell (the T-07 charge
  * convention); each encashment mints its own INV-013 key
  * (leave_encashment:{id} · post — the payout precedent).
+ *
+ * THE SHARED ATOMICITY FLOOR (T-20, the owner's concurrency review
+ * round): the encashment takes the SAME (employee, type, year) CELL
+ * lock as the approval, the accrual recompute, and the carry-over
+ * rollover — the remaining read and the used_days decrement are one
+ * atomic step under the lock (used_days is the source of truth:
+ * leaves AND encashments ride it), so a racing approval can never
+ * jointly push the cell past the cap.
  */
 
 /** Exact 4dp string math via domain-core Decimal (ADR-0009). */
@@ -236,11 +245,21 @@ export class LeavePostingService {
       throw new CashAccountNotFoundError(input.cashAccountId);
     }
 
-    // INV-031 AT THE ENCASH BOUNDARY — the typed refusal BEFORE the
-    // decrement (the T-07 approve-boundary pattern; the charge lands on
-    // the entry date's year cell).
+    // INV-031 AT THE ENCASH BOUNDARY (T-20's rework) — the typed
+    // refusal BEFORE the decrement (the T-07 approve-boundary
+    // pattern; the charge lands on the entry date's year cell).
+    // THE CELL LOCK FIRST: the encashment, the approval, the accrual
+    // recompute, and the carry-over rollover ALL serialize on the
+    // (employee, type, year) cell (the shared atomicity floor) — the
+    // remaining read and the decrement below are one atomic step
+    // under the lock, so a racing approval can never jointly push the
+    // cell past the cap (the owner's used=25-on-20 proof, pinned).
     const year = Number(entryDate.slice(0, 4));
     await store.ensureBalanceCell(input.employeeId, input.leaveTypeId, year);
+    await atomic.lockBalanceCell(input.employeeId, input.leaveTypeId, year);
+    // The cell read runs UNDER the lock (the post-lock recompute —
+    // used_days is the source of truth: approved leaves AND
+    // encashments ride it).
     const cell = await store.findBalanceCell(input.employeeId, input.leaveTypeId, year);
     const remaining =
       new Decimal(cell!.entitlementDays).plus(cell!.carriedForwardDays).minus(cell!.usedDays);

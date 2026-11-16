@@ -329,8 +329,16 @@ export async function findLeaveRequestById(id: string): Promise<LeaveRequestRow 
 }
 
 /** A PENDING-or-APPROVED span of this employee overlapping [from, to]
- * (the two-leaves-at-once law's read). */
-export async function findOverlappingLeave(employeeId: string, from: string, to: string): Promise<LeaveRequestRow | undefined> {
+ * (the two-leaves-at-once law's read). `excludeId` spares the request
+ * being approved — its own span always overlaps itself (the
+ * approve-boundary re-check, T-20). */
+export async function findOverlappingLeave(
+  employeeId: string,
+  from: string,
+  to: string,
+  excludeId?: string,
+): Promise<LeaveRequestRow | undefined> {
+  const excludeFilter = excludeId === undefined ? sql`true` : sql`r.id <> ${excludeId}::uuid`;
   const rows = await tenantTx().execute(sql`
     SELECT ${REQUEST_COLUMNS}
     FROM leave_requests r
@@ -338,22 +346,11 @@ export async function findOverlappingLeave(employeeId: string, from: string, to:
     JOIN leave_types t ON t.id = r.leave_type_id
     WHERE r.employee_id = ${employeeId} AND r.status IN ('PENDING', 'APPROVED')
       AND r.start_date <= ${to}::date AND r.end_date >= ${from}::date
+      AND ${excludeFilter}
     ORDER BY r.start_date
     LIMIT 1
   `);
   return (rows.rows as unknown as LeaveRequestRow[])[0];
-}
-
-/** The APPROVED days of an employee+type+year (the span's year — the
- * charge lands on the START year's cell, the documented convention). */
-export async function approvedDaysInYear(employeeId: string, leaveTypeId: string, year: number): Promise<string> {
-  const rows = await tenantTx().execute<{ total: string }>(sql`
-    SELECT COALESCE(sum(days), 0)::text AS total FROM leave_requests
-    WHERE employee_id = ${employeeId} AND leave_type_id = ${leaveTypeId}
-      AND status = 'APPROVED'
-      AND EXTRACT(YEAR FROM start_date) = ${year}
-  `);
-  return rows.rows[0]!.total;
 }
 
 export async function decideLeaveRequest(input: {

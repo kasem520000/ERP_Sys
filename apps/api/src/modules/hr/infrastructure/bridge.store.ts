@@ -14,6 +14,18 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  * user_id IS NOT NULL — one user maps to at most ONE employee per
  * tenant at any moment; the service refuses a taken user BEFORE the
  * write and the floor catches the race (23505 surfaced typed).
+ *
+ * THE CONDITIONAL WRITE (T-20, the owner's concurrency review
+ * round): the link write is a compare-and-set — `UPDATE employees
+ * SET user_id = … WHERE id = … AND user_id IS NULL RETURNING id`.
+ * The row lock the UPDATE itself takes is the serialization point:
+ * a second concurrent linker (another user, this same employee)
+ * waits on the row lock, re-evaluates against the winner's COMMITTED
+ * row, matches ZERO rows, and renders the typed BRIDGE_ALREADY_LINKED
+ * refusal — the silent replacement (two link events, no unlink) the
+ * owner's two-transaction proof found is structurally impossible
+ * now. The employee-side floor plus the 0085 user-side partial
+ * UNIQUE cover both directions of the race.
  */
 
 function tenantTx(): TenantDb {
@@ -57,13 +69,17 @@ export async function findEmployeeByUser(userId: string): Promise<BridgeEmployee
   return (rows.rows as unknown as BridgeEmployeeRow[])[0];
 }
 
-/** Write the link (the service has proven: the employee exists, carries
- * no link, and the user is an unlinked active member). */
+/** Write the link — THE CONDITIONAL compare-and-set (T-20): the
+ * row locks only if the employee is STILL unlinked; a concurrent
+ * winner leaves this call ZERO rows and the caller renders the
+ * typed BRIDGE_ALREADY_LINKED refusal (never a silent replacement). */
 export async function linkUser(employeeId: string, userId: string): Promise<BridgeEmployeeRow | undefined> {
-  await tenantTx().execute(sql`
+  const rows = await tenantTx().execute<{ id: string }>(sql`
     UPDATE employees SET user_id = ${userId}::uuid, updated_at = now(), version = version + 1
-    WHERE id = ${employeeId}::uuid
+    WHERE id = ${employeeId}::uuid AND user_id IS NULL
+    RETURNING id
   `);
+  if ((rows.rows as unknown as { id: string }[])[0] === undefined) return undefined;
   return findBridgeEmployeeById(employeeId);
 }
 

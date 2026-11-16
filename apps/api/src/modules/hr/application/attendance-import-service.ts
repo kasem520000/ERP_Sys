@@ -16,6 +16,7 @@ import {
   EmployeeNotFoundError,
 } from "../domain/hr-errors";
 import * as importStore from "../infrastructure/attendance-import.store";
+import * as atomic from "../infrastructure/atomic";
 import { employeeExists } from "../infrastructure/hr.store";
 import { AttendanceService } from "./attendance-service";
 
@@ -54,6 +55,17 @@ import { AttendanceService } from "./attendance-service";
  *   floor   → ALREADY_IMPORTED (the 0081 dedupe floor vs the DB — a
  *             different file with overlapping rows imports the rest)
  *             and SESSION_OVERLAP (INV-031 at import time).
+ *
+ * THE SHARED ATOMICITY FLOOR (T-20, the owner's concurrency review
+ * round): the COMMIT path takes the SAME transaction-scoped day
+ * locks as every other attendance writer — for every employee-day
+ * the file would touch — BEFORE the DB floors read, so the floors
+ * see every concurrent writer's committed state (a session landing
+ * between the preview's floor read and the commit can no longer
+ * slip past — it quarantines exactly as if it had been in the file
+ * all along). The anomaly-resolve correction rides the same day
+ * lock. Preview stays lock-free (zero writes — an honest snapshot,
+ * races included).
  *
  * THE FINGERPRINT LAW: the committed batch carries the file's sha256
  * and the (tenant, sha256) UNIQUE is the floor — THE SAME FILE NEVER
@@ -315,6 +327,21 @@ export class AttendanceImportService {
   // -- the analysis (preview = this alone; zero writes) ---------------------------------
 
   async analyze(content: string, mappingOverride?: ImportMapping): Promise<ImportAnalysis> {
+    const parsed = await this.analyzeParsed(content, mappingOverride);
+    const floored = await this.applyDbFloors(parsed.sessions, parsed.anomalies);
+    return {
+      fingerprint: parsed.fingerprint,
+      rowCount: parsed.rowCount,
+      sessions: floored.sessions,
+      anomalies: floored.anomalies,
+    };
+  }
+
+  /** parse → shape → horizon → codes → dedupe → pair — everything up
+   * to (but EXCLUDING) the DB floors. The commit path locks the
+   * file's employee-days FIRST and then runs `applyDbFloors` under
+   * the locks (T-20); preview runs the same two halves unlocked. */
+  private async analyzeParsed(content: string, mappingOverride?: ImportMapping): Promise<ImportAnalysis> {
     if (typeof content !== "string" || content.length === 0) {
       throw new AttendanceImportInvalidError("the import content is empty");
     }
@@ -539,7 +566,25 @@ export class AttendanceImportService {
       }
     }
 
-    // -- the DB floors (ALREADY_IMPORTED + SESSION_OVERLAP) -----------------------------
+    // NOTE: the DB floors deliberately run OUTSIDE analyzeParsed —
+    // the commit path locks the file's employee-days first and then
+    // calls applyDbFloors itself (T-20); `analyze` (the preview
+    // surface) runs the two halves back-to-back unlocked.
+    return { fingerprint, rowCount, sessions, anomalies };
+  }
+
+  /** THE DB FLOORS: ALREADY_IMPORTED (the 0081 dedupe floor vs the
+   * committed rows) and SESSION_OVERLAP (INV-031 at import time) —
+   * plus the in-file cross-session floor (two sessions of one file
+   * must not overlap each other either). The commit path runs this
+   * UNDER the day locks (T-20); the preview path runs it unlocked
+   * (zero writes — an honest snapshot, races included). */
+  private async applyDbFloors(
+    sessions: readonly ImportableSession[],
+    anomalies: readonly ImportAnomaly[],
+  ): Promise<{ sessions: ImportableSession[]; anomalies: ImportAnomaly[] }> {
+    const floorAnomalies = [...anomalies];
+    const keptSessions: ImportableSession[] = [];
     if (sessions.length > 0) {
       const from = sessions.reduce((min, session) => (session.workDate < min ? session.workDate : min), sessions[0]!.workDate);
       const to = sessions.reduce((max, session) => (session.workDate > max ? session.workDate : max), sessions[0]!.workDate);
@@ -555,7 +600,6 @@ export class AttendanceImportService {
         if (bucket === undefined) existingByDay.set(key, [row]);
         else bucket.push(row);
       }
-      const kept: ImportableSession[] = [];
       for (const session of sessions) {
         const checkInWc = Date.parse(`${session.checkInNaive.replace(" ", "T")}Z`);
         const checkOutWc =
@@ -565,7 +609,7 @@ export class AttendanceImportService {
         const siblings = existingByDay.get(`${session.employeeId}|${session.workDate}`) ?? [];
         const duplicate = siblings.find((row) => row.checkInWcMs === checkInWc);
         if (duplicate !== undefined) {
-          anomalies.push({
+          floorAnomalies.push({
             lineNo: session.lineIn,
             employeeCode: null,
             punchAt: session.checkInNaive,
@@ -583,7 +627,7 @@ export class AttendanceImportService {
             checkInWc < (row.checkOutWcMs ?? Number.POSITIVE_INFINITY),
         );
         if (overlap !== undefined) {
-          anomalies.push({
+          floorAnomalies.push({
             lineNo: session.lineIn,
             employeeCode: null,
             punchAt: session.checkInNaive,
@@ -594,7 +638,7 @@ export class AttendanceImportService {
           });
           continue;
         }
-        kept.push(session);
+        keptSessions.push(session);
         // The session becomes part of the day's floor for the NEXT
         // session of the same employee-day (two sessions in one file
         // must not overlap EACH OTHER either).
@@ -605,11 +649,8 @@ export class AttendanceImportService {
           checkOutWcMs: checkOutWc === Number.POSITIVE_INFINITY ? null : checkOutWc,
         });
       }
-      sessions.length = 0;
-      sessions.push(...kept);
     }
-
-    return { fingerprint, rowCount, sessions, anomalies };
+    return { sessions: keptSessions, anomalies: floorAnomalies };
   }
 
   // -- preview / commit ----------------------------------------------------------------
@@ -635,15 +676,30 @@ export class AttendanceImportService {
     if (typeof input.fileName !== "string" || input.fileName.trim().length === 0 || input.fileName.length > 200) {
       throw new AttendanceImportInvalidError("fileName is required (1–200 chars) — the import log's identity");
     }
-    const analysis = await this.analyze(input.content, input.mapping);
+    const parsed = await this.analyzeParsed(input.content, input.mapping);
+    // THE SHARED ATOMICITY FLOOR (T-20): every employee-day the file
+    // would touch locks BEFORE the DB floors read — the same day lock
+    // the manual capture, the checkout, the correction, and the
+    // derivation run take. A concurrent writer that commits while we
+    // waited is visible to the floors below (its session quarantines
+    // as SESSION_OVERLAP / ALREADY_IMPORTED exactly as if it had been
+    // committed before the file arrived); one queued behind us sees
+    // our rows when it unblocks. The locks hold to this UoW's commit.
+    await atomic.lockAttendanceEmployeeDays(
+      parsed.sessions.map((session) => ({
+        employeeId: session.employeeId,
+        workDate: session.workDate,
+      })),
+    );
+    const analysis = await this.applyDbFloors(parsed.sessions, parsed.anomalies);
     const mappingUsed =
       input.mapping === undefined ? (await this.effectiveMapping()).mapping : input.mapping;
 
     // THE FINGERPRINT FLOOR: the same file never commits twice.
-    const existingBatch = await importStore.findImportBatchByFingerprint(analysis.fingerprint);
+    const existingBatch = await importStore.findImportBatchByFingerprint(parsed.fingerprint);
     if (existingBatch !== undefined) {
       throw new AttendanceImportAlreadyCommittedError(
-        `this exact file (sha256 ${analysis.fingerprint.slice(0, 12)}…) was already committed as '${existingBatch.fileName}' at ${existingBatch.createdAt} — the same file never commits twice; a CHANGED file is a new fingerprint`,
+        `this exact file (sha256 ${parsed.fingerprint.slice(0, 12)}…) was already committed as '${existingBatch.fileName}' at ${existingBatch.createdAt} — the same file never commits twice; a CHANGED file is a new fingerprint`,
       );
     }
 
@@ -654,9 +710,9 @@ export class AttendanceImportService {
 
     const batch = await importStore.insertImportBatch({
       fileName: input.fileName.trim(),
-      fileSha256: analysis.fingerprint,
+      fileSha256: parsed.fingerprint,
       fileSize: Buffer.byteLength(input.content, "utf8"),
-      rowCount: analysis.rowCount,
+      rowCount: parsed.rowCount,
       importedCount: analysis.sessions.length,
       quarantineCount: analysis.anomalies.length,
       deviceRef,
@@ -710,8 +766,8 @@ export class AttendanceImportService {
       actorId: input.actorId ?? undefined,
       after: {
         fileName: batch.fileName,
-        fingerprint: analysis.fingerprint,
-        rowCount: analysis.rowCount,
+        fingerprint: parsed.fingerprint,
+        rowCount: parsed.rowCount,
         importedCount: analysis.sessions.length,
         quarantineCount: analysis.anomalies.length,
       },
@@ -826,6 +882,13 @@ export class AttendanceImportService {
         ? null
         : await importStore.instantToNaiveLocal(input.checkOut);
     const workDate = checkInNaive.slice(0, 10);
+
+    // THE DAY LOCK FIRST (T-20): the corrected session's dedupe/
+    // overlap floor and its insert must be atomic against every
+    // concurrent writer of this employee-day — the same day lock the
+    // capture, the import commit, the checkout, and the derivation
+    // run take (never a session slipping past a stale floor read).
+    await atomic.lockAttendanceDay(input.employeeId, workDate);
 
     // The capture laws, in the file's wall-clock space.
     const checkInWc = Date.parse(`${checkInNaive.replace(" ", "T")}Z`);

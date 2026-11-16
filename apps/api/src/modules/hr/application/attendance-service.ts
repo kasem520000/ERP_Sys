@@ -12,6 +12,7 @@ import {
   EmployeeNotFoundError,
 } from "../domain/hr-errors";
 import { classifyCaptureConflict } from "../domain/attendance-classification";
+import * as atomic from "../infrastructure/atomic";
 import * as attendance from "../infrastructure/attendance.store";
 import { employeeExists } from "../infrastructure/hr.store";
 
@@ -60,6 +61,19 @@ import { employeeExists } from "../infrastructure/hr.store";
  *
  * Attendance, rosters, and shifts are NOT ledger documents (the
  * posting canon's note — nothing here posts anything).
+ *
+ * THE SHARED ATOMICITY FLOOR (T-20, the owner's concurrency review
+ * round): every writer of an employee-day — manual capture, the
+ * import commit, the anomaly-resolve correction, the one-shot
+ * checkout, and this derivation run itself — takes the SAME
+ * transaction-scoped day lock (infrastructure/atomic.ts) BEFORE its
+ * guard read, so INV-031's non-overlap check and the ABSENT-marker
+ * synthesis always run on the winner's COMMITTED state and the
+ * loser renders the typed refusal (never two overlapping sessions,
+ * never two DERIVED_ABSENT markers — the owner's two-transaction
+ * proofs at fd61ff2, now pinned by the permanent concurrency
+ * suite). The lock is re-entrant within the UoW: capture's own
+ * post-write derive re-takes the day key it already holds.
  */
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -170,6 +184,11 @@ export class AttendanceService {
     if (!(await employeeExists(input.employeeId))) {
       throw new EmployeeNotFoundError(input.employeeId);
     }
+    // THE DAY LOCK FIRST (T-20): every writer of this employee-day
+    // serializes here — the overlap check below then sees every
+    // concurrent writer's committed state, and a concurrent writer
+    // sees ours. The lock holds until the ambient UoW commits.
+    await atomic.lockAttendanceDay(input.employeeId, workDate);
     const checkInMs = Date.parse(checkIn);
     const checkOutMs = checkOut === null ? null : Date.parse(checkOut);
     if (checkOutMs !== null && checkOutMs <= checkInMs) {
@@ -282,6 +301,12 @@ export class AttendanceService {
         `checkOut must fall on ${record.workDate} or the day after (the tenant's timezone — the operational day's envelope): ${at}`,
       );
     }
+    // THE DAY LOCK FIRST (T-20): the sibling-overlap check below and
+    // the one-shot fill must be atomic against every concurrent
+    // writer of this employee-day (a sibling session landing between
+    // the check and the fill would otherwise close this session INTO
+    // an overlap).
+    await atomic.lockAttendanceDay(record.employeeId, record.workDate);
     // INV-031 against the day's OTHER sessions: closing [checkIn → ∞)
     // at `at` must not overlap a sibling session.
     const dayRows = await attendance.listDerivationRows({
@@ -409,11 +434,33 @@ export class AttendanceService {
       employeeIds = undefined;
     }
 
+    // The universe (pre-lock — it only decides WHICH employee-days
+    // this run touches): every (employee, date) with rows OR a
+    // rostered shift (an unrostered, punchless day is nobody's
+    // absence).
     const window = await attendance.loadDerivationWindow({ from, to, employeeIds });
+    const firstRows = await attendance.listDerivationRows({ from, to, employeeIds });
+    const universeKeys = new Set<string>();
+    for (const row of firstRows) {
+      universeKeys.add(`${row.employeeId}|${row.workDate}`);
+    }
+    for (const key of window.roster.keys()) {
+      universeKeys.add(key);
+    }
+
+    // THE SHARED ATOMICITY FLOOR (T-20): every employee-day of the
+    // run's universe locks BEFORE any verdict is computed — held to
+    // this UoW's commit. A concurrent writer that committed while we
+    // waited is VISIBLE to the re-read below (the verdict never
+    // runs on a stale day), and one queued behind us re-derives its
+    // own day after we commit — the ABSENT marker can never land
+    // twice (the owner's duplicate-marker proof, pinned).
+    await atomic.lockAttendanceDays([...universeKeys]);
+
+    // The verdict reads run UNDER the floor — a fresh, post-lock
+    // view of every day's rows.
     const rows = await attendance.listDerivationRows({ from, to, employeeIds });
 
-    // The universe: every (employee, date) with rows OR a rostered
-    // shift (an unrostered, punchless day is nobody's absence).
     const universe = new Map<string, attendance.DerivationRow[]>();
     for (const row of rows) {
       const key = `${row.employeeId}|${row.workDate}`;

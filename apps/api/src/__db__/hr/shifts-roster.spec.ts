@@ -688,10 +688,15 @@ describe("PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern g
       }),
     );
 
-    // H1 in canonical lowercase, then the SAME H1 with the first hex
-    // segments uppercased — one uuid to PostgreSQL, two "distinct"
-    // strings to a case-sensitive Set (the pre-fix hole).
-    const h1Upper = `${f.employeeH1Id.slice(0, 14).toUpperCase()}${f.employeeH1Id.slice(14)}`;
+    // H1 in canonical lowercase, then the SAME H1 uppercased — one
+    // uuid to PostgreSQL, two "distinct" strings to a case-sensitive
+    // Set (the pre-fix hole). The FULL-id uppercase (never a partial
+    // prefix — a uuid whose hex prefix happens to be all digits would
+    // make a partial uppercasing a silent no-op and fail this arm's
+    // own precondition, the latent flake the T-20 re-run rounds found)
+    // differs from the canonical spelling unless every hex digit is a
+    // digit (~1 in 2.1M — and the assertion below still guards it).
+    const h1Upper = f.employeeH1Id.toUpperCase();
     expect(h1Upper).not.toBe(f.employeeH1Id); // genuinely case-varied, not a no-op
     // …and it IS the same employee to the database (the uuid is
     // case-insensitive on lookup — the existence check finds H1).

@@ -1,0 +1,22 @@
+@erp/ui:typecheck: > @erp/ui@1.0.0 typecheck /home/z/erp/packages/ui
+@erp/ui:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/ui:typecheck: 
+@erp/desktop:typecheck: 
+@erp/desktop:typecheck: > @erp/desktop@0.1.0 typecheck /home/z/erp/apps/desktop
+@erp/desktop:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/desktop:typecheck: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    1m3.468s 
+
+TYPECHECK_EXIT=0
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/erp/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    43.78s 
+
+LINT_EXIT=0

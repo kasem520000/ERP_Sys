@@ -1,0 +1,39 @@
+=== docs:validate ===
+PASS  8d. v3.2 residual-layer artifacts (Layer-3 file R-01..R-15 + directive + CR-49..52 + roadmap §6.5/548)
+
+33/33 checks passed.
+=== permissions-drift ===
+> tsx scripts/check-permissions-drift.ts
+
+[permissions-drift] OK — matrix 297 keys, seed 297 keys
+=== i18n parity ===
+
+== i18n key parity: ar=6007 keys, en=6007 keys ==
+ar/en catalogs at 100% key parity; no empty values.
+=== id-ledger ===
+
+[check-id-ledger] implemented: G 51 · INV 31 · BR 84 | reservations: 19 phases, 66 ids | phase docs scanned: 68 (95 claim ids, 2517 reference ids)
+[check-id-ledger] 0 errors, 0 warning(s) — OK
+=== id-ledger self-test ===
+[check-id-ledger] self-test (9c) the REAL 045 shape (synthetic fixture, ledger-independent) — 6 claims / 0 findings clean; the mutated G-950→G-44 claim rejected while the note's references stay clean: OK ✓
+[check-id-ledger] self-test (9d) the REAL 046 shape (synthetic fixture, ledger-independent) — 7 claims / 0 findings clean (the implemented G-29 stays a reference inside the claim clause, G-951 a reference inside the note); the mutated G-952→G-44 claim rejected, G-29 never flagged: OK ✓
+[check-id-ledger] implemented: G 51 · INV 31 · BR 84 | reservations: 19 phases, 66 ids | phase docs scanned: 68 (95 claim ids, 2517 reference ids)
+[check-id-ledger] 0 errors, 0 warning(s) — OK
+=== manifests ===
+OK   industry.rental_logistics@1.0.0 — schema valid (content hash sha256:5879bcac535bc721b20903dfd8c4e614097ddf2eb287f504f8cb7e29264d29c7)
+
+OK — 13 manifest(s) valid against §3; ids unique; versions semver; required_feature_keys non-empty.
+=== capabilities ===
+#44 Consolidation (groups, eliminations, runs, consolidated s…n/a (online-only) —                online-only      —                —                
+rows: PASS 25 · DEFERRED 3 · n/a 16 — cells: PASS 42 · DEFERRED 8 (annotated 0 + matrix-derived 8) · online-only 18 · — 108
+capabilities matrix and fixture agree: every implemented claim carries a gate, every ✓ row has a fixture row, every deferral is annotated.
+=== history-secrets ===
+check-history-secrets: sampled (last 200 + 0 tag anchors) — 174/174 commits across all refs
+check-history-secrets: 0 violation(s) · 5568 allowlisted fixture hit(s) across 11 documented allowlist paths
+check-history-secrets: authoritative full-history gate = CI gitleaks job (ci.yml); this local substitute documents the pattern set + fixture allowlist.
+=== desktop-shell ===
+check:desktop-shell: PASS — shell sources structurally valid
+  (honest note: the Rust crate is compiled only by .github/workflows/desktop-release.yml)
+=== mobile-shell ===
+check:mobile-shell: PASS — mobile shell + screen surface structurally valid
+  (honest note: the expo toolchain is compiled only by .github/workflows/mobile-release.yml)

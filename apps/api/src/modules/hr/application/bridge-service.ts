@@ -24,6 +24,15 @@ import * as store from "../infrastructure/bridge.store";
  * floor; the pre-write check refuses a taken user and the floor catches
  * the race — 23505 surfaced as the same typed refusal).
  *
+ * THE CONDITIONAL WRITE (T-20, the owner's concurrency review round):
+ * the link write itself is the atomic compare-and-set (bridge.store's
+ * `WHERE … AND user_id IS NULL`), so the SECOND concurrent linker —
+ * the exact interleaving of the owner's two-transaction proof (two
+ * links accepted, the first silently replaced, two link events, no
+ * unlink event) — matches ZERO rows and renders the typed
+ * BRIDGE_ALREADY_LINKED refusal naming the winning user; exactly one
+ * link event is ever written.
+ *
  * THE MEMBERSHIP LAW: the linked user must be an ACTIVE member of the
  * acting tenant — a link to a user who cannot reach the tenant would be
  * an orphan (they could never see their own rows); the check reads the
@@ -95,7 +104,16 @@ export class BridgeService {
       }
       throw error;
     }
-    if (linked === undefined) throw new EmployeeNotFoundError(input.employeeId);
+    if (linked === undefined) {
+      // The conditional write matched ZERO rows: a concurrent linker
+      // won this employee's row between our pre-check and our write
+      // (T-20's compare-and-set floor). The typed refusal names the
+      // winner — never a silent replacement of the link.
+      const winner = await store.findBridgeEmployeeById(input.employeeId);
+      throw new BridgeAlreadyLinkedError(
+        `employee ${winner?.code ?? input.employeeId} was linked concurrently to user ${winner?.userId ?? "another user"} — one employee carries one link; unlink first (the audited way a link moves)`,
+      );
+    }
     await this.audit.record({
       action: "hr.employee_user_linked",
       entityType: "employee",

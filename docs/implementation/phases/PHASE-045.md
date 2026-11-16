@@ -1,8 +1,7 @@
 # PHASE-045 — HR Core — Attendance, Leaves & Shifts
 
-> **Status:** **COMPLETE 2026-11-16** (all 19 tasks delivered T-01…T-19; the acceptance evidence in
-> [reports/PHASE-045-COMPLETION.md](reports/PHASE-045-COMPLETION.md) — the triple flip per CR-48.
-> Completing 045 is NOT closure of the 043 hard review and NOT production approval — RISK-031/RISK-032 stay OPEN) ·
+> **Status:** **IN_PROGRESS — REOPENED 2026-11-16 for the owner's concurrency review round (T-20 delivered; awaiting the owner's re-review)** — T-01…T-19 remain delivered (the acceptance evidence in
+> [reports/PHASE-045-COMPLETION.md](reports/PHASE-045-COMPLETION.md) stands); the owner's five two-transaction race findings (attendance overlap + duplicate ABSENT markers, leave-span overlap, balance over-consumption, the encashment cap bypass, the bridge's silent link replacement) are fixed by the shared atomicity floor and pinned by the permanent two-transaction suite — the completion declaration is NOT production approval and the phase stays OPEN for re-review. PHASE-043's hard review and RISK-031/RISK-032 stay OPEN) ·
 > **Started:** 2026-11-14 (the owner's parallel directive: 045 ran alongside the 043-completion review) ·
 > **Wave:** 2 / Stage 13 · **Register:** [CR-15](../../planning/COMPLETENESS_REGISTER.md)
 
@@ -213,6 +212,7 @@ on this phase's feeds and the `employees.user_id` bridge.
 | T-17 | INV-031 suite (non-overlapping intervals, balance caps, feed totals) + BR-082…083 guards + golden failure packs | api |
 | T-18 | Docs: JOURNAL_RULES §7 rows + non-ledger note, ACCOUNTING_INVARIANTS INV-031, BUSINESS_RULES BR rows, FEATURE_CATALOG keys, NAVIGATION_MODEL entries, AUTHORIZATION_MATRIX SoD note, simple-approval decision record | docs |
 | T-19 | Run full local gates + OA-06 EXPLAIN budgets (`attendance_records`, `leave_balances` hot paths); record evidence | all |
+| T-20 | **The owner's concurrency review round (REOPEN):** the shared atomicity floor (attendance-day / leave-span / balance-cell advisory gates + the bridge's conditional compare-and-set) across all writers — manual capture, import commit, correction, checkout, derivation (ABSENT exactly-once), request create + approve (the span law's both doors), approval/encashment/accrual/rollover (used_days as the source of truth under the cell lock, the toYear preservation guard), the employee↔user link — + the PERMANENT two-transaction race suite (16 duels + smokes, the mfg harness idiom, no-illegal-state assertions); full gates + the full DB suite re-run in a prepared environment; evidence [gate-evidence/2026-11-16-phase045-t20.md](../../operations/gate-evidence/2026-11-16-phase045-t20.md) | all |
 
 ## 6. Verification
 
