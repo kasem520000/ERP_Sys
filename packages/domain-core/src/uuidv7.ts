@@ -26,8 +26,17 @@ const COUNTER_MAX = 0x0fff; // 12 bits
 let lastTimestampMs = -1;
 let counter = 0;
 
-function randomFill(bytes: Uint8Array): void {
+function randomFill(bytes: Uint8Array<ArrayBuffer>): void {
   // globalThis.crypto is available in Node >= 19 and in all browsers.
+  // PHASE-046 (W-4 — the prepared-environment repair, honestly recorded):
+  // the parameter is pinned to Uint8Array<ArrayBuffer> — the exact type of
+  // the sole allocation site (`new Uint8Array(8)`) and the intersection of
+  // every ambient getRandomValues signature (the modern @types/node
+  // ArrayBufferLike-tolerant webcrypto shape AND the stricter shape an
+  // ambient @types/node 14 chain can win in packages without a direct
+  // @types/node dependency — the fresh-sandbox turbo cache surfaced the
+  // latent fragility; the previous environment's typecheck evidence for
+  // this file rode a cache replay). Zero runtime change.
   globalThis.crypto.getRandomValues(bytes);
 }
 

@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Put, Query, Req } from "@nestjs/common";
-import type { Request } from "express";
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Post, Put, Query, Req, Res } from "@nestjs/common";
+import type { Request, Response } from "express";
 import { z } from "zod";
 
 import { identityOf, type SessionContext } from "../../../infra/context/session-context";
@@ -11,8 +11,10 @@ import { EmployeeService, toEmployeeView } from "../application/employee-service
 import { EosService } from "../application/eos-service";
 import { LoanService } from "../application/loan-service";
 import { PayoutService } from "../application/payout-service";
+import { RemittanceExportService } from "../application/remittance-export-service";
 import { RunCalculationService } from "../application/run-calculation-service";
 import { RunPostingService } from "../application/run-posting-service";
+import { StatutoryProfileService } from "../application/statutory-profile-service";
 import { StructureService } from "../application/structure-service";
 import {
   attachValues,
@@ -180,17 +182,46 @@ const eosSettleSchema = z.object({
   entryDate: DATE.optional(),
 });
 
+// PHASE-046 (W-4, T-09 — D-10): the BR-085 verify act's citation — the
+// flip ALWAYS rests on a source (the 0089 VERIFIED⟺source CHECK; a bare
+// assertion never flips a row).
+const verifyProfileSchema = z.object({
+  sourceName: z.string().min(1).max(500),
+  sourceRef: z.string().min(1).max(500).nullable().optional(),
+});
+
+// PHASE-046 (W-4, T-08): the remittance export's shape — XLSX (default) or
+// CSV, in the run locale (the house default ar — the payslips precedent).
+const remittanceExportQuerySchema = z.object({
+  format: z.enum(["xlsx", "csv"]).default("xlsx"),
+  locale: z.enum(["ar", "en"]).default("ar"),
+});
+
 @Controller("api/v1/payroll")
 export class PayrollController {
+  // PHASE-046 (W-4 — the DI repair, honestly recorded): the constructor
+  // params carry EXPLICIT @Inject tokens (the identity/hr house pattern).
+  // The 029-era shape relied on tsc's emitDecoratorMetadata (correct in the
+  // production build); W-4's route-level spec boots the controller through
+  // the real Nest pipeline under the vitest/esbuild transform, which emits
+  // NO design:paramtypes — the two NEW params (statutory + remittance
+  // exports) resolved undefined and the route 500'd. The @Inject repair is
+  // mechanical (token = the same class), zero production behavior change,
+  // and it makes the whole controller resolvable under both pipelines.
   constructor(
-    private readonly employees: EmployeeService,
-    private readonly structures: StructureService,
-    private readonly calculation: RunCalculationService,
-    private readonly workflow: ApprovalWorkflow,
-    private readonly posting: RunPostingService,
-    private readonly payouts: PayoutService,
-    private readonly loans: LoanService,
-    private readonly eos: EosService,
+    @Inject(EmployeeService) private readonly employees: EmployeeService,
+    @Inject(StructureService) private readonly structures: StructureService,
+    @Inject(RunCalculationService) private readonly calculation: RunCalculationService,
+    @Inject(ApprovalWorkflow) private readonly workflow: ApprovalWorkflow,
+    @Inject(RunPostingService) private readonly posting: RunPostingService,
+    @Inject(PayoutService) private readonly payouts: PayoutService,
+    @Inject(LoanService) private readonly loans: LoanService,
+    @Inject(EosService) private readonly eos: EosService,
+    // PHASE-046 (W-4): the statutory surfaces — the verify act (T-09) +
+    // the remittance export (T-08).
+    @Inject(StatutoryProfileService) private readonly statutory: StatutoryProfileService,
+    @Inject(RemittanceExportService)
+    private readonly remittanceExports: RemittanceExportService,
   ) {}
 
   // -- employees (PII-restricted surface) --------------------------------------
@@ -466,6 +497,45 @@ export class PayrollController {
     return envelope(await this.payouts.payslips(UUID.parse(id), resolved));
   }
 
+  /**
+   * PHASE-046 (W-4, T-08 — IN-06): THE REMITTANCE EXPORT — the run's
+   * frozen statutory liability as the remittance-ready XLSX/CSV (the 028
+   * exceljs pattern: RTL view at locale=ar, tabular 4dp, the per-employee
+   * contribution breakdown + totals, the statutory_summary liability
+   * block). READ-ONLY + AUDITED (BR-086 — `payroll.remittance_exported`;
+   * no register writes, no new machinery); the file STREAMS under
+   * payroll.statutory (the management key — the audit-events export's
+   * @Res() streaming precedent, bytes not envelope). Exports + PHASE-055
+   * are the path — NO live-government-API claim exists anywhere.
+   */
+  @Get("runs/:id/remittance-export")
+  @RequirePermissions("payroll.statutory")
+  async remittanceExport(
+    @Req() request: Request,
+    @Res() response: Response,
+    @Param("id") id: string,
+    @Query("format") format?: string,
+    @Query("locale") locale?: string,
+  ) {
+    const identity = requireIdentity(request);
+    const input = remittanceExportQuerySchema.parse({
+      format: format === undefined || format === "" ? undefined : format,
+      locale: locale === undefined || locale === "" ? undefined : locale,
+    });
+    const result = await this.remittanceExports.exportRun({
+      runId: UUID.parse(id),
+      format: input.format,
+      locale: input.locale,
+      actorId: identity.userId,
+    });
+    response.header("Content-Type", result.contentType);
+    response.header(
+      "Content-Disposition",
+      `attachment; filename="${result.filename}"`,
+    );
+    response.status(200).send(result.bytes);
+  }
+
   // -- loans ---------------------------------------------------------------------
 
   @Get("loans")
@@ -550,5 +620,45 @@ export class PayrollController {
     return envelope(
       await this.eos.settle(UUID.parse(id), { ...input, actorId: identity.userId }),
     );
+  }
+
+  // -- statutory (PHASE-046, matrix §3.24) --------------------------------------
+
+  /**
+   * PHASE-046 (W-4, T-09 — D-10/BR-085): THE VERIFY ACT — flip a
+   * REQUIRES_VERIFICATION contribution profile to VERIFIED through the
+   * service's ONE-conditional-UPDATE CAS (a concurrent pair collapses to
+   * one flip + one typed STATUTORY_ALREADY_VERIFIED 409), the SoD law
+   * (the verifier ≠ the row's last editor — the typed 409 otherwise), and
+   * the audit trail (`payroll.statutory_verified` carrying the citation
+   * the flip rests on). Owner-only by seed (payroll.statutory.verify —
+   * the act unblocks legal postings, never a management-surface key).
+   */
+  @Post("statutory/profiles/:id/verify")
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions("payroll.statutory.verify")
+  async verifyProfile(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ) {
+    const identity = requireIdentity(request);
+    const input = verifyProfileSchema.parse(body);
+    const flipped = await this.statutory.verify({
+      profileId: UUID.parse(id),
+      actorId: identity.userId,
+      sourceName: input.sourceName,
+      sourceRef: input.sourceRef ?? null,
+    });
+    return envelope({
+      id: flipped.id,
+      jurisdictionCode: flipped.jurisdictionCode,
+      code: flipped.code,
+      status: flipped.status,
+      sourceName: flipped.sourceName,
+      sourceRef: flipped.sourceRef,
+      verifiedBy: flipped.verifiedBy,
+      verifiedAt: flipped.verifiedAt,
+    });
   }
 }

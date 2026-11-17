@@ -16,6 +16,7 @@ import { RunPostingService } from "./application/run-posting-service";
 import { StatutoryProfileService } from "./application/statutory-profile-service";
 import { StructureService } from "./application/structure-service";
 import { registerPayrollJobs } from "./infrastructure/run-calculation.job";
+import { RemittanceExportService } from "./application/remittance-export-service";
 import { PayrollController } from "./presentation/payroll.controller";
 
 /**
@@ -63,6 +64,9 @@ import { PayrollController } from "./presentation/payroll.controller";
     StatutoryProfileService,
     PitEngine,
     EosbService,
+    // PHASE-046 (W-4, T-08): the remittance export (the 028 exceljs
+    // pattern — read-only + audited, BR-086).
+    RemittanceExportService,
   ],
   exports: [EmployeeService, RunCalculationService, EosService, StatutoryProfileService, PitEngine, EosbService],
 })

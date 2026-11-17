@@ -514,6 +514,21 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-046 (D-08, BR-055): the late-arrival deduction is OFF by default — the feed's lateMinutes never dock pay until the tenant turns the gate on (then: lateMinutes × basic/30/hoursPerDay/60, exact 4dp, folded into the INV-025 deductions).",
   }),
+  // PHASE-046 (W-4, T-08/IN-06 — the GOSI integration-profile READINESS
+  // surface): the tenant's GOSI establishment number. NO default ships (the
+  // BR-055 discipline — the platform fabricates no authority identifiers);
+  // while unset the remittance export carries the honest not-configured
+  // note, never a refusal (readiness only — IN-06: the export + the
+  // PHASE-055 integration platform are the path; NO live-government-API
+  // claim exists anywhere). The null default is pin-neutral by construction
+  // (a null value is omitted from the §5 policies map — precedence.ts).
+  "payroll.statutory.gosi_establishment_no": Object.freeze({
+    key: "payroll.statutory.gosi_establishment_no",
+    schema: z.string().min(1).max(40).nullable(),
+    default: null,
+    description:
+      "PHASE-046 (T-08, IN-06): the tenant's GOSI establishment number (الرقم المنشأة لدى التأمينات الاجتماعية) for the remittance-ready export header. NO default — while unset the export honestly states the not-configured state (readiness only; no live government API — the integration platform is PHASE-055).",
+  }),
   // PHASE-019 professional-services keys (the §9 policy surface; the
   // professional_services manifest sets the six as L1 defaults via
   // workflow_policies, and the crm services read them from the resolved

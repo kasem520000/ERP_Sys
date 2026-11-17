@@ -13,8 +13,8 @@ INV-031 + BR-082…084 as delivered canon) → the ID_LEDGER's coordinated slots
 
 **Status: APPROVED 2026-11-16 (the owner's dispatch, with six binding amendments
 recorded in §1a below) — W-0 + the T-20 pinned notes + W-1 + the
-audit-reconciliation fix wave + W-2 + W-3 DELIVERED; W-4 NEXT (the
-verification workflow + the GOSI remittance export).**
+audit-reconciliation fix wave + W-2 + W-3 + the W-4 honest-record wave +
+W-4 (verification + export) DELIVERED; W-5 NEXT (the web plane).**
 
 ## 1a. The owner's approval amendments (binding — recorded 2026-11-16)
 

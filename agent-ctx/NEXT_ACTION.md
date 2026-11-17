@@ -263,11 +263,88 @@ isolation + entitlements + tenancy + migrations + identity 6 files ·
 agree, id-ledger 0 errors, history-secrets 0, check:rls clean (the
 standalone run on a temp embedded PG16: 0 violations). Evidence:
 [gate-evidence/2026-11-16-phase046-w3.md](../docs/operations/gate-evidence/2026-11-16-phase046-w3.md)
-+ `audit-evidence/phase046-w3/`. **Next: W-4 — the verification
-workflow surface (the verify route on payroll.statutory.verify) + the
-GOSI remittance export (XLSX/CSV, the 028 pattern) + the
-integration-profile readiness surface (IN-06 — exports only, NO
-live-government-API claims).**
++ `audit-evidence/phase046-w3/`.
+
+**W-4 (delivered 2026-11-17 — Verification + export, T-08+T-09; the
+honest-record wave FIRST at `6387da9` — F1's dated disclosure + F4's
+status sync + the F2/F3 plan recordings):** **THE VERIFY ROUTE**
+`POST /api/v1/payroll/statutory/profiles/:id/verify` on
+`payroll.statutory.verify` (owner-only by seed, §8-registered; the
+citation body `{sourceName, sourceRef?}` — the 0089 VERIFIED⟺source
+law; the envelope law; the W-2 act exposed UNCHANGED: the
+one-conditional-UPDATE CAS + the SoD verifier ≠ last editor + the
+`payroll.statutory_verified` audit trail) + **THE GOSI REMITTANCE
+EXPORT** `GET /api/v1/payroll/runs/:id/remittance-export?format=xlsx|csv&locale=ar|en`
+on `payroll.statutory` (§8-registered; streamed bytes with
+Content-Disposition — the audit-events export precedent): the 028
+exceljs pattern (RTL view at locale=ar, the frozen header,
+**tabular `#,##0.0000`** on every money/rate column, one row per
+employee × statutory row + the PIT row when withheld, the bold totals,
+the frozen `statutory_summary` liability block, the self-describing
+footer carrying the establishment number OR the honest
+not-configured note + the bilingual IN-06 statement); the CSV arm
+(UTF-8 BOM · RFC-4180 · CRLF · **the frozen exact 4dp strings
+verbatim**); the service laws — POSTED-only (the typed
+IMMUTABLE_DOCUMENT 409 — the G-52 settlement's own law), READ-ONLY +
+AUDITED (BR-086 — `payroll.remittance_exported` per generation; no
+register reads/writes, no journals, no new machinery), the
+frozen-snapshot law (never recomputed, never re-resolved, never
+rounded), **the totals tie asserted in service code** (Σ per
+(code, kind) == `statutory_summary.accrued`), the payslips PII
+precedent (employee code + name only — national_id/bank never leave);
+**THE READINESS SURFACE** — the setting
+`payroll.statutory.gosi_establishment_no` (nullable, NO default —
+BR-055; unset = the honest not-configured note, never a refusal;
+**pin-neutral by construction** — the 37 golden pins stayed stable) +
+`docs/tax/GOSI_INTEGRATION_READINESS.md` (the readiness matrix, **the
+no-API-claim inventory — IN-06: nothing transmits/submits/clears/
+acknowledges anything to or from any authority; PHASE-055 is the
+path**, the RV-1..4 REQUIRES_VERIFICATION register: the official
+submission file format, the employee identifier semantics, the SANED
+ceiling, the establishment-field semantics). **THE ROUTE-LEVEL SPEC**
+`statutory-routes.spec.ts` **11/11** (the identity-http idiom — the
+FULL Nest pipeline against real PG, the dedicated REMIT tenant with
+its own login users): the verify arms (the permission gate · the flip
++ one audit event · the SoD 409 zero-residue · the CAS 409 naming the
+winner · **THE CONCURRENT PAIR through real HTTP — exactly one 200 +
+one typed 409 + ONE audit event + one flip** · the A7 404) + the
+export arms (the gates · POSTED-only · A7 · **the XLSX round-trip at
+locale=ar** — RTL TRUE, the Arabic headers, the tabular formats, the 4
+golden breakdown rows (Saudi 1,080/1,080 · 90/90 · 0/240; non-Saudi
+OH-only 0/240), the totals 1,170/1,650/2,820, the summary block tying
+the frozen statutory_summary exactly (GOSI-OH 480 · GOSI-PENSION
+2,160 · GOSI-SANED 180) · **the CSV round-trip at locale=en** + the
+locale law through the XLSX arm (en → LTR + EN_HEADERS) · the
+readiness arm (the configured establishment rides the file) · **THE
+NEGATIVE LEDGER PROOF — the run row + the journal registers
+byte-identical through every export**). **THE TWO HONEST REPAIRS**
+(both pre-existing, both proven at the base commit by a stash test,
+both zero-behavior-change, both surfaced by this fresh sandbox's clean
+turbo cache): (1) the payroll controller's constructor params now
+carry **explicit @Inject() tokens** (the identity/hr house pattern —
+the 029-era shape relied on tsc's emitDecoratorMetadata, which the
+vitest/esbuild transform does not emit; the W-3 sync-core typecheck
+evidence rode a `cache hit, replaying logs` — verbatim in the W-3
+log); (2) `domain-core/uuidv7.ts` `randomFill` pinned to
+`Uint8Array<ArrayBuffer>` (the ambient @types/node-14 chain's stricter
+getRandomValues signature — the exact type of the sole allocation
+site). GATES: typecheck/lint 8/8, depcruise clean (**1,926 ·
+14,307**), api unit **660/660** (the first attempt's one red = the
+known chromium-1248 env-prep gap, re-run green after
+`playwright install chromium`), unit 8/8 packages (one first-run
+flaky timeout of a randomized property test under parallel load —
+17/17 standalone + the re-run green, recorded), the payroll folder
+**8 files · 64/64** (53 + the 11 new), the hr folder 13 files ·
+83/83, isolation+entitlements+tenancy×2+migrations+identity×2 **8
+files · 1,693/1,693**, docs 33/33, drift 300 = 300, manifests 13/13,
+i18n parity 6,007 = 6,007 (no web keys — D-15 is W-5), capabilities
+agree, id-ledger 0 errors, history-secrets 0, shells PASS, check:rls
+clean (292 catalog tables). Evidence:
+[gate-evidence/2026-11-17-phase046-w4.md](../docs/operations/gate-evidence/2026-11-17-phase046-w4.md)
++ `audit-evidence/phase046-w4/`. **Next: W-5 — the web plane (the
+three surfaces D-16 + NAV_ITEMS +2 + FALLBACK_CRUMBS + ⌘K + api-types
++ the ~110 i18n keys + the run-screen statutory columns + the
+remittance export button + the reports tab wiring).**
 
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE

@@ -4213,6 +4213,33 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "payroll.runs.post",
   },
 
+  // PHASE-046 (W-4 — matrix §3.24's dated note, D-10/D-13): the BR-085
+  // VERIFICATION ACT — the REQUIRES_VERIFICATION → VERIFIED flip (the
+  // one-conditional-UPDATE CAS + the SoD law: the verifier ≠ the row's
+  // last editor + the audit trail). Owner-only by seed (the act unblocks
+  // legal postings) riding payroll.statutory.verify, NEVER
+  // payroll.statutory — the management key must not carry the flip (the
+  // SoD split D-10).
+  {
+    method: "POST",
+    path: "/api/v1/payroll/statutory/profiles/:id/verify",
+    permission: "payroll.statutory.verify",
+  },
+
+  // PHASE-046 (W-4 — matrix §3.24's dated note, T-08/IN-06): the GOSI
+  // remittance export — the run's frozen statutory liability as
+  // XLSX/CSV (the 028 exceljs pattern: RTL view at locale=ar, tabular
+  // 4dp, the per-employee contribution breakdown + totals). A READ-ONLY
+  // audited artifact (BR-086 — payroll.remittance_exported; no register
+  // writes, no new machinery) riding payroll.statutory (the management
+  // key, D-13's export law); exports + PHASE-055 are the path — NO
+  // live-government-API claim exists anywhere (IN-06).
+  {
+    method: "GET",
+    path: "/api/v1/payroll/runs/:id/remittance-export",
+    permission: "payroll.statutory",
+  },
+
   // PHASE-045 (T-14 — matrix §3.23 + the 0086 seed note): the employee
   // self-service plane — the OWN-ROWS reads (summary, attendance
   // calendar, roster, the leave world) + the two narrow writes
