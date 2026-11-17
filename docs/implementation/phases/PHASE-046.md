@@ -1,6 +1,15 @@
 # PHASE-046 — HR Payroll Compliance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-16](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** **COMPLETE 2026-11-17** (W-0 + the T-20 pinned notes + W-1 + the
+> audit-reconciliation fix wave + W-2 + W-3 + W-4 + W-5 + W-6 + the W-7 closure
+> wave — T-15 + T-16 + T-18 + migration 0094; the completion report
+> [reports/PHASE-046-COMPLETION.md](reports/PHASE-046-COMPLETION.md) is the
+> delivery evidence: the full DB suite 250/250 files · 3,436/3,436 · 0 failed ·
+> 0 skipped; the 0094 pre-state verification ALL ASSERTIONS PASSED; the OA-06
+> budgets P1–P4; drift 300 = 300; the archives byte-verified; the tag
+> `phase/046`). PHASE-047 (HR Growth) is unblocked (the 045 → 046 → 047 chain
+> complete). PHASE-043's hard review and RISK-031/RISK-032 stay OPEN — NOT
+> production approval · **Wave:** 2 / Stage 13 · **Register:** [CR-16](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-05 (payroll/legal-risk part) · §10 HR-11/HR-12 · §13 X-02 · §17 IN-06 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §2 «الفجوة 2»
 
 ## 1. Phase Overview

@@ -50,7 +50,9 @@ import type { StatutoryBreakdownEntry } from "../../modules/payroll/domain/statu
  *   (the full 2,820 through the payout machinery + the summary's
  *   accrued → remitted) and INV-013's double-settle refusal.
  * - (b) FAILURE PACK — THE WRONG-CAP SHAPE: a base FAR above every cap
- *   (60,000) must clamp per row (pension/SANED/OH at their OWN caps —
+ *   (50,000 — 48,000 basic + 2,000 housing; title/comment corrected from
+ *   the wrong "60,000" 2026-11-17, the W-7 F1 literal-truth sweep) must
+ *   clamp per row (pension/SANED/OH at their OWN caps —
  *   the dual-cap law): the wrong outcome (an above-cap line) is
  *   unrepresentable; every line == rate × the CAPPED base, clampedBy
  *   MAX on all three rows, capped counts surface.
@@ -366,7 +368,11 @@ describe("PHASE-046 (W-6, T-14) · the G-52/G-53/G-54 golden suites with failure
     });
   });
 
-  it("(b) FAILURE PACK — THE WRONG-CAP SHAPE: a base of 60,000 clamps at EVERY row's own cap (the dual-cap law); no line above the capped maximum, every line == rate × the CAPPED base", async () => {
+  // (title corrected 2026-11-17 — the W-7 F1 literal-truth sweep: it said
+  // "a base of 60,000" while the fixture (48,000 basic + 2,000 housing) and
+  // every assertion pin the base at 50,000; the header bullet above carried
+  // the same wrong number and moved with it — zero behavior change)
+  it("(b) FAILURE PACK — THE WRONG-CAP SHAPE: a base of 50,000 clamps at EVERY row's own cap (the dual-cap law); no line above the capped maximum, every line == rate × the CAPPED base", async () => {
     await withTenant(TENANT_GOLD, async () => {
       await employees.reactivate(world.bigEmployeeId, P_ACTOR);
       const run = await calculation.createRun({

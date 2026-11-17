@@ -431,6 +431,56 @@ verdict rows live in
 - Stages 9–11 never alter the MVP (PHASE-014) or GA (PHASE-025) gate criteria (ED-01) —
   expansion evidence is additional, never a substitute.
 
+## Per-phase criteria — Blueprint v3.0 expansion (stages 12+)
+
+Universal criteria U1–U8 above apply unchanged, as do the register §O safeguards. The
+v3.0 phases' criteria below distill each phase document's §6; the full evidence ledger
+lives in each phase's completion report. (PHASE-035…045's criteria are carried by
+their phase documents + completion reports — the first v3.0 register entries begin
+with the phases whose acceptance needed a coordinated cross-doc flip.)
+
+### PHASE-046 — HR Payroll Compliance (GOSI / PIT / EOSB)
+
+- **INV-032 enforced**: every statutory line == rate × the CLAMPED wage base, exact
+  4dp (the dual-cap law — one base clamps at every row's OWN cap; an above-cap line is
+  unrepresentable); the totals tie three ways (Σ lines == run totals == the
+  independent jsonb re-fold, tolerance 0); the EOSB delta == entitlement − provision
+  exactly (the `ck_eosb_calculations_delta` table-level law).
+- Goldens **G-52/G-53/G-54** green with failure packs: the statutory accrual + the
+  remittance settlement (one golden, two legs); the employer contribution pair; the
+  delta-only EOSB true-up (OPENING / PERIOD / TERMINATION / release mirror / the
+  zero-delta no-journal law). ZERO new account purposes, ZERO new treasury movement
+  kinds; the 029 regression packs (G-29/G-30/G-31) stay green.
+- **BR-085 proven both ways**: a REQUIRES_VERIFICATION row refuses the whole
+  calculation typed with the audit event and zero residue; the verify act is
+  permission-gated (`payroll.statutory.verify`, owner-only), SoD-bound, CAS-once;
+  only VERIFIED rows post — the GOSI rows post out of the box on a KSA tenant (the
+  PwC citation is the seed's verification record; the register's open items are
+  exactly two: the SANED 15,000 ceiling + the EOSB M/51 Art. 84 text).
+- **BR-086**: statutory/variable amounts exist ONLY as run lines through the
+  feed-service boundary (called ONCE per run — the negative ledger proof); the
+  remittance settles only through the payout machinery; the export is read-only +
+  audited.
+- **BR-087**: the true-up posts ONLY the delta; settled employees never true-up
+  again; TERMINATED employees settle only through G-31 after the alignment; the
+  reconciliation view ties entitlement ↔ provision ↔ settled at every row.
+- **PIT**: the marginal fold over VERIFIED SET-CONSISTENT bracket sets (per-slice
+  half-up 4dp, no absorbed residual); the no-bracket jurisdiction computes zero PIT
+  with the explicit honest note (KSA); the gapped-set typed refusal.
+- **Variable lines** (the 045 handoff): overtime/absence/late feeds land as run-time
+  variable lines with multiplier application; every knob OFF/NULL by default
+  (BR-055); encashment stays G-51's machinery.
+- **Migrations 0089–0094** apply cleanly from zero with the RLS/catalog checker
+  clean at 288 tables; the 0094 RLS-class repair verified end-to-end against the
+  realistic pre-states (its evidence kept); every concurrent writer held by the
+  permanent race suite on the T-20 floor (the F2 payout × payout + F3
+  two-employees-one-run duels).
+- **The report contracts** (`payroll.statutory-summary` · `payroll.eosb-liability`)
+  render + export with the block-on-fail tie checks; the registry pins re-pinned at
+  every site (104 → 106) with zero new permissions (drift 300 = 300).
+- **The register** ([../decisions/product/STATUTORY_VERIFICATION_REGISTER.md](../decisions/product/STATUTORY_VERIFICATION_REGISTER.md))
+  lists every seeded row with citation, status, reviewer/date, and blocking effect.
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

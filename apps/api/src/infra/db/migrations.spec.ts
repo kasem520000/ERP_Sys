@@ -235,7 +235,17 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // no longer presented as the citation; the register's open items narrow
     // to exactly two — the SANED 15,000 ceiling + the EOSB official text;
     // 0089–0092 byte-stable).
-    expect(files.at(-1)?.tag).toBe("0093_statutory_gosi_citation");
+    // PHASE-046 (the W-7 closure wave, 2026-11-17): 0094_rls_tenant_sweep_
+    // repair — THE RLS LATENT NO-OP CLASS REPAIR (the owner's §1a.6 ruling):
+    // the exhaustive FROM-"tenants" sweep inventory 0001…0093 + the
+    // idempotent ON CONFLICT DO NOTHING re-materialization against the
+    // canonical current shapes (0009's master-data basics + 0092's five
+    // remaining families; GOSI stays 0093's repair) through the temporary
+    // migration-plane policy gate (created + self-dropped in the one file —
+    // the final policy set is exactly the pre-0094 set); 0071's FROM-
+    // "warehouses" sibling EXCLUDED and flagged, never guessed;
+    // 0089–0093 byte-stable.
+    expect(files.at(-1)?.tag).toBe("0094_rls_tenant_sweep_repair");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

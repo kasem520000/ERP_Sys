@@ -1,9 +1,60 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-13 (PHASE-044 post-closure audit fixes, wave 5)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-17 (PHASE-046 W-7 — the closure wave)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-17 — **PHASE-046 COMPLETE — the W-7 closure wave** (T-15 + T-16 +
+  T-18 + migration 0094, on the W-6 delivery head `a83874f`; the owner's
+  W-6 verification + the one-word record correction received — the goldens
+  title fix landed under the F1 literal-truth law): **MIGRATION 0094 — THE
+  RLS LATENT NO-OP CLASS REPAIR** (the owner's §1a.6 ruling, one file, the
+  0093 pattern): the exhaustive FROM-"tenants" sweep inventory 0001…0093 in
+  the header (affected: 0009's master-data basics ×14 + 0092's five
+  remaining families; examined-not-affected: 0063's definer reader, 0064's
+  BYPASSRLS definer sweep, 0092 §1/§2's platform-policy paths, 0093's own
+  repair; EXCLUDED and flagged: 0071's FROM-"warehouses" location-tree
+  sibling — outside the ruled class, the runtime `ensureDefaultBin` lazy
+  path is the canonical seeder — never guessed), the idempotent ON
+  CONFLICT DO NOTHING re-materialization against the CANONICAL current
+  shapes (statutory-canonical.ts — the one-source law; the 0092↔canonical
+  name drift disclosed in the header, never silent), the temporary
+  migration-plane policy gate (created + self-dropped in the one file —
+  the final policy set is EXACTLY the pre-0094 set), the pre-state
+  verification end-to-end on embedded PG16 (S1 the pre-0009 tenant
+  repaired · S2 the post-0009 tenant idempotent · S3 the onboarded tenant
+  untouched · GOSI untouched · the platform operations tenant — the one
+  tenant existing at migration time — carries the full repaired set in
+  the FROM-ZERO chain itself; the output kept in
+  `audit-evidence/phase046-w7/m0094-prestate-verification.log`), and the
+  journal/manifest/spec pins to 94 with the chain re-proven from zero.
+  **T-15 THE CANON DOCS WAVE**: JOURNAL_RULES §7's G-52/G-53/G-54 rows +
+  entry 17 (the statutory PROFILE tables are NOT ledger documents) +
+  POSTING_ENGINE §4.1's `payroll_remittance`/`eosb_calculation` source-key
+  rows + the non-ledger note extension; ACCOUNTING_INVARIANTS' Statutory
+  exactness section (INV-032 (a)/(b)/(c) incl. the table-level
+  `ck_eosb_calculations_delta` law); BUSINESS_RULES' statutory section
+  (BR-085 the verification gate · BR-086 the runs-only monopoly · BR-087
+  the delta-only true-up); NAVIGATION_MODEL's two registry rows + the §9
+  LIVE row; PHASE_ACCEPTANCE_CRITERIA's §PHASE-046 (the first v3.0
+  register entry); **the STATUTORY_VERIFICATION_REGISTER landing**
+  (`docs/decisions/product/STATUTORY_VERIFICATION_REGISTER.md` — every
+  seeded row: citation, status, reviewer/date, blocking effect; the open
+  items exactly two: the SANED 15,000 ceiling + the EOSB M/51 Art. 84
+  text; the AE/EG/JO pending sets the owner's open item); the ID_LEDGER
+  flip (the PHASE-046 row DELIVERED — G-01…G-54 · INV-001…032 ·
+  BR-001…087; the checker's probe 7 moved to G-55/PHASE-048 per the
+  fixture-drift law, self-test all-probes-OK). **T-16 THE FULL GATE
+  SWEEP** at the final head + the OA-06 EXPLAIN budgets P1–P4 pinned as
+  the permanent `__db__/payroll/oa06-budgets.spec.ts` (the 041/044/045
+  method; the plans logged). **T-18 THE CLOSURE**: the completion report
+  (the 10 acceptance criteria evidenced), the triple flip (the phase doc
+  header + IMPLEMENTATION_STATUS + NEXT_ACTION → PHASE-047), the archives
+  rebuilt + byte-verified (`ERP_PLATFORM_PHASE046.zip` + the standing
+  043/045), and the tag `phase/046`. Standing: PHASE-043 + RISK-031/
+  RISK-032 OPEN; §7(b)'s three 045 final-audit documentation remarks
+  remain the owner's open input (their text never entered the record —
+  never fabricated); NOT production approval.
 - 2026-11-13 — **PHASE-044 post-closure audit fixes, wave 5** (the owner's
   review of the fourth wave at head `8f943aa` — the union fix accepted,
   then the remaining sequential scenario from the wave-4 §5 limitation: a

@@ -22,6 +22,7 @@ architecture owner.
 | [DR-035-02-customer-portal.md](DR-035-02-customer-portal.md) | Customer portal (S-20): PLANNED PHASE-060 | **ACCEPTED** 2026-11-10 | Decided — classification recorded (was unclassified "priority 3 / 023–025"); PHASE-060 intake consumes it |
 | [DR-035-03-platform-payouts.md](DR-035-03-platform-payouts.md) | platform.payouts: DEFERRED to PHASE-059; the SHIPPED-PHASE-023 claim retracted | **ACCEPTED** 2026-11-10 | Decided — substrate/surface split recorded; PHASE-059 intake consumes it |
 | [DR-045-01-hr-simple-approval.md](DR-045-01-hr-simple-approval.md) | HR approvals: the simple one-step model (leave + overtime), PHASE-052 is the upgrade path | **ACCEPTED** 2026-11-16 | Decided — delivered with PHASE-045; PHASE-052's engine consumes the lifecycle tables without data migration |
+| [STATUTORY_VERIFICATION_REGISTER.md](STATUTORY_VERIFICATION_REGISTER.md) | The statutory verification register (every seeded statutory row: citation, status, reviewer/date, blocking effect) — BR-085's companion | **LIVING** (established 2026-11-17, PHASE-046 W-7) | Standing register — updated with every seed edit and every verify act; exactly two open items (the SANED 15,000 ceiling + the EOSB M/51 Art. 84 text) |
 
 The `DR-P25-NN` rows are **post-GA pointer stubs** (PHASE-025 T14): filed owning slots
 for GA-deliberately-open items — context + options + trigger + owner recorded; not

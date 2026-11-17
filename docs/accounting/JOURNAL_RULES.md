@@ -125,6 +125,9 @@ mandatory failure pack ([../testing/ACCOUNTING_TESTS.md](../testing/ACCOUNTING_T
 | G-49 | MTO completion at actual cost with the reservation chain — `manufacturing` | Source `production_order`, operation `complete` (the G-47/G-single shape carries it) + the MTO chain around it: binding a production order to its driving sales line creates the AVAILABILITY reservation (holder `PRODUCTION_ORDER`, the 0076 widening — the ACTUAL completed qty; an ATP-level hold that nets availability, never a physical pick lock — the soft model, proven in reservation-basis.spec test (c); the unreserved-demand POLICY is DECIDED — the owner's 2026-11-14 directive: the unreserved portion is ADVISORY ONLY and a BACKORDER STAYS LEGAL, no ATP gate exists at issue — with RISK-032 open for the review of the reservation-side defenses ONLY, never as a policy question. Corrected in place 2026-11-15 (the c537113 round): the former wording said “the hard-vs-soft POLICY choice stays OPEN — RISK-032” — the policy is not open; the shipped soft-model reservation with the decided advisory unreserved portion is the standing law); the reservation settles at the delivery (per shipped unit, MTO-first), at the fully-delivered finalization, and at the order's cancel/close — and is never created for a line whose order already died (the round-3 dead-line guard); completion receipts the FG batch at the MO's ACTUAL unit cost (the batch layer IS the MO cost) and lands it at the linked sales order's warehouse (the link's warehouse contract) so a delivery note pinning the produced batch (`orderLineId` + `batchId`, raised MANUALLY — there is no auto-draft hook) posts COGS at exactly the MO's actual unit cost (the batch layer the movement core consumes). **Corrected in place 2026-11-14 (audit round 3):** the original wording said "the HARD reservation (… planned qty, released only on unbind) … routes the output to the linked sales delivery — a DRAFT delivery note" — three misstatements of the shipped behavior (the hold is availability-level per the soft model with the policy choice open; the holder carries the actual completed qty, pinned by the round-3 probe planned 12/completed 9 → holder 9; the release paths are the delivery settlement/finalization/cancel-close, pinned by mto-surplus-cancel; no auto-draft delivery hook exists — the DN is raised manually with the batch pinnable per line) | PHASE-043 |
 | G-50 | Period-end leave-accrual posting (policy-gated) — `hr` | Source `leave_accrual_run`, key `post_{YYYYMM}`: OFF by default (the typed `LEAVE_ACCRUAL_POSTING_DISABLED` while the `hr.leave_accrual_posting` policy is unset — the BR-055 discipline; a 0-accrual type and a zero-value run never post; the monthly law — a multi-month period is the typed refusal, the slice is monthly, never a prorated guess); with 'post': DR `SALARIES_EXPENSE` · CR `SALARIES_PAYABLE` (the payroll family's canonical pair — no new purposes) at Σ (accrual_days/12 × basic/30 — the 029 EOS daily-rate convention, exact 4dp); the roster law (hired ≤ period end — the hire month counts fully; not terminated before period start); EXACTLY-ONCE per (type, period month) under INV-013 — the replay returns the stored journal and audits nothing (CC-01); worked: monthly slice 2.0000 × 2 employees (9,000 + 6,000) = 1,000.0000 | PHASE-045 |
 | G-51 | Leave encashment settlement through the payroll payout machinery — `hr` | Source `leave_encashment`, key `post` (each encashment mints its own key): INV-031 AT THE ENCASH BOUNDARY (days ≤ remaining — the typed refusal BEFORE the same-transaction decrement; the balance untouched on refusal); DR `SALARIES_PAYABLE` · CR CASH + the treasury movement (source `payroll_payout`, the EXISTING kind — INV-019 exact: movement.base == the journal's cash line); TERMINATED employees never encash (the 029 EOS machinery owns them); the charge lands on the entry date's year cell; worked: 2.50 days × 9,000/30 = 750.0000 settled, used 0 → 2.50, remaining 21.50 | PHASE-045 |
+| G-52 | Statutory accrual + remittance settlement (one golden, two legs) — `payroll` | THE ACCRUAL LEG rides the run's own single `(payroll_run, runId, post)` INV-013 key (additive lines in the G-29 fold — the key is NOT split): the employee statutory share + PIT fold into the existing line set — CR `DEDUCTIONS_PAYABLE` grows by (employee share + PIT), net shrinks accordingly (INV-032(b): Σ statutory lines == the run totals == the independent jsonb breakdown re-fold, tolerance 0); THE SETTLEMENT LEG — source `payroll_remittance`, key `post` (each remittance mints its own key): DR `DEDUCTIONS_PAYABLE` · CR the cash account (explicit accountId) through the payout machinery + the treasury movement (source `payroll_payout`, the EXISTING kind — the G-51 precedent, no `cash_movements` CHECK widening), INV-019 exact (movement.base == the journal's cash line), INV-013's double-settle refusal; the `statutory_summary` liability tracks accrued → remitted (the over-remit typed refusal; the partial remittance allocates first-row-first); worked: the KSA run DR `SALARIES_EXPENSE` 12,000 · DR `EMPLOYER_CONTRIBUTIONS` 1,410 · CR `DEDUCTIONS_PAYABLE` 2,580 · CR `SALARIES_PAYABLE` 10,830, the remittance settles 2,580 | PHASE-046 |
+| G-53 | Employer contribution pair — `payroll` | Source `payroll_run` (the same single fold/journal — additive lines, G-52's leg): DR `EMPLOYER_CONTRIBUTIONS` · CR `DEDUCTIONS_PAYABLE` at the employer statutory total (the G-29 account family — ZERO new purposes: BR-053's six-key `PAYROLL_PURPOSE_KEYS` pre-flight and the engine's journal_entry-source guard are untouched); the employer share never nets against the employee share (own lines, own direction — the balanced fold proven by INV-032(b)); worked: the Saudi employer total 1,410.0000 (pension 1,080 + SANED 90 + OH 240), the non-Saudi arm OH-only 240.0000 | PHASE-046 |
+| G-54 | EOSB true-up, delta only — `payroll` | Source `eosb_calculation`, key `eosb_true_up` (each calculation mints its own key): the ACCRUE leg DR `EOS_PROVISION_EXPENSE` · CR `EOS_PROVISION` at (recalculated entitlement − standing provision) when positive; the RELEASE mirror DR `EOS_PROVISION` · CR `EOS_PROVISION_EXPENSE` when negative; ZERO lines when the delta is zero (the evidence row still records — never stamped POSTED; the `ck_eosb_calculations_delta` table-level law enforces delta = entitlement − provision IN SQL — a non-delta row cannot even be INSERTed); an explicit OPENING true-up on first adoption (BR-087), delta-only thereafter; the standing provision = the 029 `balanceFor` balance + the accumulated true-up deltas (the zero-delta law — a re-run with nothing changed posts NO journal, never a double true-up); settled employees never true-up again (G-31 owns them after the alignment); worked: 7 years × eosBase 9,000 → 135 days → 40,500.0000 OPENING; the release 27,000 − 40,500 = −13,500.0000 mirror | PHASE-046 |
 
 Notes:
 
@@ -336,3 +339,41 @@ Notes:
     the EXISTING kind — INV-019 exact: movement.base == the journal's cash line);
     TERMINATED employees never encash (the 029 EOS machinery owns them); worked:
     2.50 days × 9,000/30 = 750.0000 settled, used 0 → 2.50, remaining 21.50.
+
+17. **G-52…G-54 delivered mechanics (PHASE-046, migrations 0089–0094).** Numbering:
+    the PHASE-046 document planned G-52/G-53/G-54 — those slots held (the ID_LEDGER
+    coordination; the 045 wave ended at G-51). **The statutory PROFILE tables are NOT
+    ledger documents** — `statutory_contribution_profiles`, `payroll_tax_brackets`,
+    and `eosb_rules` are rate/rule registers (the effective-dated row-sets whose
+    verification records live in the STATUTORY_VERIFICATION_REGISTER); they never
+    post anything. The cluster's ledger surfaces are the runs themselves (the G-29
+    fold extended by G-52/G-53's additive lines), the remittances (G-52's settlement
+    leg), and the EOSB calculations (G-54). ZERO new account purposes and ZERO new
+    treasury movement kinds shipped (the phase doc's risk-section law; BR-053's
+    six-key pre-flight untouched). Worked examples as pinned by the DB suites
+    (`__db__/payroll/run-statutory.spec.ts`, `statutory-goldens.spec.ts`,
+    `eosb.spec.ts`, `payroll-compliance-reports.spec.ts`): **G-52** the KSA worked
+    example — Saudi basic 10,000 + housing 2,000 → wage base 12,000 → pension
+    1,080.0000/1,080.0000 + SANED 90.0000/90.0000 + OH 0/240.0000 = employee
+    1,170.0000 / employer 1,410.0000, net 10,830.0000; the run's journal DR
+    `SALARIES_EXPENSE` 12,000 · DR `EMPLOYER_CONTRIBUTIONS` 1,410 · CR
+    `DEDUCTIONS_PAYABLE` 2,580 · CR `SALARIES_PAYABLE` 10,830; the remittance
+    settlement 2,580 through the payout machinery with INV-013's double-settle
+    refusal; the consolidated golden carries BOTH arms in one posted run (the
+    non-Saudi OH 240.0000 employer-only) — the balanced 25,650 journal, the full
+    2,820 settlement; the PIT world (tenant BH, the synthetic VERIFIED set): gross
+    40,000 → taxable 35,000 → **3,000.0000** withheld through the same fold; KSA
+    computes zero PIT (the honest no-bracket state). **G-53** the employer pair
+    beside the employee legs in the same fold — the Saudi 1,410.0000 (1,080 + 90 +
+    240), the non-Saudi 240.0000. **G-54** the OPENING true-up posts the full
+    entitlement (7 years × eosBase 9,000 → 5×15 + 2×30 = 135 days → 40,500.0000);
+    the PERIOD true-up posts only the delta; the zero-delta re-run posts NOTHING
+    (the evidence row still records); the release mirror 27,000 − 40,500 =
+    −13,500.0000 (DR `EOS_PROVISION` · CR `EOS_PROVISION_EXPENSE`); the
+    CONTRACTOR override folds its own tier set (140 days → 42,000.0000); the
+    termination sequence — a posted run builds the 029 provision 900 → the true-up
+    aligns +48,600 → G-31 settles 900 → the 029 machinery green after. The
+    INV-032 property wing pins the laws over the whole input space (fast-check,
+    deterministic); the permanent race suite holds every new concurrent writer on
+    the T-20 floor (the F2 payout × payout duel — one serialized window; the F3
+    two-employees-one-run true-up — the SQL-side increment).

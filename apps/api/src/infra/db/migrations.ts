@@ -493,6 +493,23 @@ export const MIGRATIONS: readonly string[] = [
   // does not state it) + the EOSB official text (Labor Law M/51 Art. 84).
   // 0089–0092 stay byte-stable).
   "0093_statutory_gosi_citation",
+  // PHASE-046 (the W-7 closure wave, 2026-11-17): 0094_rls_tenant_sweep_
+  // repair — THE RLS LATENT NO-OP CLASS REPAIR (the owner's §1a.6 ruling,
+  // 2026-11-16: the 0093 honest finding ruled a CLASS, not an incident).
+  // DATA-ONLY, one file, the 0093 pattern (a temporary migration-plane
+  // policy gate, created + self-dropped inside the file — the final policy
+  // set is EXACTLY the pre-0094 set): the exhaustive FROM-"tenants" sweep
+  // inventory 0001…0093 in the header, then the idempotent ON CONFLICT DO
+  // NOTHING re-materialization against the CANONICAL current shapes —
+  // 0009's master-data basics (uoms ×8, credit_terms ×4, the kg↔g pair)
+  // + 0092's five remaining families (the KSA EOSB tiers ×2, the AE/EG/JO
+  // placeholder profiles/brackets/tiers). The GOSI family is NOT repeated
+  // (0093 repaired it with the final citation records). 0071's FROM-
+  // "warehouses" location-tree sweep — the same latent class outside the
+  // ruled FROM-"tenants" pattern — is EXCLUDED and flagged in the header
+  // (the runtime ensureDefaultBin lazy path is the canonical seeder),
+  // never guessed. 0089–0093 stay byte-stable.
+  "0094_rls_tenant_sweep_repair",
 ];
 
 /**

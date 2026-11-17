@@ -167,13 +167,20 @@ shapes are normative in [JOURNAL_RULES.md](JOURNAL_RULES.md) §7.
 | `CONSOLIDATION_ELIMINATION` | consolidation (PHASE-034) | `post` | Elimination in the parent's consolidation books only — G-32 |
 | `leave_accrual_run` | hr (PHASE-045, T-11) | `post_{YYYYMM}` | G-50 — the period-end leave-accrual posting (policy-gated `hr.leave_accrual_posting`, default off — the BR-055 discipline): DR `SALARIES_EXPENSE` · CR `SALARIES_PAYABLE` at the monthly slice (accrual_days/12 × basic/30); exactly-once per (leave type, period month) |
 | `leave_encashment` | hr (PHASE-045, T-11) | `post` | G-51 — the leave encashment settlement through the payroll payout machinery: DR `SALARIES_PAYABLE` · CR CASH + the treasury movement (`cash_movements.source_type = 'payroll_payout'`, the existing kind); INV-031 at the encash boundary; each encashment mints its own key |
+| `payroll_remittance` | payroll (PHASE-046, W-3) | `post` | G-52's settlement leg — the statutory remittance: DR `DEDUCTIONS_PAYABLE` · CR the cash account (explicit accountId) through the payout machinery + the treasury movement (`payroll_payout`, the existing kind); INV-019 exact; the `statutory_summary` liability tracks accrued → remitted; each remittance mints its own key (INV-013's double-settle refusal) |
+| `eosb_calculation` | payroll (PHASE-046, W-2) | `eosb_true_up` | G-54 — the EOSB provision true-up, DELTA ONLY: accrue DR `EOS_PROVISION_EXPENSE` · CR `EOS_PROVISION` (positive delta) or the release mirror (negative); ZERO posts nothing (the evidence row still records); each calculation mints its own key; the `ck_eosb_calculations_delta` CHECK enforces delta = entitlement − provision at the table level |
 
 The `budgeting` module (PHASE-028) intentionally registers **no** source type: budgets are
 not ledger documents (advisory controls only, BR-051 — see
 [DOCUMENT_LIFECYCLE.md](DOCUMENT_LIFECYCLE.md) §3). The same law holds for the rest of the
 hr cluster (PHASE-045): attendance records, rosters, and overtime entries register **no**
 source types — they are operational rows feeding the variable lines PHASE-046 consumes
-(the T-10 feed service), never ledger documents.
+(the T-10 feed service), never ledger documents. The statutory PROFILE tables (PHASE-046:
+`statutory_contribution_profiles`, `payroll_tax_brackets`, `eosb_rules`) follow the same
+law — they are effective-dated rate/rule registers with verification records (the
+STATUTORY_VERIFICATION_REGISTER), never ledger documents; the payroll cluster's ledger
+surfaces are the runs (G-29's fold extended by G-52/G-53's additive lines), the
+remittances (`payroll_remittance`), and the EOSB calculations (`eosb_calculation`).
 
 ## 5. Sequencing example (credit invoice with goods)
 
