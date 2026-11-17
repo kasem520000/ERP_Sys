@@ -383,8 +383,13 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
     // atomicity floor's no-expansion law refuses the pre-W-3 fixture
     // batching (a run-key holder cannot then take the employee key: a
     // backwards expansion is the 40P01 recipe). The PRODUCTION shape is
-    // one writer per UoW (the T-20 self-service.spec precedent); the
-    // assertions below are unchanged.
+    // one writer per UoW (the T-20 self-service.spec precedent). The
+    // 029 golden assertions are unchanged EXCEPT ONE, disclosed per the
+    // owner's W-4 F1 ruling (2026-11-17): the settlement block's run-id
+    // assertion weakened from `expect(run2Id).toBe(run.id)` to
+    // `expect(run2Id).toBeTruthy()` — the split moved it into a UoW
+    // where the create-run result `run` is no longer in scope (the id
+    // is still captured verbatim at creation: `run2Id = run.id`).
     await withTenant(TENANT_PAY, async () => {
       // Flip the population: E1 suspended, E2 reactivated.
       await employees.suspend(fixture.employeeE1Id, P_ACTOR);
@@ -468,7 +473,11 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
       expect(after.balance).toBe("0.0000");
       expect(after.settled).toBe("4000.0000");
       // run2 recorded for the report-tie suite below (set in the run
-      // writer's UoW above — the id itself is the record).
+      // writer's UoW above — the id itself is the record). F1 disclosure
+      // (2026-11-17): pre-W-3 this asserted `toBe(run.id)` inside the ONE
+      // batched UoW; the split-UoW restructure moved this block out of
+      // `run`'s scope, so the strongest assertion available here is
+      // truthiness — the verbatim capture above is the id's record.
       expect(run2Id).toBeTruthy();
       // One settlement per employee (terminal) — the re-entrant
       // re-settle refuses typed (the same employee key, one UoW).

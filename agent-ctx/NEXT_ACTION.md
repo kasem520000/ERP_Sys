@@ -243,7 +243,17 @@ the eosb termination sequence's run-writer + settle batching in one
 UoW — exactly the shape the floor exists to refuse) — both
 restructured to the production one-writer-per-UoW shape (the T-20
 self-service.spec precedent), the ASSERTIONS byte-identical (the 029
-golden pack 14/14, untouched laws). GATES: typecheck/lint 8/8,
+golden pack 14/14, untouched laws). **THE F1 CORRECTION (2026-11-17,
+the owner's W-4 dispatch):** the "byte-identical" claim was imprecise —
+ONE assertion changed in `payroll-rules.spec.ts`'s G-31 settlement
+block: `expect(run2Id).toBe(run.id)` → `expect(run2Id).toBeTruthy()`
+(the split moved the settlement assertions into their own `withTenant`
+UoW where the create-run result `run` is out of scope; the id is still
+captured verbatim at creation — `run2Id = run.id` — so truthiness is
+the strongest assertion available there; every 029 golden assertion is
+unchanged). The dated disclosure lands in the W-3 gate doc + the
+in-code comment in the same W-4 change — never rewrite history
+silently. GATES: typecheck/lint 8/8,
 depcruise clean (1,923 · 14,273), unit 8/8 packages · api **660/660**
 (626 + 25 + 9), the payroll folder 7 files · 53/53, the hr folder 13
 files · 83/83 (the race suite 20/20 — the floor's extension green),

@@ -491,6 +491,29 @@ flip, the loser typed `STATUTORY_ALREADY_VERIFIED`, exactly one audit event);
 (6) remittance × remittance (INV-013 — one journal, one movement, the liability
 tracks once); (7) a smoke duel (no deadlock under three in-flight writers —
 the forest argument re-asserted for the payroll namespaces).
+**THE OWNER'S W-4 SCOPE ADDITIONS (recorded 2026-11-17 with the W-4
+dispatch — F2/F3, owner-approved, implemented HERE in W-6/T-17):**
+- **F2 — the G-30 payout gate + the permanent payout × payout duel (8):**
+  `PayoutService.payout()` takes the run gate `payroll.run|{runId}` (the
+  same two-line adoption as W-3's remit — the outstanding read + the
+  `paid_net_total` advance under ONE lock); rationale: `paid_net_total`
+  advances via an app-computed read-modify-write (`updateRun` is a plain
+  SET) with NO gate — two concurrent partial payouts lose an update, and
+  the 0043 CHECK (0 ≤ paid ≤ net) does NOT catch the concurrent-partial
+  case; D-09's scope extends to this pre-029 writer. The duel: payout ×
+  payout on one run with a partial outstanding — exactly one loser typed
+  (the above-outstanding refusal), `paid_net_total` advanced exactly once.
+- **F3 — the `eosb_trueup_total` race-free advance + the permanent duel
+  (9):** the W-3 advance is an app-computed read-modify-write under the
+  EMPLOYEE gate only — two TRUE-UPS ON DIFFERENT EMPLOYEES referencing the
+  SAME RUN race on the tracking column (the G-54 journals are safe; the
+  column is not). The fix (either shape, decided at W-6 implementation):
+  a SQL-side increment (`SET eosb_trueup_total = eosb_trueup_total + δ`)
+  OR the ascending run-gate acquisition (`payroll.eosb-employee|{id}`
+  sorts before `payroll.run|{id}` in C order — legal under the
+  no-expansion law). The duel: true-up × true-up, TWO employees, ONE run
+  reference — the column advances by exactly the Σ of both deltas, no
+  lost update.
 **Exit:** every duel "blocked" (the pre-fix "slipped" shape fails the suite);
 the no-illegal-state SQL assertions green; the full §4 matrix green.
 
@@ -610,7 +633,12 @@ flip + the archive + the tag delivered; PHASE-047 unblocked.
 - Watch items carried: the shipped modules' unawaited controller sites (the
   T-14 sibling pattern — NEW controllers must not add to it), SF-026-001/002,
   the 028/029/030/037 environmental items, the DB-suite serial-order
-  sensitivities (the runbook note).
+  sensitivities (the runbook note), **the owner's W-4 scope additions
+  (recorded 2026-11-17, implemented in W-6/T-17): F2 — the G-30 payout
+  rides the run gate + the permanent payout × payout duel;
+  F3 — the `eosb_trueup_total` advance made race-free (the SQL-side
+  increment or the ascending run-gate acquisition) + the permanent
+  two-employees-one-run-reference duel**.
 - Honest deferrals recorded in the completion report (the 028 precedent):
   the live-integration platform is PHASE-055 (exports only here); the
   jurisdiction sourcing is the owner's open item (the register lists it).
