@@ -2452,6 +2452,9 @@ export function localizedPayrollError(
   retryAfterSeconds?: number,
 ): string {
   switch (error.code) {
+    // PHASE-046 (W-5, D-16): the statutory family's typed 404s join the
+    // payroll not-found group (A7 parity — unknown == foreign, never a
+    // disclosure).
     case "EMPLOYEE_NOT_FOUND":
     case "SALARY_STRUCTURE_NOT_FOUND":
     case "SALARY_COMPONENT_NOT_FOUND":
@@ -2459,6 +2462,10 @@ export function localizedPayrollError(
     case "EMPLOYEE_LOAN_NOT_FOUND":
     case "EMPLOYEE_LOAN_LINE_NOT_FOUND":
     case "ACCOUNT_NOT_FOUND":
+    case "STATUTORY_PROFILE_NOT_FOUND":
+    case "PIT_BRACKET_NOT_FOUND":
+    case "EOSB_RULE_NOT_FOUND":
+    case "EOSB_CALCULATION_NOT_FOUND":
       return d.payErrNotFound;
     case "PAYROLL_STATE_INVALID":
     case "EMPLOYEE_STATE_INVALID":
@@ -2496,6 +2503,23 @@ export function localizedPayrollError(
       return d.payErrPurposeNotMapped;
     case "PERIOD_LOCKED":
       return d.payErrPeriodLocked;
+    // PHASE-046 (W-5, D-16): the statutory family's typed errors — the
+    // BR-085 fail-closed gate, the verify CAS/SoD conflicts, the bracket
+    // set law, the EOSB guards (the W-2 taxonomy's web mirror).
+    case "STATUTORY_REQUIRES_VERIFICATION":
+      return d.payErrStatutoryRequiresVerification;
+    case "STATUTORY_ALREADY_VERIFIED":
+      return d.payErrStatutoryAlreadyVerified;
+    case "STATUTORY_VERIFY_SOD":
+      return d.payErrStatutoryVerifySod;
+    case "PIT_BRACKET_SET_INVALID":
+      return d.payErrPitBracketSetInvalid;
+    case "EOSB_NO_RULE":
+      return d.payErrEosbNoRule;
+    case "EOSB_TRUE_UP_INVALID":
+      return d.payErrEosbTrueUpInvalid;
+    case "STATUTORY_NATIONALITY_UNRESOLVED":
+      return d.payErrStatutoryNationality;
     default:
       return localizedApiError(d, error, retryAfterSeconds);
   }

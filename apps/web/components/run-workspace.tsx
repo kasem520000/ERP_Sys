@@ -35,6 +35,7 @@ import type {
   PayslipsResult,
   RunCalculationResult,
 } from "../lib/api-types";
+import { errorBodyOf, parseJsonOrUndefined } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { subtractExact } from "../lib/exact-money";
 import {
@@ -58,6 +59,7 @@ export function RunWorkspace({
   employees,
   cashAccounts,
   currency,
+  canExportRemittance,
 }: {
   locale: Locale;
   run: PayrollRunListRow;
@@ -66,6 +68,8 @@ export function RunWorkspace({
   employees: readonly EmployeeListRow[];
   cashAccounts: readonly CashAccountRow[];
   currency: string;
+  /** PHASE-046 (W-5): the session's payroll.statutory — the export's gate. */
+  canExportRemittance: boolean;
 }): JSX.Element {
   const d = getDictionary(locale);
   const router = useRouter();
@@ -92,6 +96,43 @@ export function RunWorkspace({
   // Payslips (on demand — the masked batch).
   const [payslips, setPayslips] = useState<PayslipsResult | null>(null);
   const [payslipsBusy, setPayslipsBusy] = useState(false);
+
+  // PHASE-046 (W-5, D-16): the remittance export — the frozen statutory
+  // liability as the remittance-ready file (XLSX in the viewing locale;
+  // the bytes stream through the BFF with the session cookie; a typed
+  // error renders through the localized map, never a raw JSON tab).
+  async function exportRemittance(): Promise<void> {
+    setBusy("remittance-export");
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/bff/payroll/runs/${run.id}/remittance-export?format=xlsx&locale=${locale}`,
+        { credentials: "same-origin" },
+      );
+      if (!response.ok) {
+        const json = parseJsonOrUndefined(await response.text());
+        setError(localizedPayrollError(d, errorBodyOf(json)));
+        return;
+      }
+      const blob = await response.blob();
+      const disposition = response.headers.get("content-disposition") ?? "";
+      const match = /filename="([^"]+)"/.exec(disposition);
+      const filename = match?.[1] ?? `remittance-${run.id}.xlsx`;
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      toast({ tone: "success", title: d.payRunRemittanceExportToast });
+    } catch {
+      setError(d.errorsGeneric);
+    } finally {
+      setBusy(null);
+    }
+  }
 
   const activeCashAccounts = cashAccounts.filter((account) => account.status === "ACTIVE");
   const employeeById = new Map(employees.map((employee) => [employee.id, employee]));
@@ -279,6 +320,20 @@ export function RunWorkspace({
                     {d.payRunPayout}
                   </Button>
                 )}
+                {/* PHASE-046 (W-5, D-16): the remittance export — POSTED-only
+                    (the IMMUTABLE_DOCUMENT law), the frozen statutory
+                    liability as the remittance-ready file; the button rides
+                    the session's payroll.statutory (D-13's export law). */}
+                {canExportRemittance && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => void exportRemittance()}
+                    loading={busy === "remittance-export"}
+                    disabled={busy !== null}
+                  >
+                    {d.payRunRemittanceExport}
+                  </Button>
+                )}
                 <Button
                   variant="danger"
                   onClick={() => setReverseOpen(reverseOpen ? false : true)}
@@ -389,6 +444,103 @@ export function RunWorkspace({
           )}
         </div>
       </Card>
+
+      {/* PHASE-046 (W-5, D-16): the frozen statutory_summary liability
+          block — per profile row (code · kind) the accrued / remitted /
+          outstanding triple (the G-52 settlement consumes the
+          outstanding), the run's PIT total, and the EOSB true-up total
+          (Σ the G-54 deltas referencing this run). Rendered only when a
+          calculated run carries a summary — the honest absence otherwise. */}
+      {run.statutorySummary !== null && run.statutorySummary.length > 0 && (
+        <Card title={d.payRunStatutorySummary}>
+          <DataTable
+            columns={[
+              {
+                id: "code",
+                header: activeLocaleHeader(d.payStatutoryCode),
+                accessor: (row) => row.code,
+                mono: true,
+                render: (row) => (
+                  <span className="font-mono text-sm" dir="ltr">
+                    {row.code}
+                  </span>
+                ),
+              },
+              {
+                id: "kind",
+                header: activeLocaleHeader(d.payEosbKind),
+                accessor: (row) => row.kind,
+                render: (row) =>
+                  row.kind === "PIT" ? <Badge>{d.payRunPitRow}</Badge> : <Badge>{d.payStatutoryTabProfiles}</Badge>,
+              },
+              {
+                id: "accrued",
+                header: activeLocaleHeader(d.payRunStatutoryAccrued),
+                accessor: (row) => row.accrued,
+                numeric: true,
+                render: (row) => (
+                  <span className="font-mono tabular-nums" dir="ltr">
+                    {formatMoneyDisplay(row.accrued, 2)}
+                  </span>
+                ),
+              },
+              {
+                id: "remitted",
+                header: activeLocaleHeader(d.payRunStatutoryRemitted),
+                accessor: (row) => row.remitted,
+                numeric: true,
+                render: (row) => (
+                  <span className="font-mono tabular-nums" dir="ltr">
+                    {formatMoneyDisplay(row.remitted, 2)}
+                  </span>
+                ),
+              },
+              {
+                id: "outstanding",
+                header: activeLocaleHeader(d.payRunStatutoryOutstanding),
+                accessor: (row) => row.accrued,
+                numeric: true,
+                render: (row) => (
+                  <span className="font-mono tabular-nums font-semibold" dir="ltr">
+                    {formatMoneyDisplay(subtractExact(row.accrued, row.remitted), 2)}
+                  </span>
+                ),
+              },
+            ]}
+            rows={[...run.statutorySummary]}
+            rowKey={(row) => row.code + ":" + row.kind}
+            empty={{ title: d.payRunEmptyLines }}
+          />
+          <div className="mt-3 flex flex-wrap gap-x-8 gap-y-1 text-sm text-gray-600">
+            <span>
+              {d.payRunStatutoryEmployee}:{" "}
+              <span className="font-mono tabular-nums" dir="ltr">
+                {formatMoneyDisplay(run.statutoryEmployeeTotal, 2)}
+              </span>
+            </span>
+            <span>
+              {d.payRunStatutoryEmployer}:{" "}
+              <span className="font-mono tabular-nums" dir="ltr">
+                {formatMoneyDisplay(run.statutoryEmployerTotal, 2)}
+              </span>
+            </span>
+            <span>
+              {d.payRunPit}:{" "}
+              <span className="font-mono tabular-nums" dir="ltr">
+                {formatMoneyDisplay(run.pitTotal, 2)}
+              </span>
+            </span>
+            {run.eosbTrueupTotal !== "0.0000" && (
+              <span>
+                {d.payEosbTrueUp}:{" "}
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(run.eosbTrueupTotal, 2)}
+                </span>
+              </span>
+            )}
+          </div>
+        </Card>
+      )}
 
       {payslips !== null && (
         <Card title={d.payRunPayslips} description={d.payPiiNote}>
@@ -512,6 +664,82 @@ export function RunWorkspace({
               render: (row) => (
                 <span className="font-mono tabular-nums font-semibold" dir="ltr">
                   {formatMoneyDisplay(row.netAmount, 2)}
+                </span>
+              ),
+            },
+            /* PHASE-046 (W-5, D-16): the statutory/variable breakdown
+               columns — additive breakdowns of the frozen fold (INV-025
+               unwidened: the deductions/net columns already carry the
+               totals; these show WHAT composed them, 4dp tabular). */
+            {
+              id: "statutoryEmployee",
+              header: activeLocaleHeader(d.payRunStatutoryEmployee),
+              accessor: (row) => row.statutoryEmployeeShare,
+              numeric: true,
+              sortable: true,
+              render: (row) => (
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(row.statutoryEmployeeShare, 2)}
+                </span>
+              ),
+            },
+            {
+              id: "statutoryEmployer",
+              header: activeLocaleHeader(d.payRunStatutoryEmployer),
+              accessor: (row) => row.statutoryEmployerShare,
+              numeric: true,
+              sortable: true,
+              render: (row) => (
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(row.statutoryEmployerShare, 2)}
+                </span>
+              ),
+            },
+            {
+              id: "pit",
+              header: activeLocaleHeader(d.payRunPit),
+              accessor: (row) => row.pitWithheld,
+              numeric: true,
+              sortable: true,
+              render: (row) => (
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(row.pitWithheld, 2)}
+                </span>
+              ),
+            },
+            {
+              id: "overtime",
+              header: activeLocaleHeader(d.payRunVariableOvertime),
+              accessor: (row) => row.variableOvertimeAmount,
+              numeric: true,
+              sortable: true,
+              render: (row) => (
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(row.variableOvertimeAmount, 2)}
+                </span>
+              ),
+            },
+            {
+              id: "absence",
+              header: activeLocaleHeader(d.payRunVariableAbsence),
+              accessor: (row) => row.variableAbsenceAmount,
+              numeric: true,
+              sortable: true,
+              render: (row) => (
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(row.variableAbsenceAmount, 2)}
+                </span>
+              ),
+            },
+            {
+              id: "late",
+              header: activeLocaleHeader(d.payRunVariableLate),
+              accessor: (row) => row.variableLateAmount,
+              numeric: true,
+              sortable: true,
+              render: (row) => (
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {formatMoneyDisplay(row.variableLateAmount, 2)}
                 </span>
               ),
             },

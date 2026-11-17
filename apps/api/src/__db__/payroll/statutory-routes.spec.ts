@@ -778,3 +778,315 @@ describe("PHASE-046 W-4 T-08 — the remittance export route (payroll.statutory)
     expect(journalsAfter.rows[0]!).toEqual(world.journalCountsBefore); // 1 entry · 4 lines
   });
 });
+
+// -- PHASE-046 (W-5, D-16): the compliance lists + the EOSB views + the
+// true-up trigger ----------------------------------------------------------
+// The web plane's read surface + the one posting act, at the HTTP layer:
+// the three management lists (any status, any effective window — the
+// screen's badges ride the rows' own status/citation fields), the EOSB
+// calculations register + the BR-087 reconciliation view, and the G-54
+// true-up trigger riding the LEDGER key (payroll.runs.post — never the
+// payroll.eosb management key, matrix §3.24's guarded-routes law).
+
+interface ManagerSeed {
+  email: string;
+  userId: string;
+  token: string;
+}
+
+describe("PHASE-046 W-5 T-10/T-11 — the compliance lists + the EOSB views + the true-up trigger", () => {
+  it("(a) THE THREE MANAGEMENT LISTS: the gates (anonymous 401, viewer 403 naming payroll.statutory) + the canonical rows + the jurisdiction narrowing + the honest no-PIT state", async () => {
+    // The gates — all three lists, the same management key.
+    for (const path of [
+      "/api/v1/payroll/statutory/profiles",
+      "/api/v1/payroll/statutory/brackets",
+      "/api/v1/payroll/statutory/eosb-rules",
+    ]) {
+      const anonymous = await get(path);
+      expect(anonymous.status).toBe(401);
+      const denied = await get(path, { "x-session-token": viewer.token });
+      expect(denied.status).toBe(403);
+      const deniedBody = (await denied.json()) as {
+        error: { details: { permissionKey: string } };
+      };
+      expect(deniedBody.error.details.permissionKey).toBe("payroll.statutory");
+    }
+
+    // The owner's profiles list: the canonical KSA rows carry the owner's
+    // corrected schedule VERIFIED (the GOSI codes with the exact rates);
+    // the blocked jurisdictions' rows carry their REQUIRES_VERIFICATION
+    // badges (the BR-085 surface the screen renders).
+    const profilesResponse = await get("/api/v1/payroll/statutory/profiles", {
+      "x-session-token": owner.token,
+    });
+    expect(profilesResponse.status).toBe(200);
+    const profiles = (
+      (await profilesResponse.json()) as { data: { jurisdictionCode: string; code: string; employeeRate: string; employerRate: string; status: string }[] }
+    ).data;
+    const pension = profiles.find((row) => row.jurisdictionCode === "SA" && row.code === "GOSI-PENSION");
+    const saned = profiles.find((row) => row.jurisdictionCode === "SA" && row.code === "GOSI-SANED");
+    const oh = profiles.find((row) => row.jurisdictionCode === "SA" && row.code === "GOSI-OH");
+    expect(pension).toMatchObject({ employeeRate: "9.0000", employerRate: "9.0000", status: "VERIFIED" });
+    expect(saned).toMatchObject({ employeeRate: "0.7500", employerRate: "0.7500", status: "VERIFIED" });
+    expect(oh).toMatchObject({ employeeRate: "0.0000", employerRate: "2.0000", status: "VERIFIED" });
+    expect(
+      profiles.some(
+        (row) => row.jurisdictionCode !== "SA" && row.status === "REQUIRES_VERIFICATION",
+      ),
+    ).toBe(true);
+
+    // The jurisdiction narrowing: SA returns ONLY SA rows.
+    const saResponse = await get("/api/v1/payroll/statutory/profiles?jurisdiction=SA", {
+      "x-session-token": owner.token,
+    });
+    expect(saResponse.status).toBe(200);
+    const saProfiles = (
+      (await saResponse.json()) as { data: { jurisdictionCode: string }[] }
+    ).data;
+    expect(saProfiles.length).toBeGreaterThan(0);
+    expect(saProfiles.every((row) => row.jurisdictionCode === "SA")).toBe(true);
+
+    // The brackets list: the honest no-PIT state for SA (no KSA bracket
+    // rows exist — the 0092 law), the blocked jurisdictions' bracket sets
+    // present with their REQUIRES_VERIFICATION badges.
+    const bracketsResponse = await get("/api/v1/payroll/statutory/brackets", {
+      "x-session-token": owner.token,
+    });
+    expect(bracketsResponse.status).toBe(200);
+    const brackets = (
+      (await bracketsResponse.json()) as { data: { jurisdictionCode: string; status: string }[] }
+    ).data;
+    expect(brackets.some((row) => row.jurisdictionCode === "SA")).toBe(false); // no-PIT
+    expect(
+      brackets.some((row) => row.status === "REQUIRES_VERIFICATION"),
+    ).toBe(true);
+
+    // The EOSB tiers list: the SA ladder (15 days < 5y, 30 days after)
+    // VERIFIED.
+    const rulesResponse = await get("/api/v1/payroll/statutory/eosb-rules", {
+      "x-session-token": owner.token,
+    });
+    expect(rulesResponse.status).toBe(200);
+    const rules = (
+      (await rulesResponse.json()) as { data: { jurisdictionCode: string; fromYears: string; daysPerYear: string; status: string }[] }
+    ).data;
+    const firstTier = rules.find((row) => row.jurisdictionCode === "SA" && row.fromYears === "0.00");
+    const secondTier = rules.find((row) => row.jurisdictionCode === "SA" && row.fromYears === "5.00");
+    expect(firstTier).toMatchObject({ daysPerYear: "15.00", status: "VERIFIED" });
+    expect(secondTier).toMatchObject({ daysPerYear: "30.00", status: "VERIFIED" });
+  });
+
+  it("(b) THE EOSB VIEWS: the gates (viewer 403 naming payroll.eosb) + the honest empty register before any true-up", async () => {
+    for (const path of [
+      "/api/v1/payroll/eosb/calculations",
+      "/api/v1/payroll/eosb/reconciliation",
+    ]) {
+      const anonymous = await get(path);
+      expect(anonymous.status).toBe(401);
+      const denied = await get(path, { "x-session-token": viewer.token });
+      expect(denied.status).toBe(403);
+      const deniedBody = (await denied.json()) as {
+        error: { details: { permissionKey: string } };
+      };
+      expect(deniedBody.error.details.permissionKey).toBe("payroll.eosb");
+    }
+
+    const calculations = await get("/api/v1/payroll/eosb/calculations", {
+      "x-session-token": owner.token,
+    });
+    expect(calculations.status).toBe(200);
+    expect(((await calculations.json()) as { data: unknown[] }).data).toEqual([]);
+
+    const reconciliation = await get("/api/v1/payroll/eosb/reconciliation", {
+      "x-session-token": owner.token,
+    });
+    expect(reconciliation.status).toBe(200);
+    expect(((await reconciliation.json()) as { data: unknown[] }).data).toEqual([]);
+  });
+
+  it("(c) THE TRUE-UP KEY LAW: the management key does NOT carry the posting act — a statutory manager (both management keys, no ledger key) reads the views but takes the 403 naming payroll.runs.post", async () => {
+    // Seed a management-only user: both §3.24 management keys, NEVER
+    // payroll.runs.post (the ledger act rides the ledger key — the
+    // G-50/G-51 law).
+    const manager: ManagerSeed = {
+      email: `remit-manager-${generateUuidV7().slice(0, 8)}@fixture.test`,
+      userId: "",
+      token: "",
+    };
+    const client = await su();
+    const passwordService = new PasswordService();
+    const hash = await passwordService.hashFromNewPassword(SPEC_PASSWORD);
+    const user = await identityStore.insertUser({
+      email: manager.email,
+      fullName: "Remit statutory manager",
+      passwordHash: hash,
+      status: "ACTIVE",
+    });
+    manager.userId = user.id;
+    const roleId = generateUuidV7();
+    await client.query(
+      `INSERT INTO roles (id, tenant_id, key, name, name_ar) VALUES ($1, $2, 'statutory_manager_remit', 'statutory manager', 'مدير قانوني')`,
+      [roleId, TENANT_REMIT],
+    );
+    await client.query(
+      `INSERT INTO role_permissions (role_id, tenant_id, permission_id)
+       SELECT $1, $2, p."key" FROM permissions p WHERE p."key" IN ('payroll.statutory', 'payroll.eosb')`,
+      [roleId, TENANT_REMIT],
+    );
+    await client.query(
+      `INSERT INTO memberships (id, tenant_id, user_id, role_id) VALUES ($1, $2, $3, $4)`,
+      [generateUuidV7(), TENANT_REMIT, user.id, roleId],
+    );
+    await client.end();
+    const login = await post("/api/v1/identity/sessions", {
+      email: manager.email,
+      password: SPEC_PASSWORD,
+    });
+    expect(login.status).toBe(200);
+    manager.token = ((await login.json()) as { data: { token: string } }).data.token;
+
+    // The same user reads the EOSB views…
+    const views = await get("/api/v1/payroll/eosb/reconciliation", {
+      "x-session-token": manager.token,
+    });
+    expect(views.status).toBe(200);
+
+    // …but the true-up trigger is the typed 403 naming the LEDGER key —
+    // the management key must not carry a posting act.
+    const ksa = await withTenant(TENANT_REMIT, async () => {
+      const list = await employees.list({ limit: 100 });
+      return list.find((row) => row.code === world.ksaEmployeeCode)!;
+    });
+    const denied = await post(
+      "/api/v1/payroll/eosb/true-up",
+      { employeeId: ksa.id, kind: "OPENING", onDate: "2026-11-17" },
+      { "x-session-token": manager.token },
+    );
+    expect(denied.status).toBe(403);
+    const deniedBody = (await denied.json()) as {
+      error: { details: { permissionKey: string } };
+    };
+    expect(deniedBody.error.details.permissionKey).toBe("payroll.runs.post");
+
+    // Zero residue: no calculation row, no journal, no audit event.
+    const check = await su();
+    const calcCount = await check.query(
+      `SELECT count(*)::int AS n FROM eosb_calculations WHERE tenant_id = $1`,
+      [TENANT_REMIT],
+    );
+    expect(calcCount.rows[0]!.n).toBe(0);
+    await check.end();
+  });
+
+  it("(d) THE TRUE-UP ACT: the owner's OPENING true-up through real HTTP — the G-54 delta journal + the audit trail + both views reflect it", async () => {
+    const ksa = await withTenant(TENANT_REMIT, async () => {
+      const list = await employees.list({ limit: 100 });
+      return list.find((row) => row.code === world.ksaEmployeeCode)!;
+    });
+
+    const response = await post(
+      "/api/v1/payroll/eosb/true-up",
+      { employeeId: ksa.id, kind: "OPENING", onDate: "2026-11-17", note: "W-5 route spec opening" },
+      { "x-session-token": owner.token },
+    );
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as {
+      data: {
+        calculation: {
+          employeeId: string;
+          kind: string;
+          entitlementAmount: string;
+          provisionBalance: string;
+          delta: string;
+          journalEntryId: string | null;
+          status: string;
+        };
+        journalEntryId: string | null;
+        delta: string;
+      };
+    };
+    // The provision stood at 0 (EOS off in this world) — the opening
+    // true-up accrues the full entitlement: the delta is the positive
+    // entitlement, and the G-54 journal posts (delta ≠ 0).
+    expect(body.data.calculation.provisionBalance).toBe("0.0000");
+    expect(body.data.delta).toBe(body.data.calculation.entitlementAmount);
+    expect(Number(body.data.delta)).toBeGreaterThan(0);
+    expect(body.data.journalEntryId).not.toBeNull();
+    expect(body.data.calculation.status).toBe("POSTED");
+
+    // THE AUDIT TRAIL: the act is audited with the actor.
+    const events = await readAuditEvents("payroll.eosb_true_up");
+    expect(events.length).toBe(1);
+    expect(events[0]!.actor_id).toBe(owner.userId);
+
+    // The G-54 journal: one new entry, the DR/CR pair (EOS_PROVISION_EXPENSE
+    // / EOS_PROVISION) — the register moved from 1 entry · 4 lines to
+    // 2 · 6.
+    const client = await su();
+    const journals = await client.query<{ entries: number; lines: number }>(
+      `SELECT (SELECT count(*) FROM journal_entries WHERE tenant_id = $1)::int AS entries,
+              (SELECT count(*) FROM journal_lines WHERE tenant_id = $1)::int AS lines`,
+      [TENANT_REMIT],
+    );
+    await client.end();
+    expect(journals.rows[0]!).toEqual({ entries: 2, lines: 6 });
+
+    // Both views reflect the act: the register lists the row; the
+    // reconciliation row ties (the aligned delta is exactly 0 — the
+    // opening true-up aligned the provision to the entitlement).
+    const calculations = await get("/api/v1/payroll/eosb/calculations", {
+      "x-session-token": owner.token,
+    });
+    const register = (
+      (await calculations.json()) as { data: { employeeId: string; kind: string }[] }
+    ).data;
+    expect(register.some((row) => row.employeeId === ksa.id && row.kind === "OPENING")).toBe(true);
+
+    const reconciliation = await get(
+      `/api/v1/payroll/eosb/reconciliation?employeeId=${ksa.id}`,
+      { "x-session-token": owner.token },
+    );
+    expect(reconciliation.status).toBe(200);
+    const rows = (
+      (await reconciliation.json()) as { data: { employeeId: string; alignedDelta: string }[] }
+    ).data;
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.alignedDelta).toBe("0.0000");
+  });
+
+  it("(e) THE INVALID SHAPE: a TERMINATION true-up on an ACTIVE employee is the typed EOSB_TRUE_UP_INVALID 422, zero residue", async () => {
+    const ksa = await withTenant(TENANT_REMIT, async () => {
+      const list = await employees.list({ limit: 100 });
+      return list.find((row) => row.code === world.ksaEmployeeCode)!;
+    });
+
+    const anonymous = await post("/api/v1/payroll/eosb/true-up", {
+      employeeId: ksa.id,
+      kind: "PERIOD_TRUE_UP",
+      onDate: "2026-11-17",
+    });
+    expect(anonymous.status).toBe(401);
+
+    const refused = await post(
+      "/api/v1/payroll/eosb/true-up",
+      { employeeId: ksa.id, kind: "TERMINATION", onDate: "2026-11-17" },
+      { "x-session-token": owner.token },
+    );
+    expect(refused.status).toBe(422);
+    const refusedBody = (await refused.json()) as { error: { code: string } };
+    expect(refusedBody.error.code).toBe("EOSB_TRUE_UP_INVALID");
+
+    // Zero residue: still exactly ONE calculation (the (d) opening), one
+    // true-up audit event, 2 entries · 6 lines.
+    const client = await su();
+    const counts = await client.query<{ calcs: number; journals: number }>(
+      `SELECT (SELECT count(*) FROM eosb_calculations WHERE tenant_id = $1)::int AS calcs,
+              (SELECT count(*) FROM journal_entries WHERE tenant_id = $1)::int AS journals`,
+      [TENANT_REMIT],
+    );
+    await client.end();
+    expect(counts.rows[0]!.calcs).toBe(1);
+    expect(counts.rows[0]!.journals).toBe(2);
+    expect((await readAuditEvents("payroll.eosb_true_up")).length).toBe(1);
+  });
+});

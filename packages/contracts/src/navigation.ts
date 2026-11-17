@@ -1502,6 +1502,43 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 80,
   },
+  // PHASE-046 (W-5, T-10/T-11/T-12 — D-16): the payroll compliance web
+  // plane's two surfaces. The compliance screen (three tabs: contribution
+  // profiles / PIT brackets / EOSB tiers — verification badges + the verify
+  // act riding its OWN owner-only key at the API) and the EOSB screen (the
+  // calculations register + the BR-087 reconciliation + the G-54 true-up
+  // trigger). featureKeys the exact FEATURE_CATALOG §22 strings seeded in
+  // 0092 §2 (payroll.statutory · payroll.eosb — business + enterprise, the
+  // 0043/0086 plan-grant pattern); permissions the exact §3.24 management
+  // keys (the verify act itself never rides a nav row — the screen
+  // runtime-checks payroll.statutory.verify and hides the button without
+  // it; the true-up trigger rides payroll.runs.post at the API, the ledger
+  // act on the ledger key). Orders 90/100: the live next slots of the hr
+  // group (10–80 taken by 029/045).
+  {
+    id: "hr.statutory_profiles",
+    parentGroup: "hr",
+    label: { ar: "الملفات القانونية", en: "Statutory profiles" },
+    icon: "shield",
+    route: "/payroll/statutory-profiles",
+    featureKey: "payroll.statutory",
+    permission: "payroll.statutory",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 90,
+  },
+  {
+    id: "hr.eosb",
+    parentGroup: "hr",
+    label: { ar: "نهاية الخدمة", en: "End of service (EOSB)" },
+    icon: "landmark",
+    route: "/payroll/eosb",
+    featureKey: "payroll.eosb",
+    permission: "payroll.eosb",
+    branchScoped: false,
+    archetype: "settings",
+    order: 100,
+  },
 ];
 
 /**

@@ -17,6 +17,7 @@ import { RunWorkspace } from "../../../../../components/run-workspace";
 import { getDictionary, isLocale, type Locale } from "../../../../../i18n/dictionaries";
 import type {
   CashAccountRow,
+  CurrentSession,
   EmployeeListRow,
   FiscalPeriodRow,
   PayrollRunListRow,
@@ -65,15 +66,19 @@ export default async function RunDetailPage({
     );
   }
 
-  const [employees, cashAccounts, profile] = await Promise.all([
+  const [employees, cashAccounts, profile, session] = await Promise.all([
     fetchApi<readonly EmployeeListRow[]>("payroll/employees"),
     fetchApi<readonly CashAccountRow[]>("treasury/cash-accounts"),
     fetchApi<TenantProfile>("tenancy/profile"),
+    // PHASE-046 (W-5, D-16): the session read rides the existing batch —
+    // the remittance export button's runtime gate (payroll.statutory).
+    fetchApi<CurrentSession>("identity/sessions/current"),
   ]);
   if (
     (!employees.ok && employees.status === 401) ||
     (!cashAccounts.ok && cashAccounts.status === 401) ||
-    (!profile.ok && profile.status === 401)
+    (!profile.ok && profile.status === 401) ||
+    (!session.ok && session.status === 401)
   ) {
     redirect(`/${locale}/login`);
   }
@@ -99,6 +104,9 @@ export default async function RunDetailPage({
         employees={employees.ok ? employees.data : []}
         cashAccounts={cashAccounts.ok ? cashAccounts.data : []}
         currency={profile.ok ? profile.data.baseCurrency : "SAR"}
+        canExportRemittance={
+          session.ok && session.data.permissions.includes("payroll.statutory")
+        }
       />
     </AppShell>
   );

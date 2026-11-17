@@ -19,7 +19,7 @@ import {
   StatutoryVerifySoDError,
 } from "../domain/statutory-errors";
 import * as store from "../infrastructure/statutory.store";
-import type { StatutoryProfileRow } from "../infrastructure/statutory.store";
+import type { EosbRuleRow, PitBracketRow, StatutoryProfileRow } from "../infrastructure/statutory.store";
 
 /**
  * PHASE-046 (W-2, T-03) — THE STATUTORY PROFILE SERVICE: the
@@ -102,6 +102,28 @@ export class StatutoryProfileService {
     const jurisdictionCode = filter.jurisdictionCode ?? (await ownTenantCountryCode());
     const rows = await store.listProfiles({ jurisdictionCode, onDate: filter.onDate });
     return { jurisdictionCode, rows };
+  }
+
+  /**
+   * PHASE-046 (W-5, T-10 — D-16): the THREE MANAGEMENT LISTS for the
+   * compliance screen's three tabs — contribution profiles, PIT
+   * brackets, EOSB tiers. Every row of the tenant (any status, any
+   * effective window — the screen's effective-dates columns exist to
+   * show future and retired rows too), optionally narrowed to one
+   * jurisdiction. Pure reads: no gate, no audit (BR-086's read family —
+   * a read never stamps); the verification badges ride the rows' own
+   * status + citation fields, the verify act stays the single writer.
+   */
+  async listAllProfiles(filter: { jurisdictionCode?: string } = {}): Promise<StatutoryProfileRow[]> {
+    return store.listAllProfiles(filter);
+  }
+
+  async listAllBrackets(filter: { jurisdictionCode?: string } = {}): Promise<PitBracketRow[]> {
+    return store.listAllBrackets(filter);
+  }
+
+  async listAllEosbRules(filter: { jurisdictionCode?: string } = {}): Promise<EosbRuleRow[]> {
+    return store.listAllEosbRules(filter);
   }
 
   /**

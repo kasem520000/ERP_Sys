@@ -13,8 +13,9 @@ INV-031 + BR-082…084 as delivered canon) → the ID_LEDGER's coordinated slots
 
 **Status: APPROVED 2026-11-16 (the owner's dispatch, with six binding amendments
 recorded in §1a below) — W-0 + the T-20 pinned notes + W-1 + the
-audit-reconciliation fix wave + W-2 + W-3 + the W-4 honest-record wave +
-W-4 (verification + export) DELIVERED; W-5 NEXT (the web plane).**
+audit-reconciliation fix wave + W-2 + W-3 + W-4 (verification + export) +
+W-5 (the web plane) DELIVERED; W-6 NEXT (the reports + proof wave —
+incl. the owner's F2/F3 T-17 scope additions).**
 
 ## 1a. The owner's approval amendments (binding — recorded 2026-11-16)
 
@@ -465,9 +466,19 @@ the audit trail asserted; zero API claims beyond the export (docs review).
 ### W-5 — Web plane (T-10 + T-11 + T-12, orchestrator)
 The three surfaces (D-16) + NAV_ITEMS +2 + FALLBACK_CRUMBS + ⌘K + api-types +
 the ~110 i18n keys + the run-screen extension + the reports tab wiring.
-**Exit:** AR/EN parity green at every increment; the RTL logical-utility law
-clean (lint); the three routes render on both locales with the honest empty /
-blocked / not-linked states; ⌘K finds the new surfaces; `api-types` complete.
+**Exit (MET 2026-11-17 — delivered at the W-4 head `b8f77ef`, evidence
+[2026-11-17-phase046-w5.md](../docs/operations/gate-evidence/2026-11-17-phase046-w5.md)
++ `audit-evidence/phase046-w5/`):** AR/EN parity green at every increment
+(6,007 → 6,121, both dictionaries at 100%); the RTL logical-utility law clean
+(lint 8/8); the three routes render on both locales with the honest empty /
+blocked / not-linked states (the boards' unit tests pin the badges, the
+citations, the two runtime permission gates, the citation law, and the G-54
+trigger's shape); ⌘K finds the new surfaces (registry-driven — NAV_ITEMS +2
+at the live hr-group slots 90/100); `api-types` complete (the two run-row
+extensions + the eight new wire types). The six-route API surface rides the
+existing §3.24 keys (drift stays 300 = 300); the route-level spec extended
+11 → 16/16; the honest repair: EosbService's @Inject tokens (the W-4
+controller repair's own pre-existing class).
 
 ### W-6 — Reports + proof (T-13 + T-14 + **T-17 — the race suite**)
 T-13: the two contracts (D-12) + the registry pins 104 → 106 + the catalog

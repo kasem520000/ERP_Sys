@@ -1,0 +1,142 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-17 21:07:50.477 UTC [12549] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-17 21:07:50.478 UTC [12549] LOG:  listening on IPv6 address "::1", port 42559
+2026-11-17 21:07:50.478 UTC [12549] LOG:  listening on IPv4 address "127.0.0.1", port 42559
+
+2026-11-17 21:07:50.478 UTC [12549] LOG:  listening on Unix socket "/tmp/.s.PGSQL.42559"
+
+2026-11-17 21:07:50.479 UTC [12552] LOG:  database system was shut down at 2026-11-17 21:07:50 UTC
+
+2026-11-17 21:07:50.481 UTC [12549] LOG:  database system is ready to accept connections
+
+{"level":30,"time":1794949683335,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1794949683360,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1794949683758,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9991-7000-92d2-2c145b2ea70e","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":157,"msg":"request completed"}
+{"level":30,"time":1794949683898,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9a35-7000-940a-97f5ebd4a061","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":133,"msg":"request completed"}
+{"level":30,"time":1794949683920,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9ac5-7000-8a15-46c681e92bb4","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/8cc8705e-8238-4c66-a1e6-7e7f3b8dc210/verify","status":401,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1794949683932,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9ad2-7000-8c47-b7599a06c86b","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/8cc8705e-8238-4c66-a1e6-7e7f3b8dc210/verify","status":403,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1794949683957,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9aed-7000-9672-213594afd8ae","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/590119cb-6ca0-42f2-b025-8f5c084ec582/verify","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1794949683986,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b0b-7000-9d19-c399eca4e57f","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/5af1fde2-097b-4d65-b3b8-253e11a84ce3/verify","status":409,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794949684013,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b26-7000-ae0f-a12eef3cbaed","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/d2a42d02-db80-402a-988b-c38b4fb84c9e/verify","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794949684020,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b2f-7000-b6b0-f96db20445c7","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/d2a42d02-db80-402a-988b-c38b4fb84c9e/verify","status":409,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794949684046,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b44-7000-be4d-6551feaa17a0","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/059efc8b-329a-4e15-be28-8e5bea36caf2/verify","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1794949684047,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b45-7000-b227-7b4d25510e42","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/059efc8b-329a-4e15-be28-8e5bea36caf2/verify","status":409,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1794949684078,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b5d-7000-8e44-d1dc1ce7fd72","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/00000000-0000-4000-8000-00000000dea1/verify","status":404,"duration_ms":17,"msg":"request completed"}
+{"level":30,"time":1794949684084,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b70-7000-9125-e261ec247dae","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-9788-7000-8053-a1bcd146117e/remittance-export","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684086,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b75-7000-bce0-c576a2ae730a","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-9788-7000-8053-a1bcd146117e/remittance-export","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1794949684093,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b77-7000-8301-28167a9400f5","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-97bd-7000-bd71-6da6b1a80f04/remittance-export","status":409,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794949684099,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b7e-7000-8197-cc40ba404405","action":"request","method":"GET","path":"/api/v1/payroll/runs/00000000-0000-4000-8000-00000000dea2/remittance-export","status":404,"duration_ms":5,"msg":"request completed"}
+(node:12608) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{"level":30,"time":1794949684139,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9b84-7000-8aff-4bc9eed9a823","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-9788-7000-8053-a1bcd146117e/remittance-export?format=xlsx&locale=ar","status":200,"duration_ms":39,"msg":"request completed"}
+{"level":30,"time":1794949684231,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9bc3-7000-8070-88be0eb711bb","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-9788-7000-8053-a1bcd146117e/remittance-export?format=csv&locale=en","status":200,"duration_ms":68,"msg":"request completed"}
+{"level":30,"time":1794949684250,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c08-7000-bba2-ef39bfe06152","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-9788-7000-8053-a1bcd146117e/remittance-export?format=xlsx&locale=en","status":200,"duration_ms":18,"msg":"request completed"}
+{"level":30,"time":1794949684275,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c2a-7000-8305-e0a37e64e57a","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1eb56-9788-7000-8053-a1bcd146117e/remittance-export?format=csv&locale=en","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1794949684292,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c43-7000-9790-c8894f4d9280","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1794949684297,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c45-7000-b5b8-74884055148c","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684298,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c4a-7000-a768-7928627e20c9","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1794949684303,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c4b-7000-8371-03c200f316c0","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684304,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c50-7000-8998-fe84a229c2c0","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1794949684308,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c51-7000-9fd6-ba420b174bc3","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1794949684314,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c55-7000-bdb3-cb5e2be638bd","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794949684320,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c5c-7000-a88f-1ac2d71d6a10","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles?jurisdiction=SA","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684329,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c61-7000-8d28-052da26b1484","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1794949684336,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c6a-7000-80d4-98c201c1b760","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794949684338,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c71-7000-bd66-e3f81faf8245","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1794949684343,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c72-7000-a269-a5ba59641b8b","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794949684344,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c78-7000-a3c4-2c9e273959c4","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1794949684349,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c79-7000-9054-6ef73d88d956","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684355,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c7e-7000-9d94-9705a55d3522","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794949684360,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9c84-7000-af62-5648f6e81440","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684638,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9d1a-7000-aeb7-f0d2b902e258","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":132,"msg":"request completed"}
+{"level":30,"time":1794949684643,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9d9f-7000-b81c-e8351db7b6ef","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684650,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9da6-7000-9ad9-4c7a759089b8","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684685,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9db4-7000-889a-5ed36f70ce17","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":200,"duration_ms":25,"msg":"request completed"}
+{"level":30,"time":1794949684703,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9dda-7000-be7e-8133cbbbf55a","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794949684708,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9de0-7000-86a1-fc4d1a340cb5","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation?employeeId=01a1eb56-9785-7000-b0d0-583ca7d8e246","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794949684711,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9de7-7000-84ff-5755c9027432","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1794949684718,"service":"erp-api","module":"http","correlation_id":"01a1eb56-9de8-7001-88e7-06db95cf02f9","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794949684738,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/payroll/statutory-routes.spec.ts (16 tests) 2309ms
+2026-11-17 21:08:04.850 UTC [12669] ERROR:  permission denied for table payroll_run_lines
+2026-11-17 21:08:04.850 UTC [12669] STATEMENT:  UPDATE payroll_run_lines SET net_amount = 99999 WHERE run_id = $1
+
+ ✓ src/__db__/payroll/payroll-rules.spec.ts (14 tests) 528ms
+ ✓ src/__db__/payroll/run-statutory.spec.ts (7 tests) 305ms
+ ✓ src/__db__/payroll/variable-lines.spec.ts (5 tests) 253ms
+ ✓ src/__db__/payroll/eosb.spec.ts (9 tests) 230ms
+ ✓ src/__db__/payroll/statutory.spec.ts (7 tests) 92ms
+ ✓ src/__db__/payroll/pit.spec.ts (6 tests) 23ms
+ ✓ src/__db__/payroll/spoof.spec.ts (5 tests) 54ms
+
+ Test Files  8 passed (8)
+      Tests  69 passed (69)
+   Start at  21:07:49
+   Duration  16.90s (transform 4.72s, setup 0ms, collect 8.31s, tests 3.79s, environment 0ms, prepare 58ms)
+
+2026-11-17 21:08:06.397 UTC [12549] LOG:  received fast shutdown request
+
+2026-11-17 21:08:06.397 UTC [12549] LOG:  aborting any active transactions
+2026-11-17 21:08:06.397 UTC [12668] FATAL:  terminating connection due to administrator command
+2026-11-17 21:08:06.397 UTC [12682] FATAL:  terminating connection due to administrator command
+
+2026-11-17 21:08:06.400 UTC [12549] LOG:  background worker "logical replication launcher" (PID 12555) exited with exit code 1
+
+2026-11-17 21:08:06.401 UTC [12550] LOG:  shutting down
+2026-11-17 21:08:06.401 UTC [12550] LOG:  checkpoint starting: shutdown immediate
+
+(node:12608) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:12608) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-17 21:08:06.469 UTC [12550] LOG:  checkpoint complete: wrote 3223 buffers (19.7%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.043 s, sync=0.022 s, total=0.068 s; sync files=2738, longest=0.004 s, average=0.001 s; distance=28517 kB, estimate=28517 kB; lsn=0/30B7C88, redo lsn=0/30B7C88
+
+2026-11-17 21:08:06.478 UTC [12549] LOG:  database system is shut down
+
+EXIT:0

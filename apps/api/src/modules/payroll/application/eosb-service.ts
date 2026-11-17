@@ -82,10 +82,19 @@ export interface EosbEntitlement {
 
 @Injectable()
 export class EosbService {
+  // PHASE-046 (W-5 — the DI repair, the W-4 controller's own class of
+  // defect): the constructor params carry EXPLICIT @Inject tokens (the
+  // identity/hr house pattern). The W-2-era shape relied on tsc's
+  // emitDecoratorMetadata (correct in the production build); the
+  // vitest/esbuild transform emits NO design:paramtypes, so W-5's
+  // route-level spec (booting the controller — and this service through
+  // it — via the real Nest pipeline under that transform) resolved the
+  // posting/eos params undefined and the true-up route 500'd. Mechanical
+  // (token = the same class), zero production behavior change.
   constructor(
     @Inject(AuditService) private readonly audit: AuditService,
-    private readonly posting: PostingService,
-    private readonly eos: EosService,
+    @Inject(PostingService) private readonly posting: PostingService,
+    @Inject(EosService) private readonly eos: EosService,
   ) {}
 
   /**
@@ -340,6 +349,19 @@ export class EosbService {
       });
     }
     return { calculation, journalEntryId, delta: entitlement.delta };
+  }
+
+  /**
+   * PHASE-046 (W-5, T-11 — D-16): the CALCULATIONS REGISTER for the
+   * EOSB screen — the computation-evidence rows (newest first), pure
+   * read (BR-086's read family: no gate, no audit; the rows are already
+   * the evidence — INSERT-only by construction, the 0089 law).
+   */
+  async listCalculations(filter: {
+    employeeId?: string;
+    kind?: EosbCalculationKind;
+  } = {}): Promise<EosbCalculationRow[]> {
+    return store.listEosbCalculations(filter);
   }
 
   /**

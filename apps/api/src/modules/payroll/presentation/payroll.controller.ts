@@ -9,6 +9,7 @@ import { envelope } from "../../../infra/http/envelope";
 import { ApprovalWorkflow } from "../application/approval-workflow";
 import { EmployeeService, toEmployeeView } from "../application/employee-service";
 import { EosService } from "../application/eos-service";
+import { EosbService } from "../application/eosb-service";
 import { LoanService } from "../application/loan-service";
 import { PayoutService } from "../application/payout-service";
 import { RemittanceExportService } from "../application/remittance-export-service";
@@ -197,6 +198,35 @@ const remittanceExportQuerySchema = z.object({
   locale: z.enum(["ar", "en"]).default("ar"),
 });
 
+// PHASE-046 (W-5, T-10 — D-16): the compliance screen's management-list
+// filter — an OPTIONAL ISO-3166 alpha-2 jurisdiction narrowing (the
+// default shows every jurisdiction the tenant holds rows for).
+const statutoryListQuerySchema = z.object({
+  jurisdiction: z
+    .string()
+    .length(2)
+    .transform((value) => value.toUpperCase())
+    .optional(),
+});
+
+// PHASE-046 (W-5, T-11 — D-16): the EOSB screen's register filter.
+const eosbCalculationsQuerySchema = z.object({
+  employeeId: UUID.optional(),
+  kind: z.enum(["OPENING", "PERIOD_TRUE_UP", "TERMINATION"]).optional(),
+});
+
+// PHASE-046 (W-5, T-11 — D-16): the TRUE-UP TRIGGER's body — the act is
+// the W-2 engine's own trueUp EXPOSED UNCHANGED (the delta-only G-54 law,
+// BR-087); the endpoint adds NO semantics of its own (the employee/kind/
+// date/note ride verbatim; runId/fiscalPeriodId stay the run flow's own
+// references, never a web-supplied stamp).
+const eosbTrueUpSchema = z.object({
+  employeeId: UUID,
+  kind: z.enum(["OPENING", "PERIOD_TRUE_UP", "TERMINATION"]),
+  onDate: DATE,
+  note: TEXT,
+});
+
 @Controller("api/v1/payroll")
 export class PayrollController {
   // PHASE-046 (W-4 — the DI repair, honestly recorded): the constructor
@@ -222,6 +252,9 @@ export class PayrollController {
     @Inject(StatutoryProfileService) private readonly statutory: StatutoryProfileService,
     @Inject(RemittanceExportService)
     private readonly remittanceExports: RemittanceExportService,
+    // PHASE-046 (W-5): the EOSB screen's reads + the true-up trigger
+    // (T-11 — the W-2 engine exposed, never re-implemented).
+    @Inject(EosbService) private readonly eosb: EosbService,
   ) {}
 
   // -- employees (PII-restricted surface) --------------------------------------
@@ -659,6 +692,122 @@ export class PayrollController {
       sourceRef: flipped.sourceRef,
       verifiedBy: flipped.verifiedBy,
       verifiedAt: flipped.verifiedAt,
+    });
+  }
+
+  // -- statutory + EOSB reads + the true-up trigger (PHASE-046 W-5, matrix §3.24) ---
+
+  /**
+   * PHASE-046 (W-5, T-10 — D-16): THE COMPLIANCE SCREEN'S THREE
+   * MANAGEMENT LISTS — every statutory row of the tenant (any status,
+   * any effective window), optionally narrowed to one jurisdiction.
+   * READ-ONLY (BR-086's read family: no gate, no audit — the badges ride
+   * the rows' own status/citation fields). The three tabs of
+   * /payroll/statutory-profiles consume these verbatim.
+   */
+  @Get("statutory/profiles")
+  @RequirePermissions("payroll.statutory")
+  async listStatutoryProfiles(
+    @Req() request: Request,
+    @Query("jurisdiction") jurisdiction?: string,
+  ) {
+    requireIdentity(request);
+    const input = statutoryListQuerySchema.parse({
+      jurisdiction: jurisdiction === undefined || jurisdiction === "" ? undefined : jurisdiction,
+    });
+    return envelope(await this.statutory.listAllProfiles({ jurisdictionCode: input.jurisdiction }));
+  }
+
+  @Get("statutory/brackets")
+  @RequirePermissions("payroll.statutory")
+  async listStatutoryBrackets(
+    @Req() request: Request,
+    @Query("jurisdiction") jurisdiction?: string,
+  ) {
+    requireIdentity(request);
+    const input = statutoryListQuerySchema.parse({
+      jurisdiction: jurisdiction === undefined || jurisdiction === "" ? undefined : jurisdiction,
+    });
+    return envelope(await this.statutory.listAllBrackets({ jurisdictionCode: input.jurisdiction }));
+  }
+
+  @Get("statutory/eosb-rules")
+  @RequirePermissions("payroll.statutory")
+  async listStatutoryEosbRules(
+    @Req() request: Request,
+    @Query("jurisdiction") jurisdiction?: string,
+  ) {
+    requireIdentity(request);
+    const input = statutoryListQuerySchema.parse({
+      jurisdiction: jurisdiction === undefined || jurisdiction === "" ? undefined : jurisdiction,
+    });
+    return envelope(await this.statutory.listAllEosbRules({ jurisdictionCode: input.jurisdiction }));
+  }
+
+  /**
+   * PHASE-046 (W-5, T-11 — D-16): THE EOSB SCREEN'S READS — the
+   * calculations register (the computation evidence, newest first) and
+   * the BR-087 reconciliation view (computed entitlement ↔ provision
+   * balance ↔ settled at every row). READ-ONLY on `payroll.eosb` (the
+   * management key — the views never carry the posting act).
+   */
+  @Get("eosb/calculations")
+  @RequirePermissions("payroll.eosb")
+  async listEosbCalculations(
+    @Req() request: Request,
+    @Query("employeeId") employeeId?: string,
+    @Query("kind") kind?: string,
+  ) {
+    requireIdentity(request);
+    const input = eosbCalculationsQuerySchema.parse({
+      employeeId: employeeId === undefined || employeeId === "" ? undefined : employeeId,
+      kind: kind === undefined || kind === "" ? undefined : kind,
+    });
+    return envelope(await this.eosb.listCalculations(input));
+  }
+
+  @Get("eosb/reconciliation")
+  @RequirePermissions("payroll.eosb")
+  async eosbReconciliation(
+    @Req() request: Request,
+    @Query("employeeId") employeeId?: string,
+  ) {
+    requireIdentity(request);
+    return envelope(
+      await this.eosb.reconciliation({
+        employeeId:
+          employeeId === undefined || employeeId === "" ? undefined : UUID.parse(employeeId),
+      }),
+    );
+  }
+
+  /**
+   * PHASE-046 (W-5, T-11 — D-16): THE TRUE-UP TRIGGER — the W-2 engine's
+   * own trueUp act EXPOSED UNCHANGED at the HTTP surface: the
+   * delta-only G-54 posting (BR-087 — positive accrues, negative
+   * releases, zero posts nothing), the D-09 employee gate, the audited
+   * act, the typed BR-085 refusal when the tier set is unverified. The
+   * route rides `payroll.runs.post` (the ledger act rides the ledger
+   * key — the G-50/G-51 law, matrix §3.24): NEVER payroll.eosb (the
+   * management key must not carry a posting act).
+   */
+  @Post("eosb/true-up")
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions("payroll.runs.post")
+  async eosbTrueUp(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = eosbTrueUpSchema.parse(body);
+    const result = await this.eosb.trueUp({
+      employeeId: UUID.parse(input.employeeId),
+      kind: input.kind,
+      onDate: input.onDate,
+      note: input.note ?? null,
+      actorId: identity.userId,
+    });
+    return envelope({
+      calculation: result.calculation,
+      journalEntryId: result.journalEntryId,
+      delta: result.delta,
     });
   }
 }

@@ -1,0 +1,6 @@
+
+> erp-platform@0.1.0 check:i18n-parity /home/z/my-project/ERP_Sys
+> tsx scripts/check-i18n-parity.ts
+
+== i18n key parity: ar=6121 keys, en=6121 keys ==
+ar/en catalogs at 100% key parity; no empty values.

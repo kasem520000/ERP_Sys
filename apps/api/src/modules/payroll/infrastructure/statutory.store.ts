@@ -151,6 +151,25 @@ export async function findProfileById(id: string): Promise<StatutoryProfileRow |
 }
 
 /**
+ * PHASE-046 (W-5, T-10 — D-16): the MANAGEMENT list — every profile of
+ * the tenant (any status, any effective window — future and retired rows
+ * included; the screen's effective-dates columns exist to show them),
+ * optionally narrowed to one jurisdiction. Read-only; the verification
+ * badges + the verify act ride the same rows the engine resolves.
+ */
+export async function listAllProfiles(filter: {
+  jurisdictionCode?: string;
+}): Promise<StatutoryProfileRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${PROFILE_COLUMNS} FROM statutory_contribution_profiles
+    WHERE (${filter.jurisdictionCode ?? null}::text IS NULL
+           OR jurisdiction_code = ${filter.jurisdictionCode ?? null})
+    ORDER BY jurisdiction_code, code, effective_from
+  `);
+  return (rows.rows as unknown as ProfileSqlRow[]).map(mapProfile);
+}
+
+/**
  * The verify CAS (BR-085's flip + D-10): ONE conditional UPDATE — only a
  * REQUIRES_VERIFICATION row flips, stamping the verifier + the citation
  * the flip rests on (the 0089 VERIFIED⟺source CHECK) + the timestamp.
@@ -257,6 +276,27 @@ export async function findBracketById(id: string): Promise<PitBracketRow | undef
   return row === undefined ? undefined : mapBracket(row);
 }
 
+/**
+ * PHASE-046 (W-5, T-10 — D-16): the MANAGEMENT list — every bracket row
+ * of the tenant (any status, any effective window), optionally narrowed
+ * to one jurisdiction, in the set's own (code, sort) order so a set
+ * reads as the progressive ladder it is.
+ */
+export async function listAllBrackets(filter: {
+  jurisdictionCode?: string;
+}): Promise<PitBracketRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, jurisdiction_code, code, floor, ceiling, rate, sort,
+           personal_allowance_default, per_dependent_allowance, effective_from, effective_to,
+           status, review_note
+    FROM payroll_tax_brackets
+    WHERE (${filter.jurisdictionCode ?? null}::text IS NULL
+           OR jurisdiction_code = ${filter.jurisdictionCode ?? null})
+    ORDER BY jurisdiction_code, code, sort, effective_from
+  `);
+  return (rows.rows as unknown as BracketSqlRow[]).map(mapBracket);
+}
+
 // -- EOSB rules -------------------------------------------------------------------------
 
 export interface EosbRuleRow {
@@ -330,6 +370,25 @@ export async function findEosbRuleById(id: string): Promise<EosbRuleRow | undefi
   `);
   const row = (rows.rows as unknown as EosbRuleSqlRow[])[0];
   return row === undefined ? undefined : mapEosbRule(row);
+}
+
+/**
+ * PHASE-046 (W-5, T-10 — D-16): the MANAGEMENT list — every EOSB tier
+ * row of the tenant (any status, any effective window), optionally
+ * narrowed to one jurisdiction, in tier (fromYears) order.
+ */
+export async function listAllEosbRules(filter: {
+  jurisdictionCode?: string;
+}): Promise<EosbRuleRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, jurisdiction_code, from_years, to_years, days_per_year, contract_type,
+           effective_from, effective_to, status, review_note
+    FROM eosb_rules
+    WHERE (${filter.jurisdictionCode ?? null}::text IS NULL
+           OR jurisdiction_code = ${filter.jurisdictionCode ?? null})
+    ORDER BY jurisdiction_code, from_years, effective_from
+  `);
+  return (rows.rows as unknown as EosbRuleSqlRow[]).map(mapEosbRule);
 }
 
 // -- EOSB calculations (the computation evidence) ---------------------------------------

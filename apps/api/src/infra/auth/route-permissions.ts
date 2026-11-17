@@ -4240,6 +4240,56 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "payroll.statutory",
   },
 
+  // PHASE-046 (W-5 — matrix §3.24's guarded-routes paragraph, D-16): the
+  // compliance screen's THREE MANAGEMENT LISTS (the /payroll/
+  // statutory-profiles tabs) — every statutory row of the tenant (any
+  // status, any effective window), READ-ONLY on the management key
+  // (BR-086's read family: a read never stamps; the badges ride the
+  // rows' own status/citation fields, the verify act stays the single
+  // writer at its own owner-only key).
+  {
+    method: "GET",
+    path: "/api/v1/payroll/statutory/profiles",
+    permission: "payroll.statutory",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payroll/statutory/brackets",
+    permission: "payroll.statutory",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payroll/statutory/eosb-rules",
+    permission: "payroll.statutory",
+  },
+
+  // PHASE-046 (W-5 — matrix §3.24's guarded-routes paragraph, D-16): the
+  // EOSB screen's two views — the calculations register + the BR-087
+  // reconciliation (entitlement ↔ provision ↔ settled). READ-ONLY on
+  // payroll.eosb (the management key; the views never carry the posting
+  // act — the true-up rides the ledger key below).
+  {
+    method: "GET",
+    path: "/api/v1/payroll/eosb/calculations",
+    permission: "payroll.eosb",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/payroll/eosb/reconciliation",
+    permission: "payroll.eosb",
+  },
+
+  // PHASE-046 (W-5 — matrix §3.24's guarded-routes paragraph, D-16): the
+  // EOSB TRUE-UP TRIGGER — the W-2 engine's delta-only G-54 act exposed
+  // unchanged. The ledger act rides the EXISTING payroll.runs.post key
+  // (the G-50/G-51 law — never payroll.eosb: the management key must not
+  // carry a posting act).
+  {
+    method: "POST",
+    path: "/api/v1/payroll/eosb/true-up",
+    permission: "payroll.runs.post",
+  },
+
   // PHASE-045 (T-14 — matrix §3.23 + the 0086 seed note): the employee
   // self-service plane — the OWN-ROWS reads (summary, attendance
   // calendar, roster, the leave world) + the two narrow writes

@@ -4714,6 +4714,131 @@ export interface Dictionary {
   payErrPurposeNotMapped: string;
   payErrPeriodLocked: string;
 
+  // -- PHASE-046 (W-5, D-15): the payroll compliance web plane -------------
+  // (the three statutory surfaces: the compliance screen's three tabs —
+  // contribution profiles / PIT brackets / EOSB tiers with verification
+  // badges + the verify act; the EOSB screen — the calculations register,
+  // the BR-087 reconciliation view, the G-54 true-up trigger; the run
+  // screen extension — the statutory/variable columns + the frozen
+  // statutory_summary block + the remittance export; the typed-error
+  // map extension + the nav fallback labels. Every string in BOTH
+  // locales — parity green at every increment.)
+
+  navStatutoryProfiles: string;
+  navEosb: string;
+  payStatutoryTitle: string;
+  payStatutorySubtitle: string;
+  payStatutoryTabProfiles: string;
+  payStatutoryTabBrackets: string;
+  payStatutoryTabEosb: string;
+  payStatutoryJurisdiction: string;
+  payStatutoryCode: string;
+  payStatutoryName: string;
+  payStatutoryEmployeeRate: string;
+  payStatutoryEmployerRate: string;
+  payStatutoryBaseMin: string;
+  payStatutoryBaseMax: string;
+  payStatutoryAppliesTo: string;
+  payStatutoryAppliesAll: string;
+  payStatutoryAppliesCitizen: string;
+  payStatutoryAppliesNonCitizen: string;
+  payStatutoryEffectiveFrom: string;
+  payStatutoryEffectiveTo: string;
+  payStatutoryEffectiveOpen: string;
+  payStatutoryStatus: string;
+  payStatutoryStatusVerified: string;
+  payStatutoryStatusRequiresVerification: string;
+  payStatutoryStatusRetired: string;
+  payStatutorySource: string;
+  payStatutoryVerifiedAt: string;
+  payStatutoryReviewNote: string;
+  payStatutoryVerify: string;
+  payStatutoryVerifyTitle: string;
+  payStatutoryVerifySourceName: string;
+  payStatutoryVerifySourceRef: string;
+  payStatutoryVerifySourceRefHint: string;
+  payStatutoryVerifyConfirm: string;
+  payStatutoryVerifyToast: string;
+  payStatutoryVerifyNoPermission: string;
+  payStatutoryEmpty: string;
+  payStatutoryBracketFloor: string;
+  payStatutoryBracketCeiling: string;
+  payStatutoryBracketCeilingOpen: string;
+  payStatutoryBracketRate: string;
+  payStatutoryBracketPersonalAllowance: string;
+  payStatutoryBracketDependentAllowance: string;
+  payStatutoryEosbFromYears: string;
+  payStatutoryEosbToYears: string;
+  payStatutoryEosbToYearsOpen: string;
+  payStatutoryEosbDaysPerYear: string;
+  payStatutoryEosbContractType: string;
+  payStatutoryEosbContractAll: string;
+  payStatutoryBlockedHint: string;
+  payEosbTitle: string;
+  payEosbSubtitle: string;
+  payEosbTabCalculations: string;
+  payEosbTabReconciliation: string;
+  payEosbKind: string;
+  payEosbKindOpening: string;
+  payEosbKindPeriod: string;
+  payEosbKindTermination: string;
+  payEosbServiceYears: string;
+  payEosbEntitlement: string;
+  payEosbProvisionBalance: string;
+  payEosbSettled: string;
+  payEosbDelta: string;
+  payEosbAlignedDelta: string;
+  payEosbCalcStatus: string;
+  payEosbCalcStatusComputed: string;
+  payEosbCalcStatusPosted: string;
+  payEosbJournalEntry: string;
+  payEosbEntryDate: string;
+  payEosbNote: string;
+  payEosbTrueUp: string;
+  payEosbTrueUpTitle: string;
+  payEosbTrueUpEmployee: string;
+  payEosbTrueUpKind: string;
+  payEosbTrueUpDate: string;
+  payEosbTrueUpNote: string;
+  payEosbTrueUpConfirm: string;
+  payEosbTrueUpToast: string;
+  payEosbTrueUpNoPermission: string;
+  payEosbEmpty: string;
+  payEosbReconcileEmpty: string;
+  payEosbAlignedBadge: string;
+  payEosbUnalignedBadge: string;
+  payRunStatutoryEmployee: string;
+  payRunStatutoryEmployer: string;
+  payRunPit: string;
+  payRunVariableOvertime: string;
+  payRunVariableAbsence: string;
+  payRunVariableLate: string;
+  payRunStatutorySummary: string;
+  payRunStatutoryAccrued: string;
+  payRunStatutoryRemitted: string;
+  payRunStatutoryOutstanding: string;
+  payRunRemittanceExport: string;
+  payRunRemittanceExportToast: string;
+  payRunBreakdownTitle: string;
+  payRunBreakdownBase: string;
+  payRunBreakdownClampedBase: string;
+  payRunBreakdownClampMin: string;
+  payRunBreakdownClampMax: string;
+  payRunBreakdownRate: string;
+  payRunBreakdownEmployeeAmount: string;
+  payRunBreakdownEmployerAmount: string;
+  payRunVariableHours: string;
+  payRunVariableLateMinutes: string;
+  payRunVariableMissingPunch: string;
+  payRunPitRow: string;
+  payErrStatutoryRequiresVerification: string;
+  payErrStatutoryAlreadyVerified: string;
+  payErrStatutoryVerifySod: string;
+  payErrPitBracketSetInvalid: string;
+  payErrEosbNoRule: string;
+  payErrEosbTrueUpInvalid: string;
+  payErrStatutoryNationality: string;
+
   // -- PHASE-034 (T11): multi-entity consolidation (القوائم الموحدة) ---------
   // (the consolidation workspace: groups + members (Settings §8), the
   // elimination Transaction Entry workspace (§4) with the live DR/CR preview,
@@ -11149,6 +11274,123 @@ const ar: Dictionary = {
   payErrPurposeNotMapped: "غرض محاسبي غير معيّن — عيّن الحساب قبل الترحيل.",
   payErrPeriodLocked: "الفترة المالية مقفلة — الترحيل مرفوض.",
 
+  // -- PHASE-046 (W-5, D-15): the payroll compliance web plane -------------
+
+  navStatutoryProfiles: "الملفات القانونية",
+  navEosb: "نهاية الخدمة",
+  payStatutoryTitle: "الملفات القانونية للرواتب",
+  payStatutorySubtitle: "ملفات المساهمات القانونية وشرائح ضريبة الدخل وطبقات نهاية الخدمة — بشارات الاعتماد وفصل الاعتماد عن التعديل",
+  payStatutoryTabProfiles: "ملفات المساهمات",
+  payStatutoryTabBrackets: "شرائح الضريبة",
+  payStatutoryTabEosb: "طبقات نهاية الخدمة",
+  payStatutoryJurisdiction: "الولاية القضائية",
+  payStatutoryCode: "الرمز",
+  payStatutoryName: "الاسم",
+  payStatutoryEmployeeRate: "نسبة الموظف",
+  payStatutoryEmployerRate: "نسبة صاحب العمل",
+  payStatutoryBaseMin: "الحد الأدنى لأجر الاشتراك",
+  payStatutoryBaseMax: "الحد الأقصى لأجر الاشتراك",
+  payStatutoryAppliesTo: "يسري على",
+  payStatutoryAppliesAll: "الجميع",
+  payStatutoryAppliesCitizen: "المواطنون",
+  payStatutoryAppliesNonCitizen: "غير المواطنين",
+  payStatutoryEffectiveFrom: "ساري من",
+  payStatutoryEffectiveTo: "ساري إلى",
+  payStatutoryEffectiveOpen: "مفتوح",
+  payStatutoryStatus: "الحالة",
+  payStatutoryStatusVerified: "معتمد",
+  payStatutoryStatusRequiresVerification: "بانتظار الاعتماد",
+  payStatutoryStatusRetired: "منسحب",
+  payStatutorySource: "المصدر",
+  payStatutoryVerifiedAt: "اعتُمد في",
+  payStatutoryReviewNote: "ملاحظة المراجعة",
+  payStatutoryVerify: "اعتماد",
+  payStatutoryVerifyTitle: "اعتماد الصف القانوني",
+  payStatutoryVerifySourceName: "اسم المصدر",
+  payStatutoryVerifySourceRef: "مرجع المصدر",
+  payStatutoryVerifySourceRefHint: "اختياري — رقم الوثيقة أو الرابط",
+  payStatutoryVerifyConfirm: "اعتماد",
+  payStatutoryVerifyToast: "اعتُمد الصف القانوني",
+  payStatutoryVerifyNoPermission: "الاعتماد فعل المالك فقط (payroll.statutory.verify)",
+  payStatutoryEmpty: "لا توجد صفوف قانونية بعد — هذه هي الحالة الفارغة الصادقة",
+  payStatutoryBracketFloor: "حد الشريحة الأدنى",
+  payStatutoryBracketCeiling: "حد الشريحة الأقصى",
+  payStatutoryBracketCeilingOpen: "بلا حد",
+  payStatutoryBracketRate: "النسبة",
+  payStatutoryBracketPersonalAllowance: "الإعفاء الشخصي",
+  payStatutoryBracketDependentAllowance: "إعفاء كل مُعال",
+  payStatutoryEosbFromYears: "من (سنوات)",
+  payStatutoryEosbToYears: "إلى (سنوات)",
+  payStatutoryEosbToYearsOpen: "بلا حد",
+  payStatutoryEosbDaysPerYear: "أيام لكل سنة",
+  payStatutoryEosbContractType: "نوع العقد",
+  payStatutoryEosbContractAll: "جميع العقود",
+  payStatutoryBlockedHint: "الصفوف غير المعتمدة ترفض التسعير والترحيل (BR-085) — لا تُحتسب نسبة تخمينية أبدًا",
+  payEosbTitle: "نهاية الخدمة (EOSB)",
+  payEosbSubtitle: "مخصص نهاية الخدمة — سجل الحسابات ومطابقة المخصص وتسوية الفرق (G-54: الفرق فقط)",
+  payEosbTabCalculations: "سجل الحسابات",
+  payEosbTabReconciliation: "المطابقة",
+  payEosbKind: "النوع",
+  payEosbKindOpening: "افتتاحي",
+  payEosbKindPeriod: "تسوية دورية",
+  payEosbKindTermination: "إنهاء خدمة",
+  payEosbServiceYears: "سنوات الخدمة",
+  payEosbEntitlement: "الاستحقاق المحسوب",
+  payEosbProvisionBalance: "رصيد المخصص",
+  payEosbSettled: "المسدَّد",
+  payEosbDelta: "الفرق",
+  payEosbAlignedDelta: "فرق المواءمة",
+  payEosbCalcStatus: "حالة الحساب",
+  payEosbCalcStatusComputed: "محسوب",
+  payEosbCalcStatusPosted: "مُرحَّل",
+  payEosbJournalEntry: "قيد اليومية",
+  payEosbEntryDate: "تاريخ القيد",
+  payEosbNote: "ملاحظة",
+  payEosbTrueUp: "تسوية المخصص",
+  payEosbTrueUpTitle: "تسوية مخصص نهاية الخدمة (G-54)",
+  payEosbTrueUpEmployee: "الموظف",
+  payEosbTrueUpKind: "نوع التسوية",
+  payEosbTrueUpDate: "تاريخ التسوية",
+  payEosbTrueUpNote: "ملاحظة",
+  payEosbTrueUpConfirm: "ترحيل التسوية",
+  payEosbTrueUpToast: "اعتُمدت تسوية المخصص — الفرق مُرحَّل",
+  payEosbTrueUpNoPermission: "التسوية فعل ترحيل — تتطلب الصلاحية payroll.runs.post",
+  payEosbEmpty: "لا توجد حسابات نهاية خدمة بعد",
+  payEosbReconcileEmpty: "لا توجد أرصدة للمطابقة بعد",
+  payEosbAlignedBadge: "مُطابَق",
+  payEosbUnalignedBadge: "فرق قائم",
+  payRunStatutoryEmployee: "حصة الموظف القانونية",
+  payRunStatutoryEmployer: "حصة صاحب العمل",
+  payRunPit: "ضريبة الدخل",
+  payRunVariableOvertime: "العمل الإضافي",
+  payRunVariableAbsence: "الغياب",
+  payRunVariableLate: "التأخير",
+  payRunStatutorySummary: "ملخص الالتزامات القانونية",
+  payRunStatutoryAccrued: "المستحق",
+  payRunStatutoryRemitted: "المسدَّد",
+  payRunStatutoryOutstanding: "القائم",
+  payRunRemittanceExport: "تصدير ملف الترحيلات",
+  payRunRemittanceExportToast: "تم تنزيل ملف الترحيلات",
+  payRunBreakdownTitle: "تفاصيل الحساب القانوني",
+  payRunBreakdownBase: "أجر الاشتراك",
+  payRunBreakdownClampedBase: "بعد تطبيق السقف",
+  payRunBreakdownClampMin: "حد أدنى مُطبَّق",
+  payRunBreakdownClampMax: "حد أقصى مُطبَّق",
+  payRunBreakdownRate: "النسبة",
+  payRunBreakdownEmployeeAmount: "حصة الموظف",
+  payRunBreakdownEmployerAmount: "حصة صاحب العمل",
+  payRunVariableHours: "الساعات المعتمدة",
+  payRunVariableLateMinutes: "دقائق التأخير",
+  payRunVariableMissingPunch: "أيام البصمة المفقودة (إرشادي)",
+  payRunPitRow: "ضريبة الدخل (PIT)",
+  payErrStatutoryRequiresVerification: "الصف القانوني بانتظار الاعتماد — يرفض التسعير حتى الاعتماد (BR-085)",
+  payErrStatutoryAlreadyVerified: "الصف القانوني معتمد مسبقًا",
+  payErrStatutoryVerifySod: "فصل المهام: لا يمكن للمعتمد أن يكون آخر من عدّل الصف",
+  payErrPitBracketSetInvalid: "مجموعة شرائح الضريبة غير متسقة (فجوة أو تداخل أو حقول إعفاء متعارضة)",
+  payErrEosbNoRule: "لا توجد طبقة نهاية خدمة تغطي سنوات الخدمة في هذه الولاية القضائية",
+  payErrEosbTrueUpInvalid: "شكل تسوية نهاية الخدمة مرفوض — راجع حالة الموظف ونوع التسوية",
+  payErrStatutoryNationality: "الموظف بلا جنسية — لا يمكن تسعير الانقسام القانوني (أدخل الجنسية أولًا)",
+
   // -- PHASE-034 (T11): multi-entity consolidation (القوائم الموحدة) --------
 
   navConsolidated: "القوائم الموحدة",
@@ -17581,6 +17823,123 @@ const en: Dictionary = {
   payErrEngineOnly: "Payroll accounts post only via runs — manual journals are rejected (BR-053).",
   payErrPurposeNotMapped: "An accounting purpose is unmapped — map the account before posting.",
   payErrPeriodLocked: "The fiscal period is locked — posting is rejected.",
+
+  // -- PHASE-046 (W-5, D-15): the payroll compliance web plane -------------
+
+  navStatutoryProfiles: "Statutory profiles",
+  navEosb: "End of service (EOSB)",
+  payStatutoryTitle: "Payroll statutory profiles",
+  payStatutorySubtitle: "Statutory contribution profiles, PIT brackets, and EOSB tiers — verification badges, with verification separated from editing",
+  payStatutoryTabProfiles: "Contribution profiles",
+  payStatutoryTabBrackets: "PIT brackets",
+  payStatutoryTabEosb: "EOSB tiers",
+  payStatutoryJurisdiction: "Jurisdiction",
+  payStatutoryCode: "Code",
+  payStatutoryName: "Name",
+  payStatutoryEmployeeRate: "Employee rate",
+  payStatutoryEmployerRate: "Employer rate",
+  payStatutoryBaseMin: "Base minimum",
+  payStatutoryBaseMax: "Base maximum",
+  payStatutoryAppliesTo: "Applies to",
+  payStatutoryAppliesAll: "Everyone",
+  payStatutoryAppliesCitizen: "Citizens",
+  payStatutoryAppliesNonCitizen: "Non-citizens",
+  payStatutoryEffectiveFrom: "Effective from",
+  payStatutoryEffectiveTo: "Effective to",
+  payStatutoryEffectiveOpen: "Open",
+  payStatutoryStatus: "Status",
+  payStatutoryStatusVerified: "Verified",
+  payStatutoryStatusRequiresVerification: "Requires verification",
+  payStatutoryStatusRetired: "Retired",
+  payStatutorySource: "Source",
+  payStatutoryVerifiedAt: "Verified at",
+  payStatutoryReviewNote: "Review note",
+  payStatutoryVerify: "Verify",
+  payStatutoryVerifyTitle: "Verify the statutory row",
+  payStatutoryVerifySourceName: "Source name",
+  payStatutoryVerifySourceRef: "Source reference",
+  payStatutoryVerifySourceRefHint: "Optional — the document number or link",
+  payStatutoryVerifyConfirm: "Verify",
+  payStatutoryVerifyToast: "The statutory row is verified",
+  payStatutoryVerifyNoPermission: "Verification is the owner's act alone (payroll.statutory.verify)",
+  payStatutoryEmpty: "No statutory rows yet — the honest empty state",
+  payStatutoryBracketFloor: "Bracket floor",
+  payStatutoryBracketCeiling: "Bracket ceiling",
+  payStatutoryBracketCeilingOpen: "No ceiling",
+  payStatutoryBracketRate: "Rate",
+  payStatutoryBracketPersonalAllowance: "Personal allowance",
+  payStatutoryBracketDependentAllowance: "Per-dependent allowance",
+  payStatutoryEosbFromYears: "From (years)",
+  payStatutoryEosbToYears: "To (years)",
+  payStatutoryEosbToYearsOpen: "No ceiling",
+  payStatutoryEosbDaysPerYear: "Days per year",
+  payStatutoryEosbContractType: "Contract type",
+  payStatutoryEosbContractAll: "All contracts",
+  payStatutoryBlockedHint: "Unverified rows refuse pricing and posting (BR-085) — a guessed rate is never computed",
+  payEosbTitle: "End of service (EOSB)",
+  payEosbSubtitle: "The EOSB provision — the calculations register, the provision reconciliation, and the delta-only true-up (G-54)",
+  payEosbTabCalculations: "Calculations",
+  payEosbTabReconciliation: "Reconciliation",
+  payEosbKind: "Kind",
+  payEosbKindOpening: "Opening",
+  payEosbKindPeriod: "Period true-up",
+  payEosbKindTermination: "Termination",
+  payEosbServiceYears: "Service years",
+  payEosbEntitlement: "Computed entitlement",
+  payEosbProvisionBalance: "Provision balance",
+  payEosbSettled: "Settled",
+  payEosbDelta: "Delta",
+  payEosbAlignedDelta: "Alignment delta",
+  payEosbCalcStatus: "Calculation status",
+  payEosbCalcStatusComputed: "Computed",
+  payEosbCalcStatusPosted: "Posted",
+  payEosbJournalEntry: "Journal entry",
+  payEosbEntryDate: "Entry date",
+  payEosbNote: "Note",
+  payEosbTrueUp: "True-up",
+  payEosbTrueUpTitle: "EOSB provision true-up (G-54)",
+  payEosbTrueUpEmployee: "Employee",
+  payEosbTrueUpKind: "True-up kind",
+  payEosbTrueUpDate: "True-up date",
+  payEosbTrueUpNote: "Note",
+  payEosbTrueUpConfirm: "Post the true-up",
+  payEosbTrueUpToast: "The true-up is posted — the delta is journaled",
+  payEosbTrueUpNoPermission: "The true-up is a posting act — it requires payroll.runs.post",
+  payEosbEmpty: "No EOSB calculations yet",
+  payEosbReconcileEmpty: "No provision balances to reconcile yet",
+  payEosbAlignedBadge: "Aligned",
+  payEosbUnalignedBadge: "Outstanding delta",
+  payRunStatutoryEmployee: "Statutory (employee)",
+  payRunStatutoryEmployer: "Statutory (employer)",
+  payRunPit: "PIT",
+  payRunVariableOvertime: "Overtime",
+  payRunVariableAbsence: "Absence",
+  payRunVariableLate: "Late",
+  payRunStatutorySummary: "Statutory liability summary",
+  payRunStatutoryAccrued: "Accrued",
+  payRunStatutoryRemitted: "Remitted",
+  payRunStatutoryOutstanding: "Outstanding",
+  payRunRemittanceExport: "Remittance export",
+  payRunRemittanceExportToast: "The remittance file is downloaded",
+  payRunBreakdownTitle: "Statutory calculation breakdown",
+  payRunBreakdownBase: "Contributory base",
+  payRunBreakdownClampedBase: "After the clamp",
+  payRunBreakdownClampMin: "Minimum clamp applied",
+  payRunBreakdownClampMax: "Maximum clamp applied",
+  payRunBreakdownRate: "Rate",
+  payRunBreakdownEmployeeAmount: "Employee share",
+  payRunBreakdownEmployerAmount: "Employer share",
+  payRunVariableHours: "Multiplied hours",
+  payRunVariableLateMinutes: "Late minutes",
+  payRunVariableMissingPunch: "Missing-punch days (informational)",
+  payRunPitRow: "PIT (income tax)",
+  payErrStatutoryRequiresVerification: "The statutory row requires verification — it refuses pricing until verified (BR-085)",
+  payErrStatutoryAlreadyVerified: "The statutory row is already verified",
+  payErrStatutoryVerifySod: "Separation of duties: the verifier may not be the row's last editor",
+  payErrPitBracketSetInvalid: "The PIT bracket set is inconsistent (a gap, an overlap, or disagreeing allowance fields)",
+  payErrEosbNoRule: "No EOSB tier covers the service years in this jurisdiction",
+  payErrEosbTrueUpInvalid: "The EOSB true-up shape is refused — check the employee state and the true-up kind",
+  payErrStatutoryNationality: "The employee carries no nationality — the statutory split cannot be priced (set the nationality first)",
 
   // -- PHASE-034 (T11): multi-entity consolidation (القوائم الموحدة) --------
 

@@ -341,10 +341,106 @@ i18n parity 6,007 = 6,007 (no web keys — D-15 is W-5), capabilities
 agree, id-ledger 0 errors, history-secrets 0, shells PASS, check:rls
 clean (292 catalog tables). Evidence:
 [gate-evidence/2026-11-17-phase046-w4.md](../docs/operations/gate-evidence/2026-11-17-phase046-w4.md)
-+ `audit-evidence/phase046-w4/`. **Next: W-5 — the web plane (the
-three surfaces D-16 + NAV_ITEMS +2 + FALLBACK_CRUMBS + ⌘K + api-types
-+ the ~110 i18n keys + the run-screen statutory columns + the
-remittance export button + the reports tab wiring).**
++ `audit-evidence/phase046-w4/`.
+
+**W-5 (delivered 2026-11-17 — the web plane, T-10+T-11+T-12, on the
+W-4 delivery head `b8f77ef`):** **THE COMPLIANCE SCREEN**
+`/payroll/statutory-profiles` (archetype 2, the hr-leave-board
+pattern): THREE TABS — contribution profiles / PIT brackets / EOSB
+tiers — every row with its verification badge + the effective-dates
+window + the citation it rests on + the applies-to split + the rate
+pair + the clamp window + the review note; the verify button
+RUNTIME-CHECKS `payroll.statutory.verify` (hidden without it — the
+honest no-permission notice renders instead; the citation body
+mandatory at the surface: an empty source refuses locally, the 0089
+VERIFIED⟺source law); the jurisdiction narrowing client-side; the
+honest empty state per tab. **THE EOSB SCREEN** `/payroll/eosb`
+(archetype 11 Reconciliation/Health-Center): the calculations
+register (kind badge · service years · entitlement · provision ·
+delta · the G-54 journal tie · POSTED/COMPUTED) + the BR-087
+reconciliation view (entitlement ↔ provision ↔ settled, the
+Aligned / Outstanding-delta badges) + **THE TRUE-UP TRIGGER** — the
+W-2 engine's own act exposed unchanged; the button rides the
+session's `payroll.runs.post` (the ledger act on the ledger key —
+NEVER payroll.eosb, proven by the route spec's seeded
+statutory-manager 403). **THE RUN-SCREEN EXTENSION**: the six
+statutory/variable breakdown columns on the frozen lines (INV-025
+unwidened — breakdowns of the existing fold) + the frozen
+`statutory_summary` liability block (accrued / remitted /
+outstanding per profile row + the PIT total + the EOSB true-up
+total) + the remittance export button (POSTED-only, the session's
+`payroll.statutory`; the bytes stream through the BFF as a blob
+download — a typed error renders through the localized map, never a
+raw JSON tab). **THE API SURFACE** (matrix §3.24's guarded-routes
+paragraph, six routes, all §8-registered on the EXISTING three
+keys — the drift count stays 300): `GET statutory/profiles` ·
+`GET statutory/brackets` · `GET statutory/eosb-rules` (the
+management lists — every row, any status, any window, the optional
+jurisdiction narrowing; read-only, no gate, no audit — BR-086's
+read family) + `GET eosb/calculations` · `GET eosb/reconciliation`
+(on payroll.eosb) + `POST eosb/true-up` (on payroll.runs.post).
+**THE REGISTRIES**: NAV_ITEMS +2 (`hr.statutory_profiles` order 90
+· `hr.eosb` order 100 — the live next slots of the hr group;
+featureKeys + permissions the exact §3.24/§22 strings) — ⌘K rides
+the NAV registry (the CommandMenu searches the resolved items —
+the two surfaces are found with zero extra wiring) +
+FALLBACK_CRUMBS +2 + api-types complete (the two run-row
+extensions + the eight new wire types) + the localized error map
+extended (the W-2 statutory taxonomy's web mirror — the 404 family
+joins the payroll not-found group; the seven fail-closed/conflict
+codes) + **+114 i18n keys/locale** (6,007 → 6,121, both
+dictionaries at 100% parity). **THE REPORTS TAB**: the payroll
+module report page is registry-driven (the `payroll.*` prefix
+filter) — the W-6 T-13 rows will surface automatically; no wiring
+needed beyond what exists (verified, recorded in the gate doc).
+**THE ROUTE-LEVEL SPEC extended 11 → 16/16**: (a) the three lists'
+gates + the canonical rows (GOSI-PENSION 9/9 · GOSI-SANED 0.75/0.75
+· GOSI-OH 0/2 VERIFIED; the blocked jurisdictions' badges) + the
+jurisdiction narrowing + THE HONEST NO-PIT STATE (no SA brackets —
+the 0092 law, visible at the list level) + the SA EOSB ladder
+(15.00 / 30.00 days VERIFIED); (b) the EOSB views' gates + the
+honest empty register; (c) THE TRUE-UP KEY LAW (a statutory manager
+holding BOTH management keys reads the views but takes the 403
+naming payroll.runs.post — zero residue); (d) THE TRUE-UP ACT (the
+owner's OPENING through real HTTP — delta = the full entitlement,
+the G-54 journal 1·4 → 2·6, the `payroll.eosb_true_up` audit event
+carrying the actor, both views reflect it, the reconciliation's
+alignment delta exactly 0.0000); (e) the TERMINATION-on-ACTIVE
+typed `EOSB_TRUE_UP_INVALID` 422, zero residue. **THE WEB UNIT
+TESTS +10** (the two boards: the tabs + badges + citations, the
+jurisdiction narrowing, the honest empty states, the two runtime
+permission gates, the citation law + the G-54 trigger's POST shape
++ toasts). **THE HONEST REPAIR** (the W-4 controller repair's own
+pre-existing class): `EosbService`'s constructor params carry
+explicit `@Inject()` tokens — the W-2-era shape relied on tsc's
+emitDecoratorMetadata; the route-level spec's Nest boot under the
+esbuild transform resolved `posting` + `eos` undefined and the
+true-up route 500'd; mechanical, zero production change (the
+eosb.spec constructs the service manually — never surfaced it).
+GATES: typecheck/lint 8/8, depcruise clean (**1,932 · 14,363**),
+api unit **660/660** (green on the FIRST attempt — the chromium
+headless shell pre-installed), unit workspace **8/8** (first run,
+no flakes: web 87 · mobile 393 · api 660 · ui 42 · domain-core 38 ·
+contracts 56 · sync-core 36 · desktop 274), the payroll folder
+**8 files · 69/69** (64 + the 5 new), the hr folder **13 · 83/83**
+(incl. the race suite 20/20 — the DI repair broke nothing),
+isolation+entitlements+tenancy×2+migrations+identity×2 **8 ·
+1,693/1,693** (the ROUTE_PERMISSIONS check green on the six new
+rows; the 93-chain re-applies no-op), i18n parity **6,121 = 6,121**,
+docs 33/33, drift **300 = 300**, manifests 13/13, capabilities
+agree, id-ledger 0, history-secrets 0, shells PASS, the negative
+boundary meta-test PASS, check:rls clean (**292 catalog tables** —
+the standalone run on a scratch embedded PG16 + the full chain).
+**The binding process rule honored: every evidence artifact was
+generated in THIS session and pushes WITH the code, same session**
+(the W-4 review's rule — the EVIDENCE-NOTE lesson). Evidence:
+[gate-evidence/2026-11-17-phase046-w5.md](../docs/operations/gate-evidence/2026-11-17-phase046-w5.md)
++ `audit-evidence/phase046-w5/`. **Next: W-6 — the reports + proof
+wave (T-13 the two D-12 report contracts + the registry pins 104 →
+106 · T-14 the golden suites G-52/G-53/G-54 with failure packs + the
+INV-032 property suite + the 029 regression packs re-run · T-17 THE
+RACE SUITE — the permanent two-transaction duels incl. the owner's
+F2 payout×payout + F3 true-up×true-up scope additions).**
 
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE

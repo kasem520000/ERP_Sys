@@ -5060,6 +5060,47 @@ export interface SalaryComponentRow extends SalaryComponentInput {
   seq: number;
 }
 
+/** PHASE-046 (W-5, D-16): per profile row {code, kind, accrued, remitted}
+ * — the frozen remittance liability block (accrued − remitted = the
+ * outstanding the G-52 settlement consumes). */
+export interface StatutorySummaryRow {
+  code: string;
+  kind: "CONTRIBUTION" | "PIT";
+  accrued: string;
+  remitted: string;
+}
+
+/** PHASE-046 (W-5, D-16): the per-(line × profile row) evidence frozen at
+ * calculate — INV-032(a)'s rate × clamped base = amount, verbatim. */
+export interface StatutoryBreakdownEntry {
+  code: string;
+  kind: "CONTRIBUTION" | "PIT";
+  appliesTo?: string;
+  base?: string;
+  clampedBase?: string;
+  clampedBy?: "MIN" | "MAX" | null;
+  employeeRate?: string;
+  employerRate?: string;
+  employeeAmount: string;
+  employerAmount: string;
+}
+
+/** PHASE-046 (W-5, D-16): the feed's period facts + the applied rates (the
+ * as-of snapshot frozen on the line — MISSING_PUNCH is informational only,
+ * never folded into absence — the T-10 law). */
+export interface RunVariableBreakdown {
+  multipliedHours: string;
+  overtimeHourlyRate: string | null;
+  overtimeAmount: string;
+  absenceDays: number;
+  absenceDailyRate: string | null;
+  absenceAmount: string;
+  lateMinutes: number;
+  lateRatePerMinute: string | null;
+  lateAmount: string;
+  missingPunchDays: number;
+}
+
 /** GET /payroll/runs → rows (the monthly register; INV-025 totals). */
 export interface PayrollRunListRow {
   id: string;
@@ -5072,6 +5113,20 @@ export interface PayrollRunListRow {
   paidNetTotal: string;
   employerContributionsTotal: string;
   eosAccrualTotal: string;
+  /** PHASE-046 (W-5, D-05): the statutory/variable totals — breakdowns
+   *  of the fold's existing totals (the employer column already carries
+   *  the statutory employer share — INV-025 holds by construction). */
+  statutoryEmployeeTotal: string;
+  statutoryEmployerTotal: string;
+  pitTotal: string;
+  variableOvertimeTotal: string;
+  variableAbsenceTotal: string;
+  variableLateTotal: string;
+  /** Per profile row {code, kind, accrued, remitted} — the remittance
+   *  liability tracking (G-52's settlement consumes the outstanding). */
+  statutorySummary: StatutorySummaryRow[] | null;
+  /** Σ the G-54 deltas of true-ups referencing this run. */
+  eosbTrueupTotal: string;
   journalEntryId: string | null;
   entryNo: string | null;
   approvedAt: string | null;
@@ -5109,6 +5164,20 @@ export interface PayrollRunLineRow {
   netAmount: string;
   employerContributions: string;
   eosAccrual: string;
+  /** PHASE-046 (W-5, D-05): the statutory/variable breakdown columns —
+   *  additive breakdowns of the frozen fold (INV-025 unwidened: the
+   *  deductions/net/employer columns already carry the totals). */
+  statutoryEmployeeShare: string;
+  statutoryEmployerShare: string;
+  pitWithheld: string;
+  variableOvertimeAmount: string;
+  variableAbsenceAmount: string;
+  variableLateAmount: string;
+  /** Per profile row {code, kind, base, clampedBase, clampedBy, rates,
+   *  amounts} — the INV-032(a) evidence, frozen at calculate. */
+  statutoryBreakdown: StatutoryBreakdownEntry[] | null;
+  /** The feed's period facts + the applied rates (the as-of snapshot). */
+  variableBreakdown: RunVariableBreakdown | null;
   costCenterId: string | null;
   projectId: string | null;
   branchId: string | null;
@@ -5154,6 +5223,122 @@ export interface PayslipsResult {
     components: { key: string; name: string; nameAr: string | null; kind: string; computed: string }[];
     loanDeductions: { amount: string }[];
   }[];
+}
+
+/** PHASE-046 (W-5, D-16 — T-10): GET /payroll/statutory/profiles → rows.
+ * The contribution-profile management list (any status, any effective
+ * window — future and retired rows included; the badges ride the rows'
+ * own status/citation fields). */
+export interface StatutoryProfileManagementRow {
+  id: string;
+  jurisdictionCode: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  employeeRate: string;
+  employerRate: string;
+  baseMin: string | null;
+  baseMax: string | null;
+  contributoryKeys: string[];
+  appliesTo: string;
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  status: "REQUIRES_VERIFICATION" | "VERIFIED" | "RETIRED";
+  sourceName: string | null;
+  sourceRef: string | null;
+  verifiedBy: string | null;
+  verifiedAt: string | null;
+  reviewNote: string | null;
+  updatedAt: string;
+  version: number;
+}
+
+/** PHASE-046 (W-5, D-16 — T-10): GET /payroll/statutory/brackets → rows.
+ * The PIT bracket management list (the progressive ladders, any status). */
+export interface PitBracketManagementRow {
+  id: string;
+  jurisdictionCode: string;
+  code: string;
+  floor: string;
+  ceiling: string | null;
+  rate: string;
+  sort: number;
+  personalAllowanceDefault: string;
+  perDependentAllowance: string;
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  status: "REQUIRES_VERIFICATION" | "VERIFIED" | "RETIRED";
+  reviewNote: string | null;
+}
+
+/** PHASE-046 (W-5, D-16 — T-10): GET /payroll/statutory/eosb-rules →
+ * rows. The EOSB tier management list (any status, any window). */
+export interface EosbRuleManagementRow {
+  id: string;
+  jurisdictionCode: string;
+  fromYears: string;
+  toYears: string | null;
+  daysPerYear: string;
+  contractType: string | null;
+  effectiveFrom: string;
+  effectiveTo: string | null;
+  status: "REQUIRES_VERIFICATION" | "VERIFIED" | "RETIRED";
+  reviewNote: string | null;
+}
+
+/** PHASE-046 (W-5, D-16 — T-11): POST /payroll/statutory/profiles/:id/
+ * verify → data (the flipped row's citation summary). */
+export interface StatutoryVerifyResult {
+  id: string;
+  jurisdictionCode: string;
+  code: string;
+  status: "REQUIRES_VERIFICATION" | "VERIFIED" | "RETIRED";
+  sourceName: string | null;
+  sourceRef: string | null;
+  verifiedBy: string | null;
+  verifiedAt: string | null;
+}
+
+/** PHASE-046 (W-5, D-16 — T-11): GET /payroll/eosb/calculations → rows.
+ * The computation-evidence register (INSERT-only by construction — the
+ * 0089 evidence law; the G-54 journal id is the ledger tie). */
+export interface EosbCalculationRow {
+  id: string;
+  employeeId: string;
+  kind: "TERMINATION" | "PERIOD_TRUE_UP" | "OPENING";
+  serviceYears: string;
+  tierBreakdown: unknown;
+  wageBaseSnapshot: unknown;
+  entitlementAmount: string;
+  provisionBalance: string;
+  delta: string;
+  journalEntryId: string | null;
+  status: "COMPUTED" | "POSTED";
+  runId: string | null;
+  fiscalPeriodId: string | null;
+  entryDate: string;
+  note: string | null;
+  createdAt: string;
+}
+
+/** PHASE-046 (W-5, D-16 — T-11): POST /payroll/eosb/true-up → data (the
+ * W-2 engine's own act exposed unchanged — the delta-only G-54 law). */
+export interface EosbTrueUpResult {
+  calculation: EosbCalculationRow;
+  journalEntryId: string | null;
+  delta: string;
+}
+
+/** PHASE-046 (W-5, D-16 — T-11): GET /payroll/eosb/reconciliation →
+ * rows. The BR-087 standing tie: computed entitlement ↔ provision
+ * balance ↔ settled at every row (alignedDelta 0 = aligned). */
+export interface EosbReconciliationRow {
+  employeeId: string;
+  entitlement: string;
+  provisionBalance: string;
+  settled: string | null;
+  alignedDelta: string;
+  lastCalculation: EosbCalculationRow | null;
 }
 
 /** GET /payroll/loans → rows (the BR-054-capped register). */

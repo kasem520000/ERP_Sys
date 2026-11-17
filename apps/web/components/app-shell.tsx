@@ -237,6 +237,12 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "payroll/loans": { group: "navHr", label: "navPayrollLoans" },
   "payroll/loans/new": { group: "navHr", label: "payLoanNew" },
   "payroll/reports": { group: "navHr", label: "payReportsTitle" },
+  // -- PHASE-046 (W-5, D-16): the payroll compliance surfaces. The registry
+  // rows `hr.statutory_profiles` / `hr.eosb` (contracts NAV_ITEMS) drive the
+  // sidebar + ⌘K; these fallbacks cover nav-fetch failure (the
+  // support-sessions rule — crumbs only; the sidebar stays registry-driven).
+  "payroll/statutory-profiles": { group: "navHr", label: "navStatutoryProfiles" },
+  "payroll/eosb": { group: "navHr", label: "navEosb" },
   // -- WEB-038 (PHASE-038): the procurement sourcing surfaces (matrix §3.16).
   // The registry rows `purchasing.rfqs` / `purchasing.blanket_orders` /
   // `purchasing.supplier_scorecards` / `purchasing.capex` (contracts
