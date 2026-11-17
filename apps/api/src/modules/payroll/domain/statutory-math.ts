@@ -330,3 +330,85 @@ export function serviceYearsBetween(fromDate: string, toDate: string): string {
   const years = (to - from) / (365.25 * 24 * 60 * 60 * 1000);
   return new Decimal(years).toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toFixed(2);
 }
+
+// -- the statutory breakdown + the summary fold (W-3, D-05/D-06) ----------------------
+
+/** One frozen per-profile-row entry in a line's `statutory_breakdown`
+ * (the INV-032(a) evidence: rate × clamped base == the row's share,
+ * exact 4dp — reconstructable to the last half-unit). */
+export interface StatutoryBreakdownEntry {
+  /** The profile row's code (GOSI-PENSION / GOSI-SANED / GOSI-OH / …). */
+  readonly code: string;
+  readonly kind: "CONTRIBUTION" | "PIT";
+  readonly appliesTo?: AppliesTo;
+  /** The contributory wage base BEFORE the row's clamp. */
+  readonly base?: string;
+  /** The base AFTER the row's [base_min, base_max] clamp. */
+  readonly clampedBase?: string;
+  /** Which bound engaged (null = the raw base was in range). */
+  readonly clampedBy?: "MIN" | "MAX" | null;
+  readonly employeeRate?: string;
+  readonly employerRate?: string;
+  readonly employeeAmount: string;
+  readonly employerAmount: string;
+}
+
+/** One `statutory_summary` row on the run (D-05): the per-profile-row
+ * remittance liability tracking — accrued at calculate (frozen with the
+ * lines), advanced by the settlement (G-52's remittance leg). */
+export interface StatutorySummaryRow {
+  readonly code: string;
+  readonly kind: "CONTRIBUTION" | "PIT";
+  /** Σ (employee + employer) share over the run's lines (the PIT row:
+   * Σ pitWithheld) — the DEDUCTIONS_PAYABLE liability the run posted. */
+  readonly accrued: string;
+  /** Σ settled through the remittance machinery — advances inside the
+   * run gate; accrued − remitted is the outstanding liability. */
+  readonly remitted: string;
+}
+
+/** The per-row accruals the fold consumes (one per line × profile row
+ * — the frozen breakdown entries + the line's PIT total). */
+export interface StatutoryAccrualInput {
+  readonly code: string;
+  readonly kind: "CONTRIBUTION" | "PIT";
+  /** The row's employee + employer amounts (for the PIT row: the
+   * withheld total rides employeeAmount; employerAmount "0.0000"). */
+  readonly employeeAmount: string;
+  readonly employerAmount: string;
+}
+
+/** Fold the run's `statutory_summary` from the frozen line breakdowns
+ * (D-05): per (code, kind) the exact Σ (employee + employer) shares,
+ * first-seen order preserved (deterministic — the same lines always
+ * fold the same summary); `remitted` starts at 0.0000 (a DRAFT run has
+ * never settled — the remittance requires POSTED, and every recalc
+ * resets the lines and re-folds the summary). */
+export function foldStatutorySummary(
+  accruals: readonly StatutoryAccrualInput[],
+): StatutorySummaryRow[] {
+  const order: { code: string; kind: "CONTRIBUTION" | "PIT" }[] = [];
+  const byKey = new Map<string, StatutorySummaryRow>();
+  for (const accrual of accruals) {
+    const key = `${accrual.kind}|${accrual.code}`;
+    const existing = byKey.get(key);
+    if (existing === undefined) {
+      order.push({ code: accrual.code, kind: accrual.kind });
+      byKey.set(key, {
+        code: accrual.code,
+        kind: accrual.kind,
+        accrued: addExact(accrual.employeeAmount, accrual.employerAmount),
+        remitted: "0.0000",
+      });
+    } else {
+      byKey.set(key, {
+        ...existing,
+        accrued: addExact(
+          existing.accrued,
+          addExact(accrual.employeeAmount, accrual.employerAmount),
+        ),
+      });
+    }
+  }
+  return order.map(({ code, kind }) => byKey.get(`${kind}|${code}`)!);
+}

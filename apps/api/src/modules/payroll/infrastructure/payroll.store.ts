@@ -4,6 +4,11 @@ import { generateUuidV7 } from "@erp/domain-core";
 
 import { type TenantDb } from "../../../infra/db/client";
 import { requireTenantContext } from "../../../infra/db/tenant-context";
+import type {
+  StatutoryBreakdownEntry,
+  StatutorySummaryRow,
+} from "../domain/statutory-math";
+import type { VariableBreakdown } from "../domain/variable-lines";
 
 /**
  * Payroll store (PHASE-029): the ONLY writer of the seven payroll tables
@@ -540,6 +545,22 @@ export interface RunRow {
   paidNetTotal: string;
   employerContributionsTotal: string;
   eosAccrualTotal: string;
+  /** PHASE-046 (D-05, W-3): the statutory/variable totals — breakdowns of
+   *  the fold's existing totals (deductions_total already carries the
+   *  employee share + PIT + the gated variable deductions; the employer
+   *  column already carries the statutory employer share — INV-025 holds
+   *  by construction, the CHECKs unwidened). */
+  statutoryEmployeeTotal: string;
+  statutoryEmployerTotal: string;
+  pitTotal: string;
+  variableOvertimeTotal: string;
+  variableAbsenceTotal: string;
+  variableLateTotal: string;
+  /** Per profile row {code, kind, accrued, remitted} — the remittance
+   * liability tracking (G-52's settlement consumes the outstanding). */
+  statutorySummary: StatutorySummaryRow[] | null;
+  /** Σ the G-54 deltas of true-ups referencing this run. */
+  eosbTrueupTotal: string;
   journalEntryId: string | null;
   entryNo: string | null;
   submittedAt: string | null;
@@ -570,6 +591,14 @@ interface RunSqlRow {
   paid_net_total: string;
   employer_contributions_total: string;
   eos_accrual_total: string;
+  statutory_employee_total: string;
+  statutory_employer_total: string;
+  pit_total: string;
+  variable_overtime_total: string;
+  variable_absence_total: string;
+  variable_late_total: string;
+  statutory_summary: StatutorySummaryRow[] | null;
+  eosb_trueup_total: string;
   journal_entry_id: string | null;
   entry_no: string | null;
   submitted_at: string | null;
@@ -601,6 +630,14 @@ function mapRun(row: RunSqlRow): RunRow {
     paidNetTotal: row.paid_net_total,
     employerContributionsTotal: row.employer_contributions_total,
     eosAccrualTotal: row.eos_accrual_total,
+    statutoryEmployeeTotal: row.statutory_employee_total,
+    statutoryEmployerTotal: row.statutory_employer_total,
+    pitTotal: row.pit_total,
+    variableOvertimeTotal: row.variable_overtime_total,
+    variableAbsenceTotal: row.variable_absence_total,
+    variableLateTotal: row.variable_late_total,
+    statutorySummary: Array.isArray(row.statutory_summary) ? row.statutory_summary : null,
+    eosbTrueupTotal: row.eosb_trueup_total,
     journalEntryId: row.journal_entry_id,
     entryNo: row.entry_no,
     submittedAt: row.submitted_at,
@@ -622,7 +659,11 @@ function mapRun(row: RunSqlRow): RunRow {
 }
 
 const RUN_COLUMNS = sql`id, run_no, fiscal_period_id, status, gross_total, deductions_total,
-  net_total, paid_net_total, employer_contributions_total, eos_accrual_total, journal_entry_id, entry_no,
+  net_total, paid_net_total, employer_contributions_total, eos_accrual_total,
+  statutory_employee_total, statutory_employer_total, pit_total,
+  variable_overtime_total, variable_absence_total, variable_late_total,
+  statutory_summary, eosb_trueup_total,
+  journal_entry_id, entry_no,
   submitted_at, submitted_by, approved_at, approved_by, posted_at, posted_by,
   reversal_journal_entry_id, reversed_at, reversed_by, note, note_ar,
   created_by, created_at, updated_at, version`;
@@ -688,6 +729,17 @@ export interface RunPatch {
   paidNetTotal?: string;
   employerContributionsTotal?: string;
   eosAccrualTotal?: string;
+  /** PHASE-046 (D-05, W-3): the statutory/variable totals + the summary
+   *  (the jsonb column takes the explicit-undefined shape — a recalc
+   *  re-folds it; the remittance advances `remitted` inside the run gate). */
+  statutoryEmployeeTotal?: string;
+  statutoryEmployerTotal?: string;
+  pitTotal?: string;
+  variableOvertimeTotal?: string;
+  variableAbsenceTotal?: string;
+  variableLateTotal?: string;
+  statutorySummary?: StatutorySummaryRow[];
+  eosbTrueupTotal?: string;
   journalEntryId?: string | null;
   entryNo?: string | null;
   submittedAt?: string | null;
@@ -712,6 +764,14 @@ export async function updateRun(id: string, patch: RunPatch): Promise<RunRow> {
       paid_net_total = coalesce(${patch.paidNetTotal ?? null}, paid_net_total),
       employer_contributions_total = coalesce(${patch.employerContributionsTotal ?? null}, employer_contributions_total),
       eos_accrual_total = coalesce(${patch.eosAccrualTotal ?? null}, eos_accrual_total),
+      statutory_employee_total = coalesce(${patch.statutoryEmployeeTotal ?? null}, statutory_employee_total),
+      statutory_employer_total = coalesce(${patch.statutoryEmployerTotal ?? null}, statutory_employer_total),
+      pit_total = coalesce(${patch.pitTotal ?? null}, pit_total),
+      variable_overtime_total = coalesce(${patch.variableOvertimeTotal ?? null}, variable_overtime_total),
+      variable_absence_total = coalesce(${patch.variableAbsenceTotal ?? null}, variable_absence_total),
+      variable_late_total = coalesce(${patch.variableLateTotal ?? null}, variable_late_total),
+      statutory_summary = ${patch.statutorySummary === undefined ? sql`statutory_summary` : sql`${JSON.stringify(patch.statutorySummary)}::jsonb`},
+      eosb_trueup_total = coalesce(${patch.eosbTrueupTotal ?? null}, eosb_trueup_total),
       journal_entry_id = ${patch.journalEntryId === undefined ? sql`journal_entry_id` : sql`${patch.journalEntryId}`},
       entry_no = ${patch.entryNo === undefined ? sql`entry_no` : sql`${patch.entryNo}`},
       submitted_at = coalesce(${patch.submittedAt ?? null}, submitted_at),
@@ -743,6 +803,20 @@ export interface RunLineRow {
   netAmount: string;
   employerContributions: string;
   eosAccrual: string;
+  /** PHASE-046 (D-05, W-3): the statutory/variable breakdown columns —
+   *  additive, DEFAULT 0; the deductions/net/employer columns already
+   *  carry the fold (INV-025 unwidened). */
+  statutoryEmployeeShare: string;
+  statutoryEmployerShare: string;
+  pitWithheld: string;
+  variableOvertimeAmount: string;
+  variableAbsenceAmount: string;
+  variableLateAmount: string;
+  /** Per profile row {code, kind, base, rates, amounts, clampedBy} — the
+   *  INV-032(a) evidence, frozen at calculate. */
+  statutoryBreakdown: StatutoryBreakdownEntry[] | null;
+  /** The feed's period facts + the applied rates (the as-of snapshot). */
+  variableBreakdown: VariableBreakdown | null;
   costCenterId: string | null;
   projectId: string | null;
   branchId: string | null;
@@ -777,6 +851,14 @@ interface RunLineSqlRow {
   net_amount: string;
   employer_contributions: string;
   eos_accrual: string;
+  statutory_employee_share: string;
+  statutory_employer_share: string;
+  pit_withheld: string;
+  variable_overtime_amount: string;
+  variable_absence_amount: string;
+  variable_late_amount: string;
+  statutory_breakdown: StatutoryBreakdownEntry[] | null;
+  variable_breakdown: VariableBreakdown | null;
   cost_center_id: string | null;
   project_id: string | null;
   branch_id: string | null;
@@ -794,12 +876,27 @@ function mapRunLine(row: RunLineSqlRow): RunLineRow {
     netAmount: row.net_amount,
     employerContributions: row.employer_contributions,
     eosAccrual: row.eos_accrual,
+    statutoryEmployeeShare: row.statutory_employee_share,
+    statutoryEmployerShare: row.statutory_employer_share,
+    pitWithheld: row.pit_withheld,
+    variableOvertimeAmount: row.variable_overtime_amount,
+    variableAbsenceAmount: row.variable_absence_amount,
+    variableLateAmount: row.variable_late_amount,
+    statutoryBreakdown: Array.isArray(row.statutory_breakdown) ? row.statutory_breakdown : null,
+    variableBreakdown: (row.variable_breakdown ?? null) as VariableBreakdown | null,
     costCenterId: row.cost_center_id,
     projectId: row.project_id,
     branchId: row.branch_id,
     createdAt: row.created_at,
   };
 }
+
+const RUN_LINE_COLUMNS = sql`id, run_id, employee_id, component_snapshot, gross_amount, deductions_amount,
+  net_amount, employer_contributions, eos_accrual,
+  statutory_employee_share, statutory_employer_share, pit_withheld,
+  variable_overtime_amount, variable_absence_amount, variable_late_amount,
+  statutory_breakdown, variable_breakdown,
+  cost_center_id, project_id, branch_id, created_at`;
 
 export async function insertRunLine(input: {
   runId: string;
@@ -810,6 +907,15 @@ export async function insertRunLine(input: {
   netAmount: string;
   employerContributions: string;
   eosAccrual: string;
+  /** PHASE-046 (D-05, W-3): the statutory/variable breakdown columns. */
+  statutoryEmployeeShare?: string;
+  statutoryEmployerShare?: string;
+  pitWithheld?: string;
+  variableOvertimeAmount?: string;
+  variableAbsenceAmount?: string;
+  variableLateAmount?: string;
+  statutoryBreakdown?: StatutoryBreakdownEntry[] | null;
+  variableBreakdown?: VariableBreakdown | null;
   costCenterId: string | null;
   projectId: string | null;
   branchId: string | null;
@@ -817,21 +923,29 @@ export async function insertRunLine(input: {
   const rows = await tenantTx().execute(sql`
     INSERT INTO payroll_run_lines (id, tenant_id, run_id, employee_id, component_snapshot,
       gross_amount, deductions_amount, net_amount, employer_contributions, eos_accrual,
+      statutory_employee_share, statutory_employer_share, pit_withheld,
+      variable_overtime_amount, variable_absence_amount, variable_late_amount,
+      statutory_breakdown, variable_breakdown,
       cost_center_id, project_id, branch_id)
     VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.runId}, ${input.employeeId},
       ${JSON.stringify(input.componentSnapshot)}::jsonb, ${input.grossAmount},
       ${input.deductionsAmount}, ${input.netAmount}, ${input.employerContributions},
-      ${input.eosAccrual}, ${input.costCenterId}, ${input.projectId}, ${input.branchId})
-    RETURNING id, run_id, employee_id, component_snapshot, gross_amount, deductions_amount,
-      net_amount, employer_contributions, eos_accrual, cost_center_id, project_id, branch_id, created_at
+      ${input.eosAccrual},
+      ${input.statutoryEmployeeShare ?? "0"}, ${input.statutoryEmployerShare ?? "0"},
+      ${input.pitWithheld ?? "0"},
+      ${input.variableOvertimeAmount ?? "0"}, ${input.variableAbsenceAmount ?? "0"},
+      ${input.variableLateAmount ?? "0"},
+      ${input.statutoryBreakdown === undefined || input.statutoryBreakdown === null ? null : sql`${JSON.stringify(input.statutoryBreakdown)}::jsonb`},
+      ${input.variableBreakdown === undefined || input.variableBreakdown === null ? null : sql`${JSON.stringify(input.variableBreakdown)}::jsonb`},
+      ${input.costCenterId}, ${input.projectId}, ${input.branchId})
+    RETURNING ${RUN_LINE_COLUMNS}
   `);
   return mapRunLine((rows.rows as unknown as RunLineSqlRow[])[0]!);
 }
 
 export async function listRunLines(runId: string): Promise<RunLineRow[]> {
   const rows = await tenantTx().execute(sql`
-    SELECT id, run_id, employee_id, component_snapshot, gross_amount, deductions_amount,
-      net_amount, employer_contributions, eos_accrual, cost_center_id, project_id, branch_id, created_at
+    SELECT ${RUN_LINE_COLUMNS}
     FROM payroll_run_lines WHERE run_id = ${runId}
     ORDER BY created_at, id
   `);

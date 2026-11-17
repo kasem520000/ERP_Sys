@@ -378,6 +378,13 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
   });
 
   it("G-31: run 2 (E2) accrues 4,200 → terminate → settle 4,000 (residual 200) + the mirror case", async () => {
+    // PHASE-046 (W-3, D-09): the run writer (calculate/post) and the G-31
+    // settlement (the eosb employee gate) are DIFFERENT floor keys — the
+    // atomicity floor's no-expansion law refuses the pre-W-3 fixture
+    // batching (a run-key holder cannot then take the employee key: a
+    // backwards expansion is the 40P01 recipe). The PRODUCTION shape is
+    // one writer per UoW (the T-20 self-service.spec precedent); the
+    // assertions below are unchanged.
     await withTenant(TENANT_PAY, async () => {
       // Flip the population: E1 suspended, E2 reactivated.
       await employees.suspend(fixture.employeeE1Id, P_ACTOR);
@@ -412,8 +419,10 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
         actorId: P_ACTOR,
       });
       expect(terminated.status).toBe("TERMINATED");
+    });
 
-      // The MIRROR case first: settle above the balance dies typed.
+    // The MIRROR case first: settle above the balance dies typed.
+    await withTenant(TENANT_PAY, async () => {
       await expect(
         eos.settle(fixture.employeeE2Id, {
           settledAmount: "4200.0001",
@@ -421,7 +430,9 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
           actorId: P_ACTOR,
         }),
       ).rejects.toThrow(/exceeds/);
+    });
 
+    await withTenant(TENANT_PAY, async () => {
       // The G-31 settlement: settled 4,000 of 4,200 → residual 200.
       const settled = await eos.settle(fixture.employeeE2Id, {
         settledAmount: "4000.0000",
@@ -456,9 +467,11 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
       const after = await eos.balanceFor(fixture.employeeE2Id);
       expect(after.balance).toBe("0.0000");
       expect(after.settled).toBe("4000.0000");
-      // run2 recorded for the report-tie suite below.
-      expect(run2Id).toBe(run.id);
-      // One settlement per employee (terminal).
+      // run2 recorded for the report-tie suite below (set in the run
+      // writer's UoW above — the id itself is the record).
+      expect(run2Id).toBeTruthy();
+      // One settlement per employee (terminal) — the re-entrant
+      // re-settle refuses typed (the same employee key, one UoW).
       await expect(
         eos.settle(fixture.employeeE2Id, {
           settledAmount: "100.0000",

@@ -262,6 +262,25 @@ export class PayoutExceedsRunError extends DomainError {
   }
 }
 
+/**
+ * PHASE-046 (W-3, D-06 — G-52's settlement bound): remitting above the
+ * run's outstanding statutory liability (Σ statutory_summary accrued −
+ * remitted: the employee share + the employer share + PIT the run
+ * credited to DEDUCTIONS_PAYABLE), or remitting a non-positive amount on
+ * a run with nothing outstanding. The run gate + the outstanding
+ * re-read under the lock make the double-settle unrepresentable; this
+ * typed refusal is the caller's honest surface (the payout precedent).
+ */
+export class RemittanceExceedsLiabilityError extends DomainError {
+  constructor(details: { runId: string; requested: string; outstanding: string }) {
+    super(
+      "PAYROLL_REMITTANCE_EXCEEDS_LIABILITY",
+      `Remittance ${details.requested} exceeds run ${details.runId}'s outstanding statutory liability ${details.outstanding} (the statutory_summary's accrued − remitted)`,
+      details,
+    );
+  }
+}
+
 /** Terminating/reactivating/suspending an employee in an illegal state. */
 export class EmployeeStatusError extends DomainError {
   constructor(details: { employeeId: string; from: string; to: string; reason?: string }) {

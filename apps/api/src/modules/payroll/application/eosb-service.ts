@@ -8,6 +8,7 @@ import { addExact, compareExact, subExact } from "../../accounting/application/d
 import { AuditService } from "../../audit/api/audit";
 import { PostingService } from "../../accounting/application/posting-service";
 import { ownTenantBaseCurrency, ownTenantCountryCode } from "../../../infra/settings/setting-reader";
+import { lockPayrollEosbEmployee } from "../../hr/infrastructure/atomic";
 import {
   foldEosbTiers,
   serviceYearsBetween,
@@ -19,7 +20,7 @@ import {
   EosbTrueUpInvalidError,
   StatutoryRequiresVerificationError,
 } from "../domain/statutory-errors";
-import { EmployeeNotFoundError } from "../domain/payroll-errors";
+import { EmployeeNotFoundError, RunNotFoundError } from "../domain/payroll-errors";
 import * as payrollStore from "../infrastructure/payroll.store";
 import type { ComponentRow } from "../infrastructure/payroll.store";
 import * as store from "../infrastructure/statutory.store";
@@ -199,6 +200,13 @@ export class EosbService {
     fiscalPeriodId?: string | null;
     jurisdictionCode?: string;
   }): Promise<{ calculation: EosbCalculationRow; journalEntryId: string | null; delta: string }> {
+    // D-09 THE EOSB EMPLOYEE GATE — before the guard reads: the true-up's
+    // window (the provision read + the delta write) serializes against
+    // another true-up AND the G-31 settle (which takes the same gate) —
+    // the provision never double-counts, the settled employee's terminal
+    // stamp never races a drifting delta.
+    await lockPayrollEosbEmployee(input.employeeId);
+
     const employee = await payrollStore.findEmployeeById(input.employeeId);
     if (employee === undefined) throw new EmployeeNotFoundError(input.employeeId);
     if (employee.eosSettledAmount !== null) {
@@ -319,6 +327,18 @@ export class EosbService {
         journalEntryId,
       },
     });
+    // D-05's run column: a true-up carrying the run reference advances
+    // the run's eosb_trueup_total (Σ the G-54 deltas tied to this run —
+    // the reconciliation's per-run view; the run row itself is not a
+    // ledger document, so advancing the tracked total on the POSTED row
+    // violates no append-only law — the journal is the evidence).
+    if (input.runId !== null && input.runId !== undefined) {
+      const run = await payrollStore.findRunById(input.runId);
+      if (run === undefined) throw new RunNotFoundError(input.runId);
+      await payrollStore.updateRun(input.runId, {
+        eosbTrueupTotal: addExact(run.eosbTrueupTotal, entitlement.delta),
+      });
+    }
     return { calculation, journalEntryId, delta: entitlement.delta };
   }
 

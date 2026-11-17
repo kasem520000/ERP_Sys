@@ -11,9 +11,10 @@ writer; the permanent two-transaction race-suite pattern; JOURNAL_RULES §7 +
 INV-031 + BR-082…084 as delivered canon) → the ID_LEDGER's coordinated slots
 (**G-52…G-54 · INV-032 · BR-085…BR-087**) → this plan.
 
-**Status: APPROVED 2026-11-16 (the owner's dispatch, with five binding amendments
-recorded in §1a below) — W-0 + the T-20 pinned notes DELIVERED; W-1 IN
-PROGRESS.**
+**Status: APPROVED 2026-11-16 (the owner's dispatch, with six binding amendments
+recorded in §1a below) — W-0 + the T-20 pinned notes + W-1 + the
+audit-reconciliation fix wave + W-2 + W-3 DELIVERED; W-4 NEXT (the
+verification workflow + the GOSI remittance export).**
 
 ## 1a. The owner's approval amendments (binding — recorded 2026-11-16)
 
@@ -59,6 +60,29 @@ duels 17/18; the no-expansion law + the DB-guaranteed order + duels
 (duel 12's true serialization point honestly re-recorded). NOT the
 §7(b) documentation remarks — those stay the W-7/T-15 open input.
 5. **Tag `phase/046`** (not `phase-046`).
+6. **THE RLS LATENT NO-OP CLASS — THE OWNER'S RULING (2026-11-16, the
+   W-3 greenlight dispatch; the audit-fix wave's honest finding ruled a
+   CLASS, not an incident): a general repair migration `0094` ships in
+   the W-7 CLOSURE WAVE — one file, the 0093 pattern (a temporary
+   migration-plane policy gate, created + self-dropped inside the one
+   file, both sides DROP IF EXISTS — the final policy set exactly the
+   pre-0094 set), sweeping EVERY affected family: the 0009-era
+   master-data seeds (uoms, credit_terms, and every other
+   INSERT…SELECT…FROM tenants sweep in the chain) AND 0092's remaining
+   families (AE/EG/JO profiles, PIT bracket sets, EOSB tiers). The
+   requirements (binding): (a) FIRST an exhaustive inventory — scan
+   every migration 0001…0093 for the FROM-tenants sweep pattern and
+   list every affected family in the 0094 header; (b) idempotent
+   re-materialization with ON CONFLICT DO NOTHING against the
+   CANONICAL current shapes (the 0093 citation records for GOSI —
+   never the pre-0093 shape); (c) the end-to-end pre-state
+   verification script pattern from 0093, its output kept; (d)
+   journal/manifest/spec pins to 94, the chain re-proven from zero.
+   If the inventory finds a family whose correct behavior is genuinely
+   ambiguous, do NOT guess — flag it in the header and exclude it,
+   with the reasoning. This closes the class; NO per-family drip. The
+   GOSI family itself is already repaired (0093); the class repair
+   (0094) is a W-7 task, not a W-3 one.
 
 ## 0. Inputs consumed (the plan-first reads, all done)
 
@@ -339,7 +363,7 @@ baselines ship with it (the visual harness law).
 ## 2. Migration inventory (the honest slots — journal ends at 0088, idx 87)
 
 The phase doc's "≈0089…0093" predates the journal's actual end at 0088: the
-honest next slots are **0089…0092 (4 firm + 0093 reserved)** — recorded at the
+honest next slots were **0089…0092 (4 firm + 0093 reserved)** — recorded at the
 kickoff in the phase doc, the journal, and the manifest (the house numbering
 note). Drizzle `_journal.json` idx 88…91 + `MIGRATIONS` manifest +
 `migrations.spec` pins move with each landing.
@@ -350,7 +374,8 @@ note). Drizzle `_journal.json` idx 88…91 + `MIGRATIONS` manifest +
 | 0090 | `0090_payroll_eosb.sql` | `eosb_rules` + `eosb_calculations` (D-04; rules: master-data grants incl. DELETE; calculations: the evidence discipline — SELECT/INSERT/UPDATE, no DELETE) + indexes: rules (tenant, jurisdiction, effective), calculations (tenant, employee, kind), (tenant, journal_entry_id) |
 | 0091 | `0091_payroll_run_statutory.sql` | The runs/lines extension columns (D-05) — additive, DEFAULT 0 / NULL jsonb, no CHECK widening, no guard change |
 | 0092 | `0092_payroll_statutory_seeds.sql` | DATA-ONLY: the canonical materialization for existing tenants (D-11: GOSI VERIFIED — pension/SANED/OH rows with citations; AE/EG/JO profiles + bracket sets + EOSB tiers REQUIRES_VERIFICATION with citations; NO KSA PIT rows — the honest no-PIT state) + the 3 permissions + role grants + the 2 feature keys' plan grants + the schema_version marker |
-| (0093) | reserved | Only if an implementation-time need surfaces (an index the OA-06 probes demand, a widening) — the 0087/0088 precedent of shipping with the feature task |
+| (0093) | reserved | Only if an implementation-time need surfaces (an index the OA-06 probes demand, a widening) — the 0087/0088 precedent of shipping with the feature task. **CONSUMED 2026-11-16 (the audit-reconciliation round): the GOSI citation reclassification — the PwC source as the CITATION, the owner's dispatch as the DECISION RECORD; the GOSI family's missed-tenant materialization repaired through the temporary self-dropped migration-plane policy gate (§1a.1).** |
+| (0094) | reserved — **THE OWNER'S RULING (§1a.6, 2026-11-16)** | The RLS latent no-op CLASS repair, authored in the **W-7 closure wave**: the exhaustive inventory of every FROM-tenants sweep 0001…0093 + the idempotent ON CONFLICT DO NOTHING re-materialization against the CANONICAL shapes + the 0093 pre-state verification pattern + the journal/manifest/spec pins to 94 — one file, the 0093 pattern, closing the class (no per-family drip). |
 
 Every migration: the `SET ROLE erp_migrate` frame, statement breakpoints, the
 house CHECK families, `erp.apply_tenant_policy` ×N, purge-path policies, the

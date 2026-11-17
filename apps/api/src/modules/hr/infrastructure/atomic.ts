@@ -9,7 +9,14 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  * THE HR SHARED ATOMICITY FLOOR. Hardened in PHASE-046 by the owner's
  * pinned technical notes (2026-11-16, the approval round): the CANONICAL
  * KEY LAW, the NO-EXPANSION LAW, and the DATABASE-GUARANTEED ACQUISITION
- * ORDER.
+ * ORDER. Extended in PHASE-046 W-3 (D-09): the payroll namespaces join
+ * the SAME one floor — `payroll.run|{runId}` and
+ * `payroll.eosb-employee|{employeeId}` — the handoff contract's law that
+ * every new payroll writer rides the T-20 mechanism (one module, one
+ * acquisition, one order; the payroll module imports it directly — the
+ * boundary review at W-3 found dep-cruise clean on the edge: no cycle,
+ * no layering rule crosses, so NO promotion to src/infra/db/ is needed;
+ * recorded in the W-3 evidence).
  *
  * The owner's review (proven with temporary two-transaction DB tests at
  * fd61ff2) found every HR check-then-write boundary racy: two
@@ -103,6 +110,21 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  * sharing a gate (a hash collision between tenants would only
  * over-serialize, never under-serialize — the same entity always
  * hashes to the same key).
+ *
+ * PHASE-046 (D-09) — THE PAYROLL GATES, the same floor's namespaces:
+ *   payroll run       lockPayrollRun        — `payroll.run|{runId}`:
+ *     the run's check-then-write windows serialize — calculate (the
+ *     DRAFT reset + the line write), post (the G-29 fold + the stamp),
+ *     reverse, and the remittance settlement (the statutory_summary
+ *     liability write) ALL take it, so a reset never eats a posted
+ *     run's books and two remittances never double-settle the same
+ *     liability;
+ *   eosb employee     lockPayrollEosbEmployee — `payroll.eosb-employee|
+ *     {employeeId}`: the true-up × true-up and the true-up × G-31
+ *     settle interplay — the provision read + the delta write under
+ *     ONE lock (a racing pair collapses to one G-54 delta + the
+ *     settled employee's terminal stamp, never a double-counted
+ *     provision).
  */
 
 function tenantTx(): TenantDb {
@@ -166,6 +188,17 @@ export const hrAtomicKeys = {
   },
   balanceCell(employeeId: string, leaveTypeId: string, year: number): string {
     return `hr.balance-cell|${canonicalUuid(employeeId)}|${canonicalUuid(leaveTypeId)}|${year}`;
+  },
+} as const;
+
+/** PHASE-046 (D-09) — the payroll key space, the SAME floor: the run
+ * gate and the eosb employee gate (see the header's protocol block). */
+export const payrollAtomicKeys = {
+  run(runId: string): string {
+    return `payroll.run|${canonicalUuid(runId)}`;
+  },
+  eosbEmployee(employeeId: string): string {
+    return `payroll.eosb-employee|${canonicalUuid(employeeId)}`;
   },
 } as const;
 
@@ -316,4 +349,21 @@ export async function lockLeaveApproval(
     hrAtomicKeys.leaveSpan(employeeId),
     hrAtomicKeys.balanceCell(employeeId, leaveTypeId, year),
   ]);
+}
+
+// -- the payroll gates (PHASE-046 D-09 — the same floor) ------------------------------
+
+/** The RUN gate: calculate (the DRAFT reset + the line write), post,
+ * reverse, and the remittance settlement serialize on the run's one
+ * key — the check-then-write windows (status floor, outstanding
+ * liability) never interleave. */
+export async function lockPayrollRun(runId: string): Promise<void> {
+  await lockHrKeys([payrollAtomicKeys.run(runId)]);
+}
+
+/** The EOSB EMPLOYEE gate: the true-up × true-up and the true-up ×
+ * G-31 settle interplay — the provision read + the delta write under
+ * one lock, so the standing provision never double-counts. */
+export async function lockPayrollEosbEmployee(employeeId: string): Promise<void> {
+  await lockHrKeys([payrollAtomicKeys.eosbEmployee(employeeId)]);
 }

@@ -140,6 +140,15 @@ const payoutSchema = z.object({
   entryDate: DATE.optional(),
 });
 
+// PHASE-046 (W-3, D-06): the G-52 remittance settlement — pay the
+// authority the run's outstanding statutory liability (the same shape
+// as the payout; rides payroll.runs.post — the ledger-writing key).
+const remitSchema = z.object({
+  cashAccountId: UUID,
+  amount: MONEY.optional(),
+  entryDate: DATE.optional(),
+});
+
 const reverseSchema = z.object({
   reason: REASON,
   entryDate: DATE,
@@ -427,6 +436,21 @@ export class PayrollController {
     const input = payoutSchema.parse(body);
     return envelope(
       await this.payouts.payout(UUID.parse(id), { ...input, actorId: identity.userId }),
+    );
+  }
+
+  /** PHASE-046 (W-3) — the G-52 remittance settlement: DR
+   * DEDUCTIONS_PAYABLE · CR cash + the payroll_payout movement; the
+   * statutory_summary's liability accrued → remitted (the payout
+   * machinery — BR-086's settlement law). */
+  @Post("runs/:id/remit")
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions("payroll.runs.post")
+  async remitRun(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = remitSchema.parse(body);
+    return envelope(
+      await this.payouts.remit(UUID.parse(id), { ...input, actorId: identity.userId }),
     );
   }
 

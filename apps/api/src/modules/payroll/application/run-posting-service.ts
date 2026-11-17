@@ -13,6 +13,7 @@ import {
 } from "../../accounting/infrastructure/accounting.store";
 import { ownTenantBaseCurrency, readEffectiveSetting } from "../../../infra/settings/setting-reader";
 import { requireTenantContext } from "../../../infra/db/tenant-context";
+import { lockPayrollRun } from "../../hr/infrastructure/atomic";
 import {
   LoanAccountUnmappedError,
   RunImmutableError,
@@ -41,6 +42,37 @@ import {
  *        never DEDUCTIONS_PAYABLE)
  *   CR  EOS_PROVISION (the non-cash accrual balance — the liability leg)
  *   CR  SALARIES_PAYABLE (net)
+ *
+ * PHASE-046 (W-3, T-05) — THE G-29 FOLD EXTENSION (G-52/G-53, additive
+ * lines in the SAME journal — the run's single (payroll_run, runId,
+ * post) INV-013 key is NOT split; BR-053 stays intact by construction:
+ * ZERO new account purposes, the six-key pre-flight already fails
+ * closed on an unmapped DEDUCTIONS_PAYABLE/EMPLOYER_CONTRIBUTIONS path):
+ *   DR  SALARIES_EXPENSE at the variable OVERTIME earning (the salary
+ *        expense family — the G-50 precedent; folds into the basic's leg
+ *        when the dimensions match);
+ *   CR  the SALARIES_EXPENSE account at the gated variable DOCKS
+ *        (absence/late — the earned-less release, the G-54 release-mirror
+ *        precedent: the employee earned less, never a third-party
+ *        payable);
+ *   DR  EMPLOYER_CONTRIBUTIONS at the STATUTORY EMPLOYER share — G-53's
+ *        expense leg (the amount already rides the line's employer
+ *        column, so the existing CR DEDUCTIONS_PAYABLE bump at that
+ *        column IS G-53's liability leg);
+ *   CR  DEDUCTIONS_PAYABLE at (the STATUTORY EMPLOYEE share + PIT) —
+ *        G-52's withholding legs (the amounts already ride the line's
+ *        deductions column, so the existing CR SALARIES_PAYABLE at net
+ *        already reflects them — INV-025's fold by construction).
+ * The KSA worked example (the owner's corrected schedule): Saudi basic
+ * 10,000 + housing 2,000 → DR SALARIES_EXPENSE 12,000 · DR
+ * EMPLOYER_CONTRIBUTIONS 1,410 · CR DEDUCTIONS_PAYABLE 2,580 · CR
+ * SALARIES_PAYABLE 10,830 (13,410 = 13,410) — the remittance settles the
+ * 2,580 through the payout machinery (PayoutService.remit).
+ *
+ * PHASE-046 (D-09) — THE RUN GATE: post and reverse take
+ * `payroll.run|{runId}` BEFORE the status read, so the check-then-write
+ * windows serialize against calculate (the DRAFT reset), the remittance
+ * settlement, and each other (the reset never eats a posted run).
  *
  * Every line carries the employee's cost_center_id/project_id/branch_id
  * (phase item 7 — lines aggregate per (account × dimension group) so
@@ -103,8 +135,13 @@ export class RunPostingService {
     private readonly numbering: NumberingService,
   ) {}
 
-  /** Post the approved run (G-29). Double-post converges (INV-013). */
+  /** Post the approved run (G-29 + the G-52/G-53 statutory legs). Double-post converges (INV-013). */
   async post(runId: string, actorId: string | null): Promise<RunRow> {
+    // D-09 THE RUN GATE — before the status read: the post's window
+    // (status floor + the journal + the loan flips) serializes against
+    // calculate's DRAFT reset and the remittance settlement.
+    await lockPayrollRun(runId);
+
     const run = await store.findRunById(runId);
     if (run === undefined) throw new RunNotFoundError(runId);
     if (run.status === "POSTED") {
@@ -197,6 +234,35 @@ export class RunPostingService {
         },
         line.componentSnapshot.basicSalary,
       );
+      // PHASE-046 (W-3, D-08) — the variable OVERTIME earning: the salary
+      // expense family (the G-50 precedent — no new purpose), folding
+      // into the basic's leg when the dimensions match.
+      bump(
+        {
+          accountId: salariesExpenseAccount,
+          direction: "DEBIT",
+          ...dims,
+          memo: { en: "Overtime earning (G-29)", ar: "أجر العمل الإضافي (G-29)" },
+        },
+        line.variableOvertimeAmount,
+      );
+      // PHASE-046 (W-3, D-08) — the gated variable DOCKS (absence/late):
+      // the earned-less amounts credit the SAME salary expense account
+      // (the G-54 release-mirror precedent — the employee earned less,
+      // never a third-party payable); the breakdown columns carry the
+      // detail, the journal the aggregate.
+      bump(
+        {
+          accountId: salariesExpenseAccount,
+          direction: "CREDIT",
+          ...dims,
+          memo: {
+            en: "Absence/late dock — salary expense release (G-29)",
+            ar: "خصم الغياب والتأخير — تحرير مصروف الرواتب (G-29)",
+          },
+        },
+        addExact(line.variableAbsenceAmount, line.variableLateAmount),
+      );
       // Components: ALLOWANCE/EMPLOYER_CONTRIBUTION → their own accounts
       // (DEBIT); DEDUCTION → DEDUCTIONS_PAYABLE (CR — employee third-party).
       for (const component of line.componentSnapshot.components) {
@@ -229,7 +295,10 @@ export class RunPostingService {
         }
       }
       // Employer contributions ALSO credit DEDUCTIONS_PAYABLE (payable to
-      // the third party — the worked example's 2,000 CR).
+      // the third party — the worked example's 2,000 CR). PHASE-046 (W-3):
+      // the column already carries the STATUTORY EMPLOYER share (D-05) —
+      // this bump is G-53's liability leg; the matching expense leg posts
+      // at the EMPLOYER_CONTRIBUTIONS purpose below.
       bump(
         {
           purpose: "DEDUCTIONS_PAYABLE",
@@ -241,6 +310,38 @@ export class RunPostingService {
           },
         },
         line.employerContributions,
+      );
+      // PHASE-046 (W-3, T-05) — G-53's expense leg: the statutory EMPLOYER
+      // share debits the employer-contribution expense purpose (the G-29
+      // account family — ZERO new purposes, D-06).
+      bump(
+        {
+          purpose: "EMPLOYER_CONTRIBUTIONS",
+          direction: "DEBIT",
+          ...dims,
+          memo: {
+            en: "Employer statutory contributions (G-53)",
+            ar: "مساهمات صاحب العمل القانونية (G-53)",
+          },
+        },
+        line.statutoryEmployerShare,
+      );
+      // PHASE-046 (W-3, T-05) — G-52's withholding legs: the statutory
+      // EMPLOYEE share + PIT credit DEDUCTIONS_PAYABLE (the authority's
+      // payable; the remittance settles it through the payout machinery).
+      // The amounts already ride the line's deductions column, so the
+      // SALARIES_PAYABLE leg at net already reflects them.
+      bump(
+        {
+          purpose: "DEDUCTIONS_PAYABLE",
+          direction: "CREDIT",
+          ...dims,
+          memo: {
+            en: "Statutory withholding — employee share + PIT (G-52)",
+            ar: "الاستقطاعات القانونية — حصة الموظف وضريبة الدخل (G-52)",
+          },
+        },
+        addExact(line.statutoryEmployeeShare, line.pitWithheld),
       );
       // EOS: expense DR + the non-cash provision CR (the liability leg).
       bump(
@@ -372,6 +473,10 @@ export class RunPostingService {
     runId: string,
     input: { reason: string; entryDate: string; actorId: string | null },
   ): Promise<RunRow> {
+    // D-09 THE RUN GATE: the reversal window (the already-reversed check
+    // + the engine's reversal post) serializes with the run's writers.
+    await lockPayrollRun(runId);
+
     const run = await store.findRunById(runId);
     if (run === undefined) throw new RunNotFoundError(runId);
     if (run.status !== "POSTED" || run.journalEntryId === null) {

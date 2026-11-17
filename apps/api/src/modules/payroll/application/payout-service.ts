@@ -7,13 +7,16 @@ import { PostingService } from "../../accounting/application/posting-service";
 import { addExact, compareExact, subExact } from "../../accounting/application/decimal-strings";
 import { findPeriodById } from "../../accounting/infrastructure/accounting.store";
 import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
+import { lockPayrollRun } from "../../hr/infrastructure/atomic";
 import {
   PayoutExceedsRunError,
+  RemittanceExceedsLiabilityError,
   RunImmutableError,
   RunNotFoundError,
 } from "../domain/payroll-errors";
 import * as store from "../infrastructure/payroll.store";
 import type { EmployeeRow, RunRow } from "../infrastructure/payroll.store";
+import type { StatutorySummaryRow } from "../domain/statutory-math";
 import { toEmployeeView } from "./employee-service";
 import {
   insertCashMovement,
@@ -36,6 +39,23 @@ import {
  * paid_net_total (DB CHECK 0 ≤ paid ≤ net) advances transactionally —
  * paying above the outstanding remainder dies typed; a second full payout
  * is rejected as above-outstanding (zero residue, no double payment).
+ *
+ * PHASE-046 (W-3, T-05 — D-06's G-52 settlement leg): THE REMITTANCE
+ * SETTLEMENT — pay the authority. The run's statutory liability (the
+ * frozen statutory_summary: the employee share + the employer share +
+ * PIT the run credited to DEDUCTIONS_PAYABLE) settles ONLY through this
+ * payout-machinery path: DR DEDUCTIONS_PAYABLE · CR the cash account
+ * (explicit accountId) + the treasury movement `sourceType:
+ * 'payroll_payout'` (the G-51 precedent — NO cash_movements CHECK
+ * widening), INV-019 exact (movement.base == the journal's cash line),
+ * source key (payroll_remittance, remittanceId, post) under INV-013 —
+ * each settlement mints its own remittanceId; the run gate + the
+ * outstanding re-read UNDER the lock make the double-settle
+ * unrepresentable; the summary's `remitted` advances in the stored
+ * order (a partial settlement allocates first-row-first — deterministic,
+ * the same lines always fold the same summary); remitting above the
+ * outstanding (or on a nothing-outstanding run) is the typed
+ * RemittanceExceedsLiabilityError (the payout precedent).
  *
  * Payslips: per-run batch payload (masked national_id per the C-PII
  * discipline — the restricted permission gates the route; the payload
@@ -145,6 +165,136 @@ export class PayoutService {
       },
     });
     return { run: updated, payoutId, journalEntryId: result.journalEntryId, amount };
+  }
+
+  /**
+   * PHASE-046 (W-3, T-05) — THE REMITTANCE SETTLEMENT (G-52's leg): pay
+   * the authority the run's outstanding statutory liability. The full
+   * outstanding when amount is omitted, an exact partial otherwise
+   * (allocated first-summary-row-first); the over-remit is the typed
+   * refusal. POSTED-only (the liability exists once the run posted) and
+   * entirely under the run gate (D-09): the outstanding read + the
+   * summary advance are one window.
+   */
+  async remit(
+    runId: string,
+    input: { cashAccountId: string; amount?: string; entryDate?: string; actorId: string | null },
+  ): Promise<{
+    run: RunRow;
+    remittanceId: string;
+    journalEntryId: string;
+    amount: string;
+    summary: StatutorySummaryRow[];
+  }> {
+    // D-09 THE RUN GATE — before the outstanding read: two concurrent
+    // remittances serialize (the second re-reads the advanced summary and
+    // dies typed on the emptied outstanding, or settles what remains).
+    await lockPayrollRun(runId);
+
+    const run = await store.findRunById(runId);
+    if (run === undefined) throw new RunNotFoundError(runId);
+    if (run.status !== "POSTED") {
+      throw new RunImmutableError({
+        runId,
+        status: run.status,
+        action: "remit (only POSTED runs carry a statutory liability — the accrual posts with the run)",
+      });
+    }
+    const account = await findCashAccountById(input.cashAccountId);
+    if (account === undefined || account.status !== "ACTIVE") {
+      const { CashAccountNotFoundError } = await import("../../treasury/domain/treasury-errors");
+      throw new CashAccountNotFoundError(input.cashAccountId);
+    }
+
+    // The outstanding liability: Σ (accrued − remitted) over the frozen
+    // summary — the run's own DEDUCTIONS_PAYABLE statutory credit. A run
+    // with NO statutory rows carries NO summary (null) — nothing to
+    // settle (the typed refusal, never a zero-dollar journal).
+    const summary = run.statutorySummary ?? [];
+    let outstanding = "0.0000";
+    for (const row of summary) {
+      outstanding = addExact(outstanding, subExact(row.accrued, row.remitted));
+    }
+    const amount = input.amount === undefined ? outstanding : input.amount;
+    if (compareExact(amount, outstanding) > 0 || compareExact(amount, "0.0000") <= 0) {
+      throw new RemittanceExceedsLiabilityError({ runId, requested: amount, outstanding });
+    }
+
+    const base = await ownTenantBaseCurrency();
+    const remittanceId = generateUuidV7();
+    const entryDate =
+      input.entryDate === undefined ? new Date().toISOString().slice(0, 10) : input.entryDate;
+    const lines: JournalLineSpec[] = [
+      {
+        purpose: "DEDUCTIONS_PAYABLE",
+        direction: "DEBIT",
+        amount,
+        memo: {
+          en: "Statutory remittance to the authority (G-52)",
+          ar: "تحويل الاستقطاعات القانونية إلى الجهة (G-52)",
+        },
+      },
+      {
+        accountId: account.accountId,
+        direction: "CREDIT",
+        amount,
+        memo: { en: `Remittance via ${account.name}`, ar: `تحويل عبر ${account.name}` },
+      },
+    ];
+    const spec: JournalSpec = {
+      source: { docType: "payroll_remittance", docId: remittanceId, operation: "post" },
+      entryDate,
+      description: {
+        en: `Statutory remittance — run ${run.runNo ?? run.id} (G-52)`,
+        ar: `تحويل الاستقطاعات القانونية — مسير ${run.runNo ?? run.id} (G-52)`,
+      },
+      currency: base,
+      lines,
+    };
+    const result = await this.posting.post(spec, { postedBy: input.actorId });
+
+    // The treasury money movement (the payout machinery — the G-51
+    // precedent; INV-019 exact: base == the journal's cash line).
+    await insertCashMovement({
+      cashAccountId: account.id,
+      direction: "OUT",
+      amount,
+      currencyCode: base,
+      exchangeRate: "1",
+      baseAmount: amount,
+      sourceType: "payroll_payout",
+      sourceId: remittanceId,
+      valueDate: entryDate,
+      memo: `Statutory remittance ${run.runNo ?? run.id}`,
+      memoAr: `تحويل الاستقطاعات القانونية ${run.runNo ?? run.id}`,
+    });
+
+    // The summary advance: the settled amount allocates first-row-first
+    // (the summary's stored order — deterministic; the same lines always
+    // fold the same summary, so the allocation is stable).
+    let remaining = amount;
+    const advanced: StatutorySummaryRow[] = summary.map((row) => {
+      const rowOutstanding = subExact(row.accrued, row.remitted);
+      const take = compareExact(rowOutstanding, remaining) <= 0 ? rowOutstanding : remaining;
+      remaining = subExact(remaining, take);
+      return { ...row, remitted: addExact(row.remitted, take) };
+    });
+    const updated = await store.updateRun(runId, { statutorySummary: advanced });
+    await this.audit.record({
+      action: "payroll.remittance_settled",
+      entityType: "payroll_run",
+      entityId: runId,
+      actorId: input.actorId ?? undefined,
+      after: {
+        remittanceId,
+        amount,
+        outstandingBefore: outstanding,
+        outstandingAfter: subExact(outstanding, amount),
+        journalEntryId: result.journalEntryId,
+        cashAccount: account.name,
+      },
+    });
+    return { run: updated, remittanceId, journalEntryId: result.journalEntryId, amount, summary: advanced };
   }
 
   /**

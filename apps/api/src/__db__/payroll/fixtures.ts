@@ -17,6 +17,9 @@ import { RunPostingService } from "../../modules/payroll/application/run-posting
 import { PayoutService } from "../../modules/payroll/application/payout-service";
 import { LoanService } from "../../modules/payroll/application/loan-service";
 import { EosService } from "../../modules/payroll/application/eos-service";
+import { PitEngine } from "../../modules/payroll/application/pit-engine";
+import { StatutoryProfileService } from "../../modules/payroll/application/statutory-profile-service";
+import { FeedService } from "../../modules/hr/application/feed-service";
 import * as payrollStore from "../../modules/payroll/infrastructure/payroll.store";
 
 /**
@@ -81,7 +84,14 @@ const numbering = new NumberingService(audit);
 
 export const employees = new EmployeeService(audit);
 export const structures = new StructureService(audit);
-export const calculation = new RunCalculationService(audit);
+// PHASE-046 (W-3): the calculation service's statutory/variable arms —
+// the same construction the pg-boss worker uses (ids-only payloads).
+export const calculation = new RunCalculationService(
+  audit,
+  new StatutoryProfileService(audit),
+  new PitEngine(audit),
+  new FeedService(audit),
+);
 export const workflow = new ApprovalWorkflow(audit);
 export const runPosting = new RunPostingService(audit, posting, numbering);
 export const payouts = new PayoutService(audit, posting);

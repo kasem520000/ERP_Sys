@@ -310,17 +310,23 @@ describe("PHASE-046 T-06 — the EOSB engine", () => {
   });
 
   it("(g) THE TERMINATION SEQUENCE — a posted run builds the 029 provision; the true-up aligns; G-31 settles; the 029 machinery green after", async () => {
-    await withTenant(TENANT_EOSB, async () => {
-      const employeeId = await createSuspendedEmployee("EOSB-F", { hireDate: "2018-11-30" });
+    // PHASE-046 (W-3, D-09): the run writer (the run gate) and the
+    // true-up/settlement (the eosb employee gate) are DIFFERENT floor
+    // keys — the no-expansion law refuses the pre-W-3 fixture batching
+    // (a run-key holder cannot then take the employee key). The
+    // PRODUCTION shape is one writer per UoW (the T-20 self-service.spec
+    // precedent); the assertions are unchanged.
+    const employeeId = await withTenant(TENANT_EOSB, async () => {
+      const created = await createSuspendedEmployee("EOSB-F", { hireDate: "2018-11-30" });
       // Activate inside this spec's own run window (FY2026-10 — unused by
       // the other payroll specs), build the 029 provision, then terminate.
-      await employees.reactivate(employeeId, P_ACTOR);
+      await employees.reactivate(created, P_ACTOR);
       const run = await calculation.createRun({
         fiscalPeriodId: world.periodIds["FY2026-10"]!,
         actorId: P_ACTOR,
       });
       const calculated = await calculation.calculate(run.id, { actorId: P_ACTOR });
-      const own = calculated.lines.find((line) => line.employee.id === employeeId);
+      const own = calculated.lines.find((line) => line.employee.id === created);
       expect(own).toBeTruthy();
       expect(own!.eosAccrual).toBe("900.0000"); // 9,000 × 3/30 — the 029 policy
       await workflow.submit(run.id, P_ACTOR);
@@ -329,10 +335,13 @@ describe("PHASE-046 T-06 — the EOSB engine", () => {
       expect(posted.status).toBe("POSTED");
 
       // Terminate effective 2026-11-30 (⇒ 8.00 service years; period 11 — OPEN).
-      await employees.terminate(employeeId, { terminationDate: AT_8Y_NOV, reason: "retirement", actorId: P_ACTOR });
+      await employees.terminate(created, { terminationDate: AT_8Y_NOV, reason: "retirement", actorId: P_ACTOR });
+      return created;
+    });
 
-      // The TERMINATION true-up: standing 900 (the run) → entitlement 49,500
-      // (5×15 + 3×30 = 165 days × 9,000/30) → +48,600.
+    // The TERMINATION true-up: standing 900 (the run) → entitlement 49,500
+    // (5×15 + 3×30 = 165 days × 9,000/30) → +48,600.
+    await withTenant(TENANT_EOSB, async () => {
       const trueUp = await eosb.trueUp({
         employeeId,
         kind: "TERMINATION",
@@ -341,8 +350,11 @@ describe("PHASE-046 T-06 — the EOSB engine", () => {
       });
       expect(trueUp.delta).toBe("48600.0000");
       expect(trueUp.journalEntryId).toBeTruthy();
+    });
 
-      // G-31 settles the 029-visible balance — the shipped machinery, green after.
+    await withTenant(TENANT_EOSB, async () => {
+      // G-31 settles the 029-visible balance — the shipped machinery,
+      // green after (re-entrant on the same employee key).
       const settle = await eos.settle(employeeId, {
         settledAmount: "900.0000",
         cashAccountId: world.bankCashAccountId,

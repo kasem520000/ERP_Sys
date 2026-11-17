@@ -4200,6 +4200,19 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "payroll.runs.post",
   },
 
+  // PHASE-046 (W-3 — matrix §3.24's dated note, D-13): the G-52
+  // remittance settlement — the statutory liability's ONLY settlement
+  // path (DR DEDUCTIONS_PAYABLE · CR cash + the payroll_payout movement,
+  // the statutory_summary's accrued → remitted). A POSTING act riding
+  // payroll.runs.post (the ledger-writing key, the SoD three-way split:
+  // create ≠ approve ≠ post), never a payroll.statutory.* management
+  // key (those gate the verification + export surfaces).
+  {
+    method: "POST",
+    path: "/api/v1/payroll/runs/:id/remit",
+    permission: "payroll.runs.post",
+  },
+
   // PHASE-045 (T-14 — matrix §3.23 + the 0086 seed note): the employee
   // self-service plane — the OWN-ROWS reads (summary, attendance
   // calendar, roster, the leave world) + the two narrow writes

@@ -2,6 +2,7 @@ import { Module, type OnModuleInit } from "@nestjs/common";
 
 import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
+import { HrModule } from "../hr/hr.module";
 import { getBoss } from "../../infra/jobs/boss";
 import { ApprovalWorkflow } from "./application/approval-workflow";
 import { EmployeeService } from "./application/employee-service";
@@ -29,7 +30,14 @@ import { PayrollController } from "./presentation/payroll.controller";
  *
  * Dependencies (DEPENDENCY_RULES §2; phase §4): accounting (the posting
  * engine owns every journal — ADR-0007; periods, numbering, purposes) +
- * audit. Cross-module READ refs: tenancy branches, cost centers,
+ * audit. PHASE-046 (W-3, D-08): the HR module joins as the READ-side
+ * feed boundary — the run calculation calls FeedService.variableFeed ONCE
+ * per run (the 045 handoff contract's single consumption boundary; BR-084's
+ * read-only law enforced in its SQL — hr grants payroll nothing but the
+ * feed read; D-09's atomicity floor is imported directly from
+ * hr/infrastructure — the same cross-module infra precedent, dep-cruise
+ * clean at W-3: no cycle, no layering rule crossed, recorded in the W-3
+ * evidence). Cross-module READ refs: tenancy branches, cost centers,
  * projects, treasury cash accounts. cash_movements is written ONLY
  * through the treasury store API (treasury-owned). Nothing writes the
  * payroll tables but payroll services (MODULE_BOUNDARIES write matrix);
@@ -40,7 +48,7 @@ import { PayrollController } from "./presentation/payroll.controller";
  * (degrade-the-feature-never-the-platform).
  */
 @Module({
-  imports: [AccountingModule, AuditModule],
+  imports: [AccountingModule, AuditModule, HrModule],
   controllers: [PayrollController],
   providers: [
     EmployeeService,

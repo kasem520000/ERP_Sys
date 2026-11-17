@@ -7,6 +7,7 @@ import { PostingService } from "../../accounting/application/posting-service";
 import { addExact, compareExact, subExact } from "../../accounting/application/decimal-strings";
 import { ownTenantBaseCurrency, readEffectiveSetting } from "../../../infra/settings/setting-reader";
 import { requireTenantContext } from "../../../infra/db/tenant-context";
+import { lockPayrollEosbEmployee } from "../../hr/infrastructure/atomic";
 import {
   EosBasisRequiredError,
   EosSettlementExceedsBalanceError,
@@ -101,6 +102,13 @@ export class EosService {
       actorId: string | null;
     },
   ): Promise<{ journalEntryId: string; settled: string; residual: string }> {
+    // PHASE-046 (D-09) — THE EOSB EMPLOYEE GATE (the same key the true-up
+    // takes): the provision read + the settlement stamps serialize
+    // against the G-54 writers, so a true-up in flight can never drift
+    // the balance this settlement extinguishes (the provision never
+    // double-counts).
+    await lockPayrollEosbEmployee(employeeId);
+
     const employee = await store.findEmployeeById(employeeId);
     if (employee === undefined) throw new EmployeeNotFoundError(employeeId);
     if (employee.status !== "TERMINATED") {

@@ -171,6 +171,94 @@ floor (the run-calculation extension, the G-52/G-53 legs through the G-29
 machinery, the remittance settlement + the statutory_summary liability,
 the run gate in atomic.ts (D-09), the feed-called-ONCE boundary).**
 
+**THE 0094 RULING (the owner's dispatch, 2026-11-16 — recorded with the
+W-3 greenlight):** the RLS latent no-op finding is a CLASS, not an
+incident — a general repair migration **0094 ships in the W-7 CLOSURE
+WAVE**: one file, the 0093 pattern (the temporary self-dropped
+migration-plane policy gate), sweeping EVERY affected family (the
+0009-era master-data seeds — uoms, credit_terms, and every other
+INSERT…SELECT…FROM tenants sweep in the chain — AND 0092's remaining
+families: AE/EG/JO profiles, PIT bracket sets, EOSB tiers), with (a)
+the exhaustive inventory of every FROM-tenants sweep 0001…0093 listed
+in the 0094 header, (b) idempotent ON CONFLICT DO NOTHING
+re-materialization against the CANONICAL current shapes (the 0093
+citation records for GOSI — never the pre-0093 shape), (c) the 0093
+end-to-end pre-state verification script pattern with its output kept,
+(d) journal/manifest/spec pins to 94 + the chain re-proven from zero;
+a genuinely ambiguous family is flagged + excluded with the reasoning —
+never a guess. This closes the class; NO per-family drip. Recorded in
+the MASTER-PLAN §1a.6 + the migration inventory.
+
+**W-3 (delivered 2026-11-16 — Run integration + the floor,
+T-05+T-07+D-09):** the run-calculation extension — statutory + variable
+columns computed during `calculate`, **the feed called ONCE via the
+service boundary** (`FeedService.variableFeed` — the handoff contract),
+the INV-025 fold extended (deductions += the statutory employee share +
+PIT + the gated variable docks; the employer column += the statutory
+employer share; net = gross − deductions exactly — the CHECKs
+unwidened), the breakdowns + the `statutory_summary` frozen on the
+run/lines; **the G-29 fold extension** — G-52's employee/PIT legs (CR
+DEDUCTIONS_PAYABLE at employee share + PIT) + G-53's pair (DR
+EMPLOYER_CONTRIBUTIONS at the employer share; the existing CR
+DEDUCTIONS_PAYABLE bump at the employer column is its liability leg) +
+the overtime earning (DR SALARIES_EXPENSE, the G-50 family) + the
+absence/late docks (CR the salary expense account — the G-54
+release-mirror precedent) — additive lines in the SAME journal, ZERO
+new account purposes, the six-key pre-flight already fail-closed (the
+unmapped-path law verified in place); **the remittance settlement**
+(`PayoutService.remit`) — DR DEDUCTIONS_PAYABLE · CR cash through the
+payout machinery + the `payroll_payout` movement (INV-019 exact), the
+source key `(payroll_remittance, remittanceId, post)` under INV-013,
+the summary's liability accrued → remitted (a partial allocates
+first-summary-row-first), the over-remit typed refusal; **D-09's
+gates** — `payroll.run|{runId}` (calculate's DRAFT reset, post,
+reverse, the remittance) + `payroll.eosb-employee|{employeeId}` (the
+true-up AND the G-31 settle — the provision read + the delta write
+under one lock) on the SAME T-20 floor (dep-cruise CLEAN on the
+payroll → hr edge: 1,923 · 14,273, no promotion needed — recorded);
+**the pg-boss payload compatibility check** — the queue contract
+UNCHANGED (`{tenantId, runId}` ids-only; only the worker's construction
+grew); the route `POST runs/:id/remit` on `payroll.runs.post`
+(§8-registered). THE PURE variable math unit-spec FIRST (9/9 — the
+§4 numbers: 4.50 × 37.5000 = 168.7500; 2 × 300.0000; 60 × 0.6250; the
+UNPRICED states; MISSING_PUNCH informational; the clamps; the summary
+fold). THE DB SPECS on the dedicated tenants (RUNSTAT/VAR — the
+eosb.spec precedent, never the PAY world's registers): run-statutory
+**7/7** (the KSA worked example end-to-end: employee 1,170.0000 /
+employer 1,410.0000 → the journal DR SALARIES 12,000 · DR
+EMPLOYER_CONTRIBUTIONS 1,410 · CR DEDUCTIONS_PAYABLE 2,580 · CR
+SALARIES_PAYABLE 10,830; INV-032(a)/(b) + INV-025; the full remittance
+2,580 + the partial allocation + the over-remit typed; the non-Saudi
+OH-only arm; the NULL-nationality fail-closed arm; BR-085 AT THE RUN
+LEVEL — the typed refusal + the surviving audit event + zero residue,
+withdrawn ⇒ green) + variable-lines **5/5** (the feed boundary + THE
+NEGATIVE LEDGER PROOF — the registers' md5 digests byte-identical
+through the full run cycle; the unpriced → priced → gated sequence on
+ONE DRAFT run's recalcs; the post's balanced journal with the dock
+release; the encashment non-invention — used_days 0, one journal in
+the tenant, G-51 untouched; D-07's no-profile state). **THE HONEST
+RESTRUCTURE RECORD**: the new gates made two pre-existing spec
+sequences illegal (the no-expansion law refused the G-31 test's and
+the eosb termination sequence's run-writer + settle batching in one
+UoW — exactly the shape the floor exists to refuse) — both
+restructured to the production one-writer-per-UoW shape (the T-20
+self-service.spec precedent), the ASSERTIONS byte-identical (the 029
+golden pack 14/14, untouched laws). GATES: typecheck/lint 8/8,
+depcruise clean (1,923 · 14,273), unit 8/8 packages · api **660/660**
+(626 + 25 + 9), the payroll folder 7 files · 53/53, the hr folder 13
+files · 83/83 (the race suite 20/20 — the floor's extension green),
+isolation + entitlements + tenancy + migrations + identity 6 files ·
+1,663/1,663 (migrations 7/7 — the 93-chain), docs 33/33, drift
+300 = 300, manifests 13/13, i18n parity 6,007 = 6,007, capabilities
+agree, id-ledger 0 errors, history-secrets 0, check:rls clean (the
+standalone run on a temp embedded PG16: 0 violations). Evidence:
+[gate-evidence/2026-11-16-phase046-w3.md](../docs/operations/gate-evidence/2026-11-16-phase046-w3.md)
++ `audit-evidence/phase046-w3/`. **Next: W-4 — the verification
+workflow surface (the verify route on payroll.statutory.verify) + the
+GOSI remittance export (XLSX/CSV, the 028 pattern) + the
+integration-profile readiness surface (IN-06 — exports only, NO
+live-government-API claims).**
+
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE
 CANONICAL KEY LAW — `canonicalUuid()` in `atomic.ts` normalizes every
@@ -230,7 +318,7 @@ Permissions 297=297; i18n 6,007=6,007; report registry 104; DB suite
 (its only hard prerequisite PHASE-045 is accepted; the roadmap's hard
 ordering "045 before 046 before 047" holds). The MASTER-PLAN
 (`agent-ctx/PHASE-046-MASTER-PLAN.md`, at main c71aa9d5) governs with the
-owner's five binding amendments recorded in the header above. The canon
+owner's five approval amendments + the 0094 ruling (the sixth, recorded 2026-11-16 with the W-3 greenlight — the RLS latent no-op class repair ships as migration 0094 in the W-7 closure wave) recorded in the header above. The canon
 spine stays `docs/implementation/phases/PHASE-046.md` (T-01…T-16; goldens
 G-52…G-54, INV-032, BR-085…087 — the id-ledger's coordinated slots).
 **The immediate work order: the T-20 pinned technical notes first (the
