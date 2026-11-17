@@ -183,16 +183,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 104 frozen contracts validate against the known-permission catalog", () => { // PHASE-045: 101 → 104 (+3 hr registers)
+  it("the 106 frozen contracts validate against the known-permission catalog", () => { // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(104); // PHASE-045: 101 → 104 (+3 hr registers)
+    expect(result.count).toBe(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(104); // PHASE-045: 101 → 104 (+3 hr registers)
+    expect(snapshot).toHaveLength(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

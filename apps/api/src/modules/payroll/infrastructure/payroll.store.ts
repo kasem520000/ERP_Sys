@@ -791,6 +791,46 @@ export async function updateRun(id: string, patch: RunPatch): Promise<RunRow> {
   return mapRun((rows.rows as unknown as RunSqlRow[])[0]!);
 }
 
+/**
+ * PHASE-046 (W-6, T-17 — THE OWNER'S F3 SCOPE ADDITION, recorded
+ * 2026-11-17 at 6387da9, implemented here): advance the run's
+ * `eosb_trueup_total` by the G-54 delta as a SQL-SIDE INCREMENT —
+ * `SET eosb_trueup_total = eosb_trueup_total + δ` — never an
+ * app-computed read-modify-write.
+ *
+ * The pre-F3 shape (findRunById → updateRun(eosbTrueupTotal: run.
+ * eosbTrueupTotal + δ)) serialized only on the EMPLOYEE gate: two
+ * TRUE-UPS ON DIFFERENT EMPLOYEES referencing the SAME RUN both held
+ * their own (distinct) employee gates, both read the same column, and
+ * the second write OVERWRITES the first's advance — a lost update on
+ * the tracked total (the G-54 journals themselves are safe — each mints
+ * its own INV-013 source key; only the column is not). The chosen fix
+ * is the SQL-side increment (the plan's option (a)): the single UPDATE
+ * reads-and-adds atomically under the row lock PostgreSQL itself takes,
+ * so concurrent advances from ANY number of employees' true-ups apply
+ * on the committed value — no advisory run gate needed, no lock-order
+ * coupling between the eosb-employee and run namespaces (the plan's
+ * option (b) — the ascending run-gate acquisition — stays recorded as
+ * the alternative). PostgreSQL numeric addition is exact decimal math
+ * (the platform discipline — no float anywhere). Pinned by the
+ * permanent duel (9) — payroll-writer-races.spec.ts.
+ */
+export async function advanceRunEosbTrueup(runId: string, delta: string): Promise<RunRow> {
+  const rows = await tenantTx().execute(sql`
+    UPDATE payroll_runs SET
+      eosb_trueup_total = eosb_trueup_total + ${delta}::numeric,
+      updated_at = now(),
+      version = version + 1
+    WHERE id = ${runId}
+    RETURNING ${RUN_COLUMNS}
+  `);
+  const row = (rows.rows as unknown as RunSqlRow[])[0];
+  if (row === undefined) {
+    throw new Error(`payroll run ${runId} not found (own tenant)`);
+  }
+  return mapRun(row);
+}
+
 // -- payroll run lines (append-only: INSERT + DRAFT-reset DELETE + SELECT) --------------
 
 export interface RunLineRow {

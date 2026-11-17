@@ -115,10 +115,14 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  *   payroll run       lockPayrollRun        — `payroll.run|{runId}`:
  *     the run's check-then-write windows serialize — calculate (the
  *     DRAFT reset + the line write), post (the G-29 fold + the stamp),
- *     reverse, and the remittance settlement (the statutory_summary
- *     liability write) ALL take it, so a reset never eats a posted
- *     run's books and two remittances never double-settle the same
- *     liability;
+ *     reverse, the remittance settlement (the statutory_summary
+ *     liability write), AND the salary payout (W-6/T-17 — the owner's
+ *     F2 scope addition, recorded 2026-11-17 at 6387da9: the
+ *     paid_net_total advance was a gate-less read-modify-write, so two
+ *     concurrent partial payouts lost an update the 0043 CHECK
+ *     0 ≤ paid ≤ net cannot catch) ALL take it, so a reset never eats a
+ *     posted run's books, two remittances never double-settle the same
+ *     liability, and two payouts never double-pay one outstanding;
  *   eosb employee     lockPayrollEosbEmployee — `payroll.eosb-employee|
  *     {employeeId}`: the true-up × true-up and the true-up × G-31
  *     settle interplay — the provision read + the delta write under
@@ -354,9 +358,10 @@ export async function lockLeaveApproval(
 // -- the payroll gates (PHASE-046 D-09 — the same floor) ------------------------------
 
 /** The RUN gate: calculate (the DRAFT reset + the line write), post,
- * reverse, and the remittance settlement serialize on the run's one
- * key — the check-then-write windows (status floor, outstanding
- * liability) never interleave. */
+ * reverse, the remittance settlement, and the salary payout (W-6/T-17 —
+ * F2) serialize on the run's one key — the check-then-write windows
+ * (status floor, outstanding liability, the paid_net_total advance)
+ * never interleave. */
 export async function lockPayrollRun(runId: string): Promise<void> {
   await lockHrKeys([payrollAtomicKeys.run(runId)]);
 }

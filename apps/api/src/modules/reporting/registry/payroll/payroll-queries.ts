@@ -426,4 +426,464 @@ export class PayrollQueriesService {
       },
     };
   }
+
+  /**
+   * PHASE-046 (W-6, T-13 — D-12) · `payroll.statutory-summary`: the per
+   * (period × profile row) statutory fold over POSTED runs in a date
+   * window — base totals, the employee/employer shares, the capped-count,
+   * and the frozen `statutory_summary` liability (accrued vs remitted —
+   * the remittance-ready report companion). The PIT surfaces as its own
+   * row per period (kind PIT, code PIT — the summary's own shape).
+   *
+   * The tie folds THREE independent representations of the same money
+   * (INV-032(b)): the line COLUMNS (statutory_employee_share et al.), the
+   * run TOTALS (statutory_employee_total et al.), and the jsonb BREAKDOWN
+   * re-fold (jsonb_array_elements over the frozen per-row evidence) —
+   * plus the summary's accrued (which must equal Σ employee + Σ employer
+   * + Σ PIT). Any drift between the three surfaces FAILS the tie and
+   * blocks the export (never a silently wrong number).
+   */
+  async statutorySummary(input: { fromDate: string; toDate: string }): Promise<{
+    rows: {
+      key: string;
+      periodName: string;
+      code: string;
+      kind: "CONTRIBUTION" | "PIT";
+      baseTotal: string;
+      employeeShare: string;
+      employerShare: string;
+      cappedCount: number;
+      accrued: string;
+      remitted: string;
+    }[];
+    ties: {
+      periods: {
+        periodName: string;
+        lineEmployee: string;
+        runEmployee: string;
+        foldEmployee: string;
+        lineEmployer: string;
+        runEmployer: string;
+        foldEmployer: string;
+        linePit: string;
+        runPit: string;
+        summaryAccrued: string;
+        summaryRemitted: string;
+      }[];
+      ok: boolean;
+    };
+  }> {
+    const windowClause = sql`r.status = 'POSTED'
+          AND p.start_date >= ${input.fromDate} AND p.start_date <= ${input.toDate}`;
+
+    // (1) The per-(period × code) contribution fold — from the frozen
+    // per-line breakdown jsonb (THE row-level INV-032(a) evidence: each
+    // entry carries its own base, clampedBase, rates, and amounts).
+    const contributionRows = (
+      await tenantTx().execute(sql`
+        SELECT p.name AS period_name, entry->>'code' AS code,
+               COALESCE(SUM((entry->>'base')::numeric), 0)::numeric(19,4)::text AS base_total,
+               COALESCE(SUM((entry->>'employeeAmount')::numeric), 0)::numeric(19,4)::text AS employee_share,
+               COALESCE(SUM((entry->>'employerAmount')::numeric), 0)::numeric(19,4)::text AS employer_share,
+               COUNT(*) FILTER (WHERE entry->>'clampedBy' IS NOT NULL)::int AS capped_count
+        FROM payroll_run_lines l
+        JOIN payroll_runs r ON r.id = l.run_id
+        JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+        CROSS JOIN LATERAL jsonb_array_elements(COALESCE(l.statutory_breakdown, '[]'::jsonb)) AS entry
+        WHERE ${windowClause} AND entry->>'kind' = 'CONTRIBUTION'
+        GROUP BY p.name, entry->>'code'
+        ORDER BY p.name, entry->>'code'
+      `)
+    ).rows as unknown as {
+      period_name: string;
+      code: string;
+      base_total: string;
+      employee_share: string;
+      employer_share: string;
+      capped_count: number;
+    }[];
+
+    // (2) The PIT row per period — from the line column (the breakdown
+    // carries no PIT entry; the summary's PIT row is the frozen fold).
+    const pitRows = (
+      await tenantTx().execute(sql`
+        SELECT p.name AS period_name, COALESCE(SUM(l.pit_withheld), 0)::text AS pit
+        FROM payroll_run_lines l
+        JOIN payroll_runs r ON r.id = l.run_id
+        JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+        WHERE ${windowClause}
+        GROUP BY p.name
+        ORDER BY p.name
+      `)
+    ).rows as unknown as { period_name: string; pit: string }[];
+
+    // (3) The frozen statutory_summary liability per (period × code).
+    const summaryRows = (
+      await tenantTx().execute(sql`
+        SELECT p.name AS period_name, s->>'code' AS code, s->>'kind' AS kind,
+               COALESCE(SUM((s->>'accrued')::numeric), 0)::numeric(19,4)::text AS accrued,
+               COALESCE(SUM((s->>'remitted')::numeric), 0)::numeric(19,4)::text AS remitted
+        FROM payroll_runs r
+        JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+        CROSS JOIN LATERAL jsonb_array_elements(COALESCE(r.statutory_summary, '[]'::jsonb)) AS s
+        WHERE ${windowClause}
+        GROUP BY p.name, s->>'code', s->>'kind'
+        ORDER BY p.name, s->>'code'
+      `)
+    ).rows as unknown as {
+      period_name: string;
+      code: string;
+      kind: string;
+      accrued: string;
+      remitted: string;
+    }[];
+
+    const summaryByPeriodCode = new Map(
+      summaryRows.map((row) => [`${row.period_name}|${row.kind}|${row.code}`, row]),
+    );
+    const pitByPeriod = new Map(pitRows.map((row) => [row.period_name, row.pit]));
+
+    const rows: {
+      key: string;
+      periodName: string;
+      code: string;
+      kind: "CONTRIBUTION" | "PIT";
+      baseTotal: string;
+      employeeShare: string;
+      employerShare: string;
+      cappedCount: number;
+      accrued: string;
+      remitted: string;
+    }[] = [];
+    for (const row of contributionRows) {
+      const summary = summaryByPeriodCode.get(`${row.period_name}|CONTRIBUTION|${row.code}`);
+      rows.push({
+        key: `${row.period_name}|${row.code}`,
+        periodName: row.period_name,
+        code: row.code,
+        kind: "CONTRIBUTION",
+        baseTotal: row.base_total,
+        employeeShare: row.employee_share,
+        employerShare: row.employer_share,
+        cappedCount: row.capped_count,
+        accrued: summary?.accrued ?? "0",
+        remitted: summary?.remitted ?? "0",
+      });
+    }
+    for (const [periodName, pit] of pitByPeriod) {
+      if (compareExact(pit, "0") === 0) continue; // no withheld PIT ⇒ no row
+      const summary = summaryByPeriodCode.get(`${periodName}|PIT|PIT`);
+      rows.push({
+        key: `${periodName}|PIT`,
+        periodName,
+        code: "PIT",
+        kind: "PIT",
+        baseTotal: "0.0000",
+        employeeShare: pit,
+        employerShare: "0.0000",
+        cappedCount: 0,
+        accrued: summary?.accrued ?? pit,
+        remitted: summary?.remitted ?? "0.0000",
+      });
+    }
+    rows.sort((a, b) =>
+      a.periodName === b.periodName ? a.code.localeCompare(b.code) : a.periodName.localeCompare(b.periodName),
+    );
+
+    // (4) THE THREE-WAY TIE (INV-032(b), block-on-fail): per period, the
+    // line columns vs the run totals vs the independent jsonb re-fold —
+    // and the summary's accrued (Σ employee + Σ employer + Σ PIT).
+    const runTotals = new Map(
+      (
+        (
+          await tenantTx().execute(sql`
+          SELECT p.name AS period_name,
+                 COALESCE(SUM(r.statutory_employee_total), 0)::text AS employee,
+                 COALESCE(SUM(r.statutory_employer_total), 0)::text AS employer,
+                 COALESCE(SUM(r.pit_total), 0)::text AS pit
+          FROM payroll_runs r
+          JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+          WHERE ${windowClause}
+          GROUP BY p.name ORDER BY p.name
+        `)
+        ).rows as unknown as { period_name: string; employee: string; employer: string; pit: string }[]
+      ).map((row) => [row.period_name, row] as const),
+    );
+    const lineTotals = new Map(
+      (
+        (
+          await tenantTx().execute(sql`
+          SELECT p.name AS period_name,
+                 COALESCE(SUM(l.statutory_employee_share), 0)::text AS employee,
+                 COALESCE(SUM(l.statutory_employer_share), 0)::text AS employer,
+                 COALESCE(SUM(l.pit_withheld), 0)::text AS pit
+          FROM payroll_run_lines l
+          JOIN payroll_runs r ON r.id = l.run_id
+          JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+          WHERE ${windowClause}
+          GROUP BY p.name ORDER BY p.name
+        `)
+        ).rows as unknown as { period_name: string; employee: string; employer: string; pit: string }[]
+      ).map((row) => [row.period_name, row] as const),
+    );
+    const foldTotals = new Map(
+      (
+        (
+          await tenantTx().execute(sql`
+          SELECT p.name AS period_name,
+                 COALESCE(SUM((entry->>'employeeAmount')::numeric), 0)::numeric(19,4)::text AS employee,
+                 COALESCE(SUM((entry->>'employerAmount')::numeric), 0)::numeric(19,4)::text AS employer
+          FROM payroll_run_lines l
+          JOIN payroll_runs r ON r.id = l.run_id
+          JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+          CROSS JOIN LATERAL jsonb_array_elements(COALESCE(l.statutory_breakdown, '[]'::jsonb)) AS entry
+          WHERE ${windowClause}
+          GROUP BY p.name ORDER BY p.name
+        `)
+        ).rows as unknown as { period_name: string; employer: string; employee: string }[]
+      ).map((row) => [row.period_name, row] as const),
+    );
+    const summaryTotals = new Map(
+      (
+        (
+          await tenantTx().execute(sql`
+          SELECT p.name AS period_name,
+                 COALESCE(SUM((s->>'accrued')::numeric), 0)::numeric(19,4)::text AS accrued,
+                 COALESCE(SUM((s->>'remitted')::numeric), 0)::numeric(19,4)::text AS remitted
+          FROM payroll_runs r
+          JOIN fiscal_periods p ON p.id = r.fiscal_period_id
+          CROSS JOIN LATERAL jsonb_array_elements(COALESCE(r.statutory_summary, '[]'::jsonb)) AS s
+          WHERE ${windowClause}
+          GROUP BY p.name ORDER BY p.name
+        `)
+        ).rows as unknown as { period_name: string; accrued: string; remitted: string }[]
+      ).map((row) => [row.period_name, row] as const),
+    );
+
+    const periodNames = new Set<string>([
+      ...runTotals.keys(),
+      ...lineTotals.keys(),
+      ...foldTotals.keys(),
+      ...summaryTotals.keys(),
+    ]);
+    const ties = {
+      periods: [...periodNames].sort().map((periodName) => ({
+        periodName,
+        lineEmployee: lineTotals.get(periodName)?.employee ?? "0.0000",
+        runEmployee: runTotals.get(periodName)?.employee ?? "0.0000",
+        foldEmployee: foldTotals.get(periodName)?.employee ?? "0.0000",
+        lineEmployer: lineTotals.get(periodName)?.employer ?? "0.0000",
+        runEmployer: runTotals.get(periodName)?.employer ?? "0.0000",
+        foldEmployer: foldTotals.get(periodName)?.employer ?? "0.0000",
+        linePit: lineTotals.get(periodName)?.pit ?? "0.0000",
+        runPit: runTotals.get(periodName)?.pit ?? "0.0000",
+        summaryAccrued: summaryTotals.get(periodName)?.accrued ?? "0.0000",
+        summaryRemitted: summaryTotals.get(periodName)?.remitted ?? "0.0000",
+      })),
+      ok: true,
+    };
+    ties.ok = ties.periods.every(
+      (period) =>
+        compareExact(period.lineEmployee, period.runEmployee) === 0 &&
+        compareExact(period.lineEmployee, period.foldEmployee) === 0 &&
+        compareExact(period.lineEmployer, period.runEmployer) === 0 &&
+        compareExact(period.lineEmployer, period.foldEmployer) === 0 &&
+        compareExact(period.linePit, period.runPit) === 0 &&
+        compareExact(
+          period.summaryAccrued,
+          addExact(period.lineEmployee, addExact(period.lineEmployer, period.linePit)),
+        ) === 0,
+    );
+    return { rows, ties };
+  }
+
+  /**
+   * PHASE-046 (W-6, T-13 — D-12) · `payroll.eosb-liability`: the
+   * per-employee EOSB liability view — service years, the tier-fold days,
+   * the computed entitlement, the STANDING provision (the 029 balance +
+   * the accumulated G-54 true-up deltas — BR-087's model), the settled
+   * cash, and the latest delta — over every employee carrying EOSB
+   * computation evidence.
+   *
+   * The tie (`eosb-provision-tie`, block-on-fail): Σ per-employee
+   * standing provisions == the EOS_PROVISION purpose account's
+   * natural-direction GL balance (LIABILITY: credit − debit) — the GL
+   * includes the G-54 legs by construction, and the standing model is
+   * exactly the register side that ties: unsettled employees carry
+   * accrued + Σ deltas; settled employees carry Σ deltas only (the G-31
+   * extinguished their 029 balance at the run-line fold). The 029-era
+   * `payroll.eos-provision` report's register fold predates the G-54
+   * legs — see the dated note on that contract (the W-3/W-6 design
+   * point recorded for the owner).
+   */
+  async eosbLiability(): Promise<{
+    rows: {
+      employeeId: string;
+      employeeCode: string;
+      employeeName: string;
+      employeeNameAr: string | null;
+      status: string;
+      kind: string;
+      serviceYears: string;
+      tierDays: string;
+      entitlement: string;
+      standing: string;
+      settled: string | null;
+      lastDelta: string;
+      calculationCount: number;
+    }[];
+    ties: { registerBalance: string; glBalance: string; ok: boolean };
+  }> {
+    // The row universe is the GL's whole provision surface: employees
+    // with EOSB computation evidence ∪ employees with POSTED-run EOS
+    // accruals ∪ settled employees. An accrued-but-never-trued-up
+    // employee carries NO computation row (the honest "—" state — the
+    // 029 provision without the 046 computation) but their balance IS
+    // part of the GL the tie must account for, so they render with the
+    // 029-only standing and no entitlement — the reconciliation gap the
+    // true-up exists to close, visible at the report level.
+    const employeeRows = (
+      await tenantTx().execute(sql`
+        SELECT e.id, e.code, e.name, e.name_ar, e.status, e.eos_settled_amount
+        FROM employees e
+        WHERE EXISTS (SELECT 1 FROM eosb_calculations c WHERE c.employee_id = e.id)
+           OR EXISTS (
+             SELECT 1 FROM payroll_run_lines l
+             JOIN payroll_runs r ON r.id = l.run_id
+             WHERE l.employee_id = e.id AND r.status = 'POSTED' AND l.eos_accrual > 0
+           )
+           OR e.eos_settled_amount IS NOT NULL
+        ORDER BY e.code
+      `)
+    ).rows as unknown as {
+      id: string;
+      code: string;
+      name: string;
+      name_ar: string | null;
+      status: string;
+      eos_settled_amount: string | null;
+    }[];
+
+    const rows: {
+      employeeId: string;
+      employeeCode: string;
+      employeeName: string;
+      employeeNameAr: string | null;
+      status: string;
+      kind: string;
+      serviceYears: string;
+      tierDays: string;
+      entitlement: string;
+      standing: string;
+      settled: string | null;
+      lastDelta: string;
+      calculationCount: number;
+    }[] = [];
+    for (const employee of employeeRows) {
+      // The 029 balance: Σ eos_accrual over POSTED-run lines while
+      // unsettled, 0 after the terminal settlement (balanceFor's law).
+      const accruedRow = (
+        await tenantTx().execute(sql`
+          SELECT COALESCE(SUM(l.eos_accrual), 0)::text AS accrued
+          FROM payroll_run_lines l JOIN payroll_runs r ON r.id = l.run_id
+          WHERE l.employee_id = ${employee.id} AND r.status = 'POSTED'
+        `)
+      ).rows[0] as { accrued: string };
+      const balance =
+        employee.eos_settled_amount === null ? accruedRow.accrued : "0.0000";
+      const calcRows = (
+        await tenantTx().execute(sql`
+          SELECT kind, service_years::text AS service_years, tier_breakdown,
+                 entitlement_amount::text AS entitlement, delta::text AS delta
+          FROM eosb_calculations WHERE employee_id = ${employee.id}
+          ORDER BY created_at DESC
+        `)
+      ).rows as unknown as {
+        kind: string;
+        service_years: string;
+        tier_breakdown: { days?: string }[] | null;
+        entitlement: string;
+        delta: string;
+      }[];
+      let deltaSum = "0.0000";
+      for (const calc of calcRows) {
+        deltaSum = addExact(deltaSum, calc.delta);
+      }
+      const standing = addExact(balance, deltaSum);
+      if (calcRows.length === 0) {
+        // The 029-only row: provision accruals (or a settlement) with NO
+        // 046 computation — the honest never-true-d-up state (entitlement
+        // "—", no tier fold, no delta). The standing is the 029 balance.
+        rows.push({
+          employeeId: employee.id,
+          employeeCode: employee.code,
+          employeeName: employee.name,
+          employeeNameAr: employee.name_ar,
+          status: employee.status,
+          kind: "ACCRUED_ONLY",
+          serviceYears: "—",
+          tierDays: "—",
+          entitlement: "—",
+          standing,
+          settled: employee.eos_settled_amount,
+          lastDelta: "—",
+          calculationCount: 0,
+        });
+        continue;
+      }
+      const latest = calcRows[0]!;
+      let tierDays = "0.0000";
+      if (Array.isArray(latest.tier_breakdown)) {
+        for (const share of latest.tier_breakdown) {
+          if (typeof share.days === "string") {
+            tierDays = addExact(tierDays, share.days);
+          }
+        }
+      }
+      rows.push({
+        employeeId: employee.id,
+        employeeCode: employee.code,
+        employeeName: employee.name,
+        employeeNameAr: employee.name_ar,
+        status: employee.status,
+        kind: latest.kind,
+        serviceYears: latest.service_years,
+        tierDays,
+        entitlement: latest.entitlement,
+        standing,
+        settled: employee.eos_settled_amount,
+        lastDelta: latest.delta,
+        calculationCount: calcRows.length,
+      });
+    }
+
+    let registerBalance = "0.0000";
+    for (const row of rows) {
+      registerBalance = addExact(registerBalance, row.standing);
+    }
+    // The GL side: the EOS_PROVISION purpose account's natural balance —
+    // the SAME independent fold the 029 report ties against (the G-54
+    // legs included by construction; the standing model is the side that
+    // accounts for them).
+    const purposeRow = (
+      await tenantTx().execute(sql`
+        SELECT p.account_id,
+               COALESCE(SUM(CASE WHEN l.direction = 'CREDIT' THEN l.base_amount ELSE -l.base_amount END), 0)::text AS balance
+        FROM account_purposes p
+        JOIN journal_lines l ON l.account_id = p.account_id
+        WHERE p.purpose_key = 'EOS_PROVISION' AND p.active_to IS NULL
+        GROUP BY p.account_id
+        LIMIT 1
+      `)
+    ).rows[0] as { account_id: string; balance: string } | undefined;
+    const glBalance = purposeRow?.balance ?? "0";
+    return {
+      rows,
+      ties: {
+        registerBalance,
+        glBalance,
+        ok: compareExact(registerBalance, glBalance) === 0,
+      },
+    };
+  }
 }

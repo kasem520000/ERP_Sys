@@ -125,12 +125,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(104); // PHASE-045: +3 hr registers (101 → 104)
+    expect(result.count).toBe(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(104); // PHASE-045: +3 hr registers (101 → 104)
+    expect(snapshot).toHaveLength(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();

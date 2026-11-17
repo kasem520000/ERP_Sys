@@ -116,6 +116,11 @@ import { budgetingVarianceAnalysisContract } from "./budgeting/variance-analysis
 import { payrollRegisterContract } from "./payroll/register.contract";
 import { payrollCostSummaryContract } from "./payroll/cost-summary.contract";
 import { payrollEosProvisionContract } from "./payroll/eos-provision.contract";
+// PHASE-046 (W-6, T-13 — D-12): the two compliance contracts — the
+// statutory-summary fold (the three-way statutory-totals-tie) and the
+// EOSB liability view (the standing-model eosb-provision-tie).
+import { payrollStatutorySummaryContract } from "./payroll/statutory-summary.contract";
+import { payrollEosbLiabilityContract } from "./payroll/eosb-liability.contract";
 // PHASE-034 · the consolidation set (REPORT_CATALOG §10 — the four
 // contracts that assert INV-026 in the footer and block exports on
 // failure; statements read the completed run's immutable snapshots).
@@ -300,6 +305,14 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   payrollRegisterContract,
   payrollCostSummaryContract,
   payrollEosProvisionContract,
+  // §payroll — PHASE-046 rows (REPORT_CATALOG §payroll; W-6, T-13 — D-12):
+  // the statutory-summary (per period × profile row: base, shares, capped
+  // counts, the frozen accrued/remitted liability — the three-way
+  // statutory-totals-tie) and the EOSB liability (per employee: service
+  // years, tier days, entitlement, the standing provision, settled, the
+  // delta — the standing-model eosb-provision-tie)
+  payrollStatutorySummaryContract,
+  payrollEosbLiabilityContract,
   // §10 consolidation (REPORT_CATALOG §10 PHASE-034 rows — the
   // consolidated-statement set: TB/IS/BS with the inv026 headline
   // block-on-fail assertion + the TB balance tie, and the eliminations

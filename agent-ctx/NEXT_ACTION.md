@@ -435,12 +435,120 @@ the standalone run on a scratch embedded PG16 + the full chain).
 generated in THIS session and pushes WITH the code, same session**
 (the W-4 review's rule — the EVIDENCE-NOTE lesson). Evidence:
 [gate-evidence/2026-11-17-phase046-w5.md](../docs/operations/gate-evidence/2026-11-17-phase046-w5.md)
-+ `audit-evidence/phase046-w5/`. **Next: W-6 — the reports + proof
-wave (T-13 the two D-12 report contracts + the registry pins 104 →
-106 · T-14 the golden suites G-52/G-53/G-54 with failure packs + the
-INV-032 property suite + the 029 regression packs re-run · T-17 THE
-RACE SUITE — the permanent two-transaction duels incl. the owner's
-F2 payout×payout + F3 true-up×true-up scope additions).**
++ `audit-evidence/phase046-w5/`.
+
+**W-6 (delivered 2026-11-17 — the reports + proof wave, T-13 + T-14 +
+T-17, on the W-5 delivery head `3cda4f3`):** **T-13 THE TWO D-12
+REPORT CONTRACTS** (registry **104 → 106**, all six pin sites re-pinned
+with the dated comment; `payroll.reports.view` — zero new permissions;
+the payroll module's registry-driven report page surfaced both rows
+automatically): `payroll.statutory-summary` — the per (period ×
+profile row) fold over POSTED runs (base totals, the shares, the
+capped counts, the frozen accrued-vs-remitted liability — the
+remittance-ready companion) carrying the THREE-WAY
+`statutory-totals-tie` (Σ lines == the run totals == the independent
+jsonb breakdown re-fold; the summary's accrued == Σ employee + Σ
+employer + Σ PIT; tolerance 0); `payroll.eosb-liability` — the
+per-employee standing-provision view (service years, tier days, the
+computed entitlement, the 029 balance + the accumulated G-54 deltas,
+settled, the latest delta) carrying the `eosb-provision-tie` (Σ
+standing == the EOS_PROVISION GL balance — the model that accounts for
+the G-54 legs; the row universe = computations ∪ accruals ∪ settled,
+the never-true-d-up employee rendering as the honest ACCRUED_ONLY
+"—" row). **T-14 THE GOLDEN SUITES WITH FAILURE PACKS**
+(`statutory-goldens.spec.ts` 5/5 on the dedicated GOLD tenant): the
+consolidated G-52+G-53 golden (the Saudi 1,170/1,410 beside the
+non-Saudi 0/240 in ONE posted run — the balanced 25,650 journal with
+the legs pinned separately, INV-032(a) recomputed in-test with exact
+BigInt, INV-032(b), the full remittance settlement + INV-013's
+double-settle refusal) + the four wrong shapes RED with zero residue —
+the wrong-cap shape (base 50,000 clamps at every row's OWN cap:
+45,000/15,000/45,000 — the dual-cap law), the REQUIRES_VERIFICATION
+shape (the flip-and-restore idiom: the typed refusal + the surviving
+audit event + green after the restore), the bracket-gap shape (the
+gapped VERIFIED SA set refuses the whole calculation typed
+SET-CONSISTENT; withdrawn, the honest no-bracket state returns), the
+non-delta true-up shape (the zero-delta no-journal law + **THE
+TABLE-LEVEL LAW discovered this wave: `ck_eosb_calculations_delta`
+enforces delta = entitlement − provision IN SQL — a non-delta row
+cannot even be INSERTed** + the release mirror −13,500). **THE INV-032
+PROPERTY WING** (`__tests__/statutory-properties.spec.ts` 6/6,
+fast-check, deterministic): the contribution law over the whole input
+space (independent BigInt recomputation), the clamp law, the fold law
+(order-independent values), the PIT marginal law over random
+SET-CONSISTENT tilings (no absorbed residual), the EOSB tier law (the
+exact rational), the signed delta law. **F2 (the owner's scope
+addition, PRODUCTION): `payout()` rides `payroll.run|{runId}`** — the
+outstanding read + the paid advance one serialized window (the pre-F2
+lost update — two journals, one overwritten advance — the 0043 CHECK
+cannot catch it); the floor's protocol block records the adoption.
+**F3 (the owner's scope addition, PRODUCTION): the
+`eosb_trueup_total` advance is the store's SQL-SIDE INCREMENT**
+(`SET eosb_trueup_total = eosb_trueup_total + δ` — the plan's option
+(a); option (b) the ascending run-gate acquisition stays recorded as
+the alternative): two true-ups on different employees referencing one
+run apply atomically under the row's own lock — no lost update, no
+lock-order coupling between the namespaces. **T-17 THE PERMANENT RACE
+SUITE** (`payroll-writer-races.spec.ts` 10/10 on the dedicated RACEP
+tenant, the T-20 idiom — spy-split winner, real-call loser in its own
+UoW, the world classified from pg_locks BOUND to the raced advisory
+tag or the winner's xact, every duel closing with the
+NO-ILLEGAL-STATE assertions): (1) calculate × calculate (one line set,
+INV-025 intact) · (2a) post × calculate + (2b) calculate × post (the
+status floor both directions) · (3) true-up × true-up one employee
+(exactly one G-54; the loser IS the zero-delta no-journal law) · (4)
+true-up × G-31 settle (the employee gate; the settle lands after the
+alignment; the settled guard typed after) · (5) verify × verify (the
+CAS row-lock duel: one flip, the loser — a DIFFERENT verifier — typed
+STATUTORY_ALREADY_VERIFIED, exactly one audit event) · (6) remittance
+× remittance (INV-013: one journal, one movement, the liability
+tracked once) · (7) THE SMOKE (three in-flight writers on one run —
+remit + payout + a run-referencing true-up: no 40P01, every arm
+fulfills, the final state exact) · **(8) F2 payout × payout** (the
+loser typed PAYROLL_PAYOUT_EXCEEDS_RUN; paid == net EXACTLY — advanced
+once; one payout journal from the duel) · **(9) F3 true-up × true-up,
+two employees, one run reference** (the loser's increment blocks on
+the winner's transaction id and applies on the COMMITTED value — the
+column == the exact Σ of both deltas). **THE T-13 SPEC**
+(`payroll-compliance-reports.spec.ts` 10/10): the KSA worked example +
+the partial remittance's first-row-first allocation (OH 480 fully,
+PENSION the remaining 520) + **THE PIT WORLD (tenant BH — the FIRST
+green end-to-end PIT-through-the-run pin: the synthetic VERIFIED set,
+gross 40,000 → taxable 35,000 → 3,000.0000)** + the ACCRUED_ONLY and
+computed row families + the TWO seeded-drift FAIL arms (the tampered
+breakdown through the sanctioned replica-session path; the tampered
+settled stamp through the CHECK-coupled columns — both FAIL the tie,
+block every export, and re-tie green on the restore) + the audited
+csv/xlsx exports + the permission-denied arms. **THE HONEST RECORD —
+the 029-era `payroll.eos-provision` report's tie predates the G-54
+legs (the W-3/W-6 design point, dated on that contract for the
+owner's review): on a true-ups tenant its register fold no longer ties
+to the GL alone — block-on-fail engages (the SAFE direction);
+`payroll.eosb-liability` is the 046-correct view; the semantic update
+of the 029 report is the owner's open input, NOT changed
+unilaterally.** GATES: typecheck/lint 8/8, depcruise clean (**1,938 ·
+14,430**), api unit **666/666** (58 files, first attempt), unit
+workspace **8/8 fresh — 0 cached, forced** (web 87 · mobile 393 · api
+666 · ui 42 · domain-core 38 · contracts 56 · sync-core 36 · desktop
+274), the payroll folder **10 files · 84/84** (69 + the 5 goldens +
+the 10 duels — the 029 regression acceptance act GREEN on the unified
+head: G-29/G-30/G-31 + BR-052…055 + the ×6 purpose failure packs +
+the spoof battery), the reporting folder **17 files · 120/120**, the
+hr folder **13 · 83/83** (the standing race suite 20/20),
+isolation+entitlements+tenancy×2+migrations+identity×2 **8 ·
+1,693/1,693**, i18n parity **6,121 = 6,121** (no web keys — D-15 was
+W-5), docs 33/33, drift **300 = 300**, manifests 13/13, capabilities
+agree, id-ledger 0, history-secrets 0, shells PASS, the negative
+boundary meta-test PASS, check:rls clean (**292 catalog tables**, the
+standalone scratch-PG16 run). **The binding process rule honored:
+every artifact generated and pushed in THIS session.** Evidence:
+[gate-evidence/2026-11-17-phase046-w6.md](../docs/operations/gate-evidence/2026-11-17-phase046-w6.md)
++ `audit-evidence/phase046-w6/`. **Next: W-7 — the docs + gates +
+closure wave (T-15 the canon docs — JOURNAL_RULES §7's G-52/G-53/G-54
+rows + INV-032 + BR-085…087 + the verification register + §7(b) the
+owner's 045 remarks; T-16 the full gate sweep + the OA-06 EXPLAIN
+budgets P1–P4; T-18 the completion report + the triple flip + the
+archives + the tag; migration 0094 the RLS-class repair).**
 
 **The T-20 pinned technical notes (delivered 2026-11-16, the second
 W-0-wave increment — BEFORE the floor's payroll adoption):** (a) THE

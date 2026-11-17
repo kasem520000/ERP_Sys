@@ -40,6 +40,21 @@ import {
  * paying above the outstanding remainder dies typed; a second full payout
  * is rejected as above-outstanding (zero residue, no double payment).
  *
+ * PHASE-046 (W-6, T-17 — THE OWNER'S F2 SCOPE ADDITION, recorded
+ * 2026-11-17 at 6387da9, implemented here): payout() rides the run gate
+ * `payroll.run|{runId}` (the remit two-line adoption). The pre-F2 shape
+ * was an app-computed read-modify-write with NO gate — paid_net_total
+ * advanced as `updateRun(paidNetTotal: run.paidNetTotal + amount)` on a
+ * stale read, so two concurrent partial payouts on one run BOTH read the
+ * same outstanding, BOTH post their journals, and the second update
+ * OVERWRITES the first's advance (a lost update the 0043 CHECK
+ * 0 ≤ paid ≤ net does NOT catch — both writes land inside the legal
+ * window while the CASH side doubles). Under the gate the outstanding
+ * read + the advance are ONE serialized window: the second payout
+ * re-reads the winner's committed advance and dies typed on the emptied
+ * outstanding (or settles exactly what remains). Pinned by the permanent
+ * duel (8) — payroll-writer-races.spec.ts.
+ *
  * PHASE-046 (W-3, T-05 — D-06's G-52 settlement leg): THE REMITTANCE
  * SETTLEMENT — pay the authority. The run's statutory liability (the
  * frozen statutory_summary: the employee share + the employer share +
@@ -78,6 +93,15 @@ export class PayoutService {
     runId: string,
     input: { cashAccountId: string; amount?: string; entryDate?: string; actorId: string | null },
   ): Promise<{ run: RunRow; payoutId: string; journalEntryId: string; amount: string }> {
+    // PHASE-046 (W-6, T-17 — F2, the owner's 2026-11-17 scope addition):
+    // THE RUN GATE, before the outstanding read — the same two-line
+    // adoption as W-3's remit. The outstanding computation + the
+    // paid_net_total advance are one window under the lock; two
+    // concurrent payouts serialize and the loser answers on the winner's
+    // COMMITTED advance (the typed above-outstanding refusal), never on
+    // a stale read (the lost-update shape the CHECK cannot catch).
+    await lockPayrollRun(runId);
+
     const run = await store.findRunById(runId);
     if (run === undefined) throw new RunNotFoundError(runId);
     if (run.status !== "POSTED") {

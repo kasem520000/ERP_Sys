@@ -1,0 +1,2366 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+
+creating directory /tmp/erp-api-testdb ... ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-17 22:12:44.264 UTC [478] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-17 22:12:44.264 UTC [478] LOG:  listening on IPv6 address "::1", port 46343
+2026-11-17 22:12:44.264 UTC [478] LOG:  listening on IPv4 address "127.0.0.1", port 46343
+
+2026-11-17 22:12:44.264 UTC [478] LOG:  listening on Unix socket "/tmp/.s.PGSQL.46343"
+
+2026-11-17 22:12:44.266 UTC [481] LOG:  database system was shut down at 2026-11-17 22:12:44 UTC
+
+2026-11-17 22:12:44.267 UTC [478] LOG:  database system is ready to accept connections
+
+2026-11-17 22:12:48.556 UTC [563] ERROR:  new row violates row-level security policy for table "audit_events"
+2026-11-17 22:12:48.556 UTC [563] STATEMENT:  INSERT INTO audit_events (id, tenant_id, action, entity_type, entity_id)
+	     VALUES ('eeeeeeee-3000-4000-8000-000000000003', $1, 'iso.attack', 'iso_fixture', $1)
+
+2026-11-17 22:12:48.565 UTC [564] ERROR:  permission denied for table audit_events
+2026-11-17 22:12:48.565 UTC [564] STATEMENT:  UPDATE audit_events SET action = action WHERE id = $1
+
+2026-11-17 22:12:48.573 UTC [565] ERROR:  permission denied for table audit_events
+2026-11-17 22:12:48.573 UTC [565] STATEMENT:  DELETE FROM audit_events WHERE id = $1
+
+2026-11-17 22:12:48.604 UTC [569] ERROR:  new row violates row-level security policy for table "memberships"
+2026-11-17 22:12:48.604 UTC [569] STATEMENT:  INSERT INTO memberships (id, tenant_id, user_id, role_id)
+	     VALUES ('ffffffff-3000-4000-8000-000000000003', $1,
+	             'eeeeeeee-0000-4000-8000-000000000002', 'dddddddd-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:48.618 UTC [571] ERROR:  permission denied for table memberships
+2026-11-17 22:12:48.618 UTC [571] STATEMENT:  DELETE FROM memberships WHERE id = $1
+
+2026-11-17 22:12:48.648 UTC [575] ERROR:  new row violates row-level security policy for table "invitations"
+2026-11-17 22:12:48.648 UTC [575] STATEMENT:  INSERT INTO invitations (id, tenant_id, email, role_id, token_hash, expires_at, invited_by)
+	     VALUES ('eeeeeeee-4000-4000-8000-000000000003', $1, 'iso-attack@test',
+	             'dddddddd-0000-4000-8000-000000000002', 'iso-attack-token', now() + interval '72 hours',
+	             'eeeeeeee-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:48.662 UTC [577] ERROR:  permission denied for table invitations
+2026-11-17 22:12:48.662 UTC [577] STATEMENT:  DELETE FROM invitations WHERE id = $1
+
+2026-11-17 22:12:48.693 UTC [581] ERROR:  new row violates row-level security policy for table "roles"
+2026-11-17 22:12:48.693 UTC [581] STATEMENT:  INSERT INTO roles (id, tenant_id, key, name)
+	     VALUES ('dddddddd-3000-4000-8000-000000000003', $1, 'attack_role', 'Attack Role')
+
+2026-11-17 22:12:48.739 UTC [587] ERROR:  new row violates row-level security policy for table "role_permissions"
+2026-11-17 22:12:48.739 UTC [587] STATEMENT:  INSERT INTO role_permissions (role_id, tenant_id, permission_id)
+	     VALUES ('dddddddd-0000-4000-8000-000000000002', $1, 'partners.view')
+
+2026-11-17 22:12:48.746 UTC [588] ERROR:  permission denied for table role_permissions
+2026-11-17 22:12:48.746 UTC [588] STATEMENT:  UPDATE role_permissions SET granted_at = granted_at WHERE role_id = $1
+
+2026-11-17 22:12:48.783 UTC [593] ERROR:  new row violates row-level security policy for table "branches"
+2026-11-17 22:12:48.783 UTC [593] STATEMENT:  INSERT INTO branches (id, tenant_id, code, name)
+	     VALUES ('abababab-3000-4000-8000-000000000003', $1, 'ATK', 'Attack Branch')
+
+2026-11-17 22:12:48.798 UTC [595] ERROR:  permission denied for table branches
+2026-11-17 22:12:48.798 UTC [595] STATEMENT:  DELETE FROM branches WHERE id = $1
+
+2026-11-17 22:12:48.828 UTC [599] ERROR:  new row violates row-level security policy for table "tenant_settings"
+2026-11-17 22:12:48.828 UTC [599] STATEMENT:  INSERT INTO tenant_settings (id, tenant_id, key, value)
+	     VALUES ('acacacac-3000-4000-8000-000000000003', $1, 'sales.credit_limit_action', '"warn"'::jsonb)
+
+2026-11-17 22:12:48.843 UTC [601] ERROR:  permission denied for table tenant_settings
+2026-11-17 22:12:48.843 UTC [601] STATEMENT:  DELETE FROM tenant_settings WHERE id = $1
+
+2026-11-17 22:12:48.872 UTC [605] ERROR:  new row violates row-level security policy for table "subscriptions"
+2026-11-17 22:12:48.872 UTC [605] STATEMENT:  INSERT INTO subscriptions (id, tenant_id, plan_id, period_start, period_end)
+	     VALUES ('adadadad-3000-4000-8000-000000000003', $1,
+	             '30000000-0000-4000-8000-000000000002', '2026-01-01', '2026-12-31')
+
+2026-11-17 22:12:48.888 UTC [607] ERROR:  permission denied for table subscriptions
+2026-11-17 22:12:48.888 UTC [607] STATEMENT:  DELETE FROM subscriptions WHERE id = $1
+
+2026-11-17 22:12:48.917 UTC [611] ERROR:  new row violates row-level security policy for table "entitlements"
+2026-11-17 22:12:48.917 UTC [611] STATEMENT:  INSERT INTO entitlements (id, tenant_id, feature_key, source)
+	     VALUES ('aeaeaeae-3000-4000-8000-000000000003', $1, 'pos.sales', 'MANUAL')
+
+2026-11-17 22:12:48.960 UTC [617] ERROR:  new row violates row-level security policy for table "support_sessions"
+2026-11-17 22:12:48.960 UTC [617] STATEMENT:  INSERT INTO support_sessions (id, tenant_id, platform_user_id, opt_in, ticket_ref, reason, expires_at)
+	     VALUES ('afafafaf-3000-4000-8000-000000000003', $1,
+	             'eeeeeeee-0000-4000-8000-000000000001', false, 'ISO-ATK', 'attack fixture',
+	             now() + interval '4 hours')
+
+2026-11-17 22:12:48.975 UTC [619] ERROR:  permission denied for table support_sessions
+2026-11-17 22:12:48.975 UTC [619] STATEMENT:  DELETE FROM support_sessions WHERE id = $1
+
+2026-11-17 22:12:49.004 UTC [623] ERROR:  new row violates row-level security policy for table "accounts"
+2026-11-17 22:12:49.004 UTC [623] STATEMENT:  INSERT INTO accounts (id, tenant_id, code, name, name_ar, type, is_postable)
+	     VALUES ('b0b0b0b0-3000-4000-8000-000000000003', $1, '2000', 'Attack Account', 'حساب هجوم', 'ASSET', false)
+
+2026-11-17 22:12:49.019 UTC [625] ERROR:  permission denied for table accounts
+2026-11-17 22:12:49.019 UTC [625] STATEMENT:  DELETE FROM accounts WHERE id = $1
+
+2026-11-17 22:12:49.048 UTC [629] ERROR:  new row violates row-level security policy for table "account_purposes"
+2026-11-17 22:12:49.048 UTC [629] STATEMENT:  INSERT INTO account_purposes (id, tenant_id, purpose_key, account_id, active_from)
+	     VALUES ('b1b1b1b1-3000-4000-8000-000000000003', $1, 'AP_CONTROL',
+	             'b0b0b0b0-0000-4000-8000-000000000002', '2026-01-01')
+
+2026-11-17 22:12:49.062 UTC [631] ERROR:  permission denied for table account_purposes
+2026-11-17 22:12:49.062 UTC [631] STATEMENT:  DELETE FROM account_purposes WHERE id = $1
+
+2026-11-17 22:12:49.093 UTC [635] ERROR:  new row violates row-level security policy for table "credit_terms"
+2026-11-17 22:12:49.093 UTC [635] STATEMENT:  INSERT INTO credit_terms (id, tenant_id, code, name, days)
+	     VALUES ('b3b3b3b3-3000-4000-8000-000000000003', $1, 'ATK-NET', 'Attack Terms', 90)
+
+2026-11-17 22:12:49.107 UTC [637] ERROR:  permission denied for table credit_terms
+2026-11-17 22:12:49.107 UTC [637] STATEMENT:  DELETE FROM credit_terms WHERE id = $1
+
+2026-11-17 22:12:49.135 UTC [641] ERROR:  new row violates row-level security policy for table "price_lists"
+2026-11-17 22:12:49.135 UTC [641] STATEMENT:  INSERT INTO price_lists (id, tenant_id, name, kind, currency_code)
+	     VALUES ('b4b4b4b4-3000-4000-8000-000000000003', $1, 'Attack List', 'SALE', 'SAR')
+
+2026-11-17 22:12:49.149 UTC [643] ERROR:  permission denied for table price_lists
+2026-11-17 22:12:49.149 UTC [643] STATEMENT:  DELETE FROM price_lists WHERE id = $1
+
+2026-11-17 22:12:49.180 UTC [647] ERROR:  new row violates row-level security policy for table "partners"
+2026-11-17 22:12:49.180 UTC [647] STATEMENT:  INSERT INTO partners (id, tenant_id, kind, code, name)
+	     VALUES ('b5b5b5b5-3000-4000-8000-000000000003', $1, 'CUSTOMER', 'ATK-P', 'Attack Partner')
+
+2026-11-17 22:12:49.195 UTC [649] ERROR:  permission denied for table partners
+2026-11-17 22:12:49.195 UTC [649] STATEMENT:  DELETE FROM partners WHERE id = $1
+
+2026-11-17 22:12:49.225 UTC [653] ERROR:  new row violates row-level security policy for table "partner_contacts"
+2026-11-17 22:12:49.225 UTC [653] STATEMENT:  INSERT INTO partner_contacts (id, tenant_id, partner_id, name)
+	     VALUES ('b6b6b6b6-3000-4000-8000-000000000003', $1,
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'Attack Contact')
+
+2026-11-17 22:12:49.239 UTC [655] ERROR:  permission denied for table partner_contacts
+2026-11-17 22:12:49.239 UTC [655] STATEMENT:  DELETE FROM partner_contacts WHERE id = $1
+
+2026-11-17 22:12:49.268 UTC [659] ERROR:  new row violates row-level security policy for table "partner_addresses"
+2026-11-17 22:12:49.268 UTC [659] STATEMENT:  INSERT INTO partner_addresses (id, tenant_id, partner_id, type, line1)
+	     VALUES ('b7b7b7b7-3000-4000-8000-000000000003', $1,
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'SHIPPING', 'Attack Line')
+
+2026-11-17 22:12:49.282 UTC [661] ERROR:  permission denied for table partner_addresses
+2026-11-17 22:12:49.282 UTC [661] STATEMENT:  DELETE FROM partner_addresses WHERE id = $1
+
+2026-11-17 22:12:49.311 UTC [665] ERROR:  new row violates row-level security policy for table "item_categories"
+2026-11-17 22:12:49.311 UTC [665] STATEMENT:  INSERT INTO item_categories (id, tenant_id, code, name)
+	     VALUES ('b8b8b8b8-3000-4000-8000-000000000003', $1, 'ATK-CAT', 'Attack Category')
+
+2026-11-17 22:12:49.325 UTC [667] ERROR:  permission denied for table item_categories
+2026-11-17 22:12:49.325 UTC [667] STATEMENT:  DELETE FROM item_categories WHERE id = $1
+
+2026-11-17 22:12:49.354 UTC [671] ERROR:  new row violates row-level security policy for table "uoms"
+2026-11-17 22:12:49.354 UTC [671] STATEMENT:  INSERT INTO uoms (id, tenant_id, code, name)
+	     VALUES ('b2b2b2b2-3000-4000-8000-000000000003', $1, 'ATK-U', 'Attack Unit')
+
+2026-11-17 22:12:49.369 UTC [673] ERROR:  permission denied for table uoms
+2026-11-17 22:12:49.369 UTC [673] STATEMENT:  DELETE FROM uoms WHERE id = $1
+
+2026-11-17 22:12:49.398 UTC [677] ERROR:  new row violates row-level security policy for table "uom_conversions"
+2026-11-17 22:12:49.398 UTC [677] STATEMENT:  INSERT INTO uom_conversions (id, tenant_id, from_uom_id, to_uom_id, factor)
+	     VALUES ('b9b9b9b9-3000-4000-8000-000000000003', $1,
+	             'b2b2b2b2-0000-4000-8000-000000000002', 'b2b2b2b2-1000-4000-8000-000000000002', 999)
+
+2026-11-17 22:12:49.412 UTC [679] ERROR:  permission denied for table uom_conversions
+2026-11-17 22:12:49.412 UTC [679] STATEMENT:  DELETE FROM uom_conversions WHERE id = $1
+
+2026-11-17 22:12:49.442 UTC [683] ERROR:  new row violates row-level security policy for table "items"
+2026-11-17 22:12:49.442 UTC [683] STATEMENT:  INSERT INTO items (id, tenant_id, sku, name, kind, uom_id)
+	     VALUES ('babababa-3000-4000-8000-000000000003', $1, 'ATK-ITEM', 'Attack Item', 'STOCK',
+	             'b2b2b2b2-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:49.459 UTC [685] ERROR:  permission denied for table items
+2026-11-17 22:12:49.459 UTC [685] STATEMENT:  DELETE FROM items WHERE id = $1
+
+2026-11-17 22:12:49.489 UTC [689] ERROR:  new row violates row-level security policy for table "barcodes"
+2026-11-17 22:12:49.489 UTC [689] STATEMENT:  INSERT INTO barcodes (id, tenant_id, item_id, uom_id, code)
+	     VALUES ('bbbbbbbb-3000-4000-8000-000000000003', $1,
+	             'babababa-0000-4000-8000-000000000002', 'b2b2b2b2-0000-4000-8000-000000000002', '9999999999999')
+
+2026-11-17 22:12:49.503 UTC [691] ERROR:  permission denied for table barcodes
+2026-11-17 22:12:49.503 UTC [691] STATEMENT:  DELETE FROM barcodes WHERE id = $1
+
+2026-11-17 22:12:49.532 UTC [695] ERROR:  new row violates row-level security policy for table "price_list_items"
+2026-11-17 22:12:49.532 UTC [695] STATEMENT:  INSERT INTO price_list_items (id, tenant_id, price_list_id, item_id, uom_id, unit_price, min_qty)
+	     VALUES ('bcbcbcbc-3000-4000-8000-000000000003', $1,
+	             'b4b4b4b4-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	             'b2b2b2b2-0000-4000-8000-000000000002', 42, 99)
+
+2026-11-17 22:12:49.548 UTC [697] ERROR:  permission denied for table price_list_items
+2026-11-17 22:12:49.548 UTC [697] STATEMENT:  DELETE FROM price_list_items WHERE id = $1
+
+2026-11-17 22:12:49.576 UTC [701] ERROR:  new row violates row-level security policy for table "partner_balances"
+2026-11-17 22:12:49.576 UTC [701] STATEMENT:  INSERT INTO partner_balances (id, tenant_id, partner_id, draft_balance)
+	     VALUES ('bdbdbdbd-3000-4000-8000-000000000003', $1,
+	             'b5b5b5b5-0000-4000-8000-000000000002', 777)
+
+2026-11-17 22:12:49.590 UTC [703] ERROR:  permission denied for table partner_balances
+2026-11-17 22:12:49.590 UTC [703] STATEMENT:  DELETE FROM partner_balances WHERE id = $1
+
+2026-11-17 22:12:49.618 UTC [707] ERROR:  new row violates row-level security policy for table "opening_balance_docs"
+2026-11-17 22:12:49.618 UTC [707] STATEMENT:  INSERT INTO opening_balance_docs (id, tenant_id, kind, account_id, amount, currency_code)
+	     VALUES ('bebebebe-3000-4000-8000-000000000003', $1, 'ACCOUNT',
+	             'b0b0b0b0-0000-4000-8000-000000000002', 100, 'SAR')
+
+2026-11-17 22:12:49.632 UTC [709] ERROR:  permission denied for table opening_balance_docs
+2026-11-17 22:12:49.632 UTC [709] STATEMENT:  DELETE FROM opening_balance_docs WHERE id = $1
+
+2026-11-17 22:12:49.662 UTC [713] ERROR:  new row violates row-level security policy for table "file_objects"
+2026-11-17 22:12:49.662 UTC [713] STATEMENT:  INSERT INTO file_objects (id, tenant_id, owner_type, owner_id, storage_key, name, size_bytes, content_type)
+	     VALUES ('bfbfbfbf-3000-4000-8000-000000000003', $1, 'PARTNER',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'iso/attack.pdf', 'attack.pdf', 10, 'application/pdf')
+
+2026-11-17 22:12:49.678 UTC [715] ERROR:  permission denied for table file_objects
+2026-11-17 22:12:49.678 UTC [715] STATEMENT:  DELETE FROM file_objects WHERE id = $1
+
+2026-11-17 22:12:49.707 UTC [719] ERROR:  new row violates row-level security policy for table "import_jobs"
+2026-11-17 22:12:49.707 UTC [719] STATEMENT:  INSERT INTO import_jobs (id, tenant_id, kind, format, upload_token, file_key)
+	     VALUES ('c0c0c0c0-3000-4000-8000-000000000003', $1, 'ITEMS', 'CSV', 'iso-attack-token',
+	             'iso/attack.csv')
+
+2026-11-17 22:12:49.721 UTC [721] ERROR:  permission denied for table import_jobs
+2026-11-17 22:12:49.721 UTC [721] STATEMENT:  DELETE FROM import_jobs WHERE id = $1
+
+2026-11-17 22:12:49.749 UTC [725] ERROR:  new row violates row-level security policy for table "fiscal_years"
+2026-11-17 22:12:49.749 UTC [725] STATEMENT:  INSERT INTO fiscal_years (id, tenant_id, name, start_date, end_date)
+	     VALUES ('c1c1c1c1-3000-4000-8000-000000000003', $1, 'ATK', '2027-01-01', '2027-12-31')
+
+2026-11-17 22:12:49.767 UTC [727] ERROR:  permission denied for table fiscal_years
+2026-11-17 22:12:49.767 UTC [727] STATEMENT:  DELETE FROM fiscal_years WHERE id = $1
+
+2026-11-17 22:12:49.795 UTC [731] ERROR:  new row violates row-level security policy for table "fiscal_periods"
+2026-11-17 22:12:49.795 UTC [731] STATEMENT:  INSERT INTO fiscal_periods (id, tenant_id, fiscal_year_id, name, kind, start_date, end_date)
+	     VALUES ('c2c2c2c2-3000-4000-8000-000000000003', $1, 'c1c1c1c1-0000-4000-8000-000000000002',
+	             '2027-01', 'REGULAR', '2027-01-01', '2027-01-31')
+
+2026-11-17 22:12:49.810 UTC [733] ERROR:  permission denied for table fiscal_periods
+2026-11-17 22:12:49.810 UTC [733] STATEMENT:  DELETE FROM fiscal_periods WHERE id = $1
+
+2026-11-17 22:12:49.838 UTC [737] ERROR:  new row violates row-level security policy for table "exchange_rates"
+2026-11-17 22:12:49.838 UTC [737] STATEMENT:  INSERT INTO exchange_rates (id, tenant_id, currency_code, rate_date, rate)
+	     VALUES ('c3c3c3c3-3000-4000-8000-000000000003', $1, 'EUR', '2026-02-01', 4.05)
+
+2026-11-17 22:12:49.852 UTC [739] ERROR:  permission denied for table exchange_rates
+2026-11-17 22:12:49.852 UTC [739] STATEMENT:  DELETE FROM exchange_rates WHERE id = $1
+
+2026-11-17 22:12:49.881 UTC [743] ERROR:  new row violates row-level security policy for table "cost_centers"
+2026-11-17 22:12:49.881 UTC [743] STATEMENT:  INSERT INTO cost_centers (id, tenant_id, code, name)
+	     VALUES ('c4c4c4c4-3000-4000-8000-000000000003', $1, 'ATK', 'Attack Center')
+
+2026-11-17 22:12:49.895 UTC [745] ERROR:  permission denied for table cost_centers
+2026-11-17 22:12:49.895 UTC [745] STATEMENT:  DELETE FROM cost_centers WHERE id = $1
+
+2026-11-17 22:12:49.923 UTC [749] ERROR:  new row violates row-level security policy for table "recurring_journals"
+2026-11-17 22:12:49.923 UTC [749] STATEMENT:  INSERT INTO recurring_journals (id, tenant_id, name, template, schedule, start_date, next_run_date)
+	     VALUES ('c5c5c5c5-3000-4000-8000-000000000003', $1, 'ATK', '{"lines": []}'::jsonb,
+	             'MONTHLY', '2026-02-01', '2026-03-01')
+
+2026-11-17 22:12:49.937 UTC [751] ERROR:  permission denied for table recurring_journals
+2026-11-17 22:12:49.937 UTC [751] STATEMENT:  DELETE FROM recurring_journals WHERE id = $1
+
+2026-11-17 22:12:49.966 UTC [755] ERROR:  new row violates row-level security policy for table "approval_policies"
+2026-11-17 22:12:49.966 UTC [755] STATEMENT:  INSERT INTO approval_policies (id, tenant_id, doc_type, policy, applies_from)
+	     VALUES ('c6c6c6c6-3000-4000-8000-000000000003', $1, 'journal_entry',
+	             '{"mode": "none"}'::jsonb, '2026-02-01')
+
+2026-11-17 22:12:49.979 UTC [757] ERROR:  permission denied for table approval_policies
+2026-11-17 22:12:49.979 UTC [757] STATEMENT:  DELETE FROM approval_policies WHERE id = $1
+
+2026-11-17 22:12:50.010 UTC [761] ERROR:  new row violates row-level security policy for table "numbering_sequences"
+2026-11-17 22:12:50.010 UTC [761] STATEMENT:  INSERT INTO numbering_sequences (id, tenant_id, doc_type, period_key, next_value)
+	     VALUES ('c7c7c7c7-3000-4000-8000-000000000003', $1, 'journal_entry', '2027', 1)
+
+2026-11-17 22:12:50.024 UTC [763] ERROR:  permission denied for table numbering_sequences
+2026-11-17 22:12:50.024 UTC [763] STATEMENT:  DELETE FROM numbering_sequences WHERE id = $1
+
+2026-11-17 22:12:50.052 UTC [767] ERROR:  new row violates row-level security policy for table "number_assignments"
+2026-11-17 22:12:50.052 UTC [767] STATEMENT:  INSERT INTO number_assignments (id, tenant_id, doc_type, period_key, number, value)
+	     VALUES ('c8c8c8c8-3000-4000-8000-000000000003', $1, 'journal_entry', '2027', 'JE-2027-000001', 1)
+
+2026-11-17 22:12:50.066 UTC [769] ERROR:  permission denied for table number_assignments
+2026-11-17 22:12:50.066 UTC [769] STATEMENT:  DELETE FROM number_assignments WHERE id = $1
+
+2026-11-17 22:12:50.095 UTC [773] ERROR:  new row violates row-level security policy for table "manual_journals"
+2026-11-17 22:12:50.095 UTC [773] STATEMENT:  INSERT INTO manual_journals (id, tenant_id, status, entry_date, currency_code)
+	     VALUES ('c9c9c9c9-3000-4000-8000-000000000003', $1, 'DRAFT', '2026-02-05', 'SAR')
+
+2026-11-17 22:12:50.138 UTC [779] ERROR:  new row violates row-level security policy for table "manual_journal_lines"
+2026-11-17 22:12:50.138 UTC [779] STATEMENT:  INSERT INTO manual_journal_lines (id, tenant_id, manual_journal_id, line_no, account_id, direction, amount)
+	     VALUES ('cacacaca-3000-4000-8000-000000000003', $1, 'c9c9c9c9-0000-4000-8000-000000000002',
+	             1, 'b0b0b0b0-0000-4000-8000-000000000002', 'DEBIT', 10)
+
+2026-11-17 22:12:50.179 UTC [785] ERROR:  new row violates row-level security policy for table "journal_templates"
+2026-11-17 22:12:50.179 UTC [785] STATEMENT:  INSERT INTO journal_templates (id, tenant_id, name, lines)
+	     VALUES ('cbcbcbcb-3000-4000-8000-000000000003', $1, 'ATK template', '[{"direction": "DEBIT"}]'::jsonb)
+
+2026-11-17 22:12:50.193 UTC [787] ERROR:  permission denied for table journal_templates
+2026-11-17 22:12:50.193 UTC [787] STATEMENT:  DELETE FROM journal_templates WHERE id = $1
+
+2026-11-17 22:12:50.223 UTC [791] ERROR:  new row violates row-level security policy for table "journal_entries"
+2026-11-17 22:12:50.223 UTC [791] STATEMENT:  INSERT INTO journal_entries (id, tenant_id, entry_date, fiscal_period_id, currency_code, source_type, operation)
+	     VALUES ('cccccccc-3000-4000-8000-000000000003', $1, '2026-02-05',
+	             'c2c2c2c2-0000-4000-8000-000000000002', 'SAR', 'iso_attack', 'post')
+
+2026-11-17 22:12:50.237 UTC [793] ERROR:  permission denied for table journal_entries
+2026-11-17 22:12:50.237 UTC [793] STATEMENT:  DELETE FROM journal_entries WHERE id = $1
+
+2026-11-17 22:12:50.266 UTC [797] ERROR:  new row violates row-level security policy for table "journal_lines"
+2026-11-17 22:12:50.266 UTC [797] STATEMENT:  INSERT INTO journal_lines (id, tenant_id, journal_entry_id, line_no, account_id, direction, amount, base_amount)
+	     VALUES ('cdcdcdcd-3000-4000-8000-000000000003', $1, 'cccccccc-0000-4000-8000-000000000002',
+	             3, 'b0b0b0b0-0000-4000-8000-000000000002', 'DEBIT', 10, 10)
+
+2026-11-17 22:12:50.274 UTC [798] ERROR:  permission denied for table journal_lines
+2026-11-17 22:12:50.274 UTC [798] STATEMENT:  UPDATE journal_lines SET updated_at = updated_at WHERE id = $1
+
+2026-11-17 22:12:50.281 UTC [799] ERROR:  permission denied for table journal_lines
+2026-11-17 22:12:50.281 UTC [799] STATEMENT:  DELETE FROM journal_lines WHERE id = $1
+
+2026-11-17 22:12:50.309 UTC [803] ERROR:  new row violates row-level security policy for table "partner_subledger_entries"
+2026-11-17 22:12:50.309 UTC [803] STATEMENT:  INSERT INTO partner_subledger_entries (id, tenant_id, partner_id, journal_entry_id,
+	                                            journal_line_id, entry_date, direction, amount, base_amount, currency_code, source_type)
+	     VALUES ('cececece-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'cccccccc-0000-4000-8000-000000000002', 'cdcdcdcd-0000-4000-8000-000000000002',
+	             '2026-01-20', 'DEBIT', 10, 10, 'SAR', 'iso_attack')
+
+2026-11-17 22:12:50.316 UTC [804] ERROR:  permission denied for table partner_subledger_entries
+2026-11-17 22:12:50.316 UTC [804] STATEMENT:  UPDATE partner_subledger_entries SET updated_at = updated_at WHERE id = $1
+
+2026-11-17 22:12:50.323 UTC [805] ERROR:  permission denied for table partner_subledger_entries
+2026-11-17 22:12:50.323 UTC [805] STATEMENT:  DELETE FROM partner_subledger_entries WHERE id = $1
+
+2026-11-17 22:12:50.351 UTC [809] ERROR:  new row violates row-level security policy for table "reconciliation_runs"
+2026-11-17 22:12:50.351 UTC [809] STATEMENT:  INSERT INTO reconciliation_runs (id, tenant_id, kind, as_of, status, control_balance, subledger_balance)
+	     VALUES ('cfcfcfcf-3000-4000-8000-000000000003', $1, 'AP', '2026-02-28', 'OK', 0, 0)
+
+2026-11-17 22:12:50.366 UTC [811] ERROR:  permission denied for table reconciliation_runs
+2026-11-17 22:12:50.366 UTC [811] STATEMENT:  DELETE FROM reconciliation_runs WHERE id = $1
+
+2026-11-17 22:12:50.396 UTC [815] ERROR:  new row violates row-level security policy for table "cash_accounts"
+2026-11-17 22:12:50.396 UTC [815] STATEMENT:  INSERT INTO cash_accounts (id, tenant_id, name, type, account_id, currency_code)
+	     VALUES ('d0d0d0d0-3000-4000-8000-000000000003', $1, 'Attack Cash', 'CASH',
+	             'b0b0b0b0-0000-4000-8000-000000000002', 'SAR')
+
+2026-11-17 22:12:50.410 UTC [817] ERROR:  permission denied for table cash_accounts
+2026-11-17 22:12:50.410 UTC [817] STATEMENT:  DELETE FROM cash_accounts WHERE id = $1
+
+2026-11-17 22:12:50.440 UTC [821] ERROR:  new row violates row-level security policy for table "cash_movements"
+2026-11-17 22:12:50.440 UTC [821] STATEMENT:  INSERT INTO cash_movements (id, tenant_id, cash_account_id, direction, amount, currency_code, exchange_rate, base_amount, source_type, source_id, value_date)
+	     VALUES ('d2d2d2d2-3000-4000-8000-000000000003', $1, 'd0d0d0d0-0000-4000-8000-000000000002', 'OUT',
+	             10, 'SAR', 1, 10, 'expense', 'd0d0d0d0-0000-4000-8000-000000000002', '2027-02-01')
+
+2026-11-17 22:12:50.447 UTC [822] ERROR:  permission denied for table cash_movements
+2026-11-17 22:12:50.447 UTC [822] STATEMENT:  UPDATE cash_movements SET memo = memo WHERE id = $1
+
+2026-11-17 22:12:50.454 UTC [823] ERROR:  permission denied for table cash_movements
+2026-11-17 22:12:50.454 UTC [823] STATEMENT:  DELETE FROM cash_movements WHERE id = $1
+
+2026-11-17 22:12:50.482 UTC [827] ERROR:  new row violates row-level security policy for table "receipts"
+2026-11-17 22:12:50.482 UTC [827] STATEMENT:  INSERT INTO receipts (id, tenant_id, status, cash_account_id, partner_id, method, currency_code, amount, value_date)
+	     VALUES ('d3d3d3d3-3000-4000-8000-000000000003', $1, 'DRAFT', 'd0d0d0d0-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'CASH', 'SAR', 10, '2027-02-01')
+
+2026-11-17 22:12:50.496 UTC [829] ERROR:  permission denied for table receipts
+2026-11-17 22:12:50.496 UTC [829] STATEMENT:  DELETE FROM receipts WHERE id = $1
+
+2026-11-17 22:12:50.524 UTC [833] ERROR:  new row violates row-level security policy for table "payments"
+2026-11-17 22:12:50.524 UTC [833] STATEMENT:  INSERT INTO payments (id, tenant_id, status, cash_account_id, partner_id, method, currency_code, amount, value_date)
+	     VALUES ('d4d4d4d4-3000-4000-8000-000000000003', $1, 'DRAFT', 'd0d0d0d0-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'CASH', 'SAR', 10, '2027-02-01')
+
+2026-11-17 22:12:50.538 UTC [835] ERROR:  permission denied for table payments
+2026-11-17 22:12:50.538 UTC [835] STATEMENT:  DELETE FROM payments WHERE id = $1
+
+2026-11-17 22:12:50.568 UTC [839] ERROR:  new row violates row-level security policy for table "treasury_allocations"
+2026-11-17 22:12:50.568 UTC [839] STATEMENT:  INSERT INTO treasury_allocations (id, tenant_id, receipt_id, open_item_id, amount)
+	     VALUES ('d5d5d5d5-3000-4000-8000-000000000003', $1, 'd3d3d3d3-0000-4000-8000-000000000002',
+	             'cececece-0000-4000-8000-000000000002', 5)
+
+2026-11-17 22:12:50.575 UTC [840] ERROR:  permission denied for table treasury_allocations
+2026-11-17 22:12:50.575 UTC [840] STATEMENT:  UPDATE treasury_allocations SET amount = amount WHERE id = $1
+
+2026-11-17 22:12:50.610 UTC [845] ERROR:  new row violates row-level security policy for table "expense_categories"
+2026-11-17 22:12:50.610 UTC [845] STATEMENT:  INSERT INTO expense_categories (id, tenant_id, code, name, name_ar, account_id)
+	     VALUES ('d6d6d6d6-3000-4000-8000-000000000003', $1, 'ATK', 'Attack', 'هجوم',
+	             'b0b0b0b0-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:50.630 UTC [847] ERROR:  permission denied for table expense_categories
+2026-11-17 22:12:50.630 UTC [847] STATEMENT:  DELETE FROM expense_categories WHERE id = $1
+
+2026-11-17 22:12:50.658 UTC [851] ERROR:  new row violates row-level security policy for table "expenses"
+2026-11-17 22:12:50.658 UTC [851] STATEMENT:  INSERT INTO expenses (id, tenant_id, status, category_id, cash_account_id, payee_name, currency_code, amount, value_date)
+	     VALUES ('d7d7d7d7-3000-4000-8000-000000000003', $1, 'DRAFT', 'd6d6d6d6-0000-4000-8000-000000000002',
+	             'd0d0d0d0-0000-4000-8000-000000000002', 'Attack Payee', 'SAR', 10, '2027-02-01')
+
+2026-11-17 22:12:50.672 UTC [853] ERROR:  permission denied for table expenses
+2026-11-17 22:12:50.672 UTC [853] STATEMENT:  DELETE FROM expenses WHERE id = $1
+
+2026-11-17 22:12:50.702 UTC [857] ERROR:  new row violates row-level security policy for table "cash_transfers"
+2026-11-17 22:12:50.702 UTC [857] STATEMENT:  INSERT INTO cash_transfers (id, tenant_id, status, from_account_id, to_account_id, currency_code, amount, fee_amount, value_date)
+	     VALUES ('d8d8d8d8-3000-4000-8000-000000000003', $1, 'DRAFT', 'd0d0d0d0-0000-4000-8000-000000000002',
+	             'd1d1d1d1-0000-4000-8000-000000000002', 'SAR', 10, 0, '2027-02-01')
+
+2026-11-17 22:12:50.715 UTC [859] ERROR:  permission denied for table cash_transfers
+2026-11-17 22:12:50.715 UTC [859] STATEMENT:  DELETE FROM cash_transfers WHERE id = $1
+
+2026-11-17 22:12:50.748 UTC [863] ERROR:  new row violates row-level security policy for table "cashier_shifts"
+2026-11-17 22:12:50.748 UTC [863] STATEMENT:  INSERT INTO cashier_shifts (id, tenant_id, status, cash_account_id, currency_code, opening_amount)
+	     VALUES ('d9d9d9d9-3000-4000-8000-000000000003', $1, 'OPEN', 'd0d0d0d0-0000-4000-8000-000000000002',
+	             'SAR', 10)
+
+2026-11-17 22:12:50.763 UTC [865] ERROR:  permission denied for table cashier_shifts
+2026-11-17 22:12:50.763 UTC [865] STATEMENT:  DELETE FROM cashier_shifts WHERE id = $1
+
+2026-11-17 22:12:50.791 UTC [869] ERROR:  new row violates row-level security policy for table "bank_statements"
+2026-11-17 22:12:50.791 UTC [869] STATEMENT:  INSERT INTO bank_statements (id, tenant_id, status, cash_account_id, period_start, period_end, file_name, file_hash, adapter_id)
+	     VALUES ('dadadada-3000-4000-8000-000000000003', $1, 'IMPORTED', 'd1d1d1d1-0000-4000-8000-000000000002',
+	             '2027-02-01', '2027-02-28', 'attack.csv', repeat('c', 64), 'generic-csv')
+
+2026-11-17 22:12:50.806 UTC [871] ERROR:  permission denied for table bank_statements
+2026-11-17 22:12:50.806 UTC [871] STATEMENT:  DELETE FROM bank_statements WHERE id = $1
+
+2026-11-17 22:12:50.834 UTC [875] ERROR:  new row violates row-level security policy for table "bank_statement_lines"
+2026-11-17 22:12:50.834 UTC [875] STATEMENT:  INSERT INTO bank_statement_lines (id, tenant_id, bank_statement_id, line_no, line_date, amount)
+	     VALUES ('dbdbdbdb-3000-4000-8000-000000000003', $1, 'dadadada-0000-4000-8000-000000000002',
+	             2, '2027-02-05', 25)
+
+2026-11-17 22:12:50.848 UTC [877] ERROR:  permission denied for table bank_statement_lines
+2026-11-17 22:12:50.848 UTC [877] STATEMENT:  DELETE FROM bank_statement_lines WHERE id = $1
+
+2026-11-17 22:12:50.877 UTC [881] ERROR:  new row violates row-level security policy for table "tax_codes"
+2026-11-17 22:12:50.877 UTC [881] STATEMENT:  INSERT INTO tax_codes (id, tenant_id, code, name, country_code, default_treatment)
+	     VALUES ('e0e0e0e0-3000-4000-8000-000000000003', $1, 'ATK-INS', 'Attack Insert', 'SA', 'STANDARD_RATED')
+
+2026-11-17 22:12:50.892 UTC [883] ERROR:  permission denied for table tax_codes
+2026-11-17 22:12:50.892 UTC [883] STATEMENT:  DELETE FROM tax_codes WHERE id = $1
+
+2026-11-17 22:12:50.920 UTC [887] ERROR:  new row violates row-level security policy for table "tax_registrations"
+2026-11-17 22:12:50.920 UTC [887] STATEMENT:  INSERT INTO tax_registrations (id, tenant_id, country_code, status, registration_number, effective_from)
+	     VALUES ('e1e1e1e1-3000-4000-8000-000000000003', $1, 'SA', 'REGISTERED', '300000000000009', '2026-01-01')
+
+2026-11-17 22:12:50.934 UTC [889] ERROR:  permission denied for table tax_registrations
+2026-11-17 22:12:50.934 UTC [889] STATEMENT:  DELETE FROM tax_registrations WHERE id = $1
+
+2026-11-17 22:12:50.962 UTC [893] ERROR:  new row violates row-level security policy for table "tax_pack_bindings"
+2026-11-17 22:12:50.962 UTC [893] STATEMENT:  INSERT INTO tax_pack_bindings (id, tenant_id, country_code, pack_version)
+	     VALUES ('e2e2e2e2-3000-4000-8000-000000000003', $1, 'SA', '1.0.0-baseline')
+
+2026-11-17 22:12:50.976 UTC [895] ERROR:  permission denied for table tax_pack_bindings
+2026-11-17 22:12:50.976 UTC [895] STATEMENT:  DELETE FROM tax_pack_bindings WHERE id = $1
+
+2026-11-17 22:12:51.005 UTC [899] ERROR:  new row violates row-level security policy for table "tax_document_summaries"
+2026-11-17 22:12:51.005 UTC [899] STATEMENT:  INSERT INTO tax_document_summaries (id, tenant_id, source_type, source_id, document_date,
+	        country_code, direction, treatment, rate, taxable_base, tax_amount, snapshot, tax_code_id)
+	     VALUES ('e3e3e3e3-3000-4000-8000-000000000003', $1, 'iso_fixture', $1, '2027-02-01', 'SA',
+	        'INPUT', 'STANDARD_RATED', 15.0000, 100, 15, '{"treatment":"STANDARD_RATED"}'::jsonb,
+	        'e0e0e0e0-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:51.012 UTC [900] ERROR:  permission denied for table tax_document_summaries
+2026-11-17 22:12:51.012 UTC [900] STATEMENT:  UPDATE tax_document_summaries SET taxable_base = taxable_base WHERE id = $1
+
+2026-11-17 22:12:51.019 UTC [901] ERROR:  permission denied for table tax_document_summaries
+2026-11-17 22:12:51.019 UTC [901] STATEMENT:  DELETE FROM tax_document_summaries WHERE id = $1
+
+2026-11-17 22:12:51.047 UTC [905] ERROR:  new row violates row-level security policy for table "vat_returns"
+2026-11-17 22:12:51.047 UTC [905] STATEMENT:  INSERT INTO vat_returns (id, tenant_id, country_code, period_start, period_end, summary, cross_check)
+	     VALUES ('e4e4e4e4-3000-4000-8000-000000000003', $1, 'SA', '2027-02-01', '2027-02-28', '{}'::jsonb, '{}'::jsonb)
+
+2026-11-17 22:12:51.064 UTC [907] ERROR:  permission denied for table vat_returns
+2026-11-17 22:12:51.064 UTC [907] STATEMENT:  DELETE FROM vat_returns WHERE id = $1
+
+2026-11-17 22:12:51.094 UTC [911] ERROR:  new row violates row-level security policy for table "e_invoicing_submissions"
+2026-11-17 22:12:51.094 UTC [911] STATEMENT:  INSERT INTO e_invoicing_submissions (id, tenant_id, country_code, adapter_id, source_type, source_id, status)
+	     VALUES ('e5e5e5e5-3000-4000-8000-000000000003', $1, 'SA', 'fake', 'iso_fixture', $1, 'PENDING')
+
+2026-11-17 22:12:51.108 UTC [913] ERROR:  permission denied for table e_invoicing_submissions
+2026-11-17 22:12:51.108 UTC [913] STATEMENT:  DELETE FROM e_invoicing_submissions WHERE id = $1
+
+2026-11-17 22:12:51.138 UTC [917] ERROR:  new row violates row-level security policy for table "warehouses"
+2026-11-17 22:12:51.138 UTC [917] STATEMENT:  INSERT INTO warehouses (id, tenant_id, branch_id, code, name)
+	     VALUES ('f0f0f0f0-3000-4000-8000-000000000003', $1,
+	             'abababab-0000-4000-8000-000000000002', 'ATK', 'Attack WH')
+
+2026-11-17 22:12:51.153 UTC [919] ERROR:  permission denied for table warehouses
+2026-11-17 22:12:51.153 UTC [919] STATEMENT:  DELETE FROM warehouses WHERE id = $1
+
+2026-11-17 22:12:51.181 UTC [923] ERROR:  new row violates row-level security policy for table "item_warehouse_settings"
+2026-11-17 22:12:51.181 UTC [923] STATEMENT:  INSERT INTO item_warehouse_settings (id, tenant_id, item_id, warehouse_id, reorder_level, min_qty)
+	     VALUES ('f1f1f1f1-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 5, 2)
+
+2026-11-17 22:12:51.195 UTC [926] ERROR:  permission denied for table item_warehouse_settings
+2026-11-17 22:12:51.195 UTC [926] STATEMENT:  DELETE FROM item_warehouse_settings WHERE id = $1
+
+2026-11-17 22:12:51.224 UTC [930] ERROR:  new row violates row-level security policy for table "stock_moves"
+2026-11-17 22:12:51.224 UTC [930] STATEMENT:  INSERT INTO stock_moves (id, tenant_id, item_id, warehouse_id, direction, move_kind, qty, unit_cost, value_amount, source_type, source_id, moved_at)
+	     VALUES ('f4f4f4f4-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 'IN', 'receipt', 10, 2.5, 25,
+	             'manual_receipt', 'f4f4f4f4-3000-4000-8000-000000000003', '2027-01-05')
+
+2026-11-17 22:12:51.231 UTC [932] ERROR:  permission denied for table stock_moves
+2026-11-17 22:12:51.231 UTC [932] STATEMENT:  UPDATE stock_moves SET memo = memo WHERE id = $1
+
+2026-11-17 22:12:51.239 UTC [933] ERROR:  permission denied for table stock_moves
+2026-11-17 22:12:51.239 UTC [933] STATEMENT:  DELETE FROM stock_moves WHERE id = $1
+
+2026-11-17 22:12:51.268 UTC [937] ERROR:  new row violates row-level security policy for table "stock_layers"
+2026-11-17 22:12:51.268 UTC [937] STATEMENT:  INSERT INTO stock_layers (id, tenant_id, item_id, warehouse_id, remaining_qty, unit_cost, source_move_id, received_at)
+	     VALUES ('f5f5f5f5-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 10, 2.5,
+	             'f4f4f4f4-3000-4000-8000-000000000003', '2027-01-05')
+
+2026-11-17 22:12:51.281 UTC [939] ERROR:  permission denied for table stock_layers
+2026-11-17 22:12:51.281 UTC [939] STATEMENT:  DELETE FROM stock_layers WHERE id = $1
+
+2026-11-17 22:12:51.310 UTC [944] ERROR:  new row violates row-level security policy for table "item_stock"
+2026-11-17 22:12:51.310 UTC [944] STATEMENT:  INSERT INTO item_stock (id, tenant_id, item_id, warehouse_id, qty, avg_cost)
+	     VALUES ('f6f6f6f6-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 10, 2.5)
+
+2026-11-17 22:12:51.324 UTC [947] ERROR:  permission denied for table item_stock
+2026-11-17 22:12:51.324 UTC [947] STATEMENT:  DELETE FROM item_stock WHERE id = $1
+
+2026-11-17 22:12:51.352 UTC [951] ERROR:  new row violates row-level security policy for table "stock_transfers"
+2026-11-17 22:12:51.352 UTC [951] STATEMENT:  INSERT INTO stock_transfers (id, tenant_id, from_warehouse_id, to_warehouse_id, status)
+	     VALUES ('f7f7f7f7-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:51.367 UTC [953] ERROR:  permission denied for table stock_transfers
+2026-11-17 22:12:51.367 UTC [953] STATEMENT:  DELETE FROM stock_transfers WHERE id = $1
+
+2026-11-17 22:12:51.395 UTC [957] ERROR:  new row violates row-level security policy for table "stock_transfer_lines"
+2026-11-17 22:12:51.395 UTC [957] STATEMENT:  INSERT INTO stock_transfer_lines (id, tenant_id, transfer_id, line_no, item_id, qty)
+	     VALUES ('f8f8f8f8-3000-4000-8000-000000000003', $1, 'f7f7f7f7-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 4)
+
+2026-11-17 22:12:51.409 UTC [959] ERROR:  permission denied for table stock_transfer_lines
+2026-11-17 22:12:51.409 UTC [959] STATEMENT:  DELETE FROM stock_transfer_lines WHERE id = $1
+
+2026-11-17 22:12:51.440 UTC [963] ERROR:  new row violates row-level security policy for table "stock_adjustments"
+2026-11-17 22:12:51.440 UTC [963] STATEMENT:  INSERT INTO stock_adjustments (id, tenant_id, warehouse_id, item_id, reason, delta_qty)
+	     VALUES ('f9f9f9f9-3000-4000-8000-000000000003', $1, 'f0f0f0f0-2000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', 'DAMAGE', -1)
+
+2026-11-17 22:12:51.454 UTC [965] ERROR:  permission denied for table stock_adjustments
+2026-11-17 22:12:51.454 UTC [965] STATEMENT:  DELETE FROM stock_adjustments WHERE id = $1
+
+2026-11-17 22:12:51.483 UTC [969] ERROR:  new row violates row-level security policy for table "stock_reservations"
+2026-11-17 22:12:51.483 UTC [969] STATEMENT:  INSERT INTO stock_reservations (id, tenant_id, item_id, warehouse_id, qty, holder_type)
+	     VALUES ('fafafafa-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 2, 'MANUAL')
+
+2026-11-17 22:12:51.497 UTC [971] ERROR:  permission denied for table stock_reservations
+2026-11-17 22:12:51.497 UTC [971] STATEMENT:  DELETE FROM stock_reservations WHERE id = $1
+
+2026-11-17 22:12:51.527 UTC [977] ERROR:  new row violates row-level security policy for table "item_batches"
+2026-11-17 22:12:51.527 UTC [977] STATEMENT:  INSERT INTO item_batches (id, tenant_id, item_id, batch_no)
+	     VALUES ('f2f2f2f2-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002', 'ATK-B')
+
+2026-11-17 22:12:51.542 UTC [984] ERROR:  permission denied for table item_batches
+2026-11-17 22:12:51.542 UTC [984] STATEMENT:  DELETE FROM item_batches WHERE id = $1
+
+2026-11-17 22:12:51.571 UTC [989] ERROR:  new row violates row-level security policy for table "item_serials"
+2026-11-17 22:12:51.571 UTC [989] STATEMENT:  INSERT INTO item_serials (id, tenant_id, item_id, serial_no)
+	     VALUES ('f3f3f3f3-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002', 'ATK-SN')
+
+2026-11-17 22:12:51.585 UTC [991] ERROR:  permission denied for table item_serials
+2026-11-17 22:12:51.585 UTC [991] STATEMENT:  DELETE FROM item_serials WHERE id = $1
+
+2026-11-17 22:12:51.614 UTC [995] ERROR:  new row violates row-level security policy for table "stock_counts"
+2026-11-17 22:12:51.614 UTC [995] STATEMENT:  INSERT INTO stock_counts (id, tenant_id, warehouse_id, status, snapshot_at)
+	     VALUES ('fbfbfbfb-3000-4000-8000-000000000003', $1, 'f0f0f0f0-2000-4000-8000-000000000002',
+	             'DRAFT', '2027-01-10T09:00:00Z')
+
+2026-11-17 22:12:51.629 UTC [997] ERROR:  permission denied for table stock_counts
+2026-11-17 22:12:51.629 UTC [997] STATEMENT:  DELETE FROM stock_counts WHERE id = $1
+
+2026-11-17 22:12:51.657 UTC [1001] ERROR:  new row violates row-level security policy for table "stock_count_lines"
+2026-11-17 22:12:51.657 UTC [1001] STATEMENT:  INSERT INTO stock_count_lines (id, tenant_id, stock_count_id, line_no, item_id, batch_id, system_qty)
+	     VALUES ('fcfcfcfc-3000-4000-8000-000000000003', $1, 'fbfbfbfb-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 'f2f2f2f2-0000-4000-8000-000000000002', 10)
+
+2026-11-17 22:12:51.672 UTC [1003] ERROR:  permission denied for table stock_count_lines
+2026-11-17 22:12:51.672 UTC [1003] STATEMENT:  DELETE FROM stock_count_lines WHERE id = $1
+
+2026-11-17 22:12:51.700 UTC [1007] ERROR:  new row violates row-level security policy for table "purchase_requests"
+2026-11-17 22:12:51.700 UTC [1007] STATEMENT:  INSERT INTO purchase_requests (id, tenant_id, branch_id, status)
+	     VALUES ('5a5a5a5a-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:51.714 UTC [1009] ERROR:  permission denied for table purchase_requests
+2026-11-17 22:12:51.714 UTC [1009] STATEMENT:  DELETE FROM purchase_requests WHERE id = $1
+
+2026-11-17 22:12:51.742 UTC [1013] ERROR:  new row violates row-level security policy for table "purchase_request_lines"
+2026-11-17 22:12:51.742 UTC [1013] STATEMENT:  INSERT INTO purchase_request_lines (id, tenant_id, request_id, line_no, item_id, qty)
+	     VALUES ('5b5b5b5b-3000-4000-8000-000000000003', $1, '5a5a5a5a-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5)
+
+2026-11-17 22:12:51.758 UTC [1015] ERROR:  permission denied for table purchase_request_lines
+2026-11-17 22:12:51.758 UTC [1015] STATEMENT:  DELETE FROM purchase_request_lines WHERE id = $1
+
+2026-11-17 22:12:51.789 UTC [1019] ERROR:  new row violates row-level security policy for table "purchase_orders"
+2026-11-17 22:12:51.789 UTC [1019] STATEMENT:  INSERT INTO purchase_orders (id, tenant_id, branch_id, supplier_id, order_date, currency_code, status)
+	     VALUES ('5c5c5c5c-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '2027-02-01', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:51.804 UTC [1021] ERROR:  permission denied for table purchase_orders
+2026-11-17 22:12:51.804 UTC [1021] STATEMENT:  DELETE FROM purchase_orders WHERE id = $1
+
+2026-11-17 22:12:51.832 UTC [1025] ERROR:  new row violates row-level security policy for table "purchase_order_lines"
+2026-11-17 22:12:51.832 UTC [1025] STATEMENT:  INSERT INTO purchase_order_lines (id, tenant_id, order_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('5d5d5d5d-3000-4000-8000-000000000003', $1, '5c5c5c5c-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:51.846 UTC [1027] ERROR:  permission denied for table purchase_order_lines
+2026-11-17 22:12:51.846 UTC [1027] STATEMENT:  DELETE FROM purchase_order_lines WHERE id = $1
+
+2026-11-17 22:12:51.875 UTC [1031] ERROR:  new row violates row-level security policy for table "goods_receipts"
+2026-11-17 22:12:51.875 UTC [1031] STATEMENT:  INSERT INTO goods_receipts (id, tenant_id, branch_id, supplier_id, po_id, warehouse_id, receipt_date, status)
+	     VALUES ('5e5e5e5e-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '5c5c5c5c-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', '2027-02-05', 'DRAFT')
+
+2026-11-17 22:12:51.889 UTC [1033] ERROR:  permission denied for table goods_receipts
+2026-11-17 22:12:51.889 UTC [1033] STATEMENT:  DELETE FROM goods_receipts WHERE id = $1
+
+2026-11-17 22:12:51.917 UTC [1037] ERROR:  new row violates row-level security policy for table "goods_receipt_lines"
+2026-11-17 22:12:51.917 UTC [1037] STATEMENT:  INSERT INTO goods_receipt_lines (id, tenant_id, receipt_id, line_no, item_id, qty, unit_cost, value_amount)
+	     VALUES ('5f5f5f5f-3000-4000-8000-000000000003', $1, '5e5e5e5e-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:51.931 UTC [1039] ERROR:  permission denied for table goods_receipt_lines
+2026-11-17 22:12:51.931 UTC [1039] STATEMENT:  DELETE FROM goods_receipt_lines WHERE id = $1
+
+2026-11-17 22:12:51.959 UTC [1043] ERROR:  new row violates row-level security policy for table "supplier_invoices"
+2026-11-17 22:12:51.959 UTC [1043] STATEMENT:  INSERT INTO supplier_invoices (id, tenant_id, branch_id, supplier_id, invoice_no, invoice_date, due_date, currency_code, status)
+	     VALUES ('60606060-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'ATK-001', '2027-02-10', '2027-03-12', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:51.973 UTC [1045] ERROR:  permission denied for table supplier_invoices
+2026-11-17 22:12:51.973 UTC [1045] STATEMENT:  DELETE FROM supplier_invoices WHERE id = $1
+
+2026-11-17 22:12:52.002 UTC [1049] ERROR:  new row violates row-level security policy for table "supplier_invoice_lines"
+2026-11-17 22:12:52.002 UTC [1049] STATEMENT:  INSERT INTO supplier_invoice_lines (id, tenant_id, invoice_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('61616161-3000-4000-8000-000000000003', $1, '60606060-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:52.016 UTC [1051] ERROR:  permission denied for table supplier_invoice_lines
+2026-11-17 22:12:52.016 UTC [1051] STATEMENT:  DELETE FROM supplier_invoice_lines WHERE id = $1
+
+2026-11-17 22:12:52.044 UTC [1055] ERROR:  new row violates row-level security policy for table "debit_notes"
+2026-11-17 22:12:52.044 UTC [1055] STATEMENT:  INSERT INTO debit_notes (id, tenant_id, branch_id, supplier_id, ref_invoice_id, note_date, currency_code, status)
+	     VALUES ('62626262-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '60606060-0000-4000-8000-000000000002', '2027-02-15', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:52.059 UTC [1057] ERROR:  permission denied for table debit_notes
+2026-11-17 22:12:52.059 UTC [1057] STATEMENT:  DELETE FROM debit_notes WHERE id = $1
+
+2026-11-17 22:12:52.088 UTC [1068] ERROR:  new row violates row-level security policy for table "debit_note_lines"
+2026-11-17 22:12:52.088 UTC [1068] STATEMENT:  INSERT INTO debit_note_lines (id, tenant_id, note_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('63636363-3000-4000-8000-000000000003', $1, '62626262-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 1, 1, 1)
+
+2026-11-17 22:12:52.101 UTC [1070] ERROR:  permission denied for table debit_note_lines
+2026-11-17 22:12:52.101 UTC [1070] STATEMENT:  DELETE FROM debit_note_lines WHERE id = $1
+
+2026-11-17 22:12:52.130 UTC [1074] ERROR:  new row violates row-level security policy for table "landed_costs"
+2026-11-17 22:12:52.130 UTC [1074] STATEMENT:  INSERT INTO landed_costs (id, tenant_id, grn_id, cost_type, amount, allocation_method, charge_account_id, status)
+	     VALUES ('64646464-3000-4000-8000-000000000003', $1, '5e5e5e5e-0000-4000-8000-000000000002',
+	             'freight', 2, 'VALUE', 'b0b0b0b0-0000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:52.144 UTC [1076] ERROR:  permission denied for table landed_costs
+2026-11-17 22:12:52.144 UTC [1076] STATEMENT:  DELETE FROM landed_costs WHERE id = $1
+
+2026-11-17 22:12:52.172 UTC [1080] ERROR:  new row violates row-level security policy for table "landed_cost_allocations"
+2026-11-17 22:12:52.172 UTC [1080] STATEMENT:  INSERT INTO landed_cost_allocations (id, tenant_id, landed_cost_id, grn_line_id, item_id, warehouse_id, qty_at_allocation, remaining_qty, allocated_amount)
+	     VALUES ('65656565-3000-4000-8000-000000000003', $1, '64646464-0000-4000-8000-000000000002',
+	             '5f5f5f5f-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 5, 5, 2)
+
+2026-11-17 22:12:52.186 UTC [1082] ERROR:  permission denied for table landed_cost_allocations
+2026-11-17 22:12:52.186 UTC [1082] STATEMENT:  DELETE FROM landed_cost_allocations WHERE id = $1
+
+2026-11-17 22:12:52.223 UTC [1086] ERROR:  new row violates row-level security policy for table "purchase_reallocations"
+2026-11-17 22:12:52.223 UTC [1086] STATEMENT:  INSERT INTO purchase_reallocations (id, tenant_id, doc_no, payment_id, supplier_id, reason, total_amount)
+	     VALUES ('66666666-3000-4000-8000-000000000003', $1, 'RAL-ATK-1', 'd4d4d4d4-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'attack re-allocation', 1)
+
+2026-11-17 22:12:52.234 UTC [1087] ERROR:  permission denied for table purchase_reallocations
+2026-11-17 22:12:52.234 UTC [1087] STATEMENT:  UPDATE purchase_reallocations SET reason = reason WHERE id = $1
+
+2026-11-17 22:12:52.241 UTC [1088] ERROR:  permission denied for table purchase_reallocations
+2026-11-17 22:12:52.241 UTC [1088] STATEMENT:  DELETE FROM purchase_reallocations WHERE id = $1
+
+2026-11-17 22:12:52.269 UTC [1092] ERROR:  new row violates row-level security policy for table "purchase_reallocation_lines"
+2026-11-17 22:12:52.269 UTC [1092] STATEMENT:  INSERT INTO purchase_reallocation_lines (id, tenant_id, reallocation_id, line_no, to_open_item_id, amount)
+	     VALUES ('67676767-3000-4000-8000-000000000003', $1, '66666666-0000-4000-8000-000000000002', 2,
+	             'cececece-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:52.276 UTC [1093] ERROR:  permission denied for table purchase_reallocation_lines
+2026-11-17 22:12:52.276 UTC [1093] STATEMENT:  UPDATE purchase_reallocation_lines SET amount = amount WHERE id = $1
+
+2026-11-17 22:12:52.283 UTC [1094] ERROR:  permission denied for table purchase_reallocation_lines
+2026-11-17 22:12:52.283 UTC [1094] STATEMENT:  DELETE FROM purchase_reallocation_lines WHERE id = $1
+
+2026-11-17 22:12:52.312 UTC [1098] ERROR:  new row violates row-level security policy for table "sales_reps"
+2026-11-17 22:12:52.312 UTC [1098] STATEMENT:  INSERT INTO sales_reps (id, tenant_id, code, name, status)
+	     VALUES ('70707070-3000-4000-8000-000000000003', $1, 'ATK-REP', 'Attack Rep', 'ACTIVE')
+
+2026-11-17 22:12:52.325 UTC [1100] ERROR:  permission denied for table sales_reps
+2026-11-17 22:12:52.325 UTC [1100] STATEMENT:  DELETE FROM sales_reps WHERE id = $1
+
+2026-11-17 22:12:52.353 UTC [1104] ERROR:  new row violates row-level security policy for table "quotations"
+2026-11-17 22:12:52.353 UTC [1104] STATEMENT:  INSERT INTO quotations (id, tenant_id, branch_id, customer_id, quote_date, valid_until, currency_code, status)
+	     VALUES ('71717171-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '2027-02-01', '2027-03-03', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:52.367 UTC [1106] ERROR:  permission denied for table quotations
+2026-11-17 22:12:52.367 UTC [1106] STATEMENT:  DELETE FROM quotations WHERE id = $1
+
+2026-11-17 22:12:52.395 UTC [1110] ERROR:  new row violates row-level security policy for table "quotation_lines"
+2026-11-17 22:12:52.395 UTC [1110] STATEMENT:  INSERT INTO quotation_lines (id, tenant_id, quotation_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('72727272-3000-4000-8000-000000000003', $1, '71717171-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:52.409 UTC [1112] ERROR:  permission denied for table quotation_lines
+2026-11-17 22:12:52.409 UTC [1112] STATEMENT:  DELETE FROM quotation_lines WHERE id = $1
+
+2026-11-17 22:12:52.437 UTC [1116] ERROR:  new row violates row-level security policy for table "sales_orders"
+2026-11-17 22:12:52.437 UTC [1116] STATEMENT:  INSERT INTO sales_orders (id, tenant_id, branch_id, customer_id, warehouse_id, order_date, currency_code, status)
+	     VALUES ('73737373-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002',
+	             '2027-02-02', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:52.451 UTC [1118] ERROR:  permission denied for table sales_orders
+2026-11-17 22:12:52.451 UTC [1118] STATEMENT:  DELETE FROM sales_orders WHERE id = $1
+
+2026-11-17 22:12:52.479 UTC [1122] ERROR:  new row violates row-level security policy for table "sales_order_lines"
+2026-11-17 22:12:52.479 UTC [1122] STATEMENT:  INSERT INTO sales_order_lines (id, tenant_id, order_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('74747474-3000-4000-8000-000000000003', $1, '73737373-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:52.494 UTC [1124] ERROR:  permission denied for table sales_order_lines
+2026-11-17 22:12:52.494 UTC [1124] STATEMENT:  DELETE FROM sales_order_lines WHERE id = $1
+
+2026-11-17 22:12:52.521 UTC [1128] ERROR:  new row violates row-level security policy for table "delivery_notes"
+2026-11-17 22:12:52.521 UTC [1128] STATEMENT:  INSERT INTO delivery_notes (id, tenant_id, branch_id, customer_id, warehouse_id, delivery_date, currency_code, status)
+	     VALUES ('75757575-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002',
+	             '2027-02-05', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:52.535 UTC [1130] ERROR:  permission denied for table delivery_notes
+2026-11-17 22:12:52.535 UTC [1130] STATEMENT:  DELETE FROM delivery_notes WHERE id = $1
+
+2026-11-17 22:12:52.562 UTC [1134] ERROR:  new row violates row-level security policy for table "delivery_note_lines"
+2026-11-17 22:12:52.562 UTC [1134] STATEMENT:  INSERT INTO delivery_note_lines (id, tenant_id, delivery_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('76767676-3000-4000-8000-000000000003', $1, '75757575-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:52.576 UTC [1136] ERROR:  permission denied for table delivery_note_lines
+2026-11-17 22:12:52.576 UTC [1136] STATEMENT:  DELETE FROM delivery_note_lines WHERE id = $1
+
+2026-11-17 22:12:52.607 UTC [1140] ERROR:  new row violates row-level security policy for table "sales_invoices"
+2026-11-17 22:12:52.607 UTC [1140] STATEMENT:  INSERT INTO sales_invoices (id, tenant_id, branch_id, customer_id, kind, invoice_date, due_date, currency_code, status)
+	     VALUES ('77777777-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'CREDIT', '2027-02-10', '2027-03-12', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:52.622 UTC [1142] ERROR:  permission denied for table sales_invoices
+2026-11-17 22:12:52.622 UTC [1142] STATEMENT:  DELETE FROM sales_invoices WHERE id = $1
+
+2026-11-17 22:12:52.651 UTC [1146] ERROR:  new row violates row-level security policy for table "sales_invoice_lines"
+2026-11-17 22:12:52.651 UTC [1146] STATEMENT:  INSERT INTO sales_invoice_lines (id, tenant_id, invoice_id, line_no, item_id, qty, unit_price, net_amount)
+	     VALUES ('78787878-3000-4000-8000-000000000003', $1, '77777777-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5, 2.5, 12.5)
+
+2026-11-17 22:12:52.693 UTC [1152] ERROR:  new row violates row-level security policy for table "credit_notes"
+2026-11-17 22:12:52.693 UTC [1152] STATEMENT:  INSERT INTO credit_notes (id, tenant_id, branch_id, customer_id, invoice_id, note_date, currency_code, status)
+	     VALUES ('79797979-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002',
+	             '2027-02-15', 'SAR', 'DRAFT')
+
+2026-11-17 22:12:52.707 UTC [1154] ERROR:  permission denied for table credit_notes
+2026-11-17 22:12:52.707 UTC [1154] STATEMENT:  DELETE FROM credit_notes WHERE id = $1
+
+2026-11-17 22:12:52.735 UTC [1158] ERROR:  new row violates row-level security policy for table "credit_note_lines"
+2026-11-17 22:12:52.735 UTC [1158] STATEMENT:  INSERT INTO credit_note_lines (id, tenant_id, note_id, line_no, invoice_line_id, item_id, qty, unit_price, net_amount)
+	     VALUES ('7a7a7a7a-3000-4000-8000-000000000003', $1, '79797979-0000-4000-8000-000000000002', 2,
+	             '78787878-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002', 1, 1, 1)
+
+2026-11-17 22:12:52.749 UTC [1160] ERROR:  permission denied for table credit_note_lines
+2026-11-17 22:12:52.749 UTC [1160] STATEMENT:  DELETE FROM credit_note_lines WHERE id = $1
+
+2026-11-17 22:12:52.777 UTC [1164] ERROR:  new row violates row-level security policy for table "sales_reallocations"
+2026-11-17 22:12:52.777 UTC [1164] STATEMENT:  INSERT INTO sales_reallocations (id, tenant_id, doc_no, receipt_id, customer_id, reason, total_amount)
+	     VALUES ('7b7b7b7b-3000-4000-8000-000000000003', $1, 'SRAL-ATK-1', 'd3d3d3d3-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'attack sales re-allocation', 1)
+
+2026-11-17 22:12:52.785 UTC [1165] ERROR:  permission denied for table sales_reallocations
+2026-11-17 22:12:52.785 UTC [1165] STATEMENT:  UPDATE sales_reallocations SET reason = reason WHERE id = $1
+
+2026-11-17 22:12:52.791 UTC [1166] ERROR:  permission denied for table sales_reallocations
+2026-11-17 22:12:52.791 UTC [1166] STATEMENT:  DELETE FROM sales_reallocations WHERE id = $1
+
+2026-11-17 22:12:52.832 UTC [1170] ERROR:  new row violates row-level security policy for table "sales_reallocation_lines"
+2026-11-17 22:12:52.832 UTC [1170] STATEMENT:  INSERT INTO sales_reallocation_lines (id, tenant_id, reallocation_id, line_no, to_open_item_id, amount)
+	     VALUES ('7c7c7c7c-3000-4000-8000-000000000003', $1, '7b7b7b7b-0000-4000-8000-000000000002', 2,
+	             'cececece-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:52.840 UTC [1171] ERROR:  permission denied for table sales_reallocation_lines
+2026-11-17 22:12:52.840 UTC [1171] STATEMENT:  UPDATE sales_reallocation_lines SET amount = amount WHERE id = $1
+
+2026-11-17 22:12:52.847 UTC [1172] ERROR:  permission denied for table sales_reallocation_lines
+2026-11-17 22:12:52.847 UTC [1172] STATEMENT:  DELETE FROM sales_reallocation_lines WHERE id = $1
+
+2026-11-17 22:12:52.875 UTC [1176] ERROR:  new row violates row-level security policy for table "report_runs"
+2026-11-17 22:12:52.875 UTC [1176] STATEMENT:  INSERT INTO report_runs (id, tenant_id, report_key, contract_version, params,
+	                                      params_hash, execution_class, status)
+	     VALUES ('7d7d7d7d-3000-4000-8000-000000000003', $1, 'financial.trial-balance', 1,
+	             '{"locale": "ar"}'::jsonb, 'iso-attack', 'inline', 'QUEUED')
+
+2026-11-17 22:12:52.889 UTC [1178] ERROR:  permission denied for table report_runs
+2026-11-17 22:12:52.889 UTC [1178] STATEMENT:  DELETE FROM report_runs WHERE id = $1
+
+2026-11-17 22:12:52.919 UTC [1182] ERROR:  new row violates row-level security policy for table "print_templates"
+2026-11-17 22:12:52.919 UTC [1182] STATEMENT:  INSERT INTO print_templates (id, tenant_id, key, version, locale_variants)
+	     VALUES ('7e7e7e7e-3000-4000-8000-000000000003', $1, 'receipt-58', 1, '{"ar": 1}'::jsonb)
+
+2026-11-17 22:12:52.932 UTC [1184] ERROR:  permission denied for table print_templates
+2026-11-17 22:12:52.932 UTC [1184] STATEMENT:  DELETE FROM print_templates WHERE id = $1
+
+2026-11-17 22:12:52.961 UTC [1188] ERROR:  new row violates row-level security policy for table "subscription_invoices"
+2026-11-17 22:12:52.961 UTC [1188] STATEMENT:  INSERT INTO subscription_invoices (
+	       id, tenant_id, subscription_id, number, plan_key, period_start, period_end,
+	       amount, currency_code, status, source, due_date, placeholder_price)
+	     VALUES ('71717171-3000-4000-8000-000000000003', $1,
+	       'adadadad-0000-4000-8000-000000000002', 'BI-2026-0099', 'business',
+	       '2026-01-01', '2026-01-31', '0.0000', 'SAR', 'OPEN', 'checkout', '2026-01-08', true)
+
+2026-11-17 22:12:52.975 UTC [1190] ERROR:  permission denied for table subscription_invoices
+2026-11-17 22:12:52.975 UTC [1190] STATEMENT:  DELETE FROM subscription_invoices WHERE id = $1
+
+2026-11-17 22:12:53.004 UTC [1194] ERROR:  new row violates row-level security policy for table "billing_events"
+2026-11-17 22:12:53.004 UTC [1194] STATEMENT:  INSERT INTO billing_events (id, tenant_id, type, payload, idempotency_key)
+	     VALUES ('72727272-3000-4000-8000-000000000003', $1, 'trial.started', '{}'::jsonb, 'iso-attack-1')
+
+2026-11-17 22:12:53.012 UTC [1195] ERROR:  permission denied for table billing_events
+2026-11-17 22:12:53.012 UTC [1195] STATEMENT:  UPDATE billing_events SET type = type WHERE id = $1
+
+2026-11-17 22:12:53.018 UTC [1196] ERROR:  permission denied for table billing_events
+2026-11-17 22:12:53.018 UTC [1196] STATEMENT:  DELETE FROM billing_events WHERE id = $1
+
+2026-11-17 22:12:53.046 UTC [1200] ERROR:  new row violates row-level security policy for table "usage_counters"
+2026-11-17 22:12:53.046 UTC [1200] STATEMENT:  INSERT INTO usage_counters (id, tenant_id, counter_key, period, value)
+	     VALUES ('73737373-3000-4000-8000-000000000003', $1, 'documents_per_month', '2026-01', 5)
+
+2026-11-17 22:12:53.059 UTC [1202] ERROR:  permission denied for table usage_counters
+2026-11-17 22:12:53.059 UTC [1202] STATEMENT:  DELETE FROM usage_counters WHERE id = $1
+
+2026-11-17 22:12:53.088 UTC [1206] ERROR:  new row violates row-level security policy for table "notifications"
+2026-11-17 22:12:53.088 UTC [1206] STATEMENT:  INSERT INTO notifications (id, tenant_id, category, severity, title, body)
+	     VALUES ('74747474-3000-4000-8000-000000000003', $1, 'subscription', 'info',
+	       '{"ar":"س","en":"S"}'::jsonb, '{"ar":"ب","en":"B"}'::jsonb)
+
+2026-11-17 22:12:53.103 UTC [1208] ERROR:  permission denied for table notifications
+2026-11-17 22:12:53.103 UTC [1208] STATEMENT:  DELETE FROM notifications WHERE id = $1
+
+2026-11-17 22:12:53.134 UTC [1212] ERROR:  new row violates row-level security policy for table "notification_prefs"
+2026-11-17 22:12:53.134 UTC [1212] STATEMENT:  INSERT INTO notification_prefs (id, tenant_id, user_id, category, in_app, email)
+	     VALUES ('75757575-3000-4000-8000-000000000003', $1,
+	       'eeeeeeee-0000-4000-8000-000000000001', 'limits', true, true)
+
+2026-11-17 22:12:53.148 UTC [1214] ERROR:  permission denied for table notification_prefs
+2026-11-17 22:12:53.148 UTC [1214] STATEMENT:  DELETE FROM notification_prefs WHERE id = $1
+
+2026-11-17 22:12:53.177 UTC [1218] ERROR:  new row violates row-level security policy for table "tenant_industry_config"
+2026-11-17 22:12:53.177 UTC [1218] STATEMENT:  INSERT INTO tenant_industry_config (
+	       id, tenant_id, template_key, applied_version, applied_manifest_hash)
+	     VALUES ('76767676-3000-4000-8000-000000000003', $1, 'industry.grocery', '1.0.0', 'iso-attack')
+
+2026-11-17 22:12:53.191 UTC [1220] ERROR:  permission denied for table tenant_industry_config
+2026-11-17 22:12:53.191 UTC [1220] STATEMENT:  DELETE FROM tenant_industry_config WHERE id = $1
+
+2026-11-17 22:12:53.219 UTC [1224] ERROR:  new row violates row-level security policy for table "item_components"
+2026-11-17 22:12:53.219 UTC [1224] STATEMENT:  INSERT INTO item_components (id, tenant_id, composite_item_id, component_item_id, qty)
+	     VALUES ('77777777-3000-4000-8000-000000000003', $1,
+	       'babababa-0000-4000-8000-000000000002', '1f1f1f1f-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:53.262 UTC [1230] ERROR:  new row violates row-level security policy for table "pos_terminals"
+2026-11-17 22:12:53.262 UTC [1230] STATEMENT:  INSERT INTO pos_terminals (id, tenant_id, code, name, branch_id, cash_account_id)
+	     VALUES ('78787878-3000-4000-8000-000000000003', $1, 'ISO-ATK', 'Attack Terminal',
+	       'abababab-0000-4000-8000-000000000002', 'b0b0b0b0-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:53.288 UTC [1232] ERROR:  permission denied for table pos_terminals
+2026-11-17 22:12:53.288 UTC [1232] STATEMENT:  DELETE FROM pos_terminals WHERE id = $1
+
+2026-11-17 22:12:53.317 UTC [1236] ERROR:  new row violates row-level security policy for table "pos_tables"
+2026-11-17 22:12:53.317 UTC [1236] STATEMENT:  INSERT INTO pos_tables (id, tenant_id, branch_id, zone, label)
+	     VALUES ('79797979-3000-4000-8000-000000000003', $1,
+	       'abababab-0000-4000-8000-000000000002', 'MAIN', 'ATK')
+
+2026-11-17 22:12:53.359 UTC [1242] ERROR:  new row violates row-level security policy for table "pos_checks"
+2026-11-17 22:12:53.359 UTC [1242] STATEMENT:  INSERT INTO pos_checks (id, tenant_id, branch_id, check_no)
+	     VALUES ('7a7a7a7a-3000-4000-8000-000000000003', $1,
+	       'abababab-0000-4000-8000-000000000002', 'ISO-ATK')
+
+2026-11-17 22:12:53.373 UTC [1244] ERROR:  permission denied for table pos_checks
+2026-11-17 22:12:53.373 UTC [1244] STATEMENT:  DELETE FROM pos_checks WHERE id = $1
+
+2026-11-17 22:12:53.401 UTC [1248] ERROR:  new row violates row-level security policy for table "pos_kitchen_tickets"
+2026-11-17 22:12:53.401 UTC [1248] STATEMENT:  INSERT INTO pos_kitchen_tickets (id, tenant_id, check_id, ticket_no)
+	     VALUES ('7b7b7b7b-3000-4000-8000-000000000003', $1,
+	       '24242424-0000-4000-8000-000000000002', 'KT-ATK')
+
+2026-11-17 22:12:53.415 UTC [1250] ERROR:  permission denied for table pos_kitchen_tickets
+2026-11-17 22:12:53.415 UTC [1250] STATEMENT:  DELETE FROM pos_kitchen_tickets WHERE id = $1
+
+2026-11-17 22:12:53.444 UTC [1254] ERROR:  new row violates row-level security policy for table "change_log"
+2026-11-17 22:12:53.444 UTC [1254] STATEMENT:  INSERT INTO change_log (tenant_id, entity_type, entity_id, op)
+	     VALUES ($1, 'items', 'iso-attack-row', 'UPSERT')
+
+2026-11-17 22:12:53.451 UTC [1255] ERROR:  permission denied for table change_log
+2026-11-17 22:12:53.451 UTC [1255] STATEMENT:  UPDATE change_log SET payload = payload WHERE entity_id = $1
+
+2026-11-17 22:12:53.458 UTC [1256] ERROR:  permission denied for table change_log
+2026-11-17 22:12:53.458 UTC [1256] STATEMENT:  DELETE FROM change_log WHERE entity_id = $1
+
+2026-11-17 22:12:53.486 UTC [1260] ERROR:  new row violates row-level security policy for table "sync_cursors"
+2026-11-17 22:12:53.486 UTC [1260] STATEMENT:  INSERT INTO sync_cursors (id, tenant_id, device_id, entity_type, last_seq)
+	     VALUES ('7c7c7c7c-3000-4000-8000-000000000003', $1,
+	       'dddddddd-0000-4000-8000-000000000002', 'items', 1)
+
+2026-11-17 22:12:53.499 UTC [1262] ERROR:  permission denied for table sync_cursors
+2026-11-17 22:12:53.499 UTC [1262] STATEMENT:  DELETE FROM sync_cursors WHERE id = $1
+
+2026-11-17 22:12:53.529 UTC [1266] ERROR:  new row violates row-level security policy for table "vehicles"
+2026-11-17 22:12:53.529 UTC [1266] STATEMENT:  INSERT INTO vehicles (id, tenant_id, partner_id, make, model)
+	     VALUES ('7d7d7d7d-3000-4000-8000-000000000003', $1,
+	       'b5b5b5b5-0000-4000-8000-000000000002', 'Attack', 'Make')
+
+2026-11-17 22:12:53.543 UTC [1268] ERROR:  permission denied for table vehicles
+2026-11-17 22:12:53.543 UTC [1268] STATEMENT:  DELETE FROM vehicles WHERE id = $1
+
+2026-11-17 22:12:53.572 UTC [1272] ERROR:  new row violates row-level security policy for table "job_cards"
+2026-11-17 22:12:53.572 UTC [1272] STATEMENT:  INSERT INTO job_cards (id, tenant_id, branch_id, card_no, customer_id, warehouse_id)
+	     VALUES ('7e7e7e7e-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	       'JC-ATK', 'b5b5b5b5-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002')
+
+2026-11-17 22:12:53.587 UTC [1274] ERROR:  permission denied for table job_cards
+2026-11-17 22:12:53.587 UTC [1274] STATEMENT:  DELETE FROM job_cards WHERE id = $1
+
+2026-11-17 22:12:53.615 UTC [1278] ERROR:  new row violates row-level security policy for table "job_card_lines"
+2026-11-17 22:12:53.615 UTC [1278] STATEMENT:  INSERT INTO job_card_lines (id, tenant_id, job_card_id, line_no, line_type, item_id, qty)
+	     VALUES ('7f7f7f7f-3000-4000-8000-000000000003', $1,
+	       '28282828-0000-4000-8000-000000000002', 9, 'PARTS',
+	       'babababa-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:53.629 UTC [1280] ERROR:  permission denied for table job_card_lines
+2026-11-17 22:12:53.629 UTC [1280] STATEMENT:  DELETE FROM job_card_lines WHERE id = $1
+
+2026-11-17 22:12:53.659 UTC [1284] ERROR:  new row violates row-level security policy for table "customer_tiers"
+2026-11-17 22:12:53.659 UTC [1284] STATEMENT:  INSERT INTO customer_tiers (id, tenant_id, code, name)
+	     VALUES ('80808080-3000-4000-8000-000000000003', $1, 'ISO-ATK-TIER', 'Attack Tier')
+
+2026-11-17 22:12:53.673 UTC [1286] ERROR:  permission denied for table customer_tiers
+2026-11-17 22:12:53.673 UTC [1286] STATEMENT:  DELETE FROM customer_tiers WHERE id = $1
+
+2026-11-17 22:12:53.701 UTC [1290] ERROR:  new row violates row-level security policy for table "free_goods_rules"
+2026-11-17 22:12:53.701 UTC [1290] STATEMENT:  INSERT INTO free_goods_rules (id, tenant_id, code, name, buy_item_id, buy_qty,
+	                                     get_item_id, get_qty, reason_code)
+	     VALUES ('81818181-3000-4000-8000-000000000003', $1, 'ISO-ATK-FOC', 'Attack FOC',
+	       'babababa-0000-4000-8000-000000000002', 10,
+	       'babababa-0000-4000-8000-000000000002', 1, 'ISO-ATK')
+
+2026-11-17 22:12:53.714 UTC [1292] ERROR:  permission denied for table free_goods_rules
+2026-11-17 22:12:53.714 UTC [1292] STATEMENT:  DELETE FROM free_goods_rules WHERE id = $1
+
+2026-11-17 22:12:53.743 UTC [1296] ERROR:  new row violates row-level security policy for table "routes"
+2026-11-17 22:12:53.743 UTC [1296] STATEMENT:  INSERT INTO routes (id, tenant_id, code, name)
+	     VALUES ('82828282-3000-4000-8000-000000000003', $1, 'ISO-ATK-RT', 'Attack Route')
+
+2026-11-17 22:12:53.756 UTC [1298] ERROR:  permission denied for table routes
+2026-11-17 22:12:53.756 UTC [1298] STATEMENT:  DELETE FROM routes WHERE id = $1
+
+2026-11-17 22:12:53.784 UTC [1302] ERROR:  new row violates row-level security policy for table "route_customers"
+2026-11-17 22:12:53.784 UTC [1302] STATEMENT:  INSERT INTO route_customers (id, tenant_id, route_id, customer_id, visit_order)
+	     VALUES ('83838383-3000-4000-8000-000000000003', $1,
+	       '2c2c2c2c-0000-4000-8000-000000000002', 'b5b5b5b5-0000-4000-8000-000000000002', 9)
+
+2026-11-17 22:12:53.825 UTC [1308] ERROR:  new row violates row-level security policy for table "route_visits"
+2026-11-17 22:12:53.825 UTC [1308] STATEMENT:  INSERT INTO route_visits (id, tenant_id, route_id, customer_id, planned_date, status)
+	     VALUES ('84848484-3000-4000-8000-000000000003', $1,
+	       '2c2c2c2c-0000-4000-8000-000000000002', 'b5b5b5b5-0000-4000-8000-000000000002',
+	       '2026-02-03', 'PLANNED')
+
+2026-11-17 22:12:53.839 UTC [1310] ERROR:  permission denied for table route_visits
+2026-11-17 22:12:53.839 UTC [1310] STATEMENT:  DELETE FROM route_visits WHERE id = $1
+
+2026-11-17 22:12:53.868 UTC [1314] ERROR:  new row violates row-level security policy for table "van_stocks"
+2026-11-17 22:12:53.868 UTC [1314] STATEMENT:  INSERT INTO van_stocks (id, tenant_id, warehouse_id, item_id, qty, value)
+	     VALUES ('85858585-3000-4000-8000-000000000003', $1,
+	       'f0f0f0f0-2000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002', 1, 10)
+
+2026-11-17 22:12:53.910 UTC [1320] ERROR:  new row violates row-level security policy for table "rep_settlements"
+2026-11-17 22:12:53.910 UTC [1320] STATEMENT:  INSERT INTO rep_settlements (id, tenant_id, settlement_no, sales_rep_id,
+	                                    settlement_date, status)
+	     VALUES ('86868686-3000-4000-8000-000000000003', $1, 'STL-ATK',
+	       '70707070-0000-4000-8000-000000000002', '2026-02-03', 'DRAFT')
+
+2026-11-17 22:12:53.951 UTC [1322] ERROR:  permission denied for table rep_settlements
+2026-11-17 22:12:53.951 UTC [1322] STATEMENT:  DELETE FROM rep_settlements WHERE id = $1
+
+2026-11-17 22:12:53.980 UTC [1326] ERROR:  new row violates row-level security policy for table "rep_settlement_lines"
+2026-11-17 22:12:53.980 UTC [1326] STATEMENT:  INSERT INTO rep_settlement_lines (id, tenant_id, settlement_id, line_no,
+	                                          component, amount)
+	     VALUES ('87878787-3000-4000-8000-000000000003', $1,
+	       '30303030-0000-4000-8000-000000000002', 9, 'OPENING_CASH', 0)
+
+2026-11-17 22:12:53.994 UTC [1328] ERROR:  permission denied for table rep_settlement_lines
+2026-11-17 22:12:53.994 UTC [1328] STATEMENT:  DELETE FROM rep_settlement_lines WHERE id = $1
+
+2026-11-17 22:12:54.036 UTC [1332] ERROR:  new row violates row-level security policy for table "commission_runs"
+2026-11-17 22:12:54.036 UTC [1332] STATEMENT:  INSERT INTO commission_runs (id, tenant_id, period_from, period_to, basis)
+	     VALUES ('88888888-3000-4000-8000-000000000003', $1, '2026-03-01', '2026-03-31', 'INVOICED')
+
+2026-11-17 22:12:54.050 UTC [1334] ERROR:  permission denied for table commission_runs
+2026-11-17 22:12:54.050 UTC [1334] STATEMENT:  DELETE FROM commission_runs WHERE id = $1
+
+2026-11-17 22:12:54.078 UTC [1338] ERROR:  new row violates row-level security policy for table "commission_run_lines"
+2026-11-17 22:12:54.078 UTC [1338] STATEMENT:  INSERT INTO commission_run_lines (id, tenant_id, run_id, sales_rep_id,
+	                                            base_amount, rate_applied, commission_amount)
+	     VALUES ('89898989-3000-4000-8000-000000000003', $1,
+	       '32323232-0000-4000-8000-000000000002', '70707070-0000-4000-8000-000000000002',
+	       100, 1, 1)
+
+2026-11-17 22:12:54.093 UTC [1340] ERROR:  permission denied for table commission_run_lines
+2026-11-17 22:12:54.093 UTC [1340] STATEMENT:  DELETE FROM commission_run_lines WHERE id = $1
+
+2026-11-17 22:12:54.121 UTC [1344] ERROR:  new row violates row-level security policy for table "bills_of_materials"
+2026-11-17 22:12:54.121 UTC [1344] STATEMENT:  INSERT INTO bills_of_materials (id, tenant_id, item_id, version_no, status,
+	                                          output_uom_id, yield_pct)
+	     VALUES ('8a8a8a8a-3000-4000-8000-000000000003', $1,
+	       'babababa-0000-4000-8000-000000000002', 9, 'DRAFT',
+	       'b2b2b2b2-0000-4000-8000-000000000002', 100)
+
+2026-11-17 22:12:54.135 UTC [1346] ERROR:  permission denied for table bills_of_materials
+2026-11-17 22:12:54.135 UTC [1346] STATEMENT:  DELETE FROM bills_of_materials WHERE id = $1
+
+2026-11-17 22:12:54.164 UTC [1351] ERROR:  new row violates row-level security policy for table "bom_lines"
+2026-11-17 22:12:54.164 UTC [1351] STATEMENT:  INSERT INTO bom_lines (id, tenant_id, bom_id, line_no, component_item_id, uom_id,
+	                          qty_per_output, scrap_pct)
+	     VALUES ('8b8b8b8b-3000-4000-8000-000000000003', $1,
+	       '34343434-0000-4000-8000-000000000002', 9, 'babababa-0000-4000-8000-000000000002',
+	       'b2b2b2b2-0000-4000-8000-000000000002', 1, 0)
+
+2026-11-17 22:12:54.208 UTC [1357] ERROR:  new row violates row-level security policy for table "production_orders"
+2026-11-17 22:12:54.208 UTC [1357] STATEMENT:  INSERT INTO production_orders (id, tenant_id, branch_id, status, bom_id, item_id,
+	                                       uom_id, planned_qty, materials_warehouse_id,
+	                                       fg_warehouse_id)
+	     VALUES ('8c8c8c8c-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	       'DRAFT', '34343434-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	       'b2b2b2b2-0000-4000-8000-000000000002', 10,
+	       'f0f0f0f0-1000-4000-8000-000000000002', 'f0f0f0f0-2000-4000-8000-000000000002')
+
+2026-11-17 22:12:54.221 UTC [1359] ERROR:  permission denied for table production_orders
+2026-11-17 22:12:54.221 UTC [1359] STATEMENT:  DELETE FROM production_orders WHERE id = $1
+
+2026-11-17 22:12:54.249 UTC [1363] ERROR:  new row violates row-level security policy for table "production_order_lines"
+2026-11-17 22:12:54.249 UTC [1363] STATEMENT:  INSERT INTO production_order_lines (id, tenant_id, order_id, line_no,
+	                                            component_item_id, uom_id, planned_qty)
+	     VALUES ('8d8d8d8d-3000-4000-8000-000000000003', $1,
+	       '36363636-0000-4000-8000-000000000002', 9, 'babababa-0000-4000-8000-000000000002',
+	       'b2b2b2b2-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:54.263 UTC [1365] ERROR:  permission denied for table production_order_lines
+2026-11-17 22:12:54.263 UTC [1365] STATEMENT:  DELETE FROM production_order_lines WHERE id = $1
+
+2026-11-17 22:12:54.291 UTC [1369] ERROR:  new row violates row-level security policy for table "production_consumptions"
+2026-11-17 22:12:54.291 UTC [1369] STATEMENT:  INSERT INTO production_consumptions (id, tenant_id, order_id, item_id,
+	                                            qty, unit_cost, value, consumed_at)
+	     VALUES ('8e8e8e8e-3000-4000-8000-000000000003', $1,
+	       '36363636-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	       1, 2.5, 2.5, now())
+
+2026-11-17 22:12:54.306 UTC [1371] ERROR:  permission denied for table production_consumptions
+2026-11-17 22:12:54.306 UTC [1371] STATEMENT:  DELETE FROM production_consumptions WHERE id = $1
+
+2026-11-17 22:12:54.333 UTC [1375] ERROR:  new row violates row-level security policy for table "production_scraps"
+2026-11-17 22:12:54.333 UTC [1375] STATEMENT:  INSERT INTO production_scraps (id, tenant_id, order_id, reason_code, qty,
+	                                     value, scrapped_at)
+	     VALUES ('8f8f8f8f-3000-4000-8000-000000000003', $1,
+	       '36363636-0000-4000-8000-000000000002', 'ISO-ATK', 1, 2.5, now())
+
+2026-11-17 22:12:54.347 UTC [1377] ERROR:  permission denied for table production_scraps
+2026-11-17 22:12:54.347 UTC [1377] STATEMENT:  DELETE FROM production_scraps WHERE id = $1
+
+2026-11-17 22:12:54.375 UTC [1381] ERROR:  new row violates row-level security policy for table "inspections"
+2026-11-17 22:12:54.375 UTC [1381] STATEMENT:  INSERT INTO inspections (id, tenant_id, target_type, order_id, result, inspected_at)
+	     VALUES ('90909090-3000-4000-8000-000000000003', $1, 'production_order',
+	       '36363636-0000-4000-8000-000000000002', 'PASS', now())
+
+2026-11-17 22:12:54.389 UTC [1383] ERROR:  permission denied for table inspections
+2026-11-17 22:12:54.389 UTC [1383] STATEMENT:  DELETE FROM inspections WHERE id = $1
+
+2026-11-17 22:12:54.417 UTC [1387] ERROR:  new row violates row-level security policy for table "projects"
+2026-11-17 22:12:54.417 UTC [1387] STATEMENT:  INSERT INTO projects (id, tenant_id, code, name, status)
+	     VALUES ('91919191-3000-4000-8000-000000000003', $1, 'ATK', 'Attack Project', 'OPEN')
+
+2026-11-17 22:12:54.431 UTC [1389] ERROR:  permission denied for table projects
+2026-11-17 22:12:54.431 UTC [1389] STATEMENT:  DELETE FROM projects WHERE id = $1
+
+2026-11-17 22:12:54.459 UTC [1393] ERROR:  new row violates row-level security policy for table "leads"
+2026-11-17 22:12:54.459 UTC [1393] STATEMENT:  INSERT INTO leads (id, tenant_id, name, source, status)
+	     VALUES ('92929292-3000-4000-8000-000000000003', $1, 'Attack Lead', 'CALL', 'NEW')
+
+2026-11-17 22:12:54.473 UTC [1395] ERROR:  permission denied for table leads
+2026-11-17 22:12:54.473 UTC [1395] STATEMENT:  DELETE FROM leads WHERE id = $1
+
+2026-11-17 22:12:54.501 UTC [1399] ERROR:  new row violates row-level security policy for table "crm_tasks"
+2026-11-17 22:12:54.501 UTC [1399] STATEMENT:  INSERT INTO crm_tasks (id, tenant_id, title, related_type, related_id, status)
+	     VALUES ('93939393-3000-4000-8000-000000000003', $1, 'Attack Task', 'LEAD',
+	       '91919191-0000-4000-8000-000000000002', 'OPEN')
+
+2026-11-17 22:12:54.515 UTC [1401] ERROR:  permission denied for table crm_tasks
+2026-11-17 22:12:54.515 UTC [1401] STATEMENT:  DELETE FROM crm_tasks WHERE id = $1
+
+2026-11-17 22:12:54.543 UTC [1405] ERROR:  new row violates row-level security policy for table "crm_activities"
+2026-11-17 22:12:54.543 UTC [1405] STATEMENT:  INSERT INTO crm_activities (id, tenant_id, kind, related_type, related_id,
+	                                    occurred_at, summary)
+	     VALUES ('94949494-3000-4000-8000-000000000003', $1, 'NOTE', 'LEAD',
+	       '91919191-0000-4000-8000-000000000002', now(), 'Attack Activity')
+
+2026-11-17 22:12:54.557 UTC [1407] ERROR:  permission denied for table crm_activities
+2026-11-17 22:12:54.557 UTC [1407] STATEMENT:  DELETE FROM crm_activities WHERE id = $1
+
+2026-11-17 22:12:54.585 UTC [1411] ERROR:  new row violates row-level security policy for table "service_contracts"
+2026-11-17 22:12:54.585 UTC [1411] STATEMENT:  INSERT INTO service_contracts (id, tenant_id, partner_id, title, fee_model,
+	                                        start_date, end_date, monthly_amount,
+	                                        currency_code, status)
+	     VALUES ('95959595-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	       'Attack Contract', 'RETAINER', '2027-01-01', '2027-06-30', 100, 'SAR', 'DRAFT')
+
+2026-11-17 22:12:54.598 UTC [1413] ERROR:  permission denied for table service_contracts
+2026-11-17 22:12:54.598 UTC [1413] STATEMENT:  DELETE FROM service_contracts WHERE id = $1
+
+2026-11-17 22:12:54.627 UTC [1417] ERROR:  new row violates row-level security policy for table "contract_billing_schedule"
+2026-11-17 22:12:54.627 UTC [1417] STATEMENT:  INSERT INTO contract_billing_schedule (id, tenant_id, contract_id,
+	                                              entry_type, period_key, period_start,
+	                                              period_end, bill_date, amount,
+	                                              fee_item_id, status)
+	     VALUES ('96969696-3000-4000-8000-000000000003', $1, '94949494-0000-4000-8000-000000000002',
+	       'RETAINER_PERIOD', '2027-09', '2027-09-01', '2027-09-30', '2027-09-01', 100,
+	       'babababa-0000-4000-8000-000000000002', 'PLANNED')
+
+2026-11-17 22:12:54.640 UTC [1419] ERROR:  permission denied for table contract_billing_schedule
+2026-11-17 22:12:54.640 UTC [1419] STATEMENT:  DELETE FROM contract_billing_schedule WHERE id = $1
+
+2026-11-17 22:12:54.670 UTC [1423] ERROR:  new row violates row-level security policy for table "contract_invoices"
+2026-11-17 22:12:54.670 UTC [1423] STATEMENT:  INSERT INTO contract_invoices (id, tenant_id, contract_id, invoice_id, status)
+	     VALUES ('97979797-3000-4000-8000-000000000003', $1, '94949494-0000-4000-8000-000000000002',
+	       '77777777-0000-4000-8000-000000000002', 'GENERATED')
+
+2026-11-17 22:12:54.684 UTC [1425] ERROR:  permission denied for table contract_invoices
+2026-11-17 22:12:54.684 UTC [1425] STATEMENT:  DELETE FROM contract_invoices WHERE id = $1
+
+2026-11-17 22:12:54.714 UTC [1429] ERROR:  new row violates row-level security policy for table "contract_advances"
+2026-11-17 22:12:54.714 UTC [1429] STATEMENT:  INSERT INTO contract_advances (id, tenant_id, contract_id, receipt_id,
+	                                        amount, status)
+	     VALUES ('98989898-3000-4000-8000-000000000003', $1, '94949494-0000-4000-8000-000000000002',
+	       'd3d3d3d3-0000-4000-8000-000000000002', 25, 'HELD')
+
+2026-11-17 22:12:54.728 UTC [1431] ERROR:  permission denied for table contract_advances
+2026-11-17 22:12:54.728 UTC [1431] STATEMENT:  DELETE FROM contract_advances WHERE id = $1
+
+2026-11-17 22:12:54.756 UTC [1435] ERROR:  new row violates row-level security policy for table "service_orders"
+2026-11-17 22:12:54.756 UTC [1435] STATEMENT:  INSERT INTO service_orders (id, tenant_id, branch_id, partner_id, warehouse_id,
+	                                  status)
+	     VALUES ('99999999-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	       'b5b5b5b5-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:54.769 UTC [1437] ERROR:  permission denied for table service_orders
+2026-11-17 22:12:54.769 UTC [1437] STATEMENT:  DELETE FROM service_orders WHERE id = $1
+
+2026-11-17 22:12:54.798 UTC [1441] ERROR:  new row violates row-level security policy for table "service_order_lines"
+2026-11-17 22:12:54.798 UTC [1441] STATEMENT:  INSERT INTO service_order_lines (id, tenant_id, order_id, line_no, line_type,
+	                                        item_id, estimated_hours, unit_price, qty, status)
+	     VALUES ('a0a0a0a0-3000-4000-8000-000000000003', $1, '98989898-0000-4000-8000-000000000002',
+	       9, 'SERVICE', 'babababa-0000-4000-8000-000000000002', 3, 150, 1, 'PENDING')
+
+2026-11-17 22:12:54.812 UTC [1443] ERROR:  permission denied for table service_order_lines
+2026-11-17 22:12:54.812 UTC [1443] STATEMENT:  DELETE FROM service_order_lines WHERE id = $1
+
+2026-11-17 22:12:54.840 UTC [1447] ERROR:  new row violates row-level security policy for table "crm_time_entries"
+2026-11-17 22:12:54.840 UTC [1447] STATEMENT:  INSERT INTO crm_time_entries (id, tenant_id, entry_date, hours, fee_item_id,
+	                                   project_id, contract_id, unit_rate, narrative,
+	                                   billable, status)
+	     VALUES ('a1a1a1a1-3000-4000-8000-000000000003', $1, '2027-02-03', 1,
+	       'babababa-0000-4000-8000-000000000002', 'a1a1a1a1-0000-4000-8000-000000000002',
+	       '94949494-0000-4000-8000-000000000002', 250, 'Attack entry', true, 'DRAFT')
+
+2026-11-17 22:12:54.854 UTC [1449] ERROR:  permission denied for table crm_time_entries
+2026-11-17 22:12:54.854 UTC [1449] STATEMENT:  DELETE FROM crm_time_entries WHERE id = $1
+
+2026-11-17 22:12:54.882 UTC [1453] ERROR:  new row violates row-level security policy for table "tombstones"
+2026-11-17 22:12:54.882 UTC [1453] STATEMENT:  INSERT INTO tombstones (id, tenant_id, entity_type, entity_id, deleted_at, gc_after)
+	     VALUES ('3c3c3c3c-0000-4000-8000-000000000003', $1, 'items',
+	       '3c3c3c3c-0000-4000-8000-00000000aa03', now(), now() + interval '90 days')
+
+2026-11-17 22:12:54.924 UTC [1459] ERROR:  new row violates row-level security policy for table "inbox_commands"
+2026-11-17 22:12:54.924 UTC [1459] STATEMENT:  INSERT INTO inbox_commands (id, tenant_id, device_id, command_id, idempotency_key,
+	                                              entity_type, intent, status, result, processed_at)
+	     VALUES ('3d3d3d3d-0000-4000-8000-000000000003', $1, 'dddddddd-0000-4000-8000-000000000002',
+	       'iso-attack-inbox-cmd', 'iso-attack-inbox-key', 'pos_sale', 'create', 'REJECTED',
+	       '{}'::jsonb, now())
+
+2026-11-17 22:12:54.931 UTC [1460] ERROR:  permission denied for table inbox_commands
+2026-11-17 22:12:54.931 UTC [1460] STATEMENT:  UPDATE inbox_commands SET result = result WHERE id = $1
+
+2026-11-17 22:12:54.966 UTC [1465] ERROR:  new row violates row-level security policy for table "e_invoicing_certificates"
+2026-11-17 22:12:54.966 UTC [1465] STATEMENT:  INSERT INTO e_invoicing_certificates (id, tenant_id, country_code,
+	        adapter_id, label, key_version, secret_path, fingerprint, not_before, not_after, status)
+	     VALUES ('a2a2a2a2-3000-4000-8000-000000000003', $1, 'SA', 'fake', 'Attack insert',
+	       'k1', 'einvoicing/SA/iso-attack', 'fp-atk', '2026-01-01', '2027-01-01', 'ACTIVE')
+
+2026-11-17 22:12:55.008 UTC [1471] ERROR:  new row violates row-level security policy for table "e_invoicing_certificate_usage"
+2026-11-17 22:12:55.008 UTC [1471] STATEMENT:  INSERT INTO e_invoicing_certificate_usage (id, tenant_id,
+	        certificate_id, operation, key_version)
+	     VALUES ('a3a3a3a3-3000-4000-8000-000000000003', $1,
+	       'a2a2a2a2-0000-4000-8000-000000000002', 'SIGN', 'k1')
+
+2026-11-17 22:12:55.015 UTC [1472] ERROR:  permission denied for table e_invoicing_certificate_usage
+2026-11-17 22:12:55.015 UTC [1472] STATEMENT:  UPDATE e_invoicing_certificate_usage SET key_version = key_version WHERE id = $1
+
+2026-11-17 22:12:55.049 UTC [1477] ERROR:  new row violates row-level security policy for table "e_invoicing_adapter_settings"
+2026-11-17 22:12:55.049 UTC [1477] STATEMENT:  INSERT INTO e_invoicing_adapter_settings (id, tenant_id,
+	        adapter_id, country_code, enabled)
+	     VALUES ('a4a4a4a4-3000-4000-8000-000000000003', $1, 'fake-attack', 'SA', false)
+
+2026-11-17 22:12:55.063 UTC [1479] ERROR:  permission denied for table e_invoicing_adapter_settings
+2026-11-17 22:12:55.063 UTC [1479] STATEMENT:  DELETE FROM e_invoicing_adapter_settings WHERE id = $1
+
+2026-11-17 22:12:55.090 UTC [1483] ERROR:  new row violates row-level security policy for table "bank_statement_parked_lines"
+2026-11-17 22:12:55.090 UTC [1483] STATEMENT:  INSERT INTO bank_statement_parked_lines (id, tenant_id, statement_id,
+	        line_index, raw_cells, raw_line, parked_reason, status)
+	     VALUES ('a5a5a5a5-3000-4000-8000-000000000003', $1, 'dadadada-0000-4000-8000-000000000002',
+	       9, '["x"]'::jsonb, 'attack row', 'attack insert', 'PARKED')
+
+2026-11-17 22:12:55.104 UTC [1485] ERROR:  permission denied for table bank_statement_parked_lines
+2026-11-17 22:12:55.104 UTC [1485] STATEMENT:  DELETE FROM bank_statement_parked_lines WHERE id = $1
+
+2026-11-17 22:12:55.132 UTC [1489] ERROR:  new row violates row-level security policy for table "commerce_channel_orders"
+2026-11-17 22:12:55.132 UTC [1489] STATEMENT:  INSERT INTO commerce_channel_orders (id, tenant_id, channel_adapter_id,
+	        channel_order_id, payload, status)
+	     VALUES ('a6a6a6a6-3000-4000-8000-000000000003', $1, 'fake-shop', 'attack-1',
+	       '{}'::jsonb, 'IMPORTED')
+
+2026-11-17 22:12:55.146 UTC [1491] ERROR:  permission denied for table commerce_channel_orders
+2026-11-17 22:12:55.146 UTC [1491] STATEMENT:  DELETE FROM commerce_channel_orders WHERE id = $1
+
+2026-11-17 22:12:55.174 UTC [1495] ERROR:  new row violates row-level security policy for table "commerce_channel_imports"
+2026-11-17 22:12:55.174 UTC [1495] STATEMENT:  INSERT INTO commerce_channel_imports (id, tenant_id, channel_adapter_id,
+	        batch_key, status)
+	     VALUES ('a7a7a7a7-3000-4000-8000-000000000003', $1, 'fake-shop', 'attack-batch', 'COMPLETED')
+
+2026-11-17 22:12:55.216 UTC [1501] ERROR:  new row violates row-level security policy for table "billing_payouts"
+2026-11-17 22:12:55.216 UTC [1501] STATEMENT:  INSERT INTO billing_payouts (id, tenant_id, provider_id, provider_ref,
+	        period_start, period_end, gross_amount, fee_amount, net_amount, currency_code, status)
+	     VALUES ('a8a8a8a8-3000-4000-8000-000000000003', $1, 'sandbox', 'po_iso_attack', '2027-01-01',
+	       '2027-01-31', 100, 1, 99, 'SAR', 'PENDING')
+
+2026-11-17 22:12:55.230 UTC [1503] ERROR:  permission denied for table billing_payouts
+2026-11-17 22:12:55.230 UTC [1503] STATEMENT:  DELETE FROM billing_payouts WHERE id = $1
+
+2026-11-17 22:12:55.259 UTC [1507] ERROR:  new row violates row-level security policy for table "tenant_offboarding"
+2026-11-17 22:12:55.259 UTC [1507] STATEMENT:  INSERT INTO tenant_offboarding (id, tenant_id, status, requested_by)
+	     VALUES ('a9a9a9a9-3000-4000-8000-000000000003', $1, 'REQUESTED',
+	       'eeeeeeee-0000-4000-8000-000000000001')
+
+2026-11-17 22:12:55.274 UTC [1509] ERROR:  permission denied for table tenant_offboarding
+2026-11-17 22:12:55.274 UTC [1509] STATEMENT:  DELETE FROM tenant_offboarding WHERE id = $1
+
+2026-11-17 22:12:55.303 UTC [1513] ERROR:  new row violates row-level security policy for table "asset_categories"
+2026-11-17 22:12:55.303 UTC [1513] STATEMENT:  INSERT INTO asset_categories (id, tenant_id, code, name, name_ar,
+	        useful_life_months_default, depreciation_method_default, asset_purpose_key,
+	        accum_depreciation_purpose_key, expense_purpose_key)
+	     VALUES ('fa0a0a0a-3000-4000-8000-000000000003', $1, 'ATK-FA', 'Attack Category', 'فئة هجوم',
+	       36, 'STRAIGHT_LINE', 'FIXED_ASSET', 'ACCUM_DEPRECIATION', 'DEPRECIATION_EXPENSE')
+
+2026-11-17 22:12:55.317 UTC [1515] ERROR:  permission denied for table asset_categories
+2026-11-17 22:12:55.317 UTC [1515] STATEMENT:  DELETE FROM asset_categories WHERE id = $1
+
+2026-11-17 22:12:55.347 UTC [1519] ERROR:  new row violates row-level security policy for table "assets"
+2026-11-17 22:12:55.347 UTC [1519] STATEMENT:  INSERT INTO assets (id, tenant_id, code, name, name_ar, category_id,
+	        acquisition_date, cost, salvage_value, opening_accumulated, useful_life_months,
+	        depreciation_method, branch_id, status)
+	     VALUES ('fa1a1a1a-3000-4000-8000-000000000003', $1, 'ATK-ASSET', 'Attack Asset', 'أصل هجوم',
+	       'fa0a0a0a-0000-4000-8000-000000000002', '2026-01-15', 12000, 0, 0, 60,
+	       'STRAIGHT_LINE', 'abababab-0000-4000-8000-000000000002', 'ACTIVE')
+
+2026-11-17 22:12:55.361 UTC [1521] ERROR:  permission denied for table assets
+2026-11-17 22:12:55.361 UTC [1521] STATEMENT:  DELETE FROM assets WHERE id = $1
+
+2026-11-17 22:12:55.390 UTC [1525] ERROR:  new row violates row-level security policy for table "depreciation_runs"
+2026-11-17 22:12:55.390 UTC [1525] STATEMENT:  INSERT INTO depreciation_runs (id, tenant_id, fiscal_period_id, status,
+	        asset_count, total_amount)
+	     VALUES ('fa2a2a2a-3000-4000-8000-000000000003', $1,
+	       'c2c2c2c2-0000-4000-8000-000000000002', 'DRAFT', 0, 0)
+
+2026-11-17 22:12:55.404 UTC [1527] ERROR:  permission denied for table depreciation_runs
+2026-11-17 22:12:55.404 UTC [1527] STATEMENT:  DELETE FROM depreciation_runs WHERE id = $1
+
+2026-11-17 22:12:55.434 UTC [1531] ERROR:  new row violates row-level security policy for table "depreciation_lines"
+2026-11-17 22:12:55.434 UTC [1531] STATEMENT:  INSERT INTO depreciation_lines (id, tenant_id, run_id, asset_id, line_no,
+	        period_amount, accumulated_amount)
+	     VALUES ('fa3a3a3a-3000-4000-8000-000000000003', $1,
+	       'fa2a2a2a-0000-4000-8000-000000000002', 'fa1a1a1a-0000-4000-8000-000000000002',
+	       1, 200, 200)
+
+2026-11-17 22:12:55.441 UTC [1532] ERROR:  permission denied for table depreciation_lines
+2026-11-17 22:12:55.441 UTC [1532] STATEMENT:  UPDATE depreciation_lines SET updated_at = updated_at WHERE id = $1
+
+2026-11-17 22:12:55.478 UTC [1537] ERROR:  new row violates row-level security policy for table "asset_disposals"
+2026-11-17 22:12:55.478 UTC [1537] STATEMENT:  INSERT INTO asset_disposals (id, tenant_id, asset_id, kind, disposal_date,
+	        proceeds, net_book_value, accumulated_snapshot, gain_loss, status)
+	     VALUES ('fa4a4a4a-3000-4000-8000-000000000003', $1,
+	       'fa1a1a1a-0000-4000-8000-000000000002', 'SCRAP', '2026-06-30',
+	       0, 11800, 200, -11800, 'DRAFT')
+
+2026-11-17 22:12:55.493 UTC [1539] ERROR:  permission denied for table asset_disposals
+2026-11-17 22:12:55.493 UTC [1539] STATEMENT:  DELETE FROM asset_disposals WHERE id = $1
+
+2026-11-17 22:12:55.522 UTC [1543] ERROR:  new row violates row-level security policy for table "asset_revaluations"
+2026-11-17 22:12:55.522 UTC [1543] STATEMENT:  INSERT INTO asset_revaluations (id, tenant_id, asset_id, revaluation_date,
+	        new_gross_value, new_accumulated, delta, status, reason)
+	     VALUES ('fa5a5a5a-3000-4000-8000-000000000003', $1,
+	       'fa1a1a1a-0000-4000-8000-000000000002', '2026-06-15',
+	       13000, 200, 1000, 'DRAFT', 'attack fixture')
+
+2026-11-17 22:12:55.536 UTC [1545] ERROR:  permission denied for table asset_revaluations
+2026-11-17 22:12:55.536 UTC [1545] STATEMENT:  DELETE FROM asset_revaluations WHERE id = $1
+
+2026-11-17 22:12:55.565 UTC [1549] ERROR:  new row violates row-level security policy for table "notes"
+2026-11-17 22:12:55.565 UTC [1549] STATEMENT:  INSERT INTO notes (id, tenant_id, kind, direction, partner_id, number,
+	        issuing_bank, amount, currency, exchange_rate, issue_date, maturity_date, status)
+	     VALUES ('a0270271-3000-4000-8000-000000000003', $1, 'CHEQUE', 'RECEIVED',
+	       'b5b5b5b5-0000-4000-8000-000000000002', 'ATK-CHK', 'Attack Bank',
+	       500, 'SAR', 1, '2026-06-01', '2026-07-01', 'IN_CUSTODY')
+
+2026-11-17 22:12:55.579 UTC [1551] ERROR:  permission denied for table notes
+2026-11-17 22:12:55.579 UTC [1551] STATEMENT:  DELETE FROM notes WHERE id = $1
+
+2026-11-17 22:12:55.608 UTC [1555] ERROR:  new row violates row-level security policy for table "note_events"
+2026-11-17 22:12:55.608 UTC [1555] STATEMENT:  INSERT INTO note_events (id, tenant_id, note_id, event_kind, event_date)
+	     VALUES ('b0270271-3000-4000-8000-000000000003', $1,
+	       'a0270271-0000-4000-8000-000000000002', 'DEPOSIT', '2026-06-20')
+
+2026-11-17 22:12:55.615 UTC [1556] ERROR:  permission denied for table note_events
+2026-11-17 22:12:55.615 UTC [1556] STATEMENT:  UPDATE note_events SET updated_at = updated_at WHERE id = $1
+
+2026-11-17 22:12:55.651 UTC [1561] ERROR:  new row violates row-level security policy for table "installment_plans"
+2026-11-17 22:12:55.651 UTC [1561] STATEMENT:  INSERT INTO installment_plans (id, tenant_id, partner_id, source_type,
+	        source_id, source_no, total_amount, down_payment, line_count, start_date, frequency,
+	        late_fee_policy, status)
+	     VALUES ('c0270271-3000-4000-8000-000000000003', $1,
+	       'b5b5b5b5-0000-4000-8000-000000000002', 'sales_invoice',
+	       'a0270271-0000-4000-8000-000000000002', 'ATK-INV', 12000, 2000, 10, '2026-07-01',
+	       'MONTHLY', '{"rate":"0.0200","cap":"500.0000","grace_days":7,"auto_charge":false,"defaulted_after_lines":3}', NULL)
+
+2026-11-17 22:12:55.665 UTC [1563] ERROR:  permission denied for table installment_plans
+2026-11-17 22:12:55.665 UTC [1563] STATEMENT:  DELETE FROM installment_plans WHERE id = $1
+
+2026-11-17 22:12:55.693 UTC [1567] ERROR:  new row violates row-level security policy for table "installment_lines"
+2026-11-17 22:12:55.693 UTC [1567] STATEMENT:  INSERT INTO installment_lines (id, tenant_id, plan_id, seq, due_date, amount, status)
+	     VALUES ('d0270271-3000-4000-8000-000000000003', $1,
+	       'c0270271-0000-4000-8000-000000000002', 1, '2026-08-01', 1000, 'PENDING')
+
+2026-11-17 22:12:55.738 UTC [1573] ERROR:  new row violates row-level security policy for table "budgets"
+2026-11-17 22:12:55.738 UTC [1573] STATEMENT:  INSERT INTO budgets (id, tenant_id, code, fiscal_year_id, scope, name, name_ar,
+	        revision_no, status)
+	     VALUES ('e0280281-3000-4000-8000-000000000003', $1, 'BUD-2026-2',
+	       'c1c1c1c1-0000-4000-8000-000000000002', 'ACCOUNTS', 'Attack budget',
+	       'موازنة هجوم', 1, 'DRAFT')
+
+2026-11-17 22:12:55.752 UTC [1575] ERROR:  permission denied for table budgets
+2026-11-17 22:12:55.752 UTC [1575] STATEMENT:  DELETE FROM budgets WHERE id = $1
+
+2026-11-17 22:12:55.782 UTC [1579] ERROR:  new row violates row-level security policy for table "budget_lines"
+2026-11-17 22:12:55.782 UTC [1579] STATEMENT:  INSERT INTO budget_lines (id, tenant_id, budget_id, fiscal_period_id, account_id, amount)
+	     VALUES ('f0280281-3000-4000-8000-000000000003', $1,
+	       'e0280281-0000-4000-8000-000000000002',
+	       'c2c2c2c2-0000-4000-8000-000000000002',
+	       'b0b0b0b0-0000-4000-8000-000000000002', 1000)
+
+2026-11-17 22:12:55.829 UTC [1585] ERROR:  new row violates row-level security policy for table "employees"
+2026-11-17 22:12:55.829 UTC [1585] STATEMENT:  INSERT INTO employees (id, tenant_id, code, name, hire_date, contract_type, basic_salary, salary_structure_id, status)
+	     VALUES ('c0290291-3000-4000-8000-000000000003', $1, 'EMP-ATK', 'Attack Employee', '2025-01-01', 'FULL_TIME', 1000,
+	       'a0290291-0000-4000-8000-000000000002', 'ACTIVE')
+
+2026-11-17 22:12:55.843 UTC [1587] ERROR:  permission denied for table employees
+2026-11-17 22:12:55.843 UTC [1587] STATEMENT:  DELETE FROM employees WHERE id = $1
+
+2026-11-17 22:12:55.872 UTC [1591] ERROR:  new row violates row-level security policy for table "salary_structures"
+2026-11-17 22:12:55.872 UTC [1591] STATEMENT:  INSERT INTO salary_structures (id, tenant_id, code, name, currency, status)
+	     VALUES ('a0290291-3000-4000-8000-000000000003', $1, 'ST-ATK', 'Attack structure', 'SAR', 'ACTIVE')
+
+2026-11-17 22:12:55.885 UTC [1593] ERROR:  permission denied for table salary_structures
+2026-11-17 22:12:55.885 UTC [1593] STATEMENT:  DELETE FROM salary_structures WHERE id = $1
+
+2026-11-17 22:12:55.914 UTC [1597] ERROR:  new row violates row-level security policy for table "salary_components"
+2026-11-17 22:12:55.914 UTC [1597] STATEMENT:  INSERT INTO salary_components (id, tenant_id, structure_id, key, name, kind, calc, amount, gl_account_id, is_eos_base, seq)
+	     VALUES ('b0290291-3000-4000-8000-000000000003', $1, 'a0290291-0000-4000-8000-000000000002',
+	       'ATK', 'Attack component', 'ALLOWANCE', 'FIXED', 50, 'b0b0b0b0-0000-4000-8000-000000000002', false, 1)
+
+2026-11-17 22:12:55.957 UTC [1603] ERROR:  new row violates row-level security policy for table "payroll_runs"
+2026-11-17 22:12:55.957 UTC [1603] STATEMENT:  INSERT INTO payroll_runs (id, tenant_id, fiscal_period_id, status)
+	     VALUES ('d0290291-3000-4000-8000-000000000003', $1, 'c2c2c2c2-0000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:55.971 UTC [1605] ERROR:  permission denied for table payroll_runs
+2026-11-17 22:12:55.971 UTC [1605] STATEMENT:  DELETE FROM payroll_runs WHERE id = $1
+
+2026-11-17 22:12:56.000 UTC [1609] ERROR:  new row violates row-level security policy for table "payroll_run_lines"
+2026-11-17 22:12:56.000 UTC [1609] STATEMENT:  INSERT INTO payroll_run_lines (id, tenant_id, run_id, employee_id, component_snapshot,
+	        gross_amount, deductions_amount, net_amount)
+	     VALUES ('e0290291-3000-4000-8000-000000000003', $1, 'd0290291-0000-4000-8000-000000000002',
+	       'c0290291-0000-4000-8000-000000000002',
+	       '{"structure":{"id":"a","code":"S","name":"X"},"components":[],"loanDeductions":[],"eos":{"enabled":false,"accrual":"0"},"basicSalary":"1000"}'::jsonb,
+	       1000, 0, 1000)
+
+2026-11-17 22:12:56.008 UTC [1610] ERROR:  permission denied for table payroll_run_lines
+2026-11-17 22:12:56.008 UTC [1610] STATEMENT:  UPDATE payroll_run_lines SET updated_at = updated_at WHERE id = $1
+
+2026-11-17 22:12:56.043 UTC [1615] ERROR:  new row violates row-level security policy for table "employee_loans"
+2026-11-17 22:12:56.043 UTC [1615] STATEMENT:  INSERT INTO employee_loans (id, tenant_id, code, employee_id, amount, installments_count, start_period_id, status)
+	     VALUES ('f0290291-3000-4000-8000-000000000003', $1, 'LON-ATK', 'c0290291-0000-4000-8000-000000000002', 100, 1,
+	       'c2c2c2c2-0000-4000-8000-000000000002', 'ACTIVE')
+
+2026-11-17 22:12:56.057 UTC [1617] ERROR:  permission denied for table employee_loans
+2026-11-17 22:12:56.057 UTC [1617] STATEMENT:  DELETE FROM employee_loans WHERE id = $1
+
+2026-11-17 22:12:56.085 UTC [1621] ERROR:  new row violates row-level security policy for table "employee_loan_lines"
+2026-11-17 22:12:56.085 UTC [1621] STATEMENT:  INSERT INTO employee_loan_lines (id, tenant_id, loan_id, fiscal_period_id, amount, status)
+	     VALUES ('0a290291-3000-4000-8000-000000000003', $1, 'f0290291-0000-4000-8000-000000000002',
+	       'c2c2c2c2-0000-4000-8000-000000000002', 100, 'PENDING')
+
+2026-11-17 22:12:56.122 UTC [1623] ERROR:  permission denied for table employee_loan_lines
+2026-11-17 22:12:56.122 UTC [1623] STATEMENT:  DELETE FROM employee_loan_lines WHERE id = $1
+
+2026-11-17 22:12:56.155 UTC [1627] ERROR:  new row violates row-level security policy for table "consolidation_groups"
+2026-11-17 22:12:56.155 UTC [1627] STATEMENT:  INSERT INTO consolidation_groups (id, tenant_id, name, name_ar, base_currency)
+	     VALUES ('a0410411-3000-4000-8000-000000000003', $1, 'Attack group', 'مجموعة هجوم', 'SAR')
+
+2026-11-17 22:12:56.168 UTC [1629] ERROR:  permission denied for table consolidation_groups
+2026-11-17 22:12:56.168 UTC [1629] STATEMENT:  DELETE FROM consolidation_groups WHERE id = $1
+
+2026-11-17 22:12:56.197 UTC [1633] ERROR:  new row violates row-level security policy for table "group_entities"
+2026-11-17 22:12:56.197 UTC [1633] STATEMENT:  INSERT INTO group_entities (id, tenant_id, group_id, member_tenant_id, ownership_percent)
+	     VALUES ('b0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
+	       $1, 100)
+
+2026-11-17 22:12:56.211 UTC [1635] ERROR:  permission denied for table group_entities
+2026-11-17 22:12:56.211 UTC [1635] STATEMENT:  DELETE FROM group_entities WHERE id = $1
+
+2026-11-17 22:12:56.240 UTC [1639] ERROR:  new row violates row-level security policy for table "elimination_entries"
+2026-11-17 22:12:56.240 UTC [1639] STATEMENT:  INSERT INTO elimination_entries (id, tenant_id, group_id, fiscal_period_id, kind, description)
+	     VALUES ('c0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
+	       'c2c2c2c2-0000-4000-8000-000000000002', 'INTERCOMPANY', 'Attack elimination')
+
+2026-11-17 22:12:56.254 UTC [1641] ERROR:  permission denied for table elimination_entries
+2026-11-17 22:12:56.254 UTC [1641] STATEMENT:  DELETE FROM elimination_entries WHERE id = $1
+
+2026-11-17 22:12:56.282 UTC [1645] ERROR:  new row violates row-level security policy for table "consolidation_runs"
+2026-11-17 22:12:56.282 UTC [1645] STATEMENT:  INSERT INTO consolidation_runs (id, tenant_id, group_id, fiscal_period_id, status)
+	     VALUES ('d0410411-3000-4000-8000-000000000003', $1, 'a0410411-0000-4000-8000-000000000002',
+	       'c2c2c2c2-0000-4000-8000-000000000002', 'QUEUED')
+
+2026-11-17 22:12:56.296 UTC [1647] ERROR:  permission denied for table consolidation_runs
+2026-11-17 22:12:56.296 UTC [1647] STATEMENT:  DELETE FROM consolidation_runs WHERE id = $1
+
+2026-11-17 22:12:56.324 UTC [1651] ERROR:  new row violates row-level security policy for table "custom_field_definitions"
+2026-11-17 22:12:56.324 UTC [1651] STATEMENT:  INSERT INTO custom_field_definitions (id, tenant_id, entity_type, key, label, label_ar, data_type)
+	     VALUES ('a3603636-3000-4000-8000-000000000003', $1, 'purchase_orders', 'atk_field', 'Attack field', 'حقل الهجوم', 'TEXT')
+
+2026-11-17 22:12:56.338 UTC [1653] ERROR:  permission denied for table custom_field_definitions
+2026-11-17 22:12:56.338 UTC [1653] STATEMENT:  DELETE FROM custom_field_definitions WHERE id = $1
+
+2026-11-17 22:12:56.366 UTC [1657] ERROR:  new row violates row-level security policy for table "custom_field_values"
+2026-11-17 22:12:56.366 UTC [1657] STATEMENT:  INSERT INTO custom_field_values (id, tenant_id, entity_type, entity_id, field_id, value_text)
+	     VALUES ('d3603636-3000-4000-8000-000000000003', $1, 'purchase_orders', '63703700-0000-4000-8000-000000000002',
+	       'a3603636-0000-4000-8000-000000000002', 'atk')
+
+2026-11-17 22:12:56.407 UTC [1663] ERROR:  new row violates row-level security policy for table "custom_picklists"
+2026-11-17 22:12:56.407 UTC [1663] STATEMENT:  INSERT INTO custom_picklists (id, tenant_id, key, name, name_ar)
+	     VALUES ('b3603636-3000-4000-8000-000000000003', $1, 'atk_list', 'Attack list', 'قائمة الهجوم')
+
+2026-11-17 22:12:56.421 UTC [1665] ERROR:  permission denied for table custom_picklists
+2026-11-17 22:12:56.421 UTC [1665] STATEMENT:  DELETE FROM custom_picklists WHERE id = $1
+
+2026-11-17 22:12:56.450 UTC [1669] ERROR:  new row violates row-level security policy for table "custom_picklist_options"
+2026-11-17 22:12:56.450 UTC [1669] STATEMENT:  INSERT INTO custom_picklist_options (id, tenant_id, picklist_id, label, label_ar, sort_order)
+	     VALUES ('c3603636-3000-4000-8000-000000000003', $1, 'b3603636-0000-4000-8000-000000000002',
+	       'Attack option', 'خيار الهجوم', 2)
+
+2026-11-17 22:12:56.464 UTC [1671] ERROR:  permission denied for table custom_picklist_options
+2026-11-17 22:12:56.464 UTC [1671] STATEMENT:  DELETE FROM custom_picklist_options WHERE id = $1
+
+2026-11-17 22:12:56.492 UTC [1675] ERROR:  new row violates row-level security policy for table "form_layouts"
+2026-11-17 22:12:56.492 UTC [1675] STATEMENT:  INSERT INTO form_layouts (id, tenant_id, entity_type, role_key, name, sections)
+	     VALUES ('e3603636-3000-4000-8000-000000000003', $1, 'purchase_orders', 'sales', 'Attack layout', '[]'::jsonb)
+
+2026-11-17 22:12:56.538 UTC [1681] ERROR:  new row violates row-level security policy for table "zatca_devices"
+2026-11-17 22:12:56.538 UTC [1681] STATEMENT:  INSERT INTO zatca_devices (id, tenant_id, name, name_ar, registration_status, icv_counter)
+	     VALUES ('a0370370-3000-4000-8000-000000000003', $1, 'Isolation EIAS', 'جهاز العزل', 'NOT_REGISTERED', 0)
+
+2026-11-17 22:12:56.552 UTC [1683] ERROR:  permission denied for table zatca_devices
+2026-11-17 22:12:56.552 UTC [1683] STATEMENT:  DELETE FROM zatca_devices WHERE id = $1
+
+2026-11-17 22:12:56.580 UTC [1687] ERROR:  new row violates row-level security policy for table "rfqs"
+2026-11-17 22:12:56.580 UTC [1687] STATEMENT:  INSERT INTO rfqs (id, tenant_id, branch_id, title, mode, status, currency_code, invited_suppliers, portal_invites)
+	     VALUES ('a0388038-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'Isolation round', 'INVITED', 'DRAFT', 'SAR', '[]'::jsonb, '[]'::jsonb)
+
+2026-11-17 22:12:56.593 UTC [1689] ERROR:  permission denied for table rfqs
+2026-11-17 22:12:56.593 UTC [1689] STATEMENT:  DELETE FROM rfqs WHERE id = $1
+
+2026-11-17 22:12:56.621 UTC [1693] ERROR:  new row violates row-level security policy for table "rfq_lines"
+2026-11-17 22:12:56.621 UTC [1693] STATEMENT:  INSERT INTO rfq_lines (id, tenant_id, rfq_id, line_no, item_id, qty)
+	     VALUES ('b0388038-3000-4000-8000-000000000003', $1, 'a0388038-0000-4000-8000-000000000002', 2,
+	             'babababa-0000-4000-8000-000000000002', 5)
+
+2026-11-17 22:12:56.662 UTC [1699] ERROR:  new row violates row-level security policy for table "supplier_quotes"
+2026-11-17 22:12:56.662 UTC [1699] STATEMENT:  INSERT INTO supplier_quotes (id, tenant_id, rfq_id, supplier_id, status, submitted_via, currency_code)
+	     VALUES ('c0388038-3000-4000-8000-000000000003', $1, 'a0388038-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'SUBMITTED', 'BACK_OFFICE', 'SAR')
+
+2026-11-17 22:12:56.678 UTC [1701] ERROR:  permission denied for table supplier_quotes
+2026-11-17 22:12:56.678 UTC [1701] STATEMENT:  DELETE FROM supplier_quotes WHERE id = $1
+
+2026-11-17 22:12:56.707 UTC [1705] ERROR:  new row violates row-level security policy for table "supplier_quotes_lines"
+2026-11-17 22:12:56.707 UTC [1705] STATEMENT:  INSERT INTO supplier_quotes_lines (id, tenant_id, quote_id, rfq_line_id, line_no, qty, unit_price)
+	     VALUES ('d0388038-3000-4000-8000-000000000003', $1, 'c0388038-0000-4000-8000-000000000002',
+	             'b0388038-0000-4000-8000-000000000002', 2, 5, 10)
+
+2026-11-17 22:12:56.748 UTC [1711] ERROR:  new row violates row-level security policy for table "quote_comparisons"
+2026-11-17 22:12:56.748 UTC [1711] STATEMENT:  INSERT INTO quote_comparisons (id, tenant_id, rfq_id, snapshot, status)
+	     VALUES ('e0388038-3000-4000-8000-000000000003', $1, 'a0388038-0000-4000-8000-000000000002',
+	             '{}'::jsonb, 'PREPARED')
+
+2026-11-17 22:12:56.764 UTC [1713] ERROR:  permission denied for table quote_comparisons
+2026-11-17 22:12:56.764 UTC [1713] STATEMENT:  DELETE FROM quote_comparisons WHERE id = $1
+
+2026-11-17 22:12:56.792 UTC [1717] ERROR:  new row violates row-level security policy for table "blanket_orders"
+2026-11-17 22:12:56.792 UTC [1717] STATEMENT:  INSERT INTO blanket_orders (id, tenant_id, branch_id, blanket_no, supplier_id, title, currency_code, status, valid_from, valid_to, min_commitment, max_commitment, released_amount, price_lock)
+	     VALUES ('f0388038-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'ISO-BLK', 'b5b5b5b5-0000-4000-8000-000000000002', 'Isolation agreement', 'SAR',
+	             'ACTIVE', '2027-01-01', '2027-12-31', 0, 1000, 0, '[]'::jsonb)
+
+2026-11-17 22:12:56.806 UTC [1719] ERROR:  permission denied for table blanket_orders
+2026-11-17 22:12:56.806 UTC [1719] STATEMENT:  DELETE FROM blanket_orders WHERE id = $1
+
+2026-11-17 22:12:56.835 UTC [1723] ERROR:  new row violates row-level security policy for table "blanket_releases"
+2026-11-17 22:12:56.835 UTC [1723] STATEMENT:  INSERT INTO blanket_releases (id, tenant_id, blanket_id, release_no, release_date, lines, amount, purchase_order_id)
+	     VALUES ('a1388038-3000-4000-8000-000000000003', $1, 'f0388038-0000-4000-8000-000000000002',
+	             'ISO-BLR', '2027-02-01', '[]'::jsonb, 10, '5c5c5c5c-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:56.849 UTC [1725] ERROR:  permission denied for table blanket_releases
+2026-11-17 22:12:56.849 UTC [1725] STATEMENT:  DELETE FROM blanket_releases WHERE id = $1
+
+2026-11-17 22:12:56.877 UTC [1729] ERROR:  new row violates row-level security policy for table "supplier_ratings"
+2026-11-17 22:12:56.877 UTC [1729] STATEMENT:  INSERT INTO supplier_ratings (id, tenant_id, supplier_id, window_start, window_end, delivery_score, quality_score, price_score, overall_score, sample_size, detail)
+	     VALUES ('b1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             '2027-01-01', '2027-12-31', 50, 50, 50, 50, 0, '{}'::jsonb)
+
+2026-11-17 22:12:56.891 UTC [1731] ERROR:  permission denied for table supplier_ratings
+2026-11-17 22:12:56.891 UTC [1731] STATEMENT:  DELETE FROM supplier_ratings WHERE id = $1
+
+2026-11-17 22:12:56.919 UTC [1735] ERROR:  new row violates row-level security policy for table "approved_supplier_items"
+2026-11-17 22:12:56.919 UTC [1735] STATEMENT:  INSERT INTO approved_supplier_items (id, tenant_id, supplier_id, item_id, status)
+	     VALUES ('c1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', 'APPROVED')
+
+2026-11-17 22:12:56.932 UTC [1737] ERROR:  permission denied for table approved_supplier_items
+2026-11-17 22:12:56.932 UTC [1737] STATEMENT:  DELETE FROM approved_supplier_items WHERE id = $1
+
+2026-11-17 22:12:56.961 UTC [1741] ERROR:  new row violates row-level security policy for table "supplier_advances"
+2026-11-17 22:12:56.961 UTC [1741] STATEMENT:  INSERT INTO supplier_advances (id, tenant_id, supplier_id, currency_code, amount, status)
+	     VALUES ('d1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'SAR', 100, 'DRAFT')
+
+2026-11-17 22:12:56.975 UTC [1743] ERROR:  permission denied for table supplier_advances
+2026-11-17 22:12:56.975 UTC [1743] STATEMENT:  DELETE FROM supplier_advances WHERE id = $1
+
+2026-11-17 22:12:57.034 UTC [1747] ERROR:  new row violates row-level security policy for table "early_payment_discount_terms"
+2026-11-17 22:12:57.034 UTC [1747] STATEMENT:  INSERT INTO early_payment_discount_terms (id, tenant_id, supplier_id, discount_pct, discount_days, min_invoice_amount, status)
+	     VALUES ('e1388038-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             2, 10, 0, 'ACTIVE')
+
+2026-11-17 22:12:57.055 UTC [1749] ERROR:  permission denied for table early_payment_discount_terms
+2026-11-17 22:12:57.055 UTC [1749] STATEMENT:  DELETE FROM early_payment_discount_terms WHERE id = $1
+
+2026-11-17 22:12:57.084 UTC [1753] ERROR:  new row violates row-level security policy for table "capex_requests"
+2026-11-17 22:12:57.084 UTC [1753] STATEMENT:  INSERT INTO capex_requests (id, tenant_id, branch_id, title, account_id, estimated_amount, currency_code, status)
+	     VALUES ('f1388038-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'Isolation capex', 'b0b0b0b0-0000-4000-8000-000000000002', 500, 'SAR', 'DRAFT')
+
+2026-11-17 22:12:57.098 UTC [1755] ERROR:  permission denied for table capex_requests
+2026-11-17 22:12:57.098 UTC [1755] STATEMENT:  DELETE FROM capex_requests WHERE id = $1
+
+2026-11-17 22:12:57.129 UTC [1759] ERROR:  new row violates row-level security policy for table "tender_intakes"
+2026-11-17 22:12:57.129 UTC [1759] STATEMENT:  INSERT INTO tender_intakes (id, tenant_id, intake_no, title, announcing_authority, our_decision, status)
+	     VALUES ('a2388038-3000-4000-8000-000000000003', $1, 'ISO-TND', 'Isolation tender',
+	             'Isolation authority', 'PENDING', 'OPEN')
+
+2026-11-17 22:12:57.143 UTC [1761] ERROR:  permission denied for table tender_intakes
+2026-11-17 22:12:57.143 UTC [1761] STATEMENT:  DELETE FROM tender_intakes WHERE id = $1
+
+2026-11-17 22:12:57.172 UTC [1765] ERROR:  new row violates row-level security policy for table "return_authorizations"
+2026-11-17 22:12:57.172 UTC [1765] STATEMENT:  INSERT INTO return_authorizations (id, tenant_id, branch_id, partner_id, invoice_id, reason_code, status, currency_code)
+	     VALUES ('3b3b3b39-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002',
+	             'DAMAGED', 'REQUESTED', 'SAR')
+
+2026-11-17 22:12:57.186 UTC [1767] ERROR:  permission denied for table return_authorizations
+2026-11-17 22:12:57.186 UTC [1767] STATEMENT:  DELETE FROM return_authorizations WHERE id = $1
+
+2026-11-17 22:12:57.215 UTC [1771] ERROR:  new row violates row-level security policy for table "return_authorization_lines"
+2026-11-17 22:12:57.215 UTC [1771] STATEMENT:  INSERT INTO return_authorization_lines (id, tenant_id, rma_id, line_no, invoice_line_id, qty)
+	     VALUES ('3c3c3c39-3000-4000-8000-000000000003', $1, '3b3b3b39-0000-4000-8000-000000000002', 1,
+	             '78787878-0000-4000-8000-000000000002', 2)
+
+2026-11-17 22:12:57.258 UTC [1777] ERROR:  new row violates row-level security policy for table "warranty_registrations"
+2026-11-17 22:12:57.258 UTC [1777] STATEMENT:  INSERT INTO warranty_registrations (id, tenant_id, partner_id, item_id, terms, start_date, end_date, status)
+	     VALUES ('3d3d3d39-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002',
+	             '{"durationMonths":12,"coverage":"REPAIR","basis":"INVOICE_DATE"}'::jsonb,
+	             '2027-02-01', '2028-02-01', 'ACTIVE')
+
+2026-11-17 22:12:57.272 UTC [1779] ERROR:  permission denied for table warranty_registrations
+2026-11-17 22:12:57.272 UTC [1779] STATEMENT:  DELETE FROM warranty_registrations WHERE id = $1
+
+2026-11-17 22:12:57.301 UTC [1783] ERROR:  new row violates row-level security policy for table "supplier_return_authorizations"
+2026-11-17 22:12:57.301 UTC [1783] STATEMENT:  INSERT INTO supplier_return_authorizations (id, tenant_id, branch_id, supplier_id, purchase_order_id, reason_code, status, currency_code)
+	     VALUES ('42424239-3000-4000-8000-000000000003', $1, 'abababab-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '5c5c5c5c-0000-4000-8000-000000000002',
+	             'DAMAGED', 'REQUESTED', 'SAR')
+
+2026-11-17 22:12:57.315 UTC [1785] ERROR:  permission denied for table supplier_return_authorizations
+2026-11-17 22:12:57.315 UTC [1785] STATEMENT:  DELETE FROM supplier_return_authorizations WHERE id = $1
+
+2026-11-17 22:12:57.344 UTC [1789] ERROR:  new row violates row-level security policy for table "supplier_return_authorization_lines"
+2026-11-17 22:12:57.344 UTC [1789] STATEMENT:  INSERT INTO supplier_return_authorization_lines (id, tenant_id, srma_id, line_no, po_line_id, qty)
+	     VALUES ('43434339-3000-4000-8000-000000000003', $1, '42424239-0000-4000-8000-000000000002', 1,
+	             '5d5d5d5d-0000-4000-8000-000000000002', 2)
+
+2026-11-17 22:12:57.386 UTC [1795] ERROR:  new row violates row-level security policy for table "dunning_policies"
+2026-11-17 22:12:57.386 UTC [1795] STATEMENT:  INSERT INTO dunning_policies (id, tenant_id, name, steps)
+	     VALUES ('3a3a3a39-3000-4000-8000-000000000003', $1, 'ISO attack',
+	             '[{"stepNo":1,"daysOverdue":30,"channel":"EMAIL","templateKey":"dunning.reminder.1","escalate":false}]'::jsonb)
+
+2026-11-17 22:12:57.400 UTC [1797] ERROR:  permission denied for table dunning_policies
+2026-11-17 22:12:57.400 UTC [1797] STATEMENT:  DELETE FROM dunning_policies WHERE id = $1
+
+2026-11-17 22:12:57.429 UTC [1801] ERROR:  new row violates row-level security policy for table "dunning_letters"
+2026-11-17 22:12:57.429 UTC [1801] STATEMENT:  INSERT INTO dunning_letters (id, tenant_id, policy_id, partner_id, invoice_id, step_no, days_overdue, letter_date, channel, template_key)
+	     VALUES ('3e3e3e39-3000-4000-8000-000000000003', $1, '3a3a3a39-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', '77777777-0000-4000-8000-000000000002', 1,
+	             30, '2027-03-01', 'EMAIL', 'dunning.reminder.1')
+
+2026-11-17 22:12:57.444 UTC [1803] ERROR:  permission denied for table dunning_letters
+2026-11-17 22:12:57.444 UTC [1803] STATEMENT:  DELETE FROM dunning_letters WHERE id = $1
+
+2026-11-17 22:12:57.473 UTC [1807] ERROR:  new row violates row-level security policy for table "collection_actions"
+2026-11-17 22:12:57.473 UTC [1807] STATEMENT:  INSERT INTO collection_actions (id, tenant_id, partner_id, action_type, action_date)
+	     VALUES ('3f3f3f39-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'CALL', '2027-03-01')
+
+2026-11-17 22:12:57.488 UTC [1809] ERROR:  permission denied for table collection_actions
+2026-11-17 22:12:57.488 UTC [1809] STATEMENT:  DELETE FROM collection_actions WHERE id = $1
+
+2026-11-17 22:12:57.516 UTC [1813] ERROR:  new row violates row-level security policy for table "collection_agencies"
+2026-11-17 22:12:57.516 UTC [1813] STATEMENT:  INSERT INTO collection_agencies (id, tenant_id, partner_id, commission_mode, commission_pct)
+	     VALUES ('40404039-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'PCT_OF_COLLECTED', 10)
+
+2026-11-17 22:12:57.531 UTC [1815] ERROR:  permission denied for table collection_agencies
+2026-11-17 22:12:57.531 UTC [1815] STATEMENT:  DELETE FROM collection_agencies WHERE id = $1
+
+2026-11-17 22:12:57.559 UTC [1819] ERROR:  new row violates row-level security policy for table "collection_referrals"
+2026-11-17 22:12:57.559 UTC [1819] STATEMENT:  INSERT INTO collection_referrals (id, tenant_id, agency_id, partner_id, currency_code, referral_date, referred_amount, commission_mode, commission_pct)
+	     VALUES ('41414139-3000-4000-8000-000000000003', $1, '40404039-0000-4000-8000-000000000002',
+	             'b5b5b5b5-0000-4000-8000-000000000002', 'SAR', '2027-03-01', 50, 'PCT_OF_COLLECTED', 10)
+
+2026-11-17 22:12:57.573 UTC [1821] ERROR:  permission denied for table collection_referrals
+2026-11-17 22:12:57.573 UTC [1821] STATEMENT:  DELETE FROM collection_referrals WHERE id = $1
+
+2026-11-17 22:12:57.602 UTC [1825] ERROR:  new row violates row-level security policy for table "import_mappings"
+2026-11-17 22:12:57.602 UTC [1825] STATEMENT:  INSERT INTO import_mappings (id, tenant_id, name, direction, kind, column_map)
+	     VALUES ('44444440-3000-4000-8000-000000000003', $1, 'ISO attack', 'IMPORT', 'COA',
+	             '{"code":"Account Code","name":"Account Name"}'::jsonb)
+
+2026-11-17 22:12:57.644 UTC [1831] ERROR:  new row violates row-level security policy for table "message_templates"
+2026-11-17 22:12:57.644 UTC [1831] STATEMENT:  INSERT INTO message_templates (id, tenant_id, key, channel, locale, module, subject, body, variables)
+	     VALUES ('45454541-3000-4000-8000-000000000003', $1, 'attack.step', 'EMAIL', 'ar', 'invoice_overdue',
+	             'رسالة هجومية', 'محتوى هجومي', '[]'::jsonb)
+
+2026-11-17 22:12:57.689 UTC [1837] ERROR:  new row violates row-level security policy for table "outbound_messages"
+2026-11-17 22:12:57.689 UTC [1837] STATEMENT:  INSERT INTO outbound_messages (id, tenant_id, channel, status, recipient, module, template_key, locale, subject, body_snapshot)
+	     VALUES ('46464641-3000-4000-8000-000000000003', $1, 'EMAIL', 'QUEUED', 'attacker@example.com',
+	             'invoice_overdue', 'attack.step', 'ar', 'رسالة هجومية', 'محتوى هجومي')
+
+2026-11-17 22:12:57.704 UTC [1839] ERROR:  permission denied for table outbound_messages
+2026-11-17 22:12:57.704 UTC [1839] STATEMENT:  DELETE FROM outbound_messages WHERE id = $1
+
+2026-11-17 22:12:57.734 UTC [1843] ERROR:  new row violates row-level security policy for table "notification_preferences"
+2026-11-17 22:12:57.734 UTC [1843] STATEMENT:  INSERT INTO notification_preferences (id, tenant_id, user_id, module, channel, enabled)
+	     VALUES ('47474741-3000-4000-8000-000000000003', $1, '99999999-0000-4000-8000-000000000003', 'digest', 'SMS', true)
+
+2026-11-17 22:12:57.779 UTC [1849] ERROR:  new row violates row-level security policy for table "communication_log"
+2026-11-17 22:12:57.779 UTC [1849] STATEMENT:  INSERT INTO communication_log (id, tenant_id, kind, direction, channel, at, summary, body)
+	     VALUES ('48484841-3000-4000-8000-000000000003', $1, 'MESSAGE', 'OUTBOUND', 'EMAIL', now(),
+	             'رسالة هجومية', 'محتوى هجومي')
+
+2026-11-17 22:12:57.795 UTC [1851] ERROR:  permission denied for table communication_log
+2026-11-17 22:12:57.795 UTC [1851] STATEMENT:  DELETE FROM communication_log WHERE id = $1
+
+2026-11-17 22:12:57.826 UTC [1855] ERROR:  new row violates row-level security policy for table "work_centers"
+2026-11-17 22:12:57.826 UTC [1855] STATEMENT:  INSERT INTO work_centers (id, tenant_id, code, name, capacity_per_shift, shifts_per_day,
+	                                fixed_cost_rate, var_cost_rate, status)
+	     VALUES ('49494942-3000-4000-8000-000000000003', $1, 'WC-ATK', 'Attack work center', 8, 1, 1, 1, 'ACTIVE')
+
+2026-11-17 22:12:57.840 UTC [1857] ERROR:  permission denied for table work_centers
+2026-11-17 22:12:57.840 UTC [1857] STATEMENT:  DELETE FROM work_centers WHERE id = $1
+
+2026-11-17 22:12:57.871 UTC [1861] ERROR:  new row violates row-level security policy for table "routings"
+2026-11-17 22:12:57.871 UTC [1861] STATEMENT:  INSERT INTO routings (id, tenant_id, item_id, version_no, status, output_uom_id)
+	     VALUES ('4a4a4a42-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             9, 'DRAFT', 'b2b2b2b2-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:57.890 UTC [1863] ERROR:  permission denied for table routings
+2026-11-17 22:12:57.890 UTC [1863] STATEMENT:  DELETE FROM routings WHERE id = $1
+
+2026-11-17 22:12:57.921 UTC [1867] ERROR:  new row violates row-level security policy for table "routing_operations"
+2026-11-17 22:12:57.921 UTC [1867] STATEMENT:  INSERT INTO routing_operations (id, tenant_id, routing_id, sequence, work_center_id,
+	                                          setup_time, run_time)
+	     VALUES ('4b4b4b42-3000-4000-8000-000000000003', $1,
+	             '4a4a4a42-0000-4000-8000-000000000002', 90, '49494942-0000-4000-8000-000000000002', 1, 1)
+
+2026-11-17 22:12:57.936 UTC [1869] ERROR:  permission denied for table routing_operations
+2026-11-17 22:12:57.936 UTC [1869] STATEMENT:  DELETE FROM routing_operations WHERE id = $1
+
+2026-11-17 22:12:57.965 UTC [1873] ERROR:  new row violates row-level security policy for table "production_order_operations"
+2026-11-17 22:12:57.965 UTC [1873] STATEMENT:  INSERT INTO production_order_operations (id, tenant_id, order_id, routing_id, sequence,
+	                                                       work_center_id, status)
+	     VALUES ('4c4c4c42-3000-4000-8000-000000000003', $1,
+	             '36363636-0000-4000-8000-000000000002', '4a4a4a42-0000-4000-8000-000000000002',
+	             90, '49494942-0000-4000-8000-000000000002', 'PENDING')
+
+2026-11-17 22:12:57.980 UTC [1875] ERROR:  permission denied for table production_order_operations
+2026-11-17 22:12:57.980 UTC [1875] STATEMENT:  DELETE FROM production_order_operations WHERE id = $1
+
+2026-11-17 22:12:58.010 UTC [1879] ERROR:  new row violates row-level security policy for table "rework_orders"
+2026-11-17 22:12:58.010 UTC [1879] STATEMENT:  INSERT INTO rework_orders (id, tenant_id, parent_order_id, item_id, defect_ref, qty,
+	                                uom_id, routing_id, status)
+	     VALUES ('4d4d4d42-3000-4000-8000-000000000003', $1,
+	             '36363636-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	             'BATCH-ATK', 1, 'b2b2b2b2-0000-4000-8000-000000000002',
+	             '4a4a4a42-0000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:58.024 UTC [1881] ERROR:  permission denied for table rework_orders
+2026-11-17 22:12:58.024 UTC [1881] STATEMENT:  DELETE FROM rework_orders WHERE id = $1
+
+2026-11-17 22:12:58.052 UTC [1885] ERROR:  new row violates row-level security policy for table "downtime_records"
+2026-11-17 22:12:58.052 UTC [1885] STATEMENT:  INSERT INTO downtime_records (id, tenant_id, work_center_id, reason_code, started_at,
+	                                    duration_minutes)
+	     VALUES ('4e4e4e42-3000-4000-8000-000000000003', $1,
+	             '49494942-0000-4000-8000-000000000002', 'OTHER', now(), 5)
+
+2026-11-17 22:12:58.066 UTC [1887] ERROR:  permission denied for table downtime_records
+2026-11-17 22:12:58.066 UTC [1887] STATEMENT:  DELETE FROM downtime_records WHERE id = $1
+
+2026-11-17 22:12:58.095 UTC [1891] ERROR:  new row violates row-level security policy for table "item_standard_costs"
+2026-11-17 22:12:58.095 UTC [1891] STATEMENT:  INSERT INTO item_standard_costs (id, tenant_id, item_id, version_no, status,
+	                                          material_cost, labor_cost, overhead_cost, total_cost, source)
+	     VALUES ('4f4f4f42-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+	             9, 'DRAFT', 1, 1, 1, 3, 'MANUAL')
+
+2026-11-17 22:12:58.109 UTC [1893] ERROR:  permission denied for table item_standard_costs
+2026-11-17 22:12:58.109 UTC [1893] STATEMENT:  DELETE FROM item_standard_costs WHERE id = $1
+
+2026-11-17 22:12:58.138 UTC [1897] ERROR:  new row violates row-level security policy for table "warehouse_zones"
+2026-11-17 22:12:58.138 UTC [1897] STATEMENT:  INSERT INTO warehouse_zones (id, tenant_id, warehouse_id, code, name, zone_type)
+	     VALUES ('51515151-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'Z-ATK', 'Attack zone', 'PICKING')
+
+2026-11-17 22:12:58.152 UTC [1899] ERROR:  permission denied for table warehouse_zones
+2026-11-17 22:12:58.152 UTC [1899] STATEMENT:  DELETE FROM warehouse_zones WHERE id = $1
+
+2026-11-17 22:12:58.179 UTC [1903] ERROR:  new row violates row-level security policy for table "warehouse_aisles"
+2026-11-17 22:12:58.179 UTC [1903] STATEMENT:  INSERT INTO warehouse_aisles (id, tenant_id, zone_id, code, name)
+	     VALUES ('52525252-3000-4000-8000-000000000003', $1, '51515151-0000-4000-8000-000000000002', 'A-ATK', 'Attack aisle')
+
+2026-11-17 22:12:58.193 UTC [1905] ERROR:  permission denied for table warehouse_aisles
+2026-11-17 22:12:58.193 UTC [1905] STATEMENT:  DELETE FROM warehouse_aisles WHERE id = $1
+
+2026-11-17 22:12:58.222 UTC [1909] ERROR:  new row violates row-level security policy for table "warehouse_racks"
+2026-11-17 22:12:58.222 UTC [1909] STATEMENT:  INSERT INTO warehouse_racks (id, tenant_id, aisle_id, code, name)
+	     VALUES ('53535353-3000-4000-8000-000000000003', $1, '52525252-0000-4000-8000-000000000002', 'R-ATK', 'Attack rack')
+
+2026-11-17 22:12:58.236 UTC [1911] ERROR:  permission denied for table warehouse_racks
+2026-11-17 22:12:58.236 UTC [1911] STATEMENT:  DELETE FROM warehouse_racks WHERE id = $1
+
+2026-11-17 22:12:58.265 UTC [1915] ERROR:  new row violates row-level security policy for table "warehouse_bins"
+2026-11-17 22:12:58.265 UTC [1915] STATEMENT:  INSERT INTO warehouse_bins (id, tenant_id, warehouse_id, rack_id, code, barcode, name)
+	     VALUES ('54545454-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+	             '53535353-0000-4000-8000-000000000002', 'B-ATK', 'BIN-ATK', 'Attack bin')
+
+2026-11-17 22:12:58.280 UTC [1917] ERROR:  permission denied for table warehouse_bins
+2026-11-17 22:12:58.280 UTC [1917] STATEMENT:  DELETE FROM warehouse_bins WHERE id = $1
+
+2026-11-17 22:12:58.311 UTC [1921] ERROR:  new row violates row-level security policy for table "lpns"
+2026-11-17 22:12:58.311 UTC [1921] STATEMENT:  INSERT INTO lpns (id, tenant_id, lpn_code)
+	     VALUES ('55555555-3000-4000-8000-000000000003', $1, 'LPN-ATK')
+
+2026-11-17 22:12:58.324 UTC [1923] ERROR:  permission denied for table lpns
+2026-11-17 22:12:58.324 UTC [1923] STATEMENT:  DELETE FROM lpns WHERE id = $1
+
+2026-11-17 22:12:58.353 UTC [1927] ERROR:  new row violates row-level security policy for table "bin_contents"
+2026-11-17 22:12:58.353 UTC [1927] STATEMENT:  INSERT INTO bin_contents (id, tenant_id, bin_id, warehouse_id, item_id, status, qty)
+	     VALUES ('56565656-3000-4000-8000-000000000003', $1, '54545454-0000-4000-8000-000000000002',
+	             'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002', 'AVAILABLE', 1)
+
+2026-11-17 22:12:58.367 UTC [1929] ERROR:  permission denied for table bin_contents
+2026-11-17 22:12:58.367 UTC [1929] STATEMENT:  DELETE FROM bin_contents WHERE id = $1
+
+2026-11-17 22:12:58.395 UTC [1933] ERROR:  new row violates row-level security policy for table "returnable_packaging"
+2026-11-17 22:12:58.395 UTC [1933] STATEMENT:  INSERT INTO returnable_packaging (id, tenant_id, code, packaging_type, name, deposit_amount)
+	     VALUES ('57575757-3000-4000-8000-000000000003', $1, 'PLT-ATK', 'PALLET', 'Attack pallet', 10)
+
+2026-11-17 22:12:58.410 UTC [1935] ERROR:  permission denied for table returnable_packaging
+2026-11-17 22:12:58.410 UTC [1935] STATEMENT:  DELETE FROM returnable_packaging WHERE id = $1
+
+2026-11-17 22:12:58.438 UTC [1939] ERROR:  new row violates row-level security policy for table "returnable_packaging_movements"
+2026-11-17 22:12:58.438 UTC [1939] STATEMENT:  INSERT INTO returnable_packaging_movements (id, tenant_id, packaging_id, kind, qty, deposit_per_unit, moved_at)
+	     VALUES ('58585858-3000-4000-8000-000000000003', $1, '57575757-0000-4000-8000-000000000002', 'ISSUE', 1, 10, '2027-01-15')
+
+2026-11-17 22:12:58.446 UTC [1940] ERROR:  permission denied for table returnable_packaging_movements
+2026-11-17 22:12:58.446 UTC [1940] STATEMENT:  UPDATE returnable_packaging_movements SET note = note WHERE id = $1
+
+2026-11-17 22:12:58.453 UTC [1941] ERROR:  permission denied for table returnable_packaging_movements
+2026-11-17 22:12:58.453 UTC [1941] STATEMENT:  DELETE FROM returnable_packaging_movements WHERE id = $1
+
+2026-11-17 22:12:58.481 UTC [1945] ERROR:  new row violates row-level security policy for table "putaway_rules"
+2026-11-17 22:12:58.481 UTC [1945] STATEMENT:  INSERT INTO putaway_rules (id, tenant_id, priority, name, target_zone_type)
+	     VALUES ('59595959-3000-4000-8000-000000000003', $1, 900, 'Attack rule', 'PICKING')
+
+2026-11-17 22:12:58.495 UTC [1947] ERROR:  permission denied for table putaway_rules
+2026-11-17 22:12:58.495 UTC [1947] STATEMENT:  DELETE FROM putaway_rules WHERE id = $1
+
+2026-11-17 22:12:58.524 UTC [1951] ERROR:  new row violates row-level security policy for table "pick_strategies"
+2026-11-17 22:12:58.524 UTC [1951] STATEMENT:  INSERT INTO pick_strategies (id, tenant_id, warehouse_id, method)
+	     VALUES ('5a5a5a5a-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'FIFO')
+
+2026-11-17 22:12:58.538 UTC [1953] ERROR:  permission denied for table pick_strategies
+2026-11-17 22:12:58.538 UTC [1953] STATEMENT:  DELETE FROM pick_strategies WHERE id = $1
+
+2026-11-17 22:12:58.567 UTC [1957] ERROR:  new row violates row-level security policy for table "pick_waves"
+2026-11-17 22:12:58.567 UTC [1957] STATEMENT:  INSERT INTO pick_waves (id, tenant_id, warehouse_id, status)
+	     VALUES ('5b5b5b5b-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:58.581 UTC [1959] ERROR:  permission denied for table pick_waves
+2026-11-17 22:12:58.581 UTC [1959] STATEMENT:  DELETE FROM pick_waves WHERE id = $1
+
+2026-11-17 22:12:58.610 UTC [1963] ERROR:  new row violates row-level security policy for table "pick_tasks"
+2026-11-17 22:12:58.610 UTC [1963] STATEMENT:  INSERT INTO pick_tasks (id, tenant_id, task_kind, item_id, qty, from_bin_id, source_type, source_id)
+	     VALUES ('5c5c5c5c-3000-4000-8000-000000000003', $1, 'PICK', 'babababa-0000-4000-8000-000000000002', 1,
+	             '54545454-0000-4000-8000-000000000002', 'pick_wave', '5b5b5b5b-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:58.625 UTC [1965] ERROR:  permission denied for table pick_tasks
+2026-11-17 22:12:58.625 UTC [1965] STATEMENT:  DELETE FROM pick_tasks WHERE id = $1
+
+2026-11-17 22:12:58.661 UTC [1969] ERROR:  new row violates row-level security policy for table "cycle_count_schedules"
+2026-11-17 22:12:58.661 UTC [1969] STATEMENT:  INSERT INTO cycle_count_schedules (id, tenant_id, warehouse_id, name)
+	     VALUES ('5d5d5d5d-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'Attack schedule')
+
+2026-11-17 22:12:58.676 UTC [1971] ERROR:  permission denied for table cycle_count_schedules
+2026-11-17 22:12:58.676 UTC [1971] STATEMENT:  DELETE FROM cycle_count_schedules WHERE id = $1
+
+2026-11-17 22:12:58.705 UTC [1975] ERROR:  new row violates row-level security policy for table "cycle_count_documents"
+2026-11-17 22:12:58.705 UTC [1975] STATEMENT:  INSERT INTO cycle_count_documents (id, tenant_id, warehouse_id, status, snapshot_at)
+	     VALUES ('5e5e5e5e-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002', 'DRAFT', now())
+
+2026-11-17 22:12:58.721 UTC [1977] ERROR:  permission denied for table cycle_count_documents
+2026-11-17 22:12:58.721 UTC [1977] STATEMENT:  DELETE FROM cycle_count_documents WHERE id = $1
+
+2026-11-17 22:12:58.753 UTC [1981] ERROR:  new row violates row-level security policy for table "cycle_count_lines"
+2026-11-17 22:12:58.753 UTC [1981] STATEMENT:  INSERT INTO cycle_count_lines (id, tenant_id, document_id, line_no, item_id, system_qty)
+	     VALUES ('5f5f5f5f-3000-4000-8000-000000000003', $1, '5e5e5e5e-0000-4000-8000-000000000002', 1,
+	             'babababa-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:58.769 UTC [1983] ERROR:  permission denied for table cycle_count_lines
+2026-11-17 22:12:58.769 UTC [1983] STATEMENT:  DELETE FROM cycle_count_lines WHERE id = $1
+
+2026-11-17 22:12:58.806 UTC [1987] ERROR:  new row violates row-level security policy for table "abc_classifications"
+2026-11-17 22:12:58.806 UTC [1987] STATEMENT:  INSERT INTO abc_classifications (id, tenant_id, item_id, computed_at, window_days, class, rank_no)
+	     VALUES ('60606060-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002', now(), 90, 'C', 9)
+
+2026-11-17 22:12:58.822 UTC [1989] ERROR:  permission denied for table abc_classifications
+2026-11-17 22:12:58.822 UTC [1989] STATEMENT:  DELETE FROM abc_classifications WHERE id = $1
+
+2026-11-17 22:12:58.852 UTC [1993] ERROR:  new row violates row-level security policy for table "serial_movements"
+2026-11-17 22:12:58.852 UTC [1993] STATEMENT:  INSERT INTO serial_movements (id, tenant_id, serial_id, event, source_type, source_id, moved_at)
+	     VALUES ('61616161-3000-4000-8000-000000000003', $1, 'f3f3f3f3-0000-4000-8000-000000000002', 'RECEIVE',
+	             'stock_move', 'f4f4f4f4-0000-4000-8000-000000000002', now())
+
+2026-11-17 22:12:58.859 UTC [1994] ERROR:  permission denied for table serial_movements
+2026-11-17 22:12:58.859 UTC [1994] STATEMENT:  UPDATE serial_movements SET note = note WHERE id = $1
+
+2026-11-17 22:12:58.867 UTC [1995] ERROR:  permission denied for table serial_movements
+2026-11-17 22:12:58.867 UTC [1995] STATEMENT:  DELETE FROM serial_movements WHERE id = $1
+
+2026-11-17 22:12:58.895 UTC [1999] ERROR:  new row violates row-level security policy for table "transfer_pricing_policies"
+2026-11-17 22:12:58.895 UTC [1999] STATEMENT:  INSERT INTO transfer_pricing_policies (id, tenant_id, from_warehouse_id, to_warehouse_id, mode, markup_pct)
+	     VALUES ('62626262-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+	             'f0f0f0f0-2000-4000-8000-000000000002', 'MARKUP', 5)
+
+2026-11-17 22:12:58.909 UTC [2001] ERROR:  permission denied for table transfer_pricing_policies
+2026-11-17 22:12:58.909 UTC [2001] STATEMENT:  DELETE FROM transfer_pricing_policies WHERE id = $1
+
+2026-11-17 22:12:58.937 UTC [2005] ERROR:  new row violates row-level security policy for table "transit_exceptions"
+2026-11-17 22:12:58.937 UTC [2005] STATEMENT:  INSERT INTO transit_exceptions (id, tenant_id, transfer_id, line_no, exception_kind, qty)
+	     VALUES ('63636363-3000-4000-8000-000000000003', $1, 'f7f7f7f7-0000-4000-8000-000000000002', 1, 'DAMAGE', 1)
+
+2026-11-17 22:12:58.951 UTC [2007] ERROR:  permission denied for table transit_exceptions
+2026-11-17 22:12:58.951 UTC [2007] STATEMENT:  DELETE FROM transit_exceptions WHERE id = $1
+
+2026-11-17 22:12:58.981 UTC [2011] ERROR:  new row violates row-level security policy for table "inventory_alert_jobs"
+2026-11-17 22:12:58.981 UTC [2011] STATEMENT:  INSERT INTO inventory_alert_jobs (id, tenant_id, job_kind)
+	     VALUES ('64646464-3000-4000-8000-000000000003', $1, 'SHELF_LIFE')
+
+2026-11-17 22:12:58.996 UTC [2013] ERROR:  permission denied for table inventory_alert_jobs
+2026-11-17 22:12:58.996 UTC [2013] STATEMENT:  DELETE FROM inventory_alert_jobs WHERE id = $1
+
+2026-11-17 22:12:59.028 UTC [2017] ERROR:  new row violates row-level security policy for table "warehouse_kit_orders"
+2026-11-17 22:12:59.028 UTC [2017] STATEMENT:  INSERT INTO warehouse_kit_orders (id, tenant_id, warehouse_id, kit_item_id, qty, status)
+	     VALUES ('65656565-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', 1, 'DRAFT')
+
+2026-11-17 22:12:59.042 UTC [2019] ERROR:  permission denied for table warehouse_kit_orders
+2026-11-17 22:12:59.042 UTC [2019] STATEMENT:  DELETE FROM warehouse_kit_orders WHERE id = $1
+
+2026-11-17 22:12:59.073 UTC [2023] ERROR:  new row violates row-level security policy for table "warehouse_kit_lines"
+2026-11-17 22:12:59.073 UTC [2023] STATEMENT:  INSERT INTO warehouse_kit_lines (id, tenant_id, order_id, line_no, component_item_id, qty)
+	     VALUES ('66666666-3000-4000-8000-000000000003', $1, '65656565-0000-4000-8000-000000000002', 1,
+	             'babababa-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:59.088 UTC [2025] ERROR:  permission denied for table warehouse_kit_lines
+2026-11-17 22:12:59.088 UTC [2025] STATEMENT:  DELETE FROM warehouse_kit_lines WHERE id = $1
+
+2026-11-17 22:12:59.118 UTC [2029] ERROR:  new row violates row-level security policy for table "mps_entries"
+2026-11-17 22:12:59.118 UTC [2029] STATEMENT:  INSERT INTO mps_entries (id, tenant_id, warehouse_id, item_id, bucket_start, qty, uom_id, status)
+	     VALUES ('67676767-3000-4000-8000-000000000003', $1, 'f0f0f0f0-1000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', '2027-03-01', 1,
+	             'b2b2b2b2-0000-4000-8000-000000000002', 'PLANNED')
+
+2026-11-17 22:12:59.132 UTC [2031] ERROR:  permission denied for table mps_entries
+2026-11-17 22:12:59.132 UTC [2031] STATEMENT:  DELETE FROM mps_entries WHERE id = $1
+
+2026-11-17 22:12:59.161 UTC [2035] ERROR:  new row violates row-level security policy for table "bom_substitutions"
+2026-11-17 22:12:59.161 UTC [2035] STATEMENT:  INSERT INTO bom_substitutions (id, tenant_id, bom_line_id, substitute_item_id, priority)
+	     VALUES ('68686868-3000-4000-8000-000000000003', $1, '35353535-0000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', 9)
+
+2026-11-17 22:12:59.203 UTC [2041] ERROR:  new row violates row-level security policy for table "bom_outputs"
+2026-11-17 22:12:59.203 UTC [2041] STATEMENT:  INSERT INTO bom_outputs (id, tenant_id, bom_id, item_id, output_kind, allocation_pct, qty_per_output, uom_id)
+	     VALUES ('69696969-3000-4000-8000-000000000003', $1, '34343434-0000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', 'BY_PRODUCT', 10, 0.1,
+	             'b2b2b2b2-0000-4000-8000-000000000002')
+
+2026-11-17 22:12:59.246 UTC [2047] ERROR:  new row violates row-level security policy for table "bill_of_resources"
+2026-11-17 22:12:59.246 UTC [2047] STATEMENT:  INSERT INTO bill_of_resources (id, tenant_id, bom_id, line_no, resource_kind, work_center_id, consumption_factor)
+	     VALUES ('6a6a6a6a-3000-4000-8000-000000000003', $1, '34343434-0000-4000-8000-000000000002',
+	             9, 'WORK_CENTER', '49494942-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:59.288 UTC [2053] ERROR:  new row violates row-level security policy for table "mrp_runs"
+2026-11-17 22:12:59.288 UTC [2053] STATEMENT:  INSERT INTO mrp_runs (id, tenant_id, status, run_mode, bucket_size, horizon_buckets, warehouse_id, as_of_date, scope_item_ids, params)
+	     VALUES ('6b6b6b6b-3000-4000-8000-000000000003', $1, 'RUNNING', 'REGENERATIVE', 'DAY', 7,
+	             'f0f0f0f0-1000-4000-8000-000000000002', '2027-03-01', '[]', '{}')
+
+2026-11-17 22:12:59.303 UTC [2055] ERROR:  permission denied for table mrp_runs
+2026-11-17 22:12:59.303 UTC [2055] STATEMENT:  DELETE FROM mrp_runs WHERE id = $1
+
+2026-11-17 22:12:59.332 UTC [2059] ERROR:  new row violates row-level security policy for table "mrp_demand_lines"
+2026-11-17 22:12:59.332 UTC [2059] STATEMENT:  INSERT INTO mrp_demand_lines (id, tenant_id, run_id, warehouse_id, item_id, bucket_index, bucket_start, demand_kind, qty)
+	     VALUES ('6c6c6c6c-3000-4000-8000-000000000003', $1, '6b6b6b6b-0000-4000-8000-000000000002',
+	             'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	             9, '2027-03-10', 'SAFETY_STOCK', 1)
+
+2026-11-17 22:12:59.347 UTC [2061] ERROR:  permission denied for table mrp_demand_lines
+2026-11-17 22:12:59.347 UTC [2061] STATEMENT:  DELETE FROM mrp_demand_lines WHERE id = $1
+
+2026-11-17 22:12:59.375 UTC [2065] ERROR:  new row violates row-level security policy for table "mrp_supply_lines"
+2026-11-17 22:12:59.375 UTC [2065] STATEMENT:  INSERT INTO mrp_supply_lines (id, tenant_id, run_id, warehouse_id, item_id, bucket_index, bucket_start, supply_kind, qty)
+	     VALUES ('6d6d6d6d-3000-4000-8000-000000000003', $1, '6b6b6b6b-0000-4000-8000-000000000002',
+	             'f0f0f0f0-1000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+	             9, '2027-03-10', 'OPEN_PO', 1)
+
+2026-11-17 22:12:59.390 UTC [2067] ERROR:  permission denied for table mrp_supply_lines
+2026-11-17 22:12:59.390 UTC [2067] STATEMENT:  DELETE FROM mrp_supply_lines WHERE id = $1
+
+2026-11-17 22:12:59.418 UTC [2071] ERROR:  new row violates row-level security policy for table "mrp_suggestions"
+2026-11-17 22:12:59.418 UTC [2071] STATEMENT:  INSERT INTO mrp_suggestions (id, tenant_id, run_id, item_id, warehouse_id, suggestion_type, qty, uom_id, due_date, release_date, status, netting)
+	     VALUES ('6e6e6e6e-3000-4000-8000-000000000003', $1, '6b6b6b6b-0000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', 'f0f0f0f0-1000-4000-8000-000000000002',
+	             'PURCHASE_ORDER', 1, 'b2b2b2b2-0000-4000-8000-000000000002',
+	             '2027-03-10', '2027-03-01', 'SUGGESTED', '{}')
+
+2026-11-17 22:12:59.432 UTC [2073] ERROR:  permission denied for table mrp_suggestions
+2026-11-17 22:12:59.432 UTC [2073] STATEMENT:  DELETE FROM mrp_suggestions WHERE id = $1
+
+2026-11-17 22:12:59.461 UTC [2077] ERROR:  new row violates row-level security policy for table "contract_mfg_orders"
+2026-11-17 22:12:59.461 UTC [2077] STATEMENT:  INSERT INTO contract_mfg_orders (id, tenant_id, processor_partner_id, item_id, bom_id, warehouse_id, planned_qty, uom_id, status)
+	     VALUES ('6f6f6f6f-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+	             'babababa-0000-4000-8000-000000000002', '34343434-0000-4000-8000-000000000002',
+	             'f0f0f0f0-1000-4000-8000-000000000002', 1, 'b2b2b2b2-0000-4000-8000-000000000002', 'DRAFT')
+
+2026-11-17 22:12:59.475 UTC [2079] ERROR:  permission denied for table contract_mfg_orders
+2026-11-17 22:12:59.475 UTC [2079] STATEMENT:  DELETE FROM contract_mfg_orders WHERE id = $1
+
+2026-11-17 22:12:59.504 UTC [2083] ERROR:  new row violates row-level security policy for table "contract_mfg_moves"
+2026-11-17 22:12:59.504 UTC [2083] STATEMENT:  INSERT INTO contract_mfg_moves (id, tenant_id, order_id, move_kind, item_id, qty)
+	     VALUES ('70707070-3000-4000-8000-000000000003', $1, '6f6f6f6f-0000-4000-8000-000000000002',
+	             'RETURN_MATERIAL', 'babababa-0000-4000-8000-000000000002', 1)
+
+2026-11-17 22:12:59.518 UTC [2085] ERROR:  permission denied for table contract_mfg_moves
+2026-11-17 22:12:59.518 UTC [2085] STATEMENT:  DELETE FROM contract_mfg_moves WHERE id = $1
+
+2026-11-17 22:12:59.548 UTC [2089] ERROR:  new row violates row-level security policy for table "shifts"
+2026-11-17 22:12:59.548 UTC [2089] STATEMENT:  INSERT INTO shifts (id, tenant_id, code, name, start_time, end_time)
+	     VALUES ('71717171-3000-4000-8000-000000000003', $1, 'ATK-SHIFT', 'Attack shift', '09:00', '17:00')
+
+2026-11-17 22:12:59.590 UTC [2095] ERROR:  new row violates row-level security policy for table "shift_rotations"
+2026-11-17 22:12:59.590 UTC [2095] STATEMENT:  INSERT INTO shift_rotations (id, tenant_id, employee_id, work_date, shift_id, source)
+	     VALUES ('72727272-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+	             '2027-03-02', '71717171-0000-4000-8000-000000000002', 'MANUAL')
+
+2026-11-17 22:12:59.632 UTC [2101] ERROR:  new row violates row-level security policy for table "attendance_records"
+2026-11-17 22:12:59.632 UTC [2101] STATEMENT:  INSERT INTO attendance_records (id, tenant_id, employee_id, work_date, check_in, source, shift_id, derived_status)
+	     VALUES ('73737373-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+	             '2027-03-02', '2027-03-02 09:00:00+00', 'MANUAL',
+	             '71717171-0000-4000-8000-000000000002', 'PRESENT')
+
+2026-11-17 22:12:59.647 UTC [2103] ERROR:  permission denied for table attendance_records
+2026-11-17 22:12:59.647 UTC [2103] STATEMENT:  DELETE FROM attendance_records WHERE id = $1
+
+2026-11-17 22:12:59.675 UTC [2107] ERROR:  new row violates row-level security policy for table "overtime_rules"
+2026-11-17 22:12:59.675 UTC [2107] STATEMENT:  INSERT INTO overtime_rules (id, tenant_id, code, name, tier, multiplier)
+	     VALUES ('74747474-3000-4000-8000-000000000003', $1, 'ATK-OT', 'Attack overtime', 'WEEKEND', 2)
+
+2026-11-17 22:12:59.689 UTC [2109] ERROR:  permission denied for table overtime_rules
+2026-11-17 22:12:59.689 UTC [2109] STATEMENT:  DELETE FROM overtime_rules WHERE id = $1
+
+2026-11-17 22:12:59.717 UTC [2113] ERROR:  new row violates row-level security policy for table "overtime_entries"
+2026-11-17 22:12:59.717 UTC [2113] STATEMENT:  INSERT INTO overtime_entries (id, tenant_id, employee_id, work_date, hours, rule_id, status)
+	     VALUES ('75757575-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+	             '2027-03-02', 1, '74747474-0000-4000-8000-000000000002', 'PENDING')
+
+2026-11-17 22:12:59.731 UTC [2115] ERROR:  permission denied for table overtime_entries
+2026-11-17 22:12:59.731 UTC [2115] STATEMENT:  DELETE FROM overtime_entries WHERE id = $1
+
+2026-11-17 22:12:59.760 UTC [2119] ERROR:  new row violates row-level security policy for table "leave_types"
+2026-11-17 22:12:59.760 UTC [2119] STATEMENT:  INSERT INTO leave_types (id, tenant_id, code, name, paid, accrual_days_per_year)
+	     VALUES ('76767676-3000-4000-8000-000000000003', $1, 'ATK-LV', 'Attack leave', false, 0)
+
+2026-11-17 22:12:59.773 UTC [2121] ERROR:  permission denied for table leave_types
+2026-11-17 22:12:59.773 UTC [2121] STATEMENT:  DELETE FROM leave_types WHERE id = $1
+
+2026-11-17 22:12:59.802 UTC [2125] ERROR:  new row violates row-level security policy for table "leave_balances"
+2026-11-17 22:12:59.802 UTC [2125] STATEMENT:  INSERT INTO leave_balances (id, tenant_id, employee_id, leave_type_id, year, entitlement_days)
+	     VALUES ('77777777-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+	             '76767676-0000-4000-8000-000000000002', 2027, 5)
+
+2026-11-17 22:12:59.816 UTC [2127] ERROR:  permission denied for table leave_balances
+2026-11-17 22:12:59.816 UTC [2127] STATEMENT:  DELETE FROM leave_balances WHERE id = $1
+
+2026-11-17 22:12:59.844 UTC [2131] ERROR:  new row violates row-level security policy for table "leave_requests"
+2026-11-17 22:12:59.844 UTC [2131] STATEMENT:  INSERT INTO leave_requests (id, tenant_id, employee_id, leave_type_id, start_date, end_date, days, status)
+	     VALUES ('78787878-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+	             '76767676-0000-4000-8000-000000000002', '2027-03-04', '2027-03-05', 2, 'PENDING')
+
+2026-11-17 22:12:59.858 UTC [2133] ERROR:  permission denied for table leave_requests
+2026-11-17 22:12:59.858 UTC [2133] STATEMENT:  DELETE FROM leave_requests WHERE id = $1
+
+2026-11-17 22:12:59.887 UTC [2137] ERROR:  new row violates row-level security policy for table "holiday_calendars"
+2026-11-17 22:12:59.887 UTC [2137] STATEMENT:  INSERT INTO holiday_calendars (id, tenant_id, jurisdiction_code, name)
+	     VALUES ('79797979-3000-4000-8000-000000000003', $1, 'ATK', 'Attack calendar')
+
+2026-11-17 22:12:59.928 UTC [2143] ERROR:  new row violates row-level security policy for table "holidays"
+2026-11-17 22:12:59.928 UTC [2143] STATEMENT:  INSERT INTO holidays (id, tenant_id, calendar_id, holiday_date, name)
+	     VALUES ('7a7a7a7a-3000-4000-8000-000000000003', $1, '79797979-0000-4000-8000-000000000002',
+	             '2027-03-06', 'Attack day')
+
+2026-11-17 22:12:59.971 UTC [2149] ERROR:  new row violates row-level security policy for table "attendance_import_batches"
+2026-11-17 22:12:59.971 UTC [2149] STATEMENT:  INSERT INTO attendance_import_batches (id, tenant_id, file_name, file_sha256,
+	                                                                    file_size, row_count, imported_count, quarantine_count, mapping)
+	     VALUES ('7b7b7b7b-3000-4000-8000-000000000003', $1, 'ATK.csv', repeat('c', 64), 1, 1, 0, 0, '{}'::jsonb)
+
+2026-11-17 22:12:59.978 UTC [2150] ERROR:  permission denied for table attendance_import_batches
+2026-11-17 22:12:59.978 UTC [2150] STATEMENT:  UPDATE attendance_import_batches SET updated_at = updated_at WHERE id = $1
+
+2026-11-17 22:12:59.986 UTC [2151] ERROR:  permission denied for table attendance_import_batches
+2026-11-17 22:12:59.986 UTC [2151] STATEMENT:  DELETE FROM attendance_import_batches WHERE id = $1
+
+2026-11-17 22:13:00.015 UTC [2155] ERROR:  new row violates row-level security policy for table "attendance_import_anomalies"
+2026-11-17 22:13:00.015 UTC [2155] STATEMENT:  INSERT INTO attendance_import_anomalies (id, tenant_id, batch_id, line_no, raw_line, reason)
+	     VALUES ('7c7c7c7c-3000-4000-8000-000000000003', $1, '7b7b7b7b-0000-4000-8000-000000000002',
+	             4, 'ATK row', 'INVALID_ROW')
+
+2026-11-17 22:13:00.031 UTC [2157] ERROR:  permission denied for table attendance_import_anomalies
+2026-11-17 22:13:00.031 UTC [2157] STATEMENT:  DELETE FROM attendance_import_anomalies WHERE id = $1
+
+2026-11-17 22:13:00.060 UTC [2161] ERROR:  new row violates row-level security policy for table "statutory_contribution_profiles"
+2026-11-17 22:13:00.060 UTC [2161] STATEMENT:  INSERT INTO statutory_contribution_profiles (id, tenant_id, jurisdiction_code, code, name,
+	      employee_rate, employer_rate, applies_to, effective_from, status)
+	     VALUES ('7d7d7d7d-3000-4000-8000-000000000003', $1, 'SA', 'ATK', 'Attack profile',
+	      1, 1, 'ALL', '2020-01-01', 'REQUIRES_VERIFICATION')
+
+2026-11-17 22:13:00.074 UTC [2163] ERROR:  permission denied for table statutory_contribution_profiles
+2026-11-17 22:13:00.074 UTC [2163] STATEMENT:  DELETE FROM statutory_contribution_profiles WHERE id = $1
+
+2026-11-17 22:13:00.106 UTC [2167] ERROR:  new row violates row-level security policy for table "payroll_tax_brackets"
+2026-11-17 22:13:00.106 UTC [2167] STATEMENT:  INSERT INTO payroll_tax_brackets (id, tenant_id, jurisdiction_code, code, floor, rate, sort,
+	      effective_from, status)
+	     VALUES ('7e7e7e7e-3000-4000-8000-000000000003', $1, 'SA', 'ATK', 0, 0, 1,
+	      '2020-01-01', 'REQUIRES_VERIFICATION')
+
+2026-11-17 22:13:00.120 UTC [2169] ERROR:  permission denied for table payroll_tax_brackets
+2026-11-17 22:13:00.120 UTC [2169] STATEMENT:  DELETE FROM payroll_tax_brackets WHERE id = $1
+
+2026-11-17 22:13:00.149 UTC [2173] ERROR:  new row violates row-level security policy for table "eosb_rules"
+2026-11-17 22:13:00.149 UTC [2173] STATEMENT:  INSERT INTO eosb_rules (id, tenant_id, jurisdiction_code, from_years, to_years, days_per_year,
+	      effective_from, status)
+	     VALUES ('7f7f7f7f-3000-4000-8000-000000000003', $1, 'SA', 0, 5, 15,
+	      '2020-01-01', 'REQUIRES_VERIFICATION')
+
+2026-11-17 22:13:00.192 UTC [2179] ERROR:  new row violates row-level security policy for table "eosb_calculations"
+2026-11-17 22:13:00.192 UTC [2179] STATEMENT:  INSERT INTO eosb_calculations (id, tenant_id, employee_id, kind, service_years,
+	      tier_breakdown, wage_base_snapshot, entitlement_amount, provision_balance, delta, entry_date, status)
+	     VALUES ('80808080-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+	      'PERIOD_TRUE_UP', 3, '[]'::jsonb, '{}'::jsonb, 900, 600, 300, '2027-01-31', 'COMPUTED')
+
+2026-11-17 22:13:00.206 UTC [2181] ERROR:  permission denied for table eosb_calculations
+2026-11-17 22:13:00.206 UTC [2181] STATEMENT:  DELETE FROM eosb_calculations WHERE id = $1
+
+2026-11-17 22:13:00.222 UTC [2183] ERROR:  new row violates row-level security policy for table "roles"
+2026-11-17 22:13:00.222 UTC [2183] STATEMENT:  INSERT INTO roles (id, tenant_id, key, name, is_system)
+	       VALUES ('dddddddd-9999-4999-8999-999999999999', NULL, 'forged', 'Forged', true)
+
+2026-11-17 22:13:00.223 UTC [2183] ERROR:  new row violates row-level security policy for table "roles"
+2026-11-17 22:13:00.223 UTC [2183] STATEMENT:  UPDATE roles SET name = 'HACKED' WHERE tenant_id IS NULL AND key = 'owner'
+
+2026-11-17 22:13:00.238 UTC [2185] ERROR:  new row violates row-level security policy for table "roles"
+2026-11-17 22:13:00.238 UTC [2185] STATEMENT:  INSERT INTO roles (id, tenant_id, key, name, is_system)
+	         VALUES ('dddddddd-7777-4777-8777-777777777777', $1, 'tenant_probe', 'Tenant Probe', false)
+
+2026-11-17 22:13:00.247 UTC [2186] ERROR:  insert or update on table "memberships" violates foreign key constraint "fk_memberships_role"
+2026-11-17 22:13:00.247 UTC [2186] DETAIL:  Key (role_id, tenant_id)=(dddddddd-0000-4000-8000-000000000002, 11111111-1111-1111-1111-111111111111) is not present in table "roles".
+2026-11-17 22:13:00.247 UTC [2186] STATEMENT:  INSERT INTO memberships (id, tenant_id, user_id, role_id)
+	         VALUES ('ffffffff-1111-4111-8111-111111111111', $1,
+	                 'eeeeeeee-0000-4000-8000-000000000002',
+	                 'dddddddd-0000-4000-8000-000000000002')
+
+ ✓ src/__db__/isolation/identity-isolation.db.spec.ts (1608 tests) 12083ms
+{"level":40,"time":1794953582852,"service":"erp-api","module":"identity","user_id":"01a1eb92-1606-7000-ab5a-2cd52796a4e4","msg":"temporary lockout engaged (R-01)"}
+{"level":40,"time":1794953583016,"service":"erp-api","module":"identity","email_hash":"405489a6a8e8","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583332,"service":"erp-api","module":"identity","email_hash":"fe90e9be6563","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583333,"service":"erp-api","module":"identity","email_hash":"236f1b9d195a","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583334,"service":"erp-api","module":"identity","email_hash":"0b62835181c6","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583335,"service":"erp-api","module":"identity","email_hash":"1c3ae17b41ed","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583336,"service":"erp-api","module":"identity","email_hash":"f794a635dbba","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583336,"service":"erp-api","module":"identity","email_hash":"a0a18e76e0be","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583337,"service":"erp-api","module":"identity","email_hash":"6411faf0d2b7","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583338,"service":"erp-api","module":"identity","email_hash":"3bea867b9b16","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583338,"service":"erp-api","module":"identity","email_hash":"3b789b5ed688","msg":"login attempt for unknown email"}
+{"level":40,"time":1794953583339,"service":"erp-api","module":"identity","email_hash":"2b71691224f2","msg":"login attempt for unknown email"}
+{"level":30,"time":1794953584478,"service":"erp-api","module":"identity","user_id":"01a1eb92-1eca-7000-b39f-a26238b9540a","msg":"password reset consumed; all sessions revoked"}
+ ✓ src/__db__/identity-flows.db.spec.ts (21 tests) 5016ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > argon2id-verified login issues a rotating session and records user.login  400ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > progressive lockout: N failures → temporary lock, never permanent; counters reset on success (R-01)  1094ms
+   ✓ session windows + rotation (M-01, M-02, M-04, M-10) > owner revokes another user's session — dead immediately (M-10)  320ms
+   ✓ session windows + rotation (M-01, M-02, M-04, M-10) > password reset consume revokes every session (M-08 + AUTHENTICATION §4)  307ms
+   ✓ TOTP MFA (M-06, M-07, acceptance 3) > enroll → verify confirms; same-code replay rejected; recovery codes single-use  566ms
+   ✓ invitations (acceptance flow; single-use/expiry/revocation) > issue → accept creates membership + PENDING user path with password; token single-use  321ms
+   ✓ route × role permission checklist (acceptance 5) > every protected route: owner template grants it, viewer template does not (identity/audit plane)  305ms
+{"level":30,"time":1794953593693,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1794953593729,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1794953594033,"service":"erp-api","module":"http","correlation_id":"01a1eb92-449f-7000-853a-37c6fec08b52","action":"request","method":"GET","path":"/api/v1/platform/register/options","status":200,"duration_ms":18,"msg":"request completed"}
+{"level":30,"time":1794953594289,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-455e-7000-b9fc-c65a1993284d","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953594290,"service":"erp-api","module":"http","correlation_id":"01a1eb92-44c6-7000-8a7e-25d64a32992e","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":236,"msg":"request completed"}
+{"level":30,"time":1794953594536,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-4644-7000-91e4-0dbda2460115","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953594537,"service":"erp-api","module":"http","correlation_id":"01a1eb92-45b5-7000-b84d-d682c26a823b","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":244,"msg":"request completed"}
+{"level":30,"time":1794953594758,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-473d-7000-85c1-a1f389b13879","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953594759,"service":"erp-api","module":"http","correlation_id":"01a1eb92-46ab-7000-a600-e408a0c3ed05","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":220,"msg":"request completed"}
+{"level":30,"time":1794953594958,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-4818-7000-a514-1c39132c0bd8","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953594958,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4789-7000-a70c-63da8e40b7bb","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":197,"msg":"request completed"}
+{"level":30,"time":1794953595166,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-48de-7000-a43c-4a13b1199676","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953595166,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4851-7000-9664-b7f549cba04b","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":205,"msg":"request completed"}
+{"level":30,"time":1794953595170,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4920-7000-b026-08796cbbffd5","action":"request","method":"POST","path":"/api/v1/platform/register","status":429,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1794953595317,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4925-7000-8b23-009f3a08ecfd","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":144,"msg":"request completed"}
+{"level":30,"time":1794953595402,"service":"erp-api","module":"http","correlation_id":"01a1eb92-49b7-7000-8e75-d8a27f26f5ec","action":"request","method":"POST","path":"/api/v1/tenancy/onboarding/provision","status":200,"duration_ms":83,"msg":"request completed"}
+{"level":30,"time":1794953595455,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4a0c-7000-9dc4-c5ec32126e9d","action":"request","method":"POST","path":"/api/v1/tenancy/onboarding/provision","status":200,"duration_ms":51,"msg":"request completed"}
+{"level":30,"time":1794953595732,"service":"erp-api","module":"notifications","template":"registration_welcome","correlation_id":"01a1eb92-44c6-7000-8a7e-25d64a32992e","msg":"email delivered"}
+{"level":30,"time":1794953595750,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4ad7-7000-b501-60c3c6c05698","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":143,"msg":"request completed"}
+{"level":30,"time":1794953595761,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b69-7000-a398-efe672e9bdd0","action":"request","method":"POST","path":"/api/v1/tenancy/branches","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1794953595769,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b73-7000-82af-2ad0324dbbbf","action":"request","method":"POST","path":"/api/v1/tenancy/branches","status":403,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953595777,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b7a-7001-9b89-99572a394aef","action":"request","method":"PATCH","path":"/api/v1/tenancy/branches/01a1eb92-4b70-7000-9833-dae632dd9cbe","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953595785,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b82-7000-b126-79cffe1937fa","action":"request","method":"POST","path":"/api/v1/tenancy/branches","status":409,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953595793,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b8b-7000-964e-9a759c5d356d","action":"request","method":"GET","path":"/api/v1/tenancy/settings","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953595805,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b93-7000-9157-ac0b788a8d5f","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/general.numeral_system","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1794953595811,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4b9e-7000-b8ab-0a76e254f662","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/does.not_exist","status":422,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794953595818,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4ba4-7001-9f14-d9b4009d0220","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/general.default_locale","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953595828,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4bab-7001-b620-d983619a7535","action":"request","method":"GET","path":"/api/v1/tenancy/entitlements","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1794953595979,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4bb6-7000-871b-1265e6b540c0","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":149,"msg":"request completed"}
+{"level":30,"time":1794953595987,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4c4c-7001-9746-c6305e2ea045","action":"request","method":"GET","path":"/api/v1/platform/tenants?limit=200","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953595994,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4c55-7000-aa46-c1dcb470ac84","action":"request","method":"GET","path":"/api/v1/platform/tenants","status":403,"duration_ms":5,"msg":"request completed"}
+(node:537) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{"level":30,"time":1794953596029,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4c5c-7000-861d-240c9ad5e3b5","action":"request","method":"GET","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d","status":200,"duration_ms":33,"msg":"request completed"}
+{"level":30,"time":1794953596153,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4c7f-7000-9812-ffb0a37d890c","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/plan","status":200,"duration_ms":122,"msg":"request completed"}
+{"level":30,"time":1794953596162,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4cfb-7000-998c-a18695b6672a","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/entitlements","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953596169,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4d03-7000-86b9-bc1ffc060a2d","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/entitlements","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953596177,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4d0a-7001-8d57-41954b1b320b","action":"request","method":"DELETE","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/entitlements/accounting.recurring_journals?reason=cleanup","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953596184,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4d12-7000-b170-635cac1c4743","action":"request","method":"GET","path":"/api/v1/platform/audit/events?platformOnly=true&limit=200","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":40,"time":1794953596195,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1eb92-455e-7000-b9fc-c65a1993284d","killed_sessions":2,"msg":"tenant suspended"}
+{"level":30,"time":1794953596195,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4d1a-7000-b538-760248866479","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/suspend","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1794953596198,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4d24-7001-b81e-9aafcbd2fb8f","action":"request","method":"GET","path":"/api/v1/tenancy/profile","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":40,"time":1794953596340,"service":"erp-api","module":"identity","user_id":"01a1eb92-4563-7000-889f-c94087f4fea9","msg":"authenticated user has no active membership"}
+{"level":30,"time":1794953596341,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4d27-7000-b089-c29a4957ad4a","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":401,"duration_ms":142,"msg":"request completed"}
+{"level":30,"time":1794953596350,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4db6-7001-97f2-85ce441f0b2f","action":"request","method":"GET","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1794953596358,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4dc0-7000-b9a0-1108f6ad1c9c","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/restore","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953596502,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4dc7-7000-bc9a-73b869b92af4","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":143,"msg":"request completed"}
+{"level":30,"time":1794953596508,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4e58-7000-9a8f-513cbe659204","action":"request","method":"GET","path":"/api/v1/tenancy/profile","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794953596516,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4e5e-7000-a1a1-3d205933dbe8","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/platform.support.opt_in","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953596524,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4e65-7000-9ab3-c1fd560aa4a0","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/support-sessions","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953596531,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4e6d-7000-adb2-30776fe9984b","action":"request","method":"GET","path":"/api/v1/platform/tenants/01a1eb92-455e-7000-b9fc-c65a1993284d/support-sessions/01a1eb92-4e6a-7000-9d5b-74bb64db7853/tenant-data/users","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953596536,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4e74-7000-99a0-bfa99621c865","action":"request","method":"GET","path":"/api/v1/tenancy/support-sessions","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794953596544,"service":"erp-api","module":"http","correlation_id":"01a1eb92-4e79-7001-9213-2763502353c3","action":"request","method":"DELETE","path":"/api/v1/tenancy/support-sessions/01a1eb92-4e6a-7000-9d5b-74bb64db7853","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953596562,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/tenancy-http.db.spec.ts (16 tests) 3337ms
+   ✓ public registration (anonymous, rate-limited) > per-IP rate limit caps anonymous registrations (429 + Retry-After)  880ms
+ ✓ src/__db__/migrations.db.spec.ts (7 tests) 1335ms
+   ✓ migration state > re-apply (regression shape) is a no-op: drizzle-kit migrate skips applied entries  1097ms
+{"level":30,"time":1794953598355,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1794953598372,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1794953598376,"service":"erp-api","module":"notifications","template":"registration_welcome","correlation_id":"01a1eb92-45b5-7000-b84d-d682c26a823b","msg":"email delivered"}
+{"level":30,"time":1794953598593,"service":"erp-api","module":"http","correlation_id":"01a1eb92-55dd-7000-b263-78adc4349243","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":164,"msg":"request completed"}
+{"level":30,"time":1794953598737,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5684-7000-a15a-8ab50cabafa2","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":401,"duration_ms":141,"msg":"request completed"}
+{"level":40,"time":1794953598740,"service":"erp-api","module":"identity","email_hash":"63bc7e40b1ca","msg":"login attempt for unknown email"}
+{"level":30,"time":1794953598741,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5713-7000-aa20-046e3de9ebd0","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1794953598889,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5717-7000-b59f-af6120e465bb","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":146,"msg":"request completed"}
+{"level":30,"time":1794953598891,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57aa-7000-8201-8231e0cdeb5f","action":"request","method":"GET","path":"/api/v1/identity/users","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1794953598904,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57b4-7000-bff7-267c393a710f","action":"request","method":"GET","path":"/api/v1/identity/users","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794953598919,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57c0-7000-b3fc-ffa73edf6c42","action":"request","method":"GET","path":"/api/v1/identity/users","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1794953598925,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57c8-7000-afef-eb8be06911af","action":"request","method":"GET","path":"/api/v1/identity/sessions/current","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794953598932,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57ce-7000-8592-fe20c9cbec01","action":"request","method":"POST","path":"/api/v1/identity/sessions/switch-tenant","status":404,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953598939,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57d5-7000-b93d-f0c86e201e3a","action":"request","method":"GET","path":"/api/v1/audit/events","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953598944,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57dd-7000-b60d-3e85d359d289","action":"request","method":"GET","path":"/api/v1/audit/events","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1794953598949,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57e2-7000-bbfa-0cf827e2fd2e","action":"request","method":"POST","path":"/api/v1/identity/invitations","status":422,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1794953599098,"service":"erp-api","module":"http","correlation_id":"01a1eb92-57e6-7000-bc1e-e0cce387d2e3","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":148,"msg":"request completed"}
+{"level":30,"time":1794953599104,"service":"erp-api","module":"http","correlation_id":"01a1eb92-587b-7000-b0f6-e50cfbc2c092","action":"request","method":"DELETE","path":"/api/v1/identity/sessions/current","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794953599107,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5881-7000-b3d1-ed85d4511fcd","action":"request","method":"GET","path":"/api/v1/identity/sessions/current","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1794953599115,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5885-7000-b131-7413af49aac1","action":"request","method":"POST","path":"/api/v1/identity/mfa/totp/enroll","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1794953599125,"service":"erp-api","module":"http","correlation_id":"01a1eb92-588d-7000-9e5a-14260e053deb","action":"request","method":"POST","path":"/api/v1/identity/mfa/totp/verify","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1794953599266,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5897-7000-94e2-30c97638da61","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":423,"duration_ms":139,"msg":"request completed"}
+{"level":30,"time":1794953599273,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5924-7000-8271-731d63775f0d","action":"request","method":"POST","path":"/api/v1/identity/password-resets","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1794953599275,"service":"erp-api","module":"identity","email_domain":"exist.test","msg":"reset requested for unknown email"}
+{"level":30,"time":1794953599276,"service":"erp-api","module":"http","correlation_id":"01a1eb92-592a-7001-a8a2-0ec1e795c754","action":"request","method":"POST","path":"/api/v1/identity/password-resets","status":200,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1794953599301,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5937-7000-858c-c074f73ab298","action":"request","method":"GET","path":"/api/v1/hr/self/summary","status":200,"duration_ms":14,"msg":"request completed"}
+{"level":30,"time":1794953599311,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5946-7000-9e04-1f120c1eb69f","action":"request","method":"GET","path":"/api/v1/hr/self/summary","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1794953599320,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5950-7000-aeae-73b401f35bb8","action":"request","method":"GET","path":"/api/v1/hr/leave/types","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1794953599330,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5959-7002-897d-43388400016c","action":"request","method":"POST","path":"/api/v1/hr/shifts","status":201,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1794953599335,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5963-7000-956f-0de77a932105","action":"request","method":"GET","path":"/api/v1/hr/shifts/00000000-0000-4000-8000-0000000005ff","status":404,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1794953599338,"service":"erp-api","module":"http","correlation_id":"01a1eb92-5969-7000-9b22-5b62a5be4334","action":"request","method":"GET","path":"/api/v1/hr/self/summary","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1794953599341,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/identity-http.db.spec.ts (14 tests) 1391ms
+   ✓ login surface (public) > issues a session token with the data envelope; wrong password is a uniform 401  317ms
+{"level":30,"time":1794953599686,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-5a84-7000-96e3-7735d878ef76","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953599953,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-5b9a-7000-a8d8-f00c7a89f9c1","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953600198,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-5c95-7000-8892-8bc4ff3ef13b","country":"SA","msg":"tenant registered via public flow"}
+ ✓ src/__db__/tenancy-provisioning.db.spec.ts (4 tests) 890ms
+   ✓ provisionWorkspace (acceptance 2) > instantiates CoA (64 accounts, 41 markers) + 8 system roles + defaults — idempotently  360ms
+{"level":30,"time":1794953600585,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-5e0b-7000-a846-7dd629622003","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1794953600787,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1eb92-5edf-7000-a19c-f0e7aab7ebd1","country":"AE","msg":"tenant registered via public flow"}
+ ✓ src/__db__/entitlements.db.spec.ts (11 tests) 494ms
+2026-11-17 22:13:20.934 UTC [2324] ERROR:  new row violates row-level security policy for table "audit_events"
+2026-11-17 22:13:20.934 UTC [2324] STATEMENT:  INSERT INTO audit_events (id, tenant_id, action, entity_type, entity_id, via_platform_admin)
+	         VALUES ('cccccccc-9000-4000-8000-000000000009', $1, 'forge.tenant', 'tenant', $1, true)
+
+2026-11-17 22:13:20.942 UTC [2325] ERROR:  new row violates row-level security policy for table "audit_events"
+2026-11-17 22:13:20.942 UTC [2325] STATEMENT:  INSERT INTO audit_events (id, tenant_id, action, entity_type, entity_id, via_platform_admin)
+	         VALUES ('cccccccc-9000-4000-8000-00000000000a', NULL, 'forge.platform', 'tenant', $1, true)
+
+2026-11-17 22:13:20.949 UTC [2326] ERROR:  new row violates row-level security policy for table "plans"
+2026-11-17 22:13:20.949 UTC [2326] STATEMENT:  INSERT INTO plans (id, key, name, name_ar, price_amount, currency_code, limits, feature_keys)
+	         VALUES ('31111111-0000-4000-8000-00000000000f', 'rogue', 'Rogue', 'م rogue', 0, 'SAR',
+	                 '{}'::jsonb, ARRAY['platform.registration'])
+
+ ✓ src/__db__/isolation/platform-isolation.db.spec.ts (12 tests) 99ms
+
+ Test Files  8 passed (8)
+      Tests  1693 passed (1693)
+   Start at  22:12:43
+   Duration  37.73s (transform 4.81s, setup 0ms, collect 8.35s, tests 24.65s, environment 0ms, prepare 54ms)
+
+2026-11-17 22:13:20.993 UTC [478] LOG:  received fast shutdown request
+2026-11-17 22:13:20.993 UTC [478] LOG:  aborting any active transactions
+2026-11-17 22:13:20.993 UTC [2299] FATAL:  terminating connection due to administrator command
+2026-11-17 22:13:20.993 UTC [2311] FATAL:  terminating connection due to administrator command
+2026-11-17 22:13:20.994 UTC [2183] FATAL:  terminating connection due to administrator command
+2026-11-17 22:13:20.996 UTC [478] LOG:  background worker "logical replication launcher" (PID 484) exited with exit code 1
+
+2026-11-17 22:13:20.998 UTC [479] LOG:  shutting down
+
+2026-11-17 22:13:20.998 UTC [479] LOG:  checkpoint starting: shutdown immediate
+
+(node:537) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:537) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-17 22:13:21.042 UTC [479] LOG:  checkpoint complete: wrote 5615 buffers (34.3%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.034 s, sync=0.009 s, total=0.044 s; sync files=2738, longest=0.001 s, average=0.001 s; distance=33092 kB, estimate=33092 kB; lsn=0/352F9E0, redo lsn=0/352F9E0
+
+2026-11-17 22:13:21.052 UTC [478] LOG:  database system is shut down
+
+EXIT:0

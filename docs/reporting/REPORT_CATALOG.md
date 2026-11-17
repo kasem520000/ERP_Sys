@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-16 (PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-17 (PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. Earlier: PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -340,13 +340,23 @@ reuse module read permissions per §12.
 | `payroll.register` | Payroll Register / سجل الرواتب | payroll · payroll_runs, payroll_run_lines, employees (component snapshots) | fiscal period, branch, run | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 |
 | `payroll.cost-summary` | Payroll Cost Summary / ملخص تكاليف الرواتب | payroll · payroll_run_lines + GL expense provenance (cost allocation by branch/cost center) | period, branch, cost center, component kind | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 |
 | `payroll.eos-provision` | EOS Provision / مخصص نهاية الخدمة | payroll · employees, salary_structures (EOS-base components), payroll_runs + provision journal provenance | asOf, branch, tenure buckets | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 |
+| `payroll.statutory-summary` | Statutory Contributions Summary / ملخص الاستقطاعات القانونية | payroll · payroll_runs, payroll_run_lines (the frozen statutory_breakdown + statutory_summary liability folds) | dateFrom/To, period | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-046 |
+| `payroll.eosb-liability` | EOSB Liability / التزام مكافأة نهاية الخدمة | payroll · eosb_calculations (tier folds + deltas), payroll_runs, employees + the EOS_PROVISION GL provenance | locale, employee | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-046 |
 
 Notes: `fixed_assets.asset-register` asserts INV-023 in the footer (NBV = cost −
 accumulated depreciation ≥ salvage floor); `notes.maturity-calendar` and `notes.aging`
 assert INV-024 (custody equals journal effects — COLLECTED/DISCOUNTED/RETURNED notes carry
 zero `NOTES_RECEIVABLE` balance); `payroll.register` shows employee-level amounts — every
 run is audited and the permission is not granted to `viewer`-derived templates by default
-([AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.14).
+([AUTHORIZATION_MATRIX.md](../security/AUTHORIZATION_MATRIX.md) §3.14);
+`payroll.statutory-summary` asserts INV-032(b) in the footer (the three-way tie: Σ run
+statutory lines == the run statutory totals == the independent jsonb breakdown re-fold,
+and the summary's accrued == Σ employee + Σ employer + Σ PIT — the remittance-ready
+audit view; the filing artifact stays the run-level remittance export, IN-06);
+`payroll.eosb-liability` carries the standing-model `eosb-provision-tie` (Σ per-employee
+standing provisions == the EOS_PROVISION GL balance — the 046 view that accounts for
+the G-54 true-up legs; the 029-era `payroll.eos-provision` fold predates them — the
+W-3/W-06 design point recorded on that contract for the owner's review).
 
 **Shipped (PHASE-045, category `hr`)** — the three workforce registers over the
 PHASE-013 engine (registry 101 → 104; permissions reuse the 0086-seeded module keys —
@@ -468,6 +478,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-044 | the four WMS intelligence contracts added (§4: the bin-contents register with BR-076's owner visibility + the INV-029 fold tie, the cycle-count variance register over the §2.6 document family, the ABC classification over the latest generation, and the slow-movement intelligence view with the ABC class + bin spread — the slotting-hint angle); registry 95 → 99 |
 | PHASE-043 | the two planning contracts added (§7: the MRP exceptions view over the five documented exception classes — the data-readiness defects the run screen's panel mirrors + the latest run's uncovered residuals and frozen-fence suggestions, and the ATP/CTP position register with the BR-080 hard-exclusion evidence as first-class columns — quarantined/reserved/consignment-owned shown but never counted); registry 99 → 101 |
 | PHASE-045 | the three hr workforce contracts added (§9: the attendance register over the derived day verdicts + minute facts with the status-vocabulary/session-shape block-on-fail checks, the leave balance cells with the render-time INV-031 cap re-check + the pending-span days, and the overtime folds with BR-084's feeding law as first-class columns — the never-fed pre-approval exception hours); registry 101 → 104 |
+| PHASE-046 | the two payroll compliance contracts added (§9: the statutory contributions summary over the frozen statutory_breakdown/statutory_summary folds — the per (period × profile row) base/shares/capped-counts + the accrued-vs-remitted remittance liability, with the three-way `statutory-totals-tie` INV-032(b) check; and the EOSB liability view per employee — service years, tier days, the computed entitlement, the standing provision (the 029 balance + the accumulated G-54 deltas), settled, the delta — with the standing-model `eosb-provision-tie`); registry 104 → 106 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 

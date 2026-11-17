@@ -27,6 +27,20 @@ import { reportingServices } from "../services";
  * NO jurisdiction rates anywhere (BR-055 — the tenant policy note states
  * the basis discipline; the grep-verifiable no-rates law).
  *
+ * PHASE-046 (W-6, T-13 — THE W-3/W-6 DESIGN POINT, dated 2026-11-17,
+ * recorded for the owner's review): this 029-era register fold (Σ
+ * un-extinguished per-employee balances over the run-line accruals)
+ * predates the G-54 EOSB true-up legs. On a tenant that posts EOSB
+ * true-ups, the GL side grows by the deltas while this register side
+ * does not — the tie FAILS and the block-on-fail engages (the SAFE
+ * direction: a drifted export is refused, never silently wrong). The
+ * 046-correct view — the STANDING model (the 029 balance + the
+ * accumulated G-54 deltas), which ties in every world — is
+ * `payroll.eosb-liability` (this wave's contract). The semantic update
+ * of THIS report (fold the deltas into the register side, or retire the
+ * 029 view in favor of the standing view) is the owner's open input;
+ * not changed here unilaterally.
+ *
  * Permission `payroll.reports.view`. Employee rows carry code + display
  * names only (the PII law).
  */

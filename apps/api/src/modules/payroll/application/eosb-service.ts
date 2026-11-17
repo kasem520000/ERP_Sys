@@ -341,12 +341,20 @@ export class EosbService {
     // the reconciliation's per-run view; the run row itself is not a
     // ledger document, so advancing the tracked total on the POSTED row
     // violates no append-only law — the journal is the evidence).
+    // PHASE-046 (W-6, T-17 — F3, the owner's 2026-11-17 scope addition):
+    // the advance is the store's SQL-SIDE INCREMENT — two true-ups on
+    // DIFFERENT employees referencing the SAME run both hold only their
+    // own (distinct) employee gates, so the old read-modify-write (the
+    // new value computed FROM the read) lost an update on this column.
+    // The findRunById here is a pure EXISTENCE check (the typed 404 arm
+    // — runs are never deleted, so it is not a correctness read); the
+    // value itself is written only by `SET eosb_trueup_total =
+    // eosb_trueup_total + δ`, atomically under the row's own lock.
+    // Pinned by duel (9).
     if (input.runId !== null && input.runId !== undefined) {
       const run = await payrollStore.findRunById(input.runId);
       if (run === undefined) throw new RunNotFoundError(input.runId);
-      await payrollStore.updateRun(input.runId, {
-        eosbTrueupTotal: addExact(run.eosbTrueupTotal, entitlement.delta),
-      });
+      await payrollStore.advanceRunEosbTrueup(input.runId, entitlement.delta);
     }
     return { calculation, journalEntryId, delta: entitlement.delta };
   }
