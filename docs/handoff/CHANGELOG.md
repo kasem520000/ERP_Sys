@@ -35,11 +35,18 @@ Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BRE
   at all three record sites (the status row, the completion report §3,
   the W-6 gate doc) with dated notes. The scope-labeled battery on the
   affected surface: typecheck/lint 8/8, depcruise clean, api unit
-  667/667, the payroll DB folder 11 files · 88/88, the reporting DB
-  folder 17 files · 120/120 (the fold's complete consumer set — the full
-  DB suite NOT re-run: no migration/schema/route change), the property
-  wing 3× consecutive green (the determinism proof), docs 33/33, drift
-  300 = 300, i18n 6,121 = 6,121, id-ledger + history-secrets clean —
+  667/667, the payroll DB folder 11 files · 88/88 in the kept green log
+  — WITH THE NEW W-8 FINDING DISCLOSED: the P4 oa06-budgets probe is
+  PLAN-CHOICE FLAKY in the folder context (3 green / 3 red across six
+  identical runs; both plans index-driven; NOT the engine fix —
+  standalone green, the same tree green/red within minutes; the repair
+  options + both plans in the W-8 gate doc §4, the owner's ruling
+  requested) — the reporting DB folder 17 files · 120/120 (the fold's
+  complete consumer set — the full DB suite NOT re-run: no
+  migration/schema/route change), the property wing 3× consecutive
+  green (the determinism proof), docs 33/33 (after the gate doc
+  landed), drift 300 = 300, i18n 6,121 = 6,121, id-ledger +
+  history-secrets clean —
   [W-8 evidence](../operations/gate-evidence/2026-11-18-phase046-w8.md).
 - 2026-11-17 — **PHASE-046 COMPLETE — the W-7 closure wave** (T-15 + T-16 +
   T-18 + migration 0094, on the W-6 delivery head `a83874f`; the owner's

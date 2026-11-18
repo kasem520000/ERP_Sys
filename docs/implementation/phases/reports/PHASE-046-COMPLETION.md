@@ -196,11 +196,18 @@ self-test all-probes-OK).
   "deterministic" claim (corrected here in §3, in the status row, and in the
   W-6 gate doc, each with the dated note). The scope-labeled battery on the
   affected surface: typecheck/lint 8/8, api unit 667/667, the payroll DB
-  folder 88/88, the reporting DB folder 120/120 (the fold's complete consumer
-  set), the property wing 3× consecutive green (the determinism proof), docs
-  33/33, drift 300 = 300, i18n 6,121 = 6,121, id-ledger + history-secrets
-  clean — the full DB suite NOT re-run (no migration/schema/route change; the
-  blast radius = the fold's consumers, all green).
+  folder 88/88 in the kept green log — WITH THE NEW W-8 FINDING DISCLOSED:
+  the P4 oa06-budgets probe is PLAN-CHOICE FLAKY in the folder context
+  (3 green / 3 red across six identical runs; both plans index-driven —
+  the RLS-composed predicate's two cost-competitive paths on the shared
+  table; NOT the engine fix — standalone green, the same tree green/red
+  within minutes; the repair options + both plans in the W-8 gate doc
+  §4, the owner's ruling requested) — the reporting DB folder 120/120
+  (the fold's complete consumer set), the property wing 3× consecutive
+  green (the determinism proof), docs 33/33 (after the gate doc landed),
+  drift 300 = 300, i18n 6,121 = 6,121, id-ledger + history-secrets
+  clean — the full DB suite NOT re-run (no migration/schema/route change;
+  the blast radius = the fold's consumers, all green).
 
 ## 5. Gate evidence (the full sweep — the W-7 final head, 2026-11-17)
 

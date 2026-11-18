@@ -1,0 +1,146 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-18 02:01:49.410 UTC [15350] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-18 02:01:49.411 UTC [15350] LOG:  listening on IPv6 address "::1", port 38641
+2026-11-18 02:01:49.411 UTC [15350] LOG:  listening on IPv4 address "127.0.0.1", port 38641
+
+2026-11-18 02:01:49.411 UTC [15350] LOG:  listening on Unix socket "/tmp/.s.PGSQL.38641"
+
+2026-11-18 02:01:49.412 UTC [15353] LOG:  database system was shut down at 2026-11-18 02:01:49 UTC
+
+2026-11-18 02:01:49.414 UTC [15350] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/reporting/asof.spec.ts (2 tests) 1457ms
+   ✓ as-of freeze (posted_at cutoff) > entries posted AFTER the freeze never leak into the as-of snapshot  1246ms
+ ✓ src/__db__/reporting/render.spec.ts (2 tests) 936ms
+(node:15409) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/__db__/reporting/industry-017.spec.ts (10 tests) 663ms
+ ✓ src/__db__/reporting/payroll-compliance-reports.spec.ts (10 tests) 768ms
+ ✓ src/__db__/reporting/industry-019.spec.ts (11 tests) 561ms
+ ✓ src/__db__/reporting/industry-018.spec.ts (11 tests) 482ms
+ ✓ src/__db__/reporting/mrp-planning.spec.ts (5 tests) 444ms
+ ✓ src/__db__/reporting/manufacturing-reports.spec.ts (9 tests) 295ms
+ ✓ src/__db__/reporting/industry.spec.ts (8 tests) 266ms
+ ✓ src/__db__/reporting/wms-reports.spec.ts (9 tests) 230ms
+ ✓ src/__db__/reporting/exports.spec.ts (4 tests) 283ms
+2026-11-18 02:02:04.104 UTC [15430] ERROR:  division by zero
+2026-11-18 02:02:04.104 UTC [15430] STATEMENT:  SELECT 1/0
+
+2026-11-18 02:02:04.105 UTC [15430] ERROR:  current transaction is aborted, commands ignored until end of transaction block
+2026-11-18 02:02:04.105 UTC [15430] STATEMENT:  
+	    UPDATE report_runs SET
+	      status = 'FAILED',
+	      stage = 'failed',
+	      -- PHASE-013 fix (T-TESTS): a pre-execution failure (FORBIDDEN_AT_RUN)
+	      -- hits a QUEUED row whose started_at is still NULL; the
+	      -- ck_report_runs_finished_requires_started check then rejected the
+	      -- finished_at write, so the typed error never surfaced. Start the
+	      -- attempt at the failure moment when nothing ran before it.
+	      started_at = COALESCE(started_at, now()),
+	      finished_at = now(),
+	      duration_ms = $1,
+	      error_code = $2,
+	      error_detail = $3::jsonb,
+	      artifacts = NULL
+	    WHERE id = $4
+	  
+
+2026-11-18 02:02:04.121 UTC [15430] ERROR:  division by zero
+2026-11-18 02:02:04.121 UTC [15430] STATEMENT:  SELECT 1/0
+
+2026-11-18 02:02:04.122 UTC [15430] ERROR:  current transaction is aborted, commands ignored until end of transaction block
+2026-11-18 02:02:04.122 UTC [15430] STATEMENT:  
+	    UPDATE report_runs SET
+	      status = 'FAILED',
+	      stage = 'failed',
+	      -- PHASE-013 fix (T-TESTS): a pre-execution failure (FORBIDDEN_AT_RUN)
+	      -- hits a QUEUED row whose started_at is still NULL; the
+	      -- ck_report_runs_finished_requires_started check then rejected the
+	      -- finished_at write, so the typed error never surfaced. Start the
+	      -- attempt at the failure moment when nothing ran before it.
+	      started_at = COALESCE(started_at, now()),
+	      finished_at = now(),
+	      duration_ms = $1,
+	      error_code = $2,
+	      error_detail = $3::jsonb,
+	      artifacts = NULL
+	    WHERE id = $4
+	  
+
+ ✓ src/__db__/reporting/runs.spec.ts (7 tests) 121ms
+ ✓ src/__db__/reporting/dashboard.db.spec.ts (7 tests) 60ms
+ ✓ src/__db__/reporting/hr-reports.spec.ts (9 tests) 62ms
+ ✓ src/__db__/reporting/golden.spec.ts (6 tests) 45ms
+ ✓ src/__db__/reporting/outbound-delivery-log.spec.ts (6 tests) 26ms
+ ✓ src/__db__/reporting/einvoicing-log.spec.ts (4 tests) 21ms
+
+ Test Files  17 passed (17)
+      Tests  120 passed (120)
+   Start at  02:01:48
+   Duration  15.95s (transform 2.70s, setup 0ms, collect 4.84s, tests 6.72s, environment 0ms, prepare 53ms)
+
+2026-11-18 02:02:04.420 UTC [15350] LOG:  received fast shutdown request
+
+2026-11-18 02:02:04.420 UTC [15350] LOG:  aborting any active transactions
+
+2026-11-18 02:02:04.420 UTC [15562] FATAL:  terminating connection due to administrator command
+
+2026-11-18 02:02:04.422 UTC [15350] LOG:  background worker "logical replication launcher" (PID 15356) exited with exit code 1
+
+2026-11-18 02:02:04.423 UTC [15351] LOG:  shutting down
+2026-11-18 02:02:04.423 UTC [15351] LOG:  checkpoint starting: shutdown immediate
+
+(node:15409) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:15409) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-18 02:02:04.450 UTC [15351] LOG:  checkpoint complete: wrote 3810 buffers (23.3%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.022 s, sync=0.006 s, total=0.028 s; sync files=2426, longest=0.001 s, average=0.001 s; distance=27401 kB, estimate=27401 kB; lsn=0/2FA0F10, redo lsn=0/2FA0F10
+
+2026-11-18 02:02:04.458 UTC [15350] LOG:  database system is shut down
+
+EXIT=0
