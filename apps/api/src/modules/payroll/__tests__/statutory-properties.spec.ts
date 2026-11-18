@@ -13,13 +13,27 @@ import {
   type StatutoryAccrualInput,
 } from "../domain/statutory-math";
 
+// W-8 (2026-11-18, the owner's W-7 verification finding): THE SEED IS
+// PINNED. fast-check's default seeding is RANDOM PER RUN — the header
+// below originally claimed "fully deterministic … seeded by default",
+// which was FALSE (the F1 literal-truth correction): the wing ran 2 green /
+// 1 red across three runs in the owner's environment, and seeds
+// 1688137087 and 870425838 produced REAL INV-032(c) counterexamples (the
+// tie defect — statutory-math.ts foldEosbTiers divided by 30 before
+// multiplying, under-approximating exact ties; the W-6 gate's 666/666 was
+// seed-luck that hid it). The pin is one of the counterexample seeds
+// itself, so the regression is baked into every future run; the fix's
+// fixture twin lives in statutory-math.spec (the exact-tie pin).
+fc.configureGlobal({ seed: 1688137087 });
+
 /**
  * PHASE-046 (W-6, T-14) — THE INV-032 PROPERTY WING (the pure-engine
- * law, randomized but fully deterministic — fast-check's property
- * runners are seeded by default and shrink on failure). The worked
- * examples are pinned by the unit spec (statutory-math.spec 25/25) and
- * the DB suites; THIS spec proves the laws hold over the WHOLE input
- * space, not just the examples:
+ * law, randomized over the whole input space with the seed PINNED above
+ * — deterministic run-for-run since the W-8 pin; failures shrink and
+ * report the pinned seed). The worked examples are pinned by the unit
+ * spec (statutory-math.spec 26/26 since the W-8 tie fixture) and the DB
+ * suites; THIS spec proves the laws hold over the WHOLE input space, not
+ * just the examples:
  *
  * - INV-032(a) — the contribution law: every line == rate% × the
  *   CLAMPED base, exact 4dp half-up (recomputed independently with

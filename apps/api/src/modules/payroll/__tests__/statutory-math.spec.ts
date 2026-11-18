@@ -238,6 +238,28 @@ describe("the EOSB tier fold (D-04 — the KSA worked example)", () => {
     expect(fold.entitlement).toBe("0.0000");
     expect(fold.breakdown).toHaveLength(0);
   });
+
+  // W-8 (2026-11-18, the owner's W-7 verification finding — the INV-032(c)
+  // tie defect): the exact-tie pin. The exact rational days × base / 30
+  // here terminates at the 5th decimal (160,146.4635 / 30 = 5,338.21545 —
+  // half-up's tie point), which the old divide-first evaluation (days/30 ×
+  // base) under-approximated at the finite precision and rounded DOWN to
+  // 5,338.2154; the law (half-up of the exact rational) rounds UP. This
+  // fixture is the defect's minimal reproduction — it failed before the
+  // multiply-first reorder and pins it forever after.
+  it("an exact tie rounds UP: 1.0 year × 1 day/yr, eosBase 160,146.4635 → 5,338.2155 (the W-8 tie pin)", () => {
+    const fold = foldEosbTiers("1.0000", "160146.4635", [
+      { fromYears: "0.0000", toYears: null, daysPerYear: "1.0000" },
+    ]);
+    expect(fold.days).toBe("1.0000");
+    expect(fold.entitlement).toBe("5338.2155");
+    expect(fold.breakdown).toHaveLength(1);
+    expect(fold.breakdown[0]).toMatchObject({
+      yearsInTier: "1.0000",
+      days: "1.0000",
+      amount: "5338.2155",
+    });
+  });
 });
 
 describe("the true-up delta + the service-years lens (BR-087)", () => {

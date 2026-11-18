@@ -254,7 +254,10 @@ export interface EosbTierShare {
   readonly yearsInTier: string;
   /** yearsInTier × daysPerYear, half-up 4dp. */
   readonly days: string;
-  /** days / 30 × eosBase, half-up 4dp (the per-tier rounding point). */
+  /** (days × eosBase) / 30 — the exact rational — half-up 4dp (the
+   * per-tier rounding point; multiply before the /30 divide, the W-8
+   * tie fix: a divide-first evaluation under-approximates the
+   * non-terminating 1/30 and rounds exact ties DOWN). */
   readonly amount: string;
 }
 
@@ -298,8 +301,26 @@ export function foldEosbTiers(
     const tierDays = money(
       new Decimal(width).times(new Decimal(tier.daysPerYear)).toFixed(4),
     );
+    // W-8 (2026-11-18, the owner's W-7 verification finding — the
+    // INV-032(c) tie defect): MULTIPLY FIRST, divide by 30 LAST. The old
+    // divide-first evaluation (days/30 × base) realized the
+    // non-terminating 1/30 at the finite 34-digit precision, which
+    // UNDER-approximates — so EXACT-TIE inputs (the exact rational
+    // days × base / 30 terminating at the 5th decimal, half-up's tie
+    // point) landed one half-unit low and rounded DOWN where the pinned
+    // law (INV-032(c): half-up of the exact rational) rounds UP (proven:
+    // tiers [{0, ∞, 1.0000}], years 1.0, eosBase 160,146.4635 → engine
+    // 5,338.2154, law 5,338.2155; ~0.626% of random 4dp bases at
+    // days = 1.0, magnitude 0.0001 per tier line; pinned by the unit
+    // spec's tie fixture + the property wing's pinned seeds). With the
+    // reorder, days × base is exact within the 34 digits and every exact
+    // tie TERMINATES within them, so the /30 divide is exact at the tie —
+    // the rounding point — and non-tie values sit ≥ 1/300,000-scale
+    // half-gaps from the boundary, far beyond the divide's ~1e-25
+    // error. Only the /30 divide was affected: the contribution and PIT
+    // laws divide by 100 — exact at any precision.
     const amount = money(
-      new Decimal(tierDays).div(new Decimal(30)).times(new Decimal(eosBase)).toFixed(4),
+      new Decimal(tierDays).times(new Decimal(eosBase)).div(new Decimal(30)).toFixed(4),
     );
     breakdown.push({
       fromYears: tier.fromYears,
