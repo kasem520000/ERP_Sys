@@ -111,7 +111,7 @@ self-test all-probes-OK).
 | # | Criterion | Evidence |
 |---|---|---|
 | 1 | Migrations apply cleanly; Drizzle + catalog parity for all 4 tables; RLS A1–A10 per new tenant table | 0089–0094 apply + re-apply no-op over the 94-entry chain (`migrations.db.spec.ts` in the 250/250 run; the from-zero chain re-proven standalone — the pre-state verification PHASE B); the catalog's 4 rows complete (288, W-1); the generated A1–A10 attacks cover every new table (the isolation suite green in the 250/250 run); the RLS/catalog checker clean at **292 catalog tables** (the standalone scratch-PG16 run + the in-suite co-proof) |
-| 2 | INV-032 holds: every statutory line == rate × clamped base exact; run totals == Σ lines; the true-up delta exact | The writer-path pins (`statutory.spec` 7/7 · `pit.spec` 6/6 · `run-statutory.spec` 8/8 · `eosb.spec` 9/9 · `variable-lines.spec` 5/5) + the consolidated golden (`statutory-goldens.spec` 5/5 — INV-032(a) recomputed in-test with exact BigInt) + **the property wing 6/6** (`__tests__/statutory-properties.spec.ts`: the contribution law, the clamp law, the fold law, the PIT marginal law, the EOSB tier law, the signed delta law — fast-check, deterministic) + the TABLE-LEVEL LAW (a raw violating INSERT rejects on `ck_eosb_calculations_delta`, pinned by the goldens' (e) pack) + the reports' render-time re-checks with the block-on-fail exports |
+| 2 | INV-032 holds: every statutory line == rate × clamped base exact; run totals == Σ lines; the true-up delta exact | The writer-path pins (`statutory.spec` 7/7 · `pit.spec` 6/6 · `run-statutory.spec` 8/8 · `eosb.spec` 9/9 · `variable-lines.spec` 5/5) + the consolidated golden (`statutory-goldens.spec` 5/5 — INV-032(a) recomputed in-test with exact BigInt) + **the property wing 6/6** (`__tests__/statutory-properties.spec.ts`: the contribution law, the clamp law, the fold law, the PIT marginal law, the EOSB tier law, the signed delta law — fast-check; corrected 2026-11-18, W-8: the wing was NOT deterministic at delivery — fast-check's default seeding is random per run, which HID the INV-032(c) tie defect the owner's W-7 verification found; the W-8 wave pinned the seed (1688137087 — one of the owner's counterexample seeds) and repaired the fold's divide-first evaluation; the tie fixture now pins 160,146.4635 → 5,338.2155 in the unit spec) + the TABLE-LEVEL LAW (a raw violating INSERT rejects on `ck_eosb_calculations_delta`, pinned by the goldens' (e) pack) + the reports' render-time re-checks with the block-on-fail exports |
 | 3 | The fail-closed gate proven: a REQUIRES_VERIFICATION profile rejects the run typed + audited; AE/EG/JO cannot post until verify; GOSI posts out of the box on KSA | `statutory.spec` (BR-085 both ways — the AE placeholder refuses typed + the audit event in its own UoW + zero residue; the verify CAS + SoD + the A7 404) · `pit.spec` (blocked brackets) · `statutory-goldens.spec` (c) the flip-and-restore pack · the KSA worked example end-to-end (`run-statutory.spec`) with the PwC-cited seeded schedule |
 | 4 | Golden G-52 green: the employee shares withheld to the statutory payable + the remittance settlement leg through the payout machinery; failure pack red | `statutory-goldens.spec` (a) the consolidated golden (the Saudi 1,170/1,410 beside the non-Saudi 0/240 in ONE posted run — the balanced 25,650 journal, G-52's employee/PIT legs + G-53's pair pinned separately, the full 2,820 settlement + INV-013's double-settle refusal) + the four wrong-shape RED packs with zero residue; the KSA worked example in `run-statutory.spec` (DR SALARIES_EXPENSE 12,000 · DR EMPLOYER_CONTRIBUTIONS 1,410 · CR DEDUCTIONS_PAYABLE 2,580 · CR SALARIES_PAYABLE 10,830; the remittance 2,580) |
 | 5 | Golden G-53 green: the employer share to the contribution expense purpose with the liability leg; failure pack red | The same consolidated golden + the worked example (the employer pair pinned separately inside the one fold — zero new purposes, BR-053's six-key pre-flight untouched, proven by the ×6 purpose failure packs staying green in `payroll-rules.spec` 16/16) |
@@ -180,6 +180,27 @@ self-test all-probes-OK).
   identically** (`playwright install chromium` — the W-0 record's pattern; the
   zatca-qr-decode spec green after, the unit workspace 8/8 on the first full
   attempt after the install).
+- **THE W-8 EXACTNESS WAVE (2026-11-18, the owner's W-7 verification findings —
+  the 8252b5b precedent; on the W-7 closure head `4ddb39f`, recorded in the
+  status row's W-8 block + the W-8 gate doc):** (1) the INV-032(c) tie defect —
+  foldEosbTiers divided by 30 before multiplying, so exact-tie inputs rounded
+  DOWN one half-unit where the pinned law (half-up of the exact rational)
+  rounds UP (the owner's proof: eosBase 160,146.4635 at 1.0 year → engine
+  5,338.2154, law 5,338.2155) — repaired by the multiply-first reorder + the
+  fixed tie fixture (the unit spec 25 → 26/26); (2) the property wing's seed
+  PINNED (the wing was seed-random per run — the 666/666 gate was seed-luck
+  that hid the defect); (3) the F1 literal-truth corrections — the
+  "disclosed in the row" claim (the one-wave-late W-6 block's disclosure now
+  lives IN the status row itself), the "19 logs" count (the directory holds
+  18 — the delivery message's number, corrected in the W-8 gate doc), and the
+  "deterministic" claim (corrected here in §3, in the status row, and in the
+  W-6 gate doc, each with the dated note). The scope-labeled battery on the
+  affected surface: typecheck/lint 8/8, api unit 667/667, the payroll DB
+  folder 88/88, the reporting DB folder 120/120 (the fold's complete consumer
+  set), the property wing 3× consecutive green (the determinism proof), docs
+  33/33, drift 300 = 300, i18n 6,121 = 6,121, id-ledger + history-secrets
+  clean — the full DB suite NOT re-run (no migration/schema/route change; the
+  blast radius = the fold's consumers, all green).
 
 ## 5. Gate evidence (the full sweep — the W-7 final head, 2026-11-17)
 

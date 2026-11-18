@@ -1,9 +1,46 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-17 (PHASE-046 W-7 — the closure wave)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-046 W-8 — the honest-record + exactness wave)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-18 — **PHASE-046 W-8 — the honest-record + exactness wave** (the
+  owner's W-7 verification findings, the 8252b5b precedent, on the W-7
+  closure head `4ddb39f`): **THE INV-032(c) TIE DEFECT REPAIR** —
+  `foldEosbTiers` (statutory-math.ts) divided by 30 BEFORE multiplying;
+  the finite-precision intermediate under-approximates the non-terminating
+  1/30, so EXACT-TIE inputs (the exact rational days × base / 30
+  terminating at the 5th decimal — half-up's tie point) rounded DOWN one
+  half-unit where the pinned law rounds UP (the owner's proof: tiers
+  [{0, ∞, 1.0000}], years 1.0, eosBase 160,146.4635 → engine 5,338.2154,
+  law 5,338.2155; ~0.626% of random 4dp bases at days = 1.0, magnitude
+  0.0001 per tier line; only the /30 divide affected — the
+  contribution/PIT divides are by 100, exact) — repaired by the one-line
+  multiply-first reorder (days × base exact within the 34 digits, every
+  exact tie terminates within them, so the /30 is exact AT the tie) + the
+  FIXED TIE FIXTURE in the unit spec (25 → 26/26) + the interface doc's
+  exact-rational wording; **THE PROPERTY-WING SEED PIN** — the wing was
+  NOT deterministic (fast-check's default seeding is random per run; the
+  W-6 gate's 666/666 was seed-luck that hid the defect — the owner
+  reproduced 2 green / 1 red in three runs, counterexample seeds
+  1688137087 + 870425838) — the seed is now PINNED (1688137087, a
+  counterexample seed itself, so the regression is baked into every run)
+  + the false "deterministic" header claim corrected with the dated note;
+  **THE F1 LITERAL-TRUTH CORRECTIONS** — (a) the "disclosed in the row"
+  claim was false at W-7 delivery (the one-wave-late W-6 block's
+  disclosure lived only in the completion report §6 + the gate doc): the
+  disclosure now lives IN the IMPLEMENTATION_STATUS row itself; (b) the
+  W-7 delivery message said "19 logs" — the directory holds 18
+  (recounted, listed in the W-8 gate doc); (c) "deterministic" corrected
+  at all three record sites (the status row, the completion report §3,
+  the W-6 gate doc) with dated notes. The scope-labeled battery on the
+  affected surface: typecheck/lint 8/8, depcruise clean, api unit
+  667/667, the payroll DB folder 11 files · 88/88, the reporting DB
+  folder 17 files · 120/120 (the fold's complete consumer set — the full
+  DB suite NOT re-run: no migration/schema/route change), the property
+  wing 3× consecutive green (the determinism proof), docs 33/33, drift
+  300 = 300, i18n 6,121 = 6,121, id-ledger + history-secrets clean —
+  [W-8 evidence](../operations/gate-evidence/2026-11-18-phase046-w8.md).
 - 2026-11-17 — **PHASE-046 COMPLETE — the W-7 closure wave** (T-15 + T-16 +
   T-18 + migration 0094, on the W-6 delivery head `a83874f`; the owner's
   W-6 verification + the one-word record correction received — the goldens
