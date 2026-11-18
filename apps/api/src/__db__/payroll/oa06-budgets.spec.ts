@@ -331,10 +331,33 @@ describe("PHASE-046 T-16 — OA-06 EXPLAIN budgets (payroll compliance)", () => 
     expect(text).not.toMatch(/Seq Scan/);
   });
 
-  it("P4 the remittance liability read (the run-gated outstanding lookup G-52's settlement leg re-reads under the lock) rides pk_payroll_runs — no seq-scan", async () => {
+  it("P4 the remittance liability read (the run-gated outstanding lookup G-52's settlement leg re-reads under the lock) is INDEX-DRIVEN — pk, bitmap on pk/uq, or the tenant-prefix bitmap, per the planner — no seq-scan", async () => {
     // The remit act's driving read: findRunById — the frozen
     // statutory_summary (accrued vs remitted) + the totals the outstanding
     // computation folds, re-read INSIDE the run gate's serialized window.
+    //
+    // W-9 (2026-11-18, the owner's W-8 verification ruling — option (i)):
+    // the assertion is WIDENED from "rides pk_payroll_runs" to the stable
+    // OA-06 LAW this probe exists to police — INDEX-DRIVEN, no seq-scan —
+    // in the P3 precedent's shape, accepting either index-driven path:
+    // the PK Index Scan (pk_payroll_runs / uq_payroll_runs_id_tenant), a
+    // bitmap on pk/uq, or the tenant-prefix bitmap path
+    // (ix_payroll_runs_tenant_period_status). The RLS tenant-isolation
+    // policy composes tenant_id into the `WHERE id = $1 LIMIT 1` plan,
+    // making the tenant-prefix bitmap a legitimately cost-competitive
+    // alternative to the PK path (Bitmap Heap Scan cost=4.20..7.35 +
+    // Bitmap Index Scan rows=6 vs the PK Index Scan cost=0.13..8.16 — a
+    // razor-thin margin that flips with the shared table's per-run state
+    // in the folder context; W-8's kept evidence: 3 green / 3 red across
+    // six identical runs, P4 ONLY — the other 87 stable, latent since
+    // W-7's T-16). The rejected alternatives, per the ruling: (ii)
+    // enable_bitmapscan=off / planner hints would make the probe testify
+    // about a FORCED plan, not the production planner that legitimately
+    // picks the bitmap path; (iii) isolating the probe hides the
+    // shared-table context this probe exists to police and just relocates
+    // the nondeterminism. The observed plan is still LOGGED verbatim (the
+    // explain() helper) — the honest record of which path ran.
+    // Test-expectation repair ONLY: zero production change.
     const text = await explain(
       "P4 the remittance liability read",
       sql`
@@ -346,7 +369,7 @@ describe("PHASE-046 T-16 — OA-06 EXPLAIN budgets (payroll compliance)", () => 
       LIMIT 1`,
     );
     expect(text).toMatch(
-      /Index (Only )?Scan( Backward)? using (pk_payroll_runs|uq_payroll_runs_id_tenant)|Bitmap Index Scan on (pk_payroll_runs|uq_payroll_runs_id_tenant)/,
+      /Index (Only )?Scan( Backward)? using (pk_payroll_runs|uq_payroll_runs_id_tenant|ix_payroll_runs_tenant_period_status)|Bitmap (Heap )?Scan on (pk_payroll_runs|uq_payroll_runs_id_tenant|ix_payroll_runs_tenant_period_status)|Bitmap Index Scan on (pk_payroll_runs|uq_payroll_runs_id_tenant|ix_payroll_runs_tenant_period_status)/,
     );
     expect(text).not.toMatch(/Seq Scan/);
   });
