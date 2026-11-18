@@ -208,6 +208,35 @@ self-test all-probes-OK).
   drift 300 = 300, i18n 6,121 = 6,121, id-ledger + history-secrets
   clean — the full DB suite NOT re-run (no migration/schema/route change;
   the blast radius = the fold's consumers, all green).
+- **THE W-9 P4 RULING + NF RECORD WAVE (2026-11-18, the owner's W-8
+  verification dispatch; on the W-8 accepted head `515b80a`, recorded in
+  the status row's W-9 block + the W-9 gate doc):** (1) the P4 repair —
+  the owner's ruling §6, option (i): the oa06-budgets P4 assertion
+  WIDENED to the stable OA-06 law (INDEX-DRIVEN, no seq-scan — the PK
+  Index Scan, a bitmap on pk/uq, or the tenant-prefix bitmap path; the
+  P3 precedent's shape; a strict superset of the old pattern; the
+  observed plan still logged verbatim; the forced-plan pin and the
+  probe isolation REJECTED per the ruling) — test-expectation repair
+  ONLY, zero production change; the W-8 plan-choice flake class CLOSED,
+  proven 10 payroll-folder runs ALL 88/88 green (every one on the
+  previously-RED tenant-prefix bitmap path — this sandbox's coin lands
+  bitmap-side 10/10, the repair-critical side) + the standalone 4/4 on
+  the PK path; (2) the NF corrections with dated notes at the original
+  claim sites — NF-1 the "verifier's sandbox" misattribution (the W-7
+  cruise ran in the W-7 delivery session's own sandbox; the conclusion
+  strengthened — this clone re-proves 1,939 · 14,434, the verifier's
+  exact count), NF-2 the depcruise diff head pinned (`21f09cd7`:
+  7 M / 0 A / 0 D; the delivered head: 7 M / 15 A / 0 D — the wave's
+  own evidence + gate doc), NF-3 the capture-convention note (the red
+  log's EXIT=0 is the PG teardown's, NOT vitest's; from W-9 on every
+  log carries VITEST_EXIT=N under set -o pipefail). The scope-labeled
+  battery: typecheck/lint 8/8, depcruise clean 1,939 · 14,434, unit
+  8/8 (api 667/667 — chromium-1248 re-prepared, the known gap), the
+  payroll folder 10 × 11 files · 88/88 + the standalone 4/4, the
+  reporting folder 17 · 120/120 (the adjacent control, untouched),
+  docs 33/33, drift 300 = 300, i18n 6,121 = 6,121 · 371 = 371,
+  id-ledger + history-secrets clean — the full DB suite NOT re-run (no
+  migration/schema/route change).
 
 ## 5. Gate evidence (the full sweep — the W-7 final head, 2026-11-17)
 

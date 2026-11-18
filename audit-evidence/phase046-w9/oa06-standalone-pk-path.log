@@ -1,0 +1,136 @@
+
+ RUN  v3.2.7 /home/z/erp_w9/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/erp_w9/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-18 03:34:33.812 UTC [3139] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-18 03:34:33.812 UTC [3139] LOG:  listening on IPv6 address "::1", port 34871
+2026-11-18 03:34:33.812 UTC [3139] LOG:  listening on IPv4 address "127.0.0.1", port 34871
+
+2026-11-18 03:34:33.812 UTC [3139] LOG:  listening on Unix socket "/tmp/.s.PGSQL.34871"
+
+2026-11-18 03:34:33.813 UTC [3142] LOG:  database system was shut down at 2026-11-18 03:34:33 UTC
+
+2026-11-18 03:34:33.815 UTC [3139] LOG:  database system is ready to accept connections
+
+[oa06-budgets] P1 bracket-set resolution:
+Incremental Sort  (cost=8.20..8.25 rows=2 width=65)
+  Sort Key: code, sort
+  Presorted Key: code
+  ->  Index Scan using uq_payroll_tax_brackets_set_sort on payroll_tax_brackets  (cost=0.14..8.19 rows=2 width=65)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (jurisdiction_code = 'SA'::text) AND (effective_from <= '2026-03-31'::date))
+        Filter: ((effective_to IS NULL) OR (effective_to >= '2026-03-31'::date))
+[oa06-budgets] P2a the EOSB tier resolution:
+Sort  (cost=8.21..8.21 rows=2 width=52)
+  Sort Key: from_years
+  ->  Index Scan using ix_eosb_rules_tenant_jurisdiction_effective on eosb_rules  (cost=0.14..8.20 rows=2 width=52)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (jurisdiction_code = 'SA'::text) AND (effective_from <= '2026-06-30'::date))
+        Filter: (((effective_to IS NULL) OR (effective_to >= '2026-06-30'::date)) AND ((contract_type IS NULL) OR (contract_type = 'FULL_TIME'::text)))
+[oa06-budgets] P2b the per-employee calculations walk:
+Limit  (cost=6.23..6.24 rows=2 width=70)
+  ->  Sort  (cost=6.23..6.24 rows=2 width=70)
+        Sort Key: created_at DESC, id DESC
+        ->  Bitmap Heap Scan on eosb_calculations  (cost=4.17..6.22 rows=2 width=70)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '41206262-03aa-4656-a3fa-e48323dda051'::uuid))
+              ->  Bitmap Index Scan on ix_eosb_calculations_tenant_employee_kind  (cost=0.00..4.17 rows=2 width=0)
+                    Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '41206262-03aa-4656-a3fa-e48323dda051'::uuid))
+[oa06-budgets] P3 the statutory-summary walk:
+Sort  (cost=75.77..75.78 rows=6 width=106)
+  Sort Key: p.name, ((entry.value ->> 'code'::text))
+  ->  HashAggregate  (cost=75.49..75.69 rows=6 width=106)
+        Group Key: p.name, (entry.value ->> 'code'::text)
+        ->  Nested Loop  (cost=22.57..69.49 rows=240 width=74)
+              ->  Hash Join  (cost=22.56..59.90 rows=240 width=552)
+                    Hash Cond: (r.fiscal_period_id = p.id)
+                    ->  Nested Loop  (cost=10.16..46.42 rows=240 width=558)
+                          ->  Bitmap Heap Scan on payroll_run_lines l  (cost=10.01..39.41 rows=240 width=558)
+                                Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                                ->  Bitmap Index Scan on ix_payroll_run_lines_tenant_employee  (cost=0.00..9.95 rows=240 width=0)
+                                      Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                          ->  Memoize  (cost=0.14..0.23 rows=1 width=32)
+                                Cache Key: l.run_id
+                                Cache Mode: logical
+                                ->  Index Scan using pk_payroll_runs on payroll_runs r  (cost=0.13..0.21 rows=1 width=32)
+                                      Index Cond: (id = l.run_id)
+                                      Filter: ((status = 'POSTED'::text) AND (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid))
+                    ->  Hash  (cost=12.33..12.33 rows=6 width=26)
+                          ->  Index Scan using pk_fiscal_periods on fiscal_periods p  (cost=0.13..12.33 rows=6 width=26)
+                                Filter: ((start_date >= '2026-01-01'::date) AND (start_date <= '2026-06-30'::date) AND (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid))
+              ->  Memoize  (cost=0.01..1.51 rows=1 width=32)
+                    Cache Key: l.statutory_breakdown
+                    Cache Mode: binary
+                    ->  Function Scan on jsonb_array_elements entry  (cost=0.00..1.50 rows=1 width=32)
+                          Filter: ((value ->> 'kind'::text) = 'CONTRIBUTION'::text)
+[oa06-budgets] P4 the remittance liability read:
+Limit  (cost=0.13..8.16 rows=1 width=462)
+  ->  Index Scan using pk_payroll_runs on payroll_runs  (cost=0.13..8.16 rows=1 width=462)
+        Index Cond: (id = 'e5dd1261-8447-41ee-893f-c85cfbd7901e'::uuid)
+        Filter: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+ ✓ src/__db__/payroll/oa06-budgets.spec.ts (4 tests) 83ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  03:34:33
+   Duration  4.77s (transform 337ms, setup 0ms, collect 847ms, tests 83ms, environment 0ms, prepare 63ms)
+
+2026-11-18 03:34:37.823 UTC [3139] LOG:  received fast shutdown request
+2026-11-18 03:34:37.823 UTC [3139] LOG:  aborting any active transactions
+2026-11-18 03:34:37.824 UTC [3226] FATAL:  terminating connection due to administrator command
+2026-11-18 03:34:37.825 UTC [3139] LOG:  background worker "logical replication launcher" (PID 3145) exited with exit code 1
+
+2026-11-18 03:34:37.825 UTC [3140] LOG:  shutting down
+
+2026-11-18 03:34:37.825 UTC [3140] LOG:  checkpoint starting: shutdown immediate
+
+(node:3205) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:3205) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-18 03:34:37.844 UTC [3140] LOG:  checkpoint complete: wrote 2707 buffers (16.5%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.012 s, sync=0.007 s, total=0.019 s; sync files=2414, longest=0.001 s, average=0.001 s; distance=25033 kB, estimate=25033 kB; lsn=0/2D50F80, redo lsn=0/2D50F80
+
+2026-11-18 03:34:37.851 UTC [3139] LOG:  database system is shut down
+

@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/erp_w9
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/domain-core:lint: cache miss, executing 43f71cfcf57c41e5
+@erp/ui:lint: cache miss, executing 9c8ff6f5c2ecd275
+@erp/sync-core:lint: cache miss, executing c2b20bbcb3622f09
+@erp/contracts:lint: cache miss, executing bee7ef205ead1067
+@erp/web:lint: cache miss, executing b9ff2c922859a11f
+@erp/api:lint: cache miss, executing 64f8fdee096315f5
+@erp/mobile:lint: cache miss, executing d922e7e2aa9a7ba9
+@erp/desktop:lint: cache miss, executing d7272cfcc6ba3136
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/erp_w9/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/erp_w9/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/erp_w9/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/erp_w9/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/erp_w9/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/erp_w9/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/erp_w9/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/erp_w9/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    41.891s 
+
+EXIT=0

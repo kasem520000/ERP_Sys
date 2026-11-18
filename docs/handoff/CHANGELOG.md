@@ -1,9 +1,46 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-046 W-8 — the honest-record + exactness wave)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-046 W-9 — the P4 ruling + NF record wave)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-18 — **PHASE-046 W-9 — the P4 ruling + NF record wave** (the
+  owner's W-8 verification dispatch, on the W-8 accepted head `515b80a`):
+  **THE P4 REPAIR** (the ruling §6, option (i) — the P3 precedent's
+  shape, test-expectation repair ONLY, zero production change): the
+  oa06-budgets P4 assertion WIDENED from "rides pk_payroll_runs" to the
+  stable OA-06 law — INDEX-DRIVEN, no seq-scan — accepting the PK Index
+  Scan (pk/uq), a bitmap on pk/uq, or the tenant-prefix bitmap path
+  (ix_payroll_runs_tenant_period_status); a strict superset of the old
+  pattern (every old alternative preserved verbatim); the observed plan
+  still logged verbatim; the forced-plan pin (ii) and the probe
+  isolation (iii) REJECTED per the ruling — the W-8 plan-choice flake
+  class (W-8's 3/6 + the verifier's 2/5, P4 ONLY, both plans
+  index-driven, latent since W-7's T-16) CLOSED, proven: 10
+  payroll-folder runs ALL 88/88 green with VITEST_EXIT=0 — every one on
+  the previously-RED tenant-prefix bitmap path (this sandbox's folder
+  coin lands bitmap-side 10/10 — the repair-critical side; the flip is
+  timing-dependent, NOT forced) + the standalone oa06 4/4 on the PK
+  path + the subset guarantee for W-8's kept PK-path greens;
+  **THE NF RECORD CORRECTIONS** (step 2 `ee4f6a9`, dated notes at the
+  original claim sites): NF-1 the W-8 gate doc §5's "ran in the
+  verifier's sandbox" misattribution corrected (the W-7 cruise ran in
+  the W-7 DELIVERY session's own pre-reset sandbox per the
+  same-session evidence rule; the verifier never ran depcruise; the
+  conclusion strengthened — this clone re-proves 1,939 · 14,434, the
+  verifier's exact fresh-clone count), NF-2 the depcruise diff claim
+  pinned to the cruise head `21f09cd7` (7 M / 0 A / 0 D there;
+  7 M / 15 A / 0 D at the delivered head — the wave's own evidence +
+  gate doc), NF-3 the capture-convention note at the W-8 §6 inventory
+  (the red log's EXIT=0 is the PG teardown's, NOT vitest's; from W-9
+  on every log carries VITEST_EXIT=N under set -o pipefail); the
+  scope-labeled battery: typecheck/lint 8/8, depcruise clean
+  1,939 · 14,434, unit 8/8 (api 667/667 · desktop 274 — chromium-1248
+  re-prepared, the known gap), the payroll folder 10 × 88/88 + the
+  standalone 4/4, the reporting folder 17 · 120/120 (the adjacent
+  control), docs 33/33, drift 300 = 300, i18n 6,121 = 6,121 · 371 =
+  371, id-ledger + history-secrets clean — [W-9 gate
+  doc](../operations/gate-evidence/2026-11-18-phase046-w9.md) — PHASE-NNN
 - 2026-11-18 — **PHASE-046 W-8 — the honest-record + exactness wave** (the
   owner's W-7 verification findings, the 8252b5b precedent, on the W-7
   closure head `4ddb39f`): **THE INV-032(c) TIE DEFECT REPAIR** —

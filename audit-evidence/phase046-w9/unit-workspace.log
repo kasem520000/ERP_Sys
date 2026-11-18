@@ -1,0 +1,495 @@
+
+> erp-platform@0.1.0 test /home/z/erp_w9
+> turbo run test
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running test in 9 packages
+   • Remote caching disabled
+
+@erp/ui:test: cache miss, executing 965efd421caad9d6
+@erp/sync-core:test: cache miss, executing 5005b76171a033c7
+@erp/desktop:test: cache miss, executing 3411ed2d168d587a
+@erp/api:test: cache miss, executing c0a5ef5615b3f1e6
+@erp/web:test: cache miss, executing b04e26b27f1b386a
+@erp/contracts:test: cache miss, executing 6840c898fa3d7595
+@erp/mobile:test: cache miss, executing 64d8a9c6ed817bc4
+@erp/domain-core:test: cache miss, executing e75fd806683a5f00
+@erp/desktop:test: 
+@erp/desktop:test: > @erp/desktop@0.1.0 test /home/z/erp_w9/apps/desktop
+@erp/desktop:test: > vitest run
+@erp/desktop:test: 
+@erp/ui:test: 
+@erp/ui:test: > @erp/ui@1.0.0 test /home/z/erp_w9/packages/ui
+@erp/ui:test: > vitest run
+@erp/ui:test: 
+@erp/sync-core:test: 
+@erp/sync-core:test: > @erp/sync-core@0.1.0 test /home/z/erp_w9/packages/sync-core
+@erp/sync-core:test: > vitest run
+@erp/sync-core:test: 
+@erp/web:test: 
+@erp/web:test: > @erp/web@0.1.0 test /home/z/erp_w9/apps/web
+@erp/web:test: > vitest run
+@erp/web:test: 
+@erp/api:test: 
+@erp/api:test: > @erp/api@0.1.0 test /home/z/erp_w9/apps/api
+@erp/api:test: > vitest run
+@erp/api:test: 
+@erp/contracts:test: 
+@erp/contracts:test: > @erp/contracts@0.1.0 test /home/z/erp_w9/packages/contracts
+@erp/contracts:test: > vitest run
+@erp/contracts:test: 
+@erp/domain-core:test: 
+@erp/domain-core:test: > @erp/domain-core@0.1.0 test /home/z/erp_w9/packages/domain-core
+@erp/domain-core:test: > vitest run
+@erp/domain-core:test: 
+@erp/mobile:test: 
+@erp/mobile:test: > @erp/mobile@0.1.0 test /home/z/erp_w9/apps/mobile
+@erp/mobile:test: > vitest run
+@erp/mobile:test: 
+@erp/web:test: 
+@erp/web:test:  RUN  v3.2.7 /home/z/erp_w9/apps/web
+@erp/web:test: 
+@erp/contracts:test: 
+@erp/contracts:test:  RUN  v3.2.7 /home/z/erp_w9/packages/contracts
+@erp/desktop:test: 
+@erp/contracts:test: 
+@erp/desktop:test:  RUN  v3.2.7 /home/z/erp_w9/apps/desktop
+@erp/desktop:test: 
+@erp/ui:test: 
+@erp/ui:test:  RUN  v3.2.7 /home/z/erp_w9/packages/ui
+@erp/ui:test: 
+@erp/mobile:test: 
+@erp/mobile:test:  RUN  v3.2.7 /home/z/erp_w9/apps/mobile
+@erp/mobile:test: 
+@erp/sync-core:test: 
+@erp/sync-core:test:  RUN  v3.2.7 /home/z/erp_w9/packages/sync-core
+@erp/domain-core:test: 
+@erp/sync-core:test: 
+@erp/domain-core:test:  RUN  v3.2.7 /home/z/erp_w9/packages/domain-core
+@erp/domain-core:test: 
+@erp/api:test: 
+@erp/api:test:  RUN  v3.2.7 /home/z/erp_w9/apps/api
+@erp/api:test: 
+@erp/domain-core:test:  ✓ src/__tests__/money.test.ts (11 tests) 59ms
+@erp/contracts:test:  ✓ src/__tests__/industry-manifests.test.ts (45 tests) 596ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/template-prerequisites.spec.ts (37 tests) 396ms
+@erp/domain-core:test:  ✓ src/__tests__/property.test.ts (6 tests) 791ms
+@erp/ui:test:  ✓ src/tokens/__tests__/tokens.test.ts (4 tests) 9ms
+@erp/desktop:test:  ✓ __tests__/sync-host.test.ts (12 tests) 918ms
+@erp/sync-core:test:  ✓ __tests__/recovery-pruning.test.ts (9 tests) 1190ms
+@erp/sync-core:test:    ✓ pruneStore (LOCAL_DATABASE §5 — row-budget approximation) > honors the real per-class budgets (android-personal 10k rows)  904ms
+@erp/mobile:test:  ✓ __tests__/sync-host.test.ts (19 tests) 953ms
+@erp/contracts:test:  ✓ src/__tests__/contracts.test.ts (11 tests) 101ms
+@erp/contracts:test: 
+@erp/contracts:test:  Test Files  2 passed (2)
+@erp/contracts:test:       Tests  56 passed (56)
+@erp/contracts:test:    Start at  03:42:58
+@erp/contracts:test:    Duration  6.64s (transform 1.40s, setup 0ms, collect 3.01s, tests 697ms, environment 2ms, prepare 1.02s)
+@erp/contracts:test: 
+@erp/domain-core:test:  ✓ src/__tests__/quantity-rate.test.ts (7 tests) 28ms
+@erp/web:test:  ✓ lib/shell/__tests__/store-client.test.ts (20 tests) 260ms
+@erp/sync-core:test:  ✓ __tests__/cycle.test.ts (6 tests) 155ms
+@erp/domain-core:test:  ✓ src/__tests__/calendar-date.test.ts (6 tests) 104ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/golden-effective-configs.spec.ts (41 tests) 1328ms
+@erp/api:test:    ✓ golden effective-configs: template × plan × jurisdiction SA (pinned hashes) > every golden fixture carries the §5 shape  323ms
+@erp/mobile:test:  ✓ __tests__/auth.test.ts (18 tests) 167ms
+@erp/desktop:test:  ✓ __tests__/updater.test.ts (75 tests) 449ms
+@erp/domain-core:test:  ✓ src/__tests__/uuidv7.test.ts (4 tests) 166ms
+@erp/sync-core:test:  ✓ __tests__/chaos-slice.test.ts (8 tests) 123ms
+@erp/ui:test:  ✓ src/utils/__tests__/behavior.test.ts (21 tests) 171ms
+@erp/domain-core:test:  ✓ src/__tests__/result-errors.test.ts (4 tests) 10ms
+@erp/desktop:test:  ✓ __tests__/auth.test.ts (13 tests) 99ms
+@erp/mobile:test:  ✓ __tests__/flows.test.ts (27 tests) 338ms
+@erp/domain-core:test: 
+@erp/domain-core:test:  Test Files  6 passed (6)
+@erp/domain-core:test:       Tests  38 passed (38)
+@erp/domain-core:test:    Start at  03:42:58
+@erp/domain-core:test:    Duration  11.31s (transform 754ms, setup 0ms, collect 2.41s, tests 1.16s, environment 1ms, prepare 2.71s)
+@erp/domain-core:test: 
+@erp/sync-core:test:  ✓ __tests__/watermark-tombstone.test.ts (6 tests) 99ms
+@erp/desktop:test:  ✓ __tests__/sync-triggers.test.ts (6 tests) 411ms
+@erp/mobile:test:  ✓ __tests__/flows-documents.test.ts (26 tests) 253ms
+@erp/sync-core:test:  ✓ __tests__/retry.test.ts (7 tests) 51ms
+@erp/sync-core:test: 
+@erp/sync-core:test:  Test Files  5 passed (5)
+@erp/sync-core:test:       Tests  36 passed (36)
+@erp/sync-core:test:    Start at  03:42:58
+@erp/sync-core:test:    Duration  14.97s (transform 2.12s, setup 0ms, collect 7.26s, tests 1.62s, environment 15ms, prepare 2.09s)
+@erp/sync-core:test: 
+@erp/desktop:test:  ✓ __tests__/sync-transport.test.ts (18 tests) 81ms
+@erp/web:test:  ✓ components/__tests__/atp-promise-point.test.tsx (4 tests) 1588ms
+@erp/web:test:    ✓ AtpPromisePoint — the line's stamp refreshes after the check (the 81f09e9 review fix) > renders the stale OK stamp with the loaded line, then the check's SHORT verdict REPLACES the stamp — the badge reads what the check just recorded, not what the order load carried  1000ms
+@erp/web:test:    ✓ AtpPromisePoint — the c537113 round: the five quantities under their labels, the three protection standings, still no gate > renders ALL THREE protection standings at the promise point — UNPROTECTED, PARTIALLY_PROTECTED, FULLY_PROTECTED, each on its own line with its own quantities  378ms
+@erp/ui:test:  ✓ src/utils/__tests__/components.test.tsx (17 tests) 1409ms
+@erp/ui:test:    ✓ Button (catalog §1) > keeps the label and sets aria-busy while loading  353ms
+@erp/ui:test: 
+@erp/ui:test:  Test Files  3 passed (3)
+@erp/ui:test:       Tests  42 passed (42)
+@erp/ui:test:    Start at  03:42:58
+@erp/ui:test:    Duration  17.45s (transform 1.34s, setup 0ms, collect 3.92s, tests 1.59s, environment 8.37s, prepare 1.37s)
+@erp/ui:test: 
+@erp/desktop:test:  ✓ __tests__/store-prune.test.ts (9 tests) 356ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/config-resolution.spec.ts (47 tests) 2689ms
+@erp/api:test:    ✓ determinism: identical inputs ⇒ identical config + stable hash > property: randomized layer combinations resolve identically across runs  1322ms
+@erp/api:test:    ✓ determinism: identical inputs ⇒ identical config + stable hash > property: key insertion order never changes the resolved hash  986ms
+@erp/desktop:test:  ✓ __tests__/print.test.ts (20 tests) 63ms
+@erp/desktop:test:  ✓ __tests__/store.test.ts (11 tests) 211ms
+@erp/web:test:  ✓ components/offline/__tests__/offline-components.test.tsx (19 tests) 329ms
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (Use `node --trace-warnings ...` to show where the warning was created)
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'browserslistConfigFile' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'env' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'plugins' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'presets' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'passPerPreset' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:7782) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/desktop:test:  ✓ __tests__/store-corruption.test.ts (7 tests) 339ms
+@erp/desktop:test:  ✓ __tests__/minisign.test.ts (24 tests) 53ms
+@erp/web:test:  ✓ __tests__/local-schema-parity.test.ts (7 tests) 72ms
+@erp/desktop:test:  ✓ __tests__/sync-revocation.test.ts (4 tests) 191ms
+@erp/desktop:test:  ✓ __tests__/telemetry.test.ts (19 tests) 43ms
+@erp/api:test:  ✓ src/modules/reporting/__tests__/reporting-unit.spec.ts (42 tests) 577ms
+@erp/web:test:  ✓ lib/shell/__tests__/sync-mirror.test.ts (14 tests) 191ms
+@erp/desktop:test: stdout | __tests__/updater-manifest.test.ts > sign CLI — manifest mode + bundle mode round-trips > signs the canonical manifest JSON and round-trip verifies (file-based, real key)
+@erp/desktop:test: signed /tmp/updater-manifest-test-T2ZpDH/manifest.json (mode manifest, key 80f4ee326bf35984)
+@erp/desktop:test: 
+@erp/desktop:test: stdout | __tests__/updater-manifest.test.ts > sign CLI — manifest mode + bundle mode round-trips > signs the BUNDLE bytes (Tauri shape) and the round-trip verifies against the same bytes
+@erp/desktop:test: signed /tmp/updater-manifest-test-EHUJmJ/manifest.json (mode bundle, key 618cf1772c6a9d0a)
+@erp/desktop:test: 
+@erp/desktop:test: stdout | __tests__/updater-manifest.test.ts > publish CLI — the hosting layout (deploy/updater/README.md) > writes the immutable versioned dir + the mutable latest.json and copies artifacts
+@erp/desktop:test: signed /tmp/updater-manifest-test-g6APhy/artifacts/manifest.json (mode manifest, key 2b13ec21510ef9d9)
+@erp/desktop:test: verified manifest signature (mode manifest, key 2b13ec21510ef9d9)
+@erp/desktop:test: published layout under /tmp/updater-manifest-test-g6APhy/out/stable/3.0.0 (2 artifact(s) copied)
+@erp/desktop:test: 
+@erp/desktop:test: Runbook — finish the release (deploy/updater/README.md):
+@erp/desktop:test:   1. Upload stable/3.0.0/ (manifest + artifacts) to the CDN — IMMUTABLE (never overwrite a versioned dir).
+@erp/desktop:test:   2. Point stable/latest.json at this release (the file above) — this is the ONLY mutable object.
+@erp/desktop:test:   3. Verify: curl https://updates.erp.example/stable/{{target}}/{{current_version}} returns the manifest (the updater endpoint template).
+@erp/desktop:test:   4. Rollout: keep rollout.stagePercent from the manifest (10 → 50 → 100, crash-free gates; stable channel).
+@erp/desktop:test:   5. HALT path (crash-free < 98.5%): publish a latest.json with minVersion = 3.0.0 (force-update remedy, DR-P21-05).
+@erp/desktop:test: 
+@erp/desktop:test: 
+@erp/desktop:test:  ✓ __tests__/updater-manifest.test.ts (7 tests) 117ms
+@erp/desktop:test:  ✓ __tests__/desktop-release-ci.test.ts (8 tests) 10ms
+@erp/api:test:  ✓ src/modules/communication/__tests__/adapter-contract.spec.ts (26 tests) 177ms
+@erp/desktop:test:  ✓ __tests__/webview2.test.ts (22 tests) 9ms
+@erp/api:test:  ✓ src/infra/observability/slo.burn.spec.ts (24 tests) 107ms
+@erp/desktop:test:  ✓ __tests__/bridge.test.ts (19 tests) 50ms
+@erp/desktop:test: 
+@erp/desktop:test:  Test Files  16 passed (16)
+@erp/desktop:test:       Tests  274 passed (274)
+@erp/desktop:test:    Start at  03:42:58
+@erp/desktop:test:    Duration  28.84s (transform 2.69s, setup 0ms, collect 12.81s, tests 3.40s, environment 7ms, prepare 4.03s)
+@erp/desktop:test: 
+@erp/api:test:  ✓ src/infra/db/migrations.spec.ts (4 tests) 149ms
+@erp/web:test:  ✓ components/__tests__/statutory-profiles-board.test.tsx (5 tests) 1117ms
+@erp/web:test:    ✓ PHASE-046 W-5 T-10 — the statutory compliance board > renders the three tabs and the profiles list with the verification badges (VERIFIED vs REQUIRES_VERIFICATION)  311ms
+@erp/web:test:    ✓ PHASE-046 W-5 T-10 — the statutory compliance board > THE CITATION LAW: an empty source never flips a row — the dialog demands the source name; a filled citation posts and flips the badge  412ms
+@erp/api:test:  ✓ src/modules/fixed_assets/application/disposal-math.spec.ts (19 tests) 28ms
+@erp/web:test:  ✓ components/__tests__/eosb-board.test.tsx (5 tests) 1048ms
+@erp/web:test:    ✓ PHASE-046 W-5 T-11 — the EOSB board > THE G-54 TRIGGER: with the ledger key the dialog opens, posts the W-2 engine's own shape, and toasts  418ms
+@erp/mobile:test:  ✓ __tests__/screens.test.tsx (24 tests) 9457ms
+@erp/mobile:test:    ✓ PHASE-022 2-e · the field screens render AR + EN > RouteVisits renders the localized title + intro in BOTH locales (t() keys present for every string)  8534ms
+@erp/web:test:  ✓ lib/shell/__tests__/bridge.test.tsx (13 tests) 100ms
+@erp/web:test: 
+@erp/web:test:  Test Files  8 passed (8)
+@erp/web:test:       Tests  87 passed (87)
+@erp/web:test:    Start at  03:42:58
+@erp/web:test:    Duration  34.78s (transform 3.97s, setup 0ms, collect 11.97s, tests 4.70s, environment 12.32s, prepare 1.91s)
+@erp/web:test: 
+@erp/api:test:  ✓ src/modules/fixed_assets/application/depreciation-math.spec.ts (17 tests) 2508ms
+@erp/api:test:    ✓ INV-023 — STRAIGHT_LINE: Σ over the life = cost − salvage EXACTLY > absorbs the final-period residual across randomized (cost, salvage, life) tuples  1460ms
+@erp/api:test:    ✓ INV-023 — DECLINING_BALANCE: floor-capped decay, residual absorbed > rate = 12 / useful_life_months on opening NBV (DR-002 default); Σ = base exactly  949ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/capability-matrix-reconciliation.spec.ts (6 tests) 24ms
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (Use `node --trace-warnings ...` to show where the warning was created)
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'browserslistConfigFile' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'env' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'plugins' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'presets' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'passPerPreset' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8343) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/api:test:  ✓ src/modules/manufacturing/domain/mrp/netting.spec.ts (23 tests) 353ms
+@erp/api:test:  ✓ src/modules/accounting/domain/posting-engine/posting-engine.spec.ts (17 tests) 40ms
+@erp/api:test:  ✓ src/modules/payroll/__tests__/statutory-properties.spec.ts (6 tests) 332ms
+@erp/api:test:  ✓ src/modules/payroll/__tests__/statutory-math.spec.ts (26 tests) 12ms
+@erp/api:test:  ✓ src/modules/manufacturing/domain/mrp/explosion.spec.ts (17 tests) 12ms
+@erp/api:test:  ✓ src/modules/consolidation/__tests__/snapshot.spec.ts (12 tests) 10ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/healthcare-no-clinical-surfaces.spec.ts (7 tests) 17ms
+@erp/api:test:  ✓ src/infra/http/tenant-rate-limit.spec.ts (7 tests) 14ms
+@erp/mobile:test:  ✓ __tests__/screens-cpr.test.tsx (10 tests) 4690ms
+@erp/mobile:test:    ✓ PHASE-022 T-P22-3-b · the companion screens render AR + EN (READ-CACHED, as-of labeled) > Dashboard: today's metrics + van stock + parked tile + the OFFLINE approvals affordance + master-data search  4532ms
+@erp/api:test:  ✓ src/modules/payroll/__tests__/variable-lines.spec.ts (9 tests) 12ms
+@erp/api:test:  ✓ src/modules/consolidation/__tests__/consolidation-math.spec.ts (7 tests) 5ms
+@erp/mobile:test:  ✓ __tests__/sync-triggers.test.ts (11 tests) 115ms
+@erp/api:test:  ✓ src/modules/consolidation/__tests__/consolidation-contracts.spec.ts (6 tests) 32ms
+@erp/api:test:  ✓ src/modules/inventory/domain/valuation/valuation.spec.ts (12 tests) 222ms
+@erp/api:test:  ✓ src/modules/consolidation/__tests__/elimination-lines.spec.ts (11 tests) 7ms
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (Use `node --trace-warnings ...` to show where the warning was created)
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'browserslistConfigFile' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'env' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'plugins' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'presets' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'passPerPreset' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8645) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/api:test:  ✓ src/modules/reporting/__tests__/print-templates.spec.ts (8 tests) 15ms
+@erp/api:test:  ✓ src/modules/identity/infrastructure/secret-envelope-rotation.spec.ts (8 tests) 40ms
+@erp/api:test:  ✓ src/modules/tax/__tests__/zatca-phase1.unit.spec.ts (9 tests) 8ms
+@erp/api:test:  ✓ src/modules/sales/__tests__/dunning-ladder.spec.ts (15 tests) 8ms
+@erp/mobile:test:  ✓ __tests__/primitives.test.tsx (26 tests) 4174ms
+@erp/mobile:test:    ✓ PHASE-022 primitives — render + a11y (MASTER-PLAN §4) > Button renders with the button role and its label  4070ms
+@erp/api:test:  ✓ src/modules/reporting/__tests__/report-pack-wiring.spec.ts (5 tests) 9ms
+@erp/api:test:  ✓ src/modules/identity/infrastructure/permissions-drift.spec.ts (5 tests) 34ms
+@erp/mobile:test:  ✓ __tests__/store.test.ts (14 tests) 111ms
+@erp/api:test:  ✓ src/modules/accounting/domain/property.spec.ts (5 tests) 176ms
+@erp/mobile:test:  ✓ __tests__/companion-personal.test.ts (14 tests) 47ms
+@erp/mobile:test:  ✓ __tests__/sync-transport.test.ts (23 tests) 43ms
+@erp/api:test:  ✓ src/modules/communication/__tests__/template-service.spec.ts (10 tests) 10ms
+@erp/api:test:  ✓ src/modules/consolidation/__tests__/fx-translation.spec.ts (14 tests) 8ms
+@erp/api:test: {"level":40,"time":1794973434879,"service":"erp-api","module":"identity","account_hash":"bd7662a5eeb41614e720d477abfcb2272e19a8a70a93b7e3bc8560d44ad326e9","msg":"reset email suppressed (per-account flood limit R-05)"}
+@erp/api:test:  ✓ src/modules/identity/application/recovery-flood.spec.ts (5 tests) 37ms
+@erp/api:test: {"level":30,"time":1794973434881,"service":"erp-api","module":"identity","email_domain":"example.com","msg":"reset requested for unknown email"}
+@erp/api:test: {"level":40,"time":1794973434882,"service":"erp-api","module":"identity","account_hash":"b454f82c5857ebabf342b7258e5cf7def78b7cd975814119462973de9a38df10","msg":"reset email suppressed (per-account flood limit R-05)"}
+@erp/api:test: {"level":40,"time":1794973434883,"service":"erp-api","module":"identity","account_hash":"bd7662a5eeb41614e720d477abfcb2272e19a8a70a93b7e3bc8560d44ad326e9","msg":"reset email suppressed (per-account flood limit R-05)"}
+@erp/api:test:  ✓ src/modules/purchasing/__tests__/sourcing-math.spec.ts (16 tests) 8ms
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (Use `node --trace-warnings ...` to show where the warning was created)
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'browserslistConfigFile' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'env' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'plugins' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'presets' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'passPerPreset' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:8925) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/api:test:  ✓ src/modules/items/__tests__/composites.spec.ts (19 tests) 8ms
+@erp/mobile:test:  ✓ __tests__/i18n.test.ts (47 tests) 27ms
+@erp/api:test:  ✓ src/modules/communication/__tests__/provider-config.spec.ts (10 tests) 8ms
+@erp/mobile:test:  ✓ __tests__/store-prune.test.ts (10 tests) 129ms
+@erp/api:test:  ✓ src/modules/tenancy/__tests__/billing-unit.spec.ts (11 tests) 6ms
+@erp/api:test:  ✓ src/modules/tenancy/__tests__/webhook-rotation.spec.ts (7 tests) 34ms
+@erp/mobile:test:  ✓ __tests__/rejection-actions.test.ts (14 tests) 78ms
+@erp/mobile:test:  ✓ __tests__/sync-revocation.test.ts (6 tests) 67ms
+@erp/api:test:  ✓ src/modules/hr/__tests__/rotation-schema.spec.ts (5 tests) 6ms
+@erp/mobile:test:  ✓ __tests__/store-corruption.test.ts (8 tests) 203ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/activity-mapping.spec.ts (5 tests) 32ms
+@erp/mobile:test:  ✓ __tests__/device-registration.test.ts (5 tests) 30ms
+@erp/mobile:test:  ✓ __tests__/theme-parity.test.ts (17 tests) 9ms
+@erp/api:test:  ✓ src/modules/inventory/__tests__/reservation-sweep.spec.ts (5 tests) 9ms
+@erp/api:test:  ✓ src/modules/hr/__tests__/attendance-classification.spec.ts (5 tests) 4ms
+@erp/mobile:test:  ✓ __tests__/flows-route-visits.test.ts (8 tests) 52ms
+@erp/api:test:  ✓ src/modules/notifications/application/fcm-templates.spec.ts (6 tests) 9ms
+@erp/mobile:test:  ✓ __tests__/mobile-release-ci.test.ts (12 tests) 8ms
+@erp/api:test:  ✓ src/modules/notifications/application/templates.spec.ts (8 tests) 6ms
+@erp/mobile:test:  ✓ __tests__/device-trust.test.ts (8 tests) 6ms
+@erp/mobile:test:  ✓ __tests__/release-policy.test.ts (17 tests) 5ms
+@erp/mobile:test:  ✓ __tests__/rollout.test.ts (15 tests) 28ms
+@erp/mobile:test:  ✓ __tests__/device-watermark.test.ts (4 tests) 51ms
+@erp/api:test:  ✓ src/health/health.controller.spec.ts (4 tests) 41ms
+@erp/mobile:test:  ✓ __tests__/secure-screen.test.ts (3 tests) 4ms
+@erp/api:test:  ✓ src/modules/tax/__tests__/zatca-qr-decode.spec.ts (3 tests) 2863ms
+@erp/api:test:    ✓ QR image renderer — decode round-trip (H-02) > the documented sample payload decodes back to the EXACT bytes  723ms
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (Use `node --trace-warnings ...` to show where the warning was created)
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'browserslistConfigFile' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'env' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'plugins' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'presets' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'passPerPreset' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'Symbol(@babel/core@7 - ConfigItem)' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'test' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'include' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'exclude' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'overrides' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'ignore' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'only' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'extends' of module exports inside circular dependency
+@erp/mobile:test: (node:9509) Warning: Accessing non-existent property 'then' of module exports inside circular dependency
+@erp/api:test:  ✓ src/modules/files/application/files.service.spec.ts (5 tests) 7ms
+@erp/mobile:test:  ✓ __tests__/scaffold.test.ts (6 tests) 4ms
+@erp/mobile:test:  ✓ __tests__/scaffold-jsx.test.tsx (1 test) 8ms
+@erp/mobile:test: 
+@erp/mobile:test:  Test Files  27 passed (27)
+@erp/mobile:test:       Tests  393 passed (393)
+@erp/mobile:test:    Start at  03:42:58
+@erp/mobile:test:    Duration  69.41s (transform 3.19s, setup 1.37s, collect 34.40s, tests 21.06s, environment 43ms, prepare 4.25s)
+@erp/mobile:test: 
+@erp/api:test:  ✓ src/modules/audit/application/audit.service.spec.ts (4 tests) 5ms
+@erp/api:test:  ✓ src/modules/identity/domain/identity-unit.spec.ts (9 tests) 7ms
+@erp/api:test:  ✓ src/modules/identity/domain/totp.spec.ts (7 tests) 5ms
+@erp/api:test:  ✓ src/infra/http/security-headers.spec.ts (3 tests) 11ms
+@erp/api:test:  ✓ src/modules/communication/__tests__/calendar-matching.spec.ts (6 tests) 5ms
+@erp/api:test: {"level":30,"time":1794973450534,"service":"erp-api","module":"http","correlation_id":"01a1ecc1-4125-7000-9b40-48ee974a2c93","action":"request","method":"GET","path":"/health/live","status":200,"duration_ms":0,"msg":"request completed"}
+@erp/api:test: {"level":30,"time":1794973450536,"service":"erp-api","module":"http","correlation_id":"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee","action":"request","method":"GET","path":"/health/live","status":200,"duration_ms":0,"msg":"request completed"}
+@erp/api:test: {"level":30,"time":1794973450536,"service":"erp-api","module":"http","correlation_id":"01a1ecc1-4128-7000-9be1-df0cca4f1c83","action":"request","method":"GET","path":"/health/live","status":200,"duration_ms":0,"msg":"request completed"}
+@erp/api:test:  ✓ src/infra/observability/request-id.middleware.spec.ts (3 tests) 5ms
+@erp/api:test:  ✓ src/modules/configuration/__tests__/template-drift.spec.ts (3 tests) 3ms
+@erp/api:test:  ✓ src/modules/sales/__tests__/rma-bounding.spec.ts (7 tests) 3ms
+@erp/api:test:  ✓ src/config/env.spec.ts (3 tests) 5ms
+@erp/api:test:  ✓ src/infra/db/tenant-context.spec.ts (3 tests) 4ms
+@erp/api:test:  ✓ src/infra/observability/request-context.spec.ts (3 tests) 5ms
+@erp/api:test: 
+@erp/api:test:  Test Files  58 passed (58)
+@erp/api:test:       Tests  667 passed (667)
+@erp/api:test:    Start at  03:42:58
+@erp/api:test:    Duration  74.62s (transform 6.10s, setup 0ms, collect 41.60s, tests 12.49s, environment 21ms, prepare 6.53s)
+@erp/api:test: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    1m19.024s 
+
+EXIT=0
