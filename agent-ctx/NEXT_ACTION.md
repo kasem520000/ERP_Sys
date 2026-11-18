@@ -1,11 +1,22 @@
-# NEXT ACTION — PHASE-046 COMPLETE; PHASE-047 (HR Growth) UNBLOCKED
+# NEXT ACTION — PHASE-046 COMPLETE (W-9 closed); PHASE-047 (HR Growth) MASTER PLAN PROPOSED
 
-**THE CURRENT STATE (2026-11-17):** PHASE-046 (HR Payroll Compliance —
-GOSI/PIT/EOSB, CR-16) is **COMPLETE** — all nine waves delivered (W-0 + the T-20
-pinned notes + W-1 + the audit-reconciliation fix wave + W-2 + W-3 + W-4 + W-5 +
-W-6 + the W-7 closure wave); **W-6 VERIFIED & APPROVED by the owner's independent
-re-proof** (a fresh clone, clean caches, embedded PG16 — every number matched:
-typecheck + lint 16/16 tasks · api unit 666/666 · the payroll folder 84/84 incl.
+**THE CURRENT STATE (2026-11-18, updated at the W-9 closure + the 047 master
+plan delivery):** PHASE-046 (HR Payroll Compliance — GOSI/PIT/EOSB, CR-16) is
+**COMPLETE** — all eleven waves delivered (W-0 + the T-20 pinned notes + W-1 +
+the audit-reconciliation fix wave + W-2 + W-3 + W-4 + W-5 + W-6 + the W-7
+closure wave + **W-8** (the honest-record + exactness wave: the INV-032(c)
+tie repair + the property-wing seed pin + the F1 corrections — **ACCEPTED at
+`515b80a` by the owner's W-8 verification**) + **W-9** (the P4 ruling wave:
+the oa06 P4 assertion widened to the stable index-driven law per the owner's
+ruling §6 option (i) — 10/10 folder runs green on the previously-RED bitmap
+path + the standalone PK path green; the NF-1/2/3 record corrections; head
+`8fab3ed`)); **PHASE-047's MASTER PLAN IS PROPOSED** —
+[`agent-ctx/PHASE-047-MASTER-PLAN.md`](PHASE-047-MASTER-PLAN.md) (delivered
+with W-9 per the owner's sequencing; the implementation waves begin at the
+owner's plan-approval dispatch — the 046 precedent). The prior state (2026-11-17, the W-7 closure) stands as recorded below:
+**W-6 VERIFIED & APPROVED by the owner's independent re-proof** (a fresh clone,
+clean caches, embedded PG16 — every number matched: typecheck + lint 16/16
+tasks · api unit 666/666 · the payroll folder 84/84 incl.
 the goldens 5/5 + the races 10/10 · reporting 120/120 · hr 83/83 · i18n 6,121 =
 6,121 · drift 300 = 300 · depcruise 1,938 · 14,430), with ONE record correction
 landed in W-7 (the goldens (b) title's wrong "a base of 60,000" → the fixture's
@@ -154,5 +165,8 @@ for the owner's review, and begin implementation only on approval.
   slots begin at 0095; the ID_LEDGER's 047 reservations: BR-088…BR-091 (no
   golden/invariant slots — 047 reserves none).
 - **The baselines to move:** DB suite 250/250 files · 3,436/3,436 · permissions
-  300 · report registry 106 · i18n 6,121 · catalog 288 tables · check:rls 292 ·
+  300 · report registry 106 · i18n 6,121 · catalog 288 tables (corrected
+  2026-11-18 at the 047 plan's recount: **292** — the 288 was the W-1-era
+  figure, stale by the tables the later 046 waves added; ENTITY_CATALOG and
+  check:rls agree at 292) · check:rls 292 ·
   id-ledger implemented G-54/INV-032/BR-087.
