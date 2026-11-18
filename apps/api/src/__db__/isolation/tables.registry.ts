@@ -507,6 +507,32 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "payroll_tax_brackets" },
   { table: "eosb_rules", deleteGranted: true },
   { table: "eosb_calculations" },
+  // PHASE-047 (CR-17 — HR Growth, Talent & Performance; migrations
+  // 0095–0097; the W-1 foundation wave): the talent cluster — FOURTEEN
+  // tables in three families. Master/operational data (DELETE granted:
+  // the typed service guards own the lifecycles): performance_cycles,
+  // competencies, competency_levels, vacancies, training_programs,
+  // org_units, positions, employee_documents. The evidence discipline
+  // (SELECT/INSERT/UPDATE only — the terminal soft states are status
+  // flips, never erasures): performance_reviews (the 360 aggregate's
+  // source rows), goals (CANCELLED), applicants (the hiring record),
+  // interviews (the panel record), training_enrollments (WITHDRAWN),
+  // certifications (renewal is the UPDATE). The auto-generated A-suite
+  // extends by +84.
+  { table: "performance_cycles", deleteGranted: true },
+  { table: "performance_reviews" },
+  { table: "competencies", deleteGranted: true },
+  { table: "competency_levels", deleteGranted: true },
+  { table: "goals" },
+  { table: "vacancies", deleteGranted: true },
+  { table: "applicants" },
+  { table: "interviews" },
+  { table: "training_programs", deleteGranted: true },
+  { table: "training_enrollments" },
+  { table: "certifications" },
+  { table: "org_units", deleteGranted: true },
+  { table: "positions", deleteGranted: true },
+  { table: "employee_documents", deleteGranted: true },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

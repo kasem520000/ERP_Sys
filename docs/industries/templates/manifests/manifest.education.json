@@ -14,7 +14,11 @@
     "treasury.receipts_disbursements",
     "installments.plans",
     "installments.collections",
-    "installments.late_fees"
+    "installments.late_fees",
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org"
   ],
   "default_modules_enabled": [
     "accounting",

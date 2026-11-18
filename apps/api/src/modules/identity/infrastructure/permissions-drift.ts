@@ -185,6 +185,15 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // (owner-only — the BR-085 verification act, SoD-bound: the verifier ≠
   // the row's last editor).
   "apps/api/migrations/0092_payroll_statutory_seeds.sql",
+  // PHASE-047 (Blueprint v3.0 · CR-17): 0098 seeds the TWELVE talent
+  // keys (matrix §3.25; 300 → 312) — the four flag families
+  // (hr.performance.view/manage/review · hr.recruitment.view/manage/
+  // interview · hr.training.view/manage · hr.org.view/manage) plus the
+  // two cross-cutting keys (hr.documents.manage · hr.competency.manage).
+  // Role grants: the owner template holds all twelve; the accountant the
+  // four view keys (the finance side's read plane); no other system role
+  // (talent management is tenant-granted beyond the baseline).
+  "apps/api/migrations/0098_hr_talent_grants.sql",
 ];
 
 export async function main(): Promise<void> {

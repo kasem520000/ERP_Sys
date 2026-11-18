@@ -1,8 +1,61 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (THE 029 MAINTENANCE WAVE — the eos-provision ruled option-(A) fold delivered; earlier today: PHASE-047 — the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0 delivered)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-047 W-1 — the foundation wave delivered: migrations 0095–0098 + every mirror in ONE increment; earlier today: the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-18 — **PHASE-047 W-1 — THE FOUNDATION WAVE DELIVERED**
+  (T-01 + T-02 + T-03 + T-04, the plan §3 W-1; on the 029-wave head
+  `e6e61a1`, this session's fresh clone — the same-session evidence
+  rule's EIGHTH consecutive wave): **migrations 0095–0098** — the
+  fourteen talent tables in three clusters (performance: cycles /
+  reviews-with-the-360-rows (BR-090's substrate, the
+  SELF⟺reviewer=reviewee CHECK) / competencies / the 1–5 scale
+  (CHECK-banded) / goals (the cascade + BR-089's structural floor);
+  recruitment: vacancies / applicants (BR-088's monotonic stage CHECK +
+  the stage_history audit append) / interviews (per panelist per round);
+  training/org/documents: programs (ADR-0009 cost) / enrollments /
+  certifications / org_units + positions (D-09's cycle-safe substrate) /
+  employee_documents) + the employees extensions (D-01 `position_id` ON
+  DELETE SET NULL — the documented extension on the frozen substrate;
+  D-02 + amendment A-1 `probation_end` nullable FAIL-OPEN, PII-registered
+  in the same increment) + 0098 DATA-ONLY (the twelve permission keys
+  (matrix §3.25, 300 → 312) + the role grants + the FOUR FEATURE FLAGS on
+  business + enterprise + the four manifest enablements + the competency
+  scale seed through the 0093-gated sweep with the onboarding hook).
+  **THE ENTITLEMENT/AUTHORIZATION DIVERGENCE recorded:** the four flags
+  (hr.performance/recruitment/training/org — the manifest schema's
+  single-segment module.feature law) gate the capability; the twelve
+  permission keys ride ROLES — 045/046's one-key-both-jobs shape does not
+  fit the manifest schema (found in-session when the schema rejected the
+  dotted permission keys; designed + documented per the phase doc's own
+  flag list, matrix §3.25's dated note). The one-increment mirrors:
+  Drizzle +14, tables.registry +14 (the A-suite +84), ENTITY_CATALOG
+  292 → 306, the drift list + the spec's copy, FEATURE_DEPS +4 (each flag
+  → payroll.employees), templates.ts + the docs mirrors + the golden
+  effective-configs re-pin (31 of 37 moved, the dated review note) + the
+  layer-fixtures + the template-apply specs' stored-hash re-pins +
+  starter-chain extensions, NAV_ITEMS +4 (flag-gated; the screens land
+  W-5), i18n +4 keys/locale (6,125 = 6,125), the PII inventory rows
+  (A-1 + A-4), talent-errors.ts (the typed taxonomy), talent-canonical.ts.
+  **The honest engineering note:** the 0098 §4 gate's first
+  FOR-INSERT…WITH CHECK shape failed PG16's RLS evaluation under the
+  sweep's INSERT…SELECT…ON CONFLICT — reproduced with an in-session
+  scratch probe (FOR INSERT: the RLS violation; the 0094 FOR-ALL shape:
+  green); the proven shape governs, recorded at the statement site.
+  Gates: typecheck/lint 8/8 · depcruise clean 1,941 · 14,439 (+2 modules
+  — the disclosure law) · unit 8/8 (api 667 · web 87 · mobile 393 ·
+  desktop 274 · ui 42 · contracts 56 · domain-core 38 · sync-core 36) ·
+  **THE FULL DB SUITE 250/250 · 3,522/3,522 · 0 failed · 0 skipped** (5
+  chunks; the plan's expected 3,438 + 84 exactly; one disclosed
+  census-pin repair re-run green, both logs kept) · A1–A10 ×14 green ·
+  drift **312 = 312** · check:rls **306 / 0 violations** (scratch-PG16 +
+  in-suite) · i18n 6,125 + 371 · manifests 13/13 · docs 33/33 · id-ledger
+  0 errors + self-test OK · history-secrets 0 · capabilities agree ·
+  shells PASS · the negative boundary PASS. Evidence:
+  [gate-evidence/2026-11-18-phase047-w1.md](../operations/gate-evidence/2026-11-18-phase047-w1.md)
+  + `audit-evidence/phase047-w1/` (25 logs). NOT production approval.
+  NEXT: W-2 — the performance + goals engines. — PHASE-047
 
 - 2026-11-18 — **THE 029 MAINTENANCE WAVE — the eos-provision ruled
   option-(A) fold DELIVERED** (the owner's W-9 verification +

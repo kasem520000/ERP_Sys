@@ -55,6 +55,10 @@ const SEED_PATHS = [
   // joins both lists together (matrix §3.24, 297 → 300) — the 0086
   // lesson applied: the spec's copy extends in the SAME change.
   join(process.cwd(), "migrations", "0092_payroll_statutory_seeds.sql"), // PHASE-046 the three compliance keys (297 → 300)
+  // PHASE-047 (CR-17, W-1): 0098 seeds the twelve talent keys and joins
+  // both lists together (matrix §3.25, 300 → 312) — the 0086/0092 lesson
+  // carried: the spec's copy extends in the SAME change.
+  join(process.cwd(), "migrations", "0098_hr_talent_grants.sql"), // PHASE-047 the twelve talent keys (300 → 312)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

@@ -22,7 +22,11 @@
     "purchasing.landed_costs",
     "hr.attendance",
     "hr.leave",
-    "hr.shifts"
+    "hr.shifts",
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org"
   ],
   "default_modules_enabled": [
     "accounting",

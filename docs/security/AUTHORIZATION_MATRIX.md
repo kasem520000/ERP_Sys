@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-18 (PHASE-047 W-1 — §3.25 the twelve talent keys; catalog 300 → 312, migration 0098 §1; the four template compositions per 0098 §3) · 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -701,6 +701,56 @@ key — the G-50/G-51 law); the run screen's statutory columns ride
 Role grants per 0092 §1: owner holds all three; the accountant and the
 payroll_officer hold the two management keys (never the verify key — the
 SoD three-way split: edit ≠ verify ≠ post).
+
+### §3.25 HR growth — talent & performance (PHASE-047; catalog 300 → 312)
+
+The talent cluster (CR-17): the performance cycles with aggregated 360
+feedback, the competency framework, the cascading goals, the recruitment
+pipeline, the training/certification registers, the org structure, and the
+employee-document register. **All twelve keys seed in migration `0098` §1 —
+the permission catalog extends 300 → 312 (seed = mirror, zero drift).**
+**The entitlement/authorization divergence (this phase's own design,
+recorded):** the FOUR FEATURE FLAGS — `hr.performance` · `hr.recruitment` ·
+`hr.training` · `hr.org` (the phase doc's composable units, the §3 manifest
+schema's single-segment module.feature shape) — are the ENTITLEMENT keys:
+business + enterprise carry them (0098 §2) and the four people-carrying
+industry templates (professional_services, healthcare, education,
+food_manufacturing) compose them by default (0098 §3). The twelve keys below
+are the AUTHORIZATION surface and ride ROLES (0098 §1) — never the plans;
+the flags gate the capability (the nav/screens/feature planes), the roles
+grant the authority. (045/046 used one key for both jobs; the talent
+layer's finer-grained permission set diverges deliberately — the flags stay
+composable while the keys stay auditable.) **Ledger-free by design**: no key
+in this section unlocks any posting act (the plan's D-05) — the talent layer
+never touches the journal.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `hr.performance.view` | View performance cycles, reviews, and aggregated 360 results / عرض دورات التقييم والمراجعات ونتائج 360 المجمّعة | owner, accountant | tenant | no (read-only over the talent plane; BR-090 confines the 360 to aggregates at the ≥ 3 threshold — raw per-source rows never leave the service boundary below it) |
+| `hr.performance.manage` | Manage performance cycles and calibration / إدارة دورات التقييم والمعايرة | owner | tenant | **yes** (the cycle lifecycle gates every review window — a CLOSED cycle is immutable history; the calibration act overwrites calibrated scores) |
+| `hr.performance.review` | Submit and edit own review inputs / تقديم وتحرير مدخلات التقييم الخاصة | owner | tenant | **yes** (the 360 input rows are BR-090's raw substrate — the key holders are exactly the people who may AUTHOR inputs, never read others' attributed sources) |
+| `hr.recruitment.view` | View vacancies and the applicant pipeline / عرض الشواغر ومسار المتقدمين | owner, accountant | tenant | no (read-only; the applicant rows are PII-registered (amendment A-4) — the inventory's minimization rules govern) |
+| `hr.recruitment.manage` | Manage vacancies and applicant stages / إدارة الشواغر ومراحل المتقدمين | owner | tenant | **yes** (the stage ladder is BR-088's monotonic law — backward motion only via the recorded reopen; the HIRED act writes the employee link) |
+| `hr.recruitment.interview` | Record interview scorecards as a panelist / تسجيل بطاقات تقييم المقابلات كعضو لجنة | owner | tenant | no (one's OWN scorecard rows — the panel record is append-shaped evidence; the verdict never touches the stage ladder directly) |
+| `hr.training.view` | View training programs, enrollments, and certifications / عرض برامج التدريب والتسجيلات والشهادات | owner, accountant | tenant | no (read-only) |
+| `hr.training.manage` | Manage training programs and enrollments / إدارة برامج التدريب والتسجيلات | owner | tenant | **yes** (the cost field is money-adjacent data (ADR-0009) and the completion result feeds the external bridges' import path) |
+| `hr.org.view` | View the org structure and positions / عرض الهيكل التنظيمي والوظائف | owner, accountant | tenant | no (read-only) |
+| `hr.org.manage` | Manage org units and positions (cycle-safe moves) / إدارة الوحدات التنظيمية والوظائف (نقل آمن من الحلقات) | owner | tenant | **yes** (org moves rewrite the materialized path subtree; the cycle guard (D-09) is the write-time law — a cycle is unrepresentable through the API) |
+| `hr.documents.manage` | Manage the employee document register / إدارة سجل وثائق الموظفين | owner | tenant | **yes** (iqama/passport numbers are the platform's most sensitive operational PII (amendment A-4) — the register feeds the expiry sweeps (BR-091); never in exports) |
+| `hr.competency.manage` | Manage the competency framework and scale descriptors / إدارة إطار الكفاءات ووصف المقياس | owner | tenant | **yes** (the scale descriptors are tenant-configurable DATA with the one shipped documented default (BR-055's red line) — edits are the tenant's own calibration, never a seeded compliance fact) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — landing with the W-2/W-3 services per
+the keys-seed-first discipline, the §3.23/§3.24 precedent): the
+`/api/v1/hr/{performance,goals,recruitment,training,org,documents,competencies}`
+families — the exact keys above, one family per key cluster (the review
+submission routes additionally scope to the acting reviewer's OWN rows at the
+service boundary, the self-service precedent). Role grants per 0098 §1: the
+owner template holds all twelve; the accountant the four VIEW keys (the
+finance side's read plane over the employee substrate); NO other system role
+— talent management is tenant-granted beyond the baseline (the
+`payroll.statutory.verify` owner-only precedent's spirit). The alert surfaces
+(document-expiry, certification-expiry, probation-end, review-due) ride the
+notifications' own permission plane — no new key.
 
 ## 4. Segregation of duties & approval limits
 

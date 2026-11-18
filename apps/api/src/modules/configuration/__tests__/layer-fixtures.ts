@@ -278,6 +278,17 @@ const BUSINESS_KEYS: readonly string[] = [
   // payroll.employees (the fixtures mirror only what a consumer needs).
   "payroll.salary_structures", "payroll.runs", "payroll.eos_provision",
   "payroll.statutory", "payroll.eosb",
+  // PHASE-047 (W-1) transcription of the 0098 §2 plan grants (the FOUR
+  // FEATURE FLAGS → business + enterprise, the tier-4 precedent; starter
+  // does NOT get them): hr.performance · hr.recruitment · hr.training ·
+  // hr.org — the talent layer's composable units (the phase doc's §4;
+  // single-segment module.feature keys per the §3 schema). The four
+  // people-carrying templates' (0098 §3: professional_services +
+  // healthcare + education + food_manufacturing) REQUIRED chains resolve
+  // through exactly these grants — the talent manifest enablement. (The
+  // twelve PERMISSION keys ride ROLES per 0098 §1, never the plans —
+  // matrix §3.25's entitlement/authorization divergence note.)
+  "hr.performance", "hr.recruitment", "hr.training", "hr.org",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

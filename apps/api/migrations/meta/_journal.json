@@ -658,6 +658,34 @@
       "when": 1797148800000,
       "tag": "0094_rls_tenant_sweep_repair",
       "breakpoints": true
+    },
+    {
+      "idx": 94,
+      "version": "7",
+      "when": 1797235200000,
+      "tag": "0095_hr_talent_performance",
+      "breakpoints": true
+    },
+    {
+      "idx": 95,
+      "version": "7",
+      "when": 1797321600000,
+      "tag": "0096_hr_talent_recruitment",
+      "breakpoints": true
+    },
+    {
+      "idx": 96,
+      "version": "7",
+      "when": 1797408000000,
+      "tag": "0097_hr_talent_training_org",
+      "breakpoints": true
+    },
+    {
+      "idx": 97,
+      "version": "7",
+      "when": 1797494400000,
+      "tag": "0098_hr_talent_grants",
+      "breakpoints": true
     }
   ],
   "version": "7"

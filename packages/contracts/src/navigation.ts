@@ -1539,6 +1539,64 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "settings",
     order: 100,
   },
+  // PHASE-047 (W-1 — D-10/D-11, the talent layer's four surfaces): the
+  // rows register with the FOUNDATION (the keys + feature flags seed in
+  // 0098 — the one-increment law); the SCREENS land with W-5 (the plan's
+  // wave ordering — a granted tenant sees the nav rows as soon as its
+  // plan carries the flags, the pages follow). featureKeys the FOUR
+  // FEATURE FLAGS (the single-segment composable units, 0098 §2/§3 —
+  // NOT the permission keys: the flags gate the capability, the
+  // permissions grant the authority, matrix §3.25's divergence note);
+  // permissions the exact §3.25 view keys. Orders 110–140: the live
+  // next slots of the hr group (10–100 taken by 029/045/046).
+  {
+    id: "hr.performance",
+    parentGroup: "hr",
+    label: { ar: "الأداء والتقييم", en: "Performance" },
+    icon: "gauge",
+    route: "/hr/performance",
+    featureKey: "hr.performance",
+    permission: "hr.performance.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 110,
+  },
+  {
+    id: "hr.recruitment",
+    parentGroup: "hr",
+    label: { ar: "التوظيف والتعيين", en: "Recruitment" },
+    icon: "user-plus",
+    route: "/hr/recruitment",
+    featureKey: "hr.recruitment",
+    permission: "hr.recruitment.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 120,
+  },
+  {
+    id: "hr.training",
+    parentGroup: "hr",
+    label: { ar: "التدريب والشهادات", en: "Training & certifications" },
+    icon: "graduation-cap",
+    route: "/hr/training",
+    featureKey: "hr.training",
+    permission: "hr.training.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 130,
+  },
+  {
+    id: "hr.org-structure",
+    parentGroup: "hr",
+    label: { ar: "الهيكل التنظيمي", en: "Org structure" },
+    icon: "network",
+    route: "/hr/org-structure",
+    featureKey: "hr.org",
+    permission: "hr.org.view",
+    branchScoped: false,
+    archetype: "settings",
+    order: 140,
+  },
 ];
 
 /**

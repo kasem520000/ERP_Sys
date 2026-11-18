@@ -193,8 +193,11 @@ describe("seeds (acceptance 9)", () => {
     // 2026-11-14 in parallel with the 043-completion review)
     // + 3 = 300 after 0092 — the three PHASE-046 compliance keys
     // (payroll.statutory, payroll.eosb, payroll.statutory.verify —
-    // matrix §3.24; the drift CLI agrees: matrix 300 = seed 300).
-    expect(result.rows[0]?.n).toBe(300);
+    // matrix §3.24; the drift CLI agrees: matrix 300 = seed 300)
+    // + 12 = 312 after 0098 — the twelve PHASE-047 talent keys (matrix
+    // §3.25; the four flag families + the two cross-cutting keys; the
+    // drift CLI agrees: matrix 312 = seed 312).
+    expect(result.rows[0]?.n).toBe(312);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

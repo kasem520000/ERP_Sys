@@ -510,6 +510,19 @@ export const MIGRATIONS: readonly string[] = [
   // (the runtime ensureDefaultBin lazy path is the canonical seeder),
   // never guessed. 0089–0093 stay byte-stable.
   "0094_rls_tenant_sweep_repair",
+  // PHASE-047 (Blueprint v3.0 · CR-17) — HR Growth, Talent & Performance:
+  // 0095 the performance cluster (cycles/reviews-with-360-rows/
+  // competencies/competency_levels/goals), 0096 the recruitment cluster
+  // (vacancies/applicants/interviews — BR-088's substrate), 0097 the
+  // training/org/documents cluster (programs/enrollments/certifications/
+  // org_units/positions/employee_documents + the employees extensions:
+  // position_id D-01 + probation_end D-02/amendment A-1), 0098 the
+  // DATA-ONLY grants (the 12 permission keys + plan grants + the four
+  // manifest enablements D-10 + the competency 1–5 scale seed).
+  "0095_hr_talent_performance",
+  "0096_hr_talent_recruitment",
+  "0097_hr_talent_training_org",
+  "0098_hr_talent_grants",
 ];
 
 /**

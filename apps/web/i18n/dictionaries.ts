@@ -6539,6 +6539,12 @@ export interface Dictionary {
   // calendar, own leave request + balance, own roster — gated by
   // hr.self_service's runtime grant + the identity bridge).
   hrSelfTitle: string;
+  // PHASE-047 (W-1 — D-10/D-13): the four talent surfaces' titles (the
+  // rows register with the foundation — the screens land with W-5).
+  hrPerformanceTitle: string;
+  hrRecruitmentTitle: string;
+  hrTrainingTitle: string;
+  hrOrgStructureTitle: string;
   hrSelfNotLinkedTitle: string;
   hrSelfNotLinkedBody: string;
   hrSelfTabAttendance: string;
@@ -13081,6 +13087,12 @@ const ar: Dictionary = {
   hrErrLeaveOverlap: "يتقاطع امتداد الإجازة مع إجازة قائمة لهذا الموظف.",
   // PHASE-045 (T-14): الخدمة الذاتية للموظف
   hrSelfTitle: "الخدمة الذاتية",
+  // PHASE-047 (W-1 — D-10/D-13): عناوين أسطح المواهب الأربعة (تسجيل
+  // الصفوف مع الأساس — الشاشات تهبط مع W-5)
+  hrPerformanceTitle: "الأداء والتقييم",
+  hrRecruitmentTitle: "التوظيف والتعيين",
+  hrTrainingTitle: "التدريب والشهادات",
+  hrOrgStructureTitle: "الهيكل التنظيمي",
   hrSelfNotLinkedTitle: "لا يوجد ملف موظف مرتبط بحسابك",
   hrSelfNotLinkedBody: "تحلّ شاشات الخدمة الذاتية هويتك الوظيفية عبر ربط الموظف بالمستخدم. حسابك غير مرتبط بملف موظف في هذا المستأجر — تواصل مع الموارد البشرية لإجراء الربط، أو استخدم شاشات الموارد البشرية إن كانت لديك صلاحياتها.",
   hrSelfTabAttendance: "حضوري",
@@ -19433,6 +19445,12 @@ const en: Dictionary = {
   hrAttendanceImportTitle: "Device punch import",
   hrLeaveTitle: "Leave",
   hrShiftsTitle: "Shifts & roster",
+  // PHASE-047 (W-1 — D-10/D-13): the four talent surfaces' titles (the
+  // rows register with the foundation — the screens land with W-5).
+  hrPerformanceTitle: "Performance",
+  hrRecruitmentTitle: "Recruitment",
+  hrTrainingTitle: "Training & certifications",
+  hrOrgStructureTitle: "Org structure",
   hrAttendanceRegister: "Daily register",
   hrExceptionBoard: "Exception board",
   hrImportWizard: "Import wizard",

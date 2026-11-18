@@ -91,6 +91,11 @@ import { TaxResolverService } from "../../modules/tax/application/tax-resolver-s
  *   re-switching, capturing, blocking, and granting produce ZERO journal
  *   rows — templates and their claim metadata are configuration, never a
  *   fork. The consolidated final gate re-proves the whole file.
+ *
+ * PHASE-047 (W-1) review note: the healthcare manifest hash re-pinned
+ * (0098 §3 — the four talent flags join the required chain; healthcare
+ * already carried the 045 workforce set, the flags follow it).
+ *
  */
 
 /** KNOWN hash — `pnpm validate:manifests` on the ten-template set (the
@@ -102,7 +107,7 @@ const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
 // required_feature_keys gains the hr block (the workforce-industry
 // enablement; the migration seed, the docs mirror, and the contracts
 // verbatim moved together — the 0066 §9 re-pin procedure).
-  "industry.healthcare": "sha256:b00e2e1aeeefc631d29d3fe08d7aef60423ca8b77be0954367caa9bc36a4daeb",
+  "industry.healthcare": "sha256:607cc89a7fac4ec3ecb48f654b3561702118be6b5eceffcc23e2908ad309d2e0",
 });
 
 // -- tenant A: the healthcare apply + the claim-capture legs ------------------

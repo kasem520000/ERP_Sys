@@ -6768,6 +6768,19 @@ export const employees = pgTable(
     // {personalAllowance?, dependents?, other?} — absent keys fall back
     // to the bracket set's defaults, never fabricated values.
     pitExemptions: jsonb("pit_exemptions"),
+    // PHASE-047 (D-01, migration 0097 — the plan-approved documented
+    // extension): the org-structure slot — nullable, ON DELETE SET NULL
+    // (an employee without a position stays valid, the userId bridge's
+    // precedent). Payroll NEVER writes this column (the frozen substrate
+    // law — the 029/046 run machinery is frozen substrate).
+    positionId: uuid("position_id"),
+    // PHASE-047 (D-02 + amendment A-1, migration 0097 — the owner-approved
+    // addition, 2026-11-18): the probation end date — nullable, FAIL-OPEN
+    // (NULL = not tracked; the hr.probation-end sweep skips NULLs, no
+    // alert ever fabricated — the alert-input mirror of nationality's
+    // fail-closed pricing law); registered in the PII inventory
+    // (DATA_PROTECTION §3) in the same increment.
+    probationEnd: date("probation_end"),
   },
   (table) => [
     uniqueIndex("uq_employees_id_tenant").on(table.id, table.tenantId),
@@ -9653,5 +9666,434 @@ export const eosbCalculations = pgTable(
       table.tenantId,
       table.journalEntryId,
     ),
+  ],
+);
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * PHASE-047 (Blueprint v3.0 · CR-17) — HR Growth, Talent & Performance
+ * (migrations 0095–0097; the W-1 foundation wave). Ledger-free by design
+ * (the plan's D-05): no journal rules, no invariants, no account purposes.
+ * The grants discipline mirrors the SQL: cycles/competencies/levels/
+ * vacancies/programs/org_units/positions/documents carry DELETE (master or
+ * operational data — typed service guards own the lifecycles);
+ * reviews/goals/applicants/interviews/enrollments/certifications are the
+ * evidence discipline (SELECT/INSERT/UPDATE only — the terminal soft
+ * states are status flips, never erasures).
+ * ─────────────────────────────────────────────────────────────────────────── */
+
+/** PHASE-047 (T-01/T-05, migration 0095): the review cycle — the period
+ * window, the DRAFT→ACTIVE→CALIBRATION→CLOSED lifecycle (the CAS
+ * transitions are the W-2 engine's), the participant scope (org-unit
+ * ids), and the review-due date (the hr.review-due sweep's probe). */
+export const performanceCycles = pgTable(
+  "performance_cycles",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    periodStart: date("period_start").notNull(),
+    periodEnd: date("period_end").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    reviewDueDate: date("review_due_date"),
+    scopeOrgUnitIds: jsonb("scope_org_unit_ids").notNull().default([]),
+  },
+  (table) => [
+    uniqueIndex("uq_performance_cycles_id_tenant").on(table.id, table.tenantId),
+    index("ix_performance_cycles_tenant_status").on(table.tenantId, table.status),
+    index("ix_performance_cycles_tenant_period").on(
+      table.tenantId,
+      table.periodStart,
+      table.periodEnd,
+    ),
+  ],
+);
+
+/** PHASE-047 (T-01/T-05, migration 0095): ONE row per (cycle, reviewee,
+ * reviewer, kind) — kind MANAGER carries the review proper; kinds SELF/
+ * PEER/SUBORDINATE are the 360 INPUT rows (BR-090's raw substrate — the
+ * reviewer sees them ONLY in aggregate at the ≥ 3 threshold). The
+ * evidence discipline: no DELETE (the 360 aggregate's integrity depends
+ * on the source rows existing). */
+export const performanceReviews = pgTable(
+  "performance_reviews",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    cycleId: uuid("cycle_id").notNull(),
+    reviewerEmployeeId: uuid("reviewer_employee_id").notNull(),
+    revieweeEmployeeId: uuid("reviewee_employee_id").notNull(),
+    kind: text("kind").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    overallScore: numeric("overall_score", { precision: 5, scale: 2 }),
+    competencyScores: jsonb("competency_scores").notNull().default({}),
+    goalRollup: numeric("goal_rollup", { precision: 7, scale: 2 }),
+    comments: text("comments"),
+  },
+  (table) => [
+    uniqueIndex("uq_performance_reviews_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_performance_reviews_cycle_reviewer_reviewee_kind").on(
+      table.tenantId,
+      table.cycleId,
+      table.revieweeEmployeeId,
+      table.reviewerEmployeeId,
+      table.kind,
+    ),
+    index("ix_performance_reviews_tenant_cycle").on(table.tenantId, table.cycleId),
+    index("ix_performance_reviews_tenant_reviewee").on(
+      table.tenantId,
+      table.revieweeEmployeeId,
+      table.kind,
+    ),
+  ],
+);
+
+/** PHASE-047 (T-01, migration 0095): the tenant competency dictionary —
+ * master data (DELETE granted; the typed service guards own activation). */
+export const competencies = pgTable(
+  "competencies",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    category: text("category"),
+    active: boolean("active").notNull().default(true),
+  },
+  (table) => [
+    uniqueIndex("uq_competencies_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_competencies_tenant_code").on(table.tenantId, table.code),
+    index("ix_competencies_tenant_active").on(table.tenantId, table.active),
+  ],
+);
+
+/** PHASE-047 (T-01/T-04, migration 0095): the 1–5 scale — tenant-
+ * configurable DATA (BR-055); 0098 §4 seeds the documented AR/EN default
+ * for existing tenants, the onboarding hook for new ones (one source,
+ * both paths — talent-canonical.ts). */
+export const competencyLevels = pgTable(
+  "competency_levels",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    level: integer("level").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar").notNull(),
+    descriptor: text("descriptor").notNull(),
+    descriptorAr: text("descriptor_ar").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_competency_levels_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_competency_levels_tenant_level").on(table.tenantId, table.level),
+  ],
+);
+
+/** PHASE-047 (T-01/T-06, migration 0095): the cascading weighted goals —
+ * the parent link (org → team → employee), the KRI target/actual/progress,
+ * and the per-cycle per-reviewee weight axis (BR-089's Σ = exactly 100% is
+ * the W-2 engine's typed law; the (tenant, cycle, employee, title) UNIQUE
+ * is the structural floor). No DELETE (CANCELLED is the terminal soft
+ * state — the leave_requests precedent). */
+export const goals = pgTable(
+  "goals",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    cycleId: uuid("cycle_id").notNull(),
+    ownerEmployeeId: uuid("owner_employee_id").notNull(),
+    parentGoalId: uuid("parent_goal_id"),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    weight: numeric("weight", { precision: 5, scale: 2 }).notNull(),
+    kriTarget: text("kri_target"),
+    kriActual: text("kri_actual"),
+    progressPct: numeric("progress_pct", { precision: 5, scale: 2 }),
+    status: text("status").notNull().default("ACTIVE"),
+    dueDate: date("due_date"),
+  },
+  (table) => [
+    uniqueIndex("uq_goals_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_goals_cycle_employee_title").on(
+      table.tenantId,
+      table.cycleId,
+      table.ownerEmployeeId,
+      table.title,
+    ),
+    index("ix_goals_tenant_cycle").on(table.tenantId, table.cycleId),
+    index("ix_goals_tenant_owner").on(table.tenantId, table.ownerEmployeeId, table.status),
+    index("ix_goals_tenant_parent").on(table.tenantId, table.parentGoalId),
+  ],
+);
+
+/** PHASE-047 (T-02/T-07, migration 0096): the requisition — master data
+ * (DELETE granted); the position FK lands with 0097 §5 (positions is
+ * created there — the plan's slot ordering). */
+export const vacancies = pgTable(
+  "vacancies",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    code: text("code").notNull(),
+    positionId: uuid("position_id"),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    headcount: integer("headcount").notNull(),
+    status: text("status").notNull().default("OPEN"),
+    openedAt: timestamp("opened_at", { withTimezone: true, mode: "string" }),
+    filledAt: timestamp("filled_at", { withTimezone: true, mode: "string" }),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("uq_vacancies_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_vacancies_tenant_code").on(table.tenantId, table.code),
+    index("ix_vacancies_tenant_status").on(table.tenantId, table.status),
+    index("ix_vacancies_tenant_position").on(table.tenantId, table.positionId),
+  ],
+);
+
+/** PHASE-047 (T-02/T-07, migration 0096): the pipeline row — BR-088's
+ * monotonic stage ladder substrate (the state machine is the W-3 engine's
+ * pure law; backward motion ONLY via the recorded reopen — the
+ * stage_history jsonb append). No DELETE (the hiring record; REJECTED is
+ * a terminal state, never an erasure). */
+export const applicants = pgTable(
+  "applicants",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    vacancyId: uuid("vacancy_id").notNull(),
+    fullName: text("full_name").notNull(),
+    fullNameAr: text("full_name_ar"),
+    email: text("email"),
+    phone: text("phone"),
+    source: text("source"),
+    stage: text("stage").notNull().default("NEW"),
+    stageHistory: jsonb("stage_history").notNull().default([]),
+    hiredEmployeeId: uuid("hired_employee_id"),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("uq_applicants_id_tenant").on(table.id, table.tenantId),
+    index("ix_applicants_tenant_vacancy").on(table.tenantId, table.vacancyId),
+    index("ix_applicants_tenant_stage").on(table.tenantId, table.stage),
+  ],
+);
+
+/** PHASE-047 (T-02/T-07, migration 0096): the panel scorecards — ONE row
+ * per panelist slot per round. No DELETE (the panel record). */
+export const interviews = pgTable(
+  "interviews",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    applicantId: uuid("applicant_id").notNull(),
+    round: integer("round").notNull(),
+    panelistEmployeeId: uuid("panelist_employee_id").notNull(),
+    scheduledStart: timestamp("scheduled_start", { withTimezone: true, mode: "string" })
+      .notNull(),
+    scheduledEnd: timestamp("scheduled_end", { withTimezone: true, mode: "string" })
+      .notNull(),
+    mode: text("mode").notNull(),
+    scorecard: jsonb("scorecard").notNull().default({}),
+    verdict: text("verdict"),
+    comments: text("comments"),
+  },
+  (table) => [
+    uniqueIndex("uq_interviews_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_interviews_applicant_round_panelist").on(
+      table.tenantId,
+      table.applicantId,
+      table.round,
+      table.panelistEmployeeId,
+    ),
+    index("ix_interviews_tenant_applicant").on(
+      table.tenantId,
+      table.applicantId,
+      table.round,
+    ),
+    index("ix_interviews_tenant_panelist").on(table.tenantId, table.panelistEmployeeId),
+  ],
+);
+
+/** PHASE-047 (T-03/T-08, migration 0097): the training catalog — master
+ * data; the cost is numeric(19,4) (ADR-0009's money law). */
+export const trainingPrograms = pgTable(
+  "training_programs",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    kind: text("kind").notNull(),
+    provider: text("provider"),
+    cost: numeric("cost", { precision: 19, scale: 4 }),
+    status: text("status").notNull().default("ACTIVE"),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("uq_training_programs_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_training_programs_tenant_code").on(table.tenantId, table.code),
+    index("ix_training_programs_tenant_status").on(table.tenantId, table.status),
+  ],
+);
+
+/** PHASE-047 (T-03/T-08, migration 0097): the per-(program, employee)
+ * record — no DELETE (WITHDRAWN is the soft path). */
+export const trainingEnrollments = pgTable(
+  "training_enrollments",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    programId: uuid("program_id").notNull(),
+    employeeId: uuid("employee_id").notNull(),
+    status: text("status").notNull().default("ENROLLED"),
+    attendancePct: numeric("attendance_pct", { precision: 5, scale: 2 }),
+    completionPct: numeric("completion_pct", { precision: 5, scale: 2 }),
+    result: text("result"),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("uq_training_enrollments_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_training_enrollments_program_employee").on(
+      table.tenantId,
+      table.programId,
+      table.employeeId,
+    ),
+    index("ix_training_enrollments_tenant_employee").on(
+      table.tenantId,
+      table.employeeId,
+      table.status,
+    ),
+    index("ix_training_enrollments_tenant_program").on(table.tenantId, table.programId),
+  ],
+);
+
+/** PHASE-047 (T-03/T-08/T-09, migration 0097): the certification register
+ * — the expiry_date is the hr.certification-expiry sweep's probe; no
+ * DELETE (renewal is the UPDATE; the register is the compliance record). */
+export const certifications = pgTable(
+  "certifications",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    employeeId: uuid("employee_id").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    issuer: text("issuer").notNull(),
+    issueDate: date("issue_date").notNull(),
+    expiryDate: date("expiry_date"),
+    certificateNumber: text("certificate_number"),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("uq_certifications_id_tenant").on(table.id, table.tenantId),
+    index("ix_certifications_tenant_employee").on(table.tenantId, table.employeeId),
+    index("ix_certifications_tenant_expiry").on(table.tenantId, table.expiryDate),
+  ],
+);
+
+/** PHASE-047 (T-03/T-08, migration 0097 — D-09): the org tree — the
+ * materialized path + the parent link; every move validates no cycle at
+ * write time (the pure detectCycle, W-3). Master data (DELETE granted). */
+export const orgUnits = pgTable(
+  "org_units",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    parentId: uuid("parent_id"),
+    path: text("path").notNull(),
+    active: boolean("active").notNull().default(true),
+  },
+  (table) => [
+    uniqueIndex("uq_org_units_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_org_units_tenant_code").on(table.tenantId, table.code),
+    index("ix_org_units_tenant_parent").on(table.tenantId, table.parentId),
+  ],
+);
+
+/** PHASE-047 (T-03/T-08, migration 0097 — D-09): the bilingual titled
+ * slots — the grade, the org-unit attachment, and reports_to (the same
+ * cycle guard). Master data (DELETE granted). */
+export const positions = pgTable(
+  "positions",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    code: text("code").notNull(),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    grade: text("grade"),
+    orgUnitId: uuid("org_unit_id"),
+    reportsTo: uuid("reports_to"),
+    status: text("status").notNull().default("ACTIVE"),
+  },
+  (table) => [
+    uniqueIndex("uq_positions_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_positions_tenant_code").on(table.tenantId, table.code),
+    index("ix_positions_tenant_org_unit").on(table.tenantId, table.orgUnitId),
+    index("ix_positions_tenant_reports_to").on(table.tenantId, table.reportsTo),
+  ],
+);
+
+/** PHASE-047 (T-03/T-09, migration 0097 — HR-10): the document register —
+ * the Gulf compliance exposure converted to a scheduled alert product
+ * (the expiry sweep's probe). Operational data (DELETE granted —
+ * replacement is a normal HR operation; the audit trail lives in
+ * audit_events). The number is PII (amendment A-4): registered in the
+ * PII inventory, never in exports. */
+export const employeeDocuments = pgTable(
+  "employee_documents",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    employeeId: uuid("employee_id").notNull(),
+    kind: text("kind").notNull(),
+    number: text("number"),
+    issuedOn: date("issued_on"),
+    expiresOn: date("expires_on"),
+    notes: text("notes"),
+  },
+  (table) => [
+    uniqueIndex("uq_employee_documents_id_tenant").on(table.id, table.tenantId),
+    index("ix_employee_documents_tenant_employee").on(
+      table.tenantId,
+      table.employeeId,
+      table.kind,
+    ),
+    index("ix_employee_documents_tenant_expiry").on(table.tenantId, table.expiresOn),
   ],
 );

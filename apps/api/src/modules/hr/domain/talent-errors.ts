@@ -1,0 +1,163 @@
+import { DomainError } from "@erp/domain-core";
+
+/**
+ * PHASE-047 (W-1 — HR Growth: Talent & Performance) domain errors, the
+ * typed taxonomy the W-2/W-3 engines throw (the 046 statutory-errors
+ * precedent: landed with the foundation, registered in-phase, consumed by
+ * the engines + the HTTP layer's status map as they land). Codes are
+ * stable API contracts (ERROR_MODEL §4); A7-sensitive not-founds render
+ * identically for unknown-vs-foreign ids (RLS makes them indistinguishable
+ * at the store — the typed errors never disclose a foreign id's
+ * existence).
+ *
+ * The families (the plan's D-04 reservations):
+ * - 404 A7: the not-found family (cycle/competency/vacancy/applicant/
+ *   program/org-unit/position/document).
+ * - 409: the unique-code family (the typed taken refusals) + the cycle
+ *   CAS family (a closed/active cycle's state conflicts).
+ * - 422 fail-closed: BR-088 (the monotonic stage law — backward motion
+ *   only via the recorded reopen), BR-089 (the per-cycle per-reviewee
+ *   active weight sum must be EXACTLY 100%), BR-090 (the 360
+ *   aggregate-only law — a relationship's inputs surface only at ≥ 3
+ *   responses), D-09 (the org/goal cycle law — a move that would create
+ *   a cycle is refused before any write).
+ */
+
+// ── The 404 A7 family ───────────────────────────────────────────────────────
+
+export class TalentCycleNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("TALENT_CYCLE_NOT_FOUND", `performance cycle ${id} does not exist in this tenant`);
+  }
+}
+export class CompetencyNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("COMPETENCY_NOT_FOUND", `competency ${id} does not exist in this tenant`);
+  }
+}
+export class CompetencyLevelNotFoundError extends DomainError {
+  constructor(level: number) {
+    super(
+      "COMPETENCY_LEVEL_NOT_FOUND",
+      `competency level ${level} is not configured in this tenant (the 1–5 scale is tenant data — 0098 §4 seeds the documented default)`,
+    );
+  }
+}
+export class VacancyNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("VACANCY_NOT_FOUND", `vacancy ${id} does not exist in this tenant`);
+  }
+}
+export class ApplicantNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("APPLICANT_NOT_FOUND", `applicant ${id} does not exist in this tenant`);
+  }
+}
+export class TrainingProgramNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("TRAINING_PROGRAM_NOT_FOUND", `training program ${id} does not exist in this tenant`);
+  }
+}
+export class OrgUnitNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("ORG_UNIT_NOT_FOUND", `org unit ${id} does not exist in this tenant`);
+  }
+}
+export class PositionNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("POSITION_NOT_FOUND", `position ${id} does not exist in this tenant`);
+  }
+}
+export class EmployeeDocumentNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("EMPLOYEE_DOCUMENT_NOT_FOUND", `employee document ${id} does not exist in this tenant`);
+  }
+}
+
+// ── The 409 family: unique codes + the lifecycle CAS ───────────────────────
+
+export class TalentCodeTakenError extends DomainError {
+  constructor(kind: "cycle" | "competency" | "vacancy" | "program" | "org-unit" | "position", code: string) {
+    super(
+      "TALENT_CODE_TAKEN",
+      `${kind} code ${code} is already used in this tenant — codes are unique per kind`,
+    );
+  }
+}
+export class CycleStateConflictError extends DomainError {
+  constructor(id: string, from: string, to: string) {
+    super(
+      "CYCLE_STATE_CONFLICT",
+      `performance cycle ${id} is ${from} — the ${to} transition is not available from this state (the DRAFT→ACTIVE→CALIBRATION→CLOSED ladder is one-way; the CAS refuses a raced or stale move)`,
+    );
+  }
+}
+export class ReviewAlreadySubmittedError extends DomainError {
+  constructor(id: string) {
+    super(
+      "REVIEW_ALREADY_SUBMITTED",
+      `review ${id} is already SUBMITTED — a submitted review is immutable until calibration (re-open through the cycle's calibration phase, never a silent edit)`,
+    );
+  }
+}
+export class DuplicateEnrollmentError extends DomainError {
+  constructor(programId: string, employeeId: string) {
+    super(
+      "DUPLICATE_ENROLLMENT",
+      `employee ${employeeId} is already enrolled in program ${programId} — one enrollment record per (program, employee); the status ladder is the update path`,
+    );
+  }
+}
+
+// ── The 422 fail-closed family: the BR-088/089/090 + D-09 laws ─────────────
+
+export class StageTransitionInvalidError extends DomainError {
+  constructor(applicantId: string, from: string, to: string) {
+    super(
+      "STAGE_TRANSITION_INVALID",
+      `applicant ${applicantId}: the ${from} → ${to} stage move is not a forward step of the pipeline ladder (NEW→SCREEN→INTERVIEW→OFFER→HIRED/REJECTED — BR-088's monotonic law; backward motion only via the recorded reopen action)`,
+    );
+  }
+}
+export class ApplicantNotHireableError extends DomainError {
+  constructor(applicantId: string, stage: string) {
+    super(
+      "APPLICANT_NOT_HIREABLE",
+      `applicant ${applicantId} is at stage ${stage} — the hire act requires OFFER (BR-088's ladder; the employee link writes only from the hire)`,
+    );
+  }
+}
+export class GoalWeightsInvalidError extends DomainError {
+  constructor(employeeId: string, cycleId: string, sum: string) {
+    super(
+      "GOAL_WEIGHTS_INVALID",
+      `employee ${employeeId}'s active goal weights in cycle ${cycleId} sum to ${sum} — BR-089 requires EXACTLY 100% per cycle per reviewee (the typed refusal before any write; zero residue)`,
+    );
+  }
+}
+export class FeedbackBelowThresholdError extends DomainError {
+  constructor(kind: string, count: number) {
+    super(
+      "FEEDBACK_BELOW_THRESHOLD",
+      `the ${kind} relationship carries ${count} response(s) — BR-090 surfaces a relationship's inputs only at ≥ 3 responses (aggregate-only visibility; an attributed source never leaves the service boundary below the threshold)`,
+    );
+  }
+}
+export class OrgCycleError extends DomainError {
+  constructor(kind: "org-unit" | "position" | "goal", id: string, parentId: string) {
+    super(
+      "ORG_CYCLE_INVALID",
+      `the ${kind} ${id} cannot parent under ${parentId} — the move would create a cycle (D-09's write-time law; the illegal state never saves)`,
+    );
+  }
+}
+export class CompetencyScaleInvalidError extends DomainError {
+  constructor(message: string) {
+    super("COMPETENCY_SCALE_INVALID", message);
+  }
+}
+export class TalentInvalidError extends DomainError {
+  constructor(message: string) {
+    super("TALENT_INVALID", message);
+  }
+}

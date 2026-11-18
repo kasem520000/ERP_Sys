@@ -39,6 +39,24 @@ import { PLAN_KEYS, layerInputsFixture, l1Of, type PlanKey } from "./layer-fixtu
  * structural assertions beside each pin exist so a mismatch is debuggable,
  * not so they can substitute for the pin.
  *
+ * PHASE-047 (W-1) review note: ALL 37 pins re-pinned — 31 of 37 moved,
+ * two reviewed changes together. (1) Migration 0098 §3 composes the FOUR
+ * FEATURE FLAGS (hr.performance · hr.recruitment · hr.training · hr.org)
+ * into the four people-carrying templates' required chains
+ * (professional_services/healthcare/education/food_manufacturing) — the
+ * L1 manifest hash moves, so those four templates' STARTER rows move (the
+ * degraded chains gain the flags). (2) Migration 0098 §2 grants the same
+ * four flags to business + enterprise (the tier-4 precedent) — the L4
+ * layer folds plan feature_keys, so EVERY business/enterprise row moves
+ * (the 046/018 all-moved precedent) plus the no-template business row.
+ * feature-catalog.ts registers the four FEATURE_DEPS edges (each flag →
+ * payroll.employees, the 045 substrate law — the talent layer attaches to
+ * the frozen employees substrate, the plan's D-01) — the dependency
+ * closure is hashed content. The 12 PERMISSION keys ride ROLES (0098 §1),
+ * never the plans — matrix §3.25's entitlement/authorization divergence
+ * note; no permission key is hashed content here. The 6 unmoved rows are
+ * the plan-independent starter pins of the eight untouched templates.
+ *
  * PHASE-046 (W-1) review note: ALL 37 pins re-pinned — three reviewed
  * changes moved them together (the 039/042/044 combined procedure). (1)
  * Migration 0092 §2 grants the two compliance feature keys
@@ -241,11 +259,11 @@ const GOLDEN: Readonly<
   },
   "industry.retail × business": {
     template: RETAIL_MANIFEST,
-    hash: "sha256:b483d76ef8b3f9ca9ee7e3ee1493dbfab078d1547a2fdf1a47d1f930e7b5743f",
+    hash: "sha256:a11fa3d61f4c2991cefefbd0191a069faa4e80e3a8ae7edf0be779705503f71e",
   },
   "industry.retail × enterprise": {
     template: RETAIL_MANIFEST,
-    hash: "sha256:8a8c2142c0d772c92e82c9c56707bc2bd5f243002a7e39b44ff5b383a98804d6",
+    hash: "sha256:58f01d9c5d7598657983e444c8a2d040682666d0eaf00b7b1aa681eab4c0537a",
   },
   "industry.grocery × starter": {
     template: GROCERY_MANIFEST,
@@ -253,11 +271,11 @@ const GOLDEN: Readonly<
   },
   "industry.grocery × business": {
     template: GROCERY_MANIFEST,
-    hash: "sha256:442649c3339045ed3ba50dacf92a0abdd55d81f86b69f2a7ac4be271b167c2bd",
+    hash: "sha256:ab9ac789dab9242dd1f4ef602b03f24d9685481997b134e53638cd095aabeb68",
   },
   "industry.grocery × enterprise": {
     template: GROCERY_MANIFEST,
-    hash: "sha256:0e0797b7ea796227d3e4bbdfddc7f85a7f1b7c51287385b0993bd313e1c0eac8",
+    hash: "sha256:3634cc2654c88610df3df8622c2d0ff94fcf94245fa271526af7c657aa20dcf9",
   },
   "industry.restaurant × starter": {
     template: RESTAURANT_MANIFEST,
@@ -265,11 +283,11 @@ const GOLDEN: Readonly<
   },
   "industry.restaurant × business": {
     template: RESTAURANT_MANIFEST,
-    hash: "sha256:99ea77590d494734095e5ec0829dbaf047ac196696bf906f675b536ec7c86e6f",
+    hash: "sha256:51d23a51b777cb06635baa0107944103be15a2f2b436420271c97fdb3fb9e878",
   },
   "industry.restaurant × enterprise": {
     template: RESTAURANT_MANIFEST,
-    hash: "sha256:864da5d589f3384e9bb2d5152adac2cfac4e248c15ff2256ae9ad76b6f187dd3",
+    hash: "sha256:cb1cc5b16f79f4d42e6132d8d21948f9e52a8f02396a0aa5311b06ff32bb8462",
   },
   // -- PHASE-017 pair (migration 0025 seeds; starter = degraded back-office)
   "industry.automotive × starter": {
@@ -278,11 +296,11 @@ const GOLDEN: Readonly<
   },
   "industry.automotive × business": {
     template: AUTOMOTIVE_TEMPLATE_MANIFEST,
-    hash: "sha256:cf8a42a2cf78ae3ee112e620418ed04b79caad4d0dd55b440b927c4057026c2d",
+    hash: "sha256:a5b39ef7ef75fec87ad3bf01b204ea3768d980a42168129f4004c97de9509686",
   },
   "industry.automotive × enterprise": {
     template: AUTOMOTIVE_TEMPLATE_MANIFEST,
-    hash: "sha256:d4d5621f2897b75dba6f7d9333a4d30e831eb0b69ef6d2c9b0427ae2d0b02526",
+    hash: "sha256:50973e1f57e86b2e92bdbcdca38dff451179545617412df23a01fee8e40f7b7c",
   },
   "industry.distribution × starter": {
     template: DISTRIBUTION_TEMPLATE_MANIFEST,
@@ -290,52 +308,52 @@ const GOLDEN: Readonly<
   },
   "industry.distribution × business": {
     template: DISTRIBUTION_TEMPLATE_MANIFEST,
-    hash: "sha256:795c83a8acc62c9bf9530f7db68aadfd622183ea4cdb73921dc1e873999bc84d",
+    hash: "sha256:7911a69709515dbd814d6de2bba0ae5356a2e8d3e1a006702714daf946d42a13",
   },
   "industry.distribution × enterprise": {
     template: DISTRIBUTION_TEMPLATE_MANIFEST,
-    hash: "sha256:0738ad04ff5815e522d4c026ce088098de77c4a01346411bfb17c48359e8eaac",
+    hash: "sha256:29d6b5a70cd75883264c2817de494dda386239adf280e382ec30f96c1fdc4226",
   },
   // -- PHASE-018 (migration 0026 seed; starter = degraded back-office)
   "industry.food_manufacturing × starter": {
     template: FOOD_MANUFACTURING_TEMPLATE_MANIFEST,
-    hash: "sha256:ce4c138102286b4fdc734830beab969d911fa1c4d020bb4819d438069dc892a5",
+    hash: "sha256:af5b71092ef9c9fdc7cdd4272527b277f0acc5927e54d58a59f2fc0ee31fee2c",
   },
   "industry.food_manufacturing × business": {
     template: FOOD_MANUFACTURING_TEMPLATE_MANIFEST,
-    hash: "sha256:655464bb5fec93a279cb166169845966effe13e789ecac3a2bdc74dca2ce5449",
+    hash: "sha256:684c92817f9ea9283a1181f7356308efba77452f74698f15d4ae3c161639fd29",
   },
   "industry.food_manufacturing × enterprise": {
     template: FOOD_MANUFACTURING_TEMPLATE_MANIFEST,
-    hash: "sha256:35ec64c414d0d1f4c432afc8105029658677e0b49e8bc8fffd8b45296c9722e7",
+    hash: "sha256:a6fc4cdefc52f88d840bca88155a082c73c9baeb48d220e9dca9d3631a01104e",
   },
   // -- PHASE-019 (migration 0027 seed; starter = degraded back-office)
   "industry.professional_services × starter": {
     template: PROFESSIONAL_SERVICES_TEMPLATE_MANIFEST,
-    hash: "sha256:87d7880d58498471804e886eb8534063361c2e4c521efbcb59f8f0942d31c907",
+    hash: "sha256:646bd78506e33aefbe3f41f13024fc0a06fc6bf6b9a0502c5ee5b2e498176ee0",
   },
   "industry.professional_services × business": {
     template: PROFESSIONAL_SERVICES_TEMPLATE_MANIFEST,
-    hash: "sha256:240afae8db2c71533130b8bffec3f39f81fe603ba0357cdfb34e760aff3f557f",
+    hash: "sha256:f566231d8480aef1b8fe060de47cb604d4b509a067b9ffd4c5a68ebf692964d5",
   },
   "industry.professional_services × enterprise": {
     template: PROFESSIONAL_SERVICES_TEMPLATE_MANIFEST,
-    hash: "sha256:59f2222e6a851a5b52c4739e17cc33870846fc434f87ce256e7133d216ac16cc",
+    hash: "sha256:5de60f9ee4405dffdbab90c60daac8da5079a307b8a4b13134e66fdd14c87239",
   },
   // -- PHASE-032 (migration 0039 seed; starter = degraded back-office —
   // the installments/crm REQUIRED chain is ungranted there, exactly the
   // tier-4 posture of the 0025/0026/0027 templates before it)
   "industry.education × starter": {
     template: EDUCATION_TEMPLATE_MANIFEST,
-    hash: "sha256:4e2369160debdd7ec392ffa0eb82e0eeedae3b63e9ea1234c3aee2b6225d8d19",
+    hash: "sha256:3b372725fb5a4d8ddd574a30986542c08577e4ee509bbd4a0272cf0a09b38c59",
   },
   "industry.education × business": {
     template: EDUCATION_TEMPLATE_MANIFEST,
-    hash: "sha256:bfd6060d1cb6c27ca5eb19a180560d49d8200a301354120c0c84297a2611d59c",
+    hash: "sha256:17299e2ece76bf84b54d1a5de7e4ad5ce34f94e8bfdfcf72383d42e73eaabacc",
   },
   "industry.education × enterprise": {
     template: EDUCATION_TEMPLATE_MANIFEST,
-    hash: "sha256:4849c641415b2a4165acd2a60d5187b4174a62526cacb5bc0cb92e9f6a7899c9",
+    hash: "sha256:dc9851d4267843a37f5f41f8a46b3734f296dd4c4594b1cd57b246efc2d079c1",
   },
   // -- PHASE-033 (migration 0040 seed; starter = degraded back-office —
   // the manufacturing/batch/projects REQUIRED chain is ungranted there,
@@ -347,11 +365,11 @@ const GOLDEN: Readonly<
   },
   "industry.agriculture × business": {
     template: AGRICULTURE_TEMPLATE_MANIFEST,
-    hash: "sha256:0782e98c92487ade5ef5f4e461189b220e03a6bffa38f8752e7135f03d2bbceb",
+    hash: "sha256:f977ea99424f1fb9934b2db194eb22ac2d33f7fbae41b57412d276b1830a9859",
   },
   "industry.agriculture × enterprise": {
     template: AGRICULTURE_TEMPLATE_MANIFEST,
-    hash: "sha256:909639d5185a5164654ee07960dd3df1d3d57ef803ed378f6f6bc4e066c079ce",
+    hash: "sha256:6ef0dfb616b8ec7ca4d42a624aced330ac8fb324bee4b2800324c9e7a04286dc",
   },
   // -- PHASE-030 (migration 0044 seeds; starter = degraded back-office —
   // the notes chain + POS/service-order sets are business+enterprise)
@@ -361,11 +379,11 @@ const GOLDEN: Readonly<
   },
   "industry.wholesale × business": {
     template: WHOLESALE_TEMPLATE_MANIFEST,
-    hash: "sha256:ebd87f34311867ab00a445d2ab58133421c246474ad1390d33145cdea71b210e",
+    hash: "sha256:417c82eb3e48822977a9d85dd8d3878b05574cc8bf351dc3d3032ee0472f2fce",
   },
   "industry.wholesale × enterprise": {
     template: WHOLESALE_TEMPLATE_MANIFEST,
-    hash: "sha256:7032a9276aec799448f313f31e1e2bad40c106d54c219f8715b92d44dcdd0071",
+    hash: "sha256:41d260d8f688beafe745bfb77935d6207792530babcbaf1e7c70d5afc2eea22b",
   },
   "industry.electronics × starter": {
     template: ELECTRONICS_TEMPLATE_MANIFEST,
@@ -373,28 +391,28 @@ const GOLDEN: Readonly<
   },
   "industry.electronics × business": {
     template: ELECTRONICS_TEMPLATE_MANIFEST,
-    hash: "sha256:e43ad266ab7315e27da054ae666c77d37cea818a487fd231c9ec2244e787f16e",
+    hash: "sha256:27bf061dc1104b02451906ed0c4427107b9a0dd6fabb7b3366f6f43285ad5295",
   },
   "industry.electronics × enterprise": {
     template: ELECTRONICS_TEMPLATE_MANIFEST,
-    hash: "sha256:0179c10e71f1ee97824268bb5e77e240cf4d67e2f2022a6b63dd4ddf448f1d94",
+    hash: "sha256:f9ecabe04a2c352b531bb70d54c43b91130fd35573c38eb06344d6174208f239",
   },
   "industry.healthcare × starter": {
     template: HEALTHCARE_TEMPLATE_MANIFEST,
-    hash: "sha256:5a43f7c2612a395de50a1c2359c1ce9c8775da5b1c9a912d88bd72779258e7c9",
+    hash: "sha256:deb2f51b8aa4462e06537aafd04ce90fc6c379705ecda4e2f28ecb5659cdea43",
   },
   "industry.healthcare × business": {
     template: HEALTHCARE_TEMPLATE_MANIFEST,
-    hash: "sha256:2e1cda17acc8d09fbfad3a247ecdbd8fd64d9f6f57975c41341680fbdda0b005",
+    hash: "sha256:b3bb0cc7b650ae3560c71f557ca936c6d7ec90892a8acf12cd3584b34ef5b5d7",
   },
   "industry.healthcare × enterprise": {
     template: HEALTHCARE_TEMPLATE_MANIFEST,
-    hash: "sha256:7fb76ec2b0eb944ee3fda0321435609e49c08467b950c0cce95574e4ba0a526d",
+    hash: "sha256:d154f0ea52cf4d7e6f5e1400ee78dffedcd0903017991f8e076938af304893b7",
   },
   // The platform-default tenant (no template applied — L1 neutral).
   "(no template) × business": {
     template: null,
-    hash: "sha256:8aef5f3f53435bf9740e09f669e2fe9558fc181784f5129ef563e8403b7420a8",
+    hash: "sha256:a76e8de43fcfbf4a00c6a996b235cafd50913a7248fba7816661250686a65df7",
   },
 });
 
@@ -729,12 +747,19 @@ describe("golden effective-configs: template × plan × jurisdiction SA (pinned 
 
     // Education on starter: degraded back-office — the tier-4 posture (the
     // 0038 grants skip starter exactly like the 0025/0026/0027 sets before
-    // them): the installments + crm REQUIRED chain is uncovered.
+    // them): the installments + crm REQUIRED chain is uncovered. PHASE-047
+    // (W-1): the four talent flags join the uncovered chain (0098 §3
+    // composes them into education's required keys; starter does not carry
+    // them — the tier-4 posture extends to the talent layer).
     const educationStarter = composeTenantStaticConfig(
       layerInputsFixture({ template: EDUCATION_TEMPLATE_MANIFEST, plan: "starter" }),
     );
     expect(educationStarter.layers.l4_entitlements.missing).toEqual([
       "crm.service_contracts",
+      "hr.org",
+      "hr.performance",
+      "hr.recruitment",
+      "hr.training",
       "industry.template_engine",
       "installments.collections",
       "installments.late_fees",

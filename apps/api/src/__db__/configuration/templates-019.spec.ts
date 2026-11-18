@@ -54,13 +54,20 @@ import {
  *   starter-plan tenant blocks with the full chain.
  * - L5 beats L1 (BR-038 R8): an explicit `crm.time_entries_require_case`
  *   tenant setting overrides the manifest's true default.
+ *
+ * PHASE-047 (W-1) review note: the professional_services manifest hash
+ * re-pinned (0098 §3 — the four talent flags join the required chain);
+ * the starter degradation chain gains the four flags AND their BR-040
+ * closure dependency payroll.employees (the flags ride the employees
+ * substrate, the 045 precedent's own shape).
+ *
  */
 
 /** KNOWN hash — `pnpm validate:manifests` on the seven-template set (the
  *  constant is byte-identical to the migration 0027 registry seed and the
  *  docs mirror docs/industries/templates/manifests/
  *  manifest.professional_services.json). */
-const KNOWN_HASH = "sha256:d000a1159335ce3fa0c327b3f72be2c93b3f3c029fadc90c8bdd30ef1e13429a";
+const KNOWN_HASH = "sha256:0316122b5757a8fc5405194e794793e87dfd4d9f303c691e7ad4df9358cf8d6f";
 
 /** The 0008 base-seed CRM set (the "CRM add-on") — the §18 lesson 5 rule:
  *  revoking the FULL set keeps the tenant's own BR-040 closure valid (a
@@ -510,7 +517,12 @@ describe("templates-019 — professional_services through the PHASE-015 engine",
         "accounting.projects",
         "crm.recurring_billing",
         "crm.service_contracts",
+        "hr.org",
+        "hr.performance",
+        "hr.recruitment",
+        "hr.training",
         "industry.template_engine",
+        "payroll.employees",
       ],
       guidance: {
         ar: expect.stringContaining("crm.service_contracts"),

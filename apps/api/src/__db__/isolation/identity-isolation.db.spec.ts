@@ -3234,6 +3234,143 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-047 (CR-17, migrations 0095–0097; the W-1 foundation wave):
+  // the talent cluster — FOURTEEN tables, FK-ordered (cycles → reviews/
+  // goals; vacancies → applicants → interviews; programs → enrollments;
+  // org_units → positions; the employee-referencing registers). One row
+  // per table per tenant, idempotent, FK-consistent at each tenant's OWN
+  // fixtures (the employees c0290291-* rows, the 029 precedent).
+  await superuser.query(
+    `INSERT INTO performance_cycles (id, tenant_id, name, period_start, period_end, status)
+     VALUES
+       ('81818181-0000-4000-8000-000000000001', $1, 'ISO Cycle', '2026-01-01', '2026-12-31', 'DRAFT'),
+       ('81818181-0000-4000-8000-000000000002', $2, 'ISO Cycle', '2026-01-01', '2026-12-31', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO performance_reviews (id, tenant_id, cycle_id, reviewer_employee_id,
+                                        reviewee_employee_id, kind, status)
+     VALUES
+       ('82828282-0000-4000-8000-000000000001', $1, '81818181-0000-4000-8000-000000000001',
+        'c0290291-0000-4000-8000-000000000001', 'c0290291-0000-4000-8000-000000000001', 'SELF', 'DRAFT'),
+       ('82828282-0000-4000-8000-000000000002', $2, '81818181-0000-4000-8000-000000000002',
+        'c0290291-0000-4000-8000-000000000002', 'c0290291-0000-4000-8000-000000000002', 'SELF', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO competencies (id, tenant_id, code, name, category)
+     VALUES
+       ('83838383-0000-4000-8000-000000000001', $1, 'ISO-COMP', 'Isolation competency', 'CORE'),
+       ('83838383-0000-4000-8000-000000000002', $2, 'ISO-COMP', 'Isolation competency', 'CORE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO competency_levels (id, tenant_id, level, name, name_ar, descriptor, descriptor_ar)
+     VALUES
+       ('84848484-0000-4000-8000-000000000001', $1, 1, 'Beginner', 'مبتدئ',
+        'Initial familiarity — structured guidance.', 'إلمام مبدئي — إرشاد منظم.'),
+       ('84848484-0000-4000-8000-000000000002', $2, 1, 'Beginner', 'مبتدئ',
+        'Initial familiarity — structured guidance.', 'إلمام مبدئي — إرشاد منظم.')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO goals (id, tenant_id, cycle_id, owner_employee_id, title, weight, status)
+     VALUES
+       ('85858585-0000-4000-8000-000000000001', $1, '81818181-0000-4000-8000-000000000001',
+        'c0290291-0000-4000-8000-000000000001', 'ISO goal', 100, 'ACTIVE'),
+       ('85858585-0000-4000-8000-000000000002', $2, '81818181-0000-4000-8000-000000000002',
+        'c0290291-0000-4000-8000-000000000002', 'ISO goal', 100, 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO vacancies (id, tenant_id, code, title, headcount, status)
+     VALUES
+       ('86868686-0000-4000-8000-000000000001', $1, 'VAC-ISO', 'Isolation vacancy', 1, 'OPEN'),
+       ('86868686-0000-4000-8000-000000000002', $2, 'VAC-ISO', 'Isolation vacancy', 1, 'OPEN')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO applicants (id, tenant_id, vacancy_id, full_name, stage)
+     VALUES
+       ('87878787-0000-4000-8000-000000000001', $1, '86868686-0000-4000-8000-000000000001',
+        'Isolation Applicant', 'NEW'),
+       ('87878787-0000-4000-8000-000000000002', $2, '86868686-0000-4000-8000-000000000002',
+        'Isolation Applicant', 'NEW')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO interviews (id, tenant_id, applicant_id, round, panelist_employee_id,
+                               scheduled_start, scheduled_end, mode)
+     VALUES
+       ('88888888-0000-4000-8000-000000000001', $1, '87878787-0000-4000-8000-000000000001',
+        1, 'c0290291-0000-4000-8000-000000000001', '2026-06-01T09:00:00Z', '2026-06-01T10:00:00Z', 'ONSITE'),
+       ('88888888-0000-4000-8000-000000000002', $2, '87878787-0000-4000-8000-000000000002',
+        1, 'c0290291-0000-4000-8000-000000000002', '2026-06-01T09:00:00Z', '2026-06-01T10:00:00Z', 'ONSITE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO training_programs (id, tenant_id, code, name, kind, status)
+     VALUES
+       ('89898989-0000-4000-8000-000000000001', $1, 'TRN-ISO', 'Isolation program', 'INTERNAL', 'ACTIVE'),
+       ('89898989-0000-4000-8000-000000000002', $2, 'TRN-ISO', 'Isolation program', 'INTERNAL', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO training_enrollments (id, tenant_id, program_id, employee_id, status)
+     VALUES
+       ('8a8a8a8a-0000-4000-8000-000000000001', $1, '89898989-0000-4000-8000-000000000001',
+        'c0290291-0000-4000-8000-000000000001', 'ENROLLED'),
+       ('8a8a8a8a-0000-4000-8000-000000000002', $2, '89898989-0000-4000-8000-000000000002',
+        'c0290291-0000-4000-8000-000000000002', 'ENROLLED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO certifications (id, tenant_id, employee_id, name, issuer, issue_date)
+     VALUES
+       ('8b8b8b8b-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001',
+        'Isolation certification', 'ISO Issuer', '2026-01-01'),
+       ('8b8b8b8b-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002',
+        'Isolation certification', 'ISO Issuer', '2026-01-01')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO org_units (id, tenant_id, code, name, path, active)
+     VALUES
+       ('8c8c8c8c-0000-4000-8000-000000000001', $1, 'ORG-ISO', 'Isolation unit', 'ORG-ISO', true),
+       ('8c8c8c8c-0000-4000-8000-000000000002', $2, 'ORG-ISO', 'Isolation unit', 'ORG-ISO', true)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO positions (id, tenant_id, code, title, org_unit_id, status)
+     VALUES
+       ('8d8d8d8d-0000-4000-8000-000000000001', $1, 'POS-ISO', 'Isolation position',
+        '8c8c8c8c-0000-4000-8000-000000000001', 'ACTIVE'),
+       ('8d8d8d8d-0000-4000-8000-000000000002', $2, 'POS-ISO', 'Isolation position',
+        '8c8c8c8c-0000-4000-8000-000000000002', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO employee_documents (id, tenant_id, employee_id, kind)
+     VALUES
+       ('8e8e8e8e-0000-4000-8000-000000000001', $1, 'c0290291-0000-4000-8000-000000000001', 'CONTRACT'),
+       ('8e8e8e8e-0000-4000-8000-000000000002', $2, 'c0290291-0000-4000-8000-000000000002', 'CONTRACT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3777,6 +3914,22 @@ const OWN_ROW: Record<string, [string, string]> = {
   payroll_tax_brackets: ["7e7e7e7e-0000-4000-8000-000000000001", "7e7e7e7e-0000-4000-8000-000000000002"],
   eosb_rules: ["7f7f7f7f-0000-4000-8000-000000000001", "7f7f7f7f-0000-4000-8000-000000000002"],
   eosb_calculations: ["80808080-0000-4000-8000-000000000001", "80808080-0000-4000-8000-000000000002"],
+  // PHASE-047 (CR-17, migrations 0095–0097): the talent cluster's
+  // fourteen rows.
+  performance_cycles: ["81818181-0000-4000-8000-000000000001", "81818181-0000-4000-8000-000000000002"],
+  performance_reviews: ["82828282-0000-4000-8000-000000000001", "82828282-0000-4000-8000-000000000002"],
+  competencies: ["83838383-0000-4000-8000-000000000001", "83838383-0000-4000-8000-000000000002"],
+  competency_levels: ["84848484-0000-4000-8000-000000000001", "84848484-0000-4000-8000-000000000002"],
+  goals: ["85858585-0000-4000-8000-000000000001", "85858585-0000-4000-8000-000000000002"],
+  vacancies: ["86868686-0000-4000-8000-000000000001", "86868686-0000-4000-8000-000000000002"],
+  applicants: ["87878787-0000-4000-8000-000000000001", "87878787-0000-4000-8000-000000000002"],
+  interviews: ["88888888-0000-4000-8000-000000000001", "88888888-0000-4000-8000-000000000002"],
+  training_programs: ["89898989-0000-4000-8000-000000000001", "89898989-0000-4000-8000-000000000002"],
+  training_enrollments: ["8a8a8a8a-0000-4000-8000-000000000001", "8a8a8a8a-0000-4000-8000-000000000002"],
+  certifications: ["8b8b8b8b-0000-4000-8000-000000000001", "8b8b8b8b-0000-4000-8000-000000000002"],
+  org_units: ["8c8c8c8c-0000-4000-8000-000000000001", "8c8c8c8c-0000-4000-8000-000000000002"],
+  positions: ["8d8d8d8d-0000-4000-8000-000000000001", "8d8d8d8d-0000-4000-8000-000000000002"],
+  employee_documents: ["8e8e8e8e-0000-4000-8000-000000000001", "8e8e8e8e-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4721,6 +4874,48 @@ const MISMATCHED_INSERT: Record<string, string> = {
       tier_breakdown, wage_base_snapshot, entitlement_amount, provision_balance, delta, entry_date, status)
      VALUES ('80808080-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
       'PERIOD_TRUE_UP', 3, '[]'::jsonb, '{}'::jsonb, 900, 600, 300, '2027-01-31', 'COMPUTED')`,
+  // PHASE-047 (CR-17): the talent cluster — $1 declares the OTHER tenant
+  // while the composite-FK parents (cycle/employee/vacancy/applicant/
+  // program/org-unit below) belong to tenant B, so the FK passes and the
+  // RLS WITH CHECK is the isolated rejection (the 0087 pattern).
+  performance_cycles: `INSERT INTO performance_cycles (id, tenant_id, name, period_start, period_end, status)
+     VALUES ('81818181-3000-4000-8000-000000000003', $1, 'ATK Cycle', '2026-01-01', '2026-12-31', 'DRAFT')`,
+  performance_reviews: `INSERT INTO performance_reviews (id, tenant_id, cycle_id, reviewer_employee_id,
+      reviewee_employee_id, kind, status)
+     VALUES ('82828282-3000-4000-8000-000000000003', $1, '81818181-0000-4000-8000-000000000002',
+      'c0290291-0000-4000-8000-000000000002', 'c0290291-0000-4000-8000-000000000002', 'SELF', 'DRAFT')`,
+  competencies: `INSERT INTO competencies (id, tenant_id, code, name, category)
+     VALUES ('83838383-3000-4000-8000-000000000003', $1, 'ATK-COMP', 'Attack competency', 'CORE')`,
+  competency_levels: `INSERT INTO competency_levels (id, tenant_id, level, name, name_ar, descriptor, descriptor_ar)
+     VALUES ('84848484-3000-4000-8000-000000000003', $1, 2, 'Developing', 'في طور التطور',
+      'Routine application.', 'تطبيق اعتيادي.')`,
+  goals: `INSERT INTO goals (id, tenant_id, cycle_id, owner_employee_id, title, weight, status)
+     VALUES ('85858585-3000-4000-8000-000000000003', $1, '81818181-0000-4000-8000-000000000002',
+      'c0290291-0000-4000-8000-000000000002', 'ATK goal', 100, 'ACTIVE')`,
+  vacancies: `INSERT INTO vacancies (id, tenant_id, code, title, headcount, status)
+     VALUES ('86868686-3000-4000-8000-000000000003', $1, 'VAC-ATK', 'Attack vacancy', 1, 'OPEN')`,
+  applicants: `INSERT INTO applicants (id, tenant_id, vacancy_id, full_name, stage)
+     VALUES ('87878787-3000-4000-8000-000000000003', $1, '86868686-0000-4000-8000-000000000002',
+      'Attack Applicant', 'NEW')`,
+  interviews: `INSERT INTO interviews (id, tenant_id, applicant_id, round, panelist_employee_id,
+      scheduled_start, scheduled_end, mode)
+     VALUES ('88888888-3000-4000-8000-000000000003', $1, '87878787-0000-4000-8000-000000000002',
+      1, 'c0290291-0000-4000-8000-000000000002', '2026-06-01T09:00:00Z', '2026-06-01T10:00:00Z', 'ONSITE')`,
+  training_programs: `INSERT INTO training_programs (id, tenant_id, code, name, kind, status)
+     VALUES ('89898989-3000-4000-8000-000000000003', $1, 'TRN-ATK', 'Attack program', 'INTERNAL', 'ACTIVE')`,
+  training_enrollments: `INSERT INTO training_enrollments (id, tenant_id, program_id, employee_id, status)
+     VALUES ('8a8a8a8a-3000-4000-8000-000000000003', $1, '89898989-0000-4000-8000-000000000002',
+      'c0290291-0000-4000-8000-000000000002', 'ENROLLED')`,
+  certifications: `INSERT INTO certifications (id, tenant_id, employee_id, name, issuer, issue_date)
+     VALUES ('8b8b8b8b-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002',
+      'Attack certification', 'ISO Issuer', '2026-01-01')`,
+  org_units: `INSERT INTO org_units (id, tenant_id, code, name, path, active)
+     VALUES ('8c8c8c8c-3000-4000-8000-000000000003', $1, 'ORG-ATK', 'Attack unit', 'ORG-ATK', true)`,
+  positions: `INSERT INTO positions (id, tenant_id, code, title, org_unit_id, status)
+     VALUES ('8d8d8d8d-3000-4000-8000-000000000003', $1, 'POS-ATK', 'Attack position',
+      '8c8c8c8c-0000-4000-8000-000000000002', 'ACTIVE')`,
+  employee_documents: `INSERT INTO employee_documents (id, tenant_id, employee_id, kind)
+     VALUES ('8e8e8e8e-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002', 'CONTRACT')`,
 };
 
 beforeAll(async () => {

@@ -270,6 +270,15 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "hr/leave": { group: "navHr", label: "hrLeaveTitle" },
   "hr/shifts": { group: "navHr", label: "hrShiftsTitle" },
   "hr/self": { group: "navHr", label: "hrSelfTitle" },
+  // PHASE-047 (W-1 — D-10/D-13): the talent layer's four surfaces. The
+  // registry rows hr.performance / hr.recruitment / hr.training /
+  // hr.org-structure (contracts NAV_ITEMS) drive the sidebar + ⌘K; these
+  // fallbacks cover nav-fetch failure (the screens land with W-5 — the
+  // crumbs register with the foundation, the plan's wave ordering).
+  "hr/performance": { group: "navHr", label: "hrPerformanceTitle" },
+  "hr/recruitment": { group: "navHr", label: "hrRecruitmentTitle" },
+  "hr/training": { group: "navHr", label: "hrTrainingTitle" },
+  "hr/org-structure": { group: "navHr", label: "hrOrgStructureTitle" },
 };
 
 /**

@@ -1387,7 +1387,16 @@ export const FOOD_MANUFACTURING_TEMPLATE_MANIFEST: IndustryTemplateManifest = de
     "hr.attendance",
     "hr.leave",
     "hr.shifts",
-  
+    // PHASE-047 (W-1 — D-10, the talent-layer enablement, CR-36f): the
+    // FOUR FEATURE FLAGS ride the people-carrying templates by default
+    // (the phase doc's composable units — single-segment module.feature
+    // keys per the §3 schema; the twelve PERMISSION keys are the separate
+    // authorization surface seeded in 0098 §1 and ride ROLES, never a
+    // template's required chain — matrix §3.25's dated note).
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org",
   ],
   default_modules_enabled: [
     "accounting",
@@ -1649,6 +1658,16 @@ export const PROFESSIONAL_SERVICES_TEMPLATE_MANIFEST: IndustryTemplateManifest =
     "accounting.projects",
     "sales.invoices",
     "partners.statements",
+    // PHASE-047 (W-1 — D-10, the talent-layer enablement, CR-36f): the
+    // FOUR FEATURE FLAGS ride the people-carrying templates by default
+    // (the phase doc's composable units — single-segment module.feature
+    // keys per the §3 schema; the twelve PERMISSION keys are the separate
+    // authorization surface seeded in 0098 §1 and ride ROLES, never a
+    // template's required chain — matrix §3.25's dated note).
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org",
   ],
   default_modules_enabled: [
     "accounting",
@@ -1901,6 +1920,16 @@ export const EDUCATION_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze(
     "installments.plans",
     "installments.collections",
     "installments.late_fees",
+    // PHASE-047 (W-1 — D-10, the talent-layer enablement, CR-36f): the
+    // FOUR FEATURE FLAGS ride the people-carrying templates by default
+    // (the phase doc's composable units — single-segment module.feature
+    // keys per the §3 schema; the twelve PERMISSION keys are the separate
+    // authorization surface seeded in 0098 §1 and ride ROLES, never a
+    // template's required chain — matrix §3.25's dated note).
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org",
   ],
   default_modules_enabled: [
     "accounting",
@@ -3097,6 +3126,16 @@ export const HEALTHCARE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     "hr.attendance",
     "hr.leave",
     "hr.shifts",
+    // PHASE-047 (W-1 — D-10, the talent-layer enablement, CR-36f): the
+    // FOUR FEATURE FLAGS ride the people-carrying templates by default
+    // (the phase doc's composable units — single-segment module.feature
+    // keys per the §3 schema; the twelve PERMISSION keys are the separate
+    // authorization surface seeded in 0098 §1 and ride ROLES, never a
+    // template's required chain — matrix §3.25's dated note).
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org",
   
   ],
   default_modules_enabled: [

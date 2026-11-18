@@ -1,0 +1,53 @@
+
+> erp-platform@0.1.0 check:capabilities-matrix /home/z/erp_047
+> tsx scripts/check-capabilities-matrix.ts
+
+== offline capabilities cross-check: OFFLINE_CAPABILITIES_MATRIX §2 (44 rows, ✓ 11) × SYNC_CAPABILITY_FIXTURE (42 rows: implemented 42, deferred-annotations 0) ==
+#   operation                                                 row status        pos-terminal     desktop          android-field    android-personal 
+#1  POS sale (cash/card at counter)                           PASS              PASS(016)        —                —                —                
+#2  POS return/refund against receipt                         PASS              PASS(016)        —                —                —                
+#3  Cashier shift open/close (float, count)                   PASS              PASS(016)        —                —                —                
+#4  Items / barcodes / prices lookup                          PASS              PASS(016)        PASS(021)        PASS(022)        —                
+#5  Price list view                                           PASS              PASS(016)        PASS(021)        PASS(022)        —                
+#6  Sales invoice draft (back office)                         PASS              —                PASS(020)        PASS(022)        —                
+#7  Quotation draft                                           PASS              —                PASS(021)        PASS(022)        —                
+#8  Receipt — POS cash collection                             PASS              PASS(016)        —                —                —                
+#9  Receipt — field collection (van route)                    PASS              —                —                PASS(022)        —                
+#10 Delivery note                                             PASS              —                PASS(021)        —                —                
+#11 Stock count entry (lines as counted)                      PASS              DEFERRED(022)    PASS(021)        PASS(022)        —                
+#12 Van load / unload confirmation                            PASS              —                —                PASS(022)        —                
+#13 Customer statement view                                   PASS              —                DEFERRED(022)    PASS(022)        PASS(022)        
+#14 Invoice view (issued, own documents)                      PASS              —                DEFERRED(022)    PASS(022)        PASS(022)        
+#15 Journal entry (manual)                                    n/a (online-only) —                online-only      —                —                
+#16 Approval (any document)                                   n/a (online-only) —                online-only      online-only      —                
+#17 Posting (finalization)                                    n/a (online-only) —                online-only      —                —                
+#18 Period close / open / lock                                n/a (online-only) —                online-only      —                —                
+#19 Tax submission (e-invoice clearance/reporting, VAT return)n/a (online-only) —                online-only      —                —                
+#20 Admin actions (users, roles, plans, entitlements)         n/a (online-only) —                online-only      —                —                
+#21 Partner edit — contact fields (phone, email, address)     PASS              —                PASS(020)        PASS(022)        —                
+#22 Partner edit — constrained fields (credit limit, terms, s…n/a (online-only) —                online-only      —                —                
+#23 Partner create (new walk-in / route customer)             PASS              PASS(016)        PASS(021)        PASS(022)        —                
+#24 Item edit / create                                        n/a (online-only) —                online-only      —                —                
+#25 Expense entry (field/back office)                         PASS              —                PASS(021)        PASS(022)        —                
+#26 Stock transfer draft                                      PASS              —                PASS(021)        —                —                
+#27 Credit note (van return from customer)                    PASS              —                —                PASS(022)        —                
+#28 Personal-account online payment                           n/a (online-only) —                —                —                online-only      
+#29 Notifications / message read state                        PASS              —                —                —                PASS(022)        
+#30 Reports / financial statements                            n/a (online-only) —                online-only      online-only      —                
+#31 POS on-account (credit) sale to known customer            PASS              PASS(016)        —                —                —                
+#32 Reprint of an already-POSTED receipt/invoice              PASS              PASS(016)        PASS(021)        —                —                
+#33 Master-data search (items, partners)                      PASS              PASS(016)        PASS(021)        PASS(022)        —                
+#34 Cash transfer / drawer drop                               PASS              —                PASS(021)        —                —                
+#35 Serial/IMEI or batch capture on sale line (where tracked) PASS              PASS(016)        —                PASS(022)        —                
+#36 Tenant settings / numbering policy / CoA changes          n/a (online-only) —                online-only      —                —                
+#37 Budget & variance view                                    DEFERRED(028)     —                DEFERRED(028)    —                —                
+#38 Budget create / approve / activate                        n/a (online-only) —                online-only      —                —                
+#39 Fixed assets (register, depreciation runs, revaluation, d…n/a (online-only) —                online-only      —                —                
+#40 Cheques & notes (create, endorse, deposit, dishonor, disc…n/a (online-only) —                online-only      —                —                
+#41 Installment plan schedule view                            DEFERRED(027)     —                DEFERRED(027)    DEFERRED(027)    —                
+#42 Installment collection (receipt against an installment li…DEFERRED(027)     —                DEFERRED(027)    DEFERRED(027)    —                
+#43 Payroll (employees, structures, runs, loans, EOS)         n/a (online-only) —                online-only      —                —                
+#44 Consolidation (groups, eliminations, runs, consolidated s…n/a (online-only) —                online-only      —                —                
+rows: PASS 25 · DEFERRED 3 · n/a 16 — cells: PASS 42 · DEFERRED 8 (annotated 0 + matrix-derived 8) · online-only 18 · — 108
+capabilities matrix and fixture agree: every implemented claim carries a gate, every ✓ row has a fixture row, every deferral is annotated.
+EXIT=0

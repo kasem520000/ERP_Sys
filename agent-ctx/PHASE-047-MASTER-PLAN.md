@@ -120,6 +120,13 @@ long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
   > Every other number above is untouched; W-1's full-suite re-run carries
   > the 3,438 expectation.]**
 
+  > **[Dated 2026-11-18 (W-1 delivered) — the foundation wave moved the
+  > baselines to their §2 targets: migrations journal 0098 (idx 97) · DB
+  > suite 250/250 · 3,522 (the +84 A-suite extension) · permissions 312 ·
+  > i18n 6,125 + 371 · ENTITY_CATALOG/check:rls 306 · depcruise fresh-
+  > clone 1,941 · 14,439 (+2 modules). The report registry stays 106 (the
+  > four contracts are W-6's).]**
+
 ## 1. Settled design decisions (from the plan-first reads — binding for all waves, amendable only by the owner's dated dispatch)
 
 **D-01 — The talent layer attaches to the FROZEN employees substrate, never
@@ -307,6 +314,29 @@ stays green); the competency scale seed; the typed error taxonomy
 **Exit:** migrations apply + re-apply no-op over the 98-entry chain;
 A1–A10 ×14 green; drift **312 = 312**; manifests valid; catalog parity;
 i18n parity green; `check:rls` clean at 306.
+
+> **DELIVERED 2026-11-18 (same day, on the 029-maintenance-wave head
+> `e6e61a1`, this session's fresh clone — the same-session evidence
+> rule's eighth consecutive wave): every exit criterion met — the 98-chain
+> applies cleanly from zero + re-apply no-op; A1–A10 ×14 green (the
+> generated suite +84); drift 312 = 312; manifests 13/13; check:rls
+> **306 catalog tables, 0 violations** (scratch-PG16 + in-suite); i18n
+> 6,125 = 6,125 (+4 nav keys). The full battery: typecheck/lint 8/8,
+> depcruise 1,941 · 14,439 (+2 modules — the W-0 re-baseline's disclosure
+> law), unit 8/8 (api 667 · web 87 · mobile 393 · desktop 274 · ui 42 ·
+> contracts 56 · domain-core 38 · sync-core 36), **THE FULL DB SUITE
+> 250/250 · 3,522/3,522** (the plan's expected 3,438 + 84 exactly; 5
+> chunks, one disclosed census-pin repair re-run green, both logs kept),
+> docs 33/33, id-ledger 0 errors + self-test OK, history-secrets 0,
+> capabilities agree, shells PASS, the negative boundary PASS. THE
+> ENTITLEMENT/AUTHORIZATION DIVERGENCE recorded (the four flags gate the
+> capability on plans/manifests/nav; the twelve keys ride roles — matrix
+> §3.25's dated note; 045/046's one-key-both-jobs shape does not fit the
+> manifest schema's single-segment law, found and designed in-session).
+> The golden effective-configs re-pinned (31 of 37 moved — the review
+> note); the template-apply specs' stored-manifest hashes re-pinned with
+> the dated notes. Evidence: the W-1 gate doc +
+> `audit-evidence/phase047-w1/` (25 logs incl. the db-suite chunks).**
 
 ### W-2 — The performance + goals engines (T-05 + T-06, orchestrator)
 Cycle lifecycle (DRAFT→ACTIVE→CALIBRATION→CLOSED with CAS on the state),

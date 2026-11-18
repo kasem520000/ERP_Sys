@@ -1,41 +1,45 @@
-# NEXT ACTION — PHASE-047 W-0 + THE 029 MAINTENANCE WAVE DELIVERED; W-1 (the foundation wave) NEXT
+# NEXT ACTION — PHASE-047 W-1 (the foundation wave) DELIVERED; W-2 (the performance + goals engines) NEXT
 
-**THE CURRENT STATE (2026-11-18, updated at the owner's plan-approval dispatch
-+ the W-0 delivery + the 029 maintenance-wave delivery):** PHASE-046 (HR
-Payroll Compliance — GOSI/PIT/EOSB, CR-16) stands COMPLETE (W-9 ACCEPTED at
-`2956c27` by the owner's W-9 verification — the P4 flake class closed, the
-NF-1/2/3 record corrections confirmed, every gate re-proven in the verifier's
-fresh clone). **PHASE-047's MASTER PLAN IS APPROVED (2026-11-18) with FIVE
-BINDING AMENDMENTS** — recorded as §1a of
-[`agent-ctx/PHASE-047-MASTER-PLAN.md`](PHASE-047-MASTER-PLAN.md): A-1
-probation_end approved (+ the PII registration), A-2 BR-091 confirmed with
-the dedupe-key-shape + configurable-default precision edits, A-3 the tag
-`phase/047`, A-4 the talent PII inventory + the export-contract cross-check,
-A-5 the W-0 baseline-head precision. **Two long-standing owner inputs RULED
-in the same dispatch:** 0071 warehouses-sweep — NO REPAIR (the flag CLOSES;
-the 0094-header note landed with W-0); 029 eos-provision — option (A) fold
-the deltas. **W-0 DELIVERED same day** (the clean-environment baseline at the
-then-current head `2956c27` per A-5: typecheck/lint 8/8, unit 8/8, the full
-DB suite 250/250 · 3,436/3,436 with one disclosed fcm-channel flake — green
-standalone + pair + full-chunk re-run, every log kept — depcruise re-based
-at 1,939 · 14,434, drift 300 = 300, check:rls 292, i18n 6,121 + 371,
-id-ledger 0 errors + self-test OK, docs 33/33, manifests 13/13;
-`audit-evidence/phase047-w0/` + the W-0 gate doc). **THE 029 MAINTENANCE
-WAVE DELIVERED same day, between W-0 and W-1** (the ruled option (A) on the
-W-0 head `6ffd79d`: the eos-provision register side folds the accumulated
-G-54 true-up deltas — the standing model's law, its own `trueUp` column, the
-row universe extended to the computations; block-on-fail retained and
-re-proven by the seeded-drift arm; the golden re-pinned BOTH worlds — the
-no-true-up PAY world's legacy assertions unchanged + the true-up PCR
-world's new re-pin (Σ standing 42,500 == the GL); the pair 26/26, the
-reporting folder 17 · 122/122, the payroll folder 11 · 88/88, unit 8/8,
-typecheck/lint 8/8, depcruise 1,939 · 14,434, docs 33/33, drift 300, i18n
-6,121 + 371, id-ledger 0 errors + self-test OK — `2026-11-18-maintenance-
-029.md` + `audit-evidence/maintenance-029/`; **the SAFE-direction block
-STANDS DOWN**; the DB-suite census moves 3,436 → 3,438, the +2 re-pin
-tests). **NEXT: W-1 — the foundation wave** (migrations 0095–0098 + mirrors
-+ registry/catalog/permissions/i18n/feature-keys/NAV in ONE increment, per
-the plan §3 W-1).
+**THE CURRENT STATE (2026-11-18, updated at the W-1 delivery):** PHASE-046
+stands COMPLETE (W-9 ACCEPTED at `2956c27`). **PHASE-047's master plan
+APPROVED with the five binding amendments** (§1a of
+[`agent-ctx/PHASE-047-MASTER-PLAN.md`](PHASE-047-MASTER-PLAN.md)); the two
+long-standing rulings landed (0071 no-repair; 029 option (A) — **the
+maintenance wave DELIVERED** on the W-0 head `6ffd79d`: the eos-provision
+standing fold, the SAFE-direction block stood down, the DB census 3,436 →
+3,438). **W-0 DELIVERED** (the clean-environment baseline at `2956c27`
+per A-5). **W-1 — THE FOUNDATION WAVE — DELIVERED 2026-11-18** on the
+029-wave head `e6e61a1` (this session's fresh clone, the same-session
+evidence rule's eighth consecutive wave): migrations **0095–0098** (the
+fourteen talent tables + the employees position_id/probation_end
+extensions per D-01/D-02+A-1 + the DATA-ONLY grants: the twelve
+permission keys, the four feature flags, the four manifest enablements,
+the competency 1–5 AR/EN scale seed through the 0093-gated sweep with the
+onboarding hook) + the Drizzle mirrors + tables.registry +14 +
+ENTITY_CATALOG 292 → 306 + matrix §3.25 (300 → 312) + FEATURE_DEPS +4 +
+the golden effective-configs re-pin (31 of 37) + the template-apply
+hash re-pins + NAV_ITEMS +4 (flag-gated; the screens land W-5) + i18n
++4 + the PII inventory rows (A-1/A-4) + talent-errors.ts +
+talent-canonical.ts. **THE ENTITLEMENT/AUTHORIZATION DIVERGENCE**
+recorded: the four flags (hr.performance/recruitment/training/org — the
+manifest schema's single-segment law) gate the capability on plans/
+manifests/nav; the twelve permission keys ride roles (045/046 used one
+key for both jobs; 047 diverges deliberately — matrix §3.25's dated
+note). Gates: typecheck/lint 8/8 · depcruise 1,941 · 14,439 (+2 modules)
+· unit 8/8 (api 667 · web 87 · mobile 393 · desktop 274 · ui 42 ·
+contracts 56 · domain-core 38 · sync-core 36) · **THE FULL DB SUITE
+250/250 · 3,522/3,522** (the expected 3,438 + 84; 5 chunks; one
+disclosed census-pin repair, re-run green, both logs kept) · A1–A10 ×14
+green · drift **312 = 312** · check:rls **306** · i18n 6,125 + 371 ·
+manifests 13/13 · docs 33/33 · id-ledger 0 errors + self-test OK ·
+history-secrets 0 · capabilities agree · shells PASS · the negative
+boundary PASS — [W-1
+evidence](../docs/operations/gate-evidence/2026-11-18-phase047-w1.md) +
+`audit-evidence/phase047-w1/`. **NEXT: W-2 — the performance + goals
+engines** (T-05 + T-06: the cycle lifecycle CAS, the review submission,
+the D-08 pure 360 aggregation with BR-090 proven both ways, the
+calibration; the goals cascade + the BR-089 weight-sum typed law + the
+KRI rollup).
 The prior state (2026-11-18, the W-9 closure + the 047 plan delivery) stands
 as recorded below:
 **W-6 VERIFIED & APPROVED by the owner's independent re-proof** (a fresh clone,

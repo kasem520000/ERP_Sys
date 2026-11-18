@@ -309,6 +309,15 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "hr.attendance": ["payroll.employees"],
   "hr.leave": ["payroll.employees"],
   "hr.shifts": ["payroll.employees"],
+  // PHASE-047 (CR-17 — the HR growth talent layer): the four feature
+  // flags ride the SAME employees substrate as the 045 operational core
+  // (the plan's D-01 — the talent layer attaches to the frozen employees
+  // substrate, never rewrites it; the flags gate the capability while the
+  // twelve permission keys ride roles, matrix §3.25).
+  "hr.performance": ["payroll.employees"],
+  "hr.recruitment": ["payroll.employees"],
+  "hr.training": ["payroll.employees"],
+  "hr.org": ["payroll.employees"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

@@ -245,7 +245,14 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // the final policy set is exactly the pre-0094 set); 0071's FROM-
     // "warehouses" sibling EXCLUDED and flagged, never guessed;
     // 0089–0093 byte-stable.
-    expect(files.at(-1)?.tag).toBe("0094_rls_tenant_sweep_repair");
+    // PHASE-047 (W-1, the foundation wave, 2026-11-18): 0095–0098 — the
+    // talent cluster per the plan §2 (0095 performance ×5 · 0096
+    // recruitment ×3 · 0097 training/org/documents ×6 + the employees
+    // position_id/probation_end extensions · 0098 DATA-ONLY grants: the 12
+    // permission keys + plan grants + the four manifest enablements + the
+    // competency 1–5 scale seed through the 0093-gated existing-tenant
+    // sweep, the onboarding hook the new-tenant path).
+    expect(files.at(-1)?.tag).toBe("0098_hr_talent_grants");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

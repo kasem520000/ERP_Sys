@@ -53,6 +53,15 @@ import {
  *   a starter-plan tenant blocks with the full chain.
  * - L5 beats L1 (BR-038 R8): an explicit `manufacturing.qc_gate` tenant
  *   setting overrides the manifest's "required" default.
+ *
+ * PHASE-047 (W-1) review note: the food_manufacturing manifest hash
+ * re-pinned — 0098 §3 composes the four talent flags
+ * (hr.performance/recruitment/training/org) into the required chain, so
+ * the stored + canonical manifest hash moves; the starter degradation
+ * chain gains the four flags (the tier-4 posture: HR is not a starter
+ * feature — payroll.employees was already in the chain via the 045
+ * BR-040 closure).
+ *
  */
 
 /** KNOWN hash — `pnpm validate:manifests` on the six-template set (the
@@ -71,7 +80,7 @@ import {
  *  mirror, and the contracts verbatim copy moved together — the 0066
  *  §9 re-pin procedure).
  */
-const KNOWN_HASH = "sha256:8b16536f5dc84bc7a7bbe9c5a47cc37db200dea002aa8ebf425fbe26d8663377";
+const KNOWN_HASH = "sha256:f258fed91de8519a13c67937d30c2b736a9509ee0e40da3b7335258e022a6717";
 
 /** The 0026 plan-grant manufacturing set (the "manufacturing add-on"). */
 const MANUFACTURING_KEYS: readonly string[] = [
@@ -699,7 +708,11 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
       missingChain: [
         "hr.attendance",
         "hr.leave",
+        "hr.org",
+        "hr.performance",
+        "hr.recruitment",
         "hr.shifts",
+        "hr.training",
         "industry.template_engine",
         "inventory.batch_tracking",
         "inventory.stock_counts",

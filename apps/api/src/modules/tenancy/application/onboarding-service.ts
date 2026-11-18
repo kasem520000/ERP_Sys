@@ -17,6 +17,7 @@ import { getOwnTenant, seedMasterDataBasics } from "../infrastructure/tenancy.st
 // payroll module's infrastructure surface, imported the way the master-
 // data basics ride the tenancy store — never an ad hoc SQL copy.
 import { materializeCanonicalStatutorySet } from "../../payroll/infrastructure/statutory-canonical";
+import { materializeCanonicalCompetencyScale } from "../../hr/infrastructure/talent-canonical";
 
 /**
  * `provisionWorkspace` onboarding backend (PHASE-004 §2.3/T5): produces
@@ -107,6 +108,13 @@ export class OnboardingService {
     // materialized idempotently for the new tenant (the 0092 seed's
     // existing-tenant sweep is the same canonical source).
     await materializeCanonicalStatutorySet();
+
+    // 1d. PHASE-047 (W-1, T-04) — the canonical competency scale: the
+    // 1–5 AR/EN default (the ONE shipped default, red line 5's law —
+    // tenant-configurable DATA), materialized idempotently for the new
+    // tenant (the 0098 §4 seed's existing-tenant sweep is the same
+    // canonical source — talent-canonical.ts, one source, both paths).
+    await materializeCanonicalCompetencyScale();
 
     // 2. CoA template instantiation (code-ordered so parents insert first).
     const template = await store.listCoaTemplate();

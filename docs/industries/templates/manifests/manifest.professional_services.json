@@ -10,7 +10,11 @@
     "crm.recurring_billing",
     "accounting.projects",
     "sales.invoices",
-    "partners.statements"
+    "partners.statements",
+    "hr.performance",
+    "hr.recruitment",
+    "hr.training",
+    "hr.org"
   ],
   "default_modules_enabled": [
     "accounting",
