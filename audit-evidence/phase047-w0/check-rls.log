@@ -1,0 +1,7 @@
+
+> erp-platform@0.1.0 check:rls /home/z/erp_p047
+> tsx scripts/check-rls.ts
+
+MIGRATE_DATABASE_URL is required (migrate/bootstrap role connection)
+ ELIFECYCLE  Command failed with exit code 1.
+EXIT: 1

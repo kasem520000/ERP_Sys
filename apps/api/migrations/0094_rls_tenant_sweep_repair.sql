@@ -92,6 +92,15 @@
 --     self-heals wherever it is used; (c) repairing beyond the ruled
 --     scope would be a guess about the owner's intent. If the owner
 --     rules it in, a 0095-class repair sweeps it in one statement.
+--     [RULED 2026-11-18 (the owner's W-9 verification dispatch): NO
+--     REPAIR — the flagged item CLOSES as ruled-no-action. The pick-
+--     strategy arm rides upsertPickStrategyRow, structurally idempotent
+--     on the tenant+warehouse unique — verified by the owner, who read
+--     the migration and the runtime paths (ensureDefaultBin recreates
+--     the exact migration shape, pinned across the inventory DB suite
+--     incl. the race and conflict specs; a 0094-style re-materialization
+--     would add no capability and risks conflicting with the lazy
+--     floors).]
 --
 --   THE CANONICAL-SHAPE NOTE (honest, dated 2026-11-17): 0092 §3e's
 --   placeholder profile names embedded the jurisdiction LABEL

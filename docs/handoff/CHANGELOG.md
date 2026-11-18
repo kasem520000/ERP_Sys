@@ -1,9 +1,57 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-046 W-9 — the P4 ruling + NF record wave)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-047 — the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0 delivered)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-18 — **PHASE-047 — THE MASTER PLAN APPROVED (five binding
+  amendments) + the 0071/029 rulings + W-0 (the clean-environment
+  baseline) delivered** (the owner's W-9 verification + plan-approval
+  dispatch; W-9 ACCEPTED at `2956c27`): the plan's §1a records the FIVE
+  BINDING AMENDMENTS — **A-1** `employees.probation_end` APPROVED
+  (nullable date, fail-open — NULL = not tracked, the sweep skips
+  NULLs, no alert ever fabricated; the alert-input mirror of
+  nationality's fail-closed; registered in the PII inventory in the
+  same increment), **A-2** BR-091 CONFIRMED with two precision edits
+  (the BUSINESS_RULES text names the dedupe key's shape
+  `hr:{kind}:{employeeId}:{documentId}:{threshold}` + states 30/7/0 as
+  the documented tenant-configurable default — "per configured
+  threshold pass (documented default 30/7/0)"), **A-3** the closure tag
+  `phase/047`, **A-4** the talent tables' PII fields enter the PII
+  inventory in the migration increment + the three export contracts
+  cross-check their field lists against it (the payslips/remittance
+  precedent), **A-5** the W-0 baseline runs at the then-current head
+  and records it as such (`2956c27`; the plan's §3 W-0 "untouched W-9
+  head 8fab3ed" phrasing corrected with the dated note);
+  **TWO LONG-STANDING OWNER INPUTS RULED:** 0071 warehouses-sweep — NO
+  REPAIR (the flag CLOSES as ruled-no-action; the pick-strategy arm
+  rides `upsertPickStrategyRow`, structurally idempotent on the
+  tenant+warehouse unique — verified by the owner; the record note at
+  the 0094 header) + 029 eos-provision — option (A) fold the deltas
+  (block-on-fail retained, the 029 golden re-pinned in the true-up
+  world; a SMALL STANDALONE maintenance wave at the session's
+  scheduling discretion, NOT inside 047's ledger-free waves; the ruling
+  recorded at the contract's design-point site); **W-0 DELIVERED** (the
+  plan §3 W-0, in this session's fresh clone — the same-session
+  evidence rule's sixth consecutive wave): frozen install 6.5s ·
+  typecheck 8/8 (0 cached) · lint 8/8 (0 cached) · depcruise clean
+  **1,939 · 14,434** (the fresh-clone re-baseline) · unit 8/8 (api 58
+  files · 667 · web 87 · mobile 393 · desktop 274 · ui 42 · contracts
+  56 · domain-core 38 · sync-core 36) · **THE FULL DB SUITE 250/250
+  files · 3,436/3,436** (5 chunks 59+57+60+66+8, the 8-file
+  load-shaped family isolated; THE HONEST NOTE: one fcm-channel flake
+  on the first chunk-02 run — `outcome.sent` false on a just-opted-in
+  device — green standalone 8/8 + green pair + green identical
+  full-chunk re-run 60/60 · 482/482, every log kept incl. the red run;
+  the standing DB-suite serial-order sensitivities watch item, NOT a
+  head regression) · drift 300 = 300 · check:rls 292 (the standalone
+  scratch-PG16 run + the in-suite co-proof) · i18n 6,121 = 6,121 +
+  mobile 371 = 371 · id-ledger 0 errors + self-test OK (G 54 · INV 32
+  · BR 87) · history-secrets 0 · docs 33/33 · manifests 13/13 ·
+  capabilities agree · shells PASS · the negative boundary PASS;
+  W-1 (the foundation wave) NEXT — NOT production approval — [W-0
+  evidence](../operations/gate-evidence/2026-11-18-phase047-w0.md) +
+  `audit-evidence/phase047-w0/` — PHASE-047
 - 2026-11-18 — **PHASE-046 W-9 — the P4 ruling + NF record wave** (the
   owner's W-8 verification dispatch, on the W-8 accepted head `515b80a`):
   **THE P4 REPAIR** (the ruling §6, option (i) — the P3 precedent's

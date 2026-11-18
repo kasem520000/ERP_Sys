@@ -9,12 +9,64 @@ Authority chain: PHASE-047.md → [CR-17](../docs/planning/COMPLETENESS_REGISTER
 ID_LEDGER's 047 reservations (**BR-088…BR-091** — no golden/invariant slots;
 047 is ledger-free by design) → this plan.
 
-**Status: PROPOSED 2026-11-18 — delivered with the W-9 repair wave per the
-owner's sequencing ("PHASE-047's master plan is UNBLOCKED — deliver it with or
-after the repair wave"). Implementation waves begin at the owner's
-plan-approval dispatch (the PHASE-046 precedent: approval carried six binding
-amendments recorded in §1a of that plan; the 047 equivalents land as dated
-amendments here).**
+**Status: APPROVED 2026-11-18 (the owner's W-9 verification + plan-approval
+dispatch — W-9 ACCEPTED at `2956c27`; the plan's plan-first findings both
+verified hands-on by the owner) with FIVE BINDING AMENDMENTS recorded in §1a
+below (the PHASE-046 precedent: approval carried six binding amendments
+recorded in §1a of that plan; the 047 equivalents land as dated amendments
+here). The implementation waves are UNBLOCKED — W-0 delivered same day at the
+then-current head `2956c27` (per A-5; audit-evidence/phase047-w0/). Two
+long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
+029 ruled option (A): see §1a items 6–7.**
+
+## 1a. The owner's approval amendments (binding — recorded 2026-11-18, the W-9 verification + plan-approval dispatch)
+
+1. **A-1 (§7(a) — the probation-date substrate: APPROVED).**
+   `employees.probation_end` (nullable `date`, **fail-open** — NULL = not
+   tracked, the sweep skips NULLs, no alert ever fabricated) added in T-03's
+   `0097`. The fail-open direction confirmed correct: probation is an ALERT
+   input, not a pricing input (the mirror image of `nationality`'s
+   fail-closed). **Additionally: the field is registered in the PII inventory
+   in the same increment** (the 046 `nationality` D-02 pattern).
+2. **A-2 (§7(b) — BR-091 CONFIRMED with two precision edits).** The
+   BUSINESS_RULES text must (i) **name the dedupe key's shape**
+   (`hr:{kind}:{employeeId}:{documentId}:{threshold}`) so the law is
+   self-contained, and (ii) state the 30/7/0 as **the documented
+   tenant-configurable default** (red line 5's law), not as hard-coded
+   constants — "per configured threshold pass (documented default 30/7/0)".
+3. **A-3 (§7(c) — CONFIRMED).** The closure tag is `phase/047`.
+4. **A-4 (the PII amendment — the plan's one real gap, closed).** The talent
+   tables' PII fields enter the PII inventory **in the migration increment**
+   (D-02's pattern generalized): `employee_documents`' document
+   numbers/identifiers, applicants' personal data, interview notes. The three
+   D-07 export contracts **cross-check their field lists against the PII
+   inventory at implementation** — the payslips/remittance precedent governs
+   (employee code + name; never national_id/bank/document numbers in
+   exports).
+5. **A-5 (W-0 baseline-head precision — the F1 law).** W-0's baseline runs
+   at the then-current head and records it as such — presently `2956c27` (the
+   plan commit; docs-only above the W-9 code head `8fab3ed`). The §3 W-0
+   "untouched W-9 head `8fab3ed`" phrasing corrected at implementation
+   (the dated note in §3).
+6. **0071 warehouses-sweep — RULED: NO REPAIR (2026-11-18, the same
+   dispatch).** The owner read the migration and the runtime paths: §5's own
+   header defers post-migration warehouses to the lazy path;
+   `ensureDefaultBin` (wms-store.ts) recreates the exact migration shape and
+   is pinned across the inventory DB suite including the race and conflict
+   specs; **the pick-strategy arm rides `upsertPickStrategyRow`, structurally
+   idempotent on the tenant+warehouse unique** — verified by the owner. A
+   0094-style re-materialization would add no capability and risks
+   conflicting with the lazy floors. The flagged item CLOSES as
+   ruled-no-action; the one-line record note at the original flag site (the
+   0094 header) landed with W-0.
+7. **029 eos-provision semantic update — RULED: option (A), fold the deltas
+   (2026-11-18, the same dispatch).** The 029 report's register side folds
+   the accumulated true-up deltas (aligning with the standing model so it
+   ties in every world); block-on-fail retained; the 029 golden re-pinned in
+   the true-up world. **Delivered as a SMALL STANDALONE maintenance wave (the
+   W-8/W-9 pattern) at this session's scheduling discretion — NOT inside
+   047's ledger-free waves** (payroll-module scope; keep 047 clean). Until it
+   lands, the SAFE-direction block stands. See §7(d)'s dated note.
 
 ## 0. Inputs consumed (the plan-first reads, all done — one focused pass over the W-9 head `8fab3ed`, 2026-11-18)
 
@@ -66,14 +118,17 @@ recorded honestly):** PHASE-047.md's prerequisite table claims 045 delivered
 exists anywhere in `apps/api/src` or the 045 completion report (verified by
 exhaustive grep this session; 045 shipped `hireDate`/`terminationDate` +
 the `userId` bridge). The phase doc's own §7 anticipated this
-("Prerequisite drift … may shift before this phase runs"). **The remedy
-proposed (the 046 `nationality` D-02 precedent — a plan-level addition
-awaiting the owner's approval, §7(a)):** `employees.probation_end` (nullable
-`date`) added in the T-03 migration, fail-open semantics — NULL = not
-tracked, the expiry sweep skips NULLs, no alert ever fabricated; the
-probation-end alert (§2.9 of the scope) rides it. If the owner declines,
-the `hr.probation-end` alert drops from scope and the completion report
-records the delta (the phase doc's own mitigation).
+("Prerequisite drift … may shift before this phase runs"). **The remedy —
+APPROVED 2026-11-18, the owner's plan-approval amendment A-1 (§1a), the 046
+`nationality` D-02 precedent — a plan-level addition now confirmed:**
+`employees.probation_end` (nullable `date`) added in the T-03 migration,
+fail-open semantics — NULL = not tracked, the expiry sweep skips NULLs, no
+alert ever fabricated (the alert-input vs pricing-input mirror of
+nationality's fail-closed); **the field registers in the PII inventory in
+the same increment (A-1's addition)**. The probation-end alert (§2.9 of the
+scope) rides it. [Pre-approval text, superseded by A-1: "If the owner
+declines, the `hr.probation-end` alert drops from scope and the completion
+report records the delta (the phase doc's own mitigation)."]
 
 **D-03 — Migration slots pinned honestly: 0095–0098** (the journal ends at
 `0094_rls_tenant_sweep_repair`, idx 93 — verified this session). The phase
@@ -95,7 +150,13 @@ anonymity law (aggregate-only visibility; a relationship's inputs surface
 only at ≥ 3 responses — never attributed), BR-091 the expiry-sweep dedup
 law (one alert per employee per document per threshold pass — 30/7/0 days
 — deduplicated structurally by the notification dedupe key; never a repair,
-only the alert — the inventory alerts-service's own law).
+only the alert — the inventory alerts-service's own law). [BR-091's wording
+CONFIRMED 2026-11-18 with two precision edits — amendment **A-2**, §1a: the
+BUSINESS_RULES text names the dedupe key's shape
+`hr:{kind}:{employeeId}:{documentId}:{threshold}` (self-contained law) and
+states 30/7/0 as the documented tenant-configurable default — "per
+configured threshold pass (documented default 30/7/0)" — never hard-coded
+constants.]
 
 **D-05 — Ledger-free by design (the ID_LEDGER's own record):** no G-slots,
 no INV slots; `JOURNAL_RULES.md` and `ACCOUNTING_INVARIANTS.md` untouched;
@@ -122,7 +183,12 @@ validation reports** (accepted/rejected per row, reasons typed — the
 attendance-import precedent in the hr module); Workday/BambooHR field maps
 documented as reference profiles in the integrations README; the public API
 platform of PHASE-055 is the live-connector substrate (out of scope by the
-phase doc's own list).
+phase doc's own list). [Amendment **A-4** (2026-11-18): the talent tables'
+PII fields — employee_documents' document numbers/identifiers, applicants'
+personal data, interview notes — enter the PII inventory in the migration
+increment; the three export contracts cross-check their field lists against
+the PII inventory at implementation (the payslips/remittance precedent:
+employee code + name; never national_id/bank/document numbers in exports).]
 
 **D-08 — The 360 aggregation is a PURE domain function, aggregate-only.**
 `aggregate360(inputs) → per-relationship {count, mean, min, max}` — unit-
@@ -198,6 +264,20 @@ global-setup spawn.
 green on the untouched W-9 head `8fab3ed` in THIS environment — the baseline
 proven before any change (the honest-log law), every log kept
 (`audit-evidence/phase047-w0/`).
+
+> **DELIVERED 2026-11-18 — and the head pinned per amendment A-5 (§1a):**
+> the baseline ran at the then-current head **`2956c27`** (the plan-commit
+> head, docs-only above the W-9 code head `8fab3ed` — the original
+> "untouched W-9 head `8fab3ed`" phrasing above was imprecise about which
+> head the clone boots at; the code content is identical, `2956c27` adding
+> only the plan/NEXT_ACTION docs). All exit gates met: typecheck 8/8 · lint
+> 8/8 · depcruise 1,939 · 14,434 (the fresh-clone re-baseline) · unit 8/8 ·
+> DB suite 250/250 · 3,436/3,436 (one disclosed fcm-channel flake on the
+> first chunk-02 run — green standalone + pair + full-chunk re-run, every
+> log kept; the standing DB-suite serial-order sensitivities watch item) ·
+> drift 300 = 300 · check:rls 292 · i18n 6,121 + 371 · id-ledger 0 errors +
+> self-test OK · history-secrets 0 · docs 33/33 · manifests 13/13.
+> `audit-evidence/phase047-w0/` + the W-0 gate doc.
 
 ### W-1 — Foundation (T-01 + T-02 + T-03 + T-04, orchestrator)
 Migrations 0095–0098 (§2) + mirrors + registry/catalog/permissions/i18n/
@@ -320,21 +400,33 @@ capabilities) per the 046 gate table.
 
 ## 7. Open inputs for the owner (none block plan approval; (a) is the one scope decision)
 
+> **RESOLVED 2026-11-18 (the plan-approval dispatch): (a) = amendment A-1
+> (APPROVED — probation_end + the PII registration); (b) = A-2 (CONFIRMED
+> with the two precision edits); (c) = A-3 (phase/047); all three recorded
+> in §1a. (d)'s 0071 and 029 are now RULED (§1a items 6–7); (d)'s remaining
+> items stand unchanged.**
+
 - **(a) The probation-date substrate (D-02's drift):** approve
   `employees.probation_end` (nullable, fail-open — the 046 `nationality`
   precedent) or drop the `hr.probation-end` alert from scope. The
   prerequisite-table claim ("045 delivered probation dates") was false at
   the delivered head; this plan records it and proposes the remedy.
+  **[APPROVED 2026-11-18 — A-1, §1a.]**
 - **(b) BR-091's wording (D-04):** proposed as the expiry-sweep dedup law;
   confirm or amend at approval (BR-088/089/090 are the phase doc's own).
+  **[CONFIRMED 2026-11-18 with two precision edits — A-2, §1a.]**
 - **(c) The closure tag:** `phase/047` proposed (the 046 owner instruction
-  `phase/046` as the pattern); confirm at approval.
+  `phase/046` as the pattern); confirm at approval. **[CONFIRMED 2026-11-18
+  — A-3, §1a.]**
 - **(d) Standing owner inputs carried (unchanged, not 047 blockers):**
   §7(b)'s three PHASE-045 final-audit remarks (text awaited, never
   fabricated); the 0071 warehouses-sweep ruling; the 029 eos-provision
   semantic update; PHASE-043's hard review + RISK-031/RISK-032 OPEN; the
   register's exactly two narrowed items (SANED 15,000 ceiling + EOSB M/51
-  Art. 84 text).
+  Art. 84 text). **[Dated 2026-11-18: 0071 RULED — NO REPAIR (§1a item 6;
+  the 0094 header note landed with W-0); 029 RULED — option (A) fold the
+  deltas, a small standalone maintenance wave at the session's scheduling
+  discretion, NOT inside 047 (§1a item 7). The remaining items stand.]**
 
 **NOT production approval** — the standing law. PHASE-046 stands COMPLETE
 at the W-9 head (the owner's W-8 acceptance + the W-9 repair wave); this

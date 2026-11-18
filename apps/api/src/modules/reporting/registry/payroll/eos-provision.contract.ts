@@ -41,6 +41,16 @@ import { reportingServices } from "../services";
  * 029 view in favor of the standing view) is the owner's open input;
  * not changed here unilaterally.
  *
+ * [RULED 2026-11-18 (the owner's W-9 verification dispatch): option (A) —
+ * FOLD THE DELTAS. This report's register side folds the accumulated
+ * G-54 true-up deltas (aligning with the standing model so it ties in
+ * every world); block-on-fail retained; the 029 golden re-pinned in the
+ * true-up world. Delivered as a SMALL STANDALONE maintenance wave (the
+ * W-8/W-9 pattern) at the delivering session's scheduling discretion —
+ * NOT inside PHASE-047's ledger-free waves (payroll-module scope; keep
+ * 047 clean). Until that wave lands, the SAFE-direction block stands
+ * exactly as documented above.]
+ *
  * Permission `payroll.reports.view`. Employee rows carry code + display
  * names only (the PII law).
  */
