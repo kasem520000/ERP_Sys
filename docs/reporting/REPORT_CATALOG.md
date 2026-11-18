@@ -339,7 +339,7 @@ reuse module read permissions per §12.
 | `budgeting.variance-analysis` | Variance Analysis / تحليل الانحرافات | budgeting · budgets, budget_lines + GL read model | period, scope, variance threshold, grouping | `budgeting.reports.view` | PDF · XLSX · CSV | PHASE-028 |
 | `payroll.register` | Payroll Register / سجل الرواتب | payroll · payroll_runs, payroll_run_lines, employees (component snapshots) | fiscal period, branch, run | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 |
 | `payroll.cost-summary` | Payroll Cost Summary / ملخص تكاليف الرواتب | payroll · payroll_run_lines + GL expense provenance (cost allocation by branch/cost center) | period, branch, cost center, component kind | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 |
-| `payroll.eos-provision` | EOS Provision / مخصص نهاية الخدمة | payroll · employees, salary_structures (EOS-base components), payroll_runs + provision journal provenance | asOf, branch, tenure buckets | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 |
+| `payroll.eos-provision` | EOS Provision / مخصص نهاية الخدمة | payroll · employees, salary_structures (EOS-base components), payroll_runs + eosb_calculations (the accumulated G-54 true-up deltas — the ruled option-(A) standing fold, 2026-11-18) + provision journal provenance | asOf, branch, tenure buckets | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-029 (the fold: 2026-11-18) |
 | `payroll.statutory-summary` | Statutory Contributions Summary / ملخص الاستقطاعات القانونية | payroll · payroll_runs, payroll_run_lines (the frozen statutory_breakdown + statutory_summary liability folds) | dateFrom/To, period | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-046 |
 | `payroll.eosb-liability` | EOSB Liability / التزام مكافأة نهاية الخدمة | payroll · eosb_calculations (tier folds + deltas), payroll_runs, employees + the EOS_PROVISION GL provenance | locale, employee | `payroll.reports.view` | PDF · XLSX · CSV | PHASE-046 |
 
@@ -355,8 +355,11 @@ and the summary's accrued == Σ employee + Σ employer + Σ PIT — the remittan
 audit view; the filing artifact stays the run-level remittance export, IN-06);
 `payroll.eosb-liability` carries the standing-model `eosb-provision-tie` (Σ per-employee
 standing provisions == the EOS_PROVISION GL balance — the 046 view that accounts for
-the G-54 true-up legs; the 029-era `payroll.eos-provision` fold predates them — the
-W-3/W-06 design point recorded on that contract for the owner's review).
+the G-54 true-up legs). The 029-era `payroll.eos-provision` fold's design point is
+RESOLVED (ruled option (A), 2026-11-18 — the standalone maintenance wave): that report's
+register side now folds the accumulated G-54 deltas too (the standing model's law, its
+own `trueUp` column), so BOTH ties hold in every world; the original design point
+stays recorded at the contract site with its dated resolution.
 
 **Shipped (PHASE-045, category `hr`)** — the three workforce registers over the
 PHASE-013 engine (registry 101 → 104; permissions reuse the 0086-seeded module keys —

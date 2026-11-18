@@ -51,15 +51,30 @@ import { reportingServices } from "../services";
  * 047 clean). Until that wave lands, the SAFE-direction block stands
  * exactly as documented above.]
  *
+ * **[DELIVERED 2026-11-18 — the standalone maintenance wave LANDED (same
+ * day, on the W-0 head `6ffd79d`; the delivering session's fresh clone,
+ * the same-session evidence rule honored). The register side now carries
+ * the STANDING balance — the 029 balance + the accumulated G-54 true-up
+ * deltas — with the delta visible as its own `trueUp` column, and the
+ * row universe extended to the computations (a true-ups-only employee
+ * renders; the standing model's law). The tie `payroll-eos-ledger-tie`
+ * holds in EVERY world; block-on-fail retained (the seeded-drift arm
+ * re-proven in the true-up world); the golden re-pinned BOTH worlds — the
+ * no-true-up PAY world (payroll-rules.spec: the fold a no-op, every
+ * legacy assertion unchanged) and the true-up PCR world (the compliance
+ * spec's re-pin: Σ standing 42,500 == the GL). The SAFE-direction
+ * paragraph above is the historical pre-fold record — superseded by this
+ * delivery; `payroll.eosb-liability` remains the entitlement view.]**
+ *
  * Permission `payroll.reports.view`. Employee rows carry code + display
  * names only (the PII law).
  */
 
 const EOS_LEDGER_TIE = assertDecl(
   "payroll-eos-ledger-tie",
-  "Σ un-extinguished per-employee balances == the EOS_PROVISION purpose account's natural-direction GL balance (credit − debit; tolerance 0)",
-  "مجموع الأرصدة غير المطفأة لا يطابق رصيد حساب مخصص نهاية الخدمة في دفتر الأستاذ — التصدير محجوب حتى المطابقة",
-  "The un-extinguished balance sum does not tie to the EOS_PROVISION account's GL balance — export blocked until the tie passes",
+  "Σ per-employee standing balances (the 029 balance + the accumulated G-54 true-up deltas) == the EOS_PROVISION purpose account's natural-direction GL balance (credit − debit; tolerance 0)",
+  "مجموع الأرصدة القائمة (رصيد 029 + مجاميع تسويات G-54) لا يطابق رصيد حساب مخصص نهاية الخدمة في دفتر الأستاذ — التصدير محجوب حتى المطابقة",
+  "The standing-balance sum (the 029 balance + the accumulated G-54 deltas) does not tie to the EOS_PROVISION account's GL balance — export blocked until the tie passes",
   "INV-025",
 );
 
@@ -77,7 +92,7 @@ function tieResult(ties: { registerBalance: string; glBalance: string; ok: boole
       ? undefined
       : {
           ar: `رصيد السجل ${ties.registerBalance} ≠ رصيد دفتر الأستاذ ${ties.glBalance} — التصدير محجوب`,
-          en: `Register balance ${ties.registerBalance} ≠ GL balance ${ties.glBalance} — export blocked`,
+          en: `Register standing balance ${ties.registerBalance} ≠ GL balance ${ties.glBalance} — export blocked`,
         },
   };
 }
@@ -88,8 +103,8 @@ export const payrollEosProvisionContract = defineReport({
   title: bilingual("مخصص نهاية الخدمة", "EOS Provision"),
   category: "financial",
   description: bilingual(
-    "حركات مخصص نهاية الخدمة لكل موظف: الاستحقاقات والتسويات والفروق المحررة والرصيد — يحمل فحص payroll-eos-ledger-tie الذي يمنع التصدير عند الفشل",
-    "The end-of-service provision movements per employee: accruals, settlements, released residuals and the balance — carrying the payroll-eos-ledger-tie check that blocks exports on failure",
+    "حركات مخصص نهاية الخدمة لكل موظف: الاستحقاقات والتسويات والفروق المحررة ومجاميع تسويات G-54 والرصيد القائم — يحمل فحص payroll-eos-ledger-tie الذي يمنع التصدير عند الفشل",
+    "The end-of-service provision movements per employee: accruals, settlements, released residuals, the G-54 true-up totals and the standing balance — carrying the payroll-eos-ledger-tie check that blocks exports on failure",
   ),
   parameters: z.object({
     locale: LOCALE,
@@ -98,10 +113,10 @@ export const payrollEosProvisionContract = defineReport({
   dataSources: [
     source(
       "payroll",
-      "payrollQueries.eosProvision (the per-employee accrual/settlement folds)",
-      ["payroll_runs", "payroll_run_lines", "employees"],
-      "استحقاقات المخصص وتسوياته لكل موظف",
-      "The per-employee provision accruals and settlements",
+      "payrollQueries.eosProvision (the per-employee accrual/settlement folds + the accumulated G-54 true-up deltas — the ruled option-(A) standing fold)",
+      ["payroll_runs", "payroll_run_lines", "employees", "eosb_calculations"],
+      "استحقاقات المخصص وتسوياته ومجاميع تسويات G-54 لكل موظف",
+      "The per-employee provision accruals, settlements and G-54 true-up totals",
     ),
     source(
       "accounting",
@@ -118,6 +133,7 @@ export const payrollEosProvisionContract = defineReport({
     measures: [
       { id: "accrued", kind: "sum" },
       { id: "settled", kind: "sum" },
+      { id: "trueUp", kind: "sum" },
       { id: "balance", kind: "sum" },
     ],
     sorting: [{ by: "employeeCode", dir: "asc" }],
@@ -146,10 +162,12 @@ export const payrollEosProvisionContract = defineReport({
 
     let accruedTotal = "0";
     let settledTotal = "0";
+    let trueUpTotal = "0";
     let balanceTotal = "0";
     for (const row of result.rows) {
       accruedTotal = addExactLocal(accruedTotal, row.accrued);
       settledTotal = addExactLocal(settledTotal, row.settled ?? "0");
+      trueUpTotal = addExactLocal(trueUpTotal, row.trueUp);
       balanceTotal = addExactLocal(balanceTotal, row.balance);
     }
 
@@ -160,7 +178,8 @@ export const payrollEosProvisionContract = defineReport({
         moneyCol("accrued", "المستحق", "Accrued"),
         moneyCol("settled", "المسدّد نقداً", "Cash settled"),
         moneyCol("released", "المحرر", "Released"),
-        moneyCol("balance", "الرصيد", "Balance"),
+        moneyCol("trueUp", "مجاميع التسويات (G-54)", "True-up total (G-54)"),
+        moneyCol("balance", "الرصيد القائم", "Standing balance"),
       ],
       groups: [],
       rows: result.rows.map((row) => ({
@@ -174,6 +193,7 @@ export const payrollEosProvisionContract = defineReport({
           accrued: row.accrued,
           settled: row.settled ?? "—",
           released: row.released ?? "—",
+          trueUp: row.trueUp,
           balance: row.balance,
         },
       })),
@@ -191,9 +211,15 @@ export const payrollEosProvisionContract = defineReport({
           amount: settledTotal,
         },
         {
+          id: "trueUpTotal",
+          kind: "sum",
+          label: bilingual("إجمالي مجاميع التسويات", "True-up total"),
+          amount: trueUpTotal,
+        },
+        {
           id: "balanceTotal",
           kind: "sum",
-          label: bilingual("إجمالي الرصيد", "Balance total"),
+          label: bilingual("إجمالي الرصيد القائم", "Standing-balance total"),
           amount: balanceTotal,
         },
       ],

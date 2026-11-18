@@ -33,9 +33,11 @@ import { requireTenantContext } from "../../../../infra/db/tenant-context";
  * cost-summary: per period, Σ run-line cost (gross + employer + eos) ==
  *               the journal's payroll_run-sourced entry debit total for
  *               that period (the same independent-path discipline).
- * eos:          Σ un-extinguished balances == the EOS_PROVISION purpose
- *               account's natural-direction GL balance (LIABILITY:
- *               credit − debit) — the register-vs-ledger fold.
+ * eos:          Σ per-employee STANDING balances (the 029 balance + the
+ *               accumulated G-54 true-up deltas — the ruled option-(A)
+ *               fold, 2026-11-18) == the EOS_PROVISION purpose account's
+ *               natural-direction GL balance (LIABILITY: credit − debit)
+ *               — the register-vs-ledger fold, tying in every world.
  */
 
 function tenantTx() {
@@ -334,9 +336,21 @@ export class PayrollQueriesService {
 
   /**
    * The EOS provision report: per employee — accruals (POSTED-run lines),
-   * the cash settlement stamp, the released residual, the balance; the GL
-   * tie folds the EOS_PROVISION purpose account's natural-direction
-   * balance against Σ un-extinguished balances.
+   * the cash settlement stamp, the released residual, the accumulated
+   * G-54 true-up delta, and the STANDING balance; the GL tie folds the
+   * EOS_PROVISION purpose account's natural-direction balance against
+   * Σ standing balances.
+   *
+   * [RULED OPTION (A) — DELIVERED 2026-11-18 (the owner's W-9 verification
+   * dispatch; this standalone maintenance wave): the register side folds
+   * the accumulated G-54 true-up deltas — the standing model
+   * (eosbLiability's law), so the tie holds in every world: unsettled
+   * employees carry accrued + Σ deltas; settled employees carry Σ deltas
+   * (the G-31 extinguished their 029 balance at the run-line fold).
+   * Block-on-fail retained. Before this fold the register side was the
+   * 029-era Σ un-extinguished balances, which predated the G-54 legs — on
+   * a true-ups tenant the tie FAILED and the SAFE-direction block engaged
+   * (the W-3/W-6 design point, recorded at the contract site).]
    */
   async eosProvision(): Promise<{
     rows: {
@@ -348,10 +362,16 @@ export class PayrollQueriesService {
       accrued: string;
       settled: string | null;
       released: string | null;
+      trueUp: string;
       balance: string;
     }[];
     ties: { registerBalance: string; glBalance: string; ok: boolean };
   }> {
+    // The row universe is the GL's whole provision surface (the standing
+    // model's law): employees with POSTED-run EOS accruals ∪ settled
+    // employees ∪ employees with EOSB computation evidence — a
+    // true-ups-only employee (no accruals, never settled) carries Σ deltas
+    // that ARE part of the GL the tie must account for.
     const employeeRows = (
       await tenantTx().execute(sql`
         SELECT e.id, e.code, e.name, e.name_ar, e.status, e.eos_settled_amount
@@ -361,6 +381,7 @@ export class PayrollQueriesService {
           JOIN payroll_runs r ON r.id = l.run_id
           WHERE l.employee_id = e.id AND r.status = 'POSTED' AND l.eos_accrual > 0
         ) OR e.eos_settled_amount IS NOT NULL
+           OR EXISTS (SELECT 1 FROM eosb_calculations c WHERE c.employee_id = e.id)
         ORDER BY e.code
       `)
     ).rows as unknown as {
@@ -375,16 +396,31 @@ export class PayrollQueriesService {
     for (const employee of employeeRows) {
       const rows = (
         await tenantTx().execute(sql`
-          SELECT COALESCE(SUM(l.eos_accrual), 0)::text AS accrued
+          SELECT COALESCE(SUM(l.eos_accrual), 0.0000::numeric(19,4))::text AS accrued
           FROM payroll_run_lines l JOIN payroll_runs r ON r.id = l.run_id
           WHERE l.employee_id = ${employee.id} AND r.status = 'POSTED'
         `)
       ).rows as unknown as { accrued: string }[];
-      accruals.set(employee.id, rows[0]?.accrued ?? "0");
+      accruals.set(employee.id, rows[0]?.accrued ?? "0.0000");
+    }
+    const trueUps = new Map<string, string>();
+    for (const employee of employeeRows) {
+      // The accumulated G-54 true-up delta. The 4dp NUMERIC LITERAL default
+      // (never a bare 0): a no-row aggregate renders "0.0000" — the money
+      // convention — a case the pre-fold universe never rendered (every
+      // row then carried accruals or a settlement).
+      const rows = (
+        await tenantTx().execute(sql`
+          SELECT COALESCE(SUM(delta), 0.0000::numeric(19,4))::text AS true_up
+          FROM eosb_calculations WHERE employee_id = ${employee.id}
+        `)
+      ).rows as unknown as { true_up: string }[];
+      trueUps.set(employee.id, rows[0]?.true_up ?? "0.0000");
     }
     const rows = employeeRows.map((employee) => {
-      const accrued = accruals.get(employee.id) ?? "0";
+      const accrued = accruals.get(employee.id) ?? "0.0000";
       const settled = employee.eos_settled_amount;
+      const trueUp = trueUps.get(employee.id) ?? "0.0000";
       return {
         employeeId: employee.id,
         employeeCode: employee.code,
@@ -397,7 +433,11 @@ export class PayrollQueriesService {
         // settlement (the one-shot full-balance G-31); the residual above
         // the cash settled released to EOS_PROVISION_EXPENSE.
         released: settled === null ? null : subExact(accrued, settled),
-        balance: settled === null ? accrued : "0.0000",
+        // The ruled option-(A) fold: the STANDING balance = the 029 balance
+        // (accrued while unsettled, 0 after the terminal settlement) + the
+        // accumulated G-54 true-up deltas — the standing model's law.
+        trueUp,
+        balance: addExact(settled === null ? accrued : "0.0000", trueUp),
       };
     });
     let registerBalance = "0.0000";

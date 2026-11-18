@@ -53,6 +53,17 @@ import { materializeCanonicalStatutorySet } from "../../modules/payroll/infrastr
  *   G-54 legs; the 029-era eos-provision fold predates them — the
  *   W-3/W-6 design point recorded on that contract).
  *
+ * [RULED OPTION (A) DELIVERED 2026-11-18 (the owner's W-9 verification
+ * dispatch; the standalone maintenance wave on the W-0 head `6ffd79d`):
+ * the design point above is RESOLVED — `payroll.eos-provision`'s register
+ * side now folds the accumulated G-54 true-up deltas (the standing
+ * model's law, so its `payroll-eos-ledger-tie` holds in every world);
+ * block-on-fail retained. The re-pin block at the bottom of this spec
+ * proves the folded report in THIS true-up world (the world where the
+ * pre-fold tie failed): Σ standing 42,500 == the GL, the true-ups-only
+ * employee renders, and the seeded-drift arm re-proves the binding
+ * export block.]
+ *
  * The worlds (the RUNSTAT dedicated-tenant precedent — never the PAY
  * registers whose censuses the 029 spec pins):
  * - TENANT_PCR (SA): the KSA worked example — the Saudi employee
@@ -747,5 +758,123 @@ describe("PHASE-046 (W-6, T-13) · payroll.eosb-liability — the standing-provi
         }),
       ),
     ).rejects.toThrowError(PermissionDeniedError);
+  });
+});
+
+describe("THE 029 RULED OPTION-(A) FOLD (delivered 2026-11-18) · payroll.eos-provision — the standing view in the true-up world", () => {
+  it("THE GOLDEN RE-PIN: the folded register ties in the true-up world — the true-ups-only employee renders, Σ standing 42,500 == the GL, the tie PASSes", async () => {
+    const pcr = spec.pcr!;
+    const outcome = await withTenant(TENANT_PCR, () =>
+      newRunService().run({
+        reportKey: "payroll.eos-provision",
+        params: { locale: "en" },
+        ctx: complianceContext(TENANT_PCR),
+      }),
+    );
+    expect(outcome.status).toBe("SUCCEEDED");
+    const rows = new Map(outcome.result!.rows.map((row) => [row.key as string, row.values]));
+
+    // The TRUE-UPS-ONLY row (the fold's row-universe extension): the
+    // suspended 7-year employee — no run accruals (suspended before the
+    // run), never settled — renders ONLY because the universe now covers
+    // eosb_calculations; the honest zero-accrual state (the 4dp no-row
+    // aggregate) + the accumulated G-54 delta 40,500 + the standing
+    // balance 40,500. Pre-fold this employee never rendered; the register
+    // then read 2,000 ≠ the GL 42,500 — the tie this fold repairs.
+    const eosRow = rows.get(pcr.eosEmployeeId)!;
+    expect(eosRow).toBeDefined();
+    expect(eosRow.accrued).toBe("0.0000");
+    expect(eosRow.settled).toBe("—");
+    expect(eosRow.released).toBe("—");
+    expect(eosRow.trueUp).toBe("40500.0000");
+    expect(eosRow.balance).toBe("40500.0000");
+
+    // The ACCRUED_ONLY pair: the run accruals 1,000 each (basic 10,000 ×
+    // 3/30), no true-ups — the fold's no-op side, the legacy 029 view
+    // unchanged for never-trued-up employees.
+    const ksaRow = rows.get(pcr.ksaEmployeeId)!;
+    expect(ksaRow.accrued).toBe("1000.0000");
+    expect(ksaRow.trueUp).toBe("0.0000");
+    expect(ksaRow.balance).toBe("1000.0000");
+    const nsRow = rows.get(pcr.nsEmployeeId)!;
+    expect(nsRow.accrued).toBe("1000.0000");
+    expect(nsRow.trueUp).toBe("0.0000");
+    expect(nsRow.balance).toBe("1000.0000");
+
+    // THE TIE (block-on-fail): Σ standing (1,000 + 1,000 + 40,500 =
+    // 42,500) == the EOS_PROVISION GL balance (the run accruals 2,000 +
+    // the G-54 40,500) — PASSes in the true-up world (pre-fold: FAIL).
+    const tie = outcome.result!.assertions.find((a) => a.id === "payroll-eos-ledger-tie")!;
+    expect(tie.status).toBe("PASS");
+    expect(tie.compared?.left).toBe("42500.0000");
+    expect(tie.compared?.right).toBe("42500.0000");
+    const totals = new Map(outcome.result!.totals.map((total) => [total.id, total]));
+    expect(totals.get("trueUpTotal")?.amount).toBe("40500.0000");
+    expect(totals.get("balanceTotal")?.amount).toBe("42500.0000");
+  });
+
+  it("BLOCK-ON-FAIL RETAINED: a settlement the books never made FAILs the folded tie and blocks every export; the restore re-ties green", async () => {
+    const pcr = spec.pcr!;
+    const client = await su();
+    // Tamper (the eosb-liability fail-arm shape): stamp the KSA employee's
+    // terminal settlement WITHOUT a G-31 journal — the folded register's
+    // standing for that employee drops to 0 (settled ⇒ the 029 balance
+    // reads 0; no deltas) while the GL still carries the 1,000 accrual.
+    // The 0043 employees law couples the settled amount to its
+    // journal-linkage column, so the drift stamps the pair — pointing the
+    // linkage at the G-54 true-up's OWN journal (a real entry that is NOT
+    // a settlement).
+    await client.query(
+      `UPDATE employees SET status = 'TERMINATED', termination_date = DATE '2026-06-30',
+              eos_settled_amount = 500.0000, eos_settlement_journal_entry_id = $3::uuid
+        WHERE tenant_id = $1 AND id = $2`,
+      [TENANT_PCR, pcr.ksaEmployeeId, pcr.trueUpJournalEntryId],
+    );
+    try {
+      const runs = newRunService();
+      const outcome = await withTenant(TENANT_PCR, () =>
+        runs.run({
+          reportKey: "payroll.eos-provision",
+          params: { locale: "en" },
+          ctx: complianceContext(TENANT_PCR),
+        }),
+      );
+      expect(outcome.status).toBe("SUCCEEDED");
+      const tie = outcome.result!.assertions.find((a) => a.id === "payroll-eos-ledger-tie")!;
+      expect(tie.status).toBe("FAIL");
+      expect(tie.compared?.left).toBe("41500.0000");
+      expect(tie.detail?.en).toContain("export blocked");
+      // THE BINDING BLOCK (retained by the ruling): no format leaves the
+      // building on a FAIL — the SAFE direction, unchanged by the fold.
+      const exportsSvc = new ExportService(
+        new AuditService(new DrizzleAuditStore()),
+        new FilesService(new S3FilesStore()),
+        runs,
+      );
+      await expect(
+        withTenant(TENANT_PCR, () =>
+          exportsSvc.exportRun({ runId: outcome.runId, format: "csv", actorId: R_ACTOR }),
+        ),
+      ).rejects.toThrowError(AssertionFailedExportBlockedError);
+    } finally {
+      // RESTORE (zero residue) — the settled stamp returns to NULL and
+      // the folded tie re-ties green.
+      await client.query(
+        `UPDATE employees SET status = 'ACTIVE', termination_date = NULL, eos_settled_amount = NULL,
+                eos_settlement_journal_entry_id = NULL
+          WHERE tenant_id = $1 AND id = $2`,
+        [TENANT_PCR, pcr.ksaEmployeeId],
+      );
+      await client.end();
+    }
+    const reRun = await withTenant(TENANT_PCR, () =>
+      newRunService().run({
+        reportKey: "payroll.eos-provision",
+        params: { locale: "en" },
+        ctx: complianceContext(TENANT_PCR),
+      }),
+    );
+    const tie = reRun.result!.assertions.find((a) => a.id === "payroll-eos-ledger-tie")!;
+    expect(tie.status).toBe("PASS");
   });
 });

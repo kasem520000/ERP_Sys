@@ -68,6 +68,19 @@ long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
    047's ledger-free waves** (payroll-module scope; keep 047 clean). Until it
    lands, the SAFE-direction block stands. See §7(d)'s dated note.
 
+   > **DELIVERED 2026-11-18 (same day, between W-0 and W-1 — the earliest
+   > discretion slot; on the W-0 head `6ffd79d`, the delivering session's
+   > fresh clone): the fold landed — the standing balance (the 029 balance +
+   > Σ eosb_calculations deltas) with its own `trueUp` column, the row
+   > universe extended to the computations, block-on-fail retained and
+   > re-proven by the seeded-drift arm, the golden re-pinned BOTH worlds (the
+   > no-true-up PAY world's legacy assertions unchanged + the true-up PCR
+   > world's new re-pin: Σ standing 42,500 == the GL). The SAFE-direction
+   > block stands down. Evidence: the gate doc
+   > `2026-11-18-maintenance-029.md` + `audit-evidence/maintenance-029/`
+   > (15 logs, same-session). The DB-suite census moves 3,436 → **3,438**
+   > (the +2 re-pin tests — the §0 baselines note, dated).**
+
 ## 0. Inputs consumed (the plan-first reads, all done — one focused pass over the W-9 head `8fab3ed`, 2026-11-18)
 
 - `docs/implementation/phases/PHASE-047.md` (spec §1–§8) · COMPLETENESS_REGISTER
@@ -99,6 +112,13 @@ long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
   **6,121** (web) + **371** (mobile) · ENTITY_CATALOG **292** table rows ·
   `check:rls` **292** · id-ledger implemented **G 54 · INV 32 · BR 87** ·
   drift 300 = 300 · docs 33/33.
+
+  > **[Dated 2026-11-18 — the 029 maintenance wave (the ruled option (A)
+  > fold, §1a item 7) moved ONE baseline number: the DB-suite census is now
+  > 250/250 files · 3,438 tests** (3,436 + the 2 true-up-world re-pin tests
+  > in payroll-compliance-reports.spec — the reporting folder 120 → 122).
+  > Every other number above is untouched; W-1's full-suite re-run carries
+  > the 3,438 expectation.]**
 
 ## 1. Settled design decisions (from the plan-first reads — binding for all waves, amendable only by the owner's dated dispatch)
 
@@ -426,7 +446,9 @@ capabilities) per the 046 gate table.
   Art. 84 text). **[Dated 2026-11-18: 0071 RULED — NO REPAIR (§1a item 6;
   the 0094 header note landed with W-0); 029 RULED — option (A) fold the
   deltas, a small standalone maintenance wave at the session's scheduling
-  discretion, NOT inside 047 (§1a item 7). The remaining items stand.]**
+  discretion, NOT inside 047 (§1a item 7) — **DELIVERED same day between
+  W-0 and W-1 (the §1a item 7 note; the SAFE-direction block stands
+  down)**. The remaining items stand.]**
 
 **NOT production approval** — the standing law. PHASE-046 stands COMPLETE
 at the W-9 head (the owner's W-8 acceptance + the W-9 repair wave); this

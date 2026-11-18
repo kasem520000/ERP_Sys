@@ -828,12 +828,19 @@ describe("payroll-rules.spec (PHASE-029 §6)", () => {
       expect(eosRows.ties.ok).toBe(true);
       // E2's provision: accrued 4,200, cash settled 4,000, released 200,
       // balance 0 (extinguished); E1's accrual 800 stays outstanding.
+      // [The ruled option-(A) standing fold (2026-11-18): this NO-true-up
+      // world's re-pin — the accumulated G-54 delta renders as its own
+      // trueUp column (the honest "0.0000" — the 4dp no-row aggregate) and
+      // the balance is the fold's no-op (accrued + 0), every legacy
+      // assertion unchanged.]
       const e2Row = eosRows.rows.find((row) => row.employeeCode === "EMP-002");
       expect(e2Row?.accrued).toBe("4200.0000");
       expect(e2Row?.settled).toBe("4000.0000");
       expect(e2Row?.released).toBe("200.0000");
+      expect(e2Row?.trueUp).toBe("0.0000");
       expect(e2Row?.balance).toBe("0.0000");
       const e1Row = eosRows.rows.find((row) => row.employeeCode === "EMP-001");
+      expect(e1Row?.trueUp).toBe("0.0000");
       expect(e1Row?.balance).toBe("800.0000");
     });
   });

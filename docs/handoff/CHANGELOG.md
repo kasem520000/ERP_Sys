@@ -1,8 +1,52 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-047 — the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0 delivered)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (THE 029 MAINTENANCE WAVE — the eos-provision ruled option-(A) fold delivered; earlier today: PHASE-047 — the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0 delivered)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-18 — **THE 029 MAINTENANCE WAVE — the eos-provision ruled
+  option-(A) fold DELIVERED** (the owner's W-9 verification +
+  plan-approval dispatch ruling; a SMALL STANDALONE maintenance wave in
+  the W-8/W-9 pattern, payroll-module scope, delivered between 047's
+  W-0 and W-1 on the W-0 head `6ffd79d` — NOT inside 047's ledger-free
+  waves; the same-session evidence rule's seventh consecutive wave,
+  this session's fresh clone): `payroll.eos-provision`'s register side
+  folds the accumulated G-54 true-up deltas — the standing model's law
+  (`balance = (unsettled ? Σ eos_accrual over POSTED runs : 0) +
+  Σ eosb_calculations.delta`), so the `payroll-eos-ledger-tie` holds in
+  EVERY world. The fold is visible (its own `trueUp` column + footer
+  total; the balance retitled "Standing balance"); the row universe
+  extends to the computations (a true-ups-only employee renders — the
+  pre-fold gap that failed the tie on their account); the tie
+  declaration names both sides' shapes; the 4dp numeric-literal
+  defaults on both aggregates (a no-row aggregate renders "0.0000",
+  never a bare "0" — a case the pre-fold universe never rendered).
+  **Block-on-fail RETAINED** (re-proven in the true-up world by the
+  seeded-drift arm: register 41,500 ≠ GL 42,500 → every export blocked
+  → the restore re-ties green). **The golden re-pinned BOTH worlds:**
+  the no-true-up PAY world (payroll-rules.spec — every legacy
+  assertion unchanged, + the trueUp 0.0000 pins) + the true-up PCR
+  world (payroll-compliance-reports.spec +2 tests — the true-ups-only
+  row 40,500.0000, Σ standing 42,500 == the GL 42,500). The W-3/W-6
+  design point RESOLVED at its contract site (the dated DELIVERED
+  note; the historical paragraph kept verbatim — the record never
+  rewritten); **the SAFE-direction block STANDS DOWN**;
+  `payroll.eosb-liability` remains the entitlement view. REPORT_CATALOG
+  re-pinned (the row's source + the notes paragraph). Gates: typecheck
+  8/8 (0 cached) · lint 8/8 (0 cached) · depcruise clean 1,939 ·
+  14,434 · unit 8/8 (api 667 · web 87 · mobile 393 · desktop 274 · ui
+  42 · contracts 56 · domain-core 38 · sync-core 36) · the pair 26/26 ·
+  the reporting folder 17 · 122/122 (chromium-1248 env-prep applied
+  mid-battery — the cold container's first run 120 passed | 2
+  browser-skips, disclosed; the re-run 122/122) · the payroll folder
+  11 · 88/88 · docs 33/33 · drift 300 = 300 · i18n 6,121 + 371 ·
+  id-ledger 0 errors + self-test OK · history-secrets 0; the full DB
+  suite NOT re-run (no migration/schema/route change — the scope-label
+  law). The DB-suite census moves **3,436 → 3,438** (the +2 re-pin
+  tests — the plan §0 baselines note, dated). Evidence:
+  [gate-evidence/2026-11-18-maintenance-029.md](../operations/gate-evidence/2026-11-18-maintenance-029.md)
+  + `audit-evidence/maintenance-029/` (15 logs). NOT production
+  approval. — PHASE-029 / DECISION
 
 - 2026-11-18 — **PHASE-047 — THE MASTER PLAN APPROVED (five binding
   amendments) + the 0071/029 rulings + W-0 (the clean-environment

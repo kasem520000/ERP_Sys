@@ -1,12 +1,12 @@
-# NEXT ACTION — PHASE-047 (HR Growth) APPROVED + W-0 DELIVERED; W-1 (the foundation wave) NEXT
+# NEXT ACTION — PHASE-047 W-0 + THE 029 MAINTENANCE WAVE DELIVERED; W-1 (the foundation wave) NEXT
 
 **THE CURRENT STATE (2026-11-18, updated at the owner's plan-approval dispatch
-+ the W-0 delivery):** PHASE-046 (HR Payroll Compliance — GOSI/PIT/EOSB,
-CR-16) stands COMPLETE (W-9 ACCEPTED at `2956c27` by the owner's W-9
-verification — the P4 flake class closed, the NF-1/2/3 record corrections
-confirmed, every gate re-proven in the verifier's fresh clone).
-**PHASE-047's MASTER PLAN IS APPROVED (2026-11-18) with FIVE BINDING
-AMENDMENTS** — recorded as §1a of
++ the W-0 delivery + the 029 maintenance-wave delivery):** PHASE-046 (HR
+Payroll Compliance — GOSI/PIT/EOSB, CR-16) stands COMPLETE (W-9 ACCEPTED at
+`2956c27` by the owner's W-9 verification — the P4 flake class closed, the
+NF-1/2/3 record corrections confirmed, every gate re-proven in the verifier's
+fresh clone). **PHASE-047's MASTER PLAN IS APPROVED (2026-11-18) with FIVE
+BINDING AMENDMENTS** — recorded as §1a of
 [`agent-ctx/PHASE-047-MASTER-PLAN.md`](PHASE-047-MASTER-PLAN.md): A-1
 probation_end approved (+ the PII registration), A-2 BR-091 confirmed with
 the dedupe-key-shape + configurable-default precision edits, A-3 the tag
@@ -14,17 +14,28 @@ the dedupe-key-shape + configurable-default precision edits, A-3 the tag
 A-5 the W-0 baseline-head precision. **Two long-standing owner inputs RULED
 in the same dispatch:** 0071 warehouses-sweep — NO REPAIR (the flag CLOSES;
 the 0094-header note landed with W-0); 029 eos-provision — option (A) fold
-the deltas, as a small standalone maintenance wave at the session's
-discretion (NOT inside 047; until it lands the SAFE-direction block
-stands). **W-0 DELIVERED same day** (the clean-environment baseline at the
+the deltas. **W-0 DELIVERED same day** (the clean-environment baseline at the
 then-current head `2956c27` per A-5: typecheck/lint 8/8, unit 8/8, the full
 DB suite 250/250 · 3,436/3,436 with one disclosed fcm-channel flake — green
 standalone + pair + full-chunk re-run, every log kept — depcruise re-based
 at 1,939 · 14,434, drift 300 = 300, check:rls 292, i18n 6,121 + 371,
 id-ledger 0 errors + self-test OK, docs 33/33, manifests 13/13;
-`audit-evidence/phase047-w0/` + the W-0 gate doc). **NEXT: W-1 — the
-foundation wave** (migrations 0095–0098 + mirrors + registry/catalog/
-permissions/i18n/feature-keys/NAV in ONE increment, per the plan §3 W-1).
+`audit-evidence/phase047-w0/` + the W-0 gate doc). **THE 029 MAINTENANCE
+WAVE DELIVERED same day, between W-0 and W-1** (the ruled option (A) on the
+W-0 head `6ffd79d`: the eos-provision register side folds the accumulated
+G-54 true-up deltas — the standing model's law, its own `trueUp` column, the
+row universe extended to the computations; block-on-fail retained and
+re-proven by the seeded-drift arm; the golden re-pinned BOTH worlds — the
+no-true-up PAY world's legacy assertions unchanged + the true-up PCR
+world's new re-pin (Σ standing 42,500 == the GL); the pair 26/26, the
+reporting folder 17 · 122/122, the payroll folder 11 · 88/88, unit 8/8,
+typecheck/lint 8/8, depcruise 1,939 · 14,434, docs 33/33, drift 300, i18n
+6,121 + 371, id-ledger 0 errors + self-test OK — `2026-11-18-maintenance-
+029.md` + `audit-evidence/maintenance-029/`; **the SAFE-direction block
+STANDS DOWN**; the DB-suite census moves 3,436 → 3,438, the +2 re-pin
+tests). **NEXT: W-1 — the foundation wave** (migrations 0095–0098 + mirrors
++ registry/catalog/permissions/i18n/feature-keys/NAV in ONE increment, per
+the plan §3 W-1).
 The prior state (2026-11-18, the W-9 closure + the 047 plan delivery) stands
 as recorded below:
 **W-6 VERIFIED & APPROVED by the owner's independent re-proof** (a fresh clone,
@@ -118,17 +129,19 @@ wave delivered on the W-6 head `a83874f`:
   directs the moment the text arrives — no PHASE-045 task opens.
 - **The 029-era `payroll.eos-provision` report's semantic update — RULED
   2026-11-18 (the owner's W-9 verification dispatch): option (A), fold the
-  deltas.** The report's register side folds the accumulated G-54 true-up
-  deltas (aligning with the standing model so it ties in every world);
-  block-on-fail retained; the 029 golden re-pinned in the true-up world.
-  Delivered as a SMALL STANDALONE maintenance wave (the W-8/W-9 pattern) at
-  the delivering session's scheduling discretion — NOT inside 047's
-  ledger-free waves (payroll-module scope; keep 047 clean). **Until that
-  wave lands, the SAFE-direction block stands** (the W-3/W-6 design point,
-  recorded at its contract site with the ruling, dated 2026-11-18; on a
-  true-ups tenant the register fold no longer ties to the GL alone —
-  block-on-fail engages; `payroll.eosb-liability` remains the 046-correct
-  view).
+  deltas — DELIVERED same day (the standalone maintenance wave between W-0
+  and W-1, on the W-0 head `6ffd79d`).** The report's register side folds
+  the accumulated G-54 true-up deltas (the standing model's law — its own
+  `trueUp` column, the row universe extended to the computations), so the
+  `payroll-eos-ledger-tie` holds in every world; block-on-fail retained
+  (the seeded-drift arm re-proven); the golden re-pinned BOTH worlds (the
+  no-true-up PAY world's legacy assertions unchanged + the true-up PCR
+  world's new re-pin). **The SAFE-direction block STANDS DOWN** (the
+  W-3/W-6 design point is resolved — its record stays at the contract site
+  with the dated DELIVERED note; `payroll.eosb-liability` remains the
+  entitlement view). Evidence:
+  [gate-evidence/2026-11-18-maintenance-029.md](../docs/operations/gate-evidence/2026-11-18-maintenance-029.md)
+  + `audit-evidence/maintenance-029/` (15 logs, same-session).
 - **The 0071 warehouses-sweep ruling — RULED 2026-11-18 (the owner's W-9
   verification dispatch): NO REPAIR; the flagged item CLOSES as
   ruled-no-action.** The owner read the migration and the runtime paths:
