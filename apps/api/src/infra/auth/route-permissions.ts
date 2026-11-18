@@ -4348,6 +4348,146 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "hr.self_service",
     self: true,
   },
+
+  // PHASE-047 (W-2 — matrix §3.25, the 0098 §1 seed): the talent
+  // performance + goals families. The family-cluster mapping (the
+  // matrix's guarded-routes note): the performance plane's reads ride
+  // hr.performance.view (the scorecard's framework data included — the
+  // accountant's read plane); the manage-side writes (cycle lifecycle,
+  // calibration, goal authoring, the competency dictionary) ride
+  // hr.performance.manage; the OWN-ROWS acts (draft/submit reviews,
+  // the own goals read, the KRI progress triage) ride
+  // hr.performance.review — the reviewer/owner identity is resolved
+  // from the acting user through the identity bridge at the service
+  // boundary (never a client-supplied id); the competency dictionary's
+  // writes ride hr.competency.manage. BR-090's law holds at the
+  // service boundary: the aggregate-360 read returns only the ≥ 3
+  // per-relationship aggregates — never an attributed source.
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/cycles",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/performance/cycles",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/performance/cycles/:id",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/cycles/:id/activate",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/cycles/:id/calibrate",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/cycles/:id/close",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/performance/cycles/:id/reviews",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/performance/cycles/:id/reviews/:revieweeId/aggregate-360",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/reviews/draft",
+    permission: "hr.performance.review",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/reviews/submit",
+    permission: "hr.performance.review",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/performance/reviews/own",
+    permission: "hr.performance.review",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/performance/reviews/calibrate",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/competencies",
+    permission: "hr.competency.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/competencies",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/competencies/:id",
+    permission: "hr.competency.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/competencies/:id/activate",
+    permission: "hr.competency.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/competencies/:id/deactivate",
+    permission: "hr.competency.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/competencies/levels",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/competencies/levels/:level",
+    permission: "hr.competency.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/goals",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/goals/:id",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/goals/tree",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/goals/own",
+    permission: "hr.performance.review",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/goals/:id/progress",
+    permission: "hr.performance.review",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/goals/validate",
+    permission: "hr.performance.view",
+  },
 ];
 
 /**

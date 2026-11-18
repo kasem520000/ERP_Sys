@@ -206,6 +206,24 @@ export const payrollAtomicKeys = {
   },
 } as const;
 
+/** PHASE-047 (W-2) — the talent key space, the SAME floor: the CYCLE
+ * gate. Every performance-engine writer with a check-then-write window
+ * over a cycle's state takes the cycle's ONE key BEFORE its guard
+ * read — the lifecycle CAS transitions (activate/calibrate/close), the
+ * review draft/submit/calibrate acts (the ACTIVE-window check), and
+ * every goal write (the DRAFT/ACTIVE window check + the D-09
+ * re-parent walk over the cycle's tree) — so a goal write can never
+ * interleave with a calibrating transition and two re-parent moves can
+ * never both pass the cycle guard on the same stale read (the payroll
+ * run gate's exact discipline; the CAS UPDATE itself remains the state
+ * machine's truth — the lock closes the window, the CAS refuses the
+ * stale write). */
+export const talentAtomicKeys = {
+  cycle(cycleId: string): string {
+    return `talent.cycle|${canonicalUuid(cycleId)}`;
+  },
+} as const;
+
 // -- the reservation ledger (the no-expansion law) -----------------------------------
 
 /** The typed refusal for the deadlock recipe: a transaction trying to
@@ -371,4 +389,17 @@ export async function lockPayrollRun(runId: string): Promise<void> {
  * one lock, so the standing provision never double-counts. */
 export async function lockPayrollEosbEmployee(employeeId: string): Promise<void> {
   await lockHrKeys([payrollAtomicKeys.eosbEmployee(employeeId)]);
+}
+
+// -- the talent gates (PHASE-047 W-2 — the same floor) --------------------------------
+
+/** THE CYCLE gate: the performance engine's serialization point —
+ * every check-then-write window over a cycle's state (the lifecycle
+ * CAS transitions, the review acts' ACTIVE-window check, the goal
+ * writes' DRAFT/ACTIVE window + the D-09 re-parent walk) runs under
+ * the cycle's ONE key, so the guard reads see committed state and the
+ * CAS/conditional writes refuse anything raced or stale (the payroll
+ * run gate's discipline — see talentAtomicKeys). */
+export async function lockTalentCycle(cycleId: string): Promise<void> {
+  await lockHrKeys([talentAtomicKeys.cycle(cycleId)]);
 }

@@ -1,0 +1,10 @@
+
+ RUN  v3.2.7 /home/z/erp_047_w2/apps/api
+
+No test files found, exiting with code 1
+
+filter: src/__db__/hr/__nonexistent-proof__.spec.ts
+include: src/**/*.spec.ts
+exclude:  src/__db__/**
+
+VITEST_EXIT=1

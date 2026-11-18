@@ -1,0 +1,52 @@
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/mobile:lint: cache bypass, force executing 0e52617567c73a8b
+@erp/api:lint: cache bypass, force executing ffc89b7b5b283fa9
+@erp/domain-core:lint: cache bypass, force executing 675058801ef777da
+@erp/contracts:lint: cache bypass, force executing 13ed6b896bb32d88
+@erp/web:lint: cache bypass, force executing 1f7060a0607158bd
+@erp/sync-core:lint: cache bypass, force executing 30f71f0c96ea1a4c
+@erp/desktop:lint: cache bypass, force executing 7c443977e82a6fdf
+@erp/ui:lint: cache bypass, force executing f7f19d9421c8ccbb
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/erp_047_w2/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/erp_047_w2/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/erp_047_w2/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/erp_047_w2/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/erp_047_w2/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/erp_047_w2/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/erp_047_w2/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/erp_047_w2/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    42.726s 
+
+EXIT=0

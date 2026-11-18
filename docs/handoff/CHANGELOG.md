@@ -1,9 +1,60 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-047 W-1 — the foundation wave delivered: migrations 0095–0098 + every mirror in ONE increment; earlier today: the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-047 W-2 — the performance + goals engines delivered + the NF-4/NF-5 record fixes; earlier today: W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-18 — **PHASE-047 W-2 — THE PERFORMANCE + GOALS ENGINES
+  DELIVERED** (T-05 + T-06, the plan §3 W-2; on the W-1 head
+  `786636a`, this session's fresh clone — the same-session evidence
+  rule's NINTH consecutive wave): the PURE layer first
+  (`hr/domain/talent-math.ts` — aggregate360/visible360 (BR-090's
+  per-relationship {count, mean, min, max} + the ≥ 3 filter),
+  goalWeightSum/weightsExactly100 (BR-089's exact scaled-integer law),
+  rollupGoalProgress (ONE half-up rounding point at the total),
+  expectedPctThrough + triageKriProgress (the KRI pace fold),
+  wouldCreateCycle (D-09's bounded walk) — 17 unit tests; **the
+  unit-first law caught a real infinite-loop bug** in the guard's
+  first shape (`!seen.add(cursor)` is always truthy — the walk never
+  terminated on a pre-existing loop; fixed `has`-before-`add` BEFORE
+  any consumer landed)); the talent store (every write a conditional
+  statement — the cycle CAS, the review upsert's WHERE-immutable, the
+  submit CAS, the goals' tri-state update); the performance engine
+  (the one-way DRAFT→ACTIVE→CALIBRATION→CLOSED ladder under the NEW
+  `talent.cycle` T-20 gate on the SAME atomic floor; validation-first
+  review submission with the window/scope/scorecard laws + BR-089's
+  zero-residue gate; the BR-090 aggregate read + the typed 422; the
+  calibration act; the competency framework's CRUD) + the goals engine
+  (the cascade with the D-09 re-parent guard + the same-cycle parent
+  law + the natural key (CANCELLED keeps its title slot); the KRI
+  progress triage as the own-rows act; BR-089's explicit check); 25
+  routes on the matrix §3.25 keys (+25 ROUTE_PERMISSIONS rows, 920 →
+  945; the in-phase error-filter registration — the SF-027-001
+  lesson); the DB spec 14/14 incl. **the CAS race as a real
+  two-transaction duel** (the loser's WHERE re-evaluates against the
+  winner's commit — zero rows, one version bump), BR-089/090 BOTH
+  WAYS, the end-to-end cycle (acceptance #2 — the exact rollup
+  52.50/65.00 worked examples, the CLOSED immutability), the KRI
+  triage, the cascade, the framework, the tenant boundary. **THE
+  NF-4/NF-5 RECORD FIXES (the owner's W-1 verification findings)
+  delivered with the wave:** the dated false-stamp notes at the W-0/W-1
+  gate docs' claim sites (both red logs' `VITEST_EXIT=0` stamps were
+  false — the captures ran without pipefail and stamped the TEE's 0)
+  + **the structural fix `scripts/capture-evidence.sh`** (pipefail +
+  `PIPESTATUS[0]`; the controlled-red self-test proof: a real vitest
+  red stamps `VITEST_EXIT=1`; every W-2 evidence log is
+  wrapper-captured) + the 25→23-files dated correction in the plan's
+  W-1 DELIVERED note (NF-6: chat-only, no repo change). Gates:
+  typecheck/lint 8/8 · depcruise 1,949 · 14,495 (+8 modules) · unit
+  8/8 (api 59 files · 684) · the new spec + the hr (14 · 97) + payroll
+  (11 · 88) + isolation/identity (6 · 1,747) folders green · check:rls
+  scratch 306/0 · drift 312 = 312 · i18n 6,125 + 371 · manifests 13/13
+  · docs 33/33 · id-ledger 0 errors · history-secrets 0 · capabilities
+  agree · shells PASS · boundary PASS (the full DB suite does not
+  re-run this wave — the scope-label law; W-7's expectation 251 files
+  · 3,536). Evidence: the [W-2 gate
+  doc](../operations/gate-evidence/2026-11-18-phase047-w2.md) +
+  `audit-evidence/phase047-w2/` (22 wrapper-captured logs). — PHASE-047
 - 2026-11-18 — **PHASE-047 W-1 — THE FOUNDATION WAVE DELIVERED**
   (T-01 + T-02 + T-03 + T-04, the plan §3 W-1; on the 029-wave head
   `e6e61a1`, this session's fresh clone — the same-session evidence

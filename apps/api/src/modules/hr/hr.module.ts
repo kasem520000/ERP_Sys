@@ -13,6 +13,8 @@ import { AttendanceService } from "./application/attendance-service";
 import { OvertimeService } from "./application/overtime-service";
 import { SelfServiceService } from "./application/self-service-service";
 import { ShiftService } from "./application/shift-service";
+import { TalentGoalsService } from "./application/talent-goals-service";
+import { TalentPerformanceService } from "./application/talent-performance-service";
 import { AttendanceImportController } from "./presentation/attendance-import.controller";
 import { AttendanceController } from "./presentation/attendance.controller";
 import { BridgeController } from "./presentation/bridge.controller";
@@ -23,6 +25,8 @@ import { LeaveController } from "./presentation/leave.controller";
 import { HolidayController } from "./presentation/holiday.controller";
 import { OvertimeController } from "./presentation/overtime.controller";
 import { SelfServiceController } from "./presentation/self-service.controller";
+import { TalentGoalsController } from "./presentation/talent-goals.controller";
+import { TalentPerformanceController } from "./presentation/talent-performance.controller";
 
 /**
  * HR module (PHASE-045 — HR Core: attendance, leaves & shifts). T-03
@@ -46,11 +50,20 @@ import { SelfServiceController } from "./presentation/self-service.controller";
  * seam) — the plan's posting-canon extension (JOURNAL_RULES §7), the
  * payroll module's own dependency shape; the leave family's ONLY
  * ledger surfaces.
+ *
+ * PHASE-047 (W-2 — T-05 + T-06): the talent engines join the module —
+ * TalentPerformanceService (the cycle lifecycle CAS, the review
+ * submission, the BR-090 aggregate read, the calibration, the
+ * competency framework) + TalentGoalsService (the cascade tree with
+ * the D-09 guard, BR-089's check, the KRI triage) and their two
+ * controllers (matrix §3.25's keys). Ledger-free by design (D-05): the
+ * talent plane adds no ledger surface — the accounting imports above
+ * stay the leave family's alone.
  */
 @Module({
   imports: [AuditModule, AccountingModule, ConfigurationModule],
-  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController, SelfServiceController],
-  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService],
-  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService],
+  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController, SelfServiceController, TalentPerformanceController, TalentGoalsController],
+  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService],
+  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService],
 })
 export class HrModule {}

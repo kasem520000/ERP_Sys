@@ -1,6 +1,6 @@
-# NEXT ACTION — PHASE-047 W-1 (the foundation wave) DELIVERED; W-2 (the performance + goals engines) NEXT
+# NEXT ACTION — PHASE-047 W-2 (the performance + goals engines) DELIVERED; W-3 (recruitment + training/org + documents + the sweep) NEXT
 
-**THE CURRENT STATE (2026-11-18, updated at the W-1 delivery):** PHASE-046
+**THE CURRENT STATE (2026-11-18, updated at the W-2 delivery):** PHASE-046
 stands COMPLETE (W-9 ACCEPTED at `2956c27`). **PHASE-047's master plan
 APPROVED with the five binding amendments** (§1a of
 [`agent-ctx/PHASE-047-MASTER-PLAN.md`](PHASE-047-MASTER-PLAN.md)); the two
@@ -35,13 +35,48 @@ manifests 13/13 · docs 33/33 · id-ledger 0 errors + self-test OK ·
 history-secrets 0 · capabilities agree · shells PASS · the negative
 boundary PASS — [W-1
 evidence](../docs/operations/gate-evidence/2026-11-18-phase047-w1.md) +
-`audit-evidence/phase047-w1/`. **NEXT: W-2 — the performance + goals
-engines** (T-05 + T-06: the cycle lifecycle CAS, the review submission,
-the D-08 pure 360 aggregation with BR-090 proven both ways, the
-calibration; the goals cascade + the BR-089 weight-sum typed law + the
-KRI rollup).
-The prior state (2026-11-18, the W-9 closure + the 047 plan delivery) stands
-as recorded below:
+`audit-evidence/phase047-w1/`. **W-2 — THE PERFORMANCE + GOALS ENGINES — DELIVERED 2026-11-18** on
+the W-1 head `786636a` (this session's fresh clone, the same-session
+evidence rule's ninth consecutive wave): the PURE layer first
+(`talent-math.ts` — aggregate360/visible360 (BR-090), the weight-sum
+law (BR-089), the rollup, the pace fold + the KRI triage,
+wouldCreateCycle (D-09); 17 unit tests — **the unit-first law caught a
+real infinite-loop bug in the guard's first shape (`!seen.add` is
+always truthy — the walk never terminated) BEFORE any consumer
+landed**), the talent store (every write conditional: the cycle CAS,
+the review upsert's WHERE-immutable, the submit CAS, the tri-state
+goal update), the two engines (the one-way CAS ladder under the T-20
+`talent.cycle` gate on the SAME atomic floor; validation-first
+submission with BR-089's zero-residue gate; the BR-090 aggregate read
++ the typed 422; the calibration act; the competency framework's
+CRUD), 25 routes on the §3.25 keys (+25 ROUTE_PERMISSIONS rows; the
+in-phase error-filter registration), and the DB spec 14/14 — **the CAS
+RACE as a real two-transaction duel** (zero rows for the loser, one
+version bump), **BR-089/090 both ways**, the end-to-end cycle
+(acceptance #2: 40@50 + 60@75 = 65.00 through close + the CLOSED
+immutability), the KRI triage, the cascade + D-09, the framework, the
+tenant boundary. **THE NF-4/NF-5 RECORD FIXES delivered**: the two
+dated false-stamp notes at the W-0/W-1 gate docs + the STRUCTURAL
+capture wrapper `scripts/capture-evidence.sh` (pipefail +
+PIPESTATUS[0]; the controlled-red self-test — a real vitest red
+stamps VITEST_EXIT=1; every W-2 log wrapper-captured) + the 25→23
+dated correction in the plan's W-1 note (NF-6: chat-only, no repo
+change). Gates: typecheck/lint 8/8 · depcruise 1,949 · 14,495 (+8) ·
+unit 8/8 (api 59 · 684) · the new spec + hr (14 · 97) + payroll (11 ·
+88) + isolation/identity (6 · 1,747) folders green · check:rls
+scratch 306/0 · drift 312 = 312 · i18n 6,125 + 371 · manifests 13/13
+· docs 33/33 · id-ledger 0 errors · history-secrets 0 · capabilities
+agree · shells PASS · boundary PASS (the full DB suite does not re-run
+— the scope-label law; W-7's expectation 251 files · 3,536) — [W-2
+evidence](../docs/operations/gate-evidence/2026-11-18-phase047-w2.md)
++ `audit-evidence/phase047-w2/` (22 wrapper-captured logs). **NEXT:
+W-3 — the recruitment + training/org + documents wave** (T-07 + T-08 +
+T-09: BR-088's monotonic pipeline + the recorded reopen + the
+hire→employee link, the interview scorecards per panelist per round,
+the training/certifications registers, the org tree with the same D-09
+guard, the employee documents, and the `hr-expiry-sweep` job (D-06 —
+the four probes, 30/7/0, the structural dedupe key)).
+The prior state (2026-11-18, the W-1 delivery) stands as recorded below:
 **W-6 VERIFIED & APPROVED by the owner's independent re-proof** (a fresh clone,
 clean caches, embedded PG16 — every number matched: typecheck + lint 16/16
 tasks · api unit 666/666 · the payroll folder 84/84 incl.

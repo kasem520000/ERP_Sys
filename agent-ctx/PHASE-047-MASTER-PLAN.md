@@ -127,6 +127,16 @@ long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
   > clone 1,941 · 14,439 (+2 modules). The report registry stays 106 (the
   > four contracts are W-6's).]**
 
+  > **[Dated 2026-11-18 (W-2 delivered) — the engines wave moved the
+  > mid-suite numbers: depcruise fresh-clone 1,949 · 14,495 (+8
+  > modules: the six new src files + the two new specs) · unit api 59
+  > files · 684 (+17 pure tests) · ROUTE_PERMISSIONS 920 → 945 (+25
+  > rows) · the DB suite's W-7 full-run expectation 251 files · 3,536
+  > (250 · 3,522 + the new spec's 14). Unchanged: the journal (0098),
+  > permissions (312), i18n (6,125 + 371 — the screens are W-5's),
+  > ENTITY_CATALOG/check:rls (306 — no schema delta), the report
+  > registry (106 — W-6's), docs 33/33.]**
+
 ## 1. Settled design decisions (from the plan-first reads — binding for all waves, amendable only by the owner's dated dispatch)
 
 **D-01 — The talent layer attaches to the FROZEN employees substrate, never
@@ -338,6 +348,14 @@ i18n parity green; `check:rls` clean at 306.
 > the dated notes. Evidence: the W-1 gate doc +
 > `audit-evidence/phase047-w1/` (25 logs incl. the db-suite chunks).**
 
+> **[Dated 2026-11-18 (W-2) — the NF-5 correction, the owner's W-1
+> verification finding: the bundle count above is 23 FILES, not 25.
+> The "25" counted directory-listing entries (23 files + 2
+> directories); the same 25-vs-23 imprecision rode W-1's commit
+> message (immutable history — this note is the claim site's dated
+> correction, the F1 law). The bundle itself is unchanged: 23 files,
+> every one kept and verified.]**
+
 ### W-2 — The performance + goals engines (T-05 + T-06, orchestrator)
 Cycle lifecycle (DRAFT→ACTIVE→CALIBRATION→CLOSED with CAS on the state),
 review submission, the 360 aggregation (D-08 — pure, unit-tested first),
@@ -346,6 +364,46 @@ progress rollup.
 **Exit:** the engines' laws pinned by unit + DB specs (§4); acceptance #2's
 end-to-end cycle green; BR-090 proven both ways (aggregate shown, source
 hidden below threshold).
+
+> **DELIVERED 2026-11-18 (on the W-1 head `786636a`, this session's
+> fresh clone — the same-session evidence rule's ninth consecutive
+> wave): every exit criterion met — the pure layer FIRST
+> (`talent-math.ts`: aggregate360/visible360, the weight-sum law, the
+> rollup, the pace fold + triage, wouldCreateCycle — 17 unit tests;
+> the unit-first law caught a real infinite-loop bug in the guard's
+> first shape (`!seen.add` is always truthy) BEFORE any consumer
+> landed, recorded in the spec's header), the store (every write a
+> conditional statement: the cycle CAS, the review upsert's
+> WHERE-immutable, the submit CAS, the goals' tri-state update), the
+> two engines (the one-way CAS ladder + the T-20 `talent.cycle` gate
+> on the SAME atomic floor; validation-first submission with BR-089's
+> zero-residue gate; the BR-090 aggregate read with the typed 422;
+> the calibration act; the competency framework's CRUD), 25 routes on
+> the §3.25 keys (+25 ROUTE_PERMISSIONS rows; the in-phase error
+> filter registration), and the DB spec 14/14 (the plan §4's
+> `talent-performance.db.spec`: the CAS RACE as a real
+> two-transaction duel — zero rows for the loser, one version bump;
+> BR-089/090 both ways; the end-to-end cycle (acceptance #2) incl.
+> the exact rollup worked examples (52.50 / 65.00) and the CLOSED
+> immutability; the KRI triage over crafted windows; the cascade +
+> D-09; the framework; the tenant boundary). THE NF-4/NF-5 RECORD
+> FIXES delivered with the wave: the two dated false-stamp notes at
+> the W-0/W-1 gate docs' claim sites + the structural capture wrapper
+> `scripts/capture-evidence.sh` (the controlled-red self-test proof —
+> a real vitest red stamps VITEST_EXIT=1; every W-2 log is
+> wrapper-captured) + the 25→23-files dated correction in W-1's
+> DELIVERED note (NF-6 chat-only, no repo change). Gates: typecheck
+> 8/8 · lint 8/8 · depcruise 1,949 · 14,495 (+8 modules, the
+> disclosure law) · unit 8/8 (api 59 · 684) · the new spec + the hr
+> (14 · 97) + payroll (11 · 88) + isolation/identity (6 · 1,747)
+> folders green · check:rls scratch 306/0 · drift 312 = 312 · i18n
+> 6,125 = 6,125 + 371 · manifests 13/13 · docs 33/33 · id-ledger 0
+> errors · history-secrets 0 · capabilities agree · shells PASS ·
+> boundary PASS. The full DB suite does not re-run (the scope-label
+> law — no migration/schema delta; W-7's expectation moves to 251
+> files · 3,536). Evidence: the W-2 gate doc +
+> `audit-evidence/phase047-w2/` (22 logs, every one wrapper-captured,
+> incl. the self-test proof).**
 
 ### W-3 — Recruitment + training/org + documents + the sweep (T-07 + T-08 + T-09, orchestrator)
 The pipeline with monotonic stages (BR-088) + the recorded reopen + hire→
@@ -447,6 +505,14 @@ capabilities) per the 046 gate table.
    observed plan verbatim — never force a plan, never isolate the context.
 9. The evidence-log capture convention (NF-3): every log carries
    `VITEST_EXIT=N`/`EXIT=N` under `set -o pipefail`.
+   **[Dated 2026-11-18 (W-2) — the NF-4 repair: the convention is now
+   STRUCTURAL, not aspirational — every evidence log is captured
+   through `scripts/capture-evidence.sh` (pipefail + `PIPESTATUS[0]`
+   + the stamp reads the run command's OWN exit code; a controlled
+   red run stamps `VITEST_EXIT=1` — the self-test proof
+   `audit-evidence/phase047-w2/capture-wrapper-selftest.log`). The
+   two false-stamp red logs (W-0's chunk-02, W-1's chunk-01) carry
+   their dated corrections at their gate docs' claim sites.]**
 
 ## 7. Open inputs for the owner (none block plan approval; (a) is the one scope decision)
 

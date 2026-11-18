@@ -432,6 +432,28 @@ import { FeedPeriodNotFoundError } from "../../modules/hr/domain/feed-errors";
 // LEAVE_ENCASHMENT_INSUFFICIENT · LEAVE_ENCASHMENT_INVALID) fall
 // through to the 422 default BY DESIGN — no imports needed; the
 // not-founds reuse the 404 rows (leave type / employee / period).
+// PHASE-047 (W-2, in-phase — the SF-027-001 lesson): the talent
+// taxonomy's consumed families. The 404s (A7 parity — unknown ==
+// foreign, no existence disclosure): cycle / competency / competency
+// level. The 409 lifecycle conflicts: the cycle CAS family
+// (CYCLE_STATE_CONFLICT — a raced or stale ladder move), the submitted
+// review's immutability (REVIEW_ALREADY_SUBMITTED), the taken code
+// (TALENT_CODE_TAKEN). The 422 fail-closed family (BR-088/089/090's
+// laws, D-09's cycle guard, the shape family TALENT_INVALID,
+// COMPETENCY_SCALE_INVALID, and the W-2-consumed
+// FeedbackBelowThresholdError/GoalWeightsInvalidError) fall through
+// to the 422 default BY DESIGN — validation/policy refusals, never
+// lifecycle conflicts. The recruitment/training/org not-founds
+// (vacancy/applicant/program/org-unit/position/document) join with
+// the W-3 engines that consume them.
+import {
+  CompetencyLevelNotFoundError,
+  CompetencyNotFoundError,
+  CycleStateConflictError,
+  ReviewAlreadySubmittedError,
+  TalentCodeTakenError,
+  TalentCycleNotFoundError,
+} from "../../modules/hr/domain/talent-errors";
 
 /**
  * ERROR_MODEL exception filter: the single error envelope —
@@ -778,6 +800,29 @@ function domainStatus(error: DomainError): number {
   if (
     error instanceof BridgeAlreadyLinkedError ||
     error instanceof BridgeNotLinkedError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-047 (W-2, in-phase): the talent not-founds — 404 (A7 parity:
+  // unknown == foreign, no existence disclosure). The W-2-consumed
+  // three; the recruitment/training/org family joins with W-3's
+  // engines.
+  if (
+    error instanceof TalentCycleNotFoundError ||
+    error instanceof CompetencyNotFoundError ||
+    error instanceof CompetencyLevelNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
+  // PHASE-047 (W-2, in-phase): the talent lifecycle conflicts — 409
+  // (the cycle CAS ladder's raced/stale move, the submitted review's
+  // immutability until calibration, the taken code). The 422
+  // fail-closed family (BR-088/089/090's laws, D-09's cycle guard,
+  // the shape family) falls through to the 422 default BY DESIGN.
+  if (
+    error instanceof CycleStateConflictError ||
+    error instanceof ReviewAlreadySubmittedError ||
+    error instanceof TalentCodeTakenError
   ) {
     return HttpStatus.CONFLICT;
   }
