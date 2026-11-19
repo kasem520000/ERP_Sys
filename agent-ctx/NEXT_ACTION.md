@@ -1,21 +1,31 @@
-# NEXT ACTION — PHASE-047 COMPLETE (all eight waves delivered, the triple flip + the archive + the tag landed 2026-11-19); PHASE-048 (Projects & Contracting) NEXT
+# NEXT ACTION — PHASE-048 MASTER PLAN PROPOSED (delivered 2026-11-19, this session — awaiting the owner's approval; NO CODE WAVE before it, the owner's binding condition 1)
 
 **THE PHASE-047 CLOSURE (2026-11-19, W-7 on the W-6 head `e76bbd0` + this wave's docs):** all eight waves delivered — W-0 the clean-environment baseline · W-1 the foundation (migrations 0095–0098 + every mirror/registry/catalog/matrix/pin) · W-2 the performance + goals engines (BR-089/090, the CAS ladder, the capture wrapper) · W-3 the recruitment + training/org + documents + the sweep (BR-088, D-09, BR-091, migration 0099, the NF-7/NF-8 fixes) · W-4 the external bridges + the NF-9/NF-10/NF-11 fixes · W-5 the web plane (the four families + the 360 + the four composition reads + 308 i18n keys) · W-6 the reports + proof wave (the four contracts — registry 106 → 110; the talent RLS suite; the OA-06 budgets; THE VITEST SUMMARY GUARD — the second NF-4-class repair) · **W-7 the closure: the canon docs (BUSINESS_RULES BR-088…091 with amendment A-2's confirmed wording · NAVIGATION_MODEL's four rows + the LIVE row · FEATURE_CATALOG's talent rows · the HR talent TABLES doc · the PHASE_ACCEPTANCE_CRITERIA §PHASE-047 entry) + THE ID_LEDGER FLIP (BR-001…091, the self-test all-probes-OK) + the full gate sweep at the final head (typecheck/lint 8/8 · depcruise 1,993 · 14,855 · unit 8/8 · **THE FULL DB SUITE 259/259 · 3,623/3,623 · 0 failed · 0 skipped** — the smoke 3 · 1,717 + the perf 6 · 22 + 83 · 641 + 77 · 511 + 90 · 732 chunks; check:rls scratch 307/0 · drift 312 = 312 · i18n 6,433 + 371 · docs 33/33 · manifests 13/13 · id-ledger 0 + self-test OK · secrets 0 · capabilities agree · shells PASS · the boundary PASS) + the completion report + THE TRIPLE FLIP (the phase doc header · the IMPLEMENTATION_STATUS row · this file) + the archive `ERP_PLATFORM_PHASE047.zip` (OA-07, the members byte-verified) + THE TAG `phase/047`**. The completion report: `docs/implementation/phases/reports/PHASE-047-COMPLETION.md`. The W-7 evidence: `docs/operations/gate-evidence/2026-11-19-phase047-w7.md` + `audit-evidence/phase047-w7/`.
 
-**NEXT — PHASE-048 (Projects & Contracting, CR-18):** read the phase doc
-(`docs/implementation/phases/PHASE-048.md`) + the register row; the ID_LEDGER
-reservations stand (G-55…58 · INV-033 · BR-092…096); the 047 handoff notes
-(the completion report §6): `positions` (with grades and cost bands) + the
-employee master are the picker source for `project_resource_allocations`;
-the 360 extension is the allocating surface; the org tree's materialized
-paths roll project rollups. The first wave is the plan-authoring wave (the
-046/047 pattern: read the phase doc + the gap-analysis sections + the
-register constraints → the master plan with the binding-amendment slots →
-the owner's approval). **Standing constraints carried:** the same-session
-evidence rule (thirteen consecutive waves and counting) · the scope-label
-law · §7(b)'s three 045 remarks (the owner's open input) · RISK-031/032
-OPEN · the register's exactly-two narrowed items · the 045 self-board Tabs
-defect (the owner dispatches) · **NOT production approval**.
+**NEXT — PHASE-048 (Projects & Contracting, CR-18): THE MASTER PLAN IS
+DELIVERED AND PROPOSED** — `agent-ctx/PHASE-048-MASTER-PLAN.md` (this
+session's fresh clone at the remote head `5b73bd1`, the same-session
+evidence rule's FIFTEENTH consecutive wave; the evidence envelope
+`audit-evidence/phase048-plan/` — 20 logs incl. the FULL DB SUITE
+259/259 · 3,621 passed | 2 skipped green this session and the NF-9
+RED/GREEN protocol pre-verified). Per the owner's 2026-11-19
+authorization dispatch: **the plan is the first deliverable and the code
+waves (W-8…W-15 over T-01…T-20, migrations 0100–0103, G-55…G-58 ·
+INV-033 · BR-092…096) open ONLY at the owner's approval dispatch.** The
+plan carries the four binding conditions as red lines §6.10–§6.12 + the
+ledger reconciliation (§0a: the dispatch's W-3 anchor vs the delivered
+W-4…W-7; the phase/047 tag at `5b73bd1` standing per the dispatch's own
+permanence law) + the NF-9 blocking-item mapping (§0b: the fix in
+`83362ff` + the (d4) adversarial arm, RED on `7d22c49` / GREEN on the
+current head, the verifier's exact commands recorded; the W-8 fallback
+arm on dispatch). **The owner's approval rulings awaited (§7):** (a)
+the 047 boundary + the tag · (b) the W-8 wave numbering · (c) the
+closure tag `phase/048` · (d) the NF-9 verifier confirmation. **Standing
+constraints carried:** the same-session evidence rule (fourteen
+consecutive waves and counting) · the scope-label law · §7(b)'s three
+045 remarks (the owner's open input) · RISK-031/032 OPEN · the
+register's exactly-two narrowed items · the 045 self-board Tabs defect
+(the owner dispatches) · **NOT production approval**.
 
 **THE WAVE STATE (2026-11-19, updated at the W-6 delivery):** W-0
 through W-5 delivered (the foundation, the engines, the recruitment +

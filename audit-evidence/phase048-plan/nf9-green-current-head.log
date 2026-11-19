@@ -1,0 +1,86 @@
+
+> @erp/api@0.1.0 test:db /home/z/erp-p48/apps/api
+> vitest run --config vitest.db.config.ts src/__db__/hr/talent-training-org.db.spec.ts
+
+
+ RUN  v3.2.7 /home/z/erp-p48/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/erp-p48/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 21:59:43.047 UTC [3931] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 21:59:43.047 UTC [3931] LOG:  listening on IPv6 address "::1", port 44529
+2026-11-19 21:59:43.047 UTC [3931] LOG:  listening on IPv4 address "127.0.0.1", port 44529
+
+2026-11-19 21:59:43.047 UTC [3931] LOG:  listening on Unix socket "/tmp/.s.PGSQL.44529"
+
+2026-11-19 21:59:43.048 UTC [3934] LOG:  database system was shut down at 2026-11-19 21:59:43 UTC
+
+2026-11-19 21:59:43.050 UTC [3931] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/hr/talent-training-org.db.spec.ts (10 tests) 228ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  21:59:42
+   Duration  5.79s (transform 571ms, setup 0ms, collect 1.34s, tests 228ms, environment 0ms, prepare 70ms)
+
+2026-11-19 21:59:47.873 UTC [3931] LOG:  received fast shutdown request
+2026-11-19 21:59:47.873 UTC [3931] LOG:  aborting any active transactions
+
+2026-11-19 21:59:47.873 UTC [4017] FATAL:  terminating connection due to administrator command
+
+2026-11-19 21:59:47.875 UTC [3931] LOG:  background worker "logical replication launcher" (PID 3937) exited with exit code 1
+2026-11-19 21:59:47.876 UTC [3932] LOG:  shutting down
+2026-11-19 21:59:47.876 UTC [3932] LOG:  checkpoint starting: shutdown immediate
+
+(node:3996) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:3996) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-19 21:59:47.899 UTC [3932] LOG:  checkpoint complete: wrote 2772 buffers (16.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.016 s, sync=0.008 s, total=0.024 s; sync files=2524, longest=0.001 s, average=0.001 s; distance=25569 kB, estimate=25569 kB; lsn=0/2DD6D20, redo lsn=0/2DD6D20
+
+2026-11-19 21:59:47.915 UTC [3931] LOG:  database system is shut down
+
+VITEST_EXIT=0

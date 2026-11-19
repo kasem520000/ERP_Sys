@@ -1,0 +1,113 @@
+
+ RUN  v3.2.7 /home/z/erp-p48-prefix/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/erp-p48-prefix/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 22:10:43.620 UTC [8567] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 22:10:43.621 UTC [8567] LOG:  listening on IPv6 address "::1", port 44021
+2026-11-19 22:10:43.621 UTC [8567] LOG:  listening on IPv4 address "127.0.0.1", port 44021
+
+2026-11-19 22:10:43.621 UTC [8567] LOG:  listening on Unix socket "/tmp/.s.PGSQL.44021"
+
+2026-11-19 22:10:43.622 UTC [8570] LOG:  database system was shut down at 2026-11-19 22:10:43 UTC
+
+2026-11-19 22:10:43.623 UTC [8567] LOG:  database system is ready to accept connections
+
+ ❯ src/__db__/hr/talent-training-org.db.spec.ts (10 tests | 1 failed) 232ms
+   ✓ PHASE-047 W-3 — (a) the training program catalog > (a1) creates with the exact-decimal cost (ADR-0009), the kind enum, and the taken-code refusal 22ms
+   ✓ PHASE-047 W-3 — (b) the enrollments: the natural key, the ladder, the completion act (acceptance #4) > (b1) enrolls once per (program, employee) — the duplicate is the typed 409; the ladder walks with the validated percentages 19ms
+   ✓ PHASE-047 W-3 — (b) the enrollments: the natural key, the ladder, the completion act (acceptance #4) > (b2) the completion act stamps completed_at with the result; WITHDRAWN is terminal 17ms
+   ✓ PHASE-047 W-3 — (c) the certification register: issuer and expiry intact (acceptance #4) > (c1) registers with the validated window; the renewal UPDATE keeps the issuer/expiry coherent; the register lists per employee 12ms
+   ✓ PHASE-047 W-3 — (d) the org tree: D-09's cycle-safe moves + the materialized path > (d1) builds the tree with dot-joined paths; the dot-free code law is typed 15ms
+   ✓ PHASE-047 W-3 — (d) the org tree: D-09's cycle-safe moves + the materialized path > (d2) the move rewrites the WHOLE subtree's paths atomically 29ms
+   ✓ PHASE-047 W-3 — (d) the org tree: D-09's cycle-safe moves + the materialized path > (d3) the cycle-closing move refuses typed BEFORE any write — and the tree stays intact 14ms
+   × PHASE-047 W-3 — (d) the org tree: D-09's cycle-safe moves + the materialized path > (d4) THE NF-9 ADVERSARIAL CLOSE-CODE ARM (the owner's W-3 verification finding, fixed 2026-11-19/W-4): a sibling tree whose code differs ONLY at the underscore position is NEVER touched by a move — starts_with is literal, LIKE's `_` wildcard would have corrupted it 22ms
+     → expected 'OU-W3-14-48257.ADV11-48246_EAST.OU-W3…' to be 'ADV11-48246XEAST.OU-W3-13-48254' // Object.is equality
+   ✓ PHASE-047 W-3 — (e) the positions: reports_to with the same D-09 guard > (e1) creates the bilingual slot; the reports_to cycle refuses typed; RETIRED flips 15ms
+   ✓ PHASE-047 W-3 — (f) the tenant boundary > (f1) the empty worlds BY CONSTRUCTION + the A7 parity for foreign ids 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/hr/talent-training-org.db.spec.ts > PHASE-047 W-3 — (d) the org tree: D-09's cycle-safe moves + the materialized path > (d4) THE NF-9 ADVERSARIAL CLOSE-CODE ARM (the owner's W-3 verification finding, fixed 2026-11-19/W-4): a sibling tree whose code differs ONLY at the underscore position is NEVER touched by a move — starts_with is literal, LIKE's `_` wildcard would have corrupted it
+AssertionError: expected 'OU-W3-14-48257.ADV11-48246_EAST.OU-W3…' to be 'ADV11-48246XEAST.OU-W3-13-48254' // Object.is equality
+
+Expected: "ADV11-48246XEAST.OU-W3-13-48254"
+Received: "OU-W3-14-48257.ADV11-48246_EAST.OU-W3-13-48254"
+
+ ❯ src/__db__/hr/talent-training-org.db.spec.ts:448:34
+    446|     // corruption the finding proved).
+    447|     const xeastChildAfter = await withTenant(TENANT_H, () => orgSvc.ge…
+    448|     expect(xeastChildAfter.path).toBe(`${xeastRoot.code}.${xeastChild.…
+       |                                  ^
+    449|     const xeastRootAfter = await withTenant(TENANT_H, () => orgSvc.get…
+    450|     expect(xeastRootAfter.parentId).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 passed (10)
+   Start at  22:10:42
+   Duration  5.52s (transform 512ms, setup 0ms, collect 1.21s, tests 232ms, environment 0ms, prepare 56ms)
+
+2026-11-19 22:10:48.327 UTC [8567] LOG:  received fast shutdown request
+2026-11-19 22:10:48.327 UTC [8567] LOG:  aborting any active transactions
+2026-11-19 22:10:48.327 UTC [8648] FATAL:  terminating connection due to administrator command
+
+2026-11-19 22:10:48.330 UTC [8567] LOG:  background worker "logical replication launcher" (PID 8573) exited with exit code 1
+2026-11-19 22:10:48.330 UTC [8568] LOG:  shutting down
+2026-11-19 22:10:48.330 UTC [8568] LOG:  checkpoint starting: shutdown immediate
+
+(node:8626) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:8626) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-19 22:10:48.353 UTC [8568] LOG:  checkpoint complete: wrote 2772 buffers (16.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.016 s, sync=0.008 s, total=0.024 s; sync files=2524, longest=0.001 s, average=0.001 s; distance=25569 kB, estimate=25569 kB; lsn=0/2DD6D80, redo lsn=0/2DD6D80
+
+2026-11-19 22:10:48.360 UTC [8567] LOG:  database system is shut down
+
+VITEST_EXIT=1
