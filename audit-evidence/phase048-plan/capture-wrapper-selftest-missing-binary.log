@@ -1,0 +1,2 @@
+scripts/capture-evidence.sh: line 59: this-binary-does-not-exist-xyz: command not found
+EXIT=127

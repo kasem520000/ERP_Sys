@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-048 MASTER PLAN PROPOSED (delivered 2026-11-19, this session — awaiting the owner's approval; NO CODE WAVE before it, the owner's binding condition 1)
+# NEXT ACTION — PHASE-048 MASTER PLAN PROPOSED + THE §7 AMENDMENTS DELIVERED (2026-11-19: the four rulings recorded — (a) the 047 boundary/tag RULED · (b) W-8…W-15 CONFIRMED · (c) phase/048 RULED with the ADDITIVE-ONLY archive law · (d) the owner's NF-9 re-run executes; awaiting the verification + the approval dispatch; NO CODE WAVE)
 
 **THE PHASE-047 CLOSURE (2026-11-19, W-7 on the W-6 head `e76bbd0` + this wave's docs):** all eight waves delivered — W-0 the clean-environment baseline · W-1 the foundation (migrations 0095–0098 + every mirror/registry/catalog/matrix/pin) · W-2 the performance + goals engines (BR-089/090, the CAS ladder, the capture wrapper) · W-3 the recruitment + training/org + documents + the sweep (BR-088, D-09, BR-091, migration 0099, the NF-7/NF-8 fixes) · W-4 the external bridges + the NF-9/NF-10/NF-11 fixes · W-5 the web plane (the four families + the 360 + the four composition reads + 308 i18n keys) · W-6 the reports + proof wave (the four contracts — registry 106 → 110; the talent RLS suite; the OA-06 budgets; THE VITEST SUMMARY GUARD — the second NF-4-class repair) · **W-7 the closure: the canon docs (BUSINESS_RULES BR-088…091 with amendment A-2's confirmed wording · NAVIGATION_MODEL's four rows + the LIVE row · FEATURE_CATALOG's talent rows · the HR talent TABLES doc · the PHASE_ACCEPTANCE_CRITERIA §PHASE-047 entry) + THE ID_LEDGER FLIP (BR-001…091, the self-test all-probes-OK) + the full gate sweep at the final head (typecheck/lint 8/8 · depcruise 1,993 · 14,855 · unit 8/8 · **THE FULL DB SUITE 259/259 · 3,623/3,623 · 0 failed · 0 skipped** — the smoke 3 · 1,717 + the perf 6 · 22 + 83 · 641 + 77 · 511 + 90 · 732 chunks; check:rls scratch 307/0 · drift 312 = 312 · i18n 6,433 + 371 · docs 33/33 · manifests 13/13 · id-ledger 0 + self-test OK · secrets 0 · capabilities agree · shells PASS · the boundary PASS) + the completion report + THE TRIPLE FLIP (the phase doc header · the IMPLEMENTATION_STATUS row · this file) + the archive `ERP_PLATFORM_PHASE047.zip` (OA-07, the members byte-verified) + THE TAG `phase/047`**. The completion report: `docs/implementation/phases/reports/PHASE-047-COMPLETION.md`. The W-7 evidence: `docs/operations/gate-evidence/2026-11-19-phase047-w7.md` + `audit-evidence/phase047-w7/`.
 
@@ -6,7 +6,7 @@
 DELIVERED AND PROPOSED** — `agent-ctx/PHASE-048-MASTER-PLAN.md` (this
 session's fresh clone at the remote head `5b73bd1`, the same-session
 evidence rule's FIFTEENTH consecutive wave; the evidence envelope
-`audit-evidence/phase048-plan/` — 20 logs incl. the FULL DB SUITE
+`audit-evidence/phase048-plan/` — 25 logs incl. the FULL DB SUITE
 259/259 · 3,621 passed | 2 skipped green this session and the NF-9
 RED/GREEN protocol pre-verified). Per the owner's 2026-11-19
 authorization dispatch: **the plan is the first deliverable and the code
@@ -18,9 +18,24 @@ W-4…W-7; the phase/047 tag at `5b73bd1` standing per the dispatch's own
 permanence law) + the NF-9 blocking-item mapping (§0b: the fix in
 `83362ff` + the (d4) adversarial arm, RED on `7d22c49` / GREEN on the
 current head, the verifier's exact commands recorded; the W-8 fallback
-arm on dispatch). **The owner's approval rulings awaited (§7):** (a)
-the 047 boundary + the tag · (b) the W-8 wave numbering · (c) the
-closure tag `phase/048` · (d) the NF-9 verifier confirmation. **Standing
+arm on dispatch). **The §7 rulings RECEIVED 2026-11-19 (recorded as the plan's §1a):**
+(a) the 047 boundary + tag RULED (delivery not acceptance; defects
+fixed forward in 048's waves) · (b) W-8…W-15 CONFIRMED · (c) `phase/048`
+RULED with the binding ADDITIVE-ONLY archive condition (verbatim in
+§1a (c) + W-15 + §6.10) · (d) the owner's OWN clean-clone NF-9 re-run
+executes (literally 1 failed | 9 passed, (d4) by name, exit 1, no
+other failure — then green at `0926a74` → 10/10; the (d4) battery
+permanence facts at §0b's dated note = the EXEMPTION branch; if the
+red does not reproduce, the protocol is rejected and the
+blocking-ness returns fully to W-8). **The plan's written
+clarifications DELIVERED with the amendment commit (clarification
+only, no code, per the dispatch's boundary):** the W-15 archive's
+ADDITIVE-ONLY law verbatim · the two skipped DB tests named +
+justified + THE NO-MASKING PROOF (the render spec re-run with the
+browser present: 2/2 green) · the NF-10/NF-11 pointers (§0c) · the
+four-quadrant wrapper self-test bundle. **Still awaited:** the
+owner's verification (the queue recorded at §1a item 5) + the
+approval dispatch (may carry further binding dated amendments). **Standing
 constraints carried:** the same-session evidence rule (fourteen
 consecutive waves and counting) · the scope-label law · §7(b)'s three
 045 remarks (the owner's open input) · RISK-031/032 OPEN · the

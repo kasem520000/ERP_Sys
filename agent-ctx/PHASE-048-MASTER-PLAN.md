@@ -15,7 +15,64 @@ opens before the owner's approval of it; the dispatch's four binding
 conditions are carried verbatim as red lines §6.10–§6.12 and pre-satisfied
 where the delivered state already satisfies them — §0a/§0b).** This plan's
 evidence envelope: `audit-evidence/phase048-plan/` (every log same-session,
-the FIFTEENTH consecutive wave).
+the FIFTEENTH consecutive wave). **[Dated 2026-11-19 (later the same day) —
+the owner's §7-rulings dispatch: §0a ACCEPTED as written (the
+progress-before-authorization licensed; plan-before-code honored in
+`0926a74`; the 307 correction accepted; the swallowed-first-attempt
+disclosure accepted); the four §7 rulings recorded in §1a below; the
+written clarifications this amendment carries (the W-15 archive's
+ADDITIVE-ONLY law verbatim · the two skipped DB tests named + justified +
+the no-masking PROOF · the NF-10/NF-11 pointers · the four-quadrant wrapper
+self-test bundle) — clarification only, NO code, per the dispatch's own
+boundary. Condition 2's checkmark stands PROVISIONAL until the owner's own
+protocol re-run (§1a (d)).]**
+
+## 1a. The owner's §7 rulings (binding — recorded 2026-11-19, the §7-rulings dispatch)
+
+1. **(a) THE 047 BOUNDARY + THE TAG — RULED.** The boundary as declared is
+   adopted: PHASE-047 = W-0…W-7, delivery at `5b73bd1`. The tag
+   `phase/047` stays where placed (2026-11-19) — the owner sees it as
+   correct on the merits, not merely frozen by the permanence law.
+   **The tag is DELIVERY, NOT ACCEPTANCE:** W-4…W-7 remain pending
+   acceptance on the owner's independent verification, and any defect
+   found in them is fixed FORWARD-PROGRESSIVELY in 048's waves — no tag
+   touching, no published-item modification.
+2. **(b) THE WAVE NUMBERING — CONFIRMED.** The global sequence continues;
+   W-4…W-7 belong to 047 finally; PHASE-048's waves = **W-8…W-15** as
+   proposed. No renumbering, no collision.
+3. **(c) THE TAG `phase/048` — RULED WITH A BINDING CONDITION.** On the
+   W-15 delivery commit, per the 046/047 precedent. And — stated VERBATIM
+   as the owner required before approval: **«الأرشيف» في W-15 إضافي فقط —
+   إنشاء أدلة وملفات جديدة، ولا نقل ولا حذف ولا إعادة تسمية لأي دليل
+   قائم** — the W-15 "archive" is ADDITIVE ONLY: creating new directories
+   and files; NO moving, NO deleting, NO renaming of ANY existing
+   directory. (Also stated at W-15 in §3 and as §6.10's dated extension.)
+4. **(d) NF-9 — THE OWNER'S OWN RE-RUN DECIDES.** The owner will execute
+   the protocol in a clean clone per the evidence README's commands
+   verbatim, with raw commands: the worktree at `7d22c49` + the spec from
+   the post-fix head → required literally **1 failed | 9 passed, (d4) by
+   name, exit 1, and no other failure — number by number**; then green at
+   the plan head `0926a74` (same code as `5b73bd1` + docs only) → **10/10**.
+   The (d4) arm's fate per the owner's criterion: a permanent named arm
+   running within the standard battery on every run → **EXEMPT** from the
+   W-8 dedicated-spec requirement; isolatable or skippable → REQUIRED in
+   W-8. [§0b's dated note states the facts: (d4) is a plain named `it()`
+   under the DB config's standard include, with no skip guards anywhere in
+   the file — grep-verified this session — and it ran in every full
+   DB-suite invocation (the W-6/W-7 sweeps + this session's 259/259).]
+   **And if the red does not reproduce on the owner's re-run for any
+   reason — the protocol is REJECTED and the blocking-ness returns fully
+   to W-8.**
+5. **The verification queue (the owner's own list, recorded):** the wave
+   chain `83362ff ← 461e257 ← e76bbd0 ← 65fee86 ← 5b73bd1 ← 0926a74` +
+   the one-commit-per-wave commitment + the tags in place · the
+   `starts_with` fix with its dated comment + the (d4) arm · the NF-10/
+   NF-11 pointers (§0c below — the owner's written demand) · the journal
+   ends 0099 · the routes 979 → 984 → 988 with two dated notes ·
+   ENTITY_CATALOG 307 · zero archiving · the envelope's logs with the four
+   quadrants complete · the full battery at `0926a74` number-by-number
+   including the two skipped DB tests named + justified (§0d — with the
+   no-masking proof) · then the clause-by-clause plan review.
 
 ## 0a. THE LEDGER RECONCILIATION (the owner's 2026-11-19 dispatch vs the repository state — dated, binding)
 
@@ -129,6 +186,97 @@ at approval.]
   pre-fix tree), **W-8 (the first code wave) adds it** — same red/green
   protocol against `7d22c49`, the four-quarter logs, the F1 dated comments
   at every touched site. One wave, no scope creep.
+- **[Dated 2026-11-19 (the §7-rulings dispatch) — the (d4) arm's
+  battery permanence, the owner's criterion stated and the facts
+  verified this session:]** (d4) is a **permanent named arm inside the
+  standard battery**: a plain `it("…")` block in
+  `apps/api/src/__db__/hr/talent-training-org.db.spec.ts`, matched by the
+  DB config's include pattern (`src/__db__/**/*.spec.ts`), with **NO
+  `skipIf`/`.skip`/`ctx.skip` guards anywhere in the file** (grep-verified
+  this session), and it ran in **every full DB-suite invocation** — the
+  W-6 and W-7 sweeps (259/259 each) and this session's full run (`✓ …
+  (10 tests)` among the 259). It is not isolatable except by explicitly
+  narrowing the file selection — true of any test in the suite. **Per the
+  owner's criterion: the EXEMPTION branch** — the owner's own re-run
+  decides finally (§1a (d)).
+
+## 0c. NF-10 / NF-11 — the pointers (the owner's written demand, 2026-11-19)
+
+Both findings came from the owner's W-3 verification session; both were
+fixed in 047's W-4 (`83362ff`); the canonical documentation is the W-4
+gate doc §4 (`docs/operations/gate-evidence/2026-11-19-phase047-w4.md`).
+
+- **NF-10 — THE PHANTOM HIRE ARM (a documentation-truth defect, delivered
+  as the owner's PREFERRED remedy):** the W-3 store header named a
+  `casHireApplicant` function and an `hired_employee_id IS NULL`
+  written-once arm **that DID NOT EXIST** — the W-3 mechanism was the
+  stage pin alone (`WHERE id AND stage = 'OFFER'`; the law held only
+  because no ladder path leads from HIRED back to OFFER). The header
+  claimed a structural defense the code did not carry.
+  **The fix (`83362ff`):** the arm now EXISTS for real — `casAdvanceStage`'s
+  WHERE carries `AND (${hiredEmployeeId}::uuid IS NULL OR
+  hired_employee_id IS NULL)` (active only when the statement carries a
+  hire link; vacuously true for every ADVANCE/REOPEN call), with the dated
+  NF-10 note at the site (`talent-recruitment.store.ts`) recording what
+  the W-3 shape was, and both service doc sites (the header's HIRE ACT law
+  + the `hireApplicant` docblock) now state the TWO defense lines
+  truthfully.
+  **The regression arm:** `(d2) THE NF-10 WRITTEN-ONCE ARM` in
+  `apps/api/src/__db__/hr/talent-recruitment.db.spec.ts` — a row pinned
+  at OFFER but ALREADY LINKED (a state no API path produces; seeded by
+  raw superuser UPDATE) faces the store-level CAS with a hire link →
+  **ZERO rows matched, ZERO residue** (stage still OFFER, the ORIGINAL
+  link intact, version unbumped, no HIRE record in the history). The arm
+  runs in the standard battery with the same permanence as (d4) (same
+  file family, no skip guards).
+- **NF-11 — THE UNIT-COUNT RECORD (a pure F1 record correction):** the
+  W-3 gate doc's §3 unit row carried the inner parenthetical "58 · 684" —
+  the FILE count was off by one (the W-2 base was **59 files · 684**,
+  counted at both heads; the 9 W-3 pure tests landed in the EXISTING
+  `talent-math.spec.ts`, adding zero files — **59 · 693 at both ends**).
+  The row's headline figures (59 · 693) were correct; only the inner
+  "58" was miswritten. **The fix: the DATED 58 → 59 correction AT the
+  claim site** (the W-3 gate doc's unit row, dated 2026-11-19/W-4). No
+  test arm exists or applies — the class is documentation-truth (the F1
+  law); the dated correction at the original claim site IS the remedy,
+  and the W-4 gate doc §4 records it.
+
+## 0d. The two skipped DB tests — named, justified, and PROVEN not to mask (the owner's verification item, 2026-11-19)
+
+- **The two tests, by name** — both in the describe
+  `"ChromiumRenderEngine (real browser)"` of
+  `apps/api/src/__db__/reporting/render.spec.ts`:
+  1. `renders a 60-row ar report across ≥2 pages with a repeating thead`
+  2. `stampPdfA2b preserves the page count of the rendered document`
+- **The skip mechanism (the suite's own documented law):** the spec's
+  header documents graceful degradation — "the suite skips gracefully
+  when the browser cannot launch (the CI unit image ships no Chromium):
+  a probe render in `beforeAll` decides, and every browser-dependent test
+  calls `ctx.skip()`". The engine launches Playwright's Chromium; if the
+  launch fails, `browserAvailable = false` and the two tests skip AT
+  RUNTIME — an environment-conditional skip, never a failure mask.
+- **The cause this session (the honest timeline, timestamped from the
+  logs):** the full-suite run (22:00:04–22:09:18 UTC) PRECEDED the
+  `chromium_headless_shell-1248` install (completed ~22:15 UTC — the
+  W-0 known gap, revealed by the unit battery's first attempt at
+  22:13–22:14 on the zatca-qr spec and installed for it). At suite
+  time the browser binary was absent → the probe failed → the two
+  tests skipped. The battery's unit run and the DB suite are separate
+  invocations; the install happened between them; the render re-run
+  (22:35:51 UTC) is the proof below.
+- **THE NO-MASKING PROOF (this session, minutes later):** the re-run of
+  the spec with the browser present — at the plan head `0926a74`'s tree
+  — **2/2 GREEN, `VITEST_EXIT=0`**
+  (`audit-evidence/phase048-plan/render-spec-browser-present.log`).
+  With the browser present, the full-suite count is **3,623/3,623 · 0
+  skipped** — identical to the W-7 record.
+- **The W-3 comparison (the owner's own observation):** at W-3 the suite
+  was 254/254 · 3,572/3,572 with no skips — the render spec existed and
+  ran GREEN in the owner's verification environment (the browser present
+  there). The skip is strictly a property of THIS session's
+  browser-absent window, not of the code — and per the owner's rule:
+  had the re-run revealed a failure beneath the skip, that would have
+  been a REJECTION, not an adjustment. It revealed green.
 
 ## 0. Inputs consumed (the plan-first reads — one focused pass over the `5b73bd1` head, 2026-11-19, this session)
 
@@ -454,7 +602,12 @@ ID_LEDGER flip (G-55…58 · INV-033 · BR-092…096 → implemented); the FULL
 GATE SWEEP at the final head (the full DB suite at the new count); the
 completion report + the triple flip + the archive (OA-07,
 `ERP_PLATFORM_PHASE048.zip`, byte-verified members) + the tag
-**`phase/048`** [§7(c)].
+**`phase/048`** on the W-15 delivery commit (§1a (c) — RULED).
+**THE ARCHIVE'S ADDITIVE-ONLY LAW (§1a (c)'s binding condition, VERBATIM):
+«الأرشيف» في W-15 إضافي فقط — إنشاء أدلة وملفات جديدة، ولا نقل ولا حذف
+ولا إعادة تسمية لأي دليل قائم** — the archive step creates NEW
+directories and files ONLY; NO moving, NO deleting, NO renaming of ANY
+existing directory.
 **Exit:** acceptance #10 green; PHASE-048 COMPLETE.
 
 ## 4. Test matrix (the permanent suites)
@@ -533,6 +686,12 @@ commit count declared at every delivery · same-session evidence only.**
     +11 at W-8); **no evidence archiving or deletion — the full envelope
     at every delivery**; **ALL TAGS immutable** (`phase/046` @
     `4ddb39f` · `phase/047` @ `5b73bd1` — دائم لا يُمسّ).
+    **[Dated 2026-11-19 (the §7-rulings dispatch, §1a (c)) — the
+    archive's ADDITIVE-ONLY law, now part of this red line verbatim:
+    «الأرشيف» في W-15 إضافي فقط — إنشاء أدلة وملفات جديدة، ولا نقل
+    ولا حذف ولا إعادة تسمية لأي دليل قائم. The W-15 archive step
+    creates new directories and files only; no moving, no deleting, no
+    renaming of any existing directory.]**
 11. **THE DELIVERY LAW (the dispatch's condition 4):** every delivery
     declares its commit count precisely; evidence from the same session
     only; the owner's independent verification runs on fresh clones.
@@ -542,25 +701,35 @@ commit count declared at every delivery · same-session evidence only.**
     red-on-`7d22c49` proof is the acceptance bar, with the four-quarter
     logs (NF-7) and the F1 dated comments at every modified site.
 
-## 7. Open inputs for the owner (none block plan approval; (a)/(b) are the reconciliation confirmations)
+## 7. Open inputs for the owner (the four §7 rulings received 2026-11-19 — §1a; (d) executes now)
 
-- **(a) THE 047 BOUNDARY + THE TAG RULING (§0a):** this plan declares
-  PHASE-047 = W-0…W-7 COMPLETE at `5b73bd1`, the tag `phase/047` already
-  placed there (before the dispatch arrived) and standing per the
-  dispatch's own permanence law. Confirm, or dispatch a ruling — no tag
-  moves either way without an explicit owner instruction that itself
-  addresses the permanence law.
-- **(b) THE WAVE NUMBERING (§0a):** 048's waves continue the global
-  sequence at W-8 (the dispatch's "from W-4" reconciled — W-4…W-7 are
-  consumed by 047's delivered waves). Confirm or override.
-- **(c) THE CLOSURE TAG:** `phase/048` proposed (the A-3 pattern).
-  Confirm at approval.
+> **RESOLVED 2026-11-19 (the §7-rulings dispatch — §1a): (a) = RULED
+> (the boundary adopted; the tag stands — DELIVERY not ACCEPTANCE; the
+> forward-fix law); (b) = CONFIRMED (W-8…W-15); (c) = RULED with the
+> binding ADDITIVE-ONLY condition (stated verbatim at §1a (c), W-15, and
+> §6.10's dated extension). (d) executes now — the owner's own clean-clone
+> protocol re-run decides the (d4) arm's exemption and condition 2's
+> final checkmark.**
+
+- **(a) THE 047 BOUNDARY + THE TAG RULING (§0a):** ~~confirm or dispatch
+  a ruling~~ **RULED 2026-11-19 — §1a (a): adopted as declared; the tag
+  stands as DELIVERY (W-4…W-7 pending acceptance; defects fixed forward
+  in 048's waves; no tag or published-item touching).**
+- **(b) THE WAVE NUMBERING (§0a):** ~~confirm or override~~ **CONFIRMED
+  2026-11-19 — §1a (b): W-8…W-15 stand as proposed.**
+- **(c) THE CLOSURE TAG:** ~~proposed, confirm at approval~~ **RULED
+  2026-11-19 — §1a (c): `phase/048` on the W-15 delivery commit, WITH
+  the binding ADDITIVE-ONLY archive condition (verbatim in §1a (c)).**
 - **(d) THE NF-9 VERIFIER PROTOCOL (§0b):** the delivered pair (the
   `starts_with` fix + the (d4) adversarial arm in `83362ff`) satisfies
   the red/green protocol — pre-verified this session with the exact
-  verifier commands recorded. The owner's independent re-run confirms it;
-  alternatively the W-8 fallback arm adds a dedicated self-contained
-  regression spec on dispatch.
+  verifier commands recorded. **The owner's own re-run executes now**
+  (§1a (d)): literally 1 failed | 9 passed, (d4) by name, exit 1, no
+  other failure — number by number — then green at `0926a74` → 10/10.
+  The (d4) arm's battery permanence facts are stated at §0b's dated
+  note (the EXEMPTION branch per the owner's criterion); if the red
+  does not reproduce for any reason, the protocol is REJECTED and the
+  blocking-ness returns fully to W-8 (the dedicated-spec fallback arm).
 - **(e) Standing owner inputs carried (unchanged, not 048 blockers):**
   §7(b)'s three PHASE-045 final-audit remarks (text awaited, never
   fabricated); PHASE-043's hard review + RISK-031/RISK-032 OPEN; the
@@ -568,7 +737,9 @@ commit count declared at every delivery · same-session evidence only.**
   Art. 84); the 045 self-board Tabs defect (the owner dispatches);
   **NOT production approval.**
 
-**The implementation waves are BLOCKED until the owner's approval
-dispatch** (the dispatch's condition 1: لا تبدأ أي موجة كود قبل اعتماد
-الخطة). PHASE-047 stands COMPLETE at `5b73bd1` (W-0…W-7 delivered; W-4…W-7
-awaiting the owner's independent verification alongside this plan).
+**The implementation waves are BLOCKED until (1) the owner's
+verification succeeds and (2) the approval dispatch issues** (the
+authorization's condition 1 + the §7-rulings dispatch's fourth section —
+approval may carry further binding dated amendments). PHASE-047 stands
+COMPLETE at `5b73bd1` (W-0…W-7 delivered; W-4…W-7 pending the owner's
+independent verification alongside this plan).

@@ -31,6 +31,11 @@ permanent rule.
 | `capabilities.log` | capabilities matrix and fixture agree | EXIT=0 |
 | `desktop-shell.log` / `mobile-shell.log` | PASS / PASS | EXIT=0 |
 | `docs-validate-final.log` | docs:validate 33/33 AFTER the plan + NEXT_ACTION changes | EXIT=0 |
+| `render-spec-browser-present.log` | **THE NO-MASKING PROOF** — the render spec re-run with `chromium_headless_shell-1248` present (the two tests that skipped in the full-suite run): 2/2 GREEN at the `0926a74` tree | VITEST_EXIT=0 |
+| `capture-wrapper-selftest-green-vitest.log` | the wrapper self-test, quadrant 1 — a real green vitest run (talent-math.spec) | VITEST_EXIT=0 |
+| `capture-wrapper-selftest-red-vitest.log` | the wrapper self-test, quadrant 2 — a CONTROLLED red (an untracked probe spec with a by-construction failing assertion, deleted immediately after; `1 failed (1)` + the summary guard) | VITEST_EXIT=1 |
+| `capture-wrapper-selftest-red-nonvitest.log` | the wrapper self-test, quadrant 3 — a non-vitest command exiting 1 | EXIT=1 |
+| `capture-wrapper-selftest-missing-binary.log` | the wrapper self-test, quadrant 4 — a missing binary | EXIT=127 |
 
 Static recounts this session (no run needed): migrations journal **0099**
 (idx 98, 99 files) · `ROUTE_PERMISSIONS` **988** rows · `REPORT_CONTRACTS`
@@ -57,6 +62,25 @@ Static recounts this session (no run needed): migrations journal **0099**
    `VITEST_EXIT=1`. **Consequence for any verifier re-running at the
    pre-fix head: use the direct vitest invocation or a post-W-6 wrapper —
    never the W-3-era wrapper with the pnpm layer.**
+
+## The wrapper self-test (NF-7's four-quadrant law, this bundle)
+
+All four quadrant logs kept together per NF-7's standing law (green vitest
+→ 0 · controlled-red vitest → 1 · red non-vitest → 1 · missing binary →
+127). Construction note (the honest-log law): the red-vitest quadrant's
+FIRST construction attempt placed the probe at the package root, outside
+the unit config's `src/**/*.spec.ts` include — vitest exited 1 on the
+"no test files found" path (a red, but not the controlled one); the
+shipped log is the RE-RUN with the probe under `src/` (a real assertion
+failure: `Test Files 1 failed (1) · Tests 1 failed (1)` + the stamp 1).
+The probe file was UNTRACKED and deleted immediately after the run —
+never product code, never committed (the W-6 session's probe precedent).
+
+Also for complete transparency: the pre-fix verification worktree
+(`/home/z/erp-p48-prefix`, at `7d22c49`) was a LOCAL scratch rebuild
+removed after its logs were captured — it was never part of the
+repository or its evidence tree; the logs + the commands below allow
+anyone to rebuild it.
 
 ## The NF-9 regression protocol — the verifier's exact commands
 

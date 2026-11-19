@@ -1,0 +1,11 @@
+
+ RUN  v3.2.7 /home/z/erp-p48/apps/api
+
+ ✓ src/modules/hr/__tests__/talent-math.spec.ts (26 tests) 9ms
+
+ Test Files  1 passed (1)
+      Tests  26 passed (26)
+   Start at  22:37:43
+   Duration  286ms (transform 71ms, setup 0ms, collect 81ms, tests 9ms, environment 0ms, prepare 66ms)
+
+VITEST_EXIT=0
