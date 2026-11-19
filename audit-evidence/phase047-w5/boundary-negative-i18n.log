@@ -1,0 +1,6 @@
+
+> erp-platform@0.1.0 boundary:negative-i18n-test /home/z/ERP_Sys_W4
+> bash scripts/ci/negative-i18n-parity-test.sh
+
+NEGATIVE-I18N: parity checker fails its drifting fixture (proof complete)
+EXIT=0

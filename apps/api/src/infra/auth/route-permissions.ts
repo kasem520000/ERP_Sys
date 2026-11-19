@@ -4724,6 +4724,37 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/bridges/imports/training-completions",
     permission: "hr.training.manage",
   },
+  // PHASE-047 (W-5 — T-14, the 360 extension's composition reads): four
+  // READ routes on the EXISTING family keys (the 046 W-5 web-plane
+  // precedent — the module API serves the screen's read-model
+  // composition; no new keys, drift stays 312 = 312). The trend read
+  // ships ONLY the MANAGER reviews (BR-090 by construction — the 360
+  // input rows never leave the aggregate read); the goals read is the
+  // manage-side plane (the OWN plane stays goals/own on
+  // hr.performance.review); the applicant-by-employee read returns
+  // null for no-hire-link (A7-indistinguishable, never a 404 — null
+  // is the common case); the placement read is D-01's documented
+  // extension axes, READ-ONLY on the employees substrate.
+  {
+    method: "GET",
+    path: "/api/v1/hr/performance/reviews/for-employee/:employeeId",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/goals/for-employee/:employeeId",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/recruitment/applicants/by-employee/:employeeId",
+    permission: "hr.recruitment.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/org/placement/:employeeId",
+    permission: "hr.org.view",
+  },
 ];
 
 /**

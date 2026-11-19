@@ -1,0 +1,114 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys_W4/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_Sys_W4/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 05:00:12.348 UTC [25067] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 05:00:12.348 UTC [25067] LOG:  listening on IPv6 address "::1", port 39455
+2026-11-19 05:00:12.348 UTC [25067] LOG:  listening on IPv4 address "127.0.0.1", port 39455
+
+2026-11-19 05:00:12.349 UTC [25067] LOG:  listening on Unix socket "/tmp/.s.PGSQL.39455"
+
+2026-11-19 05:00:12.350 UTC [25070] LOG:  database system was shut down at 2026-11-19 05:00:12 UTC
+
+2026-11-19 05:00:12.351 UTC [25067] LOG:  database system is ready to accept connections
+
+{"level":30,"time":1795064424199,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795064424227,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795064424787,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22d-68ca-7000-afd6-c7b69d23cf32","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064426201,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/sandbox-isolation.db.spec.ts (7 tests) 2222ms
+   ✓ acceptance 9 — sandbox provisioning & isolation (OA-05) > provisions a time-boxed, quota-capped SANDBOX tenant with the full demo seed  929ms
+2026-11-19 05:00:26.256 UTC [25166] ERROR:  new row violates row-level security policy for table "audit_events"
+2026-11-19 05:00:26.256 UTC [25166] STATEMENT:  INSERT INTO audit_events (id, tenant_id, action, entity_type, entity_id)
+	         VALUES ('aaaaaaaa-3333-4333-8333-333333333333', $1, 'forged.created', 'x', $1)
+
+2026-11-19 05:00:26.270 UTC [25168] ERROR:  permission denied for table audit_events
+2026-11-19 05:00:26.270 UTC [25168] STATEMENT:  DELETE FROM audit_events WHERE id = $1
+
+2026-11-19 05:00:26.285 UTC [25170] ERROR:  permission denied for table audit_events
+2026-11-19 05:00:26.285 UTC [25170] STATEMENT:  UPDATE audit_events SET action = 'hacked' WHERE id = $1
+
+2026-11-19 05:00:26.285 UTC [25170] ERROR:  permission denied for table audit_events
+2026-11-19 05:00:26.285 UTC [25170] STATEMENT:  DELETE FROM audit_events WHERE id = $1
+
+2026-11-19 05:00:26.293 UTC [25171] ERROR:  audit_events are append-only (INV-003 substrate): UPDATE prohibited
+2026-11-19 05:00:26.293 UTC [25171] CONTEXT:  PL/pgSQL function erp.audit_events_guard() line 6 at RAISE
+2026-11-19 05:00:26.293 UTC [25171] STATEMENT:  UPDATE audit_events SET action = 'hacked' WHERE id = $1
+
+2026-11-19 05:00:26.294 UTC [25171] ERROR:  audit_events are append-only (INV-003 substrate): DELETE prohibited
+2026-11-19 05:00:26.294 UTC [25171] CONTEXT:  PL/pgSQL function erp.audit_events_guard() line 6 at RAISE
+2026-11-19 05:00:26.294 UTC [25171] STATEMENT:  DELETE FROM audit_events WHERE id = $1
+
+2026-11-19 05:00:26.312 UTC [25173] ERROR:  insert or update on table "_infra_probe_child" violates foreign key constraint "fk__infra_probe_tenant"
+2026-11-19 05:00:26.312 UTC [25173] DETAIL:  Key (probe_id, tenant_id)=(bbbbbbbb-1111-4111-8111-111111111111, 22222222-2222-2222-2222-222222222222) is not present in table "_infra_probe".
+2026-11-19 05:00:26.312 UTC [25173] STATEMENT:  INSERT INTO _infra_probe_child (id, probe_id, tenant_id)
+	         VALUES ('cccccccc-2222-4222-8222-222222222222', $1, $2)
+
+ ✓ src/__db__/rls-attacks.db.spec.ts (9 tests) 93ms
+
+ Test Files  2 passed (2)
+      Tests  16 passed (16)
+   Start at  05:00:11
+   Duration  14.87s (transform 4.83s, setup 0ms, collect 8.39s, tests 2.32s, environment 0ms, prepare 54ms)
+
+2026-11-19 05:00:26.327 UTC [25067] LOG:  received fast shutdown request
+
+2026-11-19 05:00:26.327 UTC [25067] LOG:  aborting any active transactions
+
+2026-11-19 05:00:26.329 UTC [25067] LOG:  background worker "logical replication launcher" (PID 25073) exited with exit code 1
+
+2026-11-19 05:00:26.329 UTC [25068] LOG:  shutting down
+
+2026-11-19 05:00:26.329 UTC [25068] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-19 05:00:26.352 UTC [25068] LOG:  checkpoint complete: wrote 3391 buffers (20.7%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.015 s, sync=0.008 s, total=0.023 s; sync files=2859, longest=0.001 s, average=0.001 s; distance=29340 kB, estimate=29340 kB; lsn=0/3185C50, redo lsn=0/3185C50
+
+2026-11-19 05:00:26.359 UTC [25067] LOG:  database system is shut down
+
+VITEST_EXIT=0

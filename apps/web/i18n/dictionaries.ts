@@ -6556,6 +6556,317 @@ export interface Dictionary {
   hrSelfNoTypes: string;
   hrSelfCancelledToast: string;
   hrErrSelfNotLinked: string;
+  // PHASE-047 (W-5 — T-11…T-14, D-12): the talent plane's screens + the 360
+  // extension (the four families + the alert surfaces; exact count at
+  // implementation per D-12 — 307 keys/locale).
+  talErrNotFound: string;
+  talErrCodeTaken: string;
+  talErrCycleState: string;
+  talErrReviewSubmitted: string;
+  talErrDuplicateEnrollment: string;
+  talErrVacancyState: string;
+  talErrAlreadyHired: string;
+  talErrSlotTaken: string;
+  talErrStageInvalid: string;
+  talErrNotHireable: string;
+  talErrReopenInvalid: string;
+  talErrWeights: string;
+  talErrBelowThreshold: string;
+  talErrOrgCycle: string;
+  talErrNotPanelist: string;
+  talErrInvalid: string;
+  talCycleDraft: string;
+  talCycleActive: string;
+  talCycleCalibration: string;
+  talCycleClosed: string;
+  talReviewDraft: string;
+  talReviewSubmitted: string;
+  talReviewCalibrated: string;
+  talKindManager: string;
+  talKindSelf: string;
+  talKindPeer: string;
+  talKindSubordinate: string;
+  talGoalActive: string;
+  talGoalAtRisk: string;
+  talGoalAchieved: string;
+  talGoalCancelled: string;
+  talStageNew: string;
+  talStageScreen: string;
+  talStageInterview: string;
+  talStageOffer: string;
+  talStageHired: string;
+  talStageRejected: string;
+  talVacancyOpen: string;
+  talVacancyOnHold: string;
+  talVacancyFilled: string;
+  talVacancyCancelled: string;
+  talEnrollEnrolled: string;
+  talEnrollInProgress: string;
+  talEnrollCompleted: string;
+  talEnrollWithdrawn: string;
+  talProgramInternal: string;
+  talProgramExternal: string;
+  talProgramActive: string;
+  talProgramRetired: string;
+  talPositionActive: string;
+  talPositionRetired: string;
+  talInterviewOnsite: string;
+  talInterviewVideo: string;
+  talInterviewPhone: string;
+  talVerdictStrongHire: string;
+  talVerdictHire: string;
+  talVerdictNoHire: string;
+  talVerdictStrongNoHire: string;
+  talDocPassport: string;
+  talDocIqama: string;
+  talDocVisa: string;
+  talDocContract: string;
+  talDocCertificate: string;
+  talDocOther: string;
+  talTabCycles: string;
+  talTabMyReviews: string;
+  talTabCalibration: string;
+  talTabGoals: string;
+  talTabCompetencies: string;
+  talTabVacancies: string;
+  talTabApplicants: string;
+  talTabInterviews: string;
+  talTabPrograms: string;
+  talTabEnrollments: string;
+  talTabCertifications: string;
+  talTabOrgUnits: string;
+  talTabPositions: string;
+  talTabDocsAlerts: string;
+  talLabelTitle: string;
+  talLabelTitleAr: string;
+  talLabelName: string;
+  talLabelNameAr: string;
+  talLabelNotes: string;
+  talLabelStatus: string;
+  talLabelGrade: string;
+  talLabelPath: string;
+  talLabelParent: string;
+  talLabelRoot: string;
+  talSelectEmployee: string;
+  talSelectPosition: string;
+  talPosition: string;
+  talSelectOrgUnit: string;
+  talSelectVacancy: string;
+  talSelectProgram: string;
+  talSelectApplicant: string;
+  talEditBtn: string;
+  talSaveBtn: string;
+  talCancelBtn: string;
+  talDeleteBtn: string;
+  talConfirmDelete: string;
+  talEmptyRows: string;
+  talFilterAll: string;
+  talPctFormat: string;
+  talDateHint: string;
+  talExpiredChip: string;
+  talDaysLeft: string;
+  talNoExpiry: string;
+  talCyclesCard: string;
+  talCycleNew: string;
+  talCyclePeriodStart: string;
+  talCyclePeriodEnd: string;
+  talCycleReviewDue: string;
+  talCycleScope: string;
+  talCyclePeriod: string;
+  talCycleVersion: string;
+  talActivate: string;
+  talOpenCalibration: string;
+  talCloseCycle: string;
+  talCycleCreatedToast: string;
+  talCycleTransitionedToast: string;
+  talReviewDueSoon: string;
+  talMyReviewsCard: string;
+  talReviewNew: string;
+  talReviewCycle: string;
+  talReviewReviewee: string;
+  talReviewKind: string;
+  talOverallScore: string;
+  talCompetencyScores: string;
+  talSaveDraft: string;
+  talSubmit: string;
+  talReviewSavedToast: string;
+  talReviewSubmittedToast: string;
+  talReviewerNote: string;
+  talGoalRollup: string;
+  talOverallOptional: string;
+  talCalibrationCard: string;
+  talCalibrate: string;
+  talCalibratedToast: string;
+  talCalibrationHint: string;
+  talAggregate360: string;
+  talAggregateHint: string;
+  talAggregateCount: string;
+  talAggregateMean: string;
+  talAggregateMin: string;
+  talAggregateMax: string;
+  talBelowThresholdNote: string;
+  talSelectCycle: string;
+  talGoalsCard: string;
+  talGoalNew: string;
+  talGoalOwner: string;
+  talGoalParent: string;
+  talGoalTitle: string;
+  talGoalTitleAr: string;
+  talGoalWeight: string;
+  talKriTarget: string;
+  talKriActual: string;
+  talProgressPct: string;
+  talDueDate: string;
+  talGoalCreatedToast: string;
+  talGoalUpdatedToast: string;
+  talWeightCheck: string;
+  talWeightSum: string;
+  talWeightValid: string;
+  talWeightInvalid: string;
+  talActiveGoalsCount: string;
+  talMyGoals: string;
+  talMyGoalsHint: string;
+  talUpdateProgress: string;
+  talProgressUpdatedToast: string;
+  talRunCheck: string;
+  talCompetenciesCard: string;
+  talCompetencyNew: string;
+  talCategory: string;
+  talActiveBadge: string;
+  talInactiveBadge: string;
+  talDeactivate: string;
+  talScaleCard: string;
+  talScaleHint: string;
+  talLevel: string;
+  talDescriptor: string;
+  talDescriptorAr: string;
+  talEditLevel: string;
+  talLevelSavedToast: string;
+  talCompetencySavedToast: string;
+  talVacanciesCard: string;
+  talVacancyNew: string;
+  talHeadcount: string;
+  talHold: string;
+  talResume: string;
+  talFill: string;
+  talVacancyCreatedToast: string;
+  talVacancyTransitionedToast: string;
+  talOpenedAt: string;
+  talFilledAt: string;
+  talApplicantsCard: string;
+  talApplicantNew: string;
+  talFullName: string;
+  talFullNameAr: string;
+  talEmail: string;
+  talPhone: string;
+  talSource: string;
+  talStage: string;
+  talAdvance: string;
+  talReopen: string;
+  talHire: string;
+  talHireEmployee: string;
+  talHireNote: string;
+  talApplicantCreatedToast: string;
+  talStageAdvancedToast: string;
+  talReopenedToast: string;
+  talHiredToast: string;
+  talFilterVacancy: string;
+  talFilterStage: string;
+  talStageHistory: string;
+  talHiredLink: string;
+  talInterviewsCard: string;
+  talInterviewNew: string;
+  talApplicant: string;
+  talRound: string;
+  talPanelist: string;
+  talScheduledStart: string;
+  talScheduledEnd: string;
+  talMode: string;
+  talVerdict: string;
+  talScorecard: string;
+  talRecordScorecard: string;
+  talScorecardHint: string;
+  talInterviewScheduledToast: string;
+  talScorecardSavedToast: string;
+  talDateTimeHint: string;
+  talProgramsCard: string;
+  talProgramNew: string;
+  talProgramKind: string;
+  talProvider: string;
+  talCost: string;
+  talRetire: string;
+  talReactivate: string;
+  talProgramCreatedToast: string;
+  talProgramSavedToast: string;
+  talEnrollmentsCard: string;
+  talEnrollNew: string;
+  talProgram: string;
+  talAttendancePct: string;
+  talCompletionPct: string;
+  talResult: string;
+  talResultPending: string;
+  talResultPassed: string;
+  talResultFailed: string;
+  talCompletedAt: string;
+  talEnrolledToast: string;
+  talEnrollSavedToast: string;
+  talEnrollStatusHint: string;
+  talCertificationsCard: string;
+  talCertNew: string;
+  talIssuer: string;
+  talIssueDate: string;
+  talExpiryDate: string;
+  talCertificateNumber: string;
+  talCertCreatedToast: string;
+  talCertSavedToast: string;
+  talCertExpiryChip: string;
+  talOrgUnitsCard: string;
+  talOrgUnitNew: string;
+  talOrgCodeHint: string;
+  talMoveUnit: string;
+  talMoveHint: string;
+  talRootOption: string;
+  talUnitSavedToast: string;
+  talUnitMovedToast: string;
+  talPositionsCard: string;
+  talPositionNew: string;
+  talReportsTo: string;
+  talNoReportsTo: string;
+  talPositionSavedToast: string;
+  talDocsCard: string;
+  talDocNew: string;
+  talDocKind: string;
+  talDocNumber: string;
+  talIssuedOn: string;
+  talExpiresOn: string;
+  talDocPiiNote: string;
+  talDocSavedToast: string;
+  talDocDeletedToast: string;
+  talAlertsCard: string;
+  talAlertsHint: string;
+  talThresholds: string;
+  talThresholdsHint: string;
+  talSweepActive: string;
+  talLastRun: string;
+  talLastFlagged: string;
+  talAlertJobSavedToast: string;
+  talAlertsCoverNote: string;
+  talNeverRun: string;
+  tal360Title: string;
+  tal360Placement: string;
+  tal360NoPlacement: string;
+  tal360Probation: string;
+  tal360Trend: string;
+  tal360TrendHint: string;
+  tal360Goals: string;
+  tal360Training: string;
+  tal360Certifications: string;
+  tal360Documents: string;
+  tal360Source: string;
+  tal360NoSource: string;
+  tal360NoAccess: string;
+  tal360Weight: string;
+  tal360Overall: string;
 }
 
 const ar: Dictionary = {
@@ -13104,6 +13415,316 @@ const ar: Dictionary = {
   hrSelfNoTypes: "لا توجد أنواع إجازات مفعّلة — راجع الموارد البشرية.",
   hrSelfCancelledToast: "تم إلغاء الطلب.",
   hrErrSelfNotLinked: "لا يوجد ملف موظف مرتبط بحسابك في هذا المستأجر — تحلّ الخدمة الذاتية هويتك عبر ربط الموظف بالمستخدم.",
+  // PHASE-047 (W-5 — T-11…T-14, D-12): the talent plane's screens + the 360
+  // extension (the four families + the alert surfaces).
+  talErrNotFound: "السجل المطلوب غير موجود في هذا المستأجر.",
+  talErrCodeTaken: "الرمز مستخدم مسبقًا — الرموز فريدة لكل نوع سجل.",
+  talErrCycleState: "حالة الدورة لا تسمح بهذا الانتقال — سلّم دورة الحياة أحادي الاتجاه.",
+  talErrReviewSubmitted: "التقييم مُقدَّم بالفعل ولا يُعدَّل بعد التقديم — التعديل في مرحلة المعايرة فقط.",
+  talErrDuplicateEnrollment: "الموظف مسجَّل في البرنامج بالفعل — سجل واحد لكل (برنامج، موظف).",
+  talErrVacancyState: "حالة الشاغر لا تسمح بهذا الإجراء.",
+  talErrAlreadyHired: "المتقدم مرتبط بموظف بالفعل — رابط التعيين يُكتب مرة واحدة.",
+  talErrSlotTaken: "خانة اللجنة محجوزة — خانة واحدة لكل عضو لكل جولة.",
+  talErrStageInvalid: "انتقال المرحلة غير صالح — المسار أحادي الاتجاه، والرجوع عبر إعادة الفتح المسجَّلة فقط.",
+  talErrNotHireable: "التعيين يتطلب وصول المتقدم إلى مرحلة العرض.",
+  talErrReopenInvalid: "إعادة الفتح للمرفوضين فقط — رابط تعيين الموظف المُعيَّن دائم.",
+  talErrWeights: "مجموع أوزان الأهداف النشطة يجب أن يساوي 100% بالضبط لكل دورة لكل موظف.",
+  talErrBelowThreshold: "هذه العلاقة دون حد الإفصاح (3 استجابات) — تُعرض المدخلات كمجمّعات فقط.",
+  talErrOrgCycle: "النقل المطلوب يُنشئ حلقة في الشجرة — مرفوض قبل أي كتابة.",
+  talErrNotPanelist: "بطاقة التقييم ملك عضو اللجنة نفسه — لا يمكن تسجيل بطاقة غيرك.",
+  talErrInvalid: "المدخلات غير صالحة — تحقق من القيم وأعد المحاولة.",
+  talCycleDraft: "مسودة",
+  talCycleActive: "نشطة",
+  talCycleCalibration: "معايرة",
+  talCycleClosed: "مغلقة",
+  talReviewDraft: "مسودة",
+  talReviewSubmitted: "مُقدَّم",
+  talReviewCalibrated: "مُعاير",
+  talKindManager: "المدير",
+  talKindSelf: "ذاتي",
+  talKindPeer: "نظير",
+  talKindSubordinate: "مرؤوس",
+  talGoalActive: "نشط",
+  talGoalAtRisk: "في خطر",
+  talGoalAchieved: "متحقق",
+  talGoalCancelled: "ملغى",
+  talStageNew: "جديد",
+  talStageScreen: "فرز",
+  talStageInterview: "مقابلة",
+  talStageOffer: "عرض",
+  talStageHired: "مُعيَّن",
+  talStageRejected: "مرفوض",
+  talVacancyOpen: "مفتوح",
+  talVacancyOnHold: "معلَّق",
+  talVacancyFilled: "مشغول",
+  talVacancyCancelled: "ملغى",
+  talEnrollEnrolled: "مسجَّل",
+  talEnrollInProgress: "قيد التنفيذ",
+  talEnrollCompleted: "مكتمل",
+  talEnrollWithdrawn: "منسحب",
+  talProgramInternal: "داخلي",
+  talProgramExternal: "خارجي",
+  talProgramActive: "مفعَّل",
+  talProgramRetired: "موقوف",
+  talPositionActive: "شاغرة",
+  talPositionRetired: "ملغاة",
+  talInterviewOnsite: "حضوري",
+  talInterviewVideo: "مرئي",
+  talInterviewPhone: "هاتفي",
+  talVerdictStrongHire: "توظيف قوي",
+  talVerdictHire: "توظيف",
+  talVerdictNoHire: "لا توظيف",
+  talVerdictStrongNoHire: "رفض قوي",
+  talDocPassport: "جواز سفر",
+  talDocIqama: "إقامة",
+  talDocVisa: "تأشيرة",
+  talDocContract: "عقد",
+  talDocCertificate: "شهادة",
+  talDocOther: "أخرى",
+  talTabCycles: "الدورات",
+  talTabMyReviews: "تقييماتي",
+  talTabCalibration: "المعايرة",
+  talTabGoals: "الأهداف",
+  talTabCompetencies: "الكفاءات",
+  talTabVacancies: "الشواغر",
+  talTabApplicants: "المتقدمون",
+  talTabInterviews: "المقابلات",
+  talTabPrograms: "البرامج",
+  talTabEnrollments: "التسجيلات",
+  talTabCertifications: "الشهادات",
+  talTabOrgUnits: "الوحدات التنظيمية",
+  talTabPositions: "الوظائف",
+  talTabDocsAlerts: "الوثائق والتنبيهات",
+  talLabelTitle: "المسمى",
+  talLabelTitleAr: "المسمى بالعربية",
+  talLabelName: "الاسم",
+  talLabelNameAr: "الاسم بالعربية",
+  talLabelNotes: "ملاحظات",
+  talLabelStatus: "الحالة",
+  talLabelGrade: "الدرجة",
+  talLabelPath: "المسار",
+  talLabelParent: "الأب",
+  talLabelRoot: "(الجذر)",
+  talSelectEmployee: "اختر موظفًا",
+  talSelectPosition: "اختر وظيفة",
+  talPosition: "الوظيفة",
+  talSelectOrgUnit: "اختر وحدة تنظيمية",
+  talSelectVacancy: "اختر شاغرًا",
+  talSelectProgram: "اختر برنامجًا",
+  talSelectApplicant: "اختر متقدمًا",
+  talEditBtn: "تحرير",
+  talSaveBtn: "حفظ",
+  talCancelBtn: "إلغاء",
+  talDeleteBtn: "حذف",
+  talConfirmDelete: "تأكيد الحذف؟",
+  talEmptyRows: "لا توجد سجلات بعد.",
+  talFilterAll: "الكل",
+  talPctFormat: "قيمة عشرية مثل 87.50",
+  talDateHint: "YYYY-MM-DD",
+  talExpiredChip: "منتهي",
+  talDaysLeft: "متبقٍ {days} يومًا",
+  talNoExpiry: "بلا انتهاء",
+  talCyclesCard: "دورات التقييم",
+  talCycleNew: "دورة جديدة",
+  talCyclePeriodStart: "بداية الفترة",
+  talCyclePeriodEnd: "نهاية الفترة",
+  talCycleReviewDue: "تاريخ استحقاق التقييم",
+  talCycleScope: "نطاق الوحدات (فارغ = كل الموظفين النشطين)",
+  talCyclePeriod: "الفترة",
+  talCycleVersion: "الإصدار",
+  talActivate: "تفعيل",
+  talOpenCalibration: "فتح المعايرة",
+  talCloseCycle: "إغلاق الدورة",
+  talCycleCreatedToast: "أُنشئت الدورة.",
+  talCycleTransitionedToast: "تحقّق انتقال الدورة.",
+  talReviewDueSoon: "الاستحقاق يقترب",
+  talMyReviewsCard: "تقييماتي",
+  talReviewNew: "تقييم جديد",
+  talReviewCycle: "الدورة",
+  talReviewReviewee: "المُقيَّم",
+  talReviewKind: "نوع المدخل",
+  talOverallScore: "الدرجة الكلية",
+  talCompetencyScores: "درجات الكفاءات (1–5)",
+  talSaveDraft: "حفظ المسودة",
+  talSubmit: "تقديم",
+  talReviewSavedToast: "حُفظت المسودة.",
+  talReviewSubmittedToast: "قُدِّم التقييم.",
+  talReviewerNote: "المقيِّم هو موظفك المرتبط — تُحلّ هويته من الجلسة، لا من النموذج.",
+  talGoalRollup: "حاصل الأهداف",
+  talOverallOptional: "اختياري لمدخل المدير، إلزامي لمدخلات 360",
+  talCalibrationCard: "المعايرة",
+  talCalibrate: "معايرة",
+  talCalibratedToast: "تمت المعايرة.",
+  talCalibrationHint: "تعمل المعايرة أثناء حالة «معايرة» فقط — الدرجة النهائية تُكتب على تقييم المدير.",
+  talAggregate360: "مجمّعات 360",
+  talAggregateHint: "تُعرض العلاقة عند 3 استجابات فأكثر — كمجمّعات فقط، دون إسناد لمصدر (BR-090).",
+  talAggregateCount: "العدد",
+  talAggregateMean: "المتوسط",
+  talAggregateMin: "الأدنى",
+  talAggregateMax: "الأعلى",
+  talBelowThresholdNote: "أقل من 3 استجابات — لا تُعرض.",
+  talSelectCycle: "اختر الدورة",
+  talGoalsCard: "الأهداف المتسلسلة",
+  talGoalNew: "هدف جديد",
+  talGoalOwner: "الموظف المالك",
+  talGoalParent: "الهدف الأب (اختياري)",
+  talGoalTitle: "العنوان",
+  talGoalTitleAr: "العنوان بالعربية",
+  talGoalWeight: "الوزن %",
+  talKriTarget: "هدف المؤشر",
+  talKriActual: "الفعلي للمؤشر",
+  talProgressPct: "الإنجاز %",
+  talDueDate: "تاريخ الاستحقاق",
+  talGoalCreatedToast: "أُنشئ الهدف.",
+  talGoalUpdatedToast: "حُدِّث الهدف.",
+  talWeightCheck: "فحص مجموع الأوزان (BR-089)",
+  talWeightSum: "المجموع",
+  talWeightValid: "صالح — 100% بالضبط",
+  talWeightInvalid: "غير صالح",
+  talActiveGoalsCount: "أهداف نشطة",
+  talMyGoals: "أهدافي وتحديث الإنجاز",
+  talMyGoalsHint: "تحدّث إنجاز أهدافك أنت — المؤشر الفعلي والنسبة، والحالة تُشتق وتيرةً.",
+  talUpdateProgress: "تحديث الإنجاز",
+  talProgressUpdatedToast: "حُدِّث الإنجاز.",
+  talRunCheck: "فحص",
+  talCompetenciesCard: "إطار الكفاءات",
+  talCompetencyNew: "كفاءة جديدة",
+  talCategory: "الفئة",
+  talActiveBadge: "مفعَّلة",
+  talInactiveBadge: "موقوفة",
+  talDeactivate: "إيقاف",
+  talScaleCard: "مقياس المستويات 1–5",
+  talScaleHint: "الوصوف بيانات خاصة بالمستأجر — البذرة الموثَّقة 1–5، والتعديل معايرتك أنت.",
+  talLevel: "المستوى",
+  talDescriptor: "الوصف",
+  talDescriptorAr: "الوصف بالعربية",
+  talEditLevel: "تحرير المستوى",
+  talLevelSavedToast: "حُفظ وصف المستوى.",
+  talCompetencySavedToast: "حُفظت الكفاءة.",
+  talVacanciesCard: "الشواغر",
+  talVacancyNew: "شاغر جديد",
+  talHeadcount: "العدد المطلوب",
+  talHold: "تعليق",
+  talResume: "استئناف",
+  talFill: "إشغال",
+  talVacancyCreatedToast: "أُنشئ الشاغر.",
+  talVacancyTransitionedToast: "تحقّق انتقال الشاغر.",
+  talOpenedAt: "تاريخ الفتح",
+  talFilledAt: "تاريخ الإشغال",
+  talApplicantsCard: "مسار المتقدمين",
+  talApplicantNew: "متقدم جديد",
+  talFullName: "الاسم الكامل",
+  talFullNameAr: "الاسم بالعربية",
+  talEmail: "البريد الإلكتروني",
+  talPhone: "الهاتف",
+  talSource: "المصدر",
+  talStage: "المرحلة",
+  talAdvance: "تقديم المرحلة",
+  talReopen: "إعادة فتح",
+  talHire: "تعيين",
+  talHireEmployee: "الموظف المرتبط",
+  talHireNote: "التعيين يربط المتقدم بملف موظف قائم — الرابط يُكتب مرة واحدة.",
+  talApplicantCreatedToast: "أُنشئ المتقدم.",
+  talStageAdvancedToast: "تقدّمت المرحلة.",
+  talReopenedToast: "أُعيد فتح المتقدم إلى الفرز.",
+  talHiredToast: "تم التعيين وربط ملف الموظف.",
+  talFilterVacancy: "الشاغر",
+  talFilterStage: "المرحلة",
+  talStageHistory: "سجل المراحل",
+  talHiredLink: "مرتبط بموظف",
+  talInterviewsCard: "مقابلات اللجان",
+  talInterviewNew: "جدولة مقابلة",
+  talApplicant: "المتقدم",
+  talRound: "الجولة",
+  talPanelist: "عضو اللجنة",
+  talScheduledStart: "البداية",
+  talScheduledEnd: "النهاية",
+  talMode: "الطريقة",
+  talVerdict: "الحكم",
+  talScorecard: "بطاقة التقييم",
+  talRecordScorecard: "تسجيل البطاقة",
+  talScorecardHint: "البطاقة ملك خانتك أنت — درجات الكفاءات من 1 إلى 5، والحكم ختام التسجيل.",
+  talInterviewScheduledToast: "جُدولة المقابلة.",
+  talScorecardSavedToast: "سُجّلت البطاقة.",
+  talDateTimeHint: "YYYY-MM-DD HH:MM",
+  talProgramsCard: "برامج التدريب",
+  talProgramNew: "برنامج جديد",
+  talProgramKind: "النوع",
+  talProvider: "الجهة المقدمة",
+  talCost: "التكلفة",
+  talRetire: "إيقاف",
+  talReactivate: "تفعيل",
+  talProgramCreatedToast: "أُنشئ البرنامج.",
+  talProgramSavedToast: "حُفظ البرنامج.",
+  talEnrollmentsCard: "سجل التسجيلات",
+  talEnrollNew: "تسجيل جديد",
+  talProgram: "البرنامج",
+  talAttendancePct: "الالتزام %",
+  talCompletionPct: "الإكمال %",
+  talResult: "النتيجة",
+  talResultPending: "معلقة",
+  talResultPassed: "ناجح",
+  talResultFailed: "راسب",
+  talCompletedAt: "تاريخ الإكمال",
+  talEnrolledToast: "تم التسجيل.",
+  talEnrollSavedToast: "حُفظ التسجيل.",
+  talEnrollStatusHint: "الإكمال يختم completed_at مع النتيجة في الكتابة نفسها — ولا يُعاد ختمه.",
+  talCertificationsCard: "سجل الشهادات",
+  talCertNew: "شهادة جديدة",
+  talIssuer: "الجهة المانحة",
+  talIssueDate: "تاريخ الإصدار",
+  talExpiryDate: "تاريخ الانتهاء",
+  talCertificateNumber: "رقم الشهادة",
+  talCertCreatedToast: "سُجّلت الشهادة.",
+  talCertSavedToast: "حُفظت الشهادة (التجديد).",
+  talCertExpiryChip: "قريبة الانتهاء",
+  talOrgUnitsCard: "شجرة الوحدات التنظيمية",
+  talOrgUnitNew: "وحدة جديدة",
+  talOrgCodeHint: "حروف وأرقام وشرطة سفلية — بلا نقاط (قواعد المسار)",
+  talMoveUnit: "نقل الوحدة",
+  talMoveHint: "النقل يُدقّق خلوّ المسار من الحلقات قبل أي كتابة — النقل الآمن فقط.",
+  talRootOption: "الجذر (بلا أب)",
+  talUnitSavedToast: "حُفظت الوحدة.",
+  talUnitMovedToast: "نُقلت الوحدة وشُوّكت مسارات الفروع.",
+  talPositionsCard: "سجل الوظائف",
+  talPositionNew: "وظيفة جديدة",
+  talReportsTo: "يتبع",
+  talNoReportsTo: "بلا تبعية",
+  talPositionSavedToast: "حُفظت الوظيفة.",
+  talDocsCard: "سجل وثائق الموظفين",
+  talDocNew: "وثيقة جديدة",
+  talDocKind: "النوع",
+  talDocNumber: "الرقم",
+  talIssuedOn: "تاريخ الإصدار",
+  talExpiresOn: "تاريخ الانتهاء",
+  talDocPiiNote: "أرقام الإقامة والجواز أدق بيانات المستأجر التشغيلية — تُدار من هنا فقط ولا تُصدَّر أبدًا.",
+  talDocSavedToast: "حُفظت الوثيقة.",
+  talDocDeletedToast: "حُذفت الوثيقة.",
+  talAlertsCard: "تفقّد الانتهاء اليومي",
+  talAlertsHint: "العتبات بيانات قابلة للضبط لكل مستأجر — الافتراضي الموثَّق 30/7/0 يومًا، والإيقاف صريح لا صامت.",
+  talThresholds: "العتبات (أيام)",
+  talThresholdsHint: "أرقام مفصولة بفواصل مثل 30, 7, 0",
+  talSweepActive: "التفقّد مفعَّل",
+  talLastRun: "آخر تشغيل",
+  talLastFlagged: "آخر عدد تنبيهات",
+  talAlertJobSavedToast: "حُفظ إعداد التفقّد.",
+  talAlertsCoverNote: "يغطي التفقّد أربعة مسابر: الوثائق، الشهادات، نهاية فترة التجربة، واستحقاق التقييم — تنبيه واحد لكل موظف لكل وثيقة لكل عتبة.",
+  talNeverRun: "لم يُشغَّل بعد",
+  tal360Title: "ملف المواهب 360",
+  tal360Placement: "الموضع التنظيمي",
+  tal360NoPlacement: "لا موضع — موظف بلا وظيفة مسندة.",
+  tal360Probation: "نهاية فترة التجربة",
+  tal360Trend: "مسار التقييمات",
+  tal360TrendHint: "درجات المدير النهائية لكل دورة — مدخلات 360 لا تُعرض إلا مجمّعة (BR-090).",
+  tal360Goals: "الأهداف",
+  tal360Training: "سجل التدريب",
+  tal360Certifications: "الشهادات",
+  tal360Documents: "الوثائق ورقائق الانتهاء",
+  tal360Source: "سجل مصدر التعيين",
+  tal360NoSource: "لا سجل توظيف — الملف لم يُنشأ من مسار المتقدمين.",
+  tal360NoAccess: "طبقة المواهب تتطلب صلاحيات الموارد البشرية — لا تعرض لك هنا.",
+  tal360Weight: "الوزن",
+  tal360Overall: "الدرجة",
 };
 
 const en: Dictionary = {
@@ -19666,6 +20287,316 @@ const en: Dictionary = {
   hrSelfNoTypes: "No active leave types — ask HR.",
   hrSelfCancelledToast: "The request was cancelled.",
   hrErrSelfNotLinked: "No employee file is linked to your account in this tenant — the self-service surfaces resolve your identity through the employee ↔ user link.",
+  // PHASE-047 (W-5 — T-11…T-14, D-12): the talent plane's screens + the 360
+  // extension (the four families + the alert surfaces).
+  talErrNotFound: "The requested record does not exist in this tenant.",
+  talErrCodeTaken: "The code is already used — codes are unique per record kind.",
+  talErrCycleState: "The cycle's state does not allow this transition — the lifecycle ladder is one-way.",
+  talErrReviewSubmitted: "The review is already submitted and immutable until calibration.",
+  talErrDuplicateEnrollment: "The employee is already enrolled — one record per (program, employee).",
+  talErrVacancyState: "The vacancy's state does not allow this action.",
+  talErrAlreadyHired: "The applicant is already linked to an employee — the hire link is written once.",
+  talErrSlotTaken: "The panel slot is taken — one slot per panelist per round.",
+  talErrStageInvalid: "The stage move is invalid — the ladder is monotonic; backward motion only via the recorded reopen.",
+  talErrNotHireable: "The hire act requires the applicant to reach the OFFER stage.",
+  talErrReopenInvalid: "Only a REJECTED applicant reopens — a hired applicant's employee link is permanent.",
+  talErrWeights: "The active goal weights must sum to exactly 100% per cycle per employee.",
+  talErrBelowThreshold: "This relationship is below the disclosure threshold (3 responses) — inputs surface as aggregates only.",
+  talErrOrgCycle: "The requested move would create a cycle in the tree — refused before any write.",
+  talErrNotPanelist: "The scorecard belongs to its own panelist — you cannot record someone else's card.",
+  talErrInvalid: "The input is invalid — check the values and retry.",
+  talCycleDraft: "Draft",
+  talCycleActive: "Active",
+  talCycleCalibration: "Calibration",
+  talCycleClosed: "Closed",
+  talReviewDraft: "Draft",
+  talReviewSubmitted: "Submitted",
+  talReviewCalibrated: "Calibrated",
+  talKindManager: "Manager",
+  talKindSelf: "Self",
+  talKindPeer: "Peer",
+  talKindSubordinate: "Subordinate",
+  talGoalActive: "Active",
+  talGoalAtRisk: "At risk",
+  talGoalAchieved: "Achieved",
+  talGoalCancelled: "Cancelled",
+  talStageNew: "New",
+  talStageScreen: "Screening",
+  talStageInterview: "Interview",
+  talStageOffer: "Offer",
+  talStageHired: "Hired",
+  talStageRejected: "Rejected",
+  talVacancyOpen: "Open",
+  talVacancyOnHold: "On hold",
+  talVacancyFilled: "Filled",
+  talVacancyCancelled: "Cancelled",
+  talEnrollEnrolled: "Enrolled",
+  talEnrollInProgress: "In progress",
+  talEnrollCompleted: "Completed",
+  talEnrollWithdrawn: "Withdrawn",
+  talProgramInternal: "Internal",
+  talProgramExternal: "External",
+  talProgramActive: "Active",
+  talProgramRetired: "Retired",
+  talPositionActive: "Active",
+  talPositionRetired: "Retired",
+  talInterviewOnsite: "Onsite",
+  talInterviewVideo: "Video",
+  talInterviewPhone: "Phone",
+  talVerdictStrongHire: "Strong hire",
+  talVerdictHire: "Hire",
+  talVerdictNoHire: "No hire",
+  talVerdictStrongNoHire: "Strong no hire",
+  talDocPassport: "Passport",
+  talDocIqama: "Iqama",
+  talDocVisa: "Visa",
+  talDocContract: "Contract",
+  talDocCertificate: "Certificate",
+  talDocOther: "Other",
+  talTabCycles: "Cycles",
+  talTabMyReviews: "My reviews",
+  talTabCalibration: "Calibration",
+  talTabGoals: "Goals",
+  talTabCompetencies: "Competencies",
+  talTabVacancies: "Vacancies",
+  talTabApplicants: "Applicants",
+  talTabInterviews: "Interviews",
+  talTabPrograms: "Programs",
+  talTabEnrollments: "Enrollments",
+  talTabCertifications: "Certifications",
+  talTabOrgUnits: "Org units",
+  talTabPositions: "Positions",
+  talTabDocsAlerts: "Documents & alerts",
+  talLabelTitle: "Title",
+  talLabelTitleAr: "Title (Arabic)",
+  talLabelName: "Name",
+  talLabelNameAr: "Name (Arabic)",
+  talLabelNotes: "Notes",
+  talLabelStatus: "Status",
+  talLabelGrade: "Grade",
+  talLabelPath: "Path",
+  talLabelParent: "Parent",
+  talLabelRoot: "(Root)",
+  talSelectEmployee: "Select an employee",
+  talSelectPosition: "Select a position",
+  talPosition: "Position",
+  talSelectOrgUnit: "Select an org unit",
+  talSelectVacancy: "Select a vacancy",
+  talSelectProgram: "Select a program",
+  talSelectApplicant: "Select an applicant",
+  talEditBtn: "Edit",
+  talSaveBtn: "Save",
+  talCancelBtn: "Cancel",
+  talDeleteBtn: "Delete",
+  talConfirmDelete: "Confirm delete?",
+  talEmptyRows: "No records yet.",
+  talFilterAll: "All",
+  talPctFormat: "A decimal value like 87.50",
+  talDateHint: "YYYY-MM-DD",
+  talExpiredChip: "Expired",
+  talDaysLeft: "{days} days remaining",
+  talNoExpiry: "No expiry",
+  talCyclesCard: "Performance cycles",
+  talCycleNew: "New cycle",
+  talCyclePeriodStart: "Period start",
+  talCyclePeriodEnd: "Period end",
+  talCycleReviewDue: "Review due date",
+  talCycleScope: "Org-unit scope (empty = all active employees)",
+  talCyclePeriod: "Period",
+  talCycleVersion: "Version",
+  talActivate: "Activate",
+  talOpenCalibration: "Open calibration",
+  talCloseCycle: "Close cycle",
+  talCycleCreatedToast: "The cycle was created.",
+  talCycleTransitionedToast: "The cycle transitioned.",
+  talReviewDueSoon: "Due soon",
+  talMyReviewsCard: "My reviews",
+  talReviewNew: "New review",
+  talReviewCycle: "Cycle",
+  talReviewReviewee: "Reviewee",
+  talReviewKind: "Input kind",
+  talOverallScore: "Overall score",
+  talCompetencyScores: "Competency scores (1–5)",
+  talSaveDraft: "Save draft",
+  talSubmit: "Submit",
+  talReviewSavedToast: "The draft was saved.",
+  talReviewSubmittedToast: "The review was submitted.",
+  talReviewerNote: "The reviewer is your linked employee — resolved from the session, never from the form.",
+  talGoalRollup: "Goal rollup",
+  talOverallOptional: "Optional for the manager input, required for the 360 kinds",
+  talCalibrationCard: "Calibration",
+  talCalibrate: "Calibrate",
+  talCalibratedToast: "The review was calibrated.",
+  talCalibrationHint: "Calibration runs only while the cycle is in CALIBRATION — the final score writes onto the manager review.",
+  talAggregate360: "360 aggregates",
+  talAggregateHint: "A relationship surfaces at 3+ responses — aggregates only, never attributed (BR-090).",
+  talAggregateCount: "Count",
+  talAggregateMean: "Mean",
+  talAggregateMin: "Min",
+  talAggregateMax: "Max",
+  talBelowThresholdNote: "Below 3 responses — not shown.",
+  talSelectCycle: "Select the cycle",
+  talGoalsCard: "Cascading goals",
+  talGoalNew: "New goal",
+  talGoalOwner: "Owner",
+  talGoalParent: "Parent goal (optional)",
+  talGoalTitle: "Title",
+  talGoalTitleAr: "Title (Arabic)",
+  talGoalWeight: "Weight %",
+  talKriTarget: "KRI target",
+  talKriActual: "KRI actual",
+  talProgressPct: "Progress %",
+  talDueDate: "Due date",
+  talGoalCreatedToast: "The goal was created.",
+  talGoalUpdatedToast: "The goal was updated.",
+  talWeightCheck: "Weight-sum check (BR-089)",
+  talWeightSum: "Sum",
+  talWeightValid: "Valid — exactly 100%",
+  talWeightInvalid: "Invalid",
+  talActiveGoalsCount: "Active goals",
+  talMyGoals: "My goals & progress triage",
+  talMyGoalsHint: "Update YOUR own goals — the KRI actual and the percentage; the status re-derives from pace.",
+  talUpdateProgress: "Update progress",
+  talProgressUpdatedToast: "The progress was updated.",
+  talRunCheck: "Check",
+  talCompetenciesCard: "Competency framework",
+  talCompetencyNew: "New competency",
+  talCategory: "Category",
+  talActiveBadge: "Active",
+  talInactiveBadge: "Inactive",
+  talDeactivate: "Deactivate",
+  talScaleCard: "The 1–5 level scale",
+  talScaleHint: "The descriptors are tenant data — the 1–5 band is the shipped default; edits are your own calibration.",
+  talLevel: "Level",
+  talDescriptor: "Descriptor",
+  talDescriptorAr: "Descriptor (Arabic)",
+  talEditLevel: "Edit level",
+  talLevelSavedToast: "The level descriptor was saved.",
+  talCompetencySavedToast: "The competency was saved.",
+  talVacanciesCard: "Vacancies",
+  talVacancyNew: "New vacancy",
+  talHeadcount: "Headcount",
+  talHold: "Hold",
+  talResume: "Resume",
+  talFill: "Fill",
+  talVacancyCreatedToast: "The vacancy was created.",
+  talVacancyTransitionedToast: "The vacancy transitioned.",
+  talOpenedAt: "Opened at",
+  talFilledAt: "Filled at",
+  talApplicantsCard: "Applicant pipeline",
+  talApplicantNew: "New applicant",
+  talFullName: "Full name",
+  talFullNameAr: "Full name (Arabic)",
+  talEmail: "Email",
+  talPhone: "Phone",
+  talSource: "Source",
+  talStage: "Stage",
+  talAdvance: "Advance stage",
+  talReopen: "Reopen",
+  talHire: "Hire",
+  talHireEmployee: "Linked employee",
+  talHireNote: "The hire links the applicant to an existing employee record — the link is written once.",
+  talApplicantCreatedToast: "The applicant was created.",
+  talStageAdvancedToast: "The stage advanced.",
+  talReopenedToast: "The applicant reopened to screening.",
+  talHiredToast: "The hire linked the employee record.",
+  talFilterVacancy: "Vacancy",
+  talFilterStage: "Stage",
+  talStageHistory: "Stage history",
+  talHiredLink: "Employee-linked",
+  talInterviewsCard: "Panel interviews",
+  talInterviewNew: "Schedule an interview",
+  talApplicant: "Applicant",
+  talRound: "Round",
+  talPanelist: "Panelist",
+  talScheduledStart: "Scheduled start",
+  talScheduledEnd: "Scheduled end",
+  talMode: "Mode",
+  talVerdict: "Verdict",
+  talScorecard: "Scorecard",
+  talRecordScorecard: "Record scorecard",
+  talScorecardHint: "The scorecard is your OWN slot's — competency ratings 1–5; the verdict closes the record.",
+  talInterviewScheduledToast: "The interview was scheduled.",
+  talScorecardSavedToast: "The scorecard was recorded.",
+  talDateTimeHint: "YYYY-MM-DD HH:MM",
+  talProgramsCard: "Training programs",
+  talProgramNew: "New program",
+  talProgramKind: "Kind",
+  talProvider: "Provider",
+  talCost: "Cost",
+  talRetire: "Retire",
+  talReactivate: "Reactivate",
+  talProgramCreatedToast: "The program was created.",
+  talProgramSavedToast: "The program was saved.",
+  talEnrollmentsCard: "Enrollments",
+  talEnrollNew: "New enrollment",
+  talProgram: "Program",
+  talAttendancePct: "Attendance %",
+  talCompletionPct: "Completion %",
+  talResult: "Result",
+  talResultPending: "Pending",
+  talResultPassed: "Passed",
+  talResultFailed: "Failed",
+  talCompletedAt: "Completed at",
+  talEnrolledToast: "The enrollment was created.",
+  talEnrollSavedToast: "The enrollment was saved.",
+  talEnrollStatusHint: "The COMPLETED edge stamps completed_at with the result in the same write — and never re-stamps it.",
+  talCertificationsCard: "Certifications",
+  talCertNew: "New certification",
+  talIssuer: "Issuer",
+  talIssueDate: "Issue date",
+  talExpiryDate: "Expiry date",
+  talCertificateNumber: "Certificate number",
+  talCertCreatedToast: "The certification was registered.",
+  talCertSavedToast: "The certification was saved (renewal).",
+  talCertExpiryChip: "Expiring",
+  talOrgUnitsCard: "The org-unit tree",
+  talOrgUnitNew: "New unit",
+  talOrgCodeHint: "Letters, digits, underscore — no dots (the path grammar)",
+  talMoveUnit: "Move unit",
+  talMoveHint: "The move validates the tree stays cycle-free before any write — cycle-safe moves only.",
+  talRootOption: "Root (no parent)",
+  talUnitSavedToast: "The unit was saved.",
+  talUnitMovedToast: "The unit moved and the subtree re-pathed.",
+  talPositionsCard: "Positions",
+  talPositionNew: "New position",
+  talReportsTo: "Reports to",
+  talNoReportsTo: "No reports-to",
+  talPositionSavedToast: "The position was saved.",
+  talDocsCard: "Employee documents",
+  talDocNew: "New document",
+  talDocKind: "Kind",
+  talDocNumber: "Number",
+  talIssuedOn: "Issued on",
+  talExpiresOn: "Expires on",
+  talDocPiiNote: "Iqama and passport numbers are the tenant's most sensitive operational data — managed here, never exported.",
+  talDocSavedToast: "The document was saved.",
+  talDocDeletedToast: "The document was deleted.",
+  talAlertsCard: "The daily expiry sweep",
+  talAlertsHint: "The thresholds are tenant-configurable data — the documented default is 30/7/0 days; deactivation is explicit, never silent.",
+  talThresholds: "Thresholds (days)",
+  talThresholdsHint: "Comma-separated numbers like 30, 7, 0",
+  talSweepActive: "Sweep active",
+  talLastRun: "Last run",
+  talLastFlagged: "Last flagged",
+  talAlertJobSavedToast: "The sweep configuration was saved.",
+  talAlertsCoverNote: "The sweep covers four probes: documents, certifications, probation end, and review due — one alert per employee per document per threshold.",
+  talNeverRun: "Never run",
+  tal360Title: "The talent 360",
+  tal360Placement: "Placement",
+  tal360NoPlacement: "No placement — the employee holds no position.",
+  tal360Probation: "Probation end",
+  tal360Trend: "Review trend",
+  tal360TrendHint: "The manager outcomes per cycle — 360 inputs surface as aggregates only (BR-090).",
+  tal360Goals: "Goals",
+  tal360Training: "Training records",
+  tal360Certifications: "Certifications",
+  tal360Documents: "Documents & expiry chips",
+  tal360Source: "Recruitment source record",
+  tal360NoSource: "No recruitment record — this employee was not created through the applicant pipeline.",
+  tal360NoAccess: "The talent plane requires HR permissions — nothing is shown here for your session.",
+  tal360Weight: "Weight",
+  tal360Overall: "Score",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

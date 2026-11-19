@@ -110,6 +110,23 @@ const DOCUMENT_COLUMNS = sql`
   version, created_at::text AS "createdAt", updated_at::text AS "updatedAt"
 `;
 
+/** The placement read's aliased axes (W-5 — the 360 extension): the
+ * position and org-unit columns under distinct aliases so ONE joined
+ * read can shape both rows (a null id = the axis is absent). */
+const POSITION_COLUMNS_ALIASED = sql`
+  p.id AS "positionId", p.code AS "positionCode", p.title AS "positionTitle",
+  p.title_ar AS "positionTitleAr", p.grade AS "positionGrade",
+  p.org_unit_id AS "positionOrgUnitId", p.reports_to AS "positionReportsTo",
+  p.status AS "positionStatus", p.version AS "positionVersion",
+  p.created_at::text AS "positionCreatedAt", p.updated_at::text AS "positionUpdatedAt"
+`;
+const ORG_UNIT_COLUMNS_ALIASED = sql`
+  o.id AS "unitId", o.code AS "unitCode", o.name AS "unitName",
+  o.name_ar AS "unitNameAr", o.parent_id AS "unitParentId", o.path AS "unitPath",
+  o.active AS "unitActive", o.version AS "unitVersion",
+  o.created_at::text AS "unitCreatedAt", o.updated_at::text AS "unitUpdatedAt"
+`;
+
 // ── org units (the cycle-safe tree, D-09) ──────────────────────────────────
 
 export async function insertOrgUnit(input: {
@@ -403,4 +420,74 @@ export async function findEmployeeBrief(
     FROM employees WHERE id = ${employeeId} LIMIT 1
   `);
   return (rows.rows as unknown as { id: string; code: string; name: string; probationEnd: string | null }[])[0];
+}
+
+/**
+ * PHASE-047 (W-5 — T-14, the 360 extension's placement read): the
+ * employee's D-01 extension axes in ONE read — the position row (with
+ * grade + reports_to), the position's org unit (with the materialized
+ * path), and D-02/amendment A-1's probation_end. READ-ONLY on the
+ * employees substrate (D-01's law: the talent layer never writes it);
+ * a position-less employee ships null axes (absence is a valid state,
+ * never an error — the userId bridge's precedent). `undefined` = no
+ * such employee row under RLS (A7: unknown == foreign).
+ */
+export interface EmployeePlacementView {
+  position: PositionRow | null;
+  orgUnit: OrgUnitRow | null;
+  probationEnd: string | null;
+}
+
+export async function findPlacement(
+  employeeId: string,
+): Promise<EmployeePlacementView | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${POSITION_COLUMNS_ALIASED}, ${ORG_UNIT_COLUMNS_ALIASED},
+           e.probation_end::text AS "probationEnd"
+    FROM employees e
+    LEFT JOIN positions p ON p.id = e.position_id
+    LEFT JOIN org_units o ON o.id = p.org_unit_id
+    WHERE e.id = ${employeeId}
+    LIMIT 1
+  `);
+  const row = (rows.rows as unknown as Record<string, string | null | boolean | number>[])[0];
+  if (row === undefined) {
+    return undefined;
+  }
+  const positionId = row["positionId"] as string | null;
+  const unitId = row["unitId"] as string | null;
+  return {
+    position:
+      positionId === null
+        ? null
+        : {
+            id: positionId,
+            code: row["positionCode"] as string,
+            title: row["positionTitle"] as string,
+            titleAr: (row["positionTitleAr"] as string | null) ?? null,
+            grade: (row["positionGrade"] as string | null) ?? null,
+            orgUnitId: (row["positionOrgUnitId"] as string | null) ?? null,
+            reportsTo: (row["positionReportsTo"] as string | null) ?? null,
+            status: row["positionStatus"] as string,
+            version: row["positionVersion"] as number,
+            createdAt: row["positionCreatedAt"] as string,
+            updatedAt: row["positionUpdatedAt"] as string,
+          },
+    orgUnit:
+      unitId === null
+        ? null
+        : {
+            id: unitId,
+            code: row["unitCode"] as string,
+            name: row["unitName"] as string,
+            nameAr: (row["unitNameAr"] as string | null) ?? null,
+            parentId: (row["unitParentId"] as string | null) ?? null,
+            path: row["unitPath"] as string,
+            active: row["unitActive"] as boolean,
+            version: row["unitVersion"] as number,
+            createdAt: row["unitCreatedAt"] as string,
+            updatedAt: row["unitUpdatedAt"] as string,
+          },
+    probationEnd: (row["probationEnd"] as string | null) ?? null,
+  };
 }

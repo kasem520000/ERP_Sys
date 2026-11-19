@@ -1,0 +1,18 @@
+Scope: 9 of 10 workspace projects
+packages/contracts typecheck$ tsc --noEmit -p tsconfig.json
+packages/domain-core typecheck$ tsc --noEmit -p tsconfig.json
+packages/domain-core typecheck: Done
+packages/contracts typecheck: Done
+packages/sync-core typecheck$ tsc --noEmit -p tsconfig.json
+packages/ui typecheck$ tsc --noEmit -p tsconfig.json
+packages/sync-core typecheck: Done
+packages/ui typecheck: Done
+apps/desktop typecheck$ tsc --noEmit -p tsconfig.json
+apps/mobile typecheck$ tsc --noEmit -p tsconfig.json
+apps/web typecheck$ tsc --noEmit -p tsconfig.json
+apps/desktop typecheck: Done
+apps/mobile typecheck: Done
+apps/web typecheck: Done
+apps/api typecheck$ tsc --noEmit -p tsconfig.json
+apps/api typecheck: Done
+EXIT=0

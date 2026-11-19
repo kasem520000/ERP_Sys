@@ -1,0 +1,18 @@
+Scope: 9 of 10 workspace projects
+packages/contracts lint$ eslint .
+packages/domain-core lint$ eslint .
+packages/domain-core lint: Done
+packages/contracts lint: Done
+packages/sync-core lint$ eslint .
+packages/ui lint$ eslint .
+packages/sync-core lint: Done
+packages/ui lint: Done
+apps/desktop lint$ eslint .
+apps/mobile lint$ eslint .
+apps/web lint$ eslint .
+apps/desktop lint: Done
+apps/mobile lint: Done
+apps/web lint: Done
+apps/api lint$ eslint .
+apps/api lint: Done
+EXIT=0

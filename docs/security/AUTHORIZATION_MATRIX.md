@@ -752,6 +752,19 @@ finance side's read plane over the employee substrate); NO other system role
 (document-expiry, certification-expiry, probation-end, review-due) ride the
 notifications' own permission plane — no new key.
 
+> **[Dated 2026-11-19 (W-5 — T-14, the 360 extension's composition reads):
+> ROUTE_PERMISSIONS 984 → 988.]** Four READ routes join on the EXISTING
+> family keys (the 046 W-5 web-plane precedent — no new keys, drift stays
+> 312 = 312): `GET /api/v1/hr/performance/reviews/for-employee/:employeeId`
+> (hr.performance.view — MANAGER reviews only, BR-090 by construction),
+> `GET /api/v1/hr/goals/for-employee/:employeeId` (hr.performance.view —
+> the manage-side plane; the OWN plane stays `goals/own` on
+> hr.performance.review), `GET
+> /api/v1/hr/recruitment/applicants/by-employee/:employeeId`
+> (hr.recruitment.view — null for no hire link, A7-indistinguishable), and
+> `GET /api/v1/hr/org/placement/:employeeId` (hr.org.view — D-01's
+> documented extension axes, read-only on the substrate).
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

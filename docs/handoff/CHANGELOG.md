@@ -1,9 +1,76 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-4 — the external bridges wave delivered + the NF-9/NF-10/NF-11 fixes; W-3 the recruitment + training/org + documents + sweep wave + the NF-7/NF-8 fixes; 2026-11-18: W-2 the performance + goals engines + the NF-4/NF-5 fixes; W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-5 — the web plane delivered: the four screen families + the 360 extension + the four composition reads + 308 i18n keys/locale, with the honest disclosure of the pre-existing 045 self-board Tabs defect; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 the recruitment + training/org + documents + sweep wave + the NF-7/NF-8 fixes; 2026-11-18: W-2 the performance + goals engines + the NF-4/NF-5 fixes; W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-19 — **PHASE-047 W-5 — THE WEB PLANE DELIVERED** (T-11 +
+  T-12 + T-13 + T-14, the plan §3 W-5 + D-13; on the W-4 head
+  `83362ff`, this session's fresh clone — the same-session evidence
+  rule's TWELFTH consecutive wave): the FOUR SCREEN FAMILIES —
+  `/hr/performance` (FIVE tabs: the cycle register with the one-way
+  lifecycle acts, MY REVIEWS — the own-rows submission plane, the
+  reviewer always the session's linked employee; the 360-kind
+  overallScore REQUIRED / the manager's optional; the calibration
+  view with **BR-090's aggregate panel** — the ≥ 3 relationships
+  only, count/mean/min/max, the below-threshold notes; the goals
+  cascade with BR-089's explicit weight check + the own-goals KRI
+  triage; the competency framework + the tenant's 1–5 scale
+  descriptors), `/hr/recruitment` (THREE tabs: the vacancy lifecycle,
+  **BR-088's monotonic applicant pipeline** with the recorded REOPEN
+  and the written-once hire link to the 045 employee master, and the
+  panel interviews with the OWN-slot scorecard), `/hr/training`
+  (THREE tabs: the program catalog — cost is money, ADR-0009; the
+  enrollments register — the COMPLETED edge stamps completed_at with
+  the result in the same write and never re-stamps; the
+  certifications with the expiry chips — the sweep's probe-2
+  visibility), and `/hr/org-structure` (THREE tabs: the org-unit tree
+  with **the cycle-safe MOVE through the guarded API — never
+  client-side reordering, D-09**, the position register, and **the
+  HR-10 documents & alerts plane** — the tenant-wide alert list with
+  the expiry chips + the register management + **the sweep's
+  registration surface**: the tenant-configurable thresholds + the
+  explicit off switch, red line 5's DATA-not-constants law)) + **THE
+  EMPLOYEE 360 EXTENSION** on `payroll/employees/[id]` (the D-01
+  placement card with the A-1 probation chip, the MANAGER-outcomes
+  trend — BR-090 by construction, the active goals, the training
+  records, the certifications, the document register with expiry
+  chips, and the hired-applicant source record with its stage
+  history; read-model composition over the module APIs, every fetch
+  degrading honestly on its own permission plane) + **THE FOUR
+  COMPOSITION READS** (the 046 W-5 precedent: the trend read
+  (hr.performance.view, MANAGER-only), the goals read (the manage
+  side; the OWN plane stays goals/own), the applicant-by-employee
+  read (**null for no hire link — A7-indistinguishable, never a
+  404**), and the D-01 placement read (hr.org.view, read-only on the
+  substrate); ROUTE_PERMISSIONS **984 → 988**, no new keys, drift
+  **312 = 312**) + **+308 i18n keys/locale** (6,125 → **6,433**,
+  100% parity — D-12's exact-count law) + the localized talent error
+  map + thirteen status localizers + the NAV flag-gating arm in the
+  ui behavior suite (each flag hides its own row — the
+  entitlement/authorization divergence proven at the resolver). The
+  specs: **+35 web component tests** (5 files, the atp-promise-point
+  pattern — the exact POST shapes, the honest no-permission notices,
+  the local-refusal laws, the typed mirrors) + **the route-level
+  spec 9/9** (the statutory-routes idiom: the four families' gates
+  through the FULL Nest pipeline, the composition reads' laws, the
+  own-rows law at HTTP — HR_SELF_NOT_LINKED — the ladder's + BR-088's
+  typed refusals through the error filter; the world build honors the
+  atomicity floor's lock order). Gates ALL GREEN (targeted DB
+  families per the scope-label law — hr 19 · 151 · isolation 2 ·
+  1,710 · identity 6 · 73 · billing 5 · 36 · payroll 11 · 88 ·
+  sandbox+rls 2 · 16; the W-7 full-run expectation moves to **256
+  files · 3,594**; typecheck/lint 8/8 0-cached · depcruise 1,986 ·
+  14,812 · unit 8/8 — web 122, ui 43 · check:rls 307/0 from a scratch
+  PG16 · drift 312 = 312 · i18n 6,433 + 371 · docs 33/33 · manifests
+  13/13 · id-ledger 0 · secrets 0). **THE HONEST DISCLOSURE (§5 of
+  the gate doc): a PRE-EXISTING 045 defect found by this wave's
+  component tests** — `hr-self-board.tsx`'s conditional-expression
+  Tabs children render EMPTY for every tab except the last (the
+  Children.forEach null-overwrite; proven in a minimal jsdom repro);
+  the W-5 boards are immune by construction (the data-slot shape);
+  the 3-line repair is 045 scope — recorded for the owner's dispatch,
+  NOT silently fixed here (the one-phase law). [PHASE-047]
 - 2026-11-19 — **PHASE-047 W-4 — THE EXTERNAL HR BRIDGES DELIVERED**
   (T-10, the plan §3 W-4; on the W-3 head `7d22c49`, this session's
   fresh clone — the same-session evidence rule's ELEVENTH consecutive

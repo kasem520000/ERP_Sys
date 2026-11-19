@@ -606,12 +606,20 @@ row rejection report).
 > · shells PASS · boundary PASS. Evidence: the W-4 gate doc +
 > `audit-evidence/phase047-w4/` (21 logs, every one wrapper-captured).**
 
-### W-5 — The web plane (T-11 + T-12 + T-13 + T-14, orchestrator)
+### W-5 — The web plane (T-11 + T-12 + T-13 + T-14, orchestrator) — DELIVERED 2026-11-19 (the gate doc `docs/operations/gate-evidence/2026-11-19-phase047-w5.md`)
 The four screen families + the 360 extension + the alert list surfaces
 (D-13); NAV/⌘K registration; feature-flag gating verified per plan and per
 template composition.
 **Exit:** acceptance #6 green (AR/EN parity, RTL, loading/empty states);
-the ⌘K + NAV checks green.
+the ⌘K + NAV checks green. **[MET 2026-11-19 (W-5): the four families +
+the 360 + the alert surfaces landed on the W-4 head 83362ff — 308
+i18n keys/locale at 6,433 = 6,433 parity, the 35 component tests + the
+route-level spec 9/9, the NAV flag-gating arm at the resolver; the four
+composition reads (ROUTE_PERMISSIONS 984 → 988, no new keys) serve the
+360's read-model composition. The honest disclosure: the PRE-EXISTING
+045 self-board Tabs defect found and recorded (gate doc §5 — the 3-line
+repair is 045 scope, the owner dispatches).]**
+
 
 ### W-6 — Reports + proof (T-15 + T-17, orchestrator)
 The four report contracts (`hr.performance-cycle-results`,

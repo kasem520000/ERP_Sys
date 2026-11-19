@@ -231,6 +231,19 @@ export class TalentPerformanceController {
   }
 
   /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's trend read): the
+   * employee's MANAGER reviews across cycles with the cycle metadata.
+   * BR-090 by construction — the 360 input rows never ride this
+   * surface (the aggregate-360 read is their only plane).
+   */
+  @Get("performance/reviews/for-employee/:employeeId")
+  @RequirePermissions("hr.performance.view")
+  async reviewsForEmployee(@Req() request: Request, @Param("employeeId") employeeId: string) {
+    requireIdentity(request);
+    return envelope(await this.performance.listReviewsForEmployee(employeeId));
+  }
+
+  /**
    * THE 360 AGGREGATE READ (BR-090): the per-relationship aggregates —
    * only the ≥ 3 relationships, count + stats, never an attributed
    * source. The optional `kind` query is the EXPLICIT request whose

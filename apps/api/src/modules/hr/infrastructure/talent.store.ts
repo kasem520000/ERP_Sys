@@ -350,6 +350,25 @@ export async function listSubmitted360Inputs(
   return rows.rows as unknown as PerformanceReviewRow[];
 }
 
+/**
+ * PHASE-047 (W-5 — T-14, the 360 extension's trend read): the
+ * reviewee's MANAGER reviews across every cycle — the review PROPER,
+ * never the 360 input rows (BR-090 by construction: this read cannot
+ * ship an attributed source because it never selects one; the
+ * SELF/PEER/SUBORDINATE substrate stays behind the aggregate read).
+ * The service joins the cycle metadata for the trend's axis.
+ */
+export async function listManagerReviewsForReviewee(
+  revieweeEmployeeId: string,
+): Promise<PerformanceReviewRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${REVIEW_COLUMNS} FROM performance_reviews
+    WHERE reviewee_employee_id = ${revieweeEmployeeId} AND kind = 'MANAGER'
+    ORDER BY cycle_id, created_at
+  `);
+  return rows.rows as unknown as PerformanceReviewRow[];
+}
+
 // ── competencies ───────────────────────────────────────────────────────────
 
 export async function insertCompetency(input: {

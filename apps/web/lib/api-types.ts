@@ -6951,3 +6951,316 @@ export interface SelfLeaveRequestsPage {
   total: number;
   hasMore: boolean;
 }
+
+// ── PHASE-047 (W-5 — T-11…T-14): the talent wire types ──────────────────────
+// The four screen families + the 360 extension ride the W-2/W-3/W-4 API
+// surface (every row an exact mirror of the store's row shape — decimal
+// fields cross the wire as EXACT strings, never JS numbers: ADR-0009's
+// law extended to the percent axes).
+
+/** GET hr/performance/cycles → the cycle register. */
+export interface PerformanceCycleRow {
+  id: string;
+  name: string;
+  nameAr: string | null;
+  periodStart: string;
+  periodEnd: string;
+  status: "DRAFT" | "ACTIVE" | "CALIBRATION" | "CLOSED";
+  reviewDueDate: string | null;
+  scopeOrgUnitIds: readonly string[];
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/performance/cycles/:id/reviews · hr/performance/reviews/own →
+ * one review row (MANAGER carries the review proper; the 360 kinds are
+ * the reviewer's own inputs). */
+export interface PerformanceReviewRow {
+  id: string;
+  cycleId: string;
+  reviewerEmployeeId: string;
+  revieweeEmployeeId: string;
+  kind: "MANAGER" | "SELF" | "PEER" | "SUBORDINATE";
+  status: "DRAFT" | "SUBMITTED" | "CALIBRATED";
+  overallScore: string | null;
+  competencyScores: Record<string, number>;
+  goalRollup: string | null;
+  comments: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/performance/reviews/for-employee/:employeeId → the 360
+ * extension's trend read (MANAGER reviews only — BR-090 by
+ * construction; the 360 input rows never ride this surface). */
+export interface EmployeeReviewTrendRow extends PerformanceReviewRow {
+  cycleName: string;
+  cycleNameAr: string | null;
+  cycleStatus: string;
+  cyclePeriodStart: string;
+  cyclePeriodEnd: string;
+}
+
+/** GET hr/performance/reviews/for-employee/:employeeId → the envelope. */
+export interface EmployeeReviewTrendRead {
+  employeeId: string;
+  reviews: readonly EmployeeReviewTrendRow[];
+}
+
+/** GET hr/performance/cycles/:id/reviews/:revieweeId/aggregate-360 →
+ * BR-090's only shape: the per-relationship aggregates (null = the
+ * relationship is below the ≥ 3 threshold). */
+export interface RelationshipAggregate {
+  kind: "SELF" | "PEER" | "SUBORDINATE";
+  count: number;
+  mean: string;
+  min: string;
+  max: string;
+}
+
+export interface Aggregate360View {
+  cycleId: string;
+  revieweeEmployeeId: string;
+  aggregates: {
+    SELF: RelationshipAggregate | null;
+    PEER: RelationshipAggregate | null;
+    SUBORDINATE: RelationshipAggregate | null;
+  };
+}
+
+/** GET hr/performance/competencies → the framework register. */
+export interface CompetencyRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  category: string | null;
+  active: boolean;
+}
+
+/** GET hr/performance/competencies/levels → the 1–5 scale (tenant data;
+ * the 0098 §4 documented default). */
+export interface CompetencyLevelRow {
+  id: string;
+  level: number;
+  name: string;
+  nameAr: string;
+  descriptor: string;
+  descriptorAr: string;
+}
+
+/** GET hr/goals/* → one goal row (the cascade's node). */
+export interface GoalRow {
+  id: string;
+  cycleId: string;
+  ownerEmployeeId: string;
+  parentGoalId: string | null;
+  title: string;
+  titleAr: string | null;
+  weight: string;
+  kriTarget: string | null;
+  kriActual: string | null;
+  progressPct: string | null;
+  status: "ACTIVE" | "AT_RISK" | "ACHIEVED" | "CANCELLED";
+  dueDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/goals/tree → the nested cascade. */
+export interface GoalTreeNode extends GoalRow {
+  children: readonly GoalTreeNode[];
+}
+
+export interface GoalTreeRead {
+  cycleId: string;
+  roots: readonly GoalTreeNode[];
+}
+
+/** GET hr/goals/validate → BR-089's explicit check. */
+export interface GoalWeightCheck {
+  cycleId: string;
+  employeeId: string;
+  sum: string;
+  valid: boolean;
+  activeGoals: number;
+}
+
+/** GET hr/recruitment/vacancies → the vacancy register. */
+export interface VacancyRow {
+  id: string;
+  code: string;
+  positionId: string | null;
+  title: string;
+  titleAr: string | null;
+  headcount: number;
+  status: "OPEN" | "ON_HOLD" | "FILLED" | "CANCELLED";
+  openedAt: string | null;
+  filledAt: string | null;
+  notes: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** One recorded stage hop (the transition audit shape). */
+export interface StageHistoryEntry {
+  from: string;
+  to: string;
+  action: "ADVANCE" | "REOPEN" | "HIRE";
+  at: string;
+  by: string | null;
+}
+
+/** GET hr/recruitment/applicants → the pipeline register. */
+export interface ApplicantRow {
+  id: string;
+  vacancyId: string;
+  fullName: string;
+  fullNameAr: string | null;
+  email: string | null;
+  phone: string | null;
+  source: string | null;
+  stage: "NEW" | "SCREEN" | "INTERVIEW" | "OFFER" | "HIRED" | "REJECTED";
+  stageHistory: readonly StageHistoryEntry[];
+  hiredEmployeeId: string | null;
+  notes: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/recruitment/interviews → the panel-slot register (one row per
+ * panelist per round). */
+export interface InterviewRow {
+  id: string;
+  applicantId: string;
+  round: number;
+  panelistEmployeeId: string;
+  scheduledStart: string;
+  scheduledEnd: string;
+  mode: "ONSITE" | "VIDEO" | "PHONE";
+  scorecard: Record<string, unknown>;
+  verdict: "STRONG_HIRE" | "HIRE" | "NO_HIRE" | "STRONG_NO_HIRE" | null;
+  comments: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/training/programs → the program catalog. */
+export interface TrainingProgramRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  kind: "INTERNAL" | "EXTERNAL";
+  provider: string | null;
+  cost: string | null;
+  status: "ACTIVE" | "RETIRED";
+  notes: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/training/enrollments → the enrollment register. */
+export interface TrainingEnrollmentRow {
+  id: string;
+  programId: string;
+  employeeId: string;
+  status: "ENROLLED" | "IN_PROGRESS" | "COMPLETED" | "WITHDRAWN";
+  attendancePct: string | null;
+  completionPct: string | null;
+  result: "PENDING" | "PASSED" | "FAILED" | null;
+  completedAt: string | null;
+  notes: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/training/certifications → the certification register. */
+export interface CertificationRow {
+  id: string;
+  employeeId: string;
+  name: string;
+  nameAr: string | null;
+  issuer: string;
+  issueDate: string;
+  expiryDate: string | null;
+  certificateNumber: string | null;
+  notes: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/org/units → the org-unit register (materialized path). */
+export interface OrgUnitRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  parentId: string | null;
+  path: string;
+  active: boolean;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/org/positions → the position register. */
+export interface PositionRow {
+  id: string;
+  code: string;
+  title: string;
+  titleAr: string | null;
+  grade: string | null;
+  orgUnitId: string | null;
+  reportsTo: string | null;
+  status: "ACTIVE" | "RETIRED";
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/org/placement/:employeeId → D-01's placement axes (the 360
+ * extension's read; null axes = the employee has no position — a
+ * valid state, never an error). */
+export interface EmployeePlacementView {
+  position: PositionRow | null;
+  orgUnit: OrgUnitRow | null;
+  probationEnd: string | null;
+}
+
+/** GET hr/documents → the employee-document register (HR-10; the
+ * numbers surface ONLY here — the PII inventory's law). */
+export interface EmployeeDocumentRow {
+  id: string;
+  employeeId: string;
+  kind: "PASSPORT" | "IQAMA" | "VISA" | "CONTRACT" | "CERTIFICATE" | "OTHER";
+  number: string | null;
+  issuedOn: string | null;
+  expiresOn: string | null;
+  notes: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET hr/alerts/expiry-sweep → the sweep's registration row (the
+ * tenant-configurable thresholds — DATA, never constants). */
+export interface HrAlertJobRow {
+  id: string;
+  jobKind: string;
+  thresholds: readonly number[];
+  isActive: boolean;
+  lastRunAt: string | null;
+  lastFlagged: number;
+  note: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}

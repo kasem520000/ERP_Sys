@@ -242,6 +242,24 @@ export async function findApplicantById(id: string): Promise<ApplicantRow | unde
   return (rows.rows as unknown as ApplicantRow[])[0];
 }
 
+/**
+ * PHASE-047 (W-5 — T-14, the 360 extension's source record): the
+ * hire link's other side — the applicant row whose hire wrote THIS
+ * employee. NULL is the honest common case (most employees were never
+ * applicants); the link is written once (the 0096 column law), so at
+ * most one row can ever match.
+ */
+export async function findApplicantByHiredEmployee(
+  employeeId: string,
+): Promise<ApplicantRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT ${APPLICANT_COLUMNS} FROM applicants
+    WHERE hired_employee_id = ${employeeId}
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as ApplicantRow[])[0];
+}
+
 export async function listApplicants(filter: {
   vacancyId?: string;
   stage?: string;

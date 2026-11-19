@@ -252,6 +252,21 @@ export class TalentRecruitmentService {
     return applicant;
   }
 
+  /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's source record): the
+   * hire link's applicant row for THIS employee, or null — the honest
+   * common case (most employees were never applicants; the link is
+   * written once, the 0096 column law). Null (not a 404) keeps A7's
+   * indistinguishability: an unknown/foreign employee id and an
+   * employee without a hire link read identically.
+   */
+  async getApplicantByHiredEmployee(employeeId: string): Promise<ApplicantRow | null> {
+    const applicant = await store.findApplicantByHiredEmployee(
+      requireUuid(employeeId, "employeeId"),
+    );
+    return applicant ?? null;
+  }
+
   async listApplicants(filter: {
     vacancyId?: string;
     stage?: string;

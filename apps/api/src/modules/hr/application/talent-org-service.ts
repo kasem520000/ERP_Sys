@@ -130,6 +130,18 @@ export class TalentOrgService {
   }
 
   /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's placement read): the
+   * employee's D-01 placement axes (position + org unit + D-02's
+   * probation_end) or the honest null axes (a position-less employee
+   * is a valid state — never an error). READ-ONLY on the substrate.
+   */
+  async getPlacement(
+    employeeId: string,
+  ): Promise<store.EmployeePlacementView | null> {
+    return (await store.findPlacement(requireUuid(employeeId, "employeeId"))) ?? null;
+  }
+
+  /**
    * The org-unit patch: the rename/active arms, OR the MOVE (a
    * non-undefined parentId) — the D-09 act. The move runs under the
    * org-plane gate: the whole-tree edge read + the pure cycle guard +

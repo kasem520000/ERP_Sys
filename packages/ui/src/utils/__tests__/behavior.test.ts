@@ -176,6 +176,45 @@ describe("navigation resolution (NAVIGATION_MODEL §2 — server-only)", () => {
     expect(resolved.groups.flatMap((g) => g.items).some((i) => i.id === "settings.roles")).toBe(false);
   });
 
+  it("PHASE-047 (W-5 — D-10/D-13): the four talent rows ride their feature flags — each flag hides its own row, all four flags render the family", () => {
+    // The flags gate the capability (0098 §2): a tenant whose plan lacks
+    // hr.performance never sees the performance row — even with every
+    // permission held (the entitlement/authorization divergence, matrix
+    // §3.25: the flags are NOT the permission keys).
+    const noPerformance = new Set([...allKeys].filter((k) => k !== "hr.performance"));
+    const withoutOne = resolveNavigation(NAV_ITEMS, {
+      featureKeys: noPerformance,
+      permissions: allPerms,
+    });
+    const withoutOneIds = withoutOne.groups.flatMap((g) => g.items).map((i) => i.id);
+    expect(withoutOneIds).not.toContain("hr.performance");
+    expect(withoutOneIds).toContain("hr.recruitment");
+    expect(withoutOneIds).toContain("hr.training");
+    expect(withoutOneIds).toContain("hr.org-structure");
+    // No talent flag at all → the whole family hides (a group never
+    // renders empty — the hr group keeps its 029/045/046 rows).
+    const noTalent = new Set([...allKeys].filter((k) => !k.startsWith("hr.")));
+    const withoutFamily = resolveNavigation(NAV_ITEMS, {
+      featureKeys: noTalent,
+      permissions: allPerms,
+    });
+    const withoutFamilyIds = withoutFamily.groups.flatMap((g) => g.items).map((i) => i.id);
+    expect(withoutFamilyIds).not.toContain("hr.performance");
+    expect(withoutFamilyIds).not.toContain("hr.recruitment");
+    expect(withoutFamilyIds).not.toContain("hr.training");
+    expect(withoutFamilyIds).not.toContain("hr.org-structure");
+    expect(withoutFamily.groups.find((g) => g.id === "hr")).toBeDefined();
+    // All four flags + permissions → the four rows render inside the hr
+    // group (the fully-entitled tenant — the 0098 §3 template shapes).
+    const withAll = resolveNavigation(NAV_ITEMS, { featureKeys: allKeys, permissions: allPerms });
+    const hrGroup = withAll.groups.find((g) => g.id === "hr");
+    expect(hrGroup).toBeDefined();
+    const hrIds = (hrGroup?.items ?? []).map((i) => i.id);
+    for (const id of ["hr.performance", "hr.recruitment", "hr.training", "hr.org-structure"]) {
+      expect(hrIds).toContain(id);
+    }
+  });
+
   it("hides items the permission lacks (404-opaque discipline)", () => {
     const noBranches = new Set([...allPerms].filter((p) => p !== "tenancy.branches.manage"));
     const resolved = resolveNavigation(NAV_ITEMS, { featureKeys: allKeys, permissions: noBranches });

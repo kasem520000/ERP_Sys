@@ -181,6 +181,18 @@ export class TalentRecruitmentController {
     );
   }
 
+  /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's source record): the
+   * hire link's applicant row for THIS employee, or null (the honest
+   * common case — most employees were never applicants; A7's
+   * indistinguishability rides null, never a 404).
+   */
+  @Get("recruitment/applicants/by-employee/:employeeId")
+  @RequirePermissions("hr.recruitment.view")
+  async applicantByEmployee(@Param("employeeId") employeeId: string) {
+    return envelope(await this.recruitment.getApplicantByHiredEmployee(employeeId));
+  }
+
   @Get("recruitment/applicants/:id")
   @RequirePermissions("hr.recruitment.view")
   async getApplicant(@Param("id") id: string) {

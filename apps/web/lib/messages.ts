@@ -2827,3 +2827,231 @@ export function localizedHrError(
       return localizedApiError(d, error, retryAfterSeconds);
   }
 }
+
+// ── PHASE-047 (W-5): the talent plane's localized mirrors ───────────────────
+
+/** The talent statuses (cycle ladder, review states, goal states,
+ * applicant stages, vacancy lifecycle, enrollment ladder, program
+ * status, position status — every enum the four screens badge). */
+export function localizedTalentCycleStatus(d: Dictionary, status: string): string {
+  switch (status) {
+    case "DRAFT":
+      return d.talCycleDraft;
+    case "ACTIVE":
+      return d.talCycleActive;
+    case "CALIBRATION":
+      return d.talCycleCalibration;
+    case "CLOSED":
+      return d.talCycleClosed;
+    default:
+      return status;
+  }
+}
+
+export function localizedTalentReviewStatus(d: Dictionary, status: string): string {
+  switch (status) {
+    case "DRAFT":
+      return d.talReviewDraft;
+    case "SUBMITTED":
+      return d.talReviewSubmitted;
+    case "CALIBRATED":
+      return d.talReviewCalibrated;
+    default:
+      return status;
+  }
+}
+
+export function localizedTalentReviewKind(d: Dictionary, kind: string): string {
+  switch (kind) {
+    case "MANAGER":
+      return d.talKindManager;
+    case "SELF":
+      return d.talKindSelf;
+    case "PEER":
+      return d.talKindPeer;
+    case "SUBORDINATE":
+      return d.talKindSubordinate;
+    default:
+      return kind;
+  }
+}
+
+export function localizedTalentGoalStatus(d: Dictionary, status: string): string {
+  switch (status) {
+    case "ACTIVE":
+      return d.talGoalActive;
+    case "AT_RISK":
+      return d.talGoalAtRisk;
+    case "ACHIEVED":
+      return d.talGoalAchieved;
+    case "CANCELLED":
+      return d.talGoalCancelled;
+    default:
+      return status;
+  }
+}
+
+export function localizedTalentApplicantStage(d: Dictionary, stage: string): string {
+  switch (stage) {
+    case "NEW":
+      return d.talStageNew;
+    case "SCREEN":
+      return d.talStageScreen;
+    case "INTERVIEW":
+      return d.talStageInterview;
+    case "OFFER":
+      return d.talStageOffer;
+    case "HIRED":
+      return d.talStageHired;
+    case "REJECTED":
+      return d.talStageRejected;
+    default:
+      return stage;
+  }
+}
+
+export function localizedTalentVacancyStatus(d: Dictionary, status: string): string {
+  switch (status) {
+    case "OPEN":
+      return d.talVacancyOpen;
+    case "ON_HOLD":
+      return d.talVacancyOnHold;
+    case "FILLED":
+      return d.talVacancyFilled;
+    case "CANCELLED":
+      return d.talVacancyCancelled;
+    default:
+      return status;
+  }
+}
+
+export function localizedTalentEnrollmentStatus(d: Dictionary, status: string): string {
+  switch (status) {
+    case "ENROLLED":
+      return d.talEnrollEnrolled;
+    case "IN_PROGRESS":
+      return d.talEnrollInProgress;
+    case "COMPLETED":
+      return d.talEnrollCompleted;
+    case "WITHDRAWN":
+      return d.talEnrollWithdrawn;
+    default:
+      return status;
+  }
+}
+
+export function localizedTalentProgramKind(d: Dictionary, kind: string): string {
+  return kind === "INTERNAL" ? d.talProgramInternal : d.talProgramExternal;
+}
+
+export function localizedTalentProgramStatus(d: Dictionary, status: string): string {
+  return status === "ACTIVE" ? d.talProgramActive : d.talProgramRetired;
+}
+
+export function localizedTalentPositionStatus(d: Dictionary, status: string): string {
+  return status === "ACTIVE" ? d.talPositionActive : d.talPositionRetired;
+}
+
+export function localizedTalentInterviewMode(d: Dictionary, mode: string): string {
+  switch (mode) {
+    case "ONSITE":
+      return d.talInterviewOnsite;
+    case "VIDEO":
+      return d.talInterviewVideo;
+    case "PHONE":
+      return d.talInterviewPhone;
+    default:
+      return mode;
+  }
+}
+
+export function localizedTalentVerdict(d: Dictionary, verdict: string): string {
+  switch (verdict) {
+    case "STRONG_HIRE":
+      return d.talVerdictStrongHire;
+    case "HIRE":
+      return d.talVerdictHire;
+    case "NO_HIRE":
+      return d.talVerdictNoHire;
+    case "STRONG_NO_HIRE":
+      return d.talVerdictStrongNoHire;
+    default:
+      return verdict;
+  }
+}
+
+export function localizedTalentDocumentKind(d: Dictionary, kind: string): string {
+  switch (kind) {
+    case "PASSPORT":
+      return d.talDocPassport;
+    case "IQAMA":
+      return d.talDocIqama;
+    case "VISA":
+      return d.talDocVisa;
+    case "CONTRACT":
+      return d.talDocContract;
+    case "CERTIFICATE":
+      return d.talDocCertificate;
+    default:
+      return d.talDocOther;
+  }
+}
+
+/** The talent error taxonomy's web mirror (talent-errors.ts — every
+ * typed code the four surfaces can meet, localized; the W-2/W-3/W-4
+ * engines' refusals render through this map, never a raw code). */
+export function localizedTalentError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "TALENT_CYCLE_NOT_FOUND":
+    case "COMPETENCY_NOT_FOUND":
+    case "COMPETENCY_LEVEL_NOT_FOUND":
+    case "VACANCY_NOT_FOUND":
+    case "APPLICANT_NOT_FOUND":
+    case "TRAINING_PROGRAM_NOT_FOUND":
+    case "ORG_UNIT_NOT_FOUND":
+    case "POSITION_NOT_FOUND":
+    case "EMPLOYEE_DOCUMENT_NOT_FOUND":
+    case "INTERVIEW_NOT_FOUND":
+    case "TRAINING_ENROLLMENT_NOT_FOUND":
+    case "CERTIFICATION_NOT_FOUND":
+      return d.talErrNotFound;
+    case "TALENT_CODE_TAKEN":
+      return d.talErrCodeTaken;
+    case "CYCLE_STATE_CONFLICT":
+      return d.talErrCycleState;
+    case "REVIEW_ALREADY_SUBMITTED":
+      return d.talErrReviewSubmitted;
+    case "DUPLICATE_ENROLLMENT":
+      return d.talErrDuplicateEnrollment;
+    case "VACANCY_STATE_CONFLICT":
+      return d.talErrVacancyState;
+    case "APPLICANT_ALREADY_HIRED":
+      return d.talErrAlreadyHired;
+    case "INTERVIEW_SLOT_TAKEN":
+      return d.talErrSlotTaken;
+    case "STAGE_TRANSITION_INVALID":
+      return d.talErrStageInvalid;
+    case "APPLICANT_NOT_HIREABLE":
+      return d.talErrNotHireable;
+    case "REOPEN_INVALID":
+      return d.talErrReopenInvalid;
+    case "GOAL_WEIGHTS_INVALID":
+      return d.talErrWeights;
+    case "FEEDBACK_BELOW_THRESHOLD":
+      return d.talErrBelowThreshold;
+    case "ORG_CYCLE_INVALID":
+      return d.talErrOrgCycle;
+    case "INTERVIEW_NOT_PANELIST":
+      return d.talErrNotPanelist;
+    case "COMPETENCY_SCALE_INVALID":
+    case "TALENT_INVALID":
+    case "BRIDGE_IMPORT_INVALID":
+      return d.talErrInvalid;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}

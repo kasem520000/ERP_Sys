@@ -1,4 +1,39 @@
-# NEXT ACTION — PHASE-047 W-2 (the performance + goals engines) DELIVERED; W-3 (recruitment + training/org + documents + the sweep) NEXT
+# NEXT ACTION — PHASE-047 W-5 (the web plane — the four screen families + the 360 extension) DELIVERED; W-6 (the reports + proof wave) NEXT
+
+**THE WAVE STATE (2026-11-19, updated at the W-5 delivery):** W-0
+through W-4 delivered (the foundation, the engines, the recruitment +
+training/org + documents + sweep, the external bridges + the
+NF-9/NF-10/NF-11 fixes). **W-5 — THE WEB PLANE — DELIVERED 2026-11-19**
+on the W-4 head `83362ff` (this session's fresh clone, the
+same-session evidence rule's TWELFTH consecutive wave): the four
+screen families (`/hr/performance` five tabs, `/hr/recruitment`
+three, `/hr/training` three, `/hr/org-structure` three incl. the
+HR-10 documents & alerts plane + the sweep's registration surface) +
+the employee 360 extension on payroll/employees/[id] (the placement
+card with the A-1 probation chip, the MANAGER-outcomes trend (BR-090
+by construction), the active goals, training, certifications, the
+document register with expiry chips, the hired-applicant source
+record — read-model composition over the module APIs, every fetch
+degrading honestly on its own permission plane) + the four
+composition reads (ROUTE_PERMISSIONS 984 → 988, no new keys, drift
+312 = 312; the applicant-by-employee read returns null for no hire
+link — A7-indistinguishable, never a 404) + 308 i18n keys/locale
+(6,125 → 6,433, 100% parity) + the localized talent error map +
+35 web component tests (5 files) + the route-level spec 9/9 (the
+four families' gates, the composition reads' laws, the own-rows law
+at HTTP, the typed refusals through the error filter) + the NAV
+flag-gating arm (ui 43). Gates green (the scope-label law's targeted
+DB families; the W-7 full-run expectation moves to 256 files ·
+3,594). **THE HONEST DISCLOSURE — the pre-existing 045 self-board
+Tabs defect** (gate doc §5): hr-self-board's conditional-expression
+Tabs children render EMPTY for every tab except the last (the
+Children.forEach null-overwrite — proven in a minimal jsdom repro);
+the W-5 boards are immune (the data-slot shape); the 3-line repair is
+045 scope — recorded for the owner's dispatch, NOT fixed here. **NEXT:
+W-6** — the reports + proof wave (T-15 + T-17: the four report
+contracts, registry 106 → 110, all pin sites re-pinned together; the
+RLS attack tests A1–A10 ×14; the OA-06 budgets in the W-9 shape
+(D-14)), on this head.
 
 **THE CURRENT STATE (2026-11-18, updated at the W-2 delivery):** PHASE-046
 stands COMPLETE (W-9 ACCEPTED at `2956c27`). **PHASE-047's master plan

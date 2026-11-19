@@ -404,6 +404,55 @@ export class TalentPerformanceService {
   }
 
   /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's trend read): the
+   * employee's MANAGER reviews across every cycle, each carrying its
+   * cycle's metadata for the trend axis. BR-090 BY CONSTRUCTION: the
+   * read selects ONLY the MANAGER rows (the review proper) — the
+   * SELF/PEER/SUBORDINATE substrate never rides this surface (the
+   * aggregate-360 read is the 360's own plane); the trend shows
+   * overall scores per cycle, never per-source values (D-08's law).
+   */
+  async listReviewsForEmployee(employeeId: string): Promise<{
+    employeeId: string;
+    reviews: ReadonlyArray<
+      PerformanceReviewRow & {
+        cycleName: string;
+        cycleNameAr: string | null;
+        cycleStatus: string;
+        cyclePeriodStart: string;
+        cyclePeriodEnd: string;
+      }
+    >;
+  }> {
+    const id = requireUuid(employeeId, "employeeId");
+    const [managerReviews, cycles] = await Promise.all([
+      store.listManagerReviewsForReviewee(id),
+      store.listCycles({ limit: 200 }),
+    ]);
+    const cyclesById = new Map(cycles.map((cycle) => [cycle.id, cycle]));
+    const reviews = managerReviews.flatMap((review) => {
+      const cycle = cyclesById.get(review.cycleId);
+      // An orphaned review (its cycle deleted out-of-band) is not a
+      // trend point; the cycles table has no DELETE in this phase, so
+      // this arm is structural honesty, not an expected path.
+      if (cycle === undefined) {
+        return [];
+      }
+      return [
+        {
+          ...review,
+          cycleName: cycle.name,
+          cycleNameAr: cycle.nameAr,
+          cycleStatus: cycle.status,
+          cyclePeriodStart: cycle.periodStart,
+          cyclePeriodEnd: cycle.periodEnd,
+        },
+      ];
+    });
+    return { employeeId: id, reviews };
+  }
+
+  /**
    * THE 360 AGGREGATE READ (BR-090, both ways): the SUBMITTED 360
    * inputs fold through the pure aggregate360 and surface through
    * visible360 — only the ≥ 3 relationships, count + stats, never an

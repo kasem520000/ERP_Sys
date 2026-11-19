@@ -396,6 +396,20 @@ export class TalentGoalsService {
   }
 
   /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's goals panel): any
+   * employee's goals (the manage-side read — hr.performance.view; the
+   * OWN plane stays `listOwnGoals` on hr.performance.review). The
+   * 360's "active goals" filter is the caller's (the surface renders
+   * the ACTIVE/AT_RISK subset and the honest empty state).
+   */
+  async listGoalsForEmployee(employeeId: string, cycleId?: string): Promise<GoalRow[]> {
+    return store.listGoalsForOwner(
+      requireUuid(employeeId, "employeeId"),
+      cycleId === undefined ? undefined : requireUuid(cycleId, "cycleId"),
+    );
+  }
+
+  /**
    * BR-089's explicit check (the drafting read): the reviewee's active
    * weight sum + the verdict. The LAW's enforcement point is the
    * review submission (the performance engine's typed gate) — this is

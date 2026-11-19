@@ -1,0 +1,203 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys_W4/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_Sys_W4/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 04:58:22.417 UTC [24238] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 04:58:22.418 UTC [24238] LOG:  listening on IPv6 address "::1", port 46199
+2026-11-19 04:58:22.418 UTC [24238] LOG:  listening on IPv4 address "127.0.0.1", port 46199
+
+2026-11-19 04:58:22.418 UTC [24238] LOG:  listening on Unix socket "/tmp/.s.PGSQL.46199"
+
+2026-11-19 04:58:22.419 UTC [24241] LOG:  database system was shut down at 2026-11-19 04:58:22 UTC
+
+2026-11-19 04:58:22.421 UTC [24238] LOG:  database system is ready to accept connections
+
+{"level":40,"time":1795064308007,"service":"erp-api","module":"identity","user_id":"01a1f22b-9e87-7000-ae41-e2a1256e89a4","msg":"temporary lockout engaged (R-01)"}
+{"level":40,"time":1795064308161,"service":"erp-api","module":"identity","email_hash":"405489a6a8e8","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308444,"service":"erp-api","module":"identity","email_hash":"fe90e9be6563","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308445,"service":"erp-api","module":"identity","email_hash":"236f1b9d195a","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308446,"service":"erp-api","module":"identity","email_hash":"0b62835181c6","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308447,"service":"erp-api","module":"identity","email_hash":"1c3ae17b41ed","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308448,"service":"erp-api","module":"identity","email_hash":"f794a635dbba","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308448,"service":"erp-api","module":"identity","email_hash":"a0a18e76e0be","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308449,"service":"erp-api","module":"identity","email_hash":"6411faf0d2b7","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308449,"service":"erp-api","module":"identity","email_hash":"3bea867b9b16","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308450,"service":"erp-api","module":"identity","email_hash":"3b789b5ed688","msg":"login attempt for unknown email"}
+{"level":40,"time":1795064308451,"service":"erp-api","module":"identity","email_hash":"2b71691224f2","msg":"login attempt for unknown email"}
+{"level":30,"time":1795064309502,"service":"erp-api","module":"identity","user_id":"01a1f22b-a66e-7000-a9eb-f9adffbceefc","msg":"password reset consumed; all sessions revoked"}
+ ✓ src/__db__/identity-flows.db.spec.ts (21 tests) 4770ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > argon2id-verified login issues a rotating session and records user.login  345ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > progressive lockout: N failures → temporary lock, never permanent; counters reset on success (R-01)  963ms
+   ✓ TOTP MFA (M-06, M-07, acceptance 3) > enroll → verify confirms; same-code replay rejected; recovery codes single-use  585ms
+   ✓ invitations (acceptance flow; single-use/expiry/revocation) > issue → accept creates membership + PENDING user path with password; token single-use  302ms
+   ✓ route × role permission checklist (acceptance 5) > every protected route: owner template grants it, viewer template does not (identity/audit plane)  313ms
+{"level":30,"time":1795064319016,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795064319054,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795064319325,"service":"erp-api","module":"http","correlation_id":"01a1f22b-cd3e-7000-a906-57eb889260a3","action":"request","method":"GET","path":"/api/v1/platform/register/options","status":200,"duration_ms":31,"msg":"request completed"}
+{"level":30,"time":1795064319578,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-ce05-7000-b209-c70b94f2b249","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064319578,"service":"erp-api","module":"http","correlation_id":"01a1f22b-cd6d-7000-91e8-98bdd07e9e0d","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":237,"msg":"request completed"}
+{"level":30,"time":1795064319799,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-ceee-7000-9c44-681fee3b2019","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064319799,"service":"erp-api","module":"http","correlation_id":"01a1f22b-ce5e-7000-bc3b-4ce98455fdd1","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":217,"msg":"request completed"}
+{"level":30,"time":1795064320023,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-cfca-7000-b146-82b48c1959c9","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064320023,"service":"erp-api","module":"http","correlation_id":"01a1f22b-cf39-7000-b7a7-50fb933748dc","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":222,"msg":"request completed"}
+{"level":30,"time":1795064320235,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-d0ac-7000-a326-577bb06ed67f","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064320236,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d01a-7000-ac9d-c16872d4066d","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":210,"msg":"request completed"}
+{"level":30,"time":1795064320554,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-d1e6-7000-9f5a-a6da97191bfd","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064320555,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d0f0-7000-9709-be8a5fc33878","action":"request","method":"POST","path":"/api/v1/platform/register","status":200,"duration_ms":315,"msg":"request completed"}
+{"level":30,"time":1795064320559,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d22d-7000-a83b-c91f759e52f4","action":"request","method":"POST","path":"/api/v1/platform/register","status":429,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795064320717,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d232-7000-8c19-5292ab2b1f8a","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":155,"msg":"request completed"}
+{"level":30,"time":1795064320803,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d2d0-7000-8c74-8efee966485c","action":"request","method":"POST","path":"/api/v1/tenancy/onboarding/provision","status":200,"duration_ms":83,"msg":"request completed"}
+{"level":30,"time":1795064320870,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d325-7000-b01e-91cc777677db","action":"request","method":"POST","path":"/api/v1/tenancy/onboarding/provision","status":200,"duration_ms":65,"msg":"request completed"}
+{"level":30,"time":1795064321057,"service":"erp-api","module":"notifications","template":"registration_welcome","correlation_id":"01a1f22b-cd6d-7000-91e8-98bdd07e9e0d","msg":"email delivered"}
+{"level":30,"time":1795064321171,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d3ff-7000-aa1d-309ddf60d58b","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":148,"msg":"request completed"}
+{"level":30,"time":1795064321182,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d495-7000-b20b-e6cea635f547","action":"request","method":"POST","path":"/api/v1/tenancy/branches","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795064321187,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d49f-7001-8703-ee64052a6440","action":"request","method":"POST","path":"/api/v1/tenancy/branches","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795064321197,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4a5-7000-a2af-2ba30f40c1b3","action":"request","method":"PATCH","path":"/api/v1/tenancy/branches/01a1f22b-d49c-7000-9beb-e040935ac8ed","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795064321208,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4af-7000-9944-3adebd44bafa","action":"request","method":"POST","path":"/api/v1/tenancy/branches","status":409,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795064321215,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4b9-7001-aedf-6047d7c6135a","action":"request","method":"GET","path":"/api/v1/tenancy/settings","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064321223,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4c1-7000-808d-edc19c9af7b7","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/general.numeral_system","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064321230,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4c8-7001-b053-aa418b948f67","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/does.not_exist","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064321242,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4cf-7001-9849-e7c90fc9dbe7","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/general.default_locale","status":422,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795064321248,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4db-7000-9dd7-eb9da3338446","action":"request","method":"GET","path":"/api/v1/tenancy/entitlements","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064321399,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d4e2-7000-a0b3-0cd92613549d","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":149,"msg":"request completed"}
+{"level":30,"time":1795064321408,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d578-7001-bf25-c43b2fb49d11","action":"request","method":"GET","path":"/api/v1/platform/tenants?limit=200","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795064321415,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d582-7000-ba9b-f789315d8971","action":"request","method":"GET","path":"/api/v1/platform/tenants","status":403,"duration_ms":5,"msg":"request completed"}
+(node:24297) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{"level":30,"time":1795064321431,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d589-7000-b22f-ea8ad02c0bfd","action":"request","method":"GET","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249","status":200,"duration_ms":14,"msg":"request completed"}
+{"level":30,"time":1795064321457,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d599-7000-8dc4-2625627b1bf3","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/plan","status":200,"duration_ms":24,"msg":"request completed"}
+{"level":30,"time":1795064321468,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5b3-7000-b36e-348bb4e5b40b","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/entitlements","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795064321476,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5be-7000-acb5-00feafcac91e","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/entitlements","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064321482,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5c5-7000-9644-af9b93fb631e","action":"request","method":"DELETE","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/entitlements/accounting.recurring_journals?reason=cleanup","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064321490,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5cc-7000-986c-a6f79ea20b2c","action":"request","method":"GET","path":"/api/v1/platform/audit/events?platformOnly=true&limit=200","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":40,"time":1795064321500,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1f22b-ce05-7000-b209-c70b94f2b249","killed_sessions":2,"msg":"tenant suspended"}
+{"level":30,"time":1795064321500,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5d4-7000-9f34-2688a22c0ff0","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/suspend","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795064321503,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5de-7000-8058-19af010abfe0","action":"request","method":"GET","path":"/api/v1/tenancy/profile","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":40,"time":1795064321636,"service":"erp-api","module":"identity","user_id":"01a1f22b-ce09-7001-a405-68571b5de590","msg":"authenticated user has no active membership"}
+{"level":30,"time":1795064321636,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d5e0-7000-82ed-fe620b00523b","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":401,"duration_ms":132,"msg":"request completed"}
+{"level":30,"time":1795064321644,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d666-7000-923b-bd40fc419f7f","action":"request","method":"GET","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064321652,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d66f-7000-a914-0ddddc765e19","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/restore","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064321802,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d676-7000-9ba0-80663483d0cb","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":148,"msg":"request completed"}
+{"level":30,"time":1795064321807,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d70b-7000-b3f1-9d4dcbb22cd0","action":"request","method":"GET","path":"/api/v1/tenancy/profile","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795064321814,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d711-7000-a1fe-81639e1903c8","action":"request","method":"PUT","path":"/api/v1/tenancy/settings/platform.support.opt_in","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064321822,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d717-7000-b3c6-ea399919cf12","action":"request","method":"POST","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/support-sessions","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795064321829,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d71f-7000-aa77-3c8a6aea508d","action":"request","method":"GET","path":"/api/v1/platform/tenants/01a1f22b-ce05-7000-b209-c70b94f2b249/support-sessions/01a1f22b-d71c-7000-a61e-350de6687c00/tenant-data/users","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064321833,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d726-7000-9d4e-f06e4cab5239","action":"request","method":"GET","path":"/api/v1/tenancy/support-sessions","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795064321839,"service":"erp-api","module":"http","correlation_id":"01a1f22b-d72a-7001-9358-af5b5fa0aac1","action":"request","method":"DELETE","path":"/api/v1/tenancy/support-sessions/01a1f22b-d71c-7000-a61e-350de6687c00","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064321853,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/tenancy-http.db.spec.ts (16 tests) 3194ms
+   ✓ public registration (anonymous, rate-limited) > per-IP rate limit caps anonymous registrations (429 + Retry-After)  981ms
+   ✓ owner journey: login → onboarding → branches → settings > the viewer joins on the instantiated viewer role (provision made it exist)  301ms
+ ✓ src/__db__/migrations.db.spec.ts (7 tests) 1342ms
+   ✓ migration state > re-apply (regression shape) is a no-op: drizzle-kit migrate skips applied entries  1105ms
+{"level":30,"time":1795064323661,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795064323682,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795064323685,"service":"erp-api","module":"notifications","template":"registration_welcome","correlation_id":"01a1f22b-ce5e-7000-bc3b-4ce98455fdd1","msg":"email delivered"}
+{"level":30,"time":1795064323903,"service":"erp-api","module":"http","correlation_id":"01a1f22b-dea4-7000-8b1d-41653f63989e","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":155,"msg":"request completed"}
+{"level":30,"time":1795064324051,"service":"erp-api","module":"http","correlation_id":"01a1f22b-df43-7000-8103-75eed64c4734","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":401,"duration_ms":144,"msg":"request completed"}
+{"level":40,"time":1795064324054,"service":"erp-api","module":"identity","email_hash":"63bc7e40b1ca","msg":"login attempt for unknown email"}
+{"level":30,"time":1795064324055,"service":"erp-api","module":"http","correlation_id":"01a1f22b-dfd5-7000-8852-8c4d8ae3a15d","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795064324204,"service":"erp-api","module":"http","correlation_id":"01a1f22b-dfd9-7000-bf4e-8b988b67e5b1","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":147,"msg":"request completed"}
+{"level":30,"time":1795064324206,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e06e-7000-af1b-ae852ccdd4db","action":"request","method":"GET","path":"/api/v1/identity/users","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1795064324219,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e077-7000-920b-b81d005f381f","action":"request","method":"GET","path":"/api/v1/identity/users","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795064324234,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e083-7000-8dd8-1c1121a068d3","action":"request","method":"GET","path":"/api/v1/identity/users","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795064324240,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e08c-7000-80c9-478cfa3f69ff","action":"request","method":"GET","path":"/api/v1/identity/sessions/current","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795064324247,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e092-7000-b6f7-72f3f1c83306","action":"request","method":"POST","path":"/api/v1/identity/sessions/switch-tenant","status":404,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064324253,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e098-7000-a988-da9bac484abb","action":"request","method":"GET","path":"/api/v1/audit/events","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064324258,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e09e-7000-9794-37352d6d9513","action":"request","method":"GET","path":"/api/v1/audit/events","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795064324263,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e0a3-7000-b115-660905406fa0","action":"request","method":"POST","path":"/api/v1/identity/invitations","status":422,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795064324413,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e0a8-7000-8794-c9dad512eae0","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":149,"msg":"request completed"}
+{"level":30,"time":1795064324419,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e13e-7000-9469-627272b42a35","action":"request","method":"DELETE","path":"/api/v1/identity/sessions/current","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064324421,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e144-7000-a9d5-4626caa0c1e8","action":"request","method":"GET","path":"/api/v1/identity/sessions/current","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795064324428,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e147-7000-95a7-5b534f9251d0","action":"request","method":"POST","path":"/api/v1/identity/mfa/totp/enroll","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064324436,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e14e-7000-9730-5a8c2a1770be","action":"request","method":"POST","path":"/api/v1/identity/mfa/totp/verify","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064324581,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e155-7001-a7b1-4203aedc9180","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":423,"duration_ms":144,"msg":"request completed"}
+{"level":30,"time":1795064324588,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e1e6-7000-aba4-d4f91b616f56","action":"request","method":"POST","path":"/api/v1/identity/password-resets","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064324591,"service":"erp-api","module":"identity","email_domain":"exist.test","msg":"reset requested for unknown email"}
+{"level":30,"time":1795064324591,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e1ed-7001-a607-1ff1483e001c","action":"request","method":"POST","path":"/api/v1/identity/password-resets","status":200,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795064324615,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e1fa-7000-b6a4-f5675e0e0c48","action":"request","method":"GET","path":"/api/v1/hr/self/summary","status":200,"duration_ms":13,"msg":"request completed"}
+{"level":30,"time":1795064324628,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e209-7000-b6ce-501f1411bcda","action":"request","method":"GET","path":"/api/v1/hr/self/summary","status":200,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795064324635,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e215-7000-b3b2-ee72c24d516e","action":"request","method":"GET","path":"/api/v1/hr/leave/types","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795064324650,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e21d-7000-8636-370b1fc67f81","action":"request","method":"POST","path":"/api/v1/hr/shifts","status":201,"duration_ms":13,"msg":"request completed"}
+{"level":30,"time":1795064324656,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e22b-7000-ac28-f18b10f4350f","action":"request","method":"GET","path":"/api/v1/hr/shifts/00000000-0000-4000-8000-0000000005ff","status":404,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795064324658,"service":"erp-api","module":"http","correlation_id":"01a1f22b-e231-7000-ace3-208ade91c621","action":"request","method":"GET","path":"/api/v1/hr/self/summary","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795064324665,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/identity-http.db.spec.ts (14 tests) 1415ms
+   ✓ login surface (public) > issues a session token with the data envelope; wrong password is a uniform 401  311ms
+{"level":30,"time":1795064324927,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-e301-7000-b426-21c0f2431f42","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064325186,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-e406-7000-b55b-d083aec57356","country":"YE","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064325413,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-e4e6-7000-8298-b114a48f0895","country":"SA","msg":"tenant registered via public flow"}
+ ✓ src/__db__/tenancy-provisioning.db.spec.ts (4 tests) 869ms
+   ✓ provisionWorkspace (acceptance 2) > instantiates CoA (64 accounts, 41 markers) + 8 system roles + defaults — idempotently  344ms
+{"level":30,"time":1795064325772,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-e656-7000-acce-12e694712ffb","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1795064325971,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1f22b-e71f-7000-9f35-db8ad0d6db57","country":"AE","msg":"tenant registered via public flow"}
+ ✓ src/__db__/entitlements.db.spec.ts (11 tests) 475ms
+
+ Test Files  6 passed (6)
+      Tests  73 passed (73)
+   Start at  04:58:21
+   Duration  24.53s (transform 4.76s, setup 0ms, collect 8.30s, tests 12.07s, environment 0ms, prepare 54ms)
+
+2026-11-19 04:58:46.060 UTC [24238] LOG:  received fast shutdown request
+
+2026-11-19 04:58:46.060 UTC [24238] LOG:  aborting any active transactions
+2026-11-19 04:58:46.060 UTC [24439] FATAL:  terminating connection due to administrator command
+2026-11-19 04:58:46.063 UTC [24427] FATAL:  terminating connection due to administrator command
+2026-11-19 04:58:46.068 UTC [24238] LOG:  background worker "logical replication launcher" (PID 24244) exited with exit code 1
+
+(node:24297) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:24297) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-19 04:58:46.068 UTC [24239] LOG:  shutting down
+2026-11-19 04:58:46.068 UTC [24239] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-19 04:58:46.092 UTC [24239] LOG:  checkpoint complete: wrote 3346 buffers (20.4%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.015 s, sync=0.009 s, total=0.024 s; sync files=2858, longest=0.001 s, average=0.001 s; distance=33736 kB, estimate=33736 kB; lsn=0/35D0B58, redo lsn=0/35D0B58
+
+2026-11-19 04:58:46.103 UTC [24238] LOG:  database system is shut down
+
+VITEST_EXIT=0

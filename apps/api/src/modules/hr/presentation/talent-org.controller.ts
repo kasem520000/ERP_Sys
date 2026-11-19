@@ -91,6 +91,17 @@ export class TalentOrgController {
     return envelope(await this.org.listOrgUnits());
   }
 
+  /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's placement read): the
+   * employee's D-01 placement axes (position + org unit + probation
+   * end) or null axes — a position-less employee is a valid state.
+   */
+  @Get("org/placement/:employeeId")
+  @RequirePermissions("hr.org.view")
+  async placement(@Param("employeeId") employeeId: string) {
+    return envelope(await this.org.getPlacement(employeeId));
+  }
+
   @Patch("org/units/:id")
   @RequirePermissions("hr.org.manage")
   async patchOrgUnit(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {

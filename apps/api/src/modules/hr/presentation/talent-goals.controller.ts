@@ -126,6 +126,28 @@ export class TalentGoalsController {
     return envelope(await this.goals.listGoalTree(UUID.parse(cycleId)));
   }
 
+  /**
+   * PHASE-047 (W-5 — T-14, the 360 extension's goals panel): any
+   * employee's goals (the manage-side read; the OWN plane stays
+   * `goals/own` on hr.performance.review — the acting employee's
+   * rows through the identity bridge).
+   */
+  @Get("goals/for-employee/:employeeId")
+  @RequirePermissions("hr.performance.view")
+  async goalsForEmployee(
+    @Req() request: Request,
+    @Param("employeeId") employeeId: string,
+    @Query("cycleId") cycleId?: string,
+  ) {
+    requireIdentity(request);
+    return envelope(
+      await this.goals.listGoalsForEmployee(
+        employeeId,
+        cycleId === undefined || cycleId === "" ? undefined : cycleId,
+      ),
+    );
+  }
+
   // -- the own plane (the KRI progress triage) ----------------------------------------
 
   @Get("goals/own")
