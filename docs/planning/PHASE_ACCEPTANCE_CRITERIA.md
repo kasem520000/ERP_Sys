@@ -481,6 +481,52 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
 - **The register** ([../decisions/product/STATUTORY_VERIFICATION_REGISTER.md](../decisions/product/STATUTORY_VERIFICATION_REGISTER.md))
   lists every seeded row with citation, status, reviewer/date, and blocking effect.
 
+### PHASE-047 — HR Growth (Talent & Performance)
+
+- **BR-088 proven both ways**: the FIXED stage ladder refuses every backward/
+  sideways/terminal-exit move typed (`STAGE_TRANSITION_INVALID`, zero residue) while
+  any forward distance is monotonic (a skip NEW→INTERVIEW is legal); the ONE
+  sanctioned backward edge is the recorded REOPEN (REJECTED → SCREEN through the
+  dedicated act, the REOPEN record appended to stage_history); the hire link is
+  WRITTEN ONCE (the CAS's WHERE carries `hired_employee_id IS NULL` — a second hire
+  collapses to the typed conflict); the two-transaction CAS duel proves the stage
+  race (zero rows for the loser).
+- **BR-089**: the goal set feeds a review submission ONLY at exactly Σ weights =
+  100% (the 80% arm refuses typed with zero residue — nothing lands, not even the
+  rows that would have been legal alone); the end-to-end cycle closes with the
+  worked example 40%@50 + 60%@75 = 65.00 and the CLOSED cycle's immutability.
+- **BR-090**: the 360 aggregate renders per relationship kind at the ≥ 3 threshold
+  (count/mean/min/max — never an attributed source; below the threshold the typed
+  422); the posture holds at every bridge BY CONSTRUCTION — the W-4 appraisal
+  export and the W-6 report contract ship MANAGER outcomes only with NO reviewer
+  axis, and the 360 inputs never leave the platform (the seeded-bait + row-universe
+  proofs).
+- **BR-091 (amendment A-2's confirmed wording)**: the four probes fire per
+  configured threshold pass (documented default 30/7/0 — tenant-configurable DATA
+  with the explicit off switch; NO row = the defaults fire); the bands are disjoint
+  with the tightest band's open lower edge (already-expired items stay caught); the
+  dedupe is STRUCTURAL via the exact key `hr:{kind}:{employeeId}:{documentId}:
+  {threshold}` (the notifications unique index — a re-run never double-alerts);
+  NULL expiry/probation never fires.
+- **Migrations 0095–0099** apply cleanly from zero with re-apply no-op; the RLS
+  catalog checker clean at 307 tables; the A1–A10 attack matrix green over all 14
+  talent tables (the generated suite + the dedicated FK-chained hostile worlds with
+  the composite-FK law proven live).
+- **The four report contracts** (`hr.performance-cycle-results` ·
+  `hr.recruitment-pipeline` · `hr.training-completions` · `hr.document-expiry`)
+  render + export with the block-on-fail checks; the registry pins re-pinned at
+  every site (106 → 110) with zero new permissions and zero new routes (drift
+  312 = 312; the catalog↔registry reconciliation extended to 110/110).
+- **The external bridges** (acceptance #9): the employee-master and
+  employment/org-snapshot exports as CSV/JSON with the A-4 PII cross-check
+  STRUCTURAL (the typed forbidden-axes list + the bait scans); the
+  appraisal-results and training-completions imports with row-level validation
+  reports (the 15-reason typed vocabulary, the in-file collapse law, the
+  idempotence laws); the contracts documented in the integrations README §3.10.
+- **The OA-06 budgets**: the applicant-pipeline and review-aggregation probes
+  index-driven, no seq-scan, the plans logged verbatim (the W-9-settled shape —
+  never a forced plan).
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

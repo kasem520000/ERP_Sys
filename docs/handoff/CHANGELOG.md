@@ -1,8 +1,40 @@
-# Changelog
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (**PHASE-047 COMPLETE — the closure wave W-7 delivered: the canon docs + the ID_LEDGER flip (BR-001…091) + the full gate sweep (the DB suite 259/259 · 3,623/3,623) + the completion report + the triple flip + the archive + the tag `phase/047`; W-6 the reports + proof wave; W-5 the web plane; W-4 + the NF-9/10/11 fixes; W-3 + the NF-7/8 fixes; W-2 + the NF-4/5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments)**
 
 > **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-19 — **PHASE-047 W-7 — THE CLOSURE WAVE DELIVERED; THE PHASE
+  COMPLETE** (T-16 + T-18; on the W-6 head `e76bbd0` + this wave's
+  changes, this session's fresh clone — the same-session evidence rule's
+  FOURTEENTH consecutive wave): **THE CANON DOCS** — BUSINESS_RULES's HR
+  growth section (BR-088 the monotonic pipeline · BR-089 the weight-sum
+  law · BR-090 the 360 aggregate anonymization · **BR-091 in amendment
+  A-2's CONFIRMED wording** — the dedupe key's exact shape named + the
+  30/7/0 as the documented tenant-configurable default), NAVIGATION_MODEL
+  (the four registry rows + the §9 LIVE row), FEATURE_CATALOG's talent
+  rows, **the HR talent TABLES doc** (the column-level truth for
+  0095–0099, every CHECK vocabulary verified against the migrations), and
+  the PHASE_ACCEPTANCE_CRITERIA §PHASE-047 entry; **THE ID_LEDGER FLIP**
+  (BR-001…091, the coordination arithmetic re-derived, the self-test
+  all-probes-OK); **THE FULL GATE SWEEP AT THE FINAL HEAD** — the full DB
+  suite **259/259 files · 3,623/3,623 · 0 failed · 0 skipped** (five
+  chunks: the smoke 3 · 1,717 + the perf 6 · 22 + 83 · 641 + 77 · 511 +
+  90 · 732; the F1 correction for the 2-test drift vs. the W-6
+  expectation, dated at both claim sites) + every fast gate green
+  (typecheck/lint 8/8 · depcruise 1,993 · 14,855 · unit 8/8 · check:rls
+  scratch 307/0 · drift 312 = 312 · i18n 6,433 + 371 · docs 33/33 ·
+  manifests 13/13 · id-ledger 0 + self-test OK · secrets 0 · capabilities
+  agree · shells PASS · the boundary PASS); **THE COMPLETION REPORT**
+  (the ten acceptance criteria evidenced + the deviations ledger + the
+  PHASE-048 handoff notes); **THE TRIPLE FLIP** (the phase doc header ·
+  the IMPLEMENTATION_STATUS row — with the W-2…W-6 wave history appended
+  at the closure, the 046 one-wave-late disclosure pattern · NEXT_ACTION →
+  the PHASE-048 intake); **THE ARCHIVE `ERP_PLATFORM_PHASE047.zip`**
+  (OA-07, the members byte-verified); **THE TAG `phase/047`** (amendment
+  A-3's confirmed tag). PHASE-047 stands COMPLETE — NOT production
+  approval; the standing constraints carried into PHASE-048 (Projects &
+  Contracting — the plan-authoring wave first). — PHASE-047
 
 - 2026-11-19 — **PHASE-047 W-6 — THE REPORTS + PROOF WAVE DELIVERED**
   (T-15 + T-17, the plan §3 W-6; on the W-5 head `461e257`, this

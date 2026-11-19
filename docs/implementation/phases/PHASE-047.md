@@ -1,6 +1,6 @@
 # PHASE-047 — HR Growth — Talent & Performance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-17](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** COMPLETE (delivered 2026-11-19 — W-0 through W-7; the completion report [reports/PHASE-047-COMPLETION.md](reports/PHASE-047-COMPLETION.md); the tag `phase/047`) · **Wave:** 2 / Stage 13 · **Register:** [CR-17](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §10 (HR-05…HR-10) · §17 (N-14) · §29.4 (DF-51) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2
 
 ## 1. Phase Overview

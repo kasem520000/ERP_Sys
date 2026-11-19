@@ -644,6 +644,10 @@ summary's own verdict; the wrapper's self-tests prove both ways). The
 W-7 full-run expectation moves to 259 files · 3,621. Evidence: the W-6
 gate doc + `audit-evidence/phase047-w6/` (25 logs incl. the two red
 first-run discovery records and the wrapper self-tests).]**
+**[Dated 2026-11-19 (W-7 — the F1 correction): the full run's ACTUAL is
+259 files · 3,623 (the expectation was 2 tests short — the W-5 base
+estimate; the delivered actual settles the count; the run green:
+`audit-evidence/phase047-w7/db-suite/`).]**
 
 ### W-7 — Docs + gates + closure (T-16 + T-18, orchestrator)
 BUSINESS_RULES BR-088…091 (D-04's wordings) + NAVIGATION_MODEL + FEATURE_
@@ -655,6 +659,16 @@ Contracting — the phase doc's own handoff: positions/grades feed
 `project_resource_allocations`).
 **Exit:** acceptance #1…#10 all green with evidence; the same-session
 evidence rule honored (the sixth+ consecutive wave).
+**[MET 2026-11-19 (W-7): the canon docs + the ID_LEDGER flip (BR-001…091)
++ the full gate sweep at the final head (the full DB suite 259/259 ·
+3,623/3,623 · 0 failed · 0 skipped — the 3,621 expectation's 2-test drift
+F1-corrected at the claim sites) + the completion report + the triple flip
++ the archive `ERP_PLATFORM_PHASE047.zip` (OA-07, byte-verified) + the tag
+`phase/047` (A-3's confirmed tag). PHASE-047 COMPLETE — the fourteen-wave
+same-session evidence streak (W-0 through W-7 across the sessions). The
+next phase: PHASE-048 (Projects & Contracting) — the plan-authoring wave
+first. Evidence: the W-7 gate doc + `audit-evidence/phase047-w7/` (19
+logs).]**
 
 ## 4. Test matrix (the permanent suites)
 
