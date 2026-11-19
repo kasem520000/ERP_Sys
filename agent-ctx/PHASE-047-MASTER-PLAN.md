@@ -160,6 +160,22 @@ long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
   > the report registry (106 — the four contracts are W-6's), docs
   > 33/33.]**
 
+  > **[Dated 2026-11-19 (W-4 delivered) — the bridges wave moved the
+  > mid-suite numbers: depcruise fresh-clone 1,971 · 14,672 (+6
+  > modules: the four new src files + the two new specs) · unit api
+  > 60 files · 712 (+1 file · +19 pure tests — the new
+  > talent-bridge.spec) · ROUTE_PERMISSIONS 979 → 984 (+5 rows: the
+  > three export GETs + the two import POSTs — no new keys, drift
+  > stays 312 = 312) · the DB suite's W-7 full-run expectation moves
+  > to 255 files · 3,585 (+1 spec file · +13 tests; the scope-label
+  > law: NO migration this wave, the full suite does not re-run — the
+  > new spec + the hr folder (18 · 142) + payroll (11 · 88) + the
+  > isolation/identity set (6 · 1,761) ran green in this wave's
+  > scope). Unchanged: the journal (0099), permissions (312), i18n
+  > (6,125 + 371 — the bridges are API-only, the screens are W-5's),
+  > ENTITY_CATALOG/check:rls (307 — no schema delta), the report
+  > registry (106 — the four contracts are W-6's), docs 33/33.]**
+
 ## 1. Settled design decisions (from the plan-first reads — binding for all waves, amendable only by the owner's dated dispatch)
 
 **D-01 — The talent layer attaches to the FROZEN employees substrate, never
@@ -547,6 +563,48 @@ reports (D-07); the integrations README's bridge contracts + the
 Workday/BambooHR reference maps.
 **Exit:** acceptance #9's bridge criteria green (CSV/JSON exports, the bad-
 row rejection report).
+
+> **DELIVERED 2026-11-19 (on the W-3 head `7d22c49`, this session's fresh
+> clone `/home/z/ERP_Sys_W4` — the same-session evidence rule's ELEVENTH
+> consecutive wave): every exit criterion met — the PURE layer first
+> (`hr/domain/talent-bridge.ts`: the three contracts' documented field
+> lists with amendment A-4's PII cross-check made STRUCTURAL — the typed
+> forbidden-axes list + the unit spec's walk of every contract column
+> against it; the CSV/JSON rendering laws (BOM/RFC 4180/CRLF — the 046
+> remittance precedent reimplemented in-domain: hr may not import
+> reporting's internals, DEPENDENCY_RULES §1); the two import row
+> validators with the 15-reason typed vocabulary — 19 unit tests), the
+> bridges store (three read-only export queries projecting EXACTLY the
+> contract columns + the batch code-axis resolution), the service (the
+> three exports read-only + audited as CSV/JSON; the two imports riding
+> the SAME machinery the in-app surfaces ride — submitReview and
+> enroll/completion — with the row-level report; BR-090's posture at
+> the bridge BY CONSTRUCTION: the appraisal contract ships MANAGER
+> outcomes only, no reviewer axis, the 360 inputs never leave), the
+> controller (5 routes: the three GET exports streaming @Res() per the
+> remittance precedent + the two POST imports under the envelope;
+> ROUTE_PERMISSIONS 979 → 984 — no new keys, drift 312 = 312), the
+> integrations README's §3.10 (the bridge contracts + the Workday/
+> BambooHR reference maps — documented profiles, NO live connector),
+> and the DB spec 13/13 (the seeded-PII-bait scan, the tenant boundary,
+> every import reason arm, the in-file collapse law, the idempotence
+> laws). THE NF-9/NF-10/NF-11 FIXES delivered with the wave (the
+> owner's W-3 verification findings): NF-9 the org move's descendant
+> match is starts_with (literal prefix — the LIKE `_` wildcard hole;
+> the adversarial close-code arm (d4) pins the sibling tree
+> untouched), NF-10 the hire CAS's written-once arm exists for real
+> (the owner's preferred remedy — the docs truthful at both sites,
+> the store-level arm (d2) pins zero rows + zero residue), NF-11 the
+> W-3 gate doc's dated 58 → 59 correction. Gates: typecheck/lint 8/8
+> (0 cached, forced) · depcruise 1,971 · 14,672 (+6) · unit 8/8 (api
+> 60 · 712) · the new spec + the hr folder (18 · 142) + payroll (11 ·
+> 88) + the isolation/identity set (6 · 1,761) green — the scope-label
+> law: no migration this wave, the full DB suite does not re-run ·
+> check:rls scratch 307/0 · drift 312 = 312 · i18n 6,125 = 6,125 + 371
+> (no i18n delta — the bridges are API-only) · manifests 13/13 · docs
+> 33/33 · id-ledger 0 errors · history-secrets 0 · capabilities agree
+> · shells PASS · boundary PASS. Evidence: the W-4 gate doc +
+> `audit-evidence/phase047-w4/` (21 logs, every one wrapper-captured).**
 
 ### W-5 — The web plane (T-11 + T-12 + T-13 + T-14, orchestrator)
 The four screen families + the 360 extension + the alert list surfaces

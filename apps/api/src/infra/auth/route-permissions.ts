@@ -4682,6 +4682,48 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/alerts/expiry-sweep",
     permission: "hr.documents.manage",
   },
+  // PHASE-047 (W-4 — matrix §3.25, the 0098 §1 seed): the external HR
+  // bridges (T-10, D-07 — the three export contracts + the two import
+  // paths). The family-cluster mapping (the W-3 precedent — no new
+  // keys, drift stays 312 = 312): the employee-master and
+  // employment-org-snapshot exports ride payroll.employees.view — the
+  // employment master's own read plane (the 045 bridge-read precedent;
+  // the org axes are D-01's documented extensions riding the master as
+  // the employment record's placement columns); the appraisal-results
+  // export rides hr.performance.view — the performance plane's read
+  // key (BR-090's posture holds structurally: the contract ships the
+  // MANAGER outcomes only, no reviewer axis, no 360 input rows); the
+  // appraisal-results import rides hr.performance.manage — the
+  // manage-side bulk act (the reviewer identity is the DATA's own, the
+  // external system's manager; the acting user is the importing
+  // administrator — the own-rows law is the in-app /review surface's);
+  // the training-completions import rides hr.training.manage — the
+  // family's write key.
+  {
+    method: "GET",
+    path: "/api/v1/hr/bridges/exports/employee-master",
+    permission: "payroll.employees.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/bridges/exports/employment-org-snapshot",
+    permission: "payroll.employees.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/bridges/exports/appraisal-results",
+    permission: "hr.performance.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/bridges/imports/appraisal-results",
+    permission: "hr.performance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/bridges/imports/training-completions",
+    permission: "hr.training.manage",
+  },
 ];
 
 /**

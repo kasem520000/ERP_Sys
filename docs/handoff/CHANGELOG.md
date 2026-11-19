@@ -1,9 +1,76 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-3 — the recruitment + training/org + documents + sweep wave delivered + the NF-7/NF-8 record fixes; 2026-11-18: W-2 the performance + goals engines + the NF-4/NF-5 fixes; W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-4 — the external bridges wave delivered + the NF-9/NF-10/NF-11 fixes; W-3 the recruitment + training/org + documents + sweep wave + the NF-7/NF-8 fixes; 2026-11-18: W-2 the performance + goals engines + the NF-4/NF-5 fixes; W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
 
+- 2026-11-19 — **PHASE-047 W-4 — THE EXTERNAL HR BRIDGES DELIVERED**
+  (T-10, the plan §3 W-4; on the W-3 head `7d22c49`, this session's
+  fresh clone — the same-session evidence rule's ELEVENTH consecutive
+  wave): the PURE layer first (`hr/domain/talent-bridge.ts` — the
+  three export contracts' documented field lists with amendment A-4's
+  PII cross-check made STRUCTURAL (the typed forbidden-axes list +
+  the unit spec's walk: a future column that smuggles a PII axis
+  fails the suite), the CSV/JSON rendering laws (UTF-8 BOM, RFC 4180,
+  CRLF — the 046 remittance precedent reimplemented in-domain because
+  hr may not import reporting's internals), and the two import row
+  validators with the typed rejection vocabulary — 19 unit tests,
+  60/60 files · 712 green); the bridges store (the three read-only
+  export queries projecting EXACTLY the contract columns — the bait
+  scan proves national_id/bank/nationality/probation_end never ride a
+  payload — plus the batch code-axis resolution); the service (the
+  three exports as CSV/JSON, read-only + audited
+  `hr.bridge_exported`; the two imports riding the SAME machinery the
+  in-app surfaces ride — submitReview's validation-first + BR-089 +
+  draft-upsert + submit-CAS, enroll + the completion act — with the
+  ROW-LEVEL VALIDATION REPORT: 15 typed reasons incl. DUPLICATE_IN_FILE
+  (the attendance import's collapse law), ALREADY_SUBMITTED,
+  GOAL_WEIGHTS_INVALID, NOT_IN_CYCLE_SCOPE, ALREADY_COMPLETED (the
+  compliance record's completed_at never re-stamped),
+  ENROLLMENT_WITHDRAWN, PROGRAM_RETIRED; BR-090's posture holds at the
+  bridge BY CONSTRUCTION — the appraisal contract ships MANAGER
+  outcomes only, no reviewer axis, the 360 inputs never leave); the
+  controller (5 routes: the three GET exports streaming under @Res()
+  per the remittance precedent — `payroll.employees.view` ×2 ·
+  `hr.performance.view` ×1 — + the two POST imports under the
+  envelope — `hr.performance.manage` · `hr.training.manage`;
+  ROUTE_PERMISSIONS **979 → 984**, no new keys, drift 312 = 312) +
+  THE INTEGRATIONS README's §3.10 (the bridge contracts' field
+  tables + the two import payload shapes + the rejection vocabulary
+  + the Workday/BambooHR REFERENCE MAPS — documented profiles, no
+  live connector, the NO-FABRICATION rule governs); the DB spec
+  `talent-bridges.db.spec` 13/13 (the exports' content + the SEEDED
+  PII BAIT scan + the tenant boundary + the audits; the imports'
+  every reason arm + the in-file collapse + the idempotence laws);
+  the error taxonomy's ONE new 422 code (BRIDGE_IMPORT_INVALID —
+  falls through by design, no filter registration needed). — **THE
+  NF-9/NF-10/NF-11 FIXES (the owner's W-3 verification findings)
+  delivered with the wave:** NF-9 the org move's descendant match is
+  `starts_with(path, oldPath || '.')` — LITERAL prefix semantics (the
+  W-3 LIKE shape's `_` wildcard would have corrupted a sibling tree
+  whose code matched at the underscore position; the adversarial
+  close-code arm (d4) — `ADV{seq}_EAST` vs `ADV{seq}XEAST` — pins the
+  sibling untouched); NF-10 the hire CAS's written-once arm
+  (`AND hired_employee_id IS NULL`, active only when the statement
+  carries a link) added for real per the owner's preferred remedy —
+  the store header's `casHireApplicant` misnomer corrected, both
+  service doc sites now truthful, and the store-level arm (d2) pins
+  ZERO rows + zero residue on an OFFER-but-already-linked floor;
+  NF-11 the W-3 gate doc's unit row carries the dated 58 → 59
+  correction. Gates (all same-session, wrapper-captured,
+  `audit-evidence/phase047-w4/`): typecheck/lint 8/8 (0 cached,
+  forced) · depcruise **1,971 · 14,672** (+6 modules: 4 src + 2
+  specs) · unit 8/8 (api **60 · 712** = 59 · 693 + the 19 pure tests
+  in the new file) · the new spec 13/13 + the hr folder **18 · 142**
+  (17 · 127 + the new file + the two NF arms) + payroll 11 · 88 + the
+  isolation/identity set 6 · 1,761 green (the scope-label law: no
+  migration this wave — the full DB suite does not re-run; W-7's
+  expectation moves to 255 files · 3,585) · check:rls scratch **307
+  catalog tables, 0 violations** (the 99-chain from zero) · drift
+  312 = 312 · i18n 6,125 = 6,125 + 371 (no i18n delta — the bridges
+  are API-only) · manifests 13/13 · docs 33/33 · id-ledger 0 errors
+  · history-secrets 0 · capabilities agree · shells PASS · boundary
+  PASS.
 - 2026-11-19 — **PHASE-047 W-3 — RECRUITMENT + TRAINING/ORG +
   DOCUMENTS + THE SWEEP DELIVERED** (T-07 + T-08 + T-09, the plan §3
   W-3; on the W-2 head `83bfc19`, this session's fresh clone — the

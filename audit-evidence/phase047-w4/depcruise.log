@@ -1,0 +1,8 @@
+
+> erp-platform@0.1.0 lint:depcruise /home/z/ERP_Sys_W4
+> dependency-cruiser apps packages --config .dependency-cruiser.cjs
+
+
+✔ no dependency violations found (1971 modules, 14672 dependencies cruised)
+
+EXIT=0

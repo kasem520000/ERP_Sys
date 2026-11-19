@@ -396,6 +396,61 @@ describe("PHASE-047 W-3 — (d) the org tree: D-09's cycle-safe moves + the mate
       ),
     ).rejects.toBeInstanceOf(OrgUnitNotFoundError);
   });
+
+  it("(d4) THE NF-9 ADVERSARIAL CLOSE-CODE ARM (the owner's W-3 verification finding, fixed 2026-11-19/W-4): a sibling tree whose code differs ONLY at the underscore position is NEVER touched by a move — starts_with is literal, LIKE's `_` wildcard would have corrupted it", async () => {
+    orgSeq += 1;
+    const seq = `${orgSeq}-${Date.now() % 100000}`;
+    // The adversarial pair: ADV{seq}_EAST vs ADV{seq}XEAST — identical
+    // except the underscore position. Under the W-3 `path LIKE
+    // '${oldPath}.%'` shape, moving ADV{seq}_EAST would ALSO have
+    // rewritten ADV{seq}XEAST's subtree (the owner's live-cluster
+    // proof: 'SALES_EAST.%' matched SALESXEAST.otherchild) — data
+    // corruption. The starts_with fix matches the literal prefix only.
+    const underscoreRoot = await withTenant(TENANT_H, () =>
+      orgSvc.createOrgUnit({
+        code: `ADV${seq}_EAST`,
+        name: "Adversarial Underscore",
+        nameAr: null,
+        parentId: null,
+        actorId: H_ACTOR,
+      }),
+    );
+    const xeastRoot = await withTenant(TENANT_H, () =>
+      orgSvc.createOrgUnit({
+        code: `ADV${seq}XEAST`,
+        name: "Adversarial Close Code",
+        nameAr: null,
+        parentId: null,
+        actorId: H_ACTOR,
+      }),
+    );
+    const underscoreChild = await freshOrgUnit(underscoreRoot.id);
+    const xeastChild = await freshOrgUnit(xeastRoot.id);
+    const newHome = await freshOrgUnit(null);
+    expect(underscoreChild.path).toBe(`${underscoreRoot.code}.${underscoreChild.code}`);
+    expect(xeastChild.path).toBe(`${xeastRoot.code}.${xeastChild.code}`);
+    // Move the underscored tree under newHome.
+    const moved = await withTenant(TENANT_H, () =>
+      orgSvc.patchOrgUnit({ id: underscoreRoot.id, parentId: newHome.id, actorId: H_ACTOR }),
+    );
+    expect(moved.path).toBe(`${newHome.code}.${underscoreRoot.code}`);
+    // THE LAW: the moved tree's own descendant re-paths…
+    const underscoreChildAfter = await withTenant(TENANT_H, () =>
+      orgSvc.getOrgUnit(underscoreChild.id),
+    );
+    expect(underscoreChildAfter.path).toBe(
+      `${newHome.code}.${underscoreRoot.code}.${underscoreChild.code}`,
+    );
+    // …and the CLOSE-CODE SIBLING'S subtree is UNTOUCHED (the W-3 LIKE
+    // shape would have rewritten xeastChild's path here — the exact
+    // corruption the finding proved).
+    const xeastChildAfter = await withTenant(TENANT_H, () => orgSvc.getOrgUnit(xeastChild.id));
+    expect(xeastChildAfter.path).toBe(`${xeastRoot.code}.${xeastChild.code}`);
+    const xeastRootAfter = await withTenant(TENANT_H, () => orgSvc.getOrgUnit(xeastRoot.id));
+    expect(xeastRootAfter.parentId).toBeNull();
+    expect(xeastRootAfter.path).toBe(xeastRoot.code);
+    expect(xeastRootAfter.version).toBe(1);
+  });
 });
 
 describe("PHASE-047 W-3 — (e) the positions: reports_to with the same D-09 guard", () => {

@@ -230,3 +230,20 @@ export class InterviewNotPanelistError extends DomainError {
     );
   }
 }
+
+// ── PHASE-047 (W-4 — T-10) — the external bridges' additions ───────────────
+// (the same in-phase discipline: the ONE new code is a 422-family shape
+// refusal — it falls through to the 422 default BY DESIGN, no error-filter
+// registration needed; the imports' file-level 404/409 refusals reuse the
+// W-1/W-2/W-3 taxonomy's already-registered codes: TALENT_CYCLE_NOT_FOUND,
+// CYCLE_STATE_CONFLICT, TALENT_INVALID).
+
+/** The file-level import refusal: a malformed/empty/oversized batch
+ * (the attendance import's bounded-file law — a bigger file is a
+ * deliberate migration, not a bridge import). The ROW-level refusals
+ * never throw: they ride the row-level validation report. */
+export class BridgeImportInvalidError extends DomainError {
+  constructor(message: string) {
+    super("BRIDGE_IMPORT_INVALID", message);
+  }
+}

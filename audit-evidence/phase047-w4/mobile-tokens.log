@@ -1,0 +1,8 @@
+
+> erp-platform@0.1.0 check:mobile-tokens /home/z/ERP_Sys_W4
+> tsx scripts/check-mobile-tokens.ts
+
+== mobile token parity: 130/130 ==
+== mobile token derivations: 50/50 ==
+canonical ⊆ mobile on every token family; RN adaptations derive from the canonical values.
+EXIT=0

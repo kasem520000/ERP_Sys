@@ -21,6 +21,19 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  * The path grammar: dot-joined unit CODES, root = own code — the
  * service's dot-free org-code law keeps the grammar unambiguous.
  *
+ * [Dated 2026-11-19 (W-4, the owner's W-3 verification finding NF-9):
+ * the descendant match is `starts_with(path, oldPath || '.')` —
+ * LITERAL prefix semantics, never a LIKE pattern. The W-3 shape
+ * `path LIKE ${oldPath}.%` carried a real hole: org codes legally
+ * contain the underscore (ORG_CODE_RE) and `_` is a single-character
+ * WILDCARD in LIKE — proven on a live cluster, the pattern
+ * 'SALES_EAST.%' matched BOTH `SALES_EAST.child` AND
+ * `SALESXEAST.otherchild`, so a sibling tree whose code matched at
+ * the underscore position would have its path corrupted by the move.
+ * `starts_with` matches the literal prefix only — the adversarial
+ * close-code arm (SALES_EAST vs SALESXEAST siblings) is pinned in
+ * talent-training-org.db.spec.ts (d).]
+ *
  * THE POSITIONS RE-PARENT: `updatePosition` rides the same pure guard
  * (reports_to); the reports_to edge set read (`listPositionEdges`) is
  * the guard's substrate.
@@ -181,7 +194,7 @@ export async function moveOrgUnit(input: {
     UPDATE org_units SET
       path = ${input.newPath} || substring(path from ${sql`length(${input.oldPath}) + 1`}),
       updated_at = now(), version = version + 1
-    WHERE path LIKE ${`${input.oldPath}.%`} AND id <> ${input.id}
+    WHERE starts_with(path, ${input.oldPath} || '.') AND id <> ${input.id}
   `);
   return moved;
 }

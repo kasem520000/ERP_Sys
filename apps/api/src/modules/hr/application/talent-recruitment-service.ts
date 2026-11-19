@@ -51,9 +51,13 @@ import type { ApplicantRow, VacancyRow } from "../infrastructure/talent-recruitm
  * - THE HIRE ACT: requires OFFER (the ladder's own law —
  *   ApplicantNotHireableError below it); links an EXISTING employee
  *   (typed 404 for unknown/foreign ids — A7 parity); the link writes
- *   ONCE (the CAS's `hired_employee_id IS NULL` arm — a second hire
- *   is the typed 409, never a silent relink); the OFFER→HIRED hop and
- *   the link and the history record ride the SAME statement.
+ *   ONCE — the hire CAS carries TWO structural arms: the stage pin
+ *   (`stage = 'OFFER'`) AND the written-once link arm
+ *   (`hired_employee_id IS NULL`, added 2026-11-19 with W-4 per the
+ *   owner's NF-10 finding — the W-3 shape pinned the stage alone) —
+ *   a second hire is the typed 409, never a silent relink; the
+ *   OFFER→HIRED hop and the link and the history record ride the
+ *   SAME statement.
  * - THE PANEL RECORD: one row per (applicant, round, panelist) — the
  *   0096 unique, the typed 409 on a duplicate schedule; the scorecard
  *   write is guarded on the panelist (a non-panelist's write matches
@@ -371,8 +375,11 @@ export class TalentRecruitmentService {
    * parity; D-01: the talent layer never writes the employees table,
    * the employee master's own creation surface is the payroll
    * module's); the OFFER→HIRED hop + the written-once link + the
-   * history record ride ONE conditional UPDATE (a raced or repeated
-   * hire matches zero rows — the typed 409 with the EXISTING link).
+   * history record ride ONE conditional UPDATE whose WHERE carries
+   * BOTH defense lines — the stage pin (`stage = 'OFFER'`) and the
+   * written-once link arm (`hired_employee_id IS NULL`, the NF-10
+   * second line, 2026-11-19/W-4) — a raced or repeated hire matches
+   * zero rows on either arm (the typed 409 with the EXISTING link).
    */
   async hireApplicant(
     applicantId: string,

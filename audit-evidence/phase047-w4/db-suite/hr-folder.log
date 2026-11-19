@@ -1,0 +1,123 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys_W4/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_Sys_W4/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 03:15:57.777 UTC [18567] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 03:15:57.777 UTC [18567] LOG:  listening on IPv6 address "::1", port 33485
+2026-11-19 03:15:57.777 UTC [18567] LOG:  listening on IPv4 address "127.0.0.1", port 33485
+
+2026-11-19 03:15:57.777 UTC [18567] LOG:  listening on Unix socket "/tmp/.s.PGSQL.33485"
+
+2026-11-19 03:15:57.778 UTC [18570] LOG:  database system was shut down at 2026-11-19 03:15:57 UTC
+
+2026-11-19 03:15:57.779 UTC [18567] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/hr/shifts-roster.spec.ts (7 tests) 8590ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  8394ms
+ ✓ src/__db__/hr/inv031.spec.ts (7 tests) 5746ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (P2) the balance-cap property matrix — 12 generated configurations through the real engine, INV-031 after every step  5114ms
+ ✓ src/__db__/hr/leave.spec.ts (5 tests) 1442ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (b) THE ACCRUAL RUN — the annual grant with joiner proration (the mid-year hire), the monthly vesting, idempotence, and the INV-031 preservation  694ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (d) THE CARRY-OVER ROLLOVER — min(remaining, cap) with the truncation audited; a 0-cap carries nothing; idempotent  640ms
+2026-11-19 03:16:19.816 UTC [18670] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-19 03:16:19.816 UTC [18670] STATEMENT:  
+	    UPDATE employees SET user_id = $1::uuid, updated_at = now(), version = version + 1
+	    WHERE id = $2::uuid AND user_id IS NULL
+	    RETURNING id
+	  
+
+ ✓ src/__db__/hr/hr-writer-races.spec.ts (20 tests) 1166ms
+2026-11-19 03:16:20.306 UTC [18723] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-performance.db.spec.ts (14 tests) 471ms
+ ✓ src/__db__/hr/feed.spec.ts (4 tests) 461ms
+ ✓ src/__db__/hr/oa06-budgets.spec.ts (6 tests) 341ms
+2026-11-19 03:16:21.761 UTC [18733] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-recruitment.db.spec.ts (16 tests) 316ms
+ ✓ src/__db__/hr/self-service.spec.ts (11 tests) 251ms
+ ✓ src/__db__/hr/talent-bridges.db.spec.ts (13 tests) 147ms
+ ✓ src/__db__/hr/attendance.spec.ts (5 tests) 178ms
+(node:18626) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/__db__/hr/leave-posting.spec.ts (3 tests) 165ms
+ ✓ src/__db__/hr/talent-documents-sweep.db.spec.ts (6 tests) 166ms
+ ✓ src/__db__/hr/talent-training-org.db.spec.ts (10 tests) 118ms
+ ✓ src/__db__/hr/overtime.spec.ts (4 tests) 105ms
+ ✓ src/__db__/hr/attendance-import.spec.ts (5 tests) 94ms
+ ✓ src/__db__/hr/holiday.spec.ts (3 tests) 64ms
+2026-11-19 03:16:23.453 UTC [18766] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-19 03:16:23.453 UTC [18766] DETAIL:  Key (tenant_id, user_id)=(7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a, 01a1f1ce-2ce3-7000-b3cb-30c0d25af007) already exists.
+2026-11-19 03:16:23.453 UTC [18766] STATEMENT:  UPDATE employees SET user_id = $1, updated_at = now(), version = version + 1
+	          WHERE id = $2 AND tenant_id = $3
+
+ ✓ src/__db__/hr/bridge.spec.ts (3 tests) 69ms
+
+ Test Files  18 passed (18)
+      Tests  142 passed (142)
+   Start at  03:15:57
+   Duration  26.44s (transform 1.38s, setup 0ms, collect 2.52s, tests 19.89s, environment 0ms, prepare 52ms)
+
+2026-11-19 03:16:23.462 UTC [18567] LOG:  received fast shutdown request
+
+2026-11-19 03:16:23.463 UTC [18567] LOG:  aborting any active transactions
+2026-11-19 03:16:23.463 UTC [18703] FATAL:  terminating connection due to administrator command
+2026-11-19 03:16:23.463 UTC [18647] FATAL:  terminating connection due to administrator command
+2026-11-19 03:16:23.464 UTC [18670] FATAL:  terminating connection due to administrator command
+2026-11-19 03:16:23.465 UTC [18567] LOG:  background worker "logical replication launcher" (PID 18573) exited with exit code 1
+2026-11-19 03:16:23.466 UTC [18669] FATAL:  terminating connection due to administrator command
+2026-11-19 03:16:23.471 UTC [18568] LOG:  shutting down
+2026-11-19 03:16:23.471 UTC [18568] LOG:  checkpoint starting: shutdown immediate
+
+(node:18626) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:18626) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-19 03:16:23.506 UTC [18568] LOG:  checkpoint complete: wrote 5832 buffers (35.6%); 0 WAL file(s) added, 0 removed, 4 recycled; write=0.028 s, sync=0.007 s, total=0.036 s; sync files=2532, longest=0.001 s, average=0.001 s; distance=72641 kB, estimate=72641 kB; lsn=0/5BCEDD0, redo lsn=0/5BCEDD0
+
+2026-11-19 03:16:23.515 UTC [18567] LOG:  database system is shut down
+
+VITEST_EXIT=0

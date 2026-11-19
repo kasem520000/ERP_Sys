@@ -15,6 +15,7 @@ import { OvertimeService } from "./application/overtime-service";
 import { SelfServiceService } from "./application/self-service-service";
 import { ShiftService } from "./application/shift-service";
 import { TalentAlertsService } from "./application/talent-alerts-service";
+import { TalentBridgesService } from "./application/talent-bridges-service";
 import { TalentGoalsService } from "./application/talent-goals-service";
 import { TalentOrgService } from "./application/talent-org-service";
 import { TalentPerformanceService } from "./application/talent-performance-service";
@@ -34,6 +35,7 @@ import { OvertimeController } from "./presentation/overtime.controller";
 import { SelfServiceController } from "./presentation/self-service.controller";
 import { TalentDocumentsController } from "./presentation/talent-documents.controller";
 import { TalentGoalsController } from "./presentation/talent-goals.controller";
+import { TalentBridgesController } from "./presentation/talent-bridges.controller";
 import { TalentOrgController } from "./presentation/talent-org.controller";
 import { TalentPerformanceController } from "./presentation/talent-performance.controller";
 import { TalentRecruitmentController } from "./presentation/talent-recruitment.controller";
@@ -86,12 +88,22 @@ import { TalentTrainingController } from "./presentation/talent-training.control
  * failure never blocks module init). Still ledger-free (D-05) and
  * still never a payroll write (D-01: the hire LINKS an existing
  * employee, the employees table stays read-only to the talent plane).
+ * PHASE-047 (W-4 — T-10): the external bridges join — TalentBridgesService
+ * (the three export contracts over the 046 remittance-export precedent
+ * + the two import paths with row-level validation reports riding the
+ * W-2/W-3 engines' own acts) + its controller (5 routes on the matrix
+ * §3.25 keys: payroll.employees.view ×2 · hr.performance.view ×1 ·
+ * hr.performance.manage ×1 · hr.training.manage ×1 — no new keys, drift
+ * stays 312 = 312). Amendment A-4's PII cross-check is structural
+ * (domain/talent-bridge.ts's forbidden-axes list + the unit spec);
+ * still ledger-free (D-05) and still never a payroll write (D-01: the
+ * exports READ the employees substrate under RLS, that is all).
  */
 @Module({
   imports: [AuditModule, AccountingModule, ConfigurationModule, NotificationsModule],
-  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController, SelfServiceController, TalentPerformanceController, TalentGoalsController, TalentRecruitmentController, TalentTrainingController, TalentOrgController, TalentDocumentsController],
-  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService, TalentRecruitmentService, TalentTrainingService, TalentOrgService, TalentAlertsService],
-  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService, TalentRecruitmentService, TalentTrainingService, TalentOrgService, TalentAlertsService],
+  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController, SelfServiceController, TalentPerformanceController, TalentGoalsController, TalentRecruitmentController, TalentTrainingController, TalentOrgController, TalentDocumentsController, TalentBridgesController],
+  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService, TalentRecruitmentService, TalentTrainingService, TalentOrgService, TalentAlertsService, TalentBridgesService],
+  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService, TalentRecruitmentService, TalentTrainingService, TalentOrgService, TalentAlertsService, TalentBridgesService],
 })
 export class HrModule implements OnModuleInit {
   /** The hr-expiry-sweep's registration (D-06 — the pg-boss queue

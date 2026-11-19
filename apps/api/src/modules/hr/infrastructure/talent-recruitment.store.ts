@@ -25,12 +25,23 @@ import { requireTenantContext } from "../../../infra/db/tenant-context";
  *   the row lock is the gate; the stage_history jsonb append rides
  *   the SAME statement (the transition record is atomic with the
  *   move — a raced backward jump matches ZERO rows).
- * - THE HIRE CAS (the written-once link): `casHireApplicant` is ONE
- *   UPDATE … WHERE id AND stage = 'OFFER' AND hired_employee_id IS
- *   NULL — the employee link writes exactly once, atomically with the
- *   OFFER→HIRED hop; a raced or repeated hire matches ZERO rows (the
- *   typed ApplicantAlreadyHiredError is the service's, and the
- *   ambient tenant UoW rolls the employee-side effects back with it).
+ * - THE HIRE CAS (the written-once link): the hire call of
+ *   `casAdvanceStage` (action HIRE, a `hiredEmployeeId` carried) adds
+ *   the SECOND defense line to the WHERE — `AND (hired_employee_id
+ *   IS NULL)` (vacuously true for every non-hire call: the arm
+ *   activates only when the statement carries a link). The employee
+ *   link writes exactly once, atomically with the OFFER→HIRED hop; a
+ *   raced or repeated hire matches ZERO rows (the typed
+ *   ApplicantAlreadyHiredError is the service's, and the ambient
+ *   tenant UoW rolls the employee-side effects back with it).
+ *   [Dated 2026-11-19 (W-4, the owner's W-3 verification finding
+ *   NF-10): this header previously named a `casHireApplicant`
+ *   function and an `hired_employee_id IS NULL` arm that DID NOT
+ *   EXIST — the W-3 mechanism was the stage pin alone (`WHERE id AND
+ *   stage = 'OFFER'`; the law held because no path leads from HIRED
+ *   back to OFFER). Per the owner's preferred remedy the arm now
+ *   EXISTS for real — the link's written-once law is structural in
+ *   the statement itself, and the documentation is truthful.]
  * - THE SCORECARD UPDATE: `updateInterviewScorecard` is ONE guarded
  *   UPDATE … WHERE id AND panelist_employee_id = ${panelistEmployeeId}
  *   — the own-rows law is structural (a non-panelist's write matches
@@ -279,6 +290,10 @@ export async function casAdvanceStage(input: {
       END,
       updated_at = now(), version = version + 1, updated_by = ${input.actorId}
     WHERE id = ${input.applicantId} AND stage = ${input.from}
+      -- THE WRITTEN-ONCE ARM (NF-10, W-4): active only when this
+      -- statement carries a hire link — the row must hold NO link yet;
+      -- vacuously true for every ADVANCE/REOPEN call.
+      AND (${input.hiredEmployeeId ?? null}::uuid IS NULL OR hired_employee_id IS NULL)
     RETURNING ${APPLICANT_COLUMNS}
   `);
   return (rows.rows as unknown as ApplicantRow[])[0];

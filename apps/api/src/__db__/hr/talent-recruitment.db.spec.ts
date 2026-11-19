@@ -19,6 +19,7 @@ import {
   VacancyStateConflictError,
 } from "../../modules/hr/domain/talent-errors";
 import { EmployeeNotFoundError } from "../../modules/hr/domain/hr-errors";
+import * as store from "../../modules/hr/infrastructure/talent-recruitment.store";
 import { superuserClient } from "../test-db";
 import { H_ACTOR, setupHrFixture, TENANT_H, TENANT_H_RLS } from "./fixtures";
 
@@ -340,6 +341,43 @@ describe("PHASE-047 W-3 — (d) the hire act: the written-once employee link (ac
     await expect(
       withTenant(TENANT_H, () => recruitmentSvc.getApplicant("11111111-1111-4111-8111-111111111188")),
     ).rejects.toBeInstanceOf(ApplicantNotFoundError);
+  });
+
+  it("(d2) THE NF-10 WRITTEN-ONCE ARM (the owner's W-3 verification finding, deepened 2026-11-19/W-4): a hire CAS against a row pinned at OFFER but ALREADY LINKED matches ZERO rows — the second defense line is structural, the row untouched", async () => {
+    const vacancy = await freshVacancy();
+    const applicant = await freshApplicant(vacancy.id);
+    await withTenant(TENANT_H, () => recruitmentSvc.advanceStage(applicant.id, "OFFER", H_ACTOR));
+    // A state no API path produces (OFFER + an existing link): the raw
+    // seed pins it — the W-3 law held via the stage pin alone because
+    // no ladder path leads back to OFFER; the NF-10 arm makes the
+    // link's written-once law hold EVEN IF a future path ever did.
+    const su: Client = await superuserClient();
+    await su.query(
+      `UPDATE applicants SET hired_employee_id = $3 WHERE tenant_id = $1 AND id = $2`,
+      [TENANT_H, applicant.id, spec.fixture!.hireEmployeeId],
+    );
+    await su.end();
+    const before = await withTenant(TENANT_H, () => recruitmentSvc.getApplicant(applicant.id));
+    // The store-level CAS with a hire link: ZERO rows (the arm refuses).
+    const cas = await withTenant(TENANT_H, () =>
+      store.casAdvanceStage({
+        applicantId: applicant.id,
+        from: "OFFER",
+        to: "HIRED",
+        action: "HIRE",
+        actorId: H_ACTOR,
+        at: new Date().toISOString(),
+        hiredEmployeeId: spec.fixture!.hireEmployeeId,
+      }),
+    );
+    expect(cas).toBeUndefined();
+    // ZERO RESIDUE: still OFFER, still the ORIGINAL link, version
+    // unbumped, no HIRE record in the history.
+    const after = await withTenant(TENANT_H, () => recruitmentSvc.getApplicant(applicant.id));
+    expect(after.stage).toBe("OFFER");
+    expect(after.hiredEmployeeId).toBe(spec.fixture!.hireEmployeeId);
+    expect(after.version).toBe(before.version);
+    expect(after.stageHistory.some((entry) => entry.action === "HIRE")).toBe(false);
   });
 });
 

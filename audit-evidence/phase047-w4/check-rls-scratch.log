@@ -1,0 +1,10 @@
+initdb: warning: enabling "trust" authentication for local connections
+initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+waiting for server to start.... done
+server started
+
+> erp-platform@0.1.0 check:rls /home/z/ERP_Sys_W4
+> tsx scripts/check-rls.ts
+
+[check-rls] OK — 307 catalog tables
+EXIT=0
