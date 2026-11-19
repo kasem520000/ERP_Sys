@@ -1,8 +1,9 @@
-import { Module } from "@nestjs/common";
+import { Module, type OnModuleInit } from "@nestjs/common";
 
 import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
 import { ConfigurationModule } from "../configuration/configuration.module";
+import { NotificationsModule } from "../notifications/notifications.module";
 import { AttendanceImportService } from "./application/attendance-import-service";
 import { BridgeService } from "./application/bridge-service";
 import { FeedService } from "./application/feed-service";
@@ -13,8 +14,14 @@ import { AttendanceService } from "./application/attendance-service";
 import { OvertimeService } from "./application/overtime-service";
 import { SelfServiceService } from "./application/self-service-service";
 import { ShiftService } from "./application/shift-service";
+import { TalentAlertsService } from "./application/talent-alerts-service";
 import { TalentGoalsService } from "./application/talent-goals-service";
+import { TalentOrgService } from "./application/talent-org-service";
 import { TalentPerformanceService } from "./application/talent-performance-service";
+import { TalentRecruitmentService } from "./application/talent-recruitment-service";
+import { TalentTrainingService } from "./application/talent-training-service";
+import { getBoss } from "../../infra/jobs/boss";
+import { registerHrExpiryJob } from "./infrastructure/hr-expiry-sweep.job";
 import { AttendanceImportController } from "./presentation/attendance-import.controller";
 import { AttendanceController } from "./presentation/attendance.controller";
 import { BridgeController } from "./presentation/bridge.controller";
@@ -25,16 +32,20 @@ import { LeaveController } from "./presentation/leave.controller";
 import { HolidayController } from "./presentation/holiday.controller";
 import { OvertimeController } from "./presentation/overtime.controller";
 import { SelfServiceController } from "./presentation/self-service.controller";
+import { TalentDocumentsController } from "./presentation/talent-documents.controller";
 import { TalentGoalsController } from "./presentation/talent-goals.controller";
+import { TalentOrgController } from "./presentation/talent-org.controller";
 import { TalentPerformanceController } from "./presentation/talent-performance.controller";
+import { TalentRecruitmentController } from "./presentation/talent-recruitment.controller";
+import { TalentTrainingController } from "./presentation/talent-training.controller";
 
 /**
  * HR module (PHASE-045 — HR Core: attendance, leaves & shifts). T-03
  * delivers the shift templates + the roster grid + the rotation pattern
  * generator (HR-04); T-04 adds the attendance service — punch-session
  * capture, the derived daily status (roster + holiday + leave), the
- * exception computation, and BR-082's immutability window; T-05 adds
- * the device-agnostic CSV import — preview/commit with the file
+ * exception computation, and BR-082's immutability window; T-05 adds the
+ * device-agnostic CSV import — preview/commit with the file
  * fingerprint, the anomaly quarantine, and the mapping setting; T-06
  * adds the overtime engine — the multiplier-tier rules, the tier
  * matching (the tenant's weekend setting — never a fabricated
@@ -59,11 +70,37 @@ import { TalentPerformanceController } from "./presentation/talent-performance.c
  * controllers (matrix §3.25's keys). Ledger-free by design (D-05): the
  * talent plane adds no ledger surface — the accounting imports above
  * stay the leave family's alone.
+ *
+ * PHASE-047 (W-3 — T-07 + T-08 + T-09): the growth engines join —
+ * TalentRecruitmentService (BR-088's monotonic pipeline + the recorded
+ * reopen + the hire act's written-once employee link + the panel
+ * scorecards), TalentTrainingService (the programs/enrollments/
+ * certifications registers), TalentOrgService (the D-09 cycle-safe org
+ * tree + positions + the HR-10 document register) and
+ * TalentAlertsService (the hr-expiry-sweep — D-06's four probes, the
+ * BR-091 structural dedupe, the 044-pattern config row) + their four
+ * controllers (matrix §3.25's keys) + the NOTIFICATIONS import (the
+ * sweep's InboxService target — the inventory module's dependency
+ * shape) + the module's FIRST OnModuleInit (the pg-boss registration,
+ * the warranty-expiry job's shape: degraded-boot — a registration
+ * failure never blocks module init). Still ledger-free (D-05) and
+ * still never a payroll write (D-01: the hire LINKS an existing
+ * employee, the employees table stays read-only to the talent plane).
  */
 @Module({
-  imports: [AuditModule, AccountingModule, ConfigurationModule],
-  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController, SelfServiceController, TalentPerformanceController, TalentGoalsController],
-  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService],
-  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService],
+  imports: [AuditModule, AccountingModule, ConfigurationModule, NotificationsModule],
+  controllers: [HrController, AttendanceController, AttendanceImportController, OvertimeController, LeaveController, HolidayController, BridgeController, FeedController, LeavePostingController, SelfServiceController, TalentPerformanceController, TalentGoalsController, TalentRecruitmentController, TalentTrainingController, TalentOrgController, TalentDocumentsController],
+  providers: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService, TalentRecruitmentService, TalentTrainingService, TalentOrgService, TalentAlertsService],
+  exports: [ShiftService, AttendanceService, AttendanceImportService, OvertimeService, LeaveService, HolidayService, BridgeService, FeedService, LeavePostingService, SelfServiceService, TalentPerformanceService, TalentGoalsService, TalentRecruitmentService, TalentTrainingService, TalentOrgService, TalentAlertsService],
 })
-export class HrModule {}
+export class HrModule implements OnModuleInit {
+  /** The hr-expiry-sweep's registration (D-06 — the pg-boss queue
+   * `hr-expiry-sweep`, daily 04:15 UTC; degraded-boot: the .catch
+   * keeps a boss-less boot (the DB specs) green — the sales module's
+   * warranty precedent). */
+  async onModuleInit(): Promise<void> {
+    await registerHrExpiryJob(getBoss(), this.alerts).catch(() => undefined);
+  }
+
+  constructor(private readonly alerts: TalentAlertsService) {}
+}

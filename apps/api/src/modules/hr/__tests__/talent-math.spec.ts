@@ -2,10 +2,20 @@ import { describe, expect, it } from "vitest";
 
 import {
   aggregate360,
+  APPLICANT_STAGES,
+  canAdvanceStage,
+  DEFAULT_EXPIRY_SWEEP_WINDOWS,
   expectedPctThrough,
+  expiryDedupeKey,
+  type ExpirySweepKind,
   goalWeightSum,
+  isApplicantStage,
   MIN_360_RESPONSES,
+  normalizeSweepWindows,
+  reopenTarget,
   rollupGoalProgress,
+  SWEEP_KEY_PLACEHOLDER,
+  sweepBands,
   triageKriProgress,
   visible360,
   weightsExactly100,
@@ -271,3 +281,171 @@ describe("PHASE-047 W-2 — D-09: the cycle-safe move guard", () => {
     expect(wouldCreateCycle(looped, "Z", "P")).toBe(true);
   });
 });
+
+// ── PHASE-047 W-3 (T-07 + T-09) — BR-088's stage machine + BR-091's
+// sweep windows/bands/dedupe key (the same unit-first law: pinned at
+// the pure layer BEFORE any store or service consumes them; the
+// DB-side behaviors — the stage CAS race, the recorded reopen over
+// real rows, the sweep's dedupe re-run — are pinned by the three W-3
+// db specs) ─────────────────────────────────────────────────────────
+
+describe("PHASE-047 W-3 — BR-088: the monotonic pipeline state machine", () => {
+  it("(a) every strictly-forward step of the rank ladder is monotonic — one-step hops, skips, and the early rejection", () => {
+    expect(canAdvanceStage("NEW", "SCREEN")).toBe(true);
+    expect(canAdvanceStage("SCREEN", "INTERVIEW")).toBe(true);
+    expect(canAdvanceStage("INTERVIEW", "OFFER")).toBe(true);
+    expect(canAdvanceStage("OFFER", "HIRED")).toBe(true);
+    expect(canAdvanceStage("OFFER", "REJECTED")).toBe(true);
+    // Skips are monotonic too — the rank never moves backward, and
+    // stage_history records the actual path (the report reads rank).
+    expect(canAdvanceStage("NEW", "INTERVIEW")).toBe(true);
+    expect(canAdvanceStage("NEW", "OFFER")).toBe(true);
+    expect(canAdvanceStage("SCREEN", "REJECTED")).toBe(true);
+    expect(canAdvanceStage("NEW", "REJECTED")).toBe(true);
+  });
+
+  it("(b) backward, sideways, and self moves all refuse — the monotonic law's zero-tolerance both directions", () => {
+    expect(canAdvanceStage("INTERVIEW", "SCREEN")).toBe(false);
+    expect(canAdvanceStage("OFFER", "NEW")).toBe(false);
+    expect(canAdvanceStage("SCREEN", "SCREEN")).toBe(false);
+    expect(canAdvanceStage("NEW", "NEW")).toBe(false);
+    // The early rejection stays monotonic but never reversible
+    // through the advance act.
+    expect(canAdvanceStage("REJECTED", "SCREEN")).toBe(false);
+  });
+
+  it("(c) the terminal stages accept nothing — HIRED (the permanent employee link) and REJECTED (the record's terminal state)", () => {
+    for (const terminal of ["HIRED", "REJECTED"] as const) {
+      for (const target of APPLICANT_STAGES) {
+        expect(canAdvanceStage(terminal, target)).toBe(false);
+      }
+    }
+  });
+
+  it("(d) the ONE sanctioned backward edge: reopen is REJECTED → SCREEN, recorded — and nothing else reopens", () => {
+    expect(reopenTarget("REJECTED")).toBe("SCREEN");
+    expect(reopenTarget("NEW")).toBeNull();
+    expect(reopenTarget("SCREEN")).toBeNull();
+    expect(reopenTarget("INTERVIEW")).toBeNull();
+    expect(reopenTarget("OFFER")).toBeNull();
+    expect(reopenTarget("HIRED")).toBeNull();
+  });
+
+  it("(e) isApplicantStage pins the FIXED enum's membership (no tenant-custom stage sets — BR-088)", () => {
+    for (const stage of APPLICANT_STAGES) {
+      expect(isApplicantStage(stage)).toBe(true);
+    }
+    expect(isApplicantStage("ONBOARDING")).toBe(false);
+    expect(isApplicantStage("hired")).toBe(false);
+    expect(isApplicantStage("")).toBe(false);
+  });
+});
+
+describe("PHASE-047 W-3 — BR-091: the sweep's windows, bands, and dedupe key", () => {
+  it("(a) normalizeSweepWindows: integers ≥ 0 kept, duplicates dropped, sorted descending; garbage never disables the sweep (fail-closed to the documented default)", () => {
+    expect(normalizeSweepWindows([30, 7, 0])).toEqual([30, 7, 0]);
+    // Unsorted input normalizes to the canonical descending order.
+    expect(normalizeSweepWindows([0, 30, 7])).toEqual([30, 7, 0]);
+    // Duplicates collapse (the dedupe key's threshold axis stays total).
+    expect(normalizeSweepWindows([7, 7, 30, 30, 0])).toEqual([30, 7, 0]);
+    // Numeric strings ride through (the jsonb array's honest shape).
+    expect(normalizeSweepWindows(["30", "7", "0"])).toEqual([30, 7, 0]);
+    // Negatives, fractions, NaN-able garbage drop out.
+    expect(normalizeSweepWindows([30, -7, 3.5, Number.NaN, 0, 7])).toEqual([30, 7, 0]);
+    // The empty and all-garbage residues FAIL CLOSED to the
+    // documented default 30/7/0 — a tenant registering garbage never
+    // silently disables the compliance sweep.
+    expect(normalizeSweepWindows([])).toEqual([...DEFAULT_EXPIRY_SWEEP_WINDOWS]);
+    expect(normalizeSweepWindows(["soon", -1, 2.5])).toEqual([...DEFAULT_EXPIRY_SWEEP_WINDOWS]);
+    // A single-window tenant is legal (the whole sweep is one band).
+    expect(normalizeSweepWindows([14])).toEqual([14]);
+  });
+
+  it("(b) sweepBands folds the windows into DISJOINT bands — an item sits in exactly one band per pass", () => {
+    const bands = sweepBands([30, 7, 0]);
+    expect(bands).toEqual([
+      { threshold: 30, fromDays: 7, toDays: 30 },
+      { threshold: 7, fromDays: 0, toDays: 7 },
+      // The tightest band's floor is OPEN: already-expired items stay
+      // caught (the compliance register's own law).
+      { threshold: 0, fromDays: null, toDays: 0 },
+    ]);
+    // Disjointness by construction: each band's floor IS the next
+    // tighter band's ceiling; the bands tile (-∞,0] (0,7] (7,30] with
+    // no overlap and no gap.
+    for (let index = 0; index < bands.length - 1; index += 1) {
+      expect(bands[index]!.fromDays).toBe(bands[index + 1]!.toDays);
+    }
+    // A custom tenant list folds the same way.
+    expect(sweepBands([14, 3])).toEqual([
+      { threshold: 14, fromDays: 3, toDays: 14 },
+      { threshold: 3, fromDays: null, toDays: 3 },
+    ]);
+    // The defaults fold identically (the config read path is the
+    // same fold).
+    expect(sweepBands(DEFAULT_EXPIRY_SWEEP_WINDOWS)).toEqual(sweepBands([30, 7, 0]));
+  });
+
+  it("(c) expiryDedupeKey derives BR-091's exact four-segment shape — with the documented placeholder for the axes a kind does not carry", () => {
+    expect(
+      expiryDedupeKey({
+        kind: "document-expiry",
+        employeeId: "emp-1",
+        documentId: "doc-1",
+        threshold: 30,
+      }),
+    ).toBe("hr:document-expiry:emp-1:doc-1:30");
+    expect(
+      expiryDedupeKey({
+        kind: "certification-expiry",
+        employeeId: "emp-1",
+        documentId: "cert-9",
+        threshold: 7,
+      }),
+    ).toBe("hr:certification-expiry:emp-1:cert-9:7");
+    // probation-end carries no document axis — the placeholder.
+    expect(
+      expiryDedupeKey({
+        kind: "probation-end",
+        employeeId: "emp-1",
+        documentId: SWEEP_KEY_PLACEHOLDER,
+        threshold: 0,
+      }),
+    ).toBe("hr:probation-end:emp-1:-:0");
+    // review-due carries no single employee axis — the placeholder;
+    // the cycle id rides the document axis.
+    expect(
+      expiryDedupeKey({
+        kind: "review-due",
+        employeeId: SWEEP_KEY_PLACEHOLDER,
+        documentId: "cycle-1",
+        threshold: 7,
+      }),
+    ).toBe("hr:review-due:-:cycle-1:7");
+  });
+
+  it("(d) the four kinds' keys never collide across kinds or thresholds — the structural dedupe is total on (kind, employee, document, threshold)", () => {
+    const keys = new Set<string>();
+    const kinds: ExpirySweepKind[] = [
+      "document-expiry",
+      "certification-expiry",
+      "probation-end",
+      "review-due",
+    ];
+    for (const kind of kinds) {
+      for (const threshold of [30, 7, 0]) {
+        keys.add(
+          expiryDedupeKey({
+            kind,
+            employeeId: "same-employee",
+            documentId: "same-axis",
+            threshold,
+          }),
+        );
+      }
+    }
+    // 4 kinds × 3 thresholds = 12 distinct keys over the SAME axes.
+    expect(keys.size).toBe(12);
+  });
+});
+

@@ -1,8 +1,80 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-18 (PHASE-047 W-2 — the performance + goals engines delivered + the NF-4/NF-5 record fixes; earlier today: W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-3 — the recruitment + training/org + documents + sweep wave delivered + the NF-7/NF-8 record fixes; 2026-11-18: W-2 the performance + goals engines + the NF-4/NF-5 fixes; W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-19 — **PHASE-047 W-3 — RECRUITMENT + TRAINING/ORG +
+  DOCUMENTS + THE SWEEP DELIVERED** (T-07 + T-08 + T-09, the plan §3
+  W-3; on the W-2 head `83bfc19`, this session's fresh clone — the
+  same-session evidence rule's TENTH consecutive wave): the PURE
+  layer first (`talent-math.ts` extended — BR-088's rank-law stage
+  machine (forward always, skips included; REJECTED→SCREEN the ONE
+  recorded backward edge), BR-091's normalizeSweepWindows/sweepBands/
+  expiryDedupeKey (the DISJOINT day-bands + the exact four-segment
+  key `hr:{kind}:{employeeId}:{documentId}:{threshold}` with the
+  documented dash placeholder) — 9 unit tests, 26/26 with W-2's 17);
+  **MIGRATION `0099_hr_alert_jobs`** (the wave's honest slot note:
+  the plan §2 listed 0095–0098 only — D-06's own "the 044 pattern"
+  config row + "run stats stamped" + amendment A-2's
+  tenant-configurable 30/7/0 (red line 5: DATA with fail-closed
+  documented defaults) REQUIRE the config surface): the hr_alert_jobs
+  registration row (thresholds jsonb DEFAULT '[30,7,0]', is_active,
+  the stamped run stats) + the 'hr' notifications category widening
+  (both CHECK domains); the journal 0098 → 0099 with the pins moved;
+  the stores ×4 + the services ×5 — the recruitment engine (the
+  vacancy lifecycle CAS; BR-088's advance act; the reopen act; THE
+  HIRE ACT linking an EXISTING employee — D-01 exactly: the talent
+  layer never writes the employees table, the link writes ONCE in
+  one conditional statement with the OFFER→HIRED hop + the history
+  record; the panel scorecards with the own-rows law structural),
+  the training engine (the exact-decimal cost; the natural key's
+  typed 409; the completion act (acceptance #4); the certification
+  register — issuer and expiry intact), the org engine (the dot-free
+  code law; the D-09 move under the NEW T-20 `talent.org-plane`
+  gate — the same pure wouldCreateCycle — with the materialized-path
+  subtree rewrite; positions' reports_to the same guard; the HR-10
+  register), THE ALERTS SERVICE + the `hr-expiry-sweep` pg-boss job
+  (the phase doc's verbatim queue name, daily 04:15 UTC, the
+  any-talent-flag entitlement gate): the four probes over the
+  pre-built expiry indexes, the disjoint bands (one alert per item
+  per threshold pass — no catch-up, no per-item stamp column), the
+  owner-targeted 'hr' notifications with the structural BR-091
+  keys, the severity ladder, the honest expired/today titles, THE
+  PII LAW (the document numbers never ride the payload), the 044
+  config law (absent = defaults fire; explicit inactive = skip;
+  garbage = fail-closed defaults), run stats stamped, audited —
+  never a repair, only the alert; 35 routes on the matrix §3.25
+  keys (+35 ROUTE_PERMISSIONS rows, 944 → 979 — the true
+  NF-8-corrected base; the in-phase error-filter registration);
+  the DB specs ×3 (the plan §4's rows): talent-recruitment 15/15
+  incl. **the stage CAS race as a real two-transaction duel** + the
+  hire link (acceptance #3) + the own-rows scorecard refusals,
+  talent-training-org 9/9 incl. the completion act + the org-tree
+  path rewrites + D-09 both guards,
+  talent-documents-sweep 6/6 incl. **THE SWEEP (acceptance #5):
+  the four probes at 30/7/0, the exact dedupe keys, THE RE-RUN
+  ZERO-NEW-ROWS PROOF (BR-091 structural), the NULL probation skip
+  (fail-open — no fabricated alert), the config row's
+  defaults/custom/off-switch/stamped-stats**. **THE NF-7/NF-8
+  RECORD FIXES (the owner's W-2 verification findings) delivered
+  with the wave:** the dated quadrant note at the W-2 gate doc's
+  self-test row (the preserved log holds the vitest-red quadrant
+  only; future self-tests keep all four quadrant logs) + the dated
+  919→944 corrections at all three NF-8 sites (the plan §0's W-2
+  note, the W-2 gate doc §5, the CHANGELOG W-2 entry). Gates
+  (same-session, wrapper-captured, `audit-evidence/phase047-w3/` —
+  24 files): typecheck/lint 8/8 (0 cached, forced) · depcruise
+  1,965 · 14,630 (+16 modules) · unit 8/8 (api 59 · 693) · **THE
+  FULL DB SUITE re-ran (the migration delta's scope-label law):
+  254/254 files · 3,572/3,572, 0 failed, 0 skipped** (5 chunks,
+  every one wrapper-captured) · check:rls scratch 307/0 (the
+  99-chain from zero) · drift 312 = 312 · i18n 6,125 + 371 ·
+  manifests 13/13 · docs 33/33 · id-ledger 0 errors ·
+  history-secrets 0 · capabilities agree · shells PASS · boundary
+  PASS. Evidence: the [W-3 gate
+  doc](../operations/gate-evidence/2026-11-19-phase047-w3.md) +
+  `audit-evidence/phase047-w3/`. — PHASE-047
 
 - 2026-11-18 — **PHASE-047 W-2 — THE PERFORMANCE + GOALS ENGINES
   DELIVERED** (T-05 + T-06, the plan §3 W-2; on the W-1 head
@@ -29,7 +101,11 @@ Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BRE
   law + the natural key (CANCELLED keeps its title slot); the KRI
   progress triage as the own-rows act; BR-089's explicit check); 25
   routes on the matrix §3.25 keys (+25 ROUTE_PERMISSIONS rows, 920 →
-  945; the in-phase error-filter registration — the SF-027-001
+  945 *[dated 2026-11-19, W-3 — the owner's W-2 verification finding
+  NF-8: the true verified figures are 919 → 944, off by one on both
+  ends (three independent counts at both heads; the +25 delta and the
+  hr sub-count 88 are correct)]; the in-phase error-filter
+  registration — the SF-027-001
   lesson); the DB spec 14/14 incl. **the CAS race as a real
   two-transaction duel** (the loser's WHERE re-evaluates against the
   winner's commit — zero rows, one version bump), BR-089/090 BOTH

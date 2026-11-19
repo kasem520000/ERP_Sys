@@ -447,12 +447,21 @@ import { FeedPeriodNotFoundError } from "../../modules/hr/domain/feed-errors";
 // (vacancy/applicant/program/org-unit/position/document) join with
 // the W-3 engines that consume them.
 import {
+  ApplicantAlreadyHiredError,
+  CertificationNotFoundError,
   CompetencyLevelNotFoundError,
   CompetencyNotFoundError,
   CycleStateConflictError,
+  DuplicateEnrollmentError,
+  InterviewNotFoundError,
+  InterviewSlotTakenError,
   ReviewAlreadySubmittedError,
   TalentCodeTakenError,
   TalentCycleNotFoundError,
+  TrainingEnrollmentNotFoundError,
+  TrainingProgramNotFoundError,
+  VacancyNotFoundError,
+  VacancyStateConflictError,
 } from "../../modules/hr/domain/talent-errors";
 
 /**
@@ -814,6 +823,19 @@ function domainStatus(error: DomainError): number {
   ) {
     return HttpStatus.NOT_FOUND;
   }
+  // PHASE-047 (W-3, in-phase): the W-1 taxonomy's remaining
+  // not-founds, consumed by the W-3 engines — 404 (A7 parity: unknown
+  // == foreign, no existence disclosure — the same law, the families
+  // promised at W-2's registration).
+  if (
+    error instanceof VacancyNotFoundError ||
+    error instanceof TrainingProgramNotFoundError ||
+    error instanceof TrainingEnrollmentNotFoundError ||
+    error instanceof CertificationNotFoundError ||
+    error instanceof InterviewNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
   // PHASE-047 (W-2, in-phase): the talent lifecycle conflicts — 409
   // (the cycle CAS ladder's raced/stale move, the submitted review's
   // immutability until calibration, the taken code). The 422
@@ -823,6 +845,21 @@ function domainStatus(error: DomainError): number {
     error instanceof CycleStateConflictError ||
     error instanceof ReviewAlreadySubmittedError ||
     error instanceof TalentCodeTakenError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-047 (W-3, in-phase): the W-3 lifecycle conflicts — 409 (the
+  // vacancy CAS ladder's raced/stale move, the hire link's
+  // written-once law, the panel-slot unique, the duplicate enrollment
+  // — DuplicateEnrollmentError rides the W-1 import). The 422
+  // fail-closed family (the stage law's typed refusals, the reopen
+  // law, the own-rows scorecard law, the org-cycle guard, the shape
+  // family) falls through to the 422 default BY DESIGN.
+  if (
+    error instanceof VacancyStateConflictError ||
+    error instanceof ApplicantAlreadyHiredError ||
+    error instanceof InterviewSlotTakenError ||
+    error instanceof DuplicateEnrollmentError
   ) {
     return HttpStatus.CONFLICT;
   }

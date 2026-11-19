@@ -3370,6 +3370,15 @@ async function seedFixtures(superuser: {
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
+  // PHASE-047 (W-3, migration 0099): the sweep's registration rows.
+  await superuser.query(
+    `INSERT INTO hr_alert_jobs (id, tenant_id, job_kind, thresholds, is_active, note)
+     VALUES
+       ('8f8f8f8f-0000-4000-8000-000000000001', $1, 'EXPIRY_SWEEP', '[30,7,0]'::jsonb, true, 'iso fixture'),
+       ('8f8f8f8f-0000-4000-8000-000000000002', $2, 'EXPIRY_SWEEP', '[30,7,0]'::jsonb, true, 'iso fixture')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
 
   // -- seedFixtures end --
 
@@ -3930,6 +3939,8 @@ const OWN_ROW: Record<string, [string, string]> = {
   org_units: ["8c8c8c8c-0000-4000-8000-000000000001", "8c8c8c8c-0000-4000-8000-000000000002"],
   positions: ["8d8d8d8d-0000-4000-8000-000000000001", "8d8d8d8d-0000-4000-8000-000000000002"],
   employee_documents: ["8e8e8e8e-0000-4000-8000-000000000001", "8e8e8e8e-0000-4000-8000-000000000002"],
+  // PHASE-047 (W-3, migration 0099): the sweep's registration rows.
+  hr_alert_jobs: ["8f8f8f8f-0000-4000-8000-000000000001", "8f8f8f8f-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4916,6 +4927,8 @@ const MISMATCHED_INSERT: Record<string, string> = {
       '8c8c8c8c-0000-4000-8000-000000000002', 'ACTIVE')`,
   employee_documents: `INSERT INTO employee_documents (id, tenant_id, employee_id, kind)
      VALUES ('8e8e8e8e-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002', 'CONTRACT')`,
+  hr_alert_jobs: `INSERT INTO hr_alert_jobs (id, tenant_id, job_kind, thresholds, is_active)
+     VALUES ('8f8f8f8f-3000-4000-8000-000000000003', $1, 'EXPIRY_SWEEP', '[30,7,0]'::jsonb, true)`,
 };
 
 beforeAll(async () => {

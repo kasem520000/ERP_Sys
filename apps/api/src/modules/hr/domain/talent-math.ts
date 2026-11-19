@@ -48,6 +48,31 @@
  *   parent chain from the PROPOSED parent upward — reaching the moved
  *   node means the move would close a loop. The org-units/positions
  *   writers (W-3) ride the SAME function.
+ *
+ * PHASE-047 (W-3 — T-07 + T-09) — the same pure layer extended by the
+ * recruitment state machine and the expiry-sweep windows:
+ *
+ * - BR-088 (the monotonic pipeline law): the FIXED stage ladder
+ *   NEW→SCREEN→INTERVIEW→OFFER→HIRED/REJECTED — `canAdvanceStage` is
+ *   the rank law (any strictly-forward move is monotonic; REJECTED is
+ *   reachable from every non-terminal stage; HIRED/REJECTED are
+ *   terminal), and `reopenTarget` is the ONE sanctioned backward
+ *   edge (REJECTED → SCREEN, the recorded reopen — the only backward
+ *   motion the pipeline ever accepts, and only through the dedicated
+ *   act that appends the REOPEN record to stage_history). The typed
+ *   refusals (StageTransitionInvalidError / ReopenInvalidError) are
+ *   the SERVICE's, never here.
+ *
+ * - BR-091 (the expiry-sweep dedup law): `normalizeSweepWindows`
+ *   validates/derives the tenant's configured threshold list (the
+ *   documented default 30/7/0 — amendment A-2: tenant-configurable
+ *   DATA, never hard-coded constants), `sweepBands` folds the windows
+ *   into DISJOINT day-bands (an item in exactly one band per pass —
+ *   no catch-up ladder on a late-registered item, no per-item stamp
+ *   column needed), and `expiryDedupeKey` derives the law's exact key
+ *   shape `hr:{kind}:{employeeId}:{documentId}:{threshold}` — the
+ *   structural dedupe the notifications table's unique index enforces.
+ *   The clock never enters: the SERVICE passes `todayIso`.
  */
 
 /** The 360 source relationships (BR-090's kinds — MANAGER is the
@@ -292,4 +317,168 @@ export function wouldCreateCycle(
     cursor = byId.get(cursor) ?? null;
   }
   return false;
+}
+
+// ── BR-088 (W-3): the recruitment pipeline's monotonic stage machine ───────
+
+/** The FIXED pipeline ladder (BR-088 — no tenant-custom stage sets; the
+ * enum is the 0096 CHECK floor and this layer's vocabulary). */
+export type ApplicantStage =
+  | "NEW"
+  | "SCREEN"
+  | "INTERVIEW"
+  | "OFFER"
+  | "HIRED"
+  | "REJECTED";
+
+export const APPLICANT_STAGES: readonly ApplicantStage[] = [
+  "NEW",
+  "SCREEN",
+  "INTERVIEW",
+  "OFFER",
+  "HIRED",
+  "REJECTED",
+];
+
+/** The monotonic order. HIRED and REJECTED share the terminal rank:
+ * neither accepts any further move (the hire link is permanent; the
+ * rejection is the record's terminal state — REOPEN is the one
+ * backward edge, and only from REJECTED). */
+const STAGE_RANK: Readonly<Record<ApplicantStage, number>> = Object.freeze({
+  NEW: 0,
+  SCREEN: 1,
+  INTERVIEW: 2,
+  OFFER: 3,
+  HIRED: 4,
+  REJECTED: 4,
+});
+
+/** Is `to` a known stage of the FIXED ladder? */
+export function isApplicantStage(value: string): value is ApplicantStage {
+  return (APPLICANT_STAGES as readonly string[]).includes(value);
+}
+
+/**
+ * BR-088's monotonic predicate: a stage move is legal iff it is a
+ * STRICTLY-FORWARD step of the rank order — `rank(to) > rank(from)`.
+ * Any forward distance is monotonic (a skip — NEW→INTERVIEW, an
+ * early rejection — SCREEN→REJECTED — never moves backward); the
+ * pipeline REPORT reads the rank, and stage_history records the actual
+ * path. Sideways, backward, self, and every move out of a terminal
+ * stage refuse (rank equal or lower); the ONE sanctioned backward
+ * edge is the recorded reopen (`reopenTarget`), never this predicate.
+ */
+export function canAdvanceStage(from: ApplicantStage, to: ApplicantStage): boolean {
+  return STAGE_RANK[to] > STAGE_RANK[from];
+}
+
+/**
+ * The ONE sanctioned backward edge (BR-088): the recorded reopen —
+ * REJECTED → SCREEN (the applicant re-enters the pipeline at the
+ * screening stage; the hop appends the REOPEN record to stage_history
+ * through the dedicated act). REJECTED is the only reopenable state:
+ * a HIRED applicant's link to the employee master is permanent (the
+ * hire act's written-once law), and a live applicant never needs a
+ * backward hop — the forward ladder is total from every non-terminal
+ * stage. Returns the reopen target, or null when the stage is not
+ * reopenable (the service's typed ReopenInvalidError).
+ */
+export function reopenTarget(from: ApplicantStage): ApplicantStage | null {
+  return from === "REJECTED" ? "SCREEN" : null;
+}
+
+// ── BR-091 (W-3): the expiry sweep's windows, bands, and dedupe key ────────
+
+/** The four sweep kinds (the phase doc §2.9's alert names, dashed —
+ * the dedupe key's {kind} axis). */
+export type ExpirySweepKind =
+  | "document-expiry"
+  | "certification-expiry"
+  | "probation-end"
+  | "review-due";
+
+/** The documented default threshold list — amendment A-2 + red line 5:
+ * 30/7/0 is the DOCUMENTED TENANT-CONFIGURABLE DEFAULT (the
+ * hr_alert_jobs row's thresholds jsonb), never a hard-coded law; this
+ * constant is what a tenant with NO config row fails closed to (the
+ * 044 inventory pattern). */
+export const DEFAULT_EXPIRY_SWEEP_WINDOWS: readonly number[] = Object.freeze([30, 7, 0]);
+
+/** The dedupe key's placeholder for an axis the kind does not carry —
+ * probation-end has no document (the employee IS the subject) and
+ * review-due has no single employee (the cycle is the subject; its id
+ * rides the document axis). A literal dash keeps the four-segment
+ * shape uniform without ever colliding with a uuid. */
+export const SWEEP_KEY_PLACEHOLDER = "-";
+
+/**
+ * Normalize a configured threshold list into the sweep's window set:
+ * keep integer day-values ≥ 0, drop duplicates, sort DESCENDING
+ * (widest first — `sweepBands` walks tightest-first from the fold).
+ * An empty/invalid residue reads as the documented default (the
+ * fail-closed direction — a tenant who registers garbage never
+ * silently disables the sweep; the defaults fire). Pure: no clock.
+ */
+export function normalizeSweepWindows(input: readonly unknown[]): number[] {
+  const windows = [
+    ...new Set(
+      input
+        .map((value) => (typeof value === "number" ? value : Number(value)))
+        .filter((days) => Number.isInteger(days) && days >= 0),
+    ),
+  ].sort((a, b) => b - a);
+  return windows.length > 0 ? windows : [...DEFAULT_EXPIRY_SWEEP_WINDOWS];
+}
+
+/** One disjoint day-band of the sweep: items with
+ * `fromDays < daysToExpiry <= toDays` — except the TIGHTEST band,
+ * whose lower edge is open (already-expired items stay caught: the
+ * compliance register's own law — an expired iqama is exactly the
+ * exposure the alert product exists for; the honest title wording is
+ * the service's). */
+export interface SweepBand {
+  /** The band's threshold — the dedupe key's {threshold} axis. */
+  readonly threshold: number;
+  /** The exclusive lower edge in days-to-expiry (null = no floor —
+   * the tightest band catches everything at or past its date). */
+  readonly fromDays: number | null;
+  /** The inclusive upper edge in days-to-expiry. */
+  readonly toDays: number;
+}
+
+/**
+ * Fold the (descending) window set into DISJOINT bands. Each item
+ * falls in EXACTLY ONE band per pass: no catch-up ladder for a
+ * late-registered item (it fires its CURRENT band's key once, never
+ * the whole ladder at once), no per-item last-notified column needed
+ * (the structural dedupe key is the whole state), and across nights
+ * an item descends band by band — 30 → 7 → 0 — firing each threshold
+ * pass exactly once (BR-091's "per threshold pass", made literal).
+ */
+export function sweepBands(windows: readonly number[]): SweepBand[] {
+  const descending = normalizeSweepWindows(windows);
+  const bands: SweepBand[] = [];
+  for (let index = 0; index < descending.length; index += 1) {
+    const toDays = descending[index]!;
+    const fromDays = index === descending.length - 1 ? null : descending[index + 1]!;
+    bands.push({ threshold: toDays, fromDays, toDays });
+  }
+  return bands;
+}
+
+/**
+ * BR-091's exact key shape — `hr:{kind}:{employeeId}:{documentId}:{threshold}`
+ * (amendment A-2: the law names the shape so it is self-contained;
+ * the notifications table's uq_notifications_dedupe on
+ * (tenant_id, dedupe_key) makes the once-ever semantics STRUCTURAL,
+ * never application-level). The placeholder keeps the four-segment
+ * shape uniform for the axes a kind does not carry.
+ */
+export function expiryDedupeKey(input: {
+  readonly kind: ExpirySweepKind;
+  readonly employeeId: string;
+  readonly documentId: string;
+  readonly threshold: number;
+}): string {
+  return `hr:${input.kind}:${input.employeeId}:${input.documentId}:${input.threshold}`;
 }

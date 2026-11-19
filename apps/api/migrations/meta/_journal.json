@@ -686,6 +686,13 @@
       "when": 1797494400000,
       "tag": "0098_hr_talent_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 98,
+      "version": "7",
+      "when": 1797508800000,
+      "tag": "0099_hr_alert_jobs",
+      "breakpoints": true
     }
   ],
   "version": "7"

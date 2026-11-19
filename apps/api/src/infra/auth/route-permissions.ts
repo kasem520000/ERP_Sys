@@ -4488,6 +4488,200 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/goals/validate",
     permission: "hr.performance.view",
   },
+  // PHASE-047 (W-3 — matrix §3.25, the 0098 §1 seed): the recruitment
+  // + training/org/documents families (T-07 + T-08 + T-09). The
+  // family-cluster mapping (the matrix's guarded-routes note): the
+  // recruitment reads ride hr.recruitment.view; the pipeline's writes
+  // (vacancies, applicants, the stage/reopen/hire acts, interview
+  // scheduling) ride hr.recruitment.manage; the panelist's OWN
+  // scorecard rides hr.recruitment.interview (the acting user's
+  // linked employee is resolved at the service boundary — the
+  // own-rows law, never a client-supplied panelist id). The training
+  // reads ride hr.training.view; the family's writes (programs,
+  // enrollments, the certification register — the family-cluster
+  // mapping: the view key names all three surfaces) ride
+  // hr.training.manage. The org reads ride hr.org.view; the tree and
+  // position writes (the D-09 cycle-safe moves) ride hr.org.manage.
+  // The document register's reads AND writes ride hr.documents.manage
+  // (the register's own permission plane — the PII inventory's law:
+  // the numbers surface only here), and the hr-expiry-sweep's
+  // registration surface rides the same key (the compliance plane's
+  // config).
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/vacancies",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/recruitment/vacancies",
+    permission: "hr.recruitment.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/recruitment/vacancies/:id",
+    permission: "hr.recruitment.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/vacancies/:id/transition",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/applicants",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/recruitment/applicants",
+    permission: "hr.recruitment.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/recruitment/applicants/:id",
+    permission: "hr.recruitment.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/applicants/:id/stage",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/applicants/:id/reopen",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/applicants/:id/hire",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/recruitment/interviews",
+    permission: "hr.recruitment.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/recruitment/interviews",
+    permission: "hr.recruitment.view",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/recruitment/interviews/:id/scorecard",
+    permission: "hr.recruitment.interview",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/training/programs",
+    permission: "hr.training.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/training/programs",
+    permission: "hr.training.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/training/programs/:id",
+    permission: "hr.training.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/hr/training/programs/:id",
+    permission: "hr.training.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/training/enrollments",
+    permission: "hr.training.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/training/enrollments",
+    permission: "hr.training.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/hr/training/enrollments/:id",
+    permission: "hr.training.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/training/certifications",
+    permission: "hr.training.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/training/certifications",
+    permission: "hr.training.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/hr/training/certifications/:id",
+    permission: "hr.training.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/org/units",
+    permission: "hr.org.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/org/units",
+    permission: "hr.org.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/hr/org/units/:id",
+    permission: "hr.org.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/positions",
+    permission: "hr.org.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/positions",
+    permission: "hr.org.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/hr/positions/:id",
+    permission: "hr.org.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/hr/documents",
+    permission: "hr.documents.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/documents",
+    permission: "hr.documents.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/hr/documents/:id",
+    permission: "hr.documents.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/hr/documents/:id",
+    permission: "hr.documents.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/hr/alerts/expiry-sweep",
+    permission: "hr.documents.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/hr/alerts/expiry-sweep",
+    permission: "hr.documents.manage",
+  },
 ];
 
 /**

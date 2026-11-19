@@ -62,7 +62,12 @@ export type NotificationCategory =
   // PHASE-039 (0056 category widening): the collections surface (the RMA
   // completion notices) and the warranty expiry ladder (30/7/0-day).
   | "collections"
-  | "warranties";
+  | "warranties"
+  // PHASE-047 (W-3, 0099 category widening): the talent alerts' family —
+  // the hr-expiry-sweep's four probes (document-expiry,
+  // certification-expiry, probation-end, review-due), the BR-091-deduped
+  // inbox notifications (D-06).
+  | "hr";
 export type NotificationSeverity = "info" | "warning" | "critical";
 
 export interface BilingualText {

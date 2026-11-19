@@ -161,3 +161,72 @@ export class TalentInvalidError extends DomainError {
     super("TALENT_INVALID", message);
   }
 }
+
+// ── PHASE-047 (W-3 — T-07 + T-08 + T-09) — the wave's own additions ─────────
+// (the W-1 taxonomy's families extended in-phase, the same discipline:
+// the 404/409 additions register in the error filter's status map; the
+// 422 fail-closed family falls through to the 422 default BY DESIGN.)
+
+// The 404 A7 additions: the interview slot, the enrollment row, the
+// certification register row.
+export class InterviewNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("INTERVIEW_NOT_FOUND", `interview ${id} does not exist in this tenant`);
+  }
+}
+export class TrainingEnrollmentNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("TRAINING_ENROLLMENT_NOT_FOUND", `training enrollment ${id} does not exist in this tenant`);
+  }
+}
+export class CertificationNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("CERTIFICATION_NOT_FOUND", `certification ${id} does not exist in this tenant`);
+  }
+}
+
+// The 409 additions: the vacancy lifecycle CAS, the hire link's
+// written-once law, and the panel-slot unique.
+export class VacancyStateConflictError extends DomainError {
+  constructor(id: string, from: string, action: string) {
+    super(
+      "VACANCY_STATE_CONFLICT",
+      `vacancy ${id} is ${from} — the ${action} action is not available from this state (OPEN↔ON_HOLD, OPEN/ON_HOLD→FILLED/CANCELLED; FILLED/CANCELLED are terminal)`,
+    );
+  }
+}
+export class ApplicantAlreadyHiredError extends DomainError {
+  constructor(applicantId: string, employeeId: string) {
+    super(
+      "APPLICANT_ALREADY_HIRED",
+      `applicant ${applicantId} is already linked to employee ${employeeId} — the hire link is written once (the 0096 column law; a second hire is never a silent relink)`,
+    );
+  }
+}
+export class InterviewSlotTakenError extends DomainError {
+  constructor(applicantId: string, round: number, panelistEmployeeId: string) {
+    super(
+      "INTERVIEW_SLOT_TAKEN",
+      `the panel slot (applicant ${applicantId}, round ${round}, panelist ${panelistEmployeeId}) already exists — one row per panelist per round (the 0096 unique; the slot's scorecard is the update path)`,
+    );
+  }
+}
+
+// The 422 fail-closed additions (fall through to the 422 default):
+// the reopen law's typed refusal and the scorecard's own-rows law.
+export class ReopenInvalidError extends DomainError {
+  constructor(applicantId: string, stage: string) {
+    super(
+      "REOPEN_INVALID",
+      `applicant ${applicantId} is at stage ${stage} — only a REJECTED applicant reopens (BR-088's one sanctioned backward edge, REJECTED → SCREEN, recorded in stage_history; a HIRED applicant's employee link is permanent)`,
+    );
+  }
+}
+export class InterviewNotPanelistError extends DomainError {
+  constructor(interviewId: string, panelistEmployeeId: string) {
+    super(
+      "INTERVIEW_NOT_PANELIST",
+      `interview ${interviewId}'s panel slot belongs to employee ${panelistEmployeeId} — the scorecard is the panelist's OWN evidence (the own-rows law, the review-submission precedent; a client cannot record someone else's card)`,
+    );
+  }
+}

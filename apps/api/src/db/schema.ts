@@ -10097,3 +10097,32 @@ export const employeeDocuments = pgTable(
     index("ix_employee_documents_tenant_expiry").on(table.tenantId, table.expiresOn),
   ],
 );
+
+/** PHASE-047 (W-3, T-09 — migration 0099, D-06): the hr-expiry-sweep's
+ * registration + run stats — the 044 inventory pattern exactly. NO row
+ * = the sweep runs on the documented default thresholds 30/7/0
+ * (amendment A-2 + red line 5: tenant-configurable DATA with
+ * fail-closed documented defaults, never hard-coded law); an explicit
+ * is_active = false row is the off switch; last_run_at/last_flagged
+ * are the stamped run stats. No DELETE (the config row is the
+ * register — the upsert surface is the update path). */
+export const hrAlertJobs = pgTable(
+  "hr_alert_jobs",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    jobKind: text("job_kind").notNull(),
+    thresholds: jsonb("thresholds").notNull().default(sql`'[30,7,0]'::jsonb`),
+    isActive: boolean("is_active").notNull().default(true),
+    lastRunAt: timestamp("last_run_at", { withTimezone: true, mode: "string" }),
+    lastFlagged: integer("last_flagged").notNull().default(0),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_hr_alert_jobs_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_hr_alert_jobs_tenant_kind").on(table.tenantId, table.jobKind),
+    index("ix_hr_alert_jobs_tenant_active").on(table.tenantId, table.isActive),
+  ],
+);

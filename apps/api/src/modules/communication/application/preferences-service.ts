@@ -50,6 +50,9 @@ export const PREFERENCE_MODULES: readonly string[] = [
   "purchasing",
   "collections",
   "warranties",
+  // PHASE-047 (W-3, 0099 category widening): the talent alerts' family
+  // (the hr-expiry-sweep's four probes — D-06).
+  "hr",
   "digest",
 ];
 

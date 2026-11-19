@@ -252,7 +252,11 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // permission keys + plan grants + the four manifest enablements + the
     // competency 1–5 scale seed through the 0093-gated existing-tenant
     // sweep, the onboarding hook the new-tenant path).
-    expect(files.at(-1)?.tag).toBe("0098_hr_talent_grants");
+    // PHASE-047 (W-3, 2026-11-19): 0099_hr_alert_jobs — the hr-expiry-
+    // sweep's config surface (D-06's 044-pattern registration row + run
+    // stats: thresholds jsonb with the documented default [30,7,0]) + the
+    // notifications 'hr' category widening (both CHECK domains).
+    expect(files.at(-1)?.tag).toBe("0099_hr_alert_jobs");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

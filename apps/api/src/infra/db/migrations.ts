@@ -523,6 +523,11 @@ export const MIGRATIONS: readonly string[] = [
   "0096_hr_talent_recruitment",
   "0097_hr_talent_training_org",
   "0098_hr_talent_grants",
+  // PHASE-047 (W-3, T-09 — D-06): the hr-expiry-sweep's config surface
+  // (the 044 inventory pattern — thresholds jsonb with the documented
+  // default [30,7,0], is_active, the stamped run stats) + the 'hr'
+  // notifications category widening (both CHECK domains).
+  "0099_hr_alert_jobs",
 ];
 
 /**

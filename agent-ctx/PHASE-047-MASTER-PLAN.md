@@ -136,6 +136,29 @@ long-standing owner inputs RULED in the same dispatch — 0071 ruled-no-action,
   > permissions (312), i18n (6,125 + 371 — the screens are W-5's),
   > ENTITY_CATALOG/check:rls (306 — no schema delta), the report
   > registry (106 — W-6's), docs 33/33.]**
+  >
+  > **[Dated 2026-11-19 (W-3, the owner's W-2 verification finding
+  > NF-8) — the ROUTE_PERMISSIONS count above is off by one on BOTH
+  > ends: the true verified figures are 919 → 944 (three independent
+  > counts at both heads; the +25 delta itself is correct; the hr
+  > sub-count 88 is correct). The same off-by-one rode the W-2 gate
+  > doc §5 and the CHANGELOG entry — both carry their own dated
+  > corrections. W-3's own delta computes from the true 944 base.]**
+  >
+  > **[Dated 2026-11-19 (W-3 delivered) — the wave moved the
+  > baselines: migrations journal 0099 (idx 98 — the hr_alert_jobs
+  > config surface, D-06's own requirement; the §2 table's dated
+  > note) · DB suite 254 files · 3,572 (THE FULL SUITE re-ran this
+  > wave — the migration delta's scope-label law; +3 spec files · +30
+  > spec tests +6 A-suite rows for hr_alert_jobs over W-2's expected
+  > 251 · 3,536) · ROUTE_PERMISSIONS 944 → 979 (+35 rows: recruitment
+  > 13 · training 10 · org 6 · documents+alerts 6 — the true base per
+  > the NF-8 correction) · depcruise fresh-clone 1,965 · 14,630 (+16
+  > modules) · unit api 59 files · 693 (+9 pure tests) ·
+  > ENTITY_CATALOG/check:rls 306 → 307 (hr_alert_jobs). Unchanged:
+  > permissions (312), i18n (6,125 + 371 — the screens are W-5's),
+  > the report registry (106 — the four contracts are W-6's), docs
+  > 33/33.]**
 
 ## 1. Settled design decisions (from the plan-first reads — binding for all waves, amendable only by the owner's dated dispatch)
 
@@ -290,6 +313,19 @@ All four: tenant_id prefix + RLS policies (the A1–A10 law), Drizzle mirrors,
 (292 → 306 table rows), journal/manifest/spec pins to 98 with the chain
 re-proven from zero + re-apply no-op.
 
+> **[Dated 2026-11-19 (W-3) — the inventory gains a FIFTH slot:
+> `0099_hr_alert_jobs.sql` (the hr-expiry-sweep's config surface —
+> the hr_alert_jobs registration row + the 'hr' notifications
+> category widening; registry/catalog 306 → 307). The table above
+> listed the talent TABLES only; D-06's own text ("fail-closed
+> documented defaults when a tenant registers no config row (the 044
+> pattern); run stats stamped") requires the config surface, and
+> amendment A-2 + red line 5 make the 30/7/0 thresholds
+> tenant-configurable DATA with documented fail-closed defaults — a
+> DATA law needs a table. The honest-slot law (D-03): the journal's
+> next slot after 0098 is 0099; the pins moved to 99 with the chain
+> re-proven from zero + re-apply no-op (the W-3 full-suite run).]**
+
 ## 3. Task waves (canon T-numbers; per-task exit criteria)
 
 ### W-0 — Environment preparation (T-00, orchestrator)
@@ -412,6 +448,98 @@ certifications; the org tree with cycle detection (D-09); employee
 documents; the `hr-expiry-sweep` job (D-06 — four probes, 30/7/0, deduped).
 **Exit:** acceptance #3/#4/#5 green (the sweep's evidence in the job log +
 notification records, dedup proven by re-run).
+
+> **DELIVERED 2026-11-19 (on the W-2 head `83bfc19`, this session's fresh
+> clone `/home/z/ERP_Sys_W3` — the same-session evidence rule's TENTH
+> consecutive wave): every exit criterion met — the PURE layer first
+> (`talent-math.ts` extended: BR-088's rank-law stage machine
+> (canAdvanceStage/isApplicantStage/reopenTarget — any strictly-forward
+> move is monotonic, skips included; REJECTED→SCREEN the ONE recorded
+> backward edge, reopenTarget the pure law), BR-091's
+> normalizeSweepWindows/sweepBands/expiryDedupeKey (the disjoint
+> day-bands + the exact four-segment key shape with the documented
+> dash placeholder) — 9 unit tests, 26/26 green with W-2's 17);
+> MIGRATION `0099_hr_alert_jobs` (the honest slot note: the §2 table
+> above listed 0095–0098 only — D-06's own text ("the 044 pattern"
+> config row + "run stats stamped") + amendment A-2's
+> tenant-configurable-thresholds law REQUIRE the config surface, and
+> A-5's red line 5 makes 30/7/0 DATA with fail-closed documented
+> defaults; the dated note rides the migration header, §2's table
+> here, and the W-3 gate doc — never a silent rewrite): the
+> hr_alert_jobs registration row (thresholds jsonb DEFAULT
+> '[30,7,0]', is_active, the stamped run stats — the 044 inventory
+> pattern exactly) + the 'hr' notifications category widening (BOTH
+> CHECK domains + the TS union + PREFERENCE_MODULES); the journal
+> 0098→**0099** (idx 98), the manifest/spec pins moved with it; the
+> stores ×4 (recruitment/training/org/alerts — one per family, every
+> write conditional: the stage CAS with the in-statement history
+> append, the hire CAS's written-once link arm, the scorecard's
+> panelist-guarded UPDATE, the org move's two-statement guarded
+> subtree rewrite, the enrollment's ON CONFLICT DO NOTHING); the
+> services ×5 (the recruitment engine — the vacancy lifecycle CAS
+> (OPEN↔ON_HOLD, →FILLED/CANCELLED terminal, filled_at stamped), the
+> hire act LINKING AN EXISTING employee (D-01 honored exactly: the
+> talent layer never writes the employees table — the payroll module
+> owns the master's creation; the link + the OFFER→HIRED hop + the
+> history record in ONE conditional statement), the interview
+> scorecards (the panelist's OWN card — the own-rows law structural);
+> the training engine (the exact-decimal cost, the (program, employee)
+> natural key's typed 409, the completion act stamping completed_at +
+> result, the certification register with issuer/expiry intact); the
+> org engine (the dot-free code law for the path grammar, the D-09
+> move under the NEW T-20 `talent.org-plane` gate — the same
+> wouldCreateCycle the goals ride, the materialized-path subtree
+> rewrite, positions' reports_to the same guard); the documents
+> register (HR-10, operational DELETE, the number never in the audit
+> payload); THE ALERTS SERVICE (D-06 exactly: the four probes over
+> the pre-built expiry indexes, the DISJOINT bands — one alert per
+> item per threshold pass, no catch-up ladder, no per-item stamp
+> column; the owner-targeted 'hr' notifications with the structural
+> BR-091 keys; the 044 config law — absent row = defaults fire,
+> explicit inactive = skip, garbage upsert = fail-closed defaults;
+> run stats stamped; audited; never a repair, only the alert) + the
+> `hr-expiry-sweep` pg-boss job (the phase doc's verbatim queue name,
+> daily 04:15 UTC, the any-talent-flag entitlement gate, the warranty
+> job's registration shape); 35 routes on the matrix §3.25 keys
+> (recruitment 13 · training 10 · org 6 · documents+alerts 6;
+> ROUTE_PERMISSIONS 944 → **979** — the true NF-8-corrected base);
+> the error filter's in-phase registration (the W-1 taxonomy's
+> remaining 404s + the W-3 409s; the 422 family falls through by
+> design). The DB specs ×3 (the plan §4's rows): talent-recruitment
+> 15/15 (the lifecycle, BR-088 both ways incl. the skip + the
+> terminals, the reopen + the live-again walk, THE HIRE (acceptance
+> #3 — requires OFFER, links, once, A7 parity), the scorecards + the
+> own-rows refusal + the slot 409, THE STAGE CAS RACE as a real
+> two-transaction duel, the tenant boundary), talent-training-org
+> 9/9 (the catalog + the natural key + the completion act (acceptance
+> #4) + the certification register + the org tree's path rewrites +
+> D-09 both guards + the boundary), talent-documents-sweep 6/6 (the
+> register, THE SWEEP (acceptance #5): the four probes at 30/7/0 with
+> the exact keys, the severity ladder, the honest expired/today
+> titles, THE PII LAW (the numbers never ride the payload), THE
+> RE-RUN DEDUPE (zero new rows — BR-091 structural), the NULL
+> probation/probation skip (fail-open, no fabricated alert), the
+> DRAFT/CLOSED review-due skip, the config row's defaults/custom/off
+> switch/stamped stats). **THE NF-7/NF-8 RECORD FIXES delivered with
+> the wave** (the owner's W-2 verification findings): the dated
+> quadrant note at the W-2 gate doc's self-test row (the preserved
+> log holds the vitest-red quadrant; the other three re-provable —
+> every future self-test keeps all four logs) + the dated 919→944
+> corrections at all THREE NF-8 sites (the plan §0's W-2 note, the
+> W-2 gate doc §5, the CHANGELOG entry). Gates (all same-session,
+> wrapper-captured, `audit-evidence/phase047-w3/` — 24 files):
+> typecheck/lint 8/8 (0 cached, forced) · depcruise **1,965 ·
+> 14,630** (+16 modules: 13 src + 3 specs) · unit 8/8 (api 59 ·
+> **693** = 684 + 9) · **THE FULL DB SUITE re-ran (the scope-label
+> law — migration delta): 254 files · 3,572/3,572, 0 failed, 0
+> skipped** (5 chunks 61·449 + 57·2,068 + 61·483 + 67·544 + 8·28;
+> every chunk wrapper-captured; the A-suite extends by +6 for
+> hr_alert_jobs) · check:rls scratch **307 catalog tables, 0
+> violations** (the 99-chain from zero) · drift 312 = 312 · i18n
+> 6,125 = 6,125 + 371 · mobile tokens 50/50 · manifests 13/13 · docs
+> 33/33 · id-ledger 0 errors · history-secrets 0 · capabilities agree
+> · shells PASS · boundary PASS. The W-7 full-suite expectation
+> moves to **254 files · 3,572** (already re-proven this wave).**
 
 ### W-4 — The external bridges (T-10, orchestrator)
 The three export contracts + the two import paths with row-level validation

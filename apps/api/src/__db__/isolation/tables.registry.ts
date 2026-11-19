@@ -533,6 +533,11 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "org_units", deleteGranted: true },
   { table: "positions", deleteGranted: true },
   { table: "employee_documents", deleteGranted: true },
+  // PHASE-047 (W-3, T-09 — migration 0099, D-06): the hr-expiry-sweep's
+  // registration + run-stats row (the 044 inventory pattern — SELECT/
+  // INSERT/UPDATE only, the config row is the register; the upsert is
+  // the update path). The auto-generated A-suite extends by +6.
+  { table: "hr_alert_jobs" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

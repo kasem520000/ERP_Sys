@@ -222,6 +222,16 @@ export const talentAtomicKeys = {
   cycle(cycleId: string): string {
     return `talent.cycle|${canonicalUuid(cycleId)}`;
   },
+  /** PHASE-047 (W-3 — D-09): the ORG-PLANE gate — the tenant's whole
+   * org tree is the entity (a move's guard read spans every unit), so
+   * every org-unit move/re-parent and every position reports_to write
+   * serializes on this ONE key (the lockHrKeys tenant prefix scopes
+   * it; no uuid segment — the tree is one entity per tenant, and two
+   * concurrent tree writes on the SAME tenant are exactly the
+   * interleaving this gate refuses). */
+  orgPlane(): string {
+    return "talent.org-plane";
+  },
 } as const;
 
 // -- the reservation ledger (the no-expansion law) -----------------------------------
@@ -402,4 +412,15 @@ export async function lockPayrollEosbEmployee(employeeId: string): Promise<void>
  * run gate's discipline — see talentAtomicKeys). */
 export async function lockTalentCycle(cycleId: string): Promise<void> {
   await lockHrKeys([talentAtomicKeys.cycle(cycleId)]);
+}
+
+/** PHASE-047 (W-3 — D-09) THE ORG-PLANE gate: the org tree's
+ * serialization point — every org-unit move (the whole-tree edge read
+ * + the pure cycle guard + the materialized-path subtree rewrite) and
+ * every position reports_to re-parent (the same guard over the
+ * position edges) runs under the tenant's ONE org-plane key, so two
+ * tree writes never interleave on the same stale edge set (the cycle
+ * gate's exact discipline; the guarded UPDATEs remain the truth). */
+export async function lockTalentOrgPlane(): Promise<void> {
+  await lockHrKeys([talentAtomicKeys.orgPlane()]);
 }
