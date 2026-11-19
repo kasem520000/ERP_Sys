@@ -12,6 +12,11 @@
  * `docs/api/integrations/README.md` §3.10; NOT report-registry
  * contracts: the reporting registry stays 106 until W-6's four, per
  * the plan §0's baselines):
+ * **[Dated 2026-11-19 (W-6 — delivered): the registry now carries
+ * 110 — hr.performance-cycle-results + hr.recruitment-pipeline +
+ * hr.training-completions + hr.document-expiry (T-15); these bridge
+ * contracts remain SEPARATE surfaces (the registry's report engine
+ * vs. the integrations bridge), per the W-4 design.]**
  *
  * - `hr.employee-master` v1 — the person + employment master: code,
  *   names, contract type, employment status, hire/termination dates.

@@ -134,11 +134,11 @@ describe("cash flow golden (§5 + INV-019)", () => {
 });
 
 describe("registry snapshot", () => {
-  it("exposes exactly the 106 frozen contracts (50 core + 18 industry + 3 fixed assets + 5 notes/installments + 2 budgeting + 5 payroll + 4 consolidation + 1 tax.e-invoicing-log + 2 sourcing + 2 returns/collections + 1 delivery log + 4 manufacturing + 2 planning + 4 WMS intelligence + 3 hr)", () => {
+  it("exposes exactly the 110 frozen contracts (50 core + 18 industry + 3 fixed assets + 5 notes/installments + 2 budgeting + 5 payroll + 4 consolidation + 1 tax.e-invoicing-log + 2 sourcing + 2 returns/collections + 1 delivery log + 4 manufacturing + 2 planning + 4 WMS intelligence + 3 hr + 4 talent)", () => {
     const snapshot = registrySnapshot(newRunService().contracts());
-    expect(snapshot).toHaveLength(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
+    expect(snapshot).toHaveLength(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
     const ids = new Set(snapshot.map((row) => row.id));
-    expect(ids.size).toBe(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2)
+    expect(ids.size).toBe(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent)
   });
 });
 

@@ -161,6 +161,17 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "hr.attendance",
   "hr.leave",
   "hr.overtime",
+  // PHASE-047 (0098 §1 seed, matrix §3.25 — W-6, T-15): the talent report
+  // keys — the four contracts ride the module's own read keys (the same
+  // §12 convention): the appraisal cycle results on hr.performance.view,
+  // the recruitment funnel on hr.recruitment.view, the training
+  // completions on hr.training.view, and the document expiry register on
+  // hr.documents.manage (the register's own permission plane — the keys
+  // the /hr talent routes ride).
+  "hr.performance.view",
+  "hr.recruitment.view",
+  "hr.training.view",
+  "hr.documents.manage",
 ]);
 
 @Module({

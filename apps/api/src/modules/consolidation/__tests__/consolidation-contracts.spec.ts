@@ -94,6 +94,12 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "hr.attendance",
   "hr.leave",
   "hr.overtime",
+  // PHASE-047 (0098 §1 seed, matrix §3.25 — W-6, T-15): the talent report
+  // keys — the four contracts ride the module's own read keys.
+  "hr.performance.view",
+  "hr.recruitment.view",
+  "hr.training.view",
+  "hr.documents.manage",
   "crm.contracts.manage",
   "fixed_assets.reports.view",
   "notes.notes.view",
@@ -125,12 +131,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
+    expect(result.count).toBe(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
+    expect(snapshot).toHaveLength(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();

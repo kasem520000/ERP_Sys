@@ -174,6 +174,19 @@ import { manufacturingAtpPositionContract } from "./manufacturing/atp-position.c
 import { hrAttendanceRegisterContract } from "./hr/attendance-register.contract";
 import { hrLeaveBalancesContract } from "./hr/leave-balances.contract";
 import { hrOvertimeSummaryContract } from "./hr/overtime-summary.contract";
+// PHASE-047 (W-6, T-15) · the talent set (REPORT_CATALOG §9's PHASE-047
+// rows — the four report contracts, registry 106 → 110): the appraisal
+// cycle results (BR-090's manager-outcomes-only posture, the W-4 bridge
+// precedent), the recruitment funnel (BR-088's FIXED ladder as count
+// columns — counts only, the applicants' personal data never ships), the
+// training completions (the once-stamped completed_at + the result
+// vocabulary), and the document expiry register (the tenant's configured
+// sweep windows as the band source — red line 5's DATA law; the document
+// number never ships, amendment A-4).
+import { hrPerformanceCycleResultsContract } from "./hr/performance-cycle-results.contract";
+import { hrRecruitmentPipelineContract } from "./hr/recruitment-pipeline.contract";
+import { hrTrainingCompletionsContract } from "./hr/training-completions.contract";
+import { hrDocumentExpiryContract } from "./hr/document-expiry.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -359,6 +372,17 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   hrAttendanceRegisterContract,
   hrLeaveBalancesContract,
   hrOvertimeSummaryContract,
+  // §9 workforce — PHASE-047 rows (REPORT_CATALOG §9's PHASE-047
+  // additions; W-6, T-15): the talent set — the appraisal cycle results
+  // (the manager-outcomes-only posture with the BR-090 block-on-fail
+  // check), the recruitment funnel (the stage-total tie over the FIXED
+  // ladder), the training completions (the completion-shape check), and
+  // the document expiry register (the band-vocabulary check over the
+  // tenant's configured thresholds).
+  hrPerformanceCycleResultsContract,
+  hrRecruitmentPipelineContract,
+  hrTrainingCompletionsContract,
+  hrDocumentExpiryContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

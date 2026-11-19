@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/erp-w6
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/api:lint: cache hit, replaying logs 82ede54b132296a7
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/erp-w6/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/sync-core:lint: cache hit, replaying logs 30f71f0c96ea1a4c
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/erp-w6/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/ui:lint: cache hit, replaying logs 9671c483eff5bfbc
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/erp-w6/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/domain-core:lint: cache hit, replaying logs 675058801ef777da
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/erp-w6/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/web:lint: cache hit, replaying logs b93764adc4369527
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/erp-w6/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/mobile:lint: cache hit, replaying logs 0e52617567c73a8b
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/erp-w6/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/desktop:lint: cache hit, replaying logs 7c443977e82a6fdf
+@erp/contracts:lint: cache hit, replaying logs 13ed6b896bb32d88
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/erp-w6/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/erp-w6/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    8 cached, 8 total
+  Time:    29ms >>> FULL TURBO
+
+EXIT=0

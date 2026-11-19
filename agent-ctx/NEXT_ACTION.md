@@ -1,6 +1,55 @@
-# NEXT ACTION — PHASE-047 W-5 (the web plane — the four screen families + the 360 extension) DELIVERED; W-6 (the reports + proof wave) NEXT
+# NEXT ACTION — PHASE-047 W-6 (the reports + proof wave — the four report contracts + the talent RLS suite + the OA-06 budgets) DELIVERED; W-7 (the docs + gates + closure wave) NEXT
 
-**THE WAVE STATE (2026-11-19, updated at the W-5 delivery):** W-0
+**THE WAVE STATE (2026-11-19, updated at the W-6 delivery):** W-0
+through W-5 delivered (the foundation, the engines, the recruitment +
+training/org + documents + sweep, the external bridges + the
+NF-9/NF-10/NF-11 fixes, the web plane). **W-6 — THE REPORTS + PROOF
+WAVE — DELIVERED 2026-11-19** on the W-5 head `461e257` (this
+session's fresh clone, the same-session evidence rule's THIRTEENTH
+consecutive wave): **the four report contracts** (REPORT_CATALOG §9's
+PHASE-047 rows, **registry 106 → 110, all pin sites re-pinned
+together**; the catalog↔registry reconciliation extended to 110/110):
+`hr.performance-cycle-results` (BR-090's manager-outcomes-only posture
+STRUCTURAL at the report — the 360 inputs never ride, no reviewer
+axis, the `performance-manager-only-source` block-on-fail check),
+`hr.recruitment-pipeline` (BR-088's FIXED ladder as COUNT-ONLY columns
+— amendment A-4: the applicants' personal data never crosses into
+exports; the `pipeline-stage-total-tie` check), `hr.training-completions`
+(the once-stamped completed_at + the result vocabulary; the
+`training-completion-shape` check), and `hr.document-expiry` (the band
+folded from the TENANT'S configured sweep windows — the same
+hr_alert_jobs source the sweep reads, red line 5; the
+`document-band-vocabulary` check; the document NUMBER never ships —
+amendment A-4, the DB spec's bait scan) + **the dedicated talent RLS
+attack suite** (`talent-rls.db.spec.ts` 10/10 — A1–A10 ×14 over full
+FK-chained two-tenant worlds, the composite-FK law proven live: the
+FK-inversion probe fails 23503 BY CONSTRUCTION) + **the OA-06 EXPLAIN
+budgets** (`talent-explain-budgets.db.spec.ts` 5/5 — D-14's shape, the
+W-9 ruling honored verbatim: a real 240+600 corpus ANALYZEd, every
+plan LOGGED verbatim, the P3/W-9 regex shape) + the four keys joined
+the three known-permission catalogs + matrix §3.25's dated note +
+**THE HONEST DISCLOSURE + STRUCTURAL REPAIR (the second NF-4-class
+finding)**: vitest 3.2.7 under the DB config exits 0 on SUITE-LEVEL
+failures — the wave's own red run stamped VITEST_EXIT=0 through a
+faithful wrapper; **the repair — THE VITEST SUMMARY GUARD in
+`scripts/capture-evidence.sh`** (the stamp is the MAX of the process
+code and the summary's own verdict; the wrapper's self-tests prove
+both ways). Gates green (the scope-label law's targeted families; the
+W-7 full-run expectation moves to **259 files · 3,621**): typecheck/
+lint 8/8 · depcruise 1,993 · 14,855 · unit 8/8 (api 60 · 712) ·
+reporting 18 · 134/134 · hr 21 · 166/166 · isolation 2 · 1,710/1,710 ·
+check:rls scratch 307/0 · drift 312 = 312 · i18n 6,433 + 371 (no
+delta — API-only) · manifests 13/13 · docs 33/33 · id-ledger 0 ·
+secrets 0 · capabilities agree · shells PASS · the negative boundary
+PASS. **NEXT: W-7** — the docs + gates + closure wave (T-16 + T-18:
+BUSINESS_RULES BR-088…091 (D-04's wordings) + NAVIGATION_MODEL +
+FEATURE_CATALOG + the HR tables doc + the integrations README
+(W-4's); the full gate sweep at the final head — the full DB suite at
+259 · 3,621; the completion report; the triple flip; the archive
+`ERP_PLATFORM_PHASE047.zip` (OA-07); the tag `phase/047`; NEXT_ACTION
+→ PHASE-048), on this head.
+
+**THE CURRENT STATE (2026-11-18, updated at the W-2 delivery):** W-0
 through W-4 delivered (the foundation, the engines, the recruitment +
 training/org + documents + sweep, the external bridges + the
 NF-9/NF-10/NF-11 fixes). **W-5 — THE WEB PLANE — DELIVERED 2026-11-19**

@@ -1,8 +1,76 @@
 # Changelog
 
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-5 — the web plane delivered: the four screen families + the 360 extension + the four composition reads + 308 i18n keys/locale, with the honest disclosure of the pre-existing 045 self-board Tabs defect; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 the recruitment + training/org + documents + sweep wave + the NF-7/NF-8 fixes; 2026-11-18: W-2 the performance + goals engines + the NF-4/NF-5 fixes; W-1 the foundation wave; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-19 — **PHASE-047 W-6 — THE REPORTS + PROOF WAVE DELIVERED**
+  (T-15 + T-17, the plan §3 W-6; on the W-5 head `461e257`, this
+  session's fresh clone — the same-session evidence rule's THIRTEENTH
+  consecutive wave): **THE FOUR REPORT CONTRACTS** (REPORT_CATALOG
+  §9's PHASE-047 rows; **registry 106 → 110, all pin sites re-pinned
+  together** — report-pack-wiring · reporting-unit ×2 ·
+  consolidation-contracts ×2 · golden ×2 · industry-018 ·
+  industry-019; the four keys joined the three known-permission
+  catalogs; the catalog↔registry reconciliation check EXTENDED to
+  110/110): `hr.performance-cycle-results` (hr.performance.view —
+  one row per (cycle × reviewee) MANAGER review in
+  SUBMITTED/CALIBRATED; **BR-090's posture at the report BY
+  CONSTRUCTION**: the 360 inputs never enter the row universe and no
+  reviewer axis exists, the `performance-manager-only-source`
+  block-on-fail check walks every rendered row; the W-4
+  appraisal-bridge posture verbatim), `hr.recruitment-pipeline`
+  (hr.recruitment.view — **BR-088's FIXED ladder as count columns,
+  COUNTS ONLY** (amendment A-4: the applicants' personal data never
+  crosses into exports) with the `pipeline-stage-total-tie` check),
+  `hr.training-completions` (hr.training.view — the once-stamped
+  completed_at + the PENDING/PASSED/FAILED result vocabulary with the
+  `training-completion-shape` check), and `hr.document-expiry`
+  (hr.documents.manage — **the band folded from the TENANT'S
+  configured sweep windows**, the same hr_alert_jobs source the sweep
+  reads (red line 5 — DATA, never constants; the documented 30/7/0
+  default fires unregistered) with the `document-band-vocabulary`
+  check, and **the document NUMBER never ships** — amendment A-4, the
+  DB spec's bait scan). **THE DEDICATED TALENT RLS ATTACK SUITE**
+  (`__db__/hr/talent-rls.db.spec.ts` 10/10, CR-36e — A1–A10 ×14 over
+  full FK-chained two-tenant worlds: the no-GUC/foreign-GUC/id-probe
+  reads, the mismatched-tenant INSERTs with attacker-owned parents,
+  the staged hijacks (score/stage/expiry flips), the granted vs
+  evidence DELETE shapes, **the composite-FK law proven live** (the
+  FK-inversion probe fails 23503 BY CONSTRUCTION + the catalog walk),
+  the join + UNION/CTE confinement walks, and the both-worlds
+  census). **THE OA-06 EXPLAIN BUDGETS**
+  (`__db__/hr/talent-explain-budgets.db.spec.ts` 5/5, D-14's shape —
+  the W-9 ruling honored verbatim: a real 240-review + 600-applicant
+  corpus ANALYZEd, `enable_seqscan = off` isolating the index proof,
+  every plan LOGGED verbatim, the P3/W-9 regex shape accepting the
+  planner's legitimate paths — the pipeline board read, the report's
+  stage fold, the 360 aggregation's driving read, the cycle's whole
+  review set). **THE SPECS** (`__db__/reporting/talent-reports.spec.ts`
+  12/12 — the row universes pinned against the never-riding arms, the
+  exact 2dp averages (BigInt minor units — the double-scaling bug the
+  first red run caught, fixed with the re-run green), the A-4 bait
+  scans, **the tenant-config arm** (a registered [60, 15] row re-bands
+  the register — red line 5 proven at the report plane), the deny
+  paths). **THE HONEST DISCLOSURE + STRUCTURAL REPAIR (the second
+  NF-4-class finding)**: vitest 3.2.7 under the DB config **exits 0
+  on SUITE-LEVEL failures** (a beforeAll crash — "Test Files 1
+  failed" with process code 0; assertion failures exit 1 correctly) —
+  the wave's own red run stamped VITEST_EXIT=0 through a faithful
+  wrapper. **The repair — THE VITEST SUMMARY GUARD in
+  `scripts/capture-evidence.sh`**: the stamp is now the MAX of the
+  process code and the log's own vitest summary verdict (red
+  summaries force VITEST_EXIT=1), proven both ways by the wrapper's
+  self-tests. The prior waves' green stamps are not impugned (every
+  earlier green log's summary counts match its stamp). Gates:
+  typecheck/lint 8/8 · depcruise 1,993 · 14,855 · unit 8/8 (api 60 ·
+  712) · the targeted DB families (the scope-label law — no
+  migration/route delta): reporting 18 · 134/134 · hr 21 · 166/166 ·
+  isolation 2 · 1,710/1,710 (the W-7 full-run expectation moves to
+  259 files · 3,621) · check:rls scratch 307/0 · drift 312 = 312 ·
+  i18n 6,433 + 371 (no delta — API-only) · manifests 13/13 · docs
+  33/33 · id-ledger 0 · secrets 0 · capabilities agree · shells PASS
+  · the negative boundary PASS. — PHASE-047
 
 - 2026-11-19 — **PHASE-047 W-5 — THE WEB PLANE DELIVERED** (T-11 +
   T-12 + T-13 + T-14, the plan §3 W-5 + D-13; on the W-4 head

@@ -180,6 +180,14 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "hr.attendance",
   "hr.leave",
   "hr.overtime",
+  // PHASE-047 (0098 §1 seed, matrix §3.25 — W-6, T-15): the talent report
+  // keys (the same §12 convention — the four contracts ride the module's
+  // own read keys the /hr talent routes ride; the document register's
+  // reads AND writes both ride hr.documents.manage per the matrix note).
+  "hr.performance.view",
+  "hr.recruitment.view",
+  "hr.training.view",
+  "hr.documents.manage",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

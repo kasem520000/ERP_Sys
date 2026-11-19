@@ -1,0 +1,244 @@
+
+ RUN  v3.2.7 /home/z/erp-w6/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/erp-w6/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 19:19:23.121 UTC [18189] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 19:19:23.121 UTC [18189] LOG:  listening on IPv6 address "::1", port 40865
+2026-11-19 19:19:23.121 UTC [18189] LOG:  listening on IPv4 address "127.0.0.1", port 40865
+
+2026-11-19 19:19:23.121 UTC [18189] LOG:  listening on Unix socket "/tmp/.s.PGSQL.40865"
+
+2026-11-19 19:19:23.122 UTC [18192] LOG:  database system was shut down at 2026-11-19 19:19:23 UTC
+
+2026-11-19 19:19:23.124 UTC [18189] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/hr/shifts-roster.spec.ts (7 tests) 8620ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  8448ms
+ ✓ src/__db__/hr/inv031.spec.ts (7 tests) 5746ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (P2) the balance-cap property matrix — 12 generated configurations through the real engine, INV-031 after every step  5101ms
+{"level":30,"time":1795115990902,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795115990930,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795115991379,"service":"erp-api","module":"http","correlation_id":"01a1f540-40b3-7000-8ce8-ccc527d6b44b","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":160,"msg":"request completed"}
+{"level":30,"time":1795115991513,"service":"erp-api","module":"http","correlation_id":"01a1f540-415b-7000-8d5a-93e39fe90e00","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":126,"msg":"request completed"}
+{"level":30,"time":1795115991641,"service":"erp-api","module":"http","correlation_id":"01a1f540-41dc-7000-b64f-07d15f4fac8b","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":125,"msg":"request completed"}
+{"level":30,"time":1795115991656,"service":"erp-api","module":"http","correlation_id":"01a1f540-425c-7000-bf17-839adca7b86f","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":401,"duration_ms":12,"msg":"request completed"}
+{"level":30,"time":1795115991669,"service":"erp-api","module":"http","correlation_id":"01a1f540-4269-7000-b705-3e7dfd77b0c8","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":403,"duration_ms":12,"msg":"request completed"}
+{"level":30,"time":1795115991676,"service":"erp-api","module":"http","correlation_id":"01a1f540-4276-7000-ad3c-059e446fb19b","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991679,"service":"erp-api","module":"http","correlation_id":"01a1f540-427d-7000-965e-f3e908c8ab5a","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795115991684,"service":"erp-api","module":"http","correlation_id":"01a1f540-4280-7000-99f1-c0818a504627","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115991693,"service":"erp-api","module":"http","correlation_id":"01a1f540-4286-7000-8424-2a20cb07149d","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795115991695,"service":"erp-api","module":"http","correlation_id":"01a1f540-428e-7000-b9fa-a14dd594d7a1","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795115991701,"service":"erp-api","module":"http","correlation_id":"01a1f540-4290-7000-9930-9de712f4e87b","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115991708,"service":"erp-api","module":"http","correlation_id":"01a1f540-4296-7000-b532-7d794c045e27","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991709,"service":"erp-api","module":"http","correlation_id":"01a1f540-429c-7000-8967-bd3088b838af","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795115991715,"service":"erp-api","module":"http","correlation_id":"01a1f540-429e-7000-96b1-f430e60f36ca","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115991722,"service":"erp-api","module":"http","correlation_id":"01a1f540-42a4-7000-b4a0-626c5b8adb21","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991729,"service":"erp-api","module":"http","correlation_id":"01a1f540-42ab-7000-ab49-29fb7bf237ee","action":"request","method":"GET","path":"/api/v1/hr/org/placement/e95fbaad-e0d1-42af-9289-8a53b6a18759","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991736,"service":"erp-api","module":"http","correlation_id":"01a1f540-42b2-7000-9c4f-12021df138d7","action":"request","method":"GET","path":"/api/v1/hr/org/placement/89fc5996-1417-4f15-ba78-6df2b8cec7c3","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991746,"service":"erp-api","module":"http","correlation_id":"01a1f540-42b9-7000-aa71-9a92454802ac","action":"request","method":"GET","path":"/api/v1/hr/performance/reviews/for-employee/89fc5996-1417-4f15-ba78-6df2b8cec7c3","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795115991754,"service":"erp-api","module":"http","correlation_id":"01a1f540-42c4-7000-80af-bccc57381f1d","action":"request","method":"GET","path":"/api/v1/hr/goals/for-employee/89fc5996-1417-4f15-ba78-6df2b8cec7c3","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991759,"service":"erp-api","module":"http","correlation_id":"01a1f540-42cb-7000-945b-643e2a2fd094","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/89fc5996-1417-4f15-ba78-6df2b8cec7c3","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115991768,"service":"erp-api","module":"http","correlation_id":"01a1f540-42d1-7000-817d-61583cbec2db","action":"request","method":"POST","path":"/api/v1/hr/recruitment/applicants/01a1f540-3ea9-7000-9fa4-ef4fa17b8ee8/hire","status":201,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795115991774,"service":"erp-api","module":"http","correlation_id":"01a1f540-42d9-7000-83a4-e1f63a20163e","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/89fc5996-1417-4f15-ba78-6df2b8cec7c3","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115991781,"service":"erp-api","module":"http","correlation_id":"01a1f540-42df-7000-90d4-b5dc2b23e469","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/e95fbaad-e0d1-42af-9289-8a53b6a18759","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115991792,"service":"erp-api","module":"http","correlation_id":"01a1f540-42e7-7000-b564-89f752af2f3d","action":"request","method":"POST","path":"/api/v1/hr/performance/reviews/submit","status":422,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795115991799,"service":"erp-api","module":"http","correlation_id":"01a1f540-42f2-7000-a368-6b8b66fdde33","action":"request","method":"POST","path":"/api/v1/hr/performance/cycles/01a1f540-3e94-7000-b7ce-a6f80219a699/close","status":409,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115991808,"service":"erp-api","module":"http","correlation_id":"01a1f540-42f9-7000-8bea-1eeb9aa947e3","action":"request","method":"POST","path":"/api/v1/hr/recruitment/applicants/01a1f540-3ea9-7000-9fa4-ef4fa17b8ee8/stage","status":422,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795115991814,"service":"erp-api","module":"http","correlation_id":"01a1f540-4301-7000-8a91-4cd0ebc560be","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115991818,"service":"erp-api","module":"http","correlation_id":"01a1f540-4307-7000-b128-f3f243406477","action":"request","method":"POST","path":"/api/v1/hr/performance/cycles","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795115991823,"service":"erp-api","module":"http","correlation_id":"01a1f540-430b-7000-88da-2559ed1b7a51","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115991831,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/hr/talent-routes.spec.ts (9 tests) 1566ms
+ ✓ src/__db__/hr/leave.spec.ts (5 tests) 1607ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (b) THE ACCRUAL RUN — the annual grant with joiner proration (the mid-year hire), the monthly vesting, idempotence, and the INV-031 preservation  810ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (d) THE CARRY-OVER ROLLOVER — min(remaining, cap) with the truncation audited; a 0-cap carries nothing; idempotent  724ms
+2026-11-19 19:19:54.486 UTC [18303] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-19 19:19:54.486 UTC [18303] STATEMENT:  
+	    UPDATE employees SET user_id = $1::uuid, updated_at = now(), version = version + 1
+	    WHERE id = $2::uuid AND user_id IS NULL
+	    RETURNING id
+	  
+
+ ✓ src/__db__/hr/hr-writer-races.spec.ts (20 tests) 1189ms
+2026-11-19 19:19:54.864 UTC [18370] ERROR:  new row violates row-level security policy for table "performance_cycles"
+2026-11-19 19:19:54.864 UTC [18370] STATEMENT:  INSERT INTO performance_cycles (id, tenant_id, name, period_start, period_end) VALUES ($1, $2, 'Forged Cycle', '2026-01-01', '2026-12-31')
+
+2026-11-19 19:19:54.870 UTC [18371] ERROR:  new row violates row-level security policy for table "performance_reviews"
+2026-11-19 19:19:54.870 UTC [18371] STATEMENT:  INSERT INTO performance_reviews (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind) VALUES ($1, $2, $3, $4, $5, 'MANAGER')
+
+2026-11-19 19:19:54.876 UTC [18372] ERROR:  new row violates row-level security policy for table "competencies"
+2026-11-19 19:19:54.876 UTC [18372] STATEMENT:  INSERT INTO competencies (id, tenant_id, code, name) VALUES ($1, $2, 'FORGED', 'Forged')
+
+2026-11-19 19:19:54.882 UTC [18373] ERROR:  new row violates row-level security policy for table "competency_levels"
+2026-11-19 19:19:54.882 UTC [18373] STATEMENT:  INSERT INTO competency_levels (id, tenant_id, level, name, name_ar, descriptor, descriptor_ar) VALUES ($1, $2, 9, 'Forged', 'مزيف', 'Forged', 'مزيف')
+
+2026-11-19 19:19:54.889 UTC [18374] ERROR:  new row violates row-level security policy for table "goals"
+2026-11-19 19:19:54.889 UTC [18374] STATEMENT:  INSERT INTO goals (id, tenant_id, cycle_id, owner_employee_id, title, weight) VALUES ($1, $2, $3, $4, 'Forged Goal', '100.00')
+
+2026-11-19 19:19:54.895 UTC [18375] ERROR:  new row violates row-level security policy for table "vacancies"
+2026-11-19 19:19:54.895 UTC [18375] STATEMENT:  INSERT INTO vacancies (id, tenant_id, code, title, headcount) VALUES ($1, $2, 'FORGED-V', 'Forged', 1)
+
+2026-11-19 19:19:54.901 UTC [18376] ERROR:  new row violates row-level security policy for table "applicants"
+2026-11-19 19:19:54.901 UTC [18376] STATEMENT:  INSERT INTO applicants (id, tenant_id, vacancy_id, full_name) VALUES ($1, $2, $3, 'Forged Applicant')
+
+2026-11-19 19:19:54.907 UTC [18377] ERROR:  new row violates row-level security policy for table "interviews"
+2026-11-19 19:19:54.907 UTC [18377] STATEMENT:  INSERT INTO interviews (id, tenant_id, applicant_id, round, panelist_employee_id, scheduled_start, scheduled_end, mode) VALUES ($1, $2, $3, 1, $4, '2026-08-01 09:00:00+00', '2026-08-01 10:00:00+00', 'ONSITE')
+
+2026-11-19 19:19:54.913 UTC [18378] ERROR:  new row violates row-level security policy for table "training_programs"
+2026-11-19 19:19:54.913 UTC [18378] STATEMENT:  INSERT INTO training_programs (id, tenant_id, code, name, kind) VALUES ($1, $2, 'FORGED-TR', 'Forged', 'COURSE')
+
+2026-11-19 19:19:54.920 UTC [18379] ERROR:  new row violates row-level security policy for table "training_enrollments"
+2026-11-19 19:19:54.920 UTC [18379] STATEMENT:  INSERT INTO training_enrollments (id, tenant_id, program_id, employee_id) VALUES ($1, $2, $3, $4)
+
+2026-11-19 19:19:54.926 UTC [18380] ERROR:  new row violates row-level security policy for table "certifications"
+2026-11-19 19:19:54.926 UTC [18380] STATEMENT:  INSERT INTO certifications (id, tenant_id, employee_id, name, issuer, issue_date) VALUES ($1, $2, $3, 'Forged Cert', 'Forged', '2026-01-01')
+
+2026-11-19 19:19:54.932 UTC [18381] ERROR:  new row violates row-level security policy for table "org_units"
+2026-11-19 19:19:54.932 UTC [18381] STATEMENT:  INSERT INTO org_units (id, tenant_id, code, name, path) VALUES ($1, $2, 'FORGED-OU', 'Forged', '/FORGED')
+
+2026-11-19 19:19:54.938 UTC [18382] ERROR:  new row violates row-level security policy for table "positions"
+2026-11-19 19:19:54.938 UTC [18382] STATEMENT:  INSERT INTO positions (id, tenant_id, code, title) VALUES ($1, $2, 'FORGED-POS', 'Forged')
+
+2026-11-19 19:19:54.944 UTC [18383] ERROR:  new row violates row-level security policy for table "employee_documents"
+2026-11-19 19:19:54.944 UTC [18383] STATEMENT:  INSERT INTO employee_documents (id, tenant_id, employee_id, kind) VALUES ($1, $2, $3, 'IQAMA')
+
+2026-11-19 19:19:54.997 UTC [18390] ERROR:  permission denied for table performance_reviews
+2026-11-19 19:19:54.997 UTC [18390] STATEMENT:  DELETE FROM performance_reviews WHERE id = $1
+
+2026-11-19 19:19:55.298 UTC [18406] ERROR:  insert or update on table "performance_reviews" violates foreign key constraint "fk_performance_reviews_cycle"
+2026-11-19 19:19:55.298 UTC [18406] DETAIL:  Key is not present in table "performance_cycles".
+2026-11-19 19:19:55.298 UTC [18406] STATEMENT:  INSERT INTO performance_reviews (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind)
+	         VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, $2, $3, 'MANAGER')
+
+ ✓ src/__db__/hr/talent-rls.db.spec.ts (10 tests) 632ms
+2026-11-19 19:19:55.584 UTC [18416] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-performance.db.spec.ts (14 tests) 494ms
+ ✓ src/__db__/hr/feed.spec.ts (4 tests) 446ms
+ ✓ src/__db__/hr/oa06-budgets.spec.ts (6 tests) 367ms
+2026-11-19 19:19:57.061 UTC [18426] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-recruitment.db.spec.ts (16 tests) 315ms
+ ✓ src/__db__/hr/self-service.spec.ts (11 tests) 261ms
+(node:18248) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/__db__/hr/leave-posting.spec.ts (3 tests) 213ms
+ ✓ src/__db__/hr/attendance.spec.ts (5 tests) 225ms
+ ✓ src/__db__/hr/talent-documents-sweep.db.spec.ts (6 tests) 239ms
+ ✓ src/__db__/hr/talent-bridges.db.spec.ts (13 tests) 188ms
+ ✓ src/__db__/hr/attendance-import.spec.ts (5 tests) 82ms
+ ✓ src/__db__/hr/talent-training-org.db.spec.ts (10 tests) 120ms
+[talent-explain-budgets] P1 the pipeline board read:
+Limit  (cost=17.89..17.96 rows=29 width=53)
+  ->  Sort  (cost=17.89..17.96 rows=29 width=53)
+        Sort Key: created_at DESC, full_name
+        ->  Bitmap Heap Scan on applicants  (cost=4.46..17.18 rows=29 width=53)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (vacancy_id = '834495ac-dc7e-4fef-9bc8-ce01b4c2a496'::uuid))
+              ->  Bitmap Index Scan on ix_applicants_tenant_vacancy  (cost=0.00..4.45 rows=29 width=0)
+                    Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (vacancy_id = '834495ac-dc7e-4fef-9bc8-ce01b4c2a496'::uuid))
+[talent-explain-budgets] P2 the pipeline report fold:
+Sort  (cost=60.28..60.33 rows=20 width=59)
+  Sort Key: v.code
+  ->  HashAggregate  (cost=59.30..59.85 rows=20 width=59)
+        Group Key: v.id
+        ->  Hash Right Join  (cost=21.56..48.80 rows=300 width=53)
+              Hash Cond: (a.vacancy_id = v.id)
+              ->  Bitmap Heap Scan on applicants a  (cost=12.81..38.31 rows=600 width=54)
+                    Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                    ->  Bitmap Index Scan on ix_applicants_tenant_stage  (cost=0.00..12.66 rows=600 width=0)
+                          Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+              ->  Hash  (cost=8.50..8.50 rows=20 width=47)
+                    ->  Index Scan using ix_vacancies_tenant_position on vacancies v  (cost=0.15..8.50 rows=20 width=47)
+                          Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+[talent-explain-budgets] P3 the 360 aggregation fold:
+Bitmap Heap Scan on performance_reviews  (cost=4.32..10.08 rows=3 width=26)
+  Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (reviewee_employee_id = '7622810b-dc53-447e-8bf6-72331eb2f1bb'::uuid))
+  Filter: ((status = ANY ('{SUBMITTED,CALIBRATED}'::text[])) AND (kind = ANY ('{SELF,PEER,SUBORDINATE}'::text[])))
+  ->  Bitmap Index Scan on ix_performance_reviews_tenant_reviewee  (cost=0.00..4.32 rows=4 width=0)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (reviewee_employee_id = '7622810b-dc53-447e-8bf6-72331eb2f1bb'::uuid))
+[talent-explain-budgets] P4 the cycle review-set read:
+Sort  (cost=24.51..24.66 rows=59 width=40)
+  Sort Key: reviewee_employee_id
+  ->  Bitmap Heap Scan on performance_reviews r  (cost=10.32..22.77 rows=59 width=40)
+        Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (cycle_id = '6c6ae357-29a7-493f-93c5-b6f324e6352f'::uuid))
+        Filter: ((status = ANY ('{SUBMITTED,CALIBRATED}'::text[])) AND (kind = 'MANAGER'::text))
+        ->  Bitmap Index Scan on ix_performance_reviews_tenant_cycle  (cost=0.00..10.31 rows=215 width=0)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (cycle_id = '6c6ae357-29a7-493f-93c5-b6f324e6352f'::uuid))
+ ✓ src/__db__/hr/talent-explain-budgets.db.spec.ts (5 tests) 75ms
+ ✓ src/__db__/hr/overtime.spec.ts (4 tests) 78ms
+ ✓ src/__db__/hr/holiday.spec.ts (3 tests) 67ms
+2026-11-19 19:19:59.083 UTC [18463] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-19 19:19:59.083 UTC [18463] DETAIL:  Key (tenant_id, user_id)=(7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a, 01a1f540-5f39-7000-9caa-3e3d131975ff) already exists.
+2026-11-19 19:19:59.083 UTC [18463] STATEMENT:  UPDATE employees SET user_id = $1, updated_at = now(), version = version + 1
+	          WHERE id = $2 AND tenant_id = $3
+
+ ✓ src/__db__/hr/bridge.spec.ts (3 tests) 61ms
+
+ Test Files  21 passed (21)
+      Tests  166 passed (166)
+   Start at  19:19:22
+   Duration  36.72s (transform 5.22s, setup 0ms, collect 9.31s, tests 22.59s, environment 0ms, prepare 58ms)
+
+2026-11-19 19:19:59.092 UTC [18189] LOG:  received fast shutdown request
+
+2026-11-19 19:19:59.092 UTC [18189] LOG:  aborting any active transactions
+2026-11-19 19:19:59.092 UTC [18336] FATAL:  terminating connection due to administrator command
+2026-11-19 19:19:59.092 UTC [18303] FATAL:  terminating connection due to administrator command
+2026-11-19 19:19:59.093 UTC [18287] FATAL:  terminating connection due to administrator command
+2026-11-19 19:19:59.095 UTC [18302] FATAL:  terminating connection due to administrator command
+2026-11-19 19:19:59.095 UTC [18189] LOG:  background worker "logical replication launcher" (PID 18195) exited with exit code 1
+2026-11-19 19:19:59.095 UTC [18297] FATAL:  terminating connection due to administrator command
+
+2026-11-19 19:19:59.100 UTC [18190] LOG:  shutting down
+2026-11-19 19:19:59.100 UTC [18190] LOG:  checkpoint starting: shutdown immediate
+
+(node:18248) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:18248) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-19 19:19:59.138 UTC [18190] LOG:  checkpoint complete: wrote 6133 buffers (37.4%); 0 WAL file(s) added, 0 removed, 4 recycled; write=0.030 s, sync=0.008 s, total=0.039 s; sync files=2859, longest=0.001 s, average=0.001 s; distance=76383 kB, estimate=76383 kB; lsn=0/5F76790, redo lsn=0/5F76790
+
+2026-11-19 19:19:59.148 UTC [18189] LOG:  database system is shut down
+
+VITEST_EXIT=0

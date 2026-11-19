@@ -629,6 +629,21 @@ together); RLS attack tests A1–A10 ×14 (CR-36e); the OA-06 budgets in the
 W-9 shape (D-14).
 **Exit:** acceptance #7/#8 green; the registry reconciliation check
 extended and green.
+**[MET 2026-11-19 (W-6): the four contracts + the dedicated talent RLS
+suite (`talent-rls.db.spec` 10/10 — A1–A10 ×14 over full FK-chained
+two-tenant worlds, the composite-FK law proven live) + the OA-06 EXPLAIN
+budgets (`talent-explain-budgets.db.spec` 5/5 — D-14's shape, the W-9
+ruling honored verbatim) delivered on the W-5 head `461e257` — registry
+106 → 110 with ALL pin sites re-pinned together, the catalog↔registry
+reconciliation extended to 110/110, drift 312 = 312 (no key/route
+delta). The wave's honest disclosure + structural repair: vitest 3.2.7
+under the DB config exits 0 on SUITE-LEVEL failures — the second
+NF-4-class finding, repaired structurally in the capture wrapper (THE
+VITEST SUMMARY GUARD — the stamp is the MAX of the process code and the
+summary's own verdict; the wrapper's self-tests prove both ways). The
+W-7 full-run expectation moves to 259 files · 3,621. Evidence: the W-6
+gate doc + `audit-evidence/phase047-w6/` (25 logs incl. the two red
+first-run discovery records and the wrapper self-tests).]**
 
 ### W-7 — Docs + gates + closure (T-16 + T-18, orchestrator)
 BUSINESS_RULES BR-088…091 (D-04's wordings) + NAVIGATION_MODEL + FEATURE_

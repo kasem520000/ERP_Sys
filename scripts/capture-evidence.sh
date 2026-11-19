@@ -60,6 +60,22 @@ set +e
 RUN_CODE="${PIPESTATUS[0]}"
 set -e
 
+# THE VITEST SUMMARY GUARD (2026-11-19, W-6 — the second NF-4-class
+# repair, discovered honestly during this wave's reporting-folder
+# run): vitest 3.2.7 under the DB config (forks pool + globalSetup)
+# exits 0 on SUITE-LEVEL failures — a beforeAll crash reported as
+# "Test Files  1 failed" leaves the process code at 0, so the exit
+# stamp alone can lie about a red run exactly the way NF-4's tee
+# masking did. The summary lines never lie: when the log's own
+# vitest summary reports failures (or an Unhandled Error), the stamp
+# is forced red regardless of the process code. The stamp is the
+# MAX of the two truths — process code and summary verdict.
+if [ "$LABEL" = "VITEST_EXIT" ] && [ "$RUN_CODE" -eq 0 ]; then
+  if grep -qE "Test Files +[0-9]+ failed|Tests +[0-9]+ failed|Unhandled Error" "$LOG_FILE"; then
+    RUN_CODE=1
+  fi
+fi
+
 # The stamp: the run command's own exit code, as the last line.
 echo "${LABEL}=${RUN_CODE}" | tee -a "$LOG_FILE" >/dev/null
 

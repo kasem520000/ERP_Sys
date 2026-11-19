@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-17 (PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. Earlier: PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-19 (PHASE-047 — hr.performance-cycle-results + hr.recruitment-pipeline + hr.training-completions + hr.document-expiry; registry 106 → 110. Earlier: PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -386,6 +386,33 @@ never-fed exception column; REJECTED never feeds; hours positive — INV-031's
 non-negative leg). Employee rows carry code + display names only (the payroll
 register's PII law).
 
+**Shipped (PHASE-047, category `hr`)** — the four talent contracts over the
+PHASE-013 engine (registry 106 → 110; permissions reuse the 0098-seeded module keys
+— the §12 module-register convention, matrix §3.25): the talent families are
+**not ledger documents** (the posting canon's note — 047 is ledger-free by
+design); the contracts are the aggregate/outcome views of the talent planes:
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `hr.performance-cycle-results` | Performance Cycle Results / نتائج دورة التقييم | hr · `hrQueries.performanceCycleResults` · performance_reviews (+ cycles/employees joins; MANAGER reviews in SUBMITTED/CALIBRATED only — BR-090's posture at the report) | cycleId, employeeId? | `hr.performance.view` | PDF · XLSX · CSV | PHASE-047 |
+| `hr.recruitment-pipeline` | Recruitment Pipeline / مسار التوظيف | hr · `hrQueries.recruitmentPipeline` · vacancies LEFT JOIN applicants (BR-088's FIXED ladder as count columns — counts only, no applicant personal data) | vacancyId?, status? (OPEN/ON_HOLD/FILLED/CANCELLED) | `hr.recruitment.view` | PDF · XLSX · CSV | PHASE-047 |
+| `hr.training-completions` | Training Completions / إتمامات التدريب | hr · `hrQueries.trainingCompletions` · training_enrollments (+ programs/employees joins; COMPLETED only, the once-stamped completed_at) | dateFrom/To, programId?, employeeId? | `hr.training.view` | PDF · XLSX · CSV | PHASE-047 |
+| `hr.document-expiry` | Document Expiry / انتهاء وثائق الموظفين | hr · `hrQueries.documentExpiry` · employee_documents (+ employees; the band folded from the tenant's hr_alert_jobs thresholds — the sweep's own source) | daysAhead (default 30), employeeId?, kind? (PASSPORT/IQAMA/VISA/CONTRACT/CERTIFICATE/OTHER) | `hr.documents.manage` | PDF · XLSX · CSV | PHASE-047 |
+
+Notes: `hr.performance-cycle-results` carries the `performance-manager-only-source`
+block-on-fail assertion (every row is a MANAGER-review outcome and the projection
+carries no reviewer axis — the 360 inputs never ship; the W-4 appraisal-bridge
+posture at the report); `hr.recruitment-pipeline` carries `pipeline-stage-total-tie`
+(the six FIXED-ladder stage counts sum to the total applicant count — every
+applicant in exactly one stage) and the projection is COUNTS ONLY (amendment A-4:
+the applicants' personal data never crosses into exports); `hr.training-completions`
+carries `training-completion-shape` (every row carries the once-stamped completed_at
+and a result inside the PENDING/PASSED/FAILED vocabulary); `hr.document-expiry`
+carries `document-band-vocabulary` (every row's band is one of the tenant's
+configured thresholds or the honest BEYOND label) and the document NUMBER never
+ships (amendment A-4 — the payslips precedent; employee code + name + kind + dates
++ band only). Employee rows carry code + display names only.
+
 ## 10. Consolidation (v2.0 — multi-entity)
 
 Delivered by PHASE-034 (**COMPLETE 2026-11-09** — registry rows 76 → 80; the four
@@ -482,6 +509,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-043 | the two planning contracts added (§7: the MRP exceptions view over the five documented exception classes — the data-readiness defects the run screen's panel mirrors + the latest run's uncovered residuals and frozen-fence suggestions, and the ATP/CTP position register with the BR-080 hard-exclusion evidence as first-class columns — quarantined/reserved/consignment-owned shown but never counted); registry 99 → 101 |
 | PHASE-045 | the three hr workforce contracts added (§9: the attendance register over the derived day verdicts + minute facts with the status-vocabulary/session-shape block-on-fail checks, the leave balance cells with the render-time INV-031 cap re-check + the pending-span days, and the overtime folds with BR-084's feeding law as first-class columns — the never-fed pre-approval exception hours); registry 101 → 104 |
 | PHASE-046 | the two payroll compliance contracts added (§9: the statutory contributions summary over the frozen statutory_breakdown/statutory_summary folds — the per (period × profile row) base/shares/capped-counts + the accrued-vs-remitted remittance liability, with the three-way `statutory-totals-tie` INV-032(b) check; and the EOSB liability view per employee — service years, tier days, the computed entitlement, the standing provision (the 029 balance + the accumulated G-54 deltas), settled, the delta — with the standing-model `eosb-provision-tie`); registry 104 → 106 |
+| PHASE-047 | the four talent contracts added (§9's hr workforce additions: the appraisal cycle results — one row per (cycle × reviewee) MANAGER review in SUBMITTED/CALIBRATED with BR-090's manager-outcomes-only posture structural (the `performance-manager-only-source` block-on-fail check; the 360 inputs never ship); the recruitment funnel — BR-088's FIXED ladder as count columns with the `pipeline-stage-total-tie` check, counts only (the applicants' personal data never crosses into exports — amendment A-4); the training completions — the once-stamped completed_at + the result vocabulary with the `training-completion-shape` check; and the document expiry register — the band folded from the tenant's configured sweep thresholds with the `document-band-vocabulary` check, the document number never ships (amendment A-4)); registry 106 → 110 |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 
@@ -546,3 +574,9 @@ A report cannot be registered before its data phase — the registry cross-check
    `services.*` pair), the §3 Commissions-Due duplicate row removed (the §8 PHASE-017
    row is canonical), and the `tax.e-invoicing-log` row updated to the delivered
    contract (`tax.einvoicing.manage` per the §12 module-register convention).
+6. PHASE-047 (2026-11-19, W-6 T-15) catalog↔registry reconciliation extended: every
+   one of the 110 registry keys has exactly one catalog row (110/110) — the four
+   talent contracts added above (§9's PHASE-047 rows); the reconciliation was
+   re-walked at delivery (each of `hr.performance-cycle-results`,
+   `hr.recruitment-pipeline`, `hr.training-completions`, `hr.document-expiry`
+   appears exactly once in §9 and once in the live registry).

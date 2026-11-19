@@ -250,6 +250,19 @@ export interface ReportParams {
   readonly tier?: "WEEKDAY" | "WEEKEND" | "HOLIDAY";
   /** PHASE-045 (hr): the exceptions-only filter of `hr.attendance-register`. */
   readonly exceptionsOnly?: boolean;
+  /** PHASE-047 (hr, W-6): the cycle of `hr.performance-cycle-results`. */
+  readonly cycleId?: string;
+  /** PHASE-047 (hr, W-6): the vacancy filter of `hr.recruitment-pipeline`. */
+  readonly vacancyId?: string;
+  /** PHASE-047 (hr, W-6): the program filter of `hr.training-completions`. */
+  readonly programId?: string;
+  /** PHASE-047 (hr, W-6): the expiry window of `hr.document-expiry`
+   * (days ahead of today; the default is 30). */
+  readonly daysAhead?: number;
+  /** PHASE-047 (hr, W-6): the document kind filter of
+   * `hr.document-expiry` (PASSPORT/IQAMA/VISA/CONTRACT/CERTIFICATE/
+   * OTHER — the HR-10 vocabulary). */
+  readonly kind?: string;
   [key: string]: unknown;
 }
 

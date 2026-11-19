@@ -136,6 +136,13 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "hr.attendance",
   "hr.leave",
   "hr.overtime",
+  // PHASE-047 (0098 §1 seed, matrix §3.25 — W-6, T-15): the talent report
+  // keys (the same §12 convention — the four contracts ride the module's
+  // own read keys the /hr talent routes ride).
+  "hr.performance.view",
+  "hr.recruitment.view",
+  "hr.training.view",
+  "hr.documents.manage",
 ]);
 
 /** A minimal but type-complete stored envelope for cache/CSV/XLSX tests. */
@@ -183,16 +190,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 106 frozen contracts validate against the known-permission catalog", () => { // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance)
+  it("the 110 frozen contracts validate against the known-permission catalog", () => { // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
+    expect(result.count).toBe(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(106); // PHASE-046 (W-6, T-13): 104 → 106 (+2 payroll compliance: statutory-summary, eosb-liability)
+    expect(snapshot).toHaveLength(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

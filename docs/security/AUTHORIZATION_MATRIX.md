@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-18 (PHASE-047 W-1 — §3.25 the twelve talent keys; catalog 300 → 312, migration 0098 §1; the four template compositions per 0098 §3) · 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-19 (PHASE-047 W-6 — §3.25 the four talent report contracts on the module keys; the reporting registry 106 → 110, no key/route delta) · 2026-11-18 (PHASE-047 W-1 — §3.25 the twelve talent keys; catalog 300 → 312, migration 0098 §1; the four template compositions per 0098 §3) · 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -764,6 +764,22 @@ notifications' own permission plane — no new key.
 > (hr.recruitment.view — null for no hire link, A7-indistinguishable), and
 > `GET /api/v1/hr/org/placement/:employeeId` (hr.org.view — D-01's
 > documented extension axes, read-only on the substrate).
+
+> **[Dated 2026-11-19 (W-6 — T-15, the four report contracts): the
+> reporting registry 106 → 110.]** `hr.performance-cycle-results`,
+> `hr.recruitment-pipeline`, `hr.training-completions`, and
+> `hr.document-expiry` ride the module's OWN keys above
+> (hr.performance.view, hr.recruitment.view, hr.training.view,
+> hr.documents.manage — the REPORT_CATALOG §12 module-register convention;
+> no new permission, no new route, drift stays 312 = 312 — the /reports
+> workspace's run service re-checks the contract's requiredPermission per
+> run, and the exports additionally need `reporting.reports.export`). The
+> contracts' PII postures are structural: the appraisal contract ships
+> MANAGER outcomes only (BR-090 — no reviewer axis, the 360 inputs never
+> ride), the pipeline contract ships COUNTS ONLY (amendment A-4 — the
+> applicants' personal data never crosses into exports), and the document
+> register's contract never ships the document NUMBER (amendment A-4 —
+> employee code + name + kind + dates + band only).
 
 ## 4. Segregation of duties & approval limits
 

@@ -1,0 +1,286 @@
+
+ RUN  v3.2.7 /home/z/erp-w6/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/erp-w6/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-19 19:17:43.351 UTC [17475] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-19 19:17:43.352 UTC [17475] LOG:  listening on IPv6 address "::1", port 37381
+2026-11-19 19:17:43.352 UTC [17475] LOG:  listening on IPv4 address "127.0.0.1", port 37381
+
+2026-11-19 19:17:43.352 UTC [17475] LOG:  listening on Unix socket "/tmp/.s.PGSQL.37381"
+
+2026-11-19 19:17:43.353 UTC [17478] LOG:  database system was shut down at 2026-11-19 19:17:43 UTC
+
+2026-11-19 19:17:43.355 UTC [17475] LOG:  database system is ready to accept connections
+
+2026-11-19 19:17:48.465 UTC [17556] ERROR:  new row for relation "performance_reviews" violates check constraint "ck_performance_reviews_self_kind"
+2026-11-19 19:17:48.465 UTC [17556] STATEMENT:  
+	      INSERT INTO performance_reviews
+	        (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind, status, overall_score)
+	      SELECT gen_random_uuid(), erp.current_tenant_id(), $1,
+	             k.reviewer_id, base.reviewee_id, k.kind, 'SUBMITTED', 70 + (base.g % 25)
+	      FROM (
+	        SELECT e.id AS reviewee_id, e.g,
+	               (SELECT e2.id FROM employees e2
+	                 WHERE e2.tenant_id = erp.current_tenant_id()
+	                   AND e2.code = 'EMP-XB' || lpad((((e.g - 1) % 60) + 1)::text, 2, '0')) AS peer1,
+	               (SELECT e3.id FROM employees e3
+	                 WHERE e3.tenant_id = erp.current_tenant_id()
+	                   AND e3.code = 'EMP-XB' || lpad((((e.g) % 60) + 1)::text, 2, '0')) AS peer2
+	        FROM (SELECT id, row_number() OVER (ORDER BY code) AS g FROM employees
+	              WHERE tenant_id = erp.current_tenant_id() AND code LIKE 'EMP-XB%') e
+	      ) base
+	      CROSS JOIN LATERAL (VALUES
+	        (base.reviewee_id, 'MANAGER'),
+	        (base.reviewee_id, 'SELF'),
+	        (base.peer1, 'PEER'),
+	        (base.peer2, 'PEER')
+	      ) AS k(reviewer_id, kind)
+	    
+
+ ❯ src/__db__/hr/talent-explain-budgets.db.spec.ts (5 tests | 5 skipped) 62ms
+   ↓ PHASE-047 W-6 — OA-06 EXPLAIN budgets (the applicant pipeline + the review-aggregation fold) > P1 the applicant pipeline board read (tenant + vacancy, newest first) rides ix_applicants_tenant_vacancy — no seq-scan
+   ↓ PHASE-047 W-6 — OA-06 EXPLAIN budgets (the applicant pipeline + the review-aggregation fold) > P2 the pipeline report's per-vacancy stage fold (the LEFT JOIN + the FILTER counts) is INDEX-DRIVEN — no seq-scan
+   ↓ PHASE-047 W-6 — OA-06 EXPLAIN budgets (the applicant pipeline + the review-aggregation fold) > P3 the 360 aggregation's driving read (tenant + reviewee + kind IN, SUBMITTED only) rides ix_performance_reviews_tenant_reviewee — no seq-scan
+   ↓ PHASE-047 W-6 — OA-06 EXPLAIN budgets (the applicant pipeline + the review-aggregation fold) > P4 the cycle's whole review set (the calibration view / the report's read) rides ix_performance_reviews_tenant_cycle — no seq-scan
+   ↓ PHASE-047 W-6 — OA-06 EXPLAIN budgets (the applicant pipeline + the review-aggregation fold) > the corpus is real (the planner's choice was informed): 240 reviews + 600 applicants on the dedicated tenant
+2026-11-19 19:17:48.515 UTC [17556] ERROR:  new row for relation "performance_reviews" violates check constraint "ck_performance_reviews_self_kind"
+2026-11-19 19:17:48.515 UTC [17556] STATEMENT:  
+	      INSERT INTO performance_reviews
+	        (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind, status, overall_score)
+	      VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, $2, $3, 'MANAGER', 'SUBMITTED', 88.00)
+	      RETURNING id
+	    
+
+ ❯ src/__db__/hr/talent-rls.db.spec.ts (10 tests | 10 skipped) 22ms
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A1: SELECT without any GUC → 0 rows on every talent table (as erp_app)
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A2: the attacker's GUC never exposes the victim's rows (foreign = 0, own ≥ 1 — every table)
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A3: INSERT with the victim's tenant_id under the attacker's GUC → 42501 on every table (zero rows written)
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A4: UPDATE of the victim's row by id under the attacker's GUC → 0 rows affected, row byte-identical
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A5: DELETE of the victim's row under the attacker's GUC → 0 rows (the granted tables) or the grant denial (the evidence tables)
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A7: id-based probes of the victim's exact row ids → 0 rows (no existence leak)
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A8: THE COMPOSITE-FK LAW — the talent child FKs are (id, tenant_id) composites; the FK-inversion attack is impossible by construction (23503)
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A9: the FK-chain joins under the attacker's GUC never surface the victim's parents
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > A10: UNION ALL over the fourteen tables + a recursive CTE walk under the attacker's GUC → 0 victim rows
+   ↓ PHASE-047 W-6 · the talent RLS attack suite (A1–A10 ×14, CR-36e) > the full census: both worlds intact after every attack (the byte-count floor)
+ ✓ src/__db__/hr/inv031.spec.ts (7 tests) 2993ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (P2) the balance-cap property matrix — 12 generated configurations through the real engine, INV-031 after every step  2538ms
+ ✓ src/__db__/hr/shifts-roster.spec.ts (7 tests) 8262ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  8179ms
+ ✓ src/__db__/hr/leave.spec.ts (5 tests) 1419ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (b) THE ACCRUAL RUN — the annual grant with joiner proration (the mid-year hire), the monthly vesting, idempotence, and the INV-031 preservation  788ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (d) THE CARRY-OVER ROLLOVER — min(remaining, cap) with the truncation audited; a 0-cap carries nothing; idempotent  568ms
+2026-11-19 19:18:03.354 UTC [17580] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-19 19:18:03.354 UTC [17580] STATEMENT:  
+	    UPDATE employees SET user_id = $1::uuid, updated_at = now(), version = version + 1
+	    WHERE id = $2::uuid AND user_id IS NULL
+	    RETURNING id
+	  
+
+ ✓ src/__db__/hr/hr-writer-races.spec.ts (20 tests) 1206ms
+{"level":30,"time":1795115891104,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795115891196,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795115891622,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bb17-7000-8bef-1b052075bad7","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":143,"msg":"request completed"}
+{"level":30,"time":1795115891743,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bbae-7000-8f38-2bb134489efe","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":113,"msg":"request completed"}
+{"level":30,"time":1795115891857,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bc22-7000-a6a3-d181ffbc352f","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":111,"msg":"request completed"}
+{"level":30,"time":1795115891871,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bc94-7000-9d2d-0ab9c7583cc6","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":401,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795115891883,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bca1-7000-b347-0af021005cee","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":403,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1795115891891,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcac-7000-b872-b86104e6ed4a","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115891893,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcb4-7000-9ae9-27e7c13ed2fb","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795115891899,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcb6-7000-a924-2b70a606b6f8","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115891907,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcbc-7000-ba98-585757f5d151","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795115891909,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcc4-7000-a7ff-4427a7c681a3","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795115891915,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcc6-7000-a7ab-40605fbe545d","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115891921,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bccc-7000-a207-0dd3e5880d2c","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115891923,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcd2-7000-b169-0531629a72df","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795115891928,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcd4-7000-99ec-777436916f93","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115891935,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcd9-7000-be9b-8070301478a9","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115891941,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bce0-7000-8c14-d8b3bbb7ee43","action":"request","method":"GET","path":"/api/v1/hr/org/placement/54ff7817-da69-4998-85fb-0b06378e513f","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115891948,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bce6-7000-8715-bf88941bb515","action":"request","method":"GET","path":"/api/v1/hr/org/placement/5ce8d060-fadf-4cd0-8a4f-f63890e496f7","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115891959,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcee-7000-87a8-bea92ddedd1d","action":"request","method":"GET","path":"/api/v1/hr/performance/reviews/for-employee/5ce8d060-fadf-4cd0-8a4f-f63890e496f7","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795115891968,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bcf8-7000-8bd3-5a3926a1473f","action":"request","method":"GET","path":"/api/v1/hr/goals/for-employee/5ce8d060-fadf-4cd0-8a4f-f63890e496f7","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795115891974,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd01-7000-a968-b826d28f7b72","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/5ce8d060-fadf-4cd0-8a4f-f63890e496f7","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115891985,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd08-7000-b329-7b1157578135","action":"request","method":"POST","path":"/api/v1/hr/recruitment/applicants/01a1f53e-b895-7000-a8b8-ba09fdf20b67/hire","status":201,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795115891993,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd13-7000-92a6-c54231f0dc73","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/5ce8d060-fadf-4cd0-8a4f-f63890e496f7","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115891998,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd1a-7000-a79d-ae1d1cd47546","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/54ff7817-da69-4998-85fb-0b06378e513f","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115892008,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd20-7000-8979-cd36b0e29e4c","action":"request","method":"POST","path":"/api/v1/hr/performance/reviews/submit","status":422,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795115892016,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd2a-7000-9e35-45e140244785","action":"request","method":"POST","path":"/api/v1/hr/performance/cycles/01a1f53e-b87e-7000-9cd7-b7ec71ed7553/close","status":409,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795115892024,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd31-7000-b92d-db986057e7ff","action":"request","method":"POST","path":"/api/v1/hr/recruitment/applicants/01a1f53e-b895-7000-a8b8-ba09fdf20b67/stage","status":422,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795115892030,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd39-7000-bb2e-03a3e3968104","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795115892035,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd3f-7000-9c93-9b92cb4ec841","action":"request","method":"POST","path":"/api/v1/hr/performance/cycles","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115892040,"service":"erp-api","module":"http","correlation_id":"01a1f53e-bd44-7000-b76e-81c5e239ce3f","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795115892048,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/hr/talent-routes.spec.ts (9 tests) 1621ms
+2026-11-19 19:18:12.307 UTC [17642] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-performance.db.spec.ts (14 tests) 488ms
+ ✓ src/__db__/hr/oa06-budgets.spec.ts (6 tests) 348ms
+ ✓ src/__db__/hr/feed.spec.ts (4 tests) 355ms
+2026-11-19 19:18:13.668 UTC [17652] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-recruitment.db.spec.ts (16 tests) 320ms
+ ✓ src/__db__/hr/self-service.spec.ts (11 tests) 273ms
+(node:17534) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ src/__db__/hr/leave-posting.spec.ts (3 tests) 185ms
+ ✓ src/__db__/hr/talent-bridges.db.spec.ts (13 tests) 149ms
+ ✓ src/__db__/hr/talent-documents-sweep.db.spec.ts (6 tests) 171ms
+ ✓ src/__db__/hr/attendance.spec.ts (5 tests) 176ms
+ ✓ src/__db__/hr/talent-training-org.db.spec.ts (10 tests) 120ms
+ ✓ src/__db__/hr/overtime.spec.ts (4 tests) 89ms
+ ✓ src/__db__/hr/attendance-import.spec.ts (5 tests) 123ms
+ ✓ src/__db__/hr/holiday.spec.ts (3 tests) 83ms
+2026-11-19 19:18:15.360 UTC [17687] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-19 19:18:15.360 UTC [17687] DETAIL:  Key (tenant_id, user_id)=(7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a, 01a1f53e-ca12-7000-b6e3-bb1bbc23d194) already exists.
+2026-11-19 19:18:15.360 UTC [17687] STATEMENT:  UPDATE employees SET user_id = $1, updated_at = now(), version = version + 1
+	          WHERE id = $2 AND tenant_id = $3
+
+ ✓ src/__db__/hr/bridge.spec.ts (3 tests) 57ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/hr/talent-explain-budgets.db.spec.ts [ src/__db__/hr/talent-explain-budgets.db.spec.ts ]
+Error: Failed query: 
+      INSERT INTO performance_reviews
+        (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind, status, overall_score)
+      SELECT gen_random_uuid(), erp.current_tenant_id(), $1,
+             k.reviewer_id, base.reviewee_id, k.kind, 'SUBMITTED', 70 + (base.g % 25)
+      FROM (
+        SELECT e.id AS reviewee_id, e.g,
+               (SELECT e2.id FROM employees e2
+                 WHERE e2.tenant_id = erp.current_tenant_id()
+                   AND e2.code = 'EMP-XB' || lpad((((e.g - 1) % 60) + 1)::text, 2, '0')) AS peer1,
+               (SELECT e3.id FROM employees e3
+                 WHERE e3.tenant_id = erp.current_tenant_id()
+                   AND e3.code = 'EMP-XB' || lpad((((e.g) % 60) + 1)::text, 2, '0')) AS peer2
+        FROM (SELECT id, row_number() OVER (ORDER BY code) AS g FROM employees
+              WHERE tenant_id = erp.current_tenant_id() AND code LIKE 'EMP-XB%') e
+      ) base
+      CROSS JOIN LATERAL (VALUES
+        (base.reviewee_id, 'MANAGER'),
+        (base.reviewee_id, 'SELF'),
+        (base.peer1, 'PEER'),
+        (base.peer2, 'PEER')
+      ) AS k(reviewer_id, kind)
+    
+params: dcfa6b3a-27e3-4e41-a257-3a50a4561f0c
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ src/__db__/hr/talent-explain-budgets.db.spec.ts:107:5
+    105|     probeCycle = cycle.rows[0]!.id;
+    106| 
+    107|     await tx.execute(sql`
+       |     ^
+    108|       INSERT INTO performance_reviews
+    109|         (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_emplo…
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/hr/talent-explain-budgets.db.spec.ts:78:3
+
+Caused by: error: new row for relation "performance_reviews" violates check constraint "ck_performance_reviews_self_kind"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ src/__db__/hr/talent-explain-budgets.db.spec.ts:107:5
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/hr/talent-explain-budgets.db.spec.ts:78:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 229, severity: 'ERROR', code: '23514', detail: undefined, hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'performance_reviews', dataType: undefined, constraint: 'ck_performance_reviews_self_kind', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__db__/hr/talent-rls.db.spec.ts [ src/__db__/hr/talent-rls.db.spec.ts ]
+Error: Failed query: 
+      INSERT INTO performance_reviews
+        (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind, status, overall_score)
+      VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, $2, $3, 'MANAGER', 'SUBMITTED', 88.00)
+      RETURNING id
+    
+params: b0e40a15-139e-4488-9c2c-7dda9982a9e4,ca24fa2c-4f09-4bc3-8f4e-64647e1d60cd,ca24fa2c-4f09-4bc3-8f4e-64647e1d60cd
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ src/__db__/hr/talent-rls.db.spec.ts:111:20
+    109|     ids.performance_cycles = cycle.rows[0]!.id;
+    110| 
+    111|     const review = await tx.execute<{ id: string }>(sql`
+       |                    ^
+    112|       INSERT INTO performance_reviews
+    113|         (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_emplo…
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/hr/talent-rls.db.spec.ts:255:33
+
+Caused by: error: new row for relation "performance_reviews" violates check constraint "ck_performance_reviews_self_kind"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ src/__db__/hr/talent-rls.db.spec.ts:111:20
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/hr/talent-rls.db.spec.ts:255:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 229, severity: 'ERROR', code: '23514', detail: undefined, hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'performance_reviews', dataType: undefined, constraint: 'ck_performance_reviews_self_kind', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 19 passed (21)
+      Tests  151 passed | 15 skipped (166)
+   Start at  19:17:42
+   Duration  32.83s (transform 5.27s, setup 0ms, collect 9.22s, tests 18.52s, environment 0ms, prepare 58ms)
+
+2026-11-19 19:18:15.381 UTC [17475] LOG:  received fast shutdown request
+2026-11-19 19:18:15.381 UTC [17475] LOG:  aborting any active transactions
+2026-11-19 19:18:15.381 UTC [17654] FATAL:  terminating connection due to administrator command
+2026-11-19 19:18:15.381 UTC [17639] FATAL:  terminating connection due to administrator command
+2026-11-19 19:18:15.381 UTC [17657] FATAL:  terminating connection due to administrator command
+2026-11-19 19:18:15.383 UTC [17631] FATAL:  terminating connection due to administrator command
+2026-11-19 19:18:15.386 UTC [17475] LOG:  background worker "logical replication launcher" (PID 17481) exited with exit code 1
+2026-11-19 19:18:15.388 UTC [17476] LOG:  shutting down
+2026-11-19 19:18:15.388 UTC [17476] LOG:  checkpoint starting: shutdown immediate
+
+(node:17534) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:17534) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-19 19:18:15.427 UTC [17476] LOG:  checkpoint complete: wrote 5776 buffers (35.3%); 0 WAL file(s) added, 0 removed, 4 recycled; write=0.031 s, sync=0.009 s, total=0.040 s; sync files=2857, longest=0.001 s, average=0.001 s; distance=70311 kB, estimate=70311 kB; lsn=0/5988880, redo lsn=0/5988880
+
+2026-11-19 19:18:15.437 UTC [17475] LOG:  database system is shut down
+
+VITEST_EXIT=1
