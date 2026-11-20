@@ -6999,6 +6999,53 @@ export interface Dictionary {
   projectsContractingSubCertColNet: string;
   projectsContractingSubCertColStatus: string;
   projectsContractingSubNoSelection: string;
+
+  // PHASE-048 (W-13 — T-16): the projects field-service dispatch board
+  // (the visits listing + the SLA clocks' evaluation panel; D-14's AR/EN
+  // pairs — the engine figures render verbatim).
+  projectsFieldserviceTitle: string;
+  projectsFieldserviceSubtitle: string;
+  projectsFieldserviceFilterStatus: string;
+  projectsFieldserviceStatusAll: string;
+  projectsFieldserviceStatusNEW: string;
+  projectsFieldserviceStatusSCHEDULED: string;
+  projectsFieldserviceStatusDISPATCHED: string;
+  projectsFieldserviceStatusINPROGRESS: string;
+  projectsFieldserviceStatusCOMPLETED: string;
+  projectsFieldserviceStatusCLOSED: string;
+  projectsFieldservicePausedBadge: string;
+  projectsFieldserviceRefresh: string;
+  projectsFieldserviceNoVisits: string;
+  projectsFieldserviceColOrder: string;
+  projectsFieldserviceColTechnician: string;
+  projectsFieldserviceColWindow: string;
+  projectsFieldserviceColStatus: string;
+  projectsFieldserviceColDispatched: string;
+  projectsFieldserviceColResponded: string;
+  projectsFieldserviceColStarted: string;
+  projectsFieldserviceColCompleted: string;
+  projectsFieldserviceColActions: string;
+  projectsFieldserviceEvaluate: string;
+  projectsFieldserviceSlaTitle: string;
+  projectsFieldserviceSlaTargets: string;
+  projectsFieldserviceSlaNoTargets: string;
+  projectsFieldserviceSlaClockResponse: string;
+  projectsFieldserviceSlaClockResolution: string;
+  projectsFieldserviceSlaRunning: string;
+  projectsFieldserviceSlaNotRunning: string;
+  projectsFieldserviceSlaElapsed: string;
+  projectsFieldserviceSlaPaused: string;
+  projectsFieldserviceSlaTarget: string;
+  projectsFieldserviceSlaBreached: string;
+  projectsFieldserviceSlaOver: string;
+  projectsFieldserviceSlaNoTarget: string;
+  projectsFieldserviceSlaEscalations: string;
+  projectsFieldserviceSlaNotified: string;
+  projectsFieldserviceSlaDedupeKey: string;
+  projectsFieldserviceSlaNoEscalations: string;
+  projectsFieldserviceRefusalTitle: string;
+  projectsFieldserviceRefusalDetails: string;
+  projectsFieldserviceHoursSuffix: string;
 }
 
 const ar: Dictionary = {
@@ -13986,6 +14033,51 @@ const ar: Dictionary = {
   projectsContractingSubCertColNet: "الصافي المستحق",
   projectsContractingSubCertColStatus: "الحالة",
   projectsContractingSubNoSelection: "اختر اتفاقية لعرض مستخلصاتها.",
+
+  // PHASE-048 (W-13 — T-16): the projects field-service dispatch board.
+  projectsFieldserviceTitle: "لوحة الخدمة الميدانية",
+  projectsFieldserviceSubtitle: "زيارات أوامر الخدمة على السبورة — الحالات والأختام والساعة الواحدة (BR-096)",
+  projectsFieldserviceFilterStatus: "تصفية الحالة",
+  projectsFieldserviceStatusAll: "كل الحالات",
+  projectsFieldserviceStatusNEW: "جديد",
+  projectsFieldserviceStatusSCHEDULED: "مجدوَل",
+  projectsFieldserviceStatusDISPATCHED: "مُرسَل",
+  projectsFieldserviceStatusINPROGRESS: "قيد التنفيذ",
+  projectsFieldserviceStatusCOMPLETED: "مكتمل",
+  projectsFieldserviceStatusCLOSED: "مغلق",
+  projectsFieldservicePausedBadge: "متوقف مؤقتًا",
+  projectsFieldserviceRefresh: "تحديث",
+  projectsFieldserviceNoVisits: "لا توجد زيارات مطابقة.",
+  projectsFieldserviceColOrder: "أمر الخدمة",
+  projectsFieldserviceColTechnician: "الفني",
+  projectsFieldserviceColWindow: "النافذة المجدولة",
+  projectsFieldserviceColStatus: "الحالة",
+  projectsFieldserviceColDispatched: "الإرسال",
+  projectsFieldserviceColResponded: "الاستجابة",
+  projectsFieldserviceColStarted: "البدء",
+  projectsFieldserviceColCompleted: "الإكمال",
+  projectsFieldserviceColActions: "إجراءات",
+  projectsFieldserviceEvaluate: "تقييم SLA",
+  projectsFieldserviceSlaTitle: "قراءة الساعة الواحدة",
+  projectsFieldserviceSlaTargets: "الأهداف المسجلة (ساعات)",
+  projectsFieldserviceSlaNoTargets: "لا يوجد سجل أهداف SLA لهذا المستأجر — الغياب الصادق (NO_TARGET).",
+  projectsFieldserviceSlaClockResponse: "ساعة الاستجابة",
+  projectsFieldserviceSlaClockResolution: "ساعة الإنجاز",
+  projectsFieldserviceSlaRunning: "تعمل",
+  projectsFieldserviceSlaNotRunning: "لم تبدأ",
+  projectsFieldserviceSlaElapsed: "الزمن المنقضي (ساعات)",
+  projectsFieldserviceSlaPaused: "زمن التوقف المطروح (ساعات)",
+  projectsFieldserviceSlaTarget: "الهدف (ساعات)",
+  projectsFieldserviceSlaBreached: "تجاوز",
+  projectsFieldserviceSlaOver: "قيمة التجاوز (ساعات)",
+  projectsFieldserviceSlaNoTarget: "لا هدف",
+  projectsFieldserviceSlaEscalations: "التصعيدات (BR-096)",
+  projectsFieldserviceSlaNotified: "أُبلغ",
+  projectsFieldserviceSlaDedupeKey: "مفتاح عدم التكرار",
+  projectsFieldserviceSlaNoEscalations: "لا تصعيدات.",
+  projectsFieldserviceRefusalTitle: "رفض مُنمّط من المحرك",
+  projectsFieldserviceRefusalDetails: "الحمولة الكاملة:",
+  projectsFieldserviceHoursSuffix: "ساعة",
 };
 
 const en: Dictionary = {
@@ -20987,6 +21079,51 @@ const en: Dictionary = {
   projectsContractingSubCertColNet: "Net payable",
   projectsContractingSubCertColStatus: "Status",
   projectsContractingSubNoSelection: "Select an agreement to load its certificates.",
+
+  // PHASE-048 (W-13 — T-16): the projects field-service dispatch board.
+  projectsFieldserviceTitle: "Field service dispatch board",
+  projectsFieldserviceSubtitle: "The service orders' visits on one board — states, stamps and the single clock (BR-096)",
+  projectsFieldserviceFilterStatus: "Filter by status",
+  projectsFieldserviceStatusAll: "All statuses",
+  projectsFieldserviceStatusNEW: "New",
+  projectsFieldserviceStatusSCHEDULED: "Scheduled",
+  projectsFieldserviceStatusDISPATCHED: "Dispatched",
+  projectsFieldserviceStatusINPROGRESS: "In progress",
+  projectsFieldserviceStatusCOMPLETED: "Completed",
+  projectsFieldserviceStatusCLOSED: "Closed",
+  projectsFieldservicePausedBadge: "Paused",
+  projectsFieldserviceRefresh: "Refresh",
+  projectsFieldserviceNoVisits: "No matching visits.",
+  projectsFieldserviceColOrder: "Service order",
+  projectsFieldserviceColTechnician: "Technician",
+  projectsFieldserviceColWindow: "Scheduled window",
+  projectsFieldserviceColStatus: "Status",
+  projectsFieldserviceColDispatched: "Dispatched",
+  projectsFieldserviceColResponded: "Responded",
+  projectsFieldserviceColStarted: "Started",
+  projectsFieldserviceColCompleted: "Completed",
+  projectsFieldserviceColActions: "Actions",
+  projectsFieldserviceEvaluate: "Evaluate SLA",
+  projectsFieldserviceSlaTitle: "The single clock's reading",
+  projectsFieldserviceSlaTargets: "Registered targets (hours)",
+  projectsFieldserviceSlaNoTargets: "No SLA-target register for this tenant — the honest NO_TARGET absence.",
+  projectsFieldserviceSlaClockResponse: "Response clock",
+  projectsFieldserviceSlaClockResolution: "Resolution clock",
+  projectsFieldserviceSlaRunning: "Running",
+  projectsFieldserviceSlaNotRunning: "Not started",
+  projectsFieldserviceSlaElapsed: "Elapsed (hours)",
+  projectsFieldserviceSlaPaused: "Paused time subtracted (hours)",
+  projectsFieldserviceSlaTarget: "Target (hours)",
+  projectsFieldserviceSlaBreached: "Breached",
+  projectsFieldserviceSlaOver: "Over by (hours)",
+  projectsFieldserviceSlaNoTarget: "No target",
+  projectsFieldserviceSlaEscalations: "Escalations (BR-096)",
+  projectsFieldserviceSlaNotified: "Notified",
+  projectsFieldserviceSlaDedupeKey: "Dedupe key",
+  projectsFieldserviceSlaNoEscalations: "No escalations.",
+  projectsFieldserviceRefusalTitle: "Typed refusal from the engine",
+  projectsFieldserviceRefusalDetails: "Full payload:",
+  projectsFieldserviceHoursSuffix: "hours",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

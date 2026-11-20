@@ -63,6 +63,13 @@ export interface ServiceVisitRow {
   note: string | null;
   noteAr: string | null;
   version: number;
+  /** PHASE-048 (W-13 — T-16): the board listing's presentation join —
+   * the parent service order's own number + the technician's own names
+   * (read-side enrichment, additive; the single-row reads keep the
+   * bare shape). */
+  orderNo?: string;
+  technicianName?: string | null;
+  technicianNameAr?: string | null;
 }
 
 export interface TechnicianRow {
@@ -74,20 +81,23 @@ export interface TechnicianRow {
   terminationDate: string | null;
 }
 
-const VISIT_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
-  created_by AS "createdBy", updated_by AS "updatedBy", service_order_id AS "serviceOrderId",
-  technician_employee_id AS "technicianEmployeeId", scheduled_start::text AS "scheduledStart",
-  scheduled_end::text AS "scheduledEnd", status, dispatched_at::text AS "dispatchedAt",
-  first_responded_at::text AS "firstRespondedAt", started_at::text AS "startedAt",
-  completed_at::text AS "completedAt", closed_at::text AS "closedAt", is_paused AS "isPaused",
-  completion_notes AS "completionNotes", completion_notes_ar AS "completionNotesAr",
-  note, note_ar AS "noteAr", version`;
+// All columns qualified `sv.` — the W-13 listing's presentation joins
+// (service_orders + employees) share these names; every VISIT_COLUMNS
+// query aliases service_visits AS sv.
+const VISIT_COLUMNS = sql`sv.id, sv.created_at::text AS "createdAt", sv.updated_at::text AS "updatedAt",
+  sv.created_by AS "createdBy", sv.updated_by AS "updatedBy", sv.service_order_id AS "serviceOrderId",
+  sv.technician_employee_id AS "technicianEmployeeId", sv.scheduled_start::text AS "scheduledStart",
+  sv.scheduled_end::text AS "scheduledEnd", sv.status, sv.dispatched_at::text AS "dispatchedAt",
+  sv.first_responded_at::text AS "firstRespondedAt", sv.started_at::text AS "startedAt",
+  sv.completed_at::text AS "completedAt", sv.closed_at::text AS "closedAt", sv.is_paused AS "isPaused",
+  sv.completion_notes AS "completionNotes", sv.completion_notes_ar AS "completionNotesAr",
+  sv.note, sv.note_ar AS "noteAr", sv.version`;
 
 // ── the reads ──────────────────────────────────────────────────────────────
 
 export async function findServiceVisitById(id: string): Promise<ServiceVisitRow | undefined> {
   const rows = await tenantTx().execute(sql`
-    SELECT ${VISIT_COLUMNS} FROM service_visits WHERE id = ${id} LIMIT 1
+    SELECT ${VISIT_COLUMNS} FROM service_visits sv WHERE sv.id = ${id} LIMIT 1
   `);
   return (rows.rows as unknown as ServiceVisitRow[])[0];
 }
@@ -98,12 +108,21 @@ export async function listServiceVisits(filter: {
   status?: string;
   limit: number;
 }): Promise<ServiceVisitRow[]> {
+  // PHASE-048 (W-13 — T-16): the presentation join lands HERE — the
+  // board listing carries the parent order's own number + the
+  // technician's own names (LEFT JOINs: an orderless/technicianless
+  // row is structurally impossible for visits, but the join stays
+  // honest anyway). The engine's own figures never change.
   const rows = await tenantTx().execute(sql`
-    SELECT ${VISIT_COLUMNS} FROM service_visits
-    WHERE (${filter.serviceOrderId ?? null}::uuid IS NULL OR service_order_id = ${filter.serviceOrderId ?? null})
-      AND (${filter.technicianEmployeeId ?? null}::uuid IS NULL OR technician_employee_id = ${filter.technicianEmployeeId ?? null})
-      AND (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
-    ORDER BY scheduled_start ASC, id ASC
+    SELECT ${VISIT_COLUMNS}, so.order_no AS "orderNo",
+      emp.name AS "technicianName", emp.name_ar AS "technicianNameAr"
+    FROM service_visits sv
+    LEFT JOIN service_orders so ON so.id = sv.service_order_id
+    LEFT JOIN employees emp ON emp.id = sv.technician_employee_id
+    WHERE (${filter.serviceOrderId ?? null}::uuid IS NULL OR sv.service_order_id = ${filter.serviceOrderId ?? null})
+      AND (${filter.technicianEmployeeId ?? null}::uuid IS NULL OR sv.technician_employee_id = ${filter.technicianEmployeeId ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR sv.status = ${filter.status ?? null})
+    ORDER BY sv.scheduled_start ASC, sv.id ASC
     LIMIT ${filter.limit}
   `);
   return rows.rows as unknown as ServiceVisitRow[];

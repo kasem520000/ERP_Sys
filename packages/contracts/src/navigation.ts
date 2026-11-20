@@ -874,6 +874,24 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 91,
   },
+  // PHASE-048 (W-13 — T-16): the field-service dispatch board — the
+  // service orders' visits on one board (the status machine's own
+  // stamps + the pause flag + THE SINGLE CLOCK's evaluation, BR-096).
+  // Feature key the exact D-16 composable unit `projects.fieldservice`;
+  // permission the W-8 seeded viewer key the fieldservice routes enforce
+  // (matrix §3.26).
+  {
+    id: "projects.fieldservice",
+    parentGroup: "accounting",
+    label: { ar: "لوحة الخدمة الميدانية", en: "Field service board" },
+    icon: "calendar-clock",
+    route: "/projects/fieldservice",
+    featureKey: "projects.fieldservice",
+    permission: "projects.fieldservice.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 92,
+  },
   // purchasing group — PHASE-011 (T13-UI): the procure-to-pay chain.
   // Feature keys are the exact FEATURE_CATALOG §9 strings; permissions the
   // exact seeded matrix keys the purchasing controller enforces (matrix

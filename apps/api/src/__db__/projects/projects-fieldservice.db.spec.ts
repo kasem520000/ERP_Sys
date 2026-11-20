@@ -745,6 +745,30 @@ describe("W-12 fieldservice — the typed refusals (the CAS ladder's walls)", ()
     // The pure-read law: no escalation ever fires on the listing.
     expect(await notificationCount()).toBe(before);
   });
+
+  // PHASE-048 (W-13 — T-16): the board listing's PRESENTATION JOIN — the
+  // parent service order's own number + the technician's own names ride
+  // the listing rows (read-side enrichment, additive; the engine's own
+  // figures never change — the dashboard renders handles, not bare uuids).
+  it("(i) the board listing carries the order's own number + the technician's own names (the W-13 presentation join)", async () => {
+    const { visitId, orderId } = await createVisit({ technician: technicianId });
+    const orderNo = await withTenant(TENANT_PJW, async () => {
+      const crmStore = await import("../../modules/crm/infrastructure/crm.store");
+      const order = await crmStore.findServiceOrderById(orderId);
+      return order?.orderNo;
+    });
+    expect(orderNo).toBeDefined();
+    const rows = await withTenant(TENANT_PJW, () =>
+      fieldservice.board({ serviceOrderId: orderId, limit: 10 }),
+    );
+    const row = rows.find((candidate) => candidate.id === visitId);
+    expect(row).toBeDefined();
+    // The parent order's own number (the dashboard's human handle).
+    expect(row!.orderNo).toBe(orderNo);
+    // The technician's own names (the PJW fixture's employee row).
+    expect(row!.technicianName).toBe("Lina Al-Muhandisa");
+    expect(row!.technicianNameAr).toBe("لينا المهندسة");
+  });
 });
 
 // -- 3. the single clock (the SLA test matrix — BR-096) --------------------------

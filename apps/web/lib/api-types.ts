@@ -4601,6 +4601,71 @@ export interface SubcontractCertificateRow {
   updatedAt: string;
 }
 
+/**
+ * PHASE-048 (W-13 — T-16): the field-service board's visit row EXACTLY
+ * as the W-12 engine's listing emits it (GET /projects/fieldservice/visits)
+ * — the machine's own stamps + the pause flag, with the W-13 listing's
+ * presentation join (the parent order's own number + the technician's
+ * own names — read-side enrichment, additive). The dashboard renders
+ * these verbatim (zero parallel computation).
+ */
+export interface ServiceVisitRow {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string | null;
+  updatedBy: string | null;
+  serviceOrderId: string;
+  technicianEmployeeId: string | null;
+  scheduledStart: string;
+  scheduledEnd: string;
+  status: "NEW" | "SCHEDULED" | "DISPATCHED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED" | string;
+  dispatchedAt: string | null;
+  firstRespondedAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  closedAt: string | null;
+  isPaused: boolean;
+  completionNotes: string | null;
+  completionNotesAr: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  /** The parent service order's own number (the W-13 presentation join). */
+  orderNo?: string;
+  technicianName?: string | null;
+  technicianNameAr?: string | null;
+}
+
+/** One clock's pause-aware reading (the pure fold's own output — the
+ * engine's figures, rendered verbatim; ms integers). */
+export interface SlaClockReading {
+  kind: "RESPONSE" | "RESOLUTION";
+  running: boolean;
+  startedAt: number | null;
+  endedAt: number | null;
+  pausedMs: number;
+  elapsedMs: number;
+  targetMs: number | null;
+  breached: boolean;
+  overMs: number;
+}
+
+/** GET /projects/fieldservice/visits/:id/sla — THE SINGLE CLOCK's
+ * evaluation (both clocks from the ONE fold + BR-096's escalations). */
+export interface SlaEvaluation {
+  visitId: string;
+  targets: { responseHours: number; resolutionHours: number } | null;
+  response: SlaClockReading;
+  resolution: SlaClockReading;
+  escalations: readonly {
+    clock: "RESPONSE" | "RESOLUTION";
+    overMs: number;
+    dedupeKey: string;
+    notified: boolean;
+  }[];
+}
+
 /** GET /crm/billing-runs rows (the crm.billing_run audit events, newest first). */
 export interface BillingRunSummaryRow {
   id: string;
