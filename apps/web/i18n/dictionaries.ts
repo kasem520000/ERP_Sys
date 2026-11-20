@@ -6919,6 +6919,86 @@ export interface Dictionary {
   projectsBoardRefusalDetails: string;
   projectsBoardLoadFailed: string;
   projectsBoardRetry: string;
+
+  // PHASE-048 (W-13 — T-15): the projects contracting screen (the
+  // certificates + retention + change orders + subcontracts tabs; D-14's
+  // AR/EN pairs — the engine figures render verbatim).
+  projectsContractingTitle: string;
+  projectsContractingSubtitle: string;
+  projectsContractingProjectLabel: string;
+  projectsContractingNoProjects: string;
+  projectsContractingTabCertificates: string;
+  projectsContractingTabRetention: string;
+  projectsContractingTabChangeOrders: string;
+  projectsContractingTabSubcontracts: string;
+  projectsContractingRefusalTitle: string;
+  projectsContractingRefusalDetails: string;
+  projectsContractingLoadFailed: string;
+  projectsContractingRetry: string;
+  projectsContractingNoData: string;
+  projectsContractingCeilingTitle: string;
+  projectsContractingCeilingApproved: string;
+  projectsContractingCeilingCumulative: string;
+  projectsContractingCeilingEffective: string;
+  projectsContractingCeilingRemaining: string;
+  projectsContractingCeilingNoRegister: string;
+  projectsContractingCertColNo: string;
+  projectsContractingCertColDate: string;
+  projectsContractingCertColKind: string;
+  projectsContractingCertColCumulative: string;
+  projectsContractingCertColGross: string;
+  projectsContractingCertColRetention: string;
+  projectsContractingCertColNet: string;
+  projectsContractingCertColCurrency: string;
+  projectsContractingCertColStatus: string;
+  projectsContractingCertColApprovedAt: string;
+  projectsContractingKindProgress: string;
+  projectsContractingKindAdvance: string;
+  projectsContractingKindFinal: string;
+  projectsContractingRetColKind: string;
+  projectsContractingRetKindCustomer: string;
+  projectsContractingRetKindSubcontractor: string;
+  projectsContractingRetColContractValue: string;
+  projectsContractingRetColHoldPercent: string;
+  projectsContractingRetColAccrued: string;
+  projectsContractingRetColReleased: string;
+  projectsContractingRetColTakingOver: string;
+  projectsContractingRetColDefectLiability: string;
+  projectsContractingRetColStatus: string;
+  projectsContractingCoCeilingTitle: string;
+  projectsContractingCoColNo: string;
+  projectsContractingCoColTitle: string;
+  projectsContractingCoColPriceDelta: string;
+  projectsContractingCoColScheduleDelta: string;
+  projectsContractingCoColStatus: string;
+  projectsContractingCoColSubmittedAt: string;
+  projectsContractingCoColApprovedAt: string;
+  projectsContractingCoContractBase: string;
+  projectsContractingCoApprovedCount: string;
+  projectsContractingCoPriceDeltaSum: string;
+  projectsContractingCoEffectiveValue: string;
+  projectsContractingCoBudgetCeiling: string;
+  projectsContractingCoScheduleSum: string;
+  projectsContractingCoNoBase: string;
+  projectsContractingCoNoAccess: string;
+  projectsContractingSubColNo: string;
+  projectsContractingSubColTitle: string;
+  projectsContractingSubColPartner: string;
+  projectsContractingSubColValue: string;
+  projectsContractingSubColRetention: string;
+  projectsContractingSubColCurrency: string;
+  projectsContractingSubColStatus: string;
+  projectsContractingSubColStart: string;
+  projectsContractingSubColEnd: string;
+  projectsContractingSubCertificates: string;
+  projectsContractingSubCertColNo: string;
+  projectsContractingSubCertColDate: string;
+  projectsContractingSubCertColPercent: string;
+  projectsContractingSubCertColGross: string;
+  projectsContractingSubCertColWithheld: string;
+  projectsContractingSubCertColNet: string;
+  projectsContractingSubCertColStatus: string;
+  projectsContractingSubNoSelection: string;
 }
 
 const ar: Dictionary = {
@@ -13828,6 +13908,84 @@ const ar: Dictionary = {
   projectsBoardRefusalDetails: "الحمولة الكاملة:",
   projectsBoardLoadFailed: "تعذر تحميل بيانات اللوحة.",
   projectsBoardRetry: "إعادة المحاولة",
+
+  // PHASE-048 (W-13 — T-15): the projects contracting screen.
+  projectsContractingTitle: "تعاقدات المشاريع",
+  projectsContractingSubtitle: "المستخلصات والمحتجيات وأوامر التغيير ومقاولو الباطن — أرقام المحركات كما هي",
+  projectsContractingProjectLabel: "المشروع",
+  projectsContractingNoProjects: "لا توجد مشاريع متاحة لجلستك.",
+  projectsContractingTabCertificates: "المستخلصات",
+  projectsContractingTabRetention: "المحتجيات",
+  projectsContractingTabChangeOrders: "أوامر التغيير",
+  projectsContractingTabSubcontracts: "مقاولو الباطن",
+  projectsContractingRefusalTitle: "رفض مُنمّط من المحرك",
+  projectsContractingRefusalDetails: "الحمولة الكاملة:",
+  projectsContractingLoadFailed: "تعذر تحميل بيانات التعاقدات.",
+  projectsContractingRetry: "إعادة المحاولة",
+  projectsContractingNoData: "لا توجد بيانات.",
+  projectsContractingCeilingTitle: "حالة الفوترة التراكمية (سقف BR-093)",
+  projectsContractingCeilingApproved: "المستخلصات المعتمدة",
+  projectsContractingCeilingCumulative: "إجمالي الفوترة التراكمية",
+  projectsContractingCeilingEffective: "قيمة العقد الفعّالة (شاملة أوامر التغيير المعتمدة)",
+  projectsContractingCeilingRemaining: "المتبقي تحت السقف",
+  projectsContractingCeilingNoRegister: "لا يوجد سجل محتجيات عميل لهذا المشروع — السقف غير محدد بعد.",
+  projectsContractingCertColNo: "رقم المستخلص",
+  projectsContractingCertColDate: "التاريخ",
+  projectsContractingCertColKind: "النوع",
+  projectsContractingCertColCumulative: "النسبة التراكمية",
+  projectsContractingCertColGross: "القيمة الإجمالية",
+  projectsContractingCertColRetention: "المحتجيات",
+  projectsContractingCertColNet: "الصافي",
+  projectsContractingCertColCurrency: "العملة",
+  projectsContractingCertColStatus: "الحالة",
+  projectsContractingCertColApprovedAt: "تاريخ الاعتماد",
+  projectsContractingKindProgress: "مستخلص جاري",
+  projectsContractingKindAdvance: "دفعات مقدمة",
+  projectsContractingKindFinal: "مستخلص نهائي",
+  projectsContractingRetColKind: "النوع",
+  projectsContractingRetKindCustomer: "عميل (سجل العقد)",
+  projectsContractingRetKindSubcontractor: "مقاول باطن",
+  projectsContractingRetColContractValue: "قيمة العقد",
+  projectsContractingRetColHoldPercent: "نسبة الحجز",
+  projectsContractingRetColAccrued: "الرصيد المتراكم",
+  projectsContractingRetColReleased: "المُفرَج عنه",
+  projectsContractingRetColTakingOver: "الاستلام الابتدائي",
+  projectsContractingRetColDefectLiability: "فترة الضمان",
+  projectsContractingRetColStatus: "الحالة",
+  projectsContractingCoCeilingTitle: "السقوف المعاد توصيفها",
+  projectsContractingCoColNo: "رقم أمر التغيير",
+  projectsContractingCoColTitle: "العنوان",
+  projectsContractingCoColPriceDelta: "فرق السعر",
+  projectsContractingCoColScheduleDelta: "فرق الجدول (أيام)",
+  projectsContractingCoColStatus: "الحالة",
+  projectsContractingCoColSubmittedAt: "تاريخ التقديم",
+  projectsContractingCoColApprovedAt: "تاريخ الاعتماد",
+  projectsContractingCoContractBase: "أساس العقد (السجل)",
+  projectsContractingCoApprovedCount: "أوامر التغيير المعتمدة",
+  projectsContractingCoPriceDeltaSum: "مجموع فروق الأسعار (المعتمدة فقط)",
+  projectsContractingCoEffectiveValue: "القيمة الفعّالة للعقد",
+  projectsContractingCoBudgetCeiling: "سقف الموازنة (BAC)",
+  projectsContractingCoScheduleSum: "مجموع فروق الجدول (أيام)",
+  projectsContractingCoNoBase: "لا يوجد سجل عقد — الأساس غير محدد بعد.",
+  projectsContractingCoNoAccess: "تبويب أوامر التغيير يتطلب مفتاح projects.change_order.view — لا يُعرض هنا لجلستك.",
+  projectsContractingSubColNo: "رقم الاتفاقية",
+  projectsContractingSubColTitle: "العنوان",
+  projectsContractingSubColPartner: "الشريك",
+  projectsContractingSubColValue: "قيمة الاتفاقية",
+  projectsContractingSubColRetention: "نسبة المحتجيات",
+  projectsContractingSubColCurrency: "العملة",
+  projectsContractingSubColStatus: "الحالة",
+  projectsContractingSubColStart: "البدء",
+  projectsContractingSubColEnd: "الانتهاء",
+  projectsContractingSubCertificates: "مستخلصات الاتفاقية",
+  projectsContractingSubCertColNo: "رقم المستخلص",
+  projectsContractingSubCertColDate: "التاريخ",
+  projectsContractingSubCertColPercent: "نسبة الإنجاز",
+  projectsContractingSubCertColGross: "القيمة الإجمالية",
+  projectsContractingSubCertColWithheld: "المحتجيات المستحجزة",
+  projectsContractingSubCertColNet: "الصافي المستحق",
+  projectsContractingSubCertColStatus: "الحالة",
+  projectsContractingSubNoSelection: "اختر اتفاقية لعرض مستخلصاتها.",
 };
 
 const en: Dictionary = {
@@ -20751,6 +20909,84 @@ const en: Dictionary = {
   projectsBoardRefusalDetails: "Full payload:",
   projectsBoardLoadFailed: "The board data failed to load.",
   projectsBoardRetry: "Retry",
+
+  // PHASE-048 (W-13 — T-15): the projects contracting screen.
+  projectsContractingTitle: "Projects contracting",
+  projectsContractingSubtitle: "Certificates, retention, change orders and subcontracts — the engines' own figures",
+  projectsContractingProjectLabel: "Project",
+  projectsContractingNoProjects: "No projects available for your session.",
+  projectsContractingTabCertificates: "Certificates",
+  projectsContractingTabRetention: "Retention",
+  projectsContractingTabChangeOrders: "Change orders",
+  projectsContractingTabSubcontracts: "Subcontracts",
+  projectsContractingRefusalTitle: "Typed refusal from the engine",
+  projectsContractingRefusalDetails: "Full payload:",
+  projectsContractingLoadFailed: "The contracting data failed to load.",
+  projectsContractingRetry: "Retry",
+  projectsContractingNoData: "No data.",
+  projectsContractingCeilingTitle: "Cumulative billing state (the BR-093 ceiling)",
+  projectsContractingCeilingApproved: "Approved certificates",
+  projectsContractingCeilingCumulative: "Cumulative gross billing",
+  projectsContractingCeilingEffective: "Effective contract value (incl. approved change orders)",
+  projectsContractingCeilingRemaining: "Remaining under the ceiling",
+  projectsContractingCeilingNoRegister: "No customer retention register for this project — the ceiling is not set yet.",
+  projectsContractingCertColNo: "Certificate no.",
+  projectsContractingCertColDate: "Date",
+  projectsContractingCertColKind: "Kind",
+  projectsContractingCertColCumulative: "Cumulative %",
+  projectsContractingCertColGross: "Gross value",
+  projectsContractingCertColRetention: "Retention",
+  projectsContractingCertColNet: "Net",
+  projectsContractingCertColCurrency: "Currency",
+  projectsContractingCertColStatus: "Status",
+  projectsContractingCertColApprovedAt: "Approved at",
+  projectsContractingKindProgress: "Progress",
+  projectsContractingKindAdvance: "Advance",
+  projectsContractingKindFinal: "Final",
+  projectsContractingRetColKind: "Kind",
+  projectsContractingRetKindCustomer: "Customer (contract register)",
+  projectsContractingRetKindSubcontractor: "Subcontractor",
+  projectsContractingRetColContractValue: "Contract value",
+  projectsContractingRetColHoldPercent: "Hold %",
+  projectsContractingRetColAccrued: "Accrued balance",
+  projectsContractingRetColReleased: "Released",
+  projectsContractingRetColTakingOver: "Taking-over",
+  projectsContractingRetColDefectLiability: "Defect liability",
+  projectsContractingRetColStatus: "Status",
+  projectsContractingCoCeilingTitle: "Re-baselined ceilings",
+  projectsContractingCoColNo: "CO no.",
+  projectsContractingCoColTitle: "Title",
+  projectsContractingCoColPriceDelta: "Price delta",
+  projectsContractingCoColScheduleDelta: "Schedule delta (days)",
+  projectsContractingCoColStatus: "Status",
+  projectsContractingCoColSubmittedAt: "Submitted at",
+  projectsContractingCoColApprovedAt: "Approved at",
+  projectsContractingCoContractBase: "Contract base (the register)",
+  projectsContractingCoApprovedCount: "Approved change orders",
+  projectsContractingCoPriceDeltaSum: "Price-delta sum (approved only)",
+  projectsContractingCoEffectiveValue: "Effective contract value",
+  projectsContractingCoBudgetCeiling: "Budget ceiling (BAC)",
+  projectsContractingCoScheduleSum: "Schedule-delta sum (days)",
+  projectsContractingCoNoBase: "No contract register — the base is not set yet.",
+  projectsContractingCoNoAccess: "The change-orders tab requires the projects.change_order.view key — nothing is shown here for your session.",
+  projectsContractingSubColNo: "Agreement no.",
+  projectsContractingSubColTitle: "Title",
+  projectsContractingSubColPartner: "Partner",
+  projectsContractingSubColValue: "Agreement value",
+  projectsContractingSubColRetention: "Retention %",
+  projectsContractingSubColCurrency: "Currency",
+  projectsContractingSubColStatus: "Status",
+  projectsContractingSubColStart: "Start",
+  projectsContractingSubColEnd: "End",
+  projectsContractingSubCertificates: "Agreement certificates",
+  projectsContractingSubCertColNo: "Certificate no.",
+  projectsContractingSubCertColDate: "Date",
+  projectsContractingSubCertColPercent: "Progress %",
+  projectsContractingSubCertColGross: "Gross",
+  projectsContractingSubCertColWithheld: "Retention withheld",
+  projectsContractingSubCertColNet: "Net payable",
+  projectsContractingSubCertColStatus: "Status",
+  projectsContractingSubNoSelection: "Select an agreement to load its certificates.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

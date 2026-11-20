@@ -200,6 +200,10 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   // fallback covers nav-fetch failure (the support-sessions rule —
   // crumbs only; the sidebar stays registry-driven).
   "projects": { group: "navAccounting", label: "projectsBoardTitle" },
+  // -- PHASE-048 (W-13 — T-15): the projects contracting screen. The
+  // registry row `projects.contracting` drives the sidebar; this fallback
+  // covers nav-fetch failure (the same rule — crumbs only).
+  "projects/contracting": { group: "navAccounting", label: "projectsContractingTitle" },
   // -- PHASE-026 (T13-UI): fixed assets & depreciation. The registry row
   // `accounting.fixed-assets` (contracts NAV_ITEMS) drives the sidebar; this
   // fallback covers nav-fetch failure for the module's sub-surfaces (the

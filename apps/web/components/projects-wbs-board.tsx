@@ -52,6 +52,7 @@ import { Card } from "./card";
 import { DefList } from "./def-list";
 import { ErrorNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
+import { TypedRefusalPanel } from "./typed-refusal-panel";
 
 /** A canonical decimal/ISO cell (display: the exact server string, LTR). */
 function monoCell(value: string, title?: string): JSX.Element {
@@ -66,68 +67,6 @@ function monoCell(value: string, title?: string): JSX.Element {
  * the title attribute (the engine-precision law). */
 function moneyCell(value: string, currency = "SAR"): JSX.Element {
   return monoCell(renderMoneyCell(formatMoneyDisplay(value, 2), currency), value);
-}
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
-
-/** THE TYPED-REFUSAL PANEL (the owner's clause 2): the code + the
- * message + the FULL details payload rendered as rows — never a generic
- * error. The payload carries the engine's own figures (the cycle path,
- * the ceiling's numbers, the reconciliation's legs). */
-export function TypedRefusalPanel({
-  error,
-  title,
-  detailsLabel,
-}: {
-  error: ApiErrorBody;
-  title: string;
-  detailsLabel: string;
-}): JSX.Element {
-  const rows: { key: string; value: string }[] = [];
-  if (isRecord(error.details)) {
-    for (const [key, value] of Object.entries(error.details)) {
-      rows.push({
-        key,
-        value:
-          typeof value === "string"
-            ? value
-            : typeof value === "number" || typeof value === "boolean"
-              ? String(value)
-              : JSON.stringify(value),
-      });
-    }
-  }
-  return (
-    <div
-      role="alert"
-      className="rounded-md border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text"
-      data-testid="typed-refusal"
-    >
-      <p className="font-semibold">{title}</p>
-      <p className="mt-1 font-mono text-xs" dir="ltr">
-        {error.code}
-      </p>
-      <p className="mt-2">{error.message}</p>
-      {rows.length > 0 ? (
-        <div className="mt-3">
-          <p className="text-xs">{detailsLabel}</p>
-          <dl className="mt-1 flex flex-col gap-1">
-            {rows.map((row) => (
-              <div key={row.key} className="flex flex-col gap-0.5 sm:flex-row sm:gap-3">
-                <dt className="font-mono text-xs sm:w-44 sm:shrink-0" dir="ltr">
-                  {row.key}
-                </dt>
-                <dd className="min-w-0 font-mono text-xs" dir="ltr">
-                  {row.value}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      ) : null}
-    </div>
-  );
 }
 
 interface BoardState {

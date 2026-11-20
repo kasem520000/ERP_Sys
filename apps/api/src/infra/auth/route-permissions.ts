@@ -5065,6 +5065,20 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "projects.wbs.view",
   },
 
+  // PHASE-048 (W-13 — T-15, dated 2026-11-21; matrix §3.26): the
+  // contracting screen's project pool — the SAME one-store read the WBS
+  // board's pool rides, bound on the CONTRACTING plane's own viewer key
+  // (the W-12 step-2 precedent, mirrored: the /projects/contracting screen
+  // renders for contracting-only sessions; the accounting module's project
+  // list keeps its own key) — the W-8 keys' fifth binding wave
+  // (1051 + 1 = 1052). The entitlement plane rides the
+  // projects.contracting feature flag (D-16).
+  {
+    method: "GET",
+    path: "/api/v1/projects/contracting/pool",
+    permission: "projects.contracting.view",
+  },
+
   // PHASE-048 (W-12 — T-13, dated 2026-11-20; matrix §3.26): the field
   // service — the W-8 keys' fourth binding wave (1038 + 12 = 1050). The
   // dispatch board on the EXISTING service_orders (never a new order

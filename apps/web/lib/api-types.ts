@@ -4444,6 +4444,163 @@ export interface EvmSnapshot {
   disclosures: string[];
 }
 
+/**
+ * PHASE-048 (W-13 — T-15): the contracting plane's rows EXACTLY as the
+ * engines emit them (the W-11 engines' own reads — the screen renders
+ * the figures verbatim: zero parallel computation, display rounding
+ * only). The pool row is the same one-store read the WBS board rides,
+ * on the contracting plane's own viewer key.
+ */
+export interface ProgressCertificateRow {
+  id: string;
+  projectId: string;
+  certificateNo: string | null;
+  certificateDate: string;
+  kind: "PROGRESS" | "ADVANCE" | "FINAL" | string;
+  cumulativePercent: string;
+  grossValue: string;
+  retentionAmount: string;
+  netValue: string;
+  currencyCode: string;
+  status: string;
+  submittedAt: string | null;
+  approvedAt: string | null;
+  voidedAt: string | null;
+  voidReason: string | null;
+  salesInvoiceId: string | null;
+  advanceAppliedAmount: string;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /projects/:id/billing — the ceiling's own read (BR-093's figures,
+ * surfaced by the billing engine itself — never recomputed client-side). */
+export interface ContractingBillingState {
+  register: RetentionAccountRow | null;
+  approvedCertificates: number;
+  cumulativeGross: string;
+  effectiveContractValue: string | null;
+  remaining: string | null;
+}
+
+/** GET /projects/:id/retention rows (the ledger: the CUSTOMER register +
+ * every sub row — the W-11 retention engine's own shapes). */
+export interface RetentionAccountRow {
+  id: string;
+  projectId: string;
+  kind: "CUSTOMER" | "SUBCONTRACTOR" | string;
+  subcontractorAgreementId: string | null;
+  customerId: string | null;
+  contractValue: string | null;
+  currencyCode: string | null;
+  holdPercent: string | null;
+  accruedBalance: string;
+  releasedAmount: string;
+  takingOverDate: string | null;
+  defectLiabilityDate: string | null;
+  status: string;
+  releasedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /projects/:id/change-orders rows (the W-10 engine's own shape). */
+export interface ChangeOrderRow {
+  id: string;
+  projectId: string;
+  coNo: string | null;
+  title: string;
+  titleAr: string | null;
+  scopeDelta: string | null;
+  scopeDeltaAr: string | null;
+  /** SIGNED numeric(19,4) as a decimal string (a credit-side CO is legal). */
+  priceDelta: string;
+  scheduleDeltaDays: number | null;
+  status: string;
+  submittedAt: string | null;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+  rejectionReason: string | null;
+  effectAppliedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /projects/:id/change-orders/ceiling — the re-baselined ceilings
+ * (the change-order engine's own read: the register base + the APPROVED
+ * deltas only — BR-094's inert-until-approved law in figure form). */
+export interface ChangeOrderCeiling {
+  projectId: string;
+  contractBase: {
+    contractValue: string;
+    currencyCode: string;
+    holdPercent: string;
+  } | null;
+  approvedChangeOrders: number;
+  priceDeltaSum: string;
+  effectiveContractValue: string | null;
+  /** Σ the APPROVED schedule deltas (days) — the recorded schedule effect. */
+  scheduleDeltaDaysSum: number;
+  /** The approved budget's total planned (null while none stands). */
+  approvedBudgetTotal: string | null;
+  /** BAC — the re-baselined budget ceiling: approved total + deltas. */
+  budgetCeiling: string | null;
+}
+
+/** GET /projects/:id/subcontracts rows (the W-11 subcontract engine). */
+export interface SubcontractAgreementRow {
+  id: string;
+  projectId: string;
+  partnerId: string;
+  agreementNo: string;
+  title: string;
+  titleAr: string | null;
+  scope: string | null;
+  agreementValue: string;
+  currencyCode: string;
+  retentionPercent: string;
+  startDate: string | null;
+  endDate: string | null;
+  status: string;
+  activatedAt: string | null;
+  closedAt: string | null;
+  cancelReason: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /projects/subcontracts/:id/certificates rows (the sub مستخلص). */
+export interface SubcontractCertificateRow {
+  id: string;
+  agreementId: string;
+  certificateNo: string | null;
+  certificateDate: string;
+  progressPercent: string;
+  grossValue: string;
+  retentionWithheld: string;
+  netPayable: string;
+  status: string;
+  approvedAt: string | null;
+  apJournalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** GET /crm/billing-runs rows (the crm.billing_run audit events, newest first). */
 export interface BillingRunSummaryRow {
   id: string;

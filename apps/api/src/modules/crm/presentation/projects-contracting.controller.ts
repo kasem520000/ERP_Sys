@@ -12,7 +12,8 @@ import { RetentionService } from "../application/retention-service";
 import { SubcontractService } from "../application/subcontract-service";
 
 /**
- * PHASE-048 (W-11 — T-10 + T-11 + T-12) — the contracting routes (D-08
+ * PHASE-048 (W-11 — T-10 + T-11 + T-12; W-13 — T-15) — the contracting
+ * routes (D-08
  * + D-09 + D-10): the subcontracting plane (the agreements' lifecycle +
  * the sub certificates + THE APPROVAL GATE that drives the AP linkage
  * and G-55's sub-side hold), the retention ledger (the CUSTOMER
@@ -110,6 +111,18 @@ export class ProjectsContractingController {
   ) {}
 
   // -- T-10: the subcontracting plane (D-08) --------------------------------
+
+  /** PHASE-048 (W-13 — T-15): the contracting screen's project pool —
+   * the SAME one-store read the WBS board's pool rides, on THIS plane's
+   * own viewer key (the W-12 step-2 precedent, mirrored: the screen
+   * renders for contracting-only sessions; the accounting module's
+   * project list keeps its own key). */
+  @Get("contracting/pool")
+  @RequirePermissions("projects.contracting.view")
+  @RequireFeature("projects.contracting")
+  async contractingPool() {
+    return envelope(await this.subcontracts.listProjects());
+  }
 
   @Get(":projectId/subcontracts")
   @RequirePermissions("projects.contracting.view")

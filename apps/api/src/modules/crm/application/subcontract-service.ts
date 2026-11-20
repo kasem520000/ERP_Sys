@@ -16,7 +16,7 @@ import {
 } from "../domain/projects-errors";
 import * as store from "../infrastructure/contracting.store";
 import type { SubcontractAgreementRow, SubcontractCertificateRow } from "../infrastructure/contracting.store";
-import { findProjectPlane } from "../infrastructure/projects.store";
+import { findProjectPlane, listProjectPlane } from "../infrastructure/projects.store";
 
 /**
  * PHASE-048 (W-11 — T-10) — the subcontracting engine (D-08): the
@@ -227,6 +227,18 @@ export class SubcontractService {
     const project = await findProjectPlane(projectId);
     if (project === undefined) throw new ProjectPlaneNotFoundError(projectId);
     return store.listSubcontractAgreements(projectId);
+  }
+
+  /** PHASE-048 (W-13 — T-15): the contracting screen's project pool —
+   * the SAME one-store read the WBS board's pool rides (T-14's own
+   * law), bound here on the CONTRACTING plane's own viewer key so the
+   * screen renders for contracting-only sessions (the W-12 step-2
+   * precedent, mirrored; zero parallel computation — one store read,
+   * two plane keys). */
+  async listProjects(): Promise<
+    readonly { id: string; code: string; name: string; nameAr: string | null; status: string }[]
+  > {
+    return listProjectPlane();
   }
 
   async getAgreement(id: string): Promise<SubcontractAgreementRow> {

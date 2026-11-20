@@ -855,6 +855,25 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 90,
   },
+  // PHASE-048 (W-13 — T-15): the projects contracting screen — the
+  // certificates + retention + change orders + subcontracts tabs (the
+  // W-11/W-10 engines' own figures rendered verbatim). Feature key the
+  // exact D-16 composable unit `projects.contracting`; permission the
+  // W-8 seeded viewer key the contracting routes enforce (matrix §3.26)
+  // — the screen renders for contracting-only sessions (its pool read
+  // rides the plane's own key).
+  {
+    id: "projects.contracting",
+    parentGroup: "accounting",
+    label: { ar: "تعاقدات المشاريع", en: "Projects contracting" },
+    icon: "file-check",
+    route: "/projects/contracting",
+    featureKey: "projects.contracting",
+    permission: "projects.contracting.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 91,
+  },
   // purchasing group — PHASE-011 (T13-UI): the procure-to-pay chain.
   // Feature keys are the exact FEATURE_CATALOG §9 strings; permissions the
   // exact seeded matrix keys the purchasing controller enforces (matrix
