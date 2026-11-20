@@ -27,6 +27,7 @@ import { Ias23Service } from "./application/ias23-service";
 import { SubcontractService } from "./application/subcontract-service";
 import { RetentionService } from "./application/retention-service";
 import { ProgressBillingService } from "./application/progress-billing-service";
+import { FieldserviceService } from "./application/fieldservice-service";
 import { LeadsController } from "./presentation/leads.controller";
 import { TasksController } from "./presentation/tasks.controller";
 import { ContractsController } from "./presentation/contracts.controller";
@@ -40,6 +41,7 @@ import { ProjectsEvmController } from "./presentation/projects-evm.controller";
 import { ChangeOrdersController } from "./presentation/change-orders.controller";
 import { ProjectsIas23Controller } from "./presentation/projects-ias23.controller";
 import { ProjectsContractingController } from "./presentation/projects-contracting.controller";
+import { ProjectsFieldserviceController } from "./presentation/projects-fieldservice.controller";
 import * as store from "./infrastructure/crm.store";
 
 /**
@@ -129,6 +131,7 @@ export interface CrmContractBillingRunJobPayload {
     ChangeOrdersController,
     ProjectsIas23Controller,
     ProjectsContractingController,
+    ProjectsFieldserviceController,
   ],
   providers: [
     LeadService,
@@ -149,6 +152,7 @@ export interface CrmContractBillingRunJobPayload {
     SubcontractService,
     RetentionService,
     ProgressBillingService,
+    FieldserviceService,
   ],
   exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService, WbsService, ProjectActualsService, ProjectBudgetService, EvmService, ChangeOrderService, Ias23Service, SubcontractService, RetentionService, ProgressBillingService],
 })

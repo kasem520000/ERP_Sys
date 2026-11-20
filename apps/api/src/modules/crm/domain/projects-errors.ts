@@ -482,3 +482,76 @@ export class CertificateInvoiceAlreadyGeneratedError extends DomainError {
     super("CERTIFICATE_INVOICE_ALREADY_GENERATED", message, details);
   }
 }
+
+// -- W-12 / T-13: the field service (D-12 — BR-096) ---------------------------
+
+/** Unknown or foreign service visit id (A7). */
+export class ServiceVisitNotFoundError extends DomainError {
+  constructor(id: string) {
+    super(
+      "SERVICE_VISIT_NOT_FOUND",
+      `service visit ${id} does not exist in this tenant`,
+    );
+  }
+}
+
+/**
+ * Field-service-plane input validation (the window's shape, the
+ * technician reference, the completion notes' length, the SLA register's
+ * malformed shape) — the 422 policy class.
+ */
+export class FieldserviceInputInvalidError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("FIELDSERVICE_INPUT_INVALID", message, details);
+  }
+}
+
+/**
+ * THE VISIT MACHINE'S CAS LAW (0103 — D-12): NEW → SCHEDULED →
+ * DISPATCHED → IN_PROGRESS → COMPLETED → CLOSED, one row per visit, the
+ * transitions are CAS writes with the 0103 stamp floors; a wrong-state
+ * transition or a raced move is the typed 409-class refusal. CLOSED is
+ * terminal (the evidence discipline: no DELETE, no reopen).
+ */
+export class ServiceVisitStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("SERVICE_VISIT_STATE", message, details);
+  }
+}
+
+/**
+ * THE TECHNICIAN-FROM-DISPATCH LAW (0103's own CHECK, surfaced typed):
+ * the technician is required from DISPATCHED on — the board's law. A
+ * dispatch without a technician (neither on the row nor in the input)
+ * refuses before the CHECK ever fires.
+ */
+export class ServiceVisitTechnicianRequiredError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("SERVICE_VISIT_TECHNICIAN_REQUIRED", message, details);
+  }
+}
+
+/**
+ * THE CANCELLED-ORDER LAW: service visits ride the EXISTING
+ * service_orders (never a new order surface — D-12); a CANCELLED order
+ * accepts no visit writes (create/dispatch/complete all re-check — the
+ * typed refusal, never a silent no-op).
+ */
+export class ServiceOrderCancelledError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("SERVICE_ORDER_CANCELLED", message, details);
+  }
+}
+
+/**
+ * THE SLA REGISTER'S MALFORMED LAW (the settings key
+ * projects.fieldservice_sla_targets): a register that exists but does
+ * not parse to { response_target_hours, resolution_target_hours } is the
+ * typed refusal — never a fabricated target and never a silent skip of
+ * the breach evaluation (red line 5's fail-closed reading).
+ */
+export class SlaRegisterMalformedError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("SLA_REGISTER_MALFORMED", message, details);
+  }
+}

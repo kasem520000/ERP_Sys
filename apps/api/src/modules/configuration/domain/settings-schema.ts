@@ -698,6 +698,26 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-048 (W-9, D-05): the tenant's overhead distributor — the allocation driver (LABOR_HOURS or DIRECT_COST) and the indirect-cost pool accounts whose net GL carry distributes over the projects by the driver share (exact 4-dp arithmetic, one half-up rounding per project — the posting reads the SAME fold). While unset (null) the overhead actual is the honest zero with the degraded note, never a fabricated allocation.",
   }),
+  // PHASE-048 (W-12 — T-13/D-12, BR-096): the field-service SLA targets —
+  // the tenant's response/resolution target hours the single clock
+  // service evaluates against. NO default ships (the ias23 register
+  // precedent): while unset (null) the SLA evaluation reports the honest
+  // NO_TARGET absence — never a fabricated target and never a breach
+  // claim (red line 5's fail-closed reading); a malformed register is
+  // the typed refusal. Pin-neutral by construction (null default omitted
+  // from the §5 policies map).
+  "projects.fieldservice_sla_targets": Object.freeze({
+    key: "projects.fieldservice_sla_targets",
+    schema: z
+      .object({
+        response_target_hours: z.number().min(0.01).max(8760),
+        resolution_target_hours: z.number().min(0.01).max(8760),
+      })
+      .nullable(),
+    default: null,
+    description:
+      "PHASE-048 (W-12, D-12/BR-096): the tenant's field-service SLA targets — the response clock (dispatch → first response) and the resolution clock (dispatch → completion) target HOURS (fractional hours allowed, e.g. 1.5 = 90 minutes). Both clocks are pause-aware (the paused time never counts). While unset (null) the evaluation reports the honest NO_TARGET absence and asserts no breach — never a fabricated target (red line 5).",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

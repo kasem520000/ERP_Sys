@@ -5053,6 +5053,80 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/projects/certificates/:id/void",
     permission: "projects.contracting.manage",
   },
+
+  // PHASE-048 (W-12 — T-13, dated 2026-11-20; matrix §3.26): the field
+  // service — the W-8 keys' fourth binding wave (1038 + 12 = 1050). The
+  // dispatch board on the EXISTING service_orders (never a new order
+  // surface — D-12): the board listing + the visit reads + THE SINGLE
+  // CLOCK's SLA evaluation (both pause-aware clocks + BR-096's deduped
+  // escalation) bind fieldservice.view; the status machine's transitions
+  // (schedule → dispatch → respond → start → pause/resume → complete
+  // with the parts-used record through the service-order line issue path
+  // → close) + the visit's authoring bind fieldservice.dispatch — the
+  // matrix's own wording: "the status machine's transitions + the SLA
+  // pause states feed BR-096's breach escalation — the single clock
+  // service's write surface". The entitlement plane rides the
+  // projects.fieldservice feature flag on every route (D-16).
+  {
+    method: "GET",
+    path: "/api/v1/projects/fieldservice/visits",
+    permission: "projects.fieldservice.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/fieldservice/visits/:id",
+    permission: "projects.fieldservice.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/fieldservice/visits/:id/sla",
+    permission: "projects.fieldservice.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/schedule",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/dispatch",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/respond",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/start",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/pause",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/resume",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/complete",
+    permission: "projects.fieldservice.dispatch",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/fieldservice/visits/:id/close",
+    permission: "projects.fieldservice.dispatch",
+  },
 ];
 
 /**
