@@ -781,6 +781,56 @@ Gantt-ish timeline + the EVM tab (the 12-template discipline, RTL, ⌘K).
 **Exit:** acceptance #8's API arms green (the SLA test matrix); the WBS
 board renders the tree/dependencies/%-complete (acceptance #2's web arm).
 
+> **[Dated 2026-11-20 (W-12 DELIVERED — on the owner-accepted W-11 head
+> `8610310`, this session's working clone — the same-session evidence
+> rule's TWENTIETH consecutive wave; the owner's push-each-step
+> instruction honored: the step commits `92af971` (T-13) + `47ee755`
+> (T-14), each pushed at its completion): ZERO migrations (the chain
+> stays 0104, the catalog 318, the scratch re-proven from zero). T-13
+> (D-12/BR-096): the pure layer FIRST (`fieldservice-math.ts` — the
+> pause-aware SLA clock arithmetic: the history fold · the window-clamped
+> subtraction · the SINGLE evaluation both clocks read · BR-096's pure
+> escalation decisions · the exact-decimal register conversion; the
+> unit-first law caught the spec's own hand-slip, corrected at the claim
+> site) + THE SINGLE CLOCK SERVICE (the NEW→SCHEDULED→DISPATCHED→
+> IN_PROGRESS→COMPLETED→CLOSED machine on the EXISTING service_orders,
+> one CAS per move with the 0103 stamp floors · the
+> technician-required-from-dispatch law · the response event idempotent +
+> the START CATCH-UP · the pause history on the append-only audit trail —
+> zero tables of our own · the completed-while-paused law · the
+> parts-used record through the service-order line issue path, the WMS
+> movement core, all-or-nothing with the completion · the SLA evaluation
+> with the tenant register (NO_TARGET the honest absence, malformed the
+> typed refusal) and BR-096's DEDUPED escalation once per (visit, clock)
+> ever) + the twelve routes (ROUTE_PERMISSIONS 1,038 → 1,050, dated at
+> the block; drift 326 = 326). T-14 (the first projects web surface):
+> the `/projects` board with the tree (the engine's own BR-095 figures
+> verbatim — zero client-side recomputation), the Gantt-ish timeline
+> (logical-property RTL), and the EVM tab (the W-10 snapshot: the two EV
+> disciplines, the four AC legs, the honest-null indices, the
+> disclosures; display-only rounding with the exact engine strings in
+> the titles); THE TYPED-REFUSAL PANEL renders the code + message + the
+> FULL payload — never a generic error; the EVM 403 degrades to the
+> honest notice; THE 045 TABS DEFECT NOT TOUCHED AND NOT AGGRAVATED (the
+> data-slot shape + the test's tab-switching arm are the recorded proof
+> — the owner's clause 8 honored); `GET /api/v1/projects` on the WBS
+> plane's OWN view key (1,050 → 1,051); the NAV_ITEMS registry row (⌘K
+> through the registry); i18n +49 AR/EN pairs — 6,433 → 6,482 = 6,482
+> (THE DECLARED DELTA, D-14's first slice) + mobile 371. The
+> `__db__/projects/` family grows: `projects-fieldservice.db.spec.ts`
+> (20 arms — the SLA test matrix, every refusal on ITS OWN world per the
+> poisoned-transaction law now permanent). Gates: the full DB suite
+> 266/266 · 3,774/3,774 · 0 failed · 0 skipped in BOTH envelopes (the
+> precomputed five chunks, coverage-verified BEFORE the first run —
+> 266/266 — + the single-process run GREEN ON THE FIRST RUN at 567.68s
+> against the pre-computed ~568s ceiling) + the scratch check:rls
+> (104-chain from zero · 318/0) + every standing checker green (the
+> evidence `audit-evidence/phase048-w12/` — 25 files — + the gate doc
+> `docs/operations/gate-evidence/2026-11-20-phase048-w12.md` — the FIVE
+> honest disclosures recorded there). Exit criteria MET — acceptance
+> #8's API arms + #2's web arm, both green with evidence. NOT production
+> approval.]**
+
 ### W-13 — The web plane II + the print pack (T-15 + T-16, orchestrator)
 The `/projects/contracting` screen (certificates, retention, change
 orders, subcontracts); the `/projects/fieldservice` dispatch board; the

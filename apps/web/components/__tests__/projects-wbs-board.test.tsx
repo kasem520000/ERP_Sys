@@ -290,7 +290,14 @@ describe("PHASE-048 W-12 — the projects WBS board", () => {
   });
 
   it("(f) switching projects re-fetches the tree + the EVM through the BFF", async () => {
-    bffFetchMock.mockResolvedValue({ ok: true, data: [] } as never);
+    // Path-dispatched mock (each arm's typed envelope): the tree read
+    // returns the empty tree; the EVM read degrades to its honest 403.
+    bffFetchMock.mockImplementation(async (path: string) => {
+      if (path.endsWith("/evm")) {
+        return { ok: false, status: 403, error: { code: "FORBIDDEN", message: "projects.evm.view required" } };
+      }
+      return { ok: true, data: [] };
+    });
     renderBoard("en");
     const select = screen.getByLabelText("Project");
     fireEvent.change(select, { target: { value: PROJECTS[1]!.id } });
@@ -298,6 +305,11 @@ describe("PHASE-048 W-12 — the projects WBS board", () => {
     await waitFor(() => {
       expect(bffFetchMock).toHaveBeenCalledWith(`projects/${PROJECTS[1]!.id}/wbs`);
       expect(bffFetchMock).toHaveBeenCalledWith(`projects/${PROJECTS[1]!.id}/evm`);
+    });
+    // Wait for the load to SETTLE inside the test (the empty tree's
+    // honest notice renders) — the continuation never leaks past cleanup.
+    await waitFor(() => {
+      expect(screen.getByText(/No tasks on this project yet/)).toBeTruthy();
     });
   });
 

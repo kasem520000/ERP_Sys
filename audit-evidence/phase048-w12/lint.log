@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/erp-w9/ERP_Sys
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/domain-core:lint: cache hit, replaying logs f13bcc9c837ad844
+@erp/api:lint: cache hit, replaying logs 9a7bc03d598cfd60
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/erp-w9/ERP_Sys/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/ui:lint: cache hit, replaying logs b2b7e1abca0675d2
+@erp/sync-core:lint: cache hit, replaying logs 53196928c2c5fa8a
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/erp-w9/ERP_Sys/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/web:lint: cache miss, executing 1fc65b4a4bbbba83
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/erp-w9/ERP_Sys/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/desktop:lint: cache hit, replaying logs f296f711b9e94bf8
+@erp/mobile:lint: cache hit, replaying logs 35b04075831da36a
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/contracts:lint: cache hit, replaying logs 7686a714cef56e27
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/erp-w9/ERP_Sys/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    7 cached, 8 total
+  Time:    10.774s 
+
+EXIT=0
