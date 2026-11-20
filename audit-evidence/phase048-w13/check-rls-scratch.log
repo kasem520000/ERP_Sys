@@ -1,0 +1,16 @@
+SCRATCH_INITDB
+SCRATCH_READY
+CHAIN_APPLYING
+No config path provided, using default 'drizzle.config.ts'
+Reading config file '/home/z/erp-w9/ERP_Sys/apps/api/drizzle.config.ts'
+Using 'pg' driver for database querying
+[⣷] applying migrations...[2K[1G[⣯] applying migrations...[2K[1G[⣟] applying migrations...[2K[1G[⡿] applying migrations...[2K[1G[⢿] applying migrations...[2K[1G[⣻] applying migrations...[2K[1G[⣽] applying migrations...[2K[1G[⣷] applying migrations...[2K[1G[⣯] applying migrations...[2K[1G[⣟] applying migrations...[2K[1G[⡿] applying migrations...[2K[1G[⢿] applying migrations...[2K[1G[⣻] applying migrations...[2K[1G[⣽] applying migrations...[2K[1G[⣷] applying migrations...[2K[1G[✓] migrations applied successfully!CHAIN_104_APPLIED
+RLS_CHECK
+
+> erp-platform@0.1.0 check:rls /home/z/erp-w9/ERP_Sys
+> tsx scripts/check-rls.ts
+
+[check-rls] OK — 318 catalog tables
+SCRATCH_STOPPING
+SCRATCH_STOPPED
+EXIT=0
