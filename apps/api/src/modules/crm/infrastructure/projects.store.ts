@@ -682,6 +682,25 @@ export async function listAllApprovedSubCertificates(): Promise<
   return rows.rows as unknown as { projectId: string; id: string; netPayable: string }[];
 }
 
+/** The WBS board's project pool (T-14's own read — the plane's list,
+ * nameAr included for the bilingual board; the accounting module's
+ * project list rides ITS key — this one rides projects.wbs.view). */
+export async function listProjectPlane(): Promise<
+  readonly { id: string; code: string; name: string; nameAr: string | null; status: string }[]
+> {
+  const rows = await tenantTx().execute<{
+    id: string;
+    code: string;
+    name: string;
+    nameAr: string | null;
+    status: string;
+  }>(sql`
+    SELECT id, code, name, name_ar AS "nameAr", status
+    FROM projects ORDER BY code ASC
+  `);
+  return rows.rows;
+}
+
 /** The project-existence read for the plane's guards (A7-indistinguishable). */
 export async function findProjectPlane(projectId: string): Promise<
   | { id: string; code: string; name: string; status: string }

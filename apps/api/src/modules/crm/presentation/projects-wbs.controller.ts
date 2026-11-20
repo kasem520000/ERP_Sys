@@ -75,6 +75,16 @@ const updateTaskSchema = z.object({
 export class ProjectsWbsController {
   constructor(@Inject(WbsService) private readonly wbs: WbsService) {}
 
+  /** The board's project pool (T-14 — the WBS plane's own read; the
+   * accounting module's project list rides ITS key, this one rides
+   * wbs.view so the board renders for WBS-only sessions). */
+  @Get()
+  @RequirePermissions("projects.wbs.view")
+  @RequireFeature("projects.wbs")
+  async listProjects() {
+    return envelope(await this.wbs.listProjects());
+  }
+
   /** The tree — every node carries its leaf-recomputed rollup (BR-095:
    * recomputed on EVERY read, never a stored stale sum). */
   @Get(":projectId/wbs")

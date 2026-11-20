@@ -5054,6 +5054,17 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     permission: "projects.contracting.manage",
   },
 
+  // PHASE-048 (W-12 — T-14, dated 2026-11-20; matrix §3.26): the WBS
+  // board's project pool — GET /api/v1/projects rides the WBS plane's
+  // OWN view key (the board renders for WBS-only sessions; the
+  // accounting module's project list keeps its own key) — the W-12
+  // step-2 addition to the keys' fourth binding wave (1050 + 1 = 1051).
+  {
+    method: "GET",
+    path: "/api/v1/projects",
+    permission: "projects.wbs.view",
+  },
+
   // PHASE-048 (W-12 — T-13, dated 2026-11-20; matrix §3.26): the field
   // service — the W-8 keys' fourth binding wave (1038 + 12 = 1050). The
   // dispatch board on the EXISTING service_orders (never a new order

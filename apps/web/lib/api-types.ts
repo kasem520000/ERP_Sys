@@ -4333,6 +4333,117 @@ export interface ProjectRow {
   status: string;
 }
 
+/** PHASE-048 (W-12 — T-14): the WBS board's project pool row (GET /projects —
+ * the plane's own read; nameAr included for the bilingual board). */
+export interface ProjectPoolRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string | null;
+  status: string;
+}
+
+/**
+ * PHASE-048 (W-12 — T-14): the WBS tree node EXACTLY as the W-9 engine
+ * emits it (GET /projects/:id/wbs) — the board renders the engine's own
+ * rolledPercent/leafCount/weightSum verbatim (BR-095's leaf-recomputed
+ * rollup, ZERO client-side recomputation; display rounding only).
+ */
+export interface WbsTreeNode {
+  id: string;
+  projectId: string;
+  parentTaskId: string | null;
+  predecessorTaskId: string | null;
+  wbsCode: string;
+  name: string;
+  nameAr: string | null;
+  isMilestone: boolean;
+  startDate: string | null;
+  endDate: string | null;
+  weight: string | null;
+  percentComplete: string;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+  /** The engine's leaf-recomputed rollup (BR-095) — rendered verbatim. */
+  rolledPercent: string;
+  leafCount: number;
+  weightSum: string;
+  children: WbsTreeNode[];
+}
+
+/** The EVM snapshot's EV disciplines (the engine's own honest shapes). */
+export interface EvmEv {
+  structural: { percent: string | null; value: string };
+  certificate: {
+    certificateId: string;
+    certificateNo: string | null;
+    kind: string;
+    cumulativePercent: string;
+    value: string;
+  } | null;
+  delta: string | null;
+  signal: "STRUCTURAL_AHEAD" | "CERTIFICATE_AHEAD" | "AGREE" | "NO_CERTIFICATE" | string;
+}
+
+/** The EVM snapshot's actual-cost breakdown (INV-033's four legs —
+ * rendered with their values, never a generic total alone). */
+export interface EvmAc {
+  labor: string;
+  materials: string;
+  subcontract: string;
+  overhead: string;
+  total: string;
+  unpricedCount: number;
+  degradedMaterials: boolean;
+  degradedOverhead: boolean;
+}
+
+/** The EVM snapshot's per-node honest cut (the engine's own row: the
+ * node's own planned cells · PV · the W-9 leaf-recomputed percent · EV ·
+ * the LABOR-leg AC — the engine's documented honest shape). */
+export interface EvmNodeRow {
+  wbsTaskId: string;
+  wbsCode: string;
+  name: string;
+  planned: string;
+  pv: string;
+  rolledPercent: string;
+  ev: string;
+  acLabor: string;
+  cpi: string | null;
+  spi: string | null;
+}
+
+/**
+ * PHASE-048 (W-12 — T-14): the EVM engine's snapshot EXACTLY as emitted
+ * (GET /projects/:id/evm) — PV from the approved curve, the TWO EV
+ * disciplines with the delta as the management signal, AC from the four
+ * collectors, the honest-null indices, the forecast, and the engine's
+ * own disclosures. The board renders these verbatim (zero parallel
+ * computation; rounding is display-only).
+ */
+export interface EvmSnapshot {
+  projectId: string;
+  asOf: string;
+  budget: {
+    budgetId: string;
+    approvedTotal: string;
+    approvedChangeOrders: number;
+    priceDeltaSum: string;
+    bac: string;
+  };
+  pv: string;
+  ev: EvmEv;
+  ac: EvmAc;
+  indices: { cpi: string | null; spi: string | null };
+  forecast: { etc: string; eac: string; method: "CPI_BASED" | "REMAINDER" | string };
+  nodes: EvmNodeRow[];
+  disclosures: string[];
+}
+
 /** GET /crm/billing-runs rows (the crm.billing_run audit events, newest first). */
 export interface BillingRunSummaryRow {
   id: string;

@@ -383,6 +383,14 @@ export class WbsService {
 
   // -- the reads (BR-095: the rollup recomputed on EVERY read) ---------------------
 
+  /** The WBS board's project pool (T-14's own read — rides the plane's
+   * wbs.view key, never the accounting module's project-list key). */
+  async listProjects(): Promise<
+    readonly { id: string; code: string; name: string; nameAr: string | null; status: string }[]
+  > {
+    return store.listProjectPlane();
+  }
+
   /** The flat node-by-node rollup — acceptance #2's reconciliation arm. */
   async rollup(projectId: string): Promise<{
     projectId: string;

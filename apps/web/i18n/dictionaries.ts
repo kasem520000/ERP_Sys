@@ -6867,6 +6867,58 @@ export interface Dictionary {
   tal360NoAccess: string;
   tal360Weight: string;
   tal360Overall: string;
+
+  // PHASE-048 (W-12 — T-14): the projects WBS board (the tree + the
+  // Gantt-ish timeline + the EVM tab; D-14's AR/EN pairs).
+  projectsBoardTitle: string;
+  projectsBoardSubtitle: string;
+  projectsBoardProjectLabel: string;
+  projectsBoardNoProjects: string;
+  projectsBoardTabTree: string;
+  projectsBoardTabTimeline: string;
+  projectsBoardTabEvm: string;
+  projectsBoardColCode: string;
+  projectsBoardColName: string;
+  projectsBoardColProgress: string;
+  projectsBoardColWeight: string;
+  projectsBoardColSchedule: string;
+  projectsBoardColDependsOn: string;
+  projectsBoardMilestone: string;
+  projectsBoardLeaves: string;
+  projectsBoardRolledPct: string;
+  projectsBoardEmptyTree: string;
+  projectsBoardTimelineRange: string;
+  projectsBoardTimelineNoDates: string;
+  projectsBoardTimelineToday: string;
+  projectsBoardEvmAsOf: string;
+  projectsBoardEvmBudget: string;
+  projectsBoardEvmBac: string;
+  projectsBoardEvmChangeOrders: string;
+  projectsBoardEvmPv: string;
+  projectsBoardEvmEv: string;
+  projectsBoardEvmStructural: string;
+  projectsBoardEvmCertificate: string;
+  projectsBoardEvmNoCertificate: string;
+  projectsBoardEvmDelta: string;
+  projectsBoardEvmAc: string;
+  projectsBoardEvmLegLabor: string;
+  projectsBoardEvmLegMaterials: string;
+  projectsBoardEvmLegSubcontract: string;
+  projectsBoardEvmLegOverhead: string;
+  projectsBoardEvmUnpriced: string;
+  projectsBoardEvmDegraded: string;
+  projectsBoardEvmCpi: string;
+  projectsBoardEvmSpi: string;
+  projectsBoardEvmEtc: string;
+  projectsBoardEvmEac: string;
+  projectsBoardEvmForecastMethod: string;
+  projectsBoardEvmNodes: string;
+  projectsBoardEvmDisclosures: string;
+  projectsBoardEvmNoAccess: string;
+  projectsBoardRefusalTitle: string;
+  projectsBoardRefusalDetails: string;
+  projectsBoardLoadFailed: string;
+  projectsBoardRetry: string;
 }
 
 const ar: Dictionary = {
@@ -13725,6 +13777,57 @@ const ar: Dictionary = {
   tal360NoAccess: "طبقة المواهب تتطلب صلاحيات الموارد البشرية — لا تعرض لك هنا.",
   tal360Weight: "الوزن",
   tal360Overall: "الدرجة",
+
+  // PHASE-048 (W-12 — T-14): لوحة هيكل تجزئة العمل.
+  projectsBoardTitle: "لوحة هيكل تجزئة العمل",
+  projectsBoardSubtitle: "الشجرة والاعتماديات والإنجاز المجمّع (BR-095) والخط الزمني وتبويب قيمة الإنجاز — كل الأرقام مخرجات المحركات كما هي.",
+  projectsBoardProjectLabel: "المشروع",
+  projectsBoardNoProjects: "لا مشاريع في هذا المستأجر بعد — أنشئ مشروعًا من شاشة المحاسبة ثم ابْنِ شجرته هنا.",
+  projectsBoardTabTree: "الشجرة",
+  projectsBoardTabTimeline: "الخط الزمني",
+  projectsBoardTabEvm: "قيمة الإنجاز",
+  projectsBoardColCode: "الرمز",
+  projectsBoardColName: "الاسم",
+  projectsBoardColProgress: "الإنجاز",
+  projectsBoardColWeight: "الوزن",
+  projectsBoardColSchedule: "الجدول",
+  projectsBoardColDependsOn: "يعتمد على",
+  projectsBoardMilestone: "معلم",
+  projectsBoardLeaves: "أوراق",
+  projectsBoardRolledPct: "الإنجاز المجمّع",
+  projectsBoardEmptyTree: "لا مهام على هذا المشروع بعد.",
+  projectsBoardTimelineRange: "نطاق الخطة",
+  projectsBoardTimelineNoDates: "مهام بلا تواريخ جدولة (تُعرض في الشجرة ولا تُرسم على الخط):",
+  projectsBoardTimelineToday: "اليوم",
+  projectsBoardEvmAsOf: "بتاريخ",
+  projectsBoardEvmBudget: "الموازنة المعتمدة",
+  projectsBoardEvmBac: "موازنة الإنجاز (BAC)",
+  projectsBoardEvmChangeOrders: "أوامر التغيير المعتمدة",
+  projectsBoardEvmPv: "القيمة المخططة (PV)",
+  projectsBoardEvmEv: "القيمة المكتسبة (EV)",
+  projectsBoardEvmStructural: "الهيكلي الموزون",
+  projectsBoardEvmCertificate: "المستخلص المعتمد",
+  projectsBoardEvmNoCertificate: "لا مستخلص معتمد بعد — القرار الهيكلي وحده",
+  projectsBoardEvmDelta: "الفرق (إشارة إدارة)",
+  projectsBoardEvmAc: "التكلفة الفعلية (AC)",
+  projectsBoardEvmLegLabor: "العمالة",
+  projectsBoardEvmLegMaterials: "المواد",
+  projectsBoardEvmLegSubcontract: "مقاولو الباطن",
+  projectsBoardEvmLegOverhead: "التكاليف غير المباشرة",
+  projectsBoardEvmUnpriced: "قيود غير مسعّرة",
+  projectsBoardEvmDegraded: "قراءة منقوصة (سجل غير مضبوط)",
+  projectsBoardEvmCpi: "مؤشر أداء التكلفة (CPI)",
+  projectsBoardEvmSpi: "مؤشر أداء الجدول (SPI)",
+  projectsBoardEvmEtc: "التقدير للإكمال (ETC)",
+  projectsBoardEvmEac: "التقدير عند الإكمال (EAC)",
+  projectsBoardEvmForecastMethod: "طريقة التوقع",
+  projectsBoardEvmNodes: "القراءة لكل عقدة",
+  projectsBoardEvmDisclosures: "إفصاحات المحرك",
+  projectsBoardEvmNoAccess: "تبويب قيمة الإنجاز يتطلب مفتاح projects.evm.view — لا يُعرض هنا لجلستك.",
+  projectsBoardRefusalTitle: "رفض مُنمّط من المحرك",
+  projectsBoardRefusalDetails: "الحمولة الكاملة:",
+  projectsBoardLoadFailed: "تعذر تحميل بيانات اللوحة.",
+  projectsBoardRetry: "إعادة المحاولة",
 };
 
 const en: Dictionary = {
@@ -20597,6 +20700,57 @@ const en: Dictionary = {
   tal360NoAccess: "The talent plane requires HR permissions — nothing is shown here for your session.",
   tal360Weight: "Weight",
   tal360Overall: "Score",
+
+  // PHASE-048 (W-12 — T-14): the projects WBS board.
+  projectsBoardTitle: "Projects WBS board",
+  projectsBoardSubtitle: "The tree, dependencies and the BR-095 rolled-up completion, the Gantt-ish timeline, and the EVM tab — every figure is the engine's own output, verbatim.",
+  projectsBoardProjectLabel: "Project",
+  projectsBoardNoProjects: "No projects in this tenant yet — create one from the accounting screen, then build its tree here.",
+  projectsBoardTabTree: "Tree",
+  projectsBoardTabTimeline: "Timeline",
+  projectsBoardTabEvm: "Earned value",
+  projectsBoardColCode: "Code",
+  projectsBoardColName: "Name",
+  projectsBoardColProgress: "% complete",
+  projectsBoardColWeight: "Weight",
+  projectsBoardColSchedule: "Schedule",
+  projectsBoardColDependsOn: "Depends on",
+  projectsBoardMilestone: "Milestone",
+  projectsBoardLeaves: "leaves",
+  projectsBoardRolledPct: "Rolled-up %",
+  projectsBoardEmptyTree: "No tasks on this project yet.",
+  projectsBoardTimelineRange: "Plan range",
+  projectsBoardTimelineNoDates: "Tasks without schedule dates (rendered in the tree, not on the timeline):",
+  projectsBoardTimelineToday: "Today",
+  projectsBoardEvmAsOf: "As of",
+  projectsBoardEvmBudget: "Approved budget",
+  projectsBoardEvmBac: "Budget at completion (BAC)",
+  projectsBoardEvmChangeOrders: "Approved change orders",
+  projectsBoardEvmPv: "Planned value (PV)",
+  projectsBoardEvmEv: "Earned value (EV)",
+  projectsBoardEvmStructural: "Weighted structural",
+  projectsBoardEvmCertificate: "Approved certificate",
+  projectsBoardEvmNoCertificate: "No approved certificate yet — the structural figure stands alone",
+  projectsBoardEvmDelta: "Delta (management signal)",
+  projectsBoardEvmAc: "Actual cost (AC)",
+  projectsBoardEvmLegLabor: "Labor",
+  projectsBoardEvmLegMaterials: "Materials",
+  projectsBoardEvmLegSubcontract: "Subcontract",
+  projectsBoardEvmLegOverhead: "Overhead",
+  projectsBoardEvmUnpriced: "unpriced entries",
+  projectsBoardEvmDegraded: "Degraded reading (unset register)",
+  projectsBoardEvmCpi: "Cost performance index (CPI)",
+  projectsBoardEvmSpi: "Schedule performance index (SPI)",
+  projectsBoardEvmEtc: "Estimate to complete (ETC)",
+  projectsBoardEvmEac: "Estimate at completion (EAC)",
+  projectsBoardEvmForecastMethod: "Forecast method",
+  projectsBoardEvmNodes: "Per-node reading",
+  projectsBoardEvmDisclosures: "Engine disclosures",
+  projectsBoardEvmNoAccess: "The earned-value tab requires the projects.evm.view key — nothing is shown here for your session.",
+  projectsBoardRefusalTitle: "Typed refusal from the engine",
+  projectsBoardRefusalDetails: "Full payload:",
+  projectsBoardLoadFailed: "The board data failed to load.",
+  projectsBoardRetry: "Retry",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

@@ -836,6 +836,25 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 80,
   },
+  // PHASE-048 (W-12 — T-14): the projects WBS board — the tree with the
+  // dependencies and the BR-095 leaf-recomputed %-complete rollup, the
+  // Gantt-ish timeline, and the EVM tab (the engine's own figures
+  // rendered verbatim). Feature key the exact D-16 composable unit
+  // `projects.wbs`; permission the W-8 viewer key the WBS routes enforce
+  // (matrix §3.26). The contracting + fieldservice boards (W-13) ride
+  // the same /projects route tree through their own registry rows.
+  {
+    id: "projects.wbs_board",
+    parentGroup: "accounting",
+    label: { ar: "لوحة هيكل تجزئة العمل", en: "Projects WBS board" },
+    icon: "list-ordered",
+    route: "/projects",
+    featureKey: "projects.wbs",
+    permission: "projects.wbs.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 90,
+  },
   // purchasing group — PHASE-011 (T13-UI): the procure-to-pay chain.
   // Feature keys are the exact FEATURE_CATALOG §9 strings; permissions the
   // exact seeded matrix keys the purchasing controller enforces (matrix
