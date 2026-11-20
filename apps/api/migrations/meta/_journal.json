@@ -693,6 +693,34 @@
       "when": 1797508800000,
       "tag": "0099_hr_alert_jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 99,
+      "version": "7",
+      "when": 1797523200000,
+      "tag": "0100_projects_wbs",
+      "breakpoints": true
+    },
+    {
+      "idx": 100,
+      "version": "7",
+      "when": 1797537600000,
+      "tag": "0101_projects_budgets_allocation",
+      "breakpoints": true
+    },
+    {
+      "idx": 101,
+      "version": "7",
+      "when": 1797552000000,
+      "tag": "0102_projects_change_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 102,
+      "version": "7",
+      "when": 1797566400000,
+      "tag": "0103_projects_contracting_fieldservice",
+      "breakpoints": true
     }
   ],
   "version": "7"

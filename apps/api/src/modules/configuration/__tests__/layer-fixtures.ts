@@ -289,6 +289,22 @@ const BUSINESS_KEYS: readonly string[] = [
   // twelve PERMISSION keys ride ROLES per 0098 §1, never the plans —
   // matrix §3.25's entitlement/authorization divergence note.)
   "hr.performance", "hr.recruitment", "hr.training", "hr.org",
+  // PHASE-048 (W-8, 2026-11-20) transcription of the 0103 §2 plan grants
+  // (the THREE FEATURE FLAGS → business + enterprise, the tier-4
+  // precedent; starter does NOT get them — the projects plane is not a
+  // starter feature): projects.wbs · projects.contracting ·
+  // projects.fieldservice — the phase doc's composable units (D-16). The
+  // three project-carrying templates' (0103 §3: professional_services +
+  // automotive + rental_logistics) REQUIRED chains resolve through
+  // exactly these grants — the projects manifest enablement. The
+  // dependency substrate (accounting.projects granted by 0008/0027,
+  // crm.service_orders by 0008/0027 — both already transcribed above in
+  // the CRM block) needs no new rows: the projects keys' BR-040 closures
+  // resolve through it (the closure-driven transcription rule — the
+  // fixtures mirror only what a consumer needs). (The fourteen PERMISSION
+  // keys ride ROLES per 0103 §1, never the plans — matrix §3.26's
+  // entitlement/authorization divergence note.)
+  "projects.wbs", "projects.contracting", "projects.fieldservice",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

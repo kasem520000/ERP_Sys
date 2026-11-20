@@ -538,6 +538,31 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   // INSERT/UPDATE only, the config row is the register; the upsert is
   // the update path). The auto-generated A-suite extends by +6.
   { table: "hr_alert_jobs" },
+  // PHASE-048 (CR-18 — Projects & Contracting; migrations 0100–0103; the
+  // W-8 foundation wave, 2026-11-20): the projects cluster — ELEVEN
+  // tables. Planning data (DELETE granted — the typed service guards
+  // own the lifecycles; the 028 budget_lines DRAFT-bulk-replace
+  // precedent): project_wbs_tasks, project_budget_lines (budgets NO
+  // delete — the approved curve is the variance truth, the 028
+  // precedent), project_resource_allocations. The evidence discipline
+  // (SELECT/INSERT/UPDATE only — the commercial record is audited
+  // history): change_orders (REJECTED stays readable), retention_
+  // accounts (the ledger), progress_certificates (the billing events),
+  // service_visits (CLOSED is the terminal state), ias23_capitalizations
+  // (the computation evidence). Master data (DELETE granted — the
+  // certificates' RESTRICT edge protects the ones with history):
+  // subcontractor_agreements. The auto-generated A-suite extends by +66.
+  { table: "project_wbs_tasks", deleteGranted: true },
+  { table: "project_budgets" },
+  { table: "project_budget_lines", deleteGranted: true },
+  { table: "project_resource_allocations", deleteGranted: true },
+  { table: "change_orders" },
+  { table: "subcontractor_agreements", deleteGranted: true },
+  { table: "subcontractor_certificates" },
+  { table: "retention_accounts" },
+  { table: "progress_certificates" },
+  { table: "service_visits" },
+  { table: "ias23_capitalizations" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

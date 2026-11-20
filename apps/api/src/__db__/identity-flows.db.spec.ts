@@ -197,7 +197,10 @@ describe("seeds (acceptance 9)", () => {
     // + 12 = 312 after 0098 — the twelve PHASE-047 talent keys (matrix
     // §3.25; the four flag families + the two cross-cutting keys; the
     // drift CLI agrees: matrix 312 = seed 312).
-    expect(result.rows[0]?.n).toBe(312);
+    // + 14 = 326 after 0103 — the fourteen PHASE-048 projects keys
+    // (matrix §3.26, the W-8 foundation wave 2026-11-20; the drift CLI
+    // agrees: matrix 326 = seed 326).
+    expect(result.rows[0]?.n).toBe(326);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

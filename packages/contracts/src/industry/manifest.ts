@@ -33,12 +33,14 @@ export const INDUSTRY_SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
  * Feature keys follow `module.feature_name` (GLOSSARY + FEATURE_CATALOG §1);
  * the module segment is one of the catalog modules (16 at v1.1 GA + the six
  * stage-9 modules per EXPANSION_REGISTER §D + `hr` — the PHASE-045 HR core's
- * operational module: attendance, leave, and shifts).
+ * operational module: attendance, leave, and shifts + `projects` — the
+ * PHASE-048 projects & contracting module's composable flags: WBS,
+ * contracting, and field service, matrix §3.26's entitlement plane).
  */
 const FEATURE_KEY_MODULE_SEGMENT =
   "platform|accounting|partners|items|inventory|sales|purchasing|treasury|tax|reporting|" +
   "crm|manufacturing|distribution|pos|offline|industry|fixed_assets|notes|installments|" +
-  "budgeting|payroll|consolidation|hr";
+  "budgeting|payroll|consolidation|hr|projects";
 
 export const INDUSTRY_FEATURE_KEY_PATTERN = new RegExp(
   `^(${FEATURE_KEY_MODULE_SEGMENT})\\.[a-z0-9_]+$`,

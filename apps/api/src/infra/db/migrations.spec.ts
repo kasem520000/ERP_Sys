@@ -256,7 +256,24 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // sweep's config surface (D-06's 044-pattern registration row + run
     // stats: thresholds jsonb with the documented default [30,7,0]) + the
     // notifications 'hr' category widening (both CHECK domains).
-    expect(files.at(-1)?.tag).toBe("0099_hr_alert_jobs");
+    // PHASE-048 (CR-18 — Projects & Contracting, the owner-approved plan
+    // §2's honest slots; delivered 2026-11-20 at W-8, the foundation
+    // wave): 0100 the WBS tree (project_wbs_tasks + the crm_time_entries
+    // WBS dimension — D-03/D-02), 0101 the budgets cluster (budgets +
+    // lines by cost type + resource allocations — D-04, the 028 grant
+    // discipline), 0102 change_orders (BR-094's inert-until-approved
+    // structural floor + G-58's exactly-once stamp — D-07), 0103 the
+    // contracting core (subcontractor agreements + certificates, the ONE
+    // retention ledger both sides, progress certificates with the invoice
+    // stamp, service visits on the existing service orders, ias23_
+    // capitalizations riding the budget lines) + THE DATA-ONLY grants
+    // block (the fourteen projects.* permission keys — matrix §3.26,
+    // 312 → 326; the three feature flags' plan grants; the three manifest
+    // enablements — the 0098 pattern). Eleven tenant tables; the IAS-23
+    // rate register is the settings-plane config registration (D-02's
+    // "config row", the gosi_establishment_no no-default precedent — NOT
+    // a table, the +11 catalog count stands).
+    expect(files.at(-1)?.tag).toBe("0103_projects_contracting_fieldservice");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

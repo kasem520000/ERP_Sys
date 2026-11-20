@@ -5946,6 +5946,11 @@ export const crmTimeEntries = pgTable(
     hours: numeric("hours", { precision: 19, scale: 6 }).notNull(),
     feeItemId: uuid("fee_item_id").notNull(),
     projectId: uuid("project_id"),
+    // PHASE-048 (T-01, migration 0100 — D-05): the WBS dimension — the
+    // labor-actual collector's node (approved entries × employee cost
+    // rates on the WBS task; the task∈project coherence is the W-9
+    // collector's write-time validation).
+    wbsTaskId: uuid("wbs_task_id"),
     contractId: uuid("contract_id"),
     feeEarnerUserId: uuid("fee_earner_user_id"),
     unitRate: numeric("unit_rate", { precision: 19, scale: 6 }).notNull(),
@@ -5962,6 +5967,10 @@ export const crmTimeEntries = pgTable(
       table.entryDate,
     ),
     index("ix_crm_time_entries_tenant_status").on(table.tenantId, table.status),
+    // PHASE-048 (migration 0100): the collector's WBS aggregation path.
+    index("ix_crm_time_entries_tenant_wbs")
+      .on(table.tenantId, table.wbsTaskId)
+      .where(sql`${table.wbsTaskId} IS NOT NULL`),
     index("ix_crm_time_entries_pullable")
       .on(table.tenantId, table.entryDate)
       .where(sql`${table.billedInvoiceId} IS NULL AND ${table.status} = 'APPROVED'`),
@@ -10124,5 +10133,522 @@ export const hrAlertJobs = pgTable(
     uniqueIndex("uq_hr_alert_jobs_id_tenant").on(table.id, table.tenantId),
     uniqueIndex("uq_hr_alert_jobs_tenant_kind").on(table.tenantId, table.jobKind),
     index("ix_hr_alert_jobs_tenant_active").on(table.tenantId, table.isActive),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// PHASE-048 · Projects & Contracting cluster (Blueprint v3.0 · CR-18;
+// migrations 0100–0103, the W-8 foundation wave, 2026-11-20). The
+// contracting world lands AROUND the frozen six-column `projects`
+// substrate (D-01: extended, never replaced — the journal-line project
+// dimension is INV-033's reconciliation target and stays untouched).
+// Eleven tenant tables + the WBS dimension on crm_time_entries; the
+// IAS-23 rate register is the settings-plane config registration
+// (D-02's "config row" — NOT a table; settings-schema.ts owns it).
+
+/** PHASE-048 (T-01, migration 0100 — D-03/BR-095): the WBS tree — the
+ * parent link and the single-predecessor dependency edge (the 047 D-09
+ * org-tree precedent: cycle safety is the pure detectCycle unit at the
+ * engine, validation at write time, the API the only move path), the
+ * milestone flag (zero-duration), the weight and percent_complete (the
+ * weighted rollup is RECOMPUTED FROM THE LEAVES on every read of the
+ * aggregate — never a stored stale sum). Planning data: DELETE granted
+ * (the typed service guards own the tree lifecycles). */
+export const projectWbsTasks = pgTable(
+  "project_wbs_tasks",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    parentTaskId: uuid("parent_task_id"),
+    predecessorTaskId: uuid("predecessor_task_id"),
+    wbsCode: text("wbs_code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    isMilestone: boolean("is_milestone").notNull().default(false),
+    startDate: date("start_date"),
+    endDate: date("end_date"),
+    weight: numeric("weight", { precision: 7, scale: 4 }),
+    percentComplete: numeric("percent_complete", { precision: 5, scale: 2 })
+      .notNull()
+      .default("0"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_project_wbs_tasks_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_project_wbs_tasks_tenant_project_code").on(
+      table.tenantId,
+      table.projectId,
+      table.wbsCode,
+    ),
+    index("ix_project_wbs_tasks_tenant_project").on(table.tenantId, table.projectId),
+    index("ix_project_wbs_tasks_tenant_parent").on(
+      table.tenantId,
+      table.projectId,
+      table.parentTaskId,
+    ),
+    index("ix_project_wbs_tasks_tenant_predecessor")
+      .on(table.tenantId, table.predecessorTaskId)
+      .where(sql`${table.predecessorTaskId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-048 (T-06, migration 0101 — D-04/PR-01): the project cost-plan
+ * header — the DRAFT→APPROVED→CLOSED lifecycle (approval precedes every
+ * EVM effect: PV reads the APPROVED curve). NO delete (the 028 budgets
+ * precedent: the approved curve is the variance truth). */
+export const projectBudgets = pgTable(
+  "project_budgets",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    status: text("status").notNull().default("DRAFT"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_project_budgets_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_project_budgets_tenant_project_name").on(
+      table.tenantId,
+      table.projectId,
+      table.name,
+    ),
+    index("ix_project_budgets_tenant_project_status").on(
+      table.tenantId,
+      table.projectId,
+      table.status,
+    ),
+  ],
+);
+
+/** PHASE-048 (T-06, migration 0101 — D-04): the cost curve's cells — one
+ * row per (budget × cost type LABOR/MATERIAL/SUBCONTRACT/OVERHEAD × WBS
+ * node × period window); ADR-0009 money, never binary float. DELETE
+ * granted for the DRAFT bulk-replace path (the 028 budget_lines
+ * precedent — the service never deletes a non-DRAFT parent's lines). */
+export const projectBudgetLines = pgTable(
+  "project_budget_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    budgetId: uuid("budget_id").notNull(),
+    costType: text("cost_type").notNull(),
+    wbsTaskId: uuid("wbs_task_id"),
+    periodStart: date("period_start").notNull(),
+    periodEnd: date("period_end").notNull(),
+    plannedAmount: numeric("planned_amount", { precision: 19, scale: 4 }).notNull(),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_project_budget_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_project_budget_lines_cell_task")
+      .on(
+        table.tenantId,
+        table.budgetId,
+        table.costType,
+        table.wbsTaskId,
+        table.periodStart,
+      )
+      .where(sql`${table.wbsTaskId} IS NOT NULL`),
+    uniqueIndex("uq_project_budget_lines_cell_project")
+      .on(table.tenantId, table.budgetId, table.costType, table.periodStart)
+      .where(sql`${table.wbsTaskId} IS NULL`),
+    index("ix_project_budget_lines_tenant_budget").on(
+      table.tenantId,
+      table.budgetId,
+      table.costType,
+    ),
+    index("ix_project_budget_lines_tenant_wbs")
+      .on(table.tenantId, table.wbsTaskId)
+      .where(sql`${table.wbsTaskId} IS NOT NULL`),
+    index("ix_project_budget_lines_tenant_period").on(
+      table.tenantId,
+      table.periodStart,
+      table.periodEnd,
+    ),
+  ],
+);
+
+/** PHASE-048 (T-02, migration 0101 — PR-03): employee or asset × date
+ * range × allocation percent (0 < x ≤ 100 per row — the over-allocation
+ * WARNING against calendars is the engine's read-side signal, never a
+ * write refusal). The asset side targets the fixed-assets register (the
+ * CMMS handoff's cross-branch movement context). */
+export const projectResourceAllocations = pgTable(
+  "project_resource_allocations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    wbsTaskId: uuid("wbs_task_id"),
+    resourceKind: text("resource_kind").notNull(),
+    employeeId: uuid("employee_id"),
+    assetId: uuid("asset_id"),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    allocationPercent: numeric("allocation_percent", { precision: 5, scale: 2 }).notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_project_resource_allocations_id_tenant").on(table.id, table.tenantId),
+    index("ix_project_resource_allocations_tenant_project").on(
+      table.tenantId,
+      table.projectId,
+      table.startDate,
+      table.endDate,
+    ),
+    index("ix_project_resource_allocations_tenant_employee")
+      .on(table.tenantId, table.employeeId, table.startDate, table.endDate)
+      .where(sql`${table.employeeId} IS NOT NULL`),
+    index("ix_project_resource_allocations_tenant_asset")
+      .on(table.tenantId, table.assetId, table.startDate, table.endDate)
+      .where(sql`${table.assetId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-048 (T-03, migration 0102 — D-07/BR-094/G-58): the contract's
+ * scope/price/schedule deltas — INERT UNTIL APPROVED (the CHECK pins
+ * effect_applied_at to the APPROVED state; the approval gate precedes
+ * any budget, billing or contract-value effect); G-58's exactly-once
+ * stamp. price_delta is SIGNED (a credit-side change order is legal).
+ * Evidence discipline: no DELETE (REJECTED stays readable). */
+export const changeOrders = pgTable(
+  "change_orders",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    coNo: text("co_no"),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    scopeDelta: text("scope_delta"),
+    scopeDeltaAr: text("scope_delta_ar"),
+    priceDelta: numeric("price_delta", { precision: 19, scale: 4 }).notNull(),
+    scheduleDeltaDays: integer("schedule_delta_days"),
+    status: text("status").notNull().default("DRAFT"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    submittedBy: uuid("submitted_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    rejectedAt: timestamp("rejected_at", { withTimezone: true, mode: "string" }),
+    rejectedBy: uuid("rejected_by"),
+    rejectionReason: text("rejection_reason"),
+    effectAppliedAt: timestamp("effect_applied_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_change_orders_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_change_orders_tenant_project_no").on(
+      table.tenantId,
+      table.projectId,
+      table.coNo,
+    ),
+    index("ix_change_orders_tenant_project_status").on(
+      table.tenantId,
+      table.projectId,
+      table.status,
+    ),
+    index("ix_change_orders_tenant_effect")
+      .on(table.tenantId, table.projectId)
+      .where(sql`${table.status} = 'APPROVED'`),
+  ],
+);
+
+/** PHASE-048 (T-04, migration 0103 — D-08/PR-06, the L2-20 home): the
+ * sub contract register — value, currency, retention % (BR-092 per
+ * contract — tenant DATA, never a global constant), the period. Master
+ * data: DELETE granted (the certificates' RESTRICT edge protects the
+ * ones with history). */
+export const subcontractorAgreements = pgTable(
+  "subcontractor_agreements",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    partnerId: uuid("partner_id").notNull(),
+    agreementNo: text("agreement_no").notNull(),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    scope: text("scope"),
+    agreementValue: numeric("agreement_value", { precision: 19, scale: 4 }).notNull(),
+    currencyCode: text("currency_code").notNull(),
+    retentionPercent: numeric("retention_percent", { precision: 5, scale: 2 }).notNull(),
+    startDate: date("start_date"),
+    endDate: date("end_date"),
+    status: text("status").notNull().default("DRAFT"),
+    activatedAt: timestamp("activated_at", { withTimezone: true, mode: "string" }),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    cancelReason: text("cancel_reason"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_subcontractor_agreements_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_subcontractor_agreements_tenant_project_no").on(
+      table.tenantId,
+      table.projectId,
+      table.agreementNo,
+    ),
+    index("ix_subcontractor_agreements_tenant_project").on(
+      table.tenantId,
+      table.projectId,
+      table.status,
+    ),
+    index("ix_subcontractor_agreements_tenant_partner").on(table.tenantId, table.partnerId),
+  ],
+);
+
+/** PHASE-048 (T-04, migration 0103 — D-08): the sub progress certificate
+ * (المستخلص) — cumulative %, this period's gross/retention/net with the
+ * arithmetic floor (retention + net = gross). Evidence discipline: no
+ * DELETE. The AP purchase linkage (the debit-note/PO chain) is W-11's
+ * engine — its stamp columns land additively with that wave. */
+export const subcontractorCertificates = pgTable(
+  "subcontractor_certificates",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    agreementId: uuid("agreement_id").notNull(),
+    certificateNo: text("certificate_no"),
+    certificateDate: date("certificate_date").notNull(),
+    progressPercent: numeric("progress_percent", { precision: 5, scale: 2 }).notNull(),
+    grossValue: numeric("gross_value", { precision: 19, scale: 4 }).notNull(),
+    retentionWithheld: numeric("retention_withheld", { precision: 19, scale: 4 }).notNull(),
+    netPayable: numeric("net_payable", { precision: 19, scale: 4 }).notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_subcontractor_certificates_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_subcontractor_certificates_tenant_no").on(
+      table.tenantId,
+      table.agreementId,
+      table.certificateNo,
+    ),
+    index("ix_subcontractor_certificates_tenant_agreement").on(
+      table.tenantId,
+      table.agreementId,
+      table.certificateDate,
+    ),
+  ],
+);
+
+/** PHASE-048 (T-04, migration 0103 — D-09/G-55/G-56): the ONE retention
+ * ledger, BOTH sides — the CUSTOMER row per project (the customer
+ * contract's commercial register: contract_value + currency + hold % —
+ * the eleven-table inventory ships no standalone contracts table, so
+ * the customer-side retention account IS the contract's financial
+ * spine) and the SUBCONTRACTOR row per agreement (its terms read from
+ * the agreement — one source of truth). Evidence discipline: no
+ * DELETE. */
+export const retentionAccounts = pgTable(
+  "retention_accounts",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    kind: text("kind").notNull(),
+    subcontractorAgreementId: uuid("subcontractor_agreement_id"),
+    contractValue: numeric("contract_value", { precision: 19, scale: 4 }),
+    currencyCode: text("currency_code"),
+    holdPercent: numeric("hold_percent", { precision: 5, scale: 2 }),
+    accruedBalance: numeric("accrued_balance", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    releasedAmount: numeric("released_amount", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    takingOverDate: date("taking_over_date"),
+    defectLiabilityDate: date("defect_liability_date"),
+    status: text("status").notNull().default("ACTIVE"),
+    releasedAt: timestamp("released_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_retention_accounts_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_retention_accounts_tenant_project_customer")
+      .on(table.tenantId, table.projectId)
+      .where(sql`${table.kind} = 'CUSTOMER'`),
+    uniqueIndex("uq_retention_accounts_tenant_agreement_sub")
+      .on(table.tenantId, table.subcontractorAgreementId)
+      .where(sql`${table.kind} = 'SUBCONTRACTOR'`),
+    index("ix_retention_accounts_tenant_project").on(
+      table.tenantId,
+      table.projectId,
+      table.kind,
+    ),
+  ],
+);
+
+/** PHASE-048 (T-04, migration 0103 — D-10/G-57, the L2-15 home): the
+ * customer billing event — PROGRESS/ADVANCE/FINAL, the cumulative %,
+ * this certificate's gross/retention/net (the arithmetic floor), the
+ * currency snapshot (FX applies at posting per the existing
+ * discipline), the approval link, and the generated-invoice stamp
+ * (BR-093's ceiling reads the retention account's contract_value + the
+ * approved change orders' deltas). Evidence discipline: no DELETE. */
+export const progressCertificates = pgTable(
+  "progress_certificates",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    certificateNo: text("certificate_no"),
+    certificateDate: date("certificate_date").notNull(),
+    kind: text("kind").notNull(),
+    cumulativePercent: numeric("cumulative_percent", { precision: 5, scale: 2 }).notNull(),
+    grossValue: numeric("gross_value", { precision: 19, scale: 4 }).notNull(),
+    retentionAmount: numeric("retention_amount", { precision: 19, scale: 4 }).notNull(),
+    netValue: numeric("net_value", { precision: 19, scale: 4 }).notNull(),
+    currencyCode: text("currency_code").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    submittedBy: uuid("submitted_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    voidedAt: timestamp("voided_at", { withTimezone: true, mode: "string" }),
+    voidReason: text("void_reason"),
+    salesInvoiceId: uuid("sales_invoice_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_progress_certificates_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_progress_certificates_tenant_no").on(
+      table.tenantId,
+      table.projectId,
+      table.certificateNo,
+    ),
+    index("ix_progress_certificates_tenant_project").on(
+      table.tenantId,
+      table.projectId,
+      table.certificateDate,
+    ),
+    index("ix_progress_certificates_tenant_ceiling")
+      .on(table.tenantId, table.projectId)
+      .where(sql`${table.status} = 'APPROVED'`),
+  ],
+);
+
+/** PHASE-048 (T-04, migration 0103 — D-12/BR-096): the dispatch board's
+ * row ON THE EXISTING service_orders (never a new order surface) — the
+ * NEW→SCHEDULED→DISPATCHED→IN_PROGRESS→COMPLETED→CLOSED machine with
+ * the stamp law, the technician, the SLA response event (the W-12
+ * single-clock service's raw input — is_paused is its state, the pause
+ * history and the breach escalation are the engine's), the completion
+ * notes (the parts-used record is the service-order line issue path).
+ * Evidence discipline: no DELETE (CLOSED is the terminal state). */
+export const serviceVisits = pgTable(
+  "service_visits",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    serviceOrderId: uuid("service_order_id").notNull(),
+    technicianEmployeeId: uuid("technician_employee_id"),
+    scheduledStart: timestamp("scheduled_start", { withTimezone: true, mode: "string" }).notNull(),
+    scheduledEnd: timestamp("scheduled_end", { withTimezone: true, mode: "string" }).notNull(),
+    status: text("status").notNull().default("NEW"),
+    dispatchedAt: timestamp("dispatched_at", { withTimezone: true, mode: "string" }),
+    firstRespondedAt: timestamp("first_responded_at", { withTimezone: true, mode: "string" }),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    isPaused: boolean("is_paused").notNull().default(false),
+    completionNotes: text("completion_notes"),
+    completionNotesAr: text("completion_notes_ar"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_service_visits_id_tenant").on(table.id, table.tenantId),
+    index("ix_service_visits_tenant_order").on(
+      table.tenantId,
+      table.serviceOrderId,
+      table.status,
+    ),
+    index("ix_service_visits_tenant_technician")
+      .on(table.tenantId, table.technicianEmployeeId, table.scheduledStart)
+      .where(sql`${table.technicianEmployeeId} IS NOT NULL`),
+    index("ix_service_visits_tenant_window").on(
+      table.tenantId,
+      table.scheduledStart,
+      table.scheduledEnd,
+    ),
+  ],
+);
+
+/** PHASE-048 (T-04, migration 0103 — D-11/R-04, the v3.2/CR-50 addition):
+ * the IAS 23 borrowing-costs scope tracking — RIDES the budget lines it
+ * capitalizes: the qualifying window slice, the expenditures base, the
+ * capitalized/expensed split (ADR-0009 money), the applied-rate
+ * snapshot (the register's REQUIRES_VERIFICATION law enforced at the
+ * posting — NO rate ships in the schema, red line 5; the register is
+ * the settings-plane key projects.ias23_capitalization_rate). Evidence
+ * discipline: no DELETE. */
+export const ias23Capitalizations = pgTable(
+  "ias23_capitalizations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    projectId: uuid("project_id").notNull(),
+    budgetLineId: uuid("budget_line_id").notNull(),
+    windowStart: date("window_start").notNull(),
+    windowEnd: date("window_end").notNull(),
+    expendituresAmount: numeric("expenditures_amount", { precision: 19, scale: 4 }).notNull(),
+    capitalizedAmount: numeric("capitalized_amount", { precision: 19, scale: 4 }).notNull(),
+    expensedAmount: numeric("expensed_amount", { precision: 19, scale: 4 }).notNull(),
+    rateSnapshot: numeric("rate_snapshot", { precision: 9, scale: 6 }).notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    postedAt: timestamp("posted_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_ias23_capitalizations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_ias23_capitalizations_line_window").on(
+      table.tenantId,
+      table.budgetLineId,
+      table.windowStart,
+    ),
+    index("ix_ias23_capitalizations_tenant_project").on(
+      table.tenantId,
+      table.projectId,
+      table.windowStart,
+    ),
   ],
 );

@@ -841,7 +841,13 @@ export const AUTOMOTIVE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     "hr.attendance",
     "hr.leave",
     "hr.shifts",
-  
+    // PHASE-048 (W-8 — D-16, the projects-plane enablement, CR-36f,
+    // 2026-11-20): the THREE FEATURE FLAGS ride the project-carrying
+    // templates by default (0103 §3 — the stored registry's guarded
+    // append; the fourteen PERMISSION keys ride ROLES, matrix §3.26).
+    "projects.wbs",
+    "projects.contracting",
+    "projects.fieldservice",
   ],
   default_modules_enabled: [
     "accounting",
@@ -1668,6 +1674,16 @@ export const PROFESSIONAL_SERVICES_TEMPLATE_MANIFEST: IndustryTemplateManifest =
     "hr.recruitment",
     "hr.training",
     "hr.org",
+    // PHASE-048 (W-8 — D-16, the projects-plane enablement, CR-36f,
+    // 2026-11-20): the THREE FEATURE FLAGS ride the project-carrying
+    // templates by default (the phase doc's composable units — the §3
+    // schema's module.projects segment; the fourteen PERMISSION keys are
+    // the separate authorization surface seeded in 0103 §1 and ride
+    // ROLES, never a template's required chain — matrix §3.26's dated
+    // note).
+    "projects.wbs",
+    "projects.contracting",
+    "projects.fieldservice",
   ],
   default_modules_enabled: [
     "accounting",
@@ -3446,6 +3462,13 @@ export const RENTAL_LOGISTICS_TEMPLATE_MANIFEST: IndustryTemplateManifest = deep
     "items.item_master",
     "partners.statements",
     "treasury.accounts",
+    // PHASE-048 (W-8 — D-16, the projects-plane enablement, CR-36f,
+    // 2026-11-20): the THREE FEATURE FLAGS ride the project-carrying
+    // templates by default (0103 §3 — the stored registry's guarded
+    // append; the fourteen PERMISSION keys ride ROLES, matrix §3.26).
+    "projects.wbs",
+    "projects.contracting",
+    "projects.fieldservice",
   ],
   default_modules_enabled: [
     "accounting",

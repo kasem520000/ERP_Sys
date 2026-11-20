@@ -31,11 +31,23 @@ permanent rule.
 | `capabilities.log` | capabilities matrix and fixture agree | EXIT=0 |
 | `desktop-shell.log` / `mobile-shell.log` | PASS / PASS | EXIT=0 |
 | `docs-validate-final.log` | docs:validate 33/33 AFTER the plan + NEXT_ACTION changes | EXIT=0 |
+| `docs-validate-amendment.log` | docs:validate 33/33 AFTER the §7-rulings amendment changes (the amendment head `765e481`) | EXIT=0 |
 | `render-spec-browser-present.log` | **THE NO-MASKING PROOF** — the render spec re-run with `chromium_headless_shell-1248` present (the two tests that skipped in the full-suite run): 2/2 GREEN at the `0926a74` tree | VITEST_EXIT=0 |
 | `capture-wrapper-selftest-green-vitest.log` | the wrapper self-test, quadrant 1 — a real green vitest run (talent-math.spec) | VITEST_EXIT=0 |
 | `capture-wrapper-selftest-red-vitest.log` | the wrapper self-test, quadrant 2 — a CONTROLLED red (an untracked probe spec with a by-construction failing assertion, deleted immediately after; `1 failed (1)` + the summary guard) | VITEST_EXIT=1 |
 | `capture-wrapper-selftest-red-nonvitest.log` | the wrapper self-test, quadrant 3 — a non-vitest command exiting 1 | EXIT=1 |
 | `capture-wrapper-selftest-missing-binary.log` | the wrapper self-test, quadrant 4 — a missing binary | EXIT=127 |
+
+> **[Dated 2026-11-20 (W-8 — the owner's approval-dispatch amendment A-1, an
+> F1 record correction at the claim site): the envelope's sealed table gains
+> its 26th row.]** The amendment session (`765e481`) shipped
+> `docs-validate-amendment.log` into this envelope — the docs:validate run
+> after the §7-rulings amendment's changes — but the table above declared
+> only 25 of the 26 physical files (the amendment commit's own message said
+> "25 logs + README"). The owner's verification counted the physical 26 and
+> dispatched the correction; this dated row closes the gap — no log was
+> added, removed, or renamed, and the file's own stamp (33/33, EXIT=0)
+> stands as shipped.
 
 Static recounts this session (no run needed): migrations journal **0099**
 (idx 98, 99 files) · `ROUTE_PERMISSIONS` **988** rows · `REPORT_CONTRACTS`
@@ -111,3 +123,27 @@ The delta between the two trees for this file is ONLY the (d4) block (the
 W-4 commit `83362ff` added it; the file is unchanged since — verified by
 `git log --follow`), so the red run isolates the defect with no other
 variable.
+
+> **[Dated 2026-11-20 (W-8 — the owner's approval-dispatch amendment A-2,
+> the NF-12 finding, a binding verifier-protocol amendment): THE VERDICT
+> RULE FOR EVERY DB-CONFIGURED VITEST RUN — judge by the SUMMARY LINES or
+> the guarded wrapper, never the raw exit code alone.]** The owner's
+> verification session proved, with a calibrated probe at the pre-fix head
+> `7d22c49` AND at the then-current head, under BOTH Node 22.12.0 and
+> Node 24, that vitest 3.2.7 under the DB configuration (the forks pool +
+> the embedded-PG globalSetup) can exit **0 on an actually-red run** — and
+> NOT only on the suite-level failure class the W-6 guard's comment
+> described (a `beforeAll` crash): the exit-code lie includes
+> **single-test assertion failures** (`Tests 1 failed` with process code
+> 0). The `echo "exit=$?"` in the red-side command above remains the
+> honest recorder of the process code — but the RUN'S VERDICT is read
+> from the log's own summary lines (`Test Files … failed` / `Tests …
+> failed` / `Unhandled Error`) or captured through the guarded wrapper
+> (`scripts/capture-evidence.sh`, post-W-6 — its summary guard parses
+> exactly those lines and forces the stamp red; every stamp in this
+> envelope's logs is therefore truthful even where the process code lied).
+> For the NF-9 protocol itself the expected red is `1 failed | 9 passed —
+> (d4) by name`: **the failure line is the verdict**; the exit code is
+> corroborating evidence only. (The guard's own scope description in
+> `capture-evidence.sh` carries the matching dated line — same amendment,
+> both sites.)

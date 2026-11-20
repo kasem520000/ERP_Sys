@@ -1,8 +1,89 @@
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (**PHASE-047 COMPLETE — the closure wave W-7 delivered: the canon docs + the ID_LEDGER flip (BR-001…091) + the full gate sweep (the DB suite 259/259 · 3,623/3,623) + the completion report + the triple flip + the archive + the tag `phase/047`; W-6 the reports + proof wave; W-5 the web plane; W-4 + the NF-9/10/11 fixes; W-3 + the NF-7/8 fixes; W-2 + the NF-4/5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments)**
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-8 the foundation wave delivered: migrations 0100–0103 + every mirror/registry/catalog/matrix/pin in ONE increment (the fourteen projects.* keys 312 → 326 · ENTITY_CATALOG 307 → 318 · the A-suite +66 · the three feature flags + the manifest enablements · the IAS-23 register as the settings key); the full DB suite at the new count green + the chain re-proven from zero; the approval amendments A-1/A-2 + the forward-progressive W-5 date-defect repair; W-9 the engines NEXT)**
 
 > **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-20 — **PHASE-048 W-8 — THE FOUNDATION WAVE DELIVERED; THE
+  PHASE'S CODE WAVES OPEN** (T-01 + T-02 + T-03 + T-04, the plan §3 W-8;
+  on the owner-approved plan head `765e481`, this session's fresh clone —
+  the same-session evidence rule's SIXTEENTH consecutive wave; the owner's
+  2026-11-19 approval dispatch: 047 ACCEPTED through `5b73bd1`, the NF-9
+  protocol confirmed with the (d4) EXEMPTION, **the plan APPROVED with the
+  two binding amendments A-1/A-2 riding W-8 — both delivered**):
+  **MIGRATIONS 0100–0103** — 0100 the WBS tree (`project_wbs_tasks`: the
+  D-03 org-tree-precedent shape with the single-predecessor edge +
+  weight/percent_complete, the rollup recomputed from the leaves) + THE
+  `crm_time_entries` WBS DIMENSION (the phase doc's "+1 column family");
+  0101 the budgets cluster (`project_budgets` DRAFT→APPROVED→CLOSED with
+  the no-delete 028 discipline · `project_budget_lines` by cost type ×
+  WBS node × period with the two-partial-unique CELL LAW ·
+  `project_resource_allocations` employee XOR asset); 0102 `change_orders`
+  (BR-094's STRUCTURAL inert-until-approved floor — effect_applied_at
+  gated to APPROVED at the DB level + the approval-link law + G-58's
+  exactly-once stamp); 0103 the contracting core (subcontractor
+  agreements + certificates with the retention+net=gross arithmetic
+  floor · **the ONE retention ledger both sides** — the CUSTOMER row IS
+  the customer contract's commercial register (value + currency + hold
+  %, BR-092's home), the SUBCONTRACTOR row reads its terms from the
+  agreement · progress certificates with the invoice stamp + the ceiling
+  read path · service visits on the EXISTING service_orders with the
+  D-12 stamp law + the IN_PROGRESS-only pause gate · `ias23_
+  capitalizations` riding the budget lines) + **THE DATA-ONLY GRANTS (the
+  0098 pattern)**: the FOURTEEN projects.* permission keys (matrix §3.26,
+  **312 → 326**; owner all fourteen, accountant the five finance-read
+  view keys), the THREE FEATURE FLAGS on business + enterprise, the three
+  manifest enablements. **THE IAS-23 RATE REGISTER as the settings key
+  `projects.ias23_capitalization_rate`** (D-02's config row — NOT a
+  table; no default, REQUIRES_VERIFICATION at the W-14 posting,
+  pin-neutral by construction — the +11 catalog count stands).
+  **EVERY MIRROR IN ONE INCREMENT:** the journal +4 + the MIGRATIONS
+  manifest + the migrations.spec pin; the Drizzle mirrors +11 + the
+  time-entry column; tables.registry +11 (**the generated A-suite +66**);
+  ENTITY_CATALOG **307 → 318** (+ the crm_time_entries extension note);
+  the drift checker's list + the spec's copy + the identity-flows census
+  pin (the 0086/0092 lesson); FEATURE_DEPS +3 (the D-16 substrate law) +
+  the layer-fixtures' 0103 §2 transcription; templates.ts + the three
+  docs manifest mirrors + **the golden effective-configs re-pin (27 of 37
+  moved, the dated review note)** + the templates-017/019 stored-hash
+  re-pins + the contracts manifests test's rental pin; the manifest
+  schema's FEATURE_KEY_MODULE_SEGMENT gains `projects` (the one-increment
+  law); **ROUTE_PERMISSIONS 988 = 988** (the keys-seed-first discipline,
+  §3.26's dated note — the /api/v1/projects/* families bind as W-9…W-13
+  ship). **THE APPROVAL AMENDMENTS:** **A-1** the phase048-plan README's
+  sealed table gains its 26th row (`docs-validate-amendment.log` — the
+  F1 record correction at the claim site, dated); **A-2 (NF-12)** the
+  README's verifier-commands section gains the binding VERDICT RULE
+  (judge by the SUMMARY LINES or the guarded wrapper, never the raw exit
+  code — the owner's calibrated probe proved the DB-configured vitest
+  exits 0 on actually-red runs INCLUDING single-test assertion failures,
+  under Node 22.12.0 and 24 both) + the capture-evidence.sh guard's dated
+  scope line (the W-6 comment described only the suite-level class).
+  **THE FORWARD-PROGRESSIVE REPAIR (§1a(a) — a 047 W-5 latent date defect
+  the wave's own unit battery caught):** the two web clock-pin test
+  blocks (employee-talent-360 + hr-org-board) pinned 2026-11-19 and then
+  IMMEDIATELY un-pinned it (`vi.useRealTimers()` on the wrong line) — the
+  pin only held while real time was 2026-11-19; the session's UTC
+  midnight flip turned "6 days remaining" into "5 days remaining" and
+  three chip tests red. REPAIRED test-only: the pins now hold
+  (`useFakeTimers({ shouldAdvanceTime: true })` + the real restore in
+  afterEach); zero production change. **GATES (this session, every log
+  kept — `audit-evidence/phase048-w8/`):** typecheck 8/8 · lint 8/8 ·
+  depcruise clean 1,993 · 14,855 · unit 8/8 (api 712 · web 122 · mobile
+  393 · desktop 274 · ui 43 · contracts 56 · domain-core 38 · sync-core
+  36) · **THE FULL DB SUITE 259/259 files AT THE NEW COUNT (the 3,623
+  baseline + the A-suite's 66 new arms) · 0 failed · 0 skipped**
+  (chromium-1248 present — the render pair green) · **the migration
+  chain re-proven from zero** (the suite's embedded boot + the standalone
+  scratch check:rls **318 tables · 0 violations**) · drift **326 = 326**
+  · manifests 13/13 · i18n 6,433 = 6,433 + 371 + tokens 50/50 · docs
+  33/33 · id-ledger 0 errors + self-test OK (the 048 reservations
+  G-55…58 · INV-033 · BR-092…096 STAND — the flip is W-15's) ·
+  history-secrets 0 · capabilities agree · shells PASS · the negative
+  boundary PASS. Standing carried unchanged: §7(b)'s three 045 remarks ·
+  PHASE-043 + RISK-031/032 OPEN · the register's two narrowed items · the
+  045 self-board Tabs defect (the owner dispatches). NOT production
+  approval. — PHASE-048
 
 - 2026-11-19 — **PHASE-047 W-7 — THE CLOSURE WAVE DELIVERED; THE PHASE
   COMPLETE** (T-16 + T-18; on the W-6 head `e76bbd0` + this wave's

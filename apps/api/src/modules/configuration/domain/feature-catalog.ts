@@ -318,6 +318,16 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "hr.recruitment": ["payroll.employees"],
   "hr.training": ["payroll.employees"],
   "hr.org": ["payroll.employees"],
+  // PHASE-048 (CR-18 — Projects & Contracting, the W-8 foundation wave,
+  // 2026-11-20): the three feature flags ride the EXISTING delivered
+  // substrates (the plan's D-16 — template-composable units; the fourteen
+  // permission keys are the separate authorization surface, matrix §3.26):
+  // the WBS plane on the 019 projects dimension (accounting.projects),
+  // the contracting plane additionally on sales invoices (G-57's billing
+  // target), and the field-service plane on the 019 service orders.
+  "projects.wbs": ["accounting.projects"],
+  "projects.contracting": ["accounting.projects", "sales.invoices"],
+  "projects.fieldservice": ["crm.service_orders"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

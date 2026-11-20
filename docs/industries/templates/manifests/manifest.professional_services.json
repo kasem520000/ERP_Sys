@@ -14,7 +14,10 @@
     "hr.performance",
     "hr.recruitment",
     "hr.training",
-    "hr.org"
+    "hr.org",
+    "projects.wbs",
+    "projects.contracting",
+    "projects.fieldservice"
   ],
   "default_modules_enabled": [
     "accounting",

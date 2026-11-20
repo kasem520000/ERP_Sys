@@ -64,7 +64,11 @@ const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   // PHASE-045 (0088): the automotive pin re-pinned — required_feature_keys
   // gains the hr block (the workforce-industry enablement; canonical +
   // stored + docs mirror + pins moved together, the 0066 §9 procedure).
-  "industry.automotive": "sha256:c26469ce109cfdb909ceff876eee3aec46d8d2f903c4aacbf3d222f6b029348f",
+  // PHASE-048 (W-8, 2026-11-20): re-pinned again — required_feature_keys
+  // gains the THREE PROJECTS FLAGS (the projects-plane enablement, D-16 /
+  // 0103 §3; canonical + stored + docs mirror + pins moved together, the
+  // 0098 §3 procedure).
+  "industry.automotive": "sha256:51ed444287022f6143c8848f6526520d7859ab36916d4749382e005ab6f552f3",
   "industry.distribution": "sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d",
 });
 

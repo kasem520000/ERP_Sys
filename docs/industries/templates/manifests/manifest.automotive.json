@@ -16,7 +16,10 @@
     "treasury.cashier_shifts",
     "hr.attendance",
     "hr.leave",
-    "hr.shifts"
+    "hr.shifts",
+    "projects.wbs",
+    "projects.contracting",
+    "projects.fieldservice"
   ],
   "default_modules_enabled": [
     "accounting",

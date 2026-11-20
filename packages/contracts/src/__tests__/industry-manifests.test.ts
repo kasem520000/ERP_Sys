@@ -1000,6 +1000,10 @@ describe("shipped industry template manifests (v1.0.0 — retail / grocery / res
     // / distribution.shipment_tracking intake pair is NEVER granted; the
     // shell's own rental_contracts capability composes the live contracts
     // engine, the healthcare insurance_claim_billing precedent).
+    // PHASE-048 (W-8, 2026-11-20 — D-16, the projects-plane enablement):
+    // the THREE PROJECTS FLAGS join the required chain (0103 §3 — the
+    // stored registry's guarded append; the canonical + docs mirrors moved
+    // together, the 0098 §3 procedure).
     expect(RENTAL_LOGISTICS_TEMPLATE_MANIFEST.required_feature_keys).toEqual([
       "industry.template_engine",
       "crm.service_contracts",
@@ -1008,6 +1012,9 @@ describe("shipped industry template manifests (v1.0.0 — retail / grocery / res
       "items.item_master",
       "partners.statements",
       "treasury.accounts",
+      "projects.wbs",
+      "projects.contracting",
+      "projects.fieldservice",
     ]);
     expect(RENTAL_LOGISTICS_TEMPLATE_MANIFEST.capability_prerequisites.rental_contracts).toEqual({
       level: "REQUIRED",

@@ -1,6 +1,6 @@
 # PHASE-048 — Projects & Contracting
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, IDs bound by v3.1/CR-45, scope extended by v3.2/CR-50) · **Wave:** 2 / Stage 13 · **Register:** [CR-18](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** IN_PROGRESS — **W-8 (the foundation: migrations 0100–0103 + every mirror) DELIVERED 2026-11-20**; the master plan APPROVED 2026-11-19 with the two binding amendments A-1/A-2 (delivered in W-8) · **Wave:** 2 / Stage 13 · **Register:** [CR-18](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-06) · §11 (PR-01…PR-15) · §29.1 (DF-08) · [gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER2_IFRS_ADVANCED.md) (L2-15 milestone billing · L2-20 subcontracting — v3.1 ID bindings on existing scope) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-04 borrowing costs — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2/§6.5
 
 ## 1. Phase Overview

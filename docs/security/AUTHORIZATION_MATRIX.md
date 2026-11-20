@@ -781,6 +781,64 @@ notifications' own permission plane — no new key.
 > register's contract never ships the document NUMBER (amendment A-4 —
 > employee code + name + kind + dates + band only).
 
+### §3.26 Projects & contracting (PHASE-048; catalog 312 → 326)
+
+The projects & contracting cluster (CR-18 — WBS/budgets/allocations, change orders,
+subcontracting with certificates, the retention ledger, progress-certificated billing,
+EVM, and the field-service dispatch board on the existing service orders). **All
+fourteen keys seed in migration `0103` §1 — the permission catalog extends 312 → 326
+(seed = mirror, zero drift).** The entitlement/authorization divergence (the §3.25
+precedent, deliberate): the THREE FEATURE FLAGS — `projects.wbs` · `projects.contracting`
+· `projects.fieldservice` (the phase doc's composable units, the §3 manifest schema's
+single-segment module.feature shape) — are the ENTITLEMENT keys: business + enterprise
+carry them (0103 §2) and the three project-carrying industry templates
+(professional_services, automotive, rental_logistics) compose them by default (0103 §3).
+The fourteen keys below are the AUTHORIZATION surface and ride ROLES (0103 §1) — never
+the plans. **NOT ledger-free** (unlike §3.25): `projects.change_order.approve` and
+`projects.certificates.approve` gate the G-58/G-57 posting acts — every posting still
+rides the centralized engine with registered source keys under INV-013 idempotency;
+the approval keys are the SoD surface (creator ≠ approver, §4), the posting itself is
+the engine's.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `projects.wbs.view` | View WBS trees, milestones, dependencies and progress / عرض هيكل عمل المشروع والمعالم والتبعيات ونسب الإنجاز | owner, accountant | tenant | no (read-only over the projects plane) |
+| `projects.wbs.manage` | Manage WBS tasks and dependencies (cycle-safe moves) / إدارة مهام هيكل العمل والتبعيات (نقل آمن من الحلقات) | owner | tenant | **yes** (the dependency graph feeds BR-095's rollup and the EVM plane — a cycle is unrepresentable through the API (the D-09 detectCycle law); re-parenting rewrites the tree) |
+| `projects.budget.view` | View project budgets and the vs-actual rollups / عرض موازنات المشاريع والمقارنات بالفعلي | owner, accountant | tenant | no (read-only; the INV-033 reconciliation is the W-9 service's typed output) |
+| `projects.budget.manage` | Manage budgets and the cost curve / إدارة الموازنات ومنحنى التكلفة | owner | tenant | **yes** (the APPROVED curve is the PV baseline — approval flips it read-only at the DB floor (no DELETE grant); money-adjacent data (ADR-0009)) |
+| `projects.allocation.manage` | Manage employee and asset allocations / إدارة تخصيص الموظفين والأصول | owner | tenant | **yes** (allocations span employees and assets — the over-allocation warning is read-side, never a write refusal; the CMMS handoff reads the asset side) |
+| `projects.change_order.view` | View change orders / عرض أوامر التغيير | owner, accountant | tenant | no (read-only; REJECTED orders stay readable — the contract history) |
+| `projects.change_order.approve` | Approve change orders (the G-58 gate) / اعتماد أوامر التغيير (بوابة G-58) | owner | tenant | **yes** (approval is the only path to any budget/billing/contract-value effect (BR-094's inert-until-approved law, structural at the DB floor); G-58's delta posts exactly once (INV-013)) |
+| `projects.contracting.view` | View subcontracts, certificates and retention / عرض عقود الباطن والمستخلصات والاحتجاز | owner, accountant | tenant | no (read-only over the commercial record) |
+| `projects.contracting.manage` | Manage subcontracts and certificates / إدارة عقود الباطن والمستخلصات | owner | tenant | **yes** (the certificates drive the AP purchase obligation; the retention % comes from the contract (BR-092 — tenant DATA, never a global constant)) |
+| `projects.certificates.approve` | Approve progress certificates / اعتماد مستخلصات الإنجاز | owner | tenant | **yes** (approval triggers G-57's revenue posting + the sales-invoice generation in-transaction, and is the BR-093 ceiling's enforcement point — cumulative billing ≤ the approved contract value including approved change orders) |
+| `projects.retention.manage` | Manage retention accounts and releases / إدارة حسابات الاحتجاز والصرف | owner | tenant | **yes** (G-55/G-56 ride the engine; the release schedule's taking-over/defect-liability gates are the commercial record; the customer-side account carries the contract's value + currency (the ceiling's base)) |
+| `projects.evm.view` | View EVM analysis and forecasts / عرض تحليل القيمة المكتسبة والتوقعات | owner, accountant | tenant | no (read-only over the computed plane — PV/EV/AC, CPI/SPI, EAC/ETC; EV never exceeds the approved budget (the typed refusal, D-06)) |
+| `projects.fieldservice.view` | View the field-service dispatch board / عرض لوحة الخدمة الميدانية | owner | tenant | no (read-only over the board; the visits' status machine is the dispatch key's) |
+| `projects.fieldservice.dispatch` | Dispatch technicians and manage visits / إرسال الفنيين وإدارة الزيارات | owner | tenant | **yes** (the status machine's transitions + the SLA pause states feed BR-096's breach escalation — the single clock service's write surface) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — the keys-seed-first discipline, the §3.23/§3.24/
+§3.25 precedent): the `/api/v1/projects/{wbs,budgets,allocations,change-orders,
+contracting,certificates,retention,evm,fieldservice}` families land with the W-9…W-13
+service waves, each route on the exact keys above. Role grants per 0103 §1: the owner
+template holds all fourteen; the accountant the FIVE finance-read keys
+(projects.wbs.view · projects.budget.view · projects.change_order.view ·
+projects.contracting.view · projects.evm.view — the finance side's read plane over the
+projects substrate; the dispatch board's view key stays owner-only — field-service
+operations are tenant-granted beyond the baseline). The alert surfaces ride the
+notifications' own permission plane — no new key.
+
+> **[Dated 2026-11-20 (W-8 — T-01…T-04, the foundation wave): the fourteen
+> keys seeded; ROUTE_PERMISSIONS stays 988 = 988.]** Migration 0103 §1 seeds
+> the catalog 312 → 326 with ZERO route rows added — the keys land first and
+> the `/api/v1/projects/*` families bind them as the W-9…W-13 service waves
+> ship (the §3.23/§3.24/§3.25 keys-seed-first precedent; every future
+> route-row addition carries its own dated note here, the 979 → 988 ledger
+> discipline). The three FEATURE FLAGS (projects.wbs · projects.contracting
+> · projects.fieldservice) grant to business + enterprise (0103 §2) and the
+> three project-carrying templates compose them by default (0103 §3) — the
+> entitlement/authorization divergence above, the §3.25 precedent.
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

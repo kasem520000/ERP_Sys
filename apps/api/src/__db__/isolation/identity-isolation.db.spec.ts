@@ -128,6 +128,10 @@ const EXPECTED_ROWS_PER_TENANT: Record<string, number> = {
   // PHASE-041: the unified interaction log carries a MESSAGE + a CALL row
   // per tenant (both kinds exercise the kind↔channel CHECK shapes).
   communication_log: 2,
+  // PHASE-048 (CR-18): the retention ledger carries BOTH sides per tenant
+  // (the CUSTOMER register row + the SUBCONTRACTOR row per agreement —
+  // the one-ledger-both-sides law, D-09).
+  retention_accounts: 2,
 };
 function expectedRowsFor(table: string): number {
   return EXPECTED_ROWS_PER_TENANT[table] ?? 1;
@@ -3380,6 +3384,150 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-048 (CR-18, migrations 0100–0103; the W-8 foundation wave,
+  // 2026-11-20): the projects cluster — ELEVEN tables, FK-ordered (wbs
+  // tasks on the a1a1a1a1 projects rows → budgets → lines (task-bound) →
+  // allocations (the c0290291 employees rows) → change orders → sub
+  // agreements (the b5b5b5b5 partners rows) → sub certificates → the
+  // retention ledger (BOTH kinds: the CUSTOMER row per project + the
+  // SUBCONTRACTOR row per agreement — the two rows per tenant set the
+  // expectedRowsFor override) → progress certificates → service visits
+  // (the 98989898 service_orders rows) → ias23 capitalizations (the
+  // budget lines). One row per table per tenant (retention: two),
+  // idempotent, FK-consistent at each tenant's OWN fixtures.
+  await superuser.query(
+    `INSERT INTO project_wbs_tasks (id, tenant_id, project_id, wbs_code, name, is_milestone,
+                                    start_date, end_date, weight, percent_complete)
+     VALUES
+       ('9b9b9b9b-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        '1', 'ISO Root Task', false, '2026-01-01', '2026-12-31', 100, 0),
+       ('9b9b9b9b-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        '1', 'ISO Root Task', false, '2026-01-01', '2026-12-31', 100, 0)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO project_budgets (id, tenant_id, project_id, name, status)
+     VALUES
+       ('9c9c9c9c-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001', 'ISO Budget', 'DRAFT'),
+       ('9c9c9c9c-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002', 'ISO Budget', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO project_budget_lines (id, tenant_id, budget_id, cost_type, wbs_task_id,
+                                       period_start, period_end, planned_amount)
+     VALUES
+       ('9d9d9d9d-0000-4000-8000-000000000001', $1, '9c9c9c9c-0000-4000-8000-000000000001',
+        'LABOR', '9b9b9b9b-0000-4000-8000-000000000001', '2026-01-01', '2026-12-31', 10000),
+       ('9d9d9d9d-0000-4000-8000-000000000002', $2, '9c9c9c9c-0000-4000-8000-000000000002',
+        'LABOR', '9b9b9b9b-0000-4000-8000-000000000002', '2026-01-01', '2026-12-31', 10000)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO project_resource_allocations (id, tenant_id, project_id, resource_kind,
+                                               employee_id, start_date, end_date, allocation_percent)
+     VALUES
+       ('9e9e9e9e-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        'EMPLOYEE', 'c0290291-0000-4000-8000-000000000001', '2026-01-01', '2026-06-30', 50),
+       ('9e9e9e9e-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        'EMPLOYEE', 'c0290291-0000-4000-8000-000000000002', '2026-01-01', '2026-06-30', 50)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO change_orders (id, tenant_id, project_id, co_no, title, price_delta, status)
+     VALUES
+       ('9f9f9f9f-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        'CO-1', 'ISO Change Order', 1000, 'DRAFT'),
+       ('9f9f9f9f-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        'CO-1', 'ISO Change Order', 1000, 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO subcontractor_agreements (id, tenant_id, project_id, partner_id, agreement_no,
+                                           title, agreement_value, currency_code, retention_percent, status)
+     VALUES
+       ('e6e6e6e6-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        'b5b5b5b5-0000-4000-8000-000000000001', 'SUB-1', 'ISO Sub Agreement', 50000, 'SAR', 10, 'DRAFT'),
+       ('e6e6e6e6-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        'b5b5b5b5-0000-4000-8000-000000000002', 'SUB-1', 'ISO Sub Agreement', 50000, 'SAR', 10, 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO subcontractor_certificates (id, tenant_id, agreement_id, certificate_no,
+                                             certificate_date, progress_percent, gross_value,
+                                             retention_withheld, net_payable, status)
+     VALUES
+       ('e7e7e7e7-0000-4000-8000-000000000001', $1, 'e6e6e6e6-0000-4000-8000-000000000001',
+        'SC-1', '2026-03-31', 50, 1000, 100, 900, 'DRAFT'),
+       ('e7e7e7e7-0000-4000-8000-000000000002', $2, 'e6e6e6e6-0000-4000-8000-000000000002',
+        'SC-1', '2026-03-31', 50, 1000, 100, 900, 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // The retention ledger: BOTH sides per tenant (the CUSTOMER row per
+  // project — the contract's commercial register — and the SUBCONTRACTOR
+  // row per agreement; the side law's CHECK shapes differ).
+  await superuser.query(
+    `INSERT INTO retention_accounts (id, tenant_id, project_id, kind, contract_value,
+                                     currency_code, hold_percent, status)
+     VALUES
+       ('e8e8e8e8-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        'CUSTOMER', 100000, 'SAR', 5, 'ACTIVE'),
+       ('e8e8e8e8-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        'CUSTOMER', 100000, 'SAR', 5, 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO retention_accounts (id, tenant_id, project_id, kind, subcontractor_agreement_id, status)
+     VALUES
+       ('e8e8e8e8-1000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        'SUBCONTRACTOR', 'e6e6e6e6-0000-4000-8000-000000000001', 'ACTIVE'),
+       ('e8e8e8e8-1000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        'SUBCONTRACTOR', 'e6e6e6e6-0000-4000-8000-000000000002', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO progress_certificates (id, tenant_id, project_id, certificate_no, certificate_date,
+                                        kind, cumulative_percent, gross_value, retention_amount,
+                                        net_value, currency_code, status)
+     VALUES
+       ('e9e9e9e9-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        'PC-1', '2026-03-31', 'PROGRESS', 25, 25000, 1250, 23750, 'SAR', 'DRAFT'),
+       ('e9e9e9e9-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        'PC-1', '2026-03-31', 'PROGRESS', 25, 25000, 1250, 23750, 'SAR', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO service_visits (id, tenant_id, service_order_id, scheduled_start, scheduled_end, status)
+     VALUES
+       ('eaeaeaea-0000-4000-8000-000000000001', $1, '98989898-0000-4000-8000-000000000001',
+        '2026-06-01T09:00:00Z', '2026-06-01T11:00:00Z', 'NEW'),
+       ('eaeaeaea-0000-4000-8000-000000000002', $2, '98989898-0000-4000-8000-000000000002',
+        '2026-06-01T09:00:00Z', '2026-06-01T11:00:00Z', 'NEW')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO ias23_capitalizations (id, tenant_id, project_id, budget_line_id, window_start,
+                                        window_end, expenditures_amount, capitalized_amount,
+                                        expensed_amount, rate_snapshot, status)
+     VALUES
+       ('ebebebeb-0000-4000-8000-000000000001', $1, 'a1a1a1a1-0000-4000-8000-000000000001',
+        '9d9d9d9d-0000-4000-8000-000000000001', '2026-01-01', '2026-03-31', 4000, 280, 3720, 0.07, 'DRAFT'),
+       ('ebebebeb-0000-4000-8000-000000000002', $2, 'a1a1a1a1-0000-4000-8000-000000000002',
+        '9d9d9d9d-0000-4000-8000-000000000002', '2026-01-01', '2026-03-31', 4000, 280, 3720, 0.07, 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -3941,6 +4089,22 @@ const OWN_ROW: Record<string, [string, string]> = {
   employee_documents: ["8e8e8e8e-0000-4000-8000-000000000001", "8e8e8e8e-0000-4000-8000-000000000002"],
   // PHASE-047 (W-3, migration 0099): the sweep's registration rows.
   hr_alert_jobs: ["8f8f8f8f-0000-4000-8000-000000000001", "8f8f8f8f-0000-4000-8000-000000000002"],
+  // PHASE-048 (CR-18, migrations 0100–0103): the projects cluster — the
+  // ELEVEN new tables' representative rows (retention_accounts owns TWO
+  // fixture rows per tenant — the CUSTOMER register row is the OWN_ROW
+  // pair, the SUBCONTRACTOR row rides the -1000- variant, the warehouses
+  // two-row precedent).
+  project_wbs_tasks: ["9b9b9b9b-0000-4000-8000-000000000001", "9b9b9b9b-0000-4000-8000-000000000002"],
+  project_budgets: ["9c9c9c9c-0000-4000-8000-000000000001", "9c9c9c9c-0000-4000-8000-000000000002"],
+  project_budget_lines: ["9d9d9d9d-0000-4000-8000-000000000001", "9d9d9d9d-0000-4000-8000-000000000002"],
+  project_resource_allocations: ["9e9e9e9e-0000-4000-8000-000000000001", "9e9e9e9e-0000-4000-8000-000000000002"],
+  change_orders: ["9f9f9f9f-0000-4000-8000-000000000001", "9f9f9f9f-0000-4000-8000-000000000002"],
+  subcontractor_agreements: ["e6e6e6e6-0000-4000-8000-000000000001", "e6e6e6e6-0000-4000-8000-000000000002"],
+  subcontractor_certificates: ["e7e7e7e7-0000-4000-8000-000000000001", "e7e7e7e7-0000-4000-8000-000000000002"],
+  retention_accounts: ["e8e8e8e8-0000-4000-8000-000000000001", "e8e8e8e8-0000-4000-8000-000000000002"],
+  progress_certificates: ["e9e9e9e9-0000-4000-8000-000000000001", "e9e9e9e9-0000-4000-8000-000000000002"],
+  service_visits: ["eaeaeaea-0000-4000-8000-000000000001", "eaeaeaea-0000-4000-8000-000000000002"],
+  ias23_capitalizations: ["ebebebeb-0000-4000-8000-000000000001", "ebebebeb-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -4929,6 +5093,55 @@ const MISMATCHED_INSERT: Record<string, string> = {
      VALUES ('8e8e8e8e-3000-4000-8000-000000000003', $1, 'c0290291-0000-4000-8000-000000000002', 'CONTRACT')`,
   hr_alert_jobs: `INSERT INTO hr_alert_jobs (id, tenant_id, job_kind, thresholds, is_active)
      VALUES ('8f8f8f8f-3000-4000-8000-000000000003', $1, 'EXPIRY_SWEEP', '[30,7,0]'::jsonb, true)`,
+  // PHASE-048 (CR-18): the projects cluster — $1 declares the OTHER
+  // tenant while the composite-FK parents (project/wbs-task/budget/
+  // agreement/service-order/budget-line below) belong to tenant B, so
+  // the FK passes and the RLS WITH CHECK is the isolated rejection (the
+  // 0087/0095 pattern).
+  project_wbs_tasks: `INSERT INTO project_wbs_tasks (id, tenant_id, project_id, wbs_code, name,
+      is_milestone, weight, percent_complete)
+     VALUES ('9b9b9b9b-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'ATK-1', 'Attack task', false, 100, 0)`,
+  project_budgets: `INSERT INTO project_budgets (id, tenant_id, project_id, name, status)
+     VALUES ('9c9c9c9c-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'ATK Budget', 'DRAFT')`,
+  project_budget_lines: `INSERT INTO project_budget_lines (id, tenant_id, budget_id, cost_type,
+      wbs_task_id, period_start, period_end, planned_amount)
+     VALUES ('9d9d9d9d-3000-4000-8000-000000000003', $1, '9c9c9c9c-0000-4000-8000-000000000002',
+      'LABOR', '9b9b9b9b-0000-4000-8000-000000000002', '2026-01-01', '2026-12-31', 500)`,
+  project_resource_allocations: `INSERT INTO project_resource_allocations (id, tenant_id, project_id,
+      resource_kind, employee_id, start_date, end_date, allocation_percent)
+     VALUES ('9e9e9e9e-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'EMPLOYEE', 'c0290291-0000-4000-8000-000000000002', '2026-01-01', '2026-06-30', 25)`,
+  change_orders: `INSERT INTO change_orders (id, tenant_id, project_id, co_no, title, price_delta, status)
+     VALUES ('9f9f9f9f-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'CO-ATK', 'Attack change order', 100, 'DRAFT')`,
+  subcontractor_agreements: `INSERT INTO subcontractor_agreements (id, tenant_id, project_id, partner_id,
+      agreement_no, title, agreement_value, currency_code, retention_percent, status)
+     VALUES ('e6e6e6e6-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'b5b5b5b5-0000-4000-8000-000000000002', 'SUB-ATK', 'Attack agreement', 9000, 'SAR', 10, 'DRAFT')`,
+  subcontractor_certificates: `INSERT INTO subcontractor_certificates (id, tenant_id, agreement_id,
+      certificate_no, certificate_date, progress_percent, gross_value, retention_withheld, net_payable, status)
+     VALUES ('e7e7e7e7-3000-4000-8000-000000000003', $1, 'e6e6e6e6-0000-4000-8000-000000000002',
+      'SC-ATK', '2026-03-31', 10, 200, 20, 180, 'DRAFT')`,
+  retention_accounts: `INSERT INTO retention_accounts (id, tenant_id, project_id, kind,
+      contract_value, currency_code, hold_percent, status)
+     VALUES ('e8e8e8e8-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'CUSTOMER', 50000, 'SAR', 5, 'ACTIVE')`,
+  progress_certificates: `INSERT INTO progress_certificates (id, tenant_id, project_id, certificate_no,
+      certificate_date, kind, cumulative_percent, gross_value, retention_amount, net_value,
+      currency_code, status)
+     VALUES ('e9e9e9e9-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      'PC-ATK', '2026-03-31', 'PROGRESS', 10, 5000, 250, 4750, 'SAR', 'DRAFT')`,
+  service_visits: `INSERT INTO service_visits (id, tenant_id, service_order_id, scheduled_start,
+      scheduled_end, status)
+     VALUES ('eaeaeaea-3000-4000-8000-000000000003', $1, '98989898-0000-4000-8000-000000000002',
+      '2026-06-01T09:00:00Z', '2026-06-01T11:00:00Z', 'NEW')`,
+  ias23_capitalizations: `INSERT INTO ias23_capitalizations (id, tenant_id, project_id, budget_line_id,
+      window_start, window_end, expenditures_amount, capitalized_amount, expensed_amount,
+      rate_snapshot, status)
+     VALUES ('ebebebeb-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
+      '9d9d9d9d-0000-4000-8000-000000000002', '2026-01-01', '2026-03-31', 1000, 70, 930, 0.07, 'DRAFT')`,
 };
 
 beforeAll(async () => {

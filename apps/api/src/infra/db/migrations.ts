@@ -528,6 +528,22 @@ export const MIGRATIONS: readonly string[] = [
   // default [30,7,0], is_active, the stamped run stats) + the 'hr'
   // notifications category widening (both CHECK domains).
   "0099_hr_alert_jobs",
+  // PHASE-048 (Blueprint v3.0 · CR-18) — Projects & Contracting: 0100 the
+  // WBS tree (project_wbs_tasks — the D-03 org-tree-precedent shape with
+  // the single-predecessor edge + the WBS dimension on crm_time_entries),
+  // 0101 budgets/lines/allocations (the D-04 cost curve + the D-13-via-
+  // 028 grant discipline), 0102 change_orders (BR-094's inert-until-
+  // approved floor + G-58's exactly-once stamp), 0103 the contracting
+  // core (subcontracts + certificates + the one retention ledger +
+  // progress certificates + service visits + ias23_capitalizations) with
+  // THE DATA-ONLY grants block (the fourteen projects.* keys, matrix
+  // §3.26, 312 → 326 + the three feature flags' plan grants + the three
+  // manifest enablements D-16 — the 0098 pattern). Delivered 2026-11-20
+  // (W-8, the foundation wave).
+  "0100_projects_wbs",
+  "0101_projects_budgets_allocation",
+  "0102_projects_change_orders",
+  "0103_projects_contracting_fieldservice",
 ];
 
 /**

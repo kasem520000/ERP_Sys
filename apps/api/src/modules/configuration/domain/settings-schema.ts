@@ -638,6 +638,29 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-029 BR-055: the tenant's EOS accrual basis in days per service year. NO default ships — an explicit tenant value is required to enable accrual (the platform fabricates no jurisdiction rates; onboarding templates may pre-create empty component shells with documentation pointers, never rates).",
   }),
+  // PHASE-048 (CR-18, the W-8 foundation wave, 2026-11-20 — D-11/R-04,
+  // the v3.2/CR-50 addition): the IAS 23 borrowing-costs capitalization
+  // rate register — the plan D-02's "config row" (NOT a table; the
+  // gosi_establishment_no no-default precedent). REQUIRES_VERIFICATION
+  // is the law: NO rate ships, NO default ships — the posting (W-14)
+  // refuses while the register is unset or unverified (red line 5: no
+  // fabricated compliance content). The tenant enters the weighted-
+  // average rate WITH the source evidence and the explicit verified
+  // flag; the register is pin-neutral by construction (a null default
+  // is omitted from the §5 policies map — precedence.ts).
+  "projects.ias23_capitalization_rate": Object.freeze({
+    key: "projects.ias23_capitalization_rate",
+    schema: z
+      .object({
+        rate: z.number().min(0).max(1),
+        source_evidence: z.string().min(1).max(500),
+        verified: z.literal(true),
+      })
+      .nullable(),
+    default: null,
+    description:
+      "PHASE-048 (D-11/R-04 — IAS 23, added by v3.2/CR-50): the tenant's borrowing-costs capitalization rate register — the weighted-average rate over borrowings for qualifying construction assets, entered WITH source evidence (the citation/text the rate derives from) and the explicit verified:true acknowledgement. REQUIRES_VERIFICATION: while unset (null) or unverified the capitalization posting REFUSES (the W-14 engine's typed law — never a fabricated rate); the qualifying window is driven by the WBS schedule start/end.",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

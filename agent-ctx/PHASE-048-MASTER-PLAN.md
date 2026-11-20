@@ -328,6 +328,63 @@ gate doc §4 (`docs/operations/gate-evidence/2026-11-19-phase047-w4.md`).
   in-suite co-proof; the standalone scratch re-runs at W-0) · the report
   registry **110** · the migration journal **0099** (idx 98).
 
+> **[Dated 2026-11-20 (W-8 DELIVERED — the foundation wave, T-01 + T-02 +
+> T-03 + T-04, on the approved-plan head `765e481`, this session's fresh
+> clone — the same-session evidence rule's SIXTEENTH consecutive wave):
+> the plan §2's inventory shipped exactly + the approval dispatch's two
+> binding amendments.]** Migrations **0100–0103** (0100 the WBS tree +
+> the `crm_time_entries` WBS dimension · 0101 budgets/lines/allocations ·
+> 0102 change orders with BR-094's structural inert-until-approved floor
+> · 0103 the contracting core + THE DATA-ONLY grants — the 0098 pattern)
+> + every mirror in ONE increment: journal +4 (idx 99–102) + the
+> MIGRATIONS manifest + the unit spec pin; Drizzle mirrors +11 + the
+> time-entry column; tables.registry +11 (the A-suite +66, the isolation
+> spec 1,764 green in the full run); ENTITY_CATALOG **307 → 318**; matrix
+> **§3.26 (312 → 326)** + the drift checker's list + the spec's copy +
+> the identity-flows census pin (the 0086/0092 lesson); FEATURE_DEPS +3
+> (wbs → accounting.projects · contracting → accounting.projects +
+> sales.invoices · fieldservice → crm.service_orders — the D-16 substrate
+> law) + the layer-fixtures' 0103 §2 transcription; templates.ts + the
+> three docs mirrors + the golden effective-configs re-pin (27 of 37
+> moved, the dated review note) + the templates-017/019 stored-hash
+> re-pins + the contracts manifests test's rental pin; the manifest
+> schema's FEATURE_KEY_MODULE_SEGMENT gains `projects` (the one-increment
+> law); **the IAS-23 rate register landed as the settings-plane config
+> key `projects.ias23_capitalization_rate`** (D-02's "config row" — NOT a
+> table, the gosi_establishment_no no-default precedent; REQUIRES_
+> VERIFICATION at the W-14 posting, pin-neutral by construction — the +11
+> catalog count stands, no +12 dated note needed). **ROUTE_PERMISSIONS
+> stays 988 = 988** (the keys-seed-first discipline, the §3.23/§3.24/
+> §3.25 precedent — matrix §3.26's dated note records it; the
+> /api/v1/projects/* families bind the keys as W-9…W-13 ship). **THE
+> OWNER'S APPROVAL-DISPATCH AMENDMENTS:** **A-1** the phase048-plan
+> README's sealed table gains its 26th row (`docs-validate-amendment.log`
+> — the F1 record correction at the claim site, dated) · **A-2 (NF-12)**
+> the README's verifier-commands section gains the binding verdict rule
+> (judge by the SUMMARY LINES or the guarded wrapper, never the raw exit
+> code — the owner's calibrated probe proved the DB-configured vitest
+> exits 0 on single-test reds too, not only the W-6 suite-level class)
+> + the matching dated scope line at the capture-evidence.sh guard.
+> **THE FORWARD-PROGRESSIVE REPAIR (§1a(a) — a 047 W-5 latent defect the
+> wave's own battery caught):** both web clock-pin test blocks
+> (employee-talent-360 + hr-org-board) pinned 2026-11-19 and then
+> IMMEDIATELY un-pinned it (`vi.useRealTimers()` on the wrong line) —
+> the pin only held while real time was 2026-11-19; the session's UTC
+> midnight flip (11-19 → 11-20) turned "6 days remaining" into "5 days
+> remaining" and three chip tests red (the date-bound class, disclosed
+> in the W-8 gate doc). REPAIRED test-only: the pin now holds
+> (`useFakeTimers({ shouldAdvanceTime: true })` + the real restore in
+> afterEach); zero production change; the rental_logistics manifests
+> test pin extended with the flags likewise. **Exit criteria met:**
+> acceptance #1 green (migrations + catalog rows + zero-drift 326 = 326);
+> the migration chain re-proven from zero (the full DB suite's embedded
+> boot + the standalone scratch run); the full DB suite at the new count
+> (259 files · 3,689 — the 3,623 baseline + the A-suite's 66 new arms;
+> every number in `audit-evidence/phase048-w8/`). The (d4) fallback arm
+> NOT dispatched (the owner's exemption ruling — §1a(d)). NOT production
+> approval. The evidence: `audit-evidence/phase048-w8/` + the gate doc
+> `docs/operations/gate-evidence/2026-11-20-phase048-w8.md`.**
+
 ## 1. Settled design decisions (from the plan-first reads — binding for all waves, amendable only by the owner's dated dispatch)
 
 **D-01 — The projects substrate is EXTENDED, never replaced (the phase

@@ -70,6 +70,21 @@ set -e
 # vitest summary reports failures (or an Unhandled Error), the stamp
 # is forced red regardless of the process code. The stamp is the
 # MAX of the two truths — process code and summary verdict.
+#
+# [Dated 2026-11-20 (W-8 — the owner's approval-dispatch amendment
+# A-2, the NF-12 finding): the guard's scope is WIDER than the
+# suite-level class the W-6 comment above described.] The owner's
+# verification session proved, with a calibrated probe at the
+# pre-fix head 7d22c49 AND at the then-current head, under both
+# Node 22.12.0 and Node 24, that the SAME exit-0-on-red behavior
+# covers SINGLE-TEST assertion failures too ("Tests 1 failed" with
+# process code 0) — not only beforeAll/suite-level crashes. The
+# guard's grep below already matches both shapes by construction
+# ("Test Files N failed" AND "Tests N failed" plus "Unhandled
+# Error"), so every stamp it has ever written remains truthful —
+# this dated line expands the DESCRIPTION to match the guard's
+# actual scope (the verifier-protocol amendment lives beside the
+# NF-9 commands in audit-evidence/phase048-plan/README.md).
 if [ "$LABEL" = "VITEST_EXIT" ] && [ "$RUN_CODE" -eq 0 ]; then
   if grep -qE "Test Files +[0-9]+ failed|Tests +[0-9]+ failed|Unhandled Error" "$LOG_FILE"; then
     RUN_CODE=1

@@ -194,6 +194,15 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // four view keys (the finance side's read plane); no other system role
   // (talent management is tenant-granted beyond the baseline).
   "apps/api/migrations/0098_hr_talent_grants.sql",
+  // PHASE-048 (Blueprint v3.0 · CR-18, the W-8 foundation wave,
+  // 2026-11-20): 0103 §1 seeds the FOURTEEN projects keys (matrix §3.26;
+  // 312 → 326) — projects.wbs.view/manage · projects.budget.view/manage
+  // · projects.allocation.manage · projects.change_order.view/approve ·
+  // projects.contracting.view/manage · projects.certificates.approve ·
+  // projects.retention.manage · projects.evm.view ·
+  // projects.fieldservice.view/dispatch. Role grants: the owner template
+  // holds all fourteen; the accountant the five finance-read view keys.
+  "apps/api/migrations/0103_projects_contracting_fieldservice.sql",
 ];
 
 export async function main(): Promise<void> {

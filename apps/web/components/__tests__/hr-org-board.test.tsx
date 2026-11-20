@@ -163,12 +163,22 @@ function renderBoard(
 
 beforeEach(() => {
   bffFetchMock.mockReset();
-  vi.useFakeTimers();
+  // PHASE-048 (W-8, 2026-11-20 — the forward-progressive repair, §1a(a)
+  // of the 048 plan): the W-5 shape pinned the clock and then IMMEDIATELY
+  // un-pinned it (vi.useRealTimers() on the line below setSystemTime), so
+  // the pin only held while real time was 2026-11-19 — the suite's own
+  // midnight flip (11-19 → 11-20) turned "6 days remaining" into
+  // "5 days remaining" and the chip tests red. The pin now HOLDS
+  // (shouldAdvanceTime keeps waitFor/promises working); afterEach restores
+  // the real clock.
+  vi.useFakeTimers({ shouldAdvanceTime: true });
   vi.setSystemTime(new Date("2026-11-19T00:00:00Z"));
-  vi.useRealTimers();
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.useRealTimers();
+});
 
 describe("PHASE-047 W-5 T-13/T-14 — the org-structure board", () => {
   it("renders the three tabs; the tree shows the ordered paths with the depth indentation", () => {

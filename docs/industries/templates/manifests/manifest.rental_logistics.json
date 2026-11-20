@@ -14,7 +14,10 @@
     "inventory.serial_tracking",
     "items.item_master",
     "partners.statements",
-    "treasury.cash_accounts"
+    "treasury.cash_accounts",
+    "projects.wbs",
+    "projects.contracting",
+    "projects.fieldservice"
   ],
   "default_modules_enabled": [
     "accounting",

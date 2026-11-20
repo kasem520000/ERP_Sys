@@ -66,8 +66,17 @@ import {
 /** KNOWN hash — `pnpm validate:manifests` on the seven-template set (the
  *  constant is byte-identical to the migration 0027 registry seed and the
  *  docs mirror docs/industries/templates/manifests/
- *  manifest.professional_services.json). */
-const KNOWN_HASH = "sha256:0316122b5757a8fc5405194e794793e87dfd4d9f303c691e7ad4df9358cf8d6f";
+ *  manifest.professional_services.json).
+ *
+ * PHASE-048 (W-8, 2026-11-20) review note: the professional_services
+ * manifest hash re-pinned (0103 §3 — the THREE PROJECTS FLAGS join the
+ * required chain, the projects-plane enablement D-16; canonical + stored
+ * + docs mirror + pins moved together, the 0098 §3 procedure); the
+ * starter degradation chain gains the three flags AND their BR-040
+ * closure dependencies (accounting.projects + sales.invoices — the
+ * contracting flag's billing target; both granted to business +
+ * enterprise, transcribed in the layer fixtures). */
+const KNOWN_HASH = "sha256:dd08b957aab40af33829ff4605dc883b1c0a01b8c84a3270f19e183643917728";
 
 /** The 0008 base-seed CRM set (the "CRM add-on") — the §18 lesson 5 rule:
  *  revoking the FULL set keeps the tenant's own BR-040 closure valid (a
@@ -456,45 +465,42 @@ describe("templates-019 — professional_services through the PHASE-015 engine",
     expect(await auditActions(degradedTenant, "industry.template.applied")).toBe(0);
   });
 
-  it("automotive WITHOUT the CRM add-on: service_contracts hides cleanly (no phase label at 19)", async () => {
-    // The OPTIONAL PHASE-019 capability degrades HIDDEN (not phase_gated —
-    // the phase shipped, so an unentitled key is an upgrade path, never a
-    // coming-soon label); the apply proceeds; nothing crashes. The FULL
-    // 5-key set is revoked (§18 lesson 5): a single-key revoke would strand
-    // recurring_billing/service_orders on a broken BR-040 closure and the
-    // apply would block instead of hiding cleanly.
-    const result = await withTenant(autoTenant, () =>
-      applyService.apply(autoOwner, { templateKey: "industry.automotive", mode: "initial" }),
-    );
-    expect(result.applied).toBe(true);
-    const svcCapability = result.prerequisiteCheck.capabilities.find(
-      (capability) => capability.capabilityId === "service_contracts",
-    );
-    expect(svcCapability).toMatchObject({
-      status: "hidden",
-      missingKeys: ["crm.service_contracts"],
+  it("automotive WITHOUT the CRM add-on: the PHASE-048 projects-plane closure BLOCKS the apply", async () => {
+    // [Dated 2026-11-20 (W-8 — the 048 projects-plane enablement, D-16):
+    // this test's W-5 shape asserted the OPTIONAL service_contracts
+    // capability degrades HIDDEN on a CRM-revoked tenant while the apply
+    // proceeds. The 0103 §3 enablement composes projects.fieldservice
+    // into automotive's REQUIRED chain, and fieldservice rides the
+    // service-orders substrate (FEATURE_DEPS: crm.service_orders →
+    // crm.service_contracts) — so a tenant that revoked the FULL CRM
+    // add-on (§18 lesson 5's set) now misses the closure and the apply
+    // BLOCKS with exactly those two keys. The hidden-not-phase-gated
+    // degradation arm itself remains covered at the other sites
+    // (degraded-entitlement.spec · templates-018 · templates-030 · the
+    // unit template-prerequisites.spec ×3). Zero rows written stands.]
+    await expect(
+      withTenant(autoTenant, () =>
+        applyService.apply(autoOwner, { templateKey: "industry.automotive", mode: "initial" }),
+      ),
+    ).rejects.toMatchObject({
+      code: "configuration/template-prerequisites-blocked",
+      templateKey: "industry.automotive",
+      missingChain: ["crm.service_contracts", "crm.service_orders"],
+      guidance: {
+        ar: expect.stringContaining("crm.service_contracts"),
+        en: expect.stringContaining("crm.service_contracts"),
+      },
     });
-    expect(svcCapability!.phase).toBeUndefined(); // no coming-soon label at PHASE-019
-    expect(result.prerequisiteCheck.requiresAcknowledgement).toBe(false);
-
-    // The workshop/parts navigation resolves with NO crm.* targets (the
-    // automotive manifest carries none — the CRM add-on would compose
-    // professional_services, §5 R10 hidden menus, no broken screen).
-    resetConfigurationCache();
-    const config = await withTenant(autoTenant, () =>
-      resolver.resolveTenantStatic(autoTenant),
+    // Never silent AND never partial: zero rows were written.
+    expect(await withTenant(autoTenant, () => findAppliedStateRow())).toBeUndefined();
+    const su = await superuserClient();
+    const series = await su.query<{ n: string }>(
+      `SELECT count(*)::text AS n FROM numbering_sequences WHERE tenant_id = $1`,
+      [autoTenant],
     );
-    expect(config.layers.l1_template?.key).toBe("industry.automotive");
-    expect(config.ui.navigation).toEqual(["workshop", "parts"]);
-    expect(
-      config.ui.navigation_tree
-        .flatMap((group) => group.items.map((item) => item.target))
-        .filter((target) => target.startsWith("crm.")),
-    ).toEqual([]);
-    // The crm module is NOT installed for this tenant (the automotive
-    // manifest does not enable it and no crm key is active — L4 stays the
-    // single source of feature truth).
-    expect(config.layers.l8_installed.crm).toBeUndefined();
+    await su.end();
+    expect(series.rows[0]!.n).toBe("0");
+    expect(await auditActions(autoTenant, "industry.template.applied")).toBe(0);
   });
 
   it("starter-plan degradation: the full missing chain blocks the apply (guided plan selection)", async () => {
@@ -502,6 +508,13 @@ describe("templates-019 — professional_services through the PHASE-015 engine",
     // capabilities block, the required_feature_keys backstop adds the
     // uncovered engine/projects keys, and BR-040 closure contributes
     // accounting.cost_centers (accounting.projects depends on it).
+    // [Dated 2026-11-20 (W-8 — the 048 projects-plane enablement, D-16):
+    // the chain gains the THREE PROJECTS FLAGS (0103 §3 composes them
+    // into the required_feature_keys) AND their BR-040 closure
+    // contribution crm.service_orders (fieldservice rides the
+    // service-orders substrate; its dep service_contracts was already in
+    // the chain) — the 047 W-1 starter-chain-extension precedent, the
+    // dated note at the site.]
     await expect(
       withTenant(starterTenant, () =>
         applyService.apply(starterOwner, {
@@ -517,12 +530,16 @@ describe("templates-019 — professional_services through the PHASE-015 engine",
         "accounting.projects",
         "crm.recurring_billing",
         "crm.service_contracts",
+        "crm.service_orders",
         "hr.org",
         "hr.performance",
         "hr.recruitment",
         "hr.training",
         "industry.template_engine",
         "payroll.employees",
+        "projects.contracting",
+        "projects.fieldservice",
+        "projects.wbs",
       ],
       guidance: {
         ar: expect.stringContaining("crm.service_contracts"),
