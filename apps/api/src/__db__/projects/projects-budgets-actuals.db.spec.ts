@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
+import { sql } from "drizzle-orm";
 
-import { withTenant } from "../../infra/db/tenant-context";
+import { requireTenantContext, withTenant } from "../../infra/db/tenant-context";
 import { AuditService } from "../../modules/audit/api/audit";
 import { DrizzleAuditStore } from "../../modules/audit/infrastructure/drizzle-audit.store";
 import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
@@ -53,6 +54,18 @@ const AC_TOTAL = "10945.3125";
 beforeAll(async () => {
   const fixture = await setupProjectsFixture();
   await withTenant(TENANT_PJW, async () => {
+    // ORDER-ROBUSTNESS (added at W-10, disclosed in its gate doc): the
+    // family's file order is not guaranteed — the W-10 specs'
+    // `ensureP1BudgetWorld` fixture helper builds THIS SAME world when
+    // they run first, and the unconditional seed below would then
+    // double-mint the entries/journals and break the coherent arms.
+    // The probe (the W-9 entry's own narrative) skips the seed when the
+    // world already stands — the ARMS below stay byte-identical.
+    const probe = await requireTenantContext().tx!.execute<{ n: number }>(
+      sql`SELECT count(*)::int AS n FROM crm_time_entries te
+          WHERE te.wbs_task_id = ${fixture.tasks.a} AND te.narrative = 'Ten hours on A'`,
+    );
+    if ((probe.rows[0]?.n ?? 0) > 0) return;
     // ── LABOR: the approved-class WBS-dimensioned entries ─────────────
     // 10h on A + 2.5h on B1 (P1) + 7.5h on P2's task (the driver share).
     await timeEntries.create({

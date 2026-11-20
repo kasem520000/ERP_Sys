@@ -4866,6 +4866,79 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/projects/:projectId/inv033",
     permission: "projects.evm.view",
   },
+
+  // PHASE-048 (W-10 — T-08 + T-09 + the D-11 engine, dated 2026-11-20;
+  // matrix §3.26): the EVM engine's own surface + the change-order gate
+  // + the IAS-23 capitalization — the W-8 keys' second binding wave
+  // (1007 + 11 = 1018). The EVM snapshot binds evm.view (the W-9
+  // finance-read key's own engine — PV from the approved curve, the two
+  // EV disciplines, AC from the collectors, CPI/SPI/ETC/EAC). The
+  // change-order authoring + reads bind change_order.view (the
+  // fourteen-key list ships no change_order.manage — BR-094's gate
+  // makes authoring safe: a DRAFT author moves nothing until an
+  // approver acts, so the view key carries the working plane), and THE
+  // GATE (approve/reject) binds change_order.approve. The IAS-23
+  // routes ride the BUDGET plane's keys (D-11's own scope law: the
+  // capitalization rides the approved budget's lines; the fourteen-key
+  // list ships no ias23 key — preview + the scope rows' read →
+  // budget.view, capitalize → budget.manage, the dated reading recorded
+  // here). The entitlement plane rides the projects.wbs feature flag on
+  // every route (D-16).
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/evm",
+    permission: "projects.evm.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/change-orders",
+    permission: "projects.change_order.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/change-orders",
+    permission: "projects.change_order.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/change-orders/ceiling",
+    permission: "projects.change_order.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/change-orders/:id",
+    permission: "projects.change_order.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/change-orders/:id/submit",
+    permission: "projects.change_order.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/change-orders/:id/approve",
+    permission: "projects.change_order.approve",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/change-orders/:id/reject",
+    permission: "projects.change_order.approve",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/ias23/preview",
+    permission: "projects.budget.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/ias23/capitalize",
+    permission: "projects.budget.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/ias23/capitalizations",
+    permission: "projects.budget.view",
+  },
 ];
 
 /**

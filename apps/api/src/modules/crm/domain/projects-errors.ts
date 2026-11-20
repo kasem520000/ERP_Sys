@@ -1,10 +1,11 @@
 import { DomainError } from "@erp/domain-core";
 
 /**
- * PHASE-048 (W-9 — Projects & Contracting: the WBS + budgets + actuals
- * engines) domain errors (T-05 + T-06 + T-07 — the plan §3). Codes are
- * stable API contracts (ERROR_MODEL §4) — the HTTP layer maps each to
- * its status; A7-sensitive not-founds render identically for
+ * PHASE-048 (Projects & Contracting) domain errors (W-9: the WBS +
+ * budgets + actuals engines T-05…T-07; W-10: the EVM engine T-08, the
+ * change-order gate T-09, the IAS-23 service D-11 — the plan §3). Codes
+ * are stable API contracts (ERROR_MODEL §4) — the HTTP layer maps each
+ * to its status; A7-sensitive not-founds render identically for
  * unknown-vs-foreign ids. The projects substrate itself is accounting's
  * (D-01: extended, never replaced) — these are the ENGINE's refusals,
  * never the GL's.
@@ -139,5 +140,155 @@ export class Inv033ReconciliationError extends DomainError {
     },
   ) {
     super("INV033_RECONCILIATION", message, details);
+  }
+}
+
+// -- W-10 / T-08: the EVM engine (D-06) --------------------------------------
+
+/** EVM-plane input validation (asOf shapes, budget ids). */
+export class EvmInputInvalidError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("EVM_INPUT_INVALID", message, details);
+  }
+}
+
+/**
+ * THE EV CEILING REFUSAL (acceptance #4 / D-06): the earned value
+ * never exceeds the approved budget at the scope it is earned against
+ * — a node's EV against the node's planned cells, the project's EV
+ * against BAC (the approved budget + the approved change-order deltas).
+ * The boundary EV = budget is legal (100% complete earns exactly the
+ * budget); any excess is the typed refusal carrying the figures.
+ */
+export class EvCeilingExceededError extends DomainError {
+  constructor(
+    message: string,
+    details: { ev: string; budget: string; percent: string | null },
+  ) {
+    super("EV_CEILING_EXCEEDED", message, details);
+  }
+}
+
+// -- W-10 / T-09: the change-order gate (BR-094 / G-58 / D-07) ----------------
+
+/** Unknown or foreign change-order id (A7: no existence disclosure). */
+export class ChangeOrderNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("CHANGE_ORDER_NOT_FOUND", `change order ${id} does not exist in this tenant`);
+  }
+}
+
+/** Change-order input validation (titles, the signed delta shapes,
+ * the non-zero schedule delta, the rejection reason). */
+export class ChangeOrderInputInvalidError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("CHANGE_ORDER_INPUT_INVALID", message, details);
+  }
+}
+
+/**
+ * The gate's lifecycle law (BR-094): DRAFT → SUBMITTED → APPROVED /
+ * REJECTED — a wrong-state transition, a raced CAS move, or an edit on
+ * a decided order is the typed 409-class refusal (the 045
+ * simple-approval shape; the order stays exactly as it was).
+ */
+export class ChangeOrderStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("CHANGE_ORDER_STATE", message, details);
+  }
+}
+
+/**
+ * G-58's exactly-once stamp (D-07): the effect application is
+ * SINGLE-USE — `effect_applied_at` is consumed exactly once; a second
+ * application attempt is the typed refusal (INV-013's engine-level
+ * idempotency converges retries; the stamp refuses re-application).
+ */
+export class ChangeOrderEffectAlreadyAppliedError extends DomainError {
+  constructor(message: string, details: { changeOrderId: string; effectAppliedAt: string }) {
+    super("CHANGE_ORDER_EFFECT_ALREADY_APPLIED", message, details);
+  }
+}
+
+// -- W-10 / D-11: the IAS-23 capitalization service ---------------------------
+
+/** IAS-23-plane input validation (asOf shapes, project ids). */
+export class Ias23InputInvalidError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("IAS23_INPUT_INVALID", message, details);
+  }
+}
+
+/**
+ * THE RATE REGISTER'S LAW (D-11 / R-04 — REQUIRES_VERIFICATION): the
+ * capitalization rate register (`projects.ias23_capitalization_rate`)
+ * is tenant-entered WITH SOURCE EVIDENCE and the explicit verified
+ * acknowledgement; while unset, malformed, or unverified the
+ * capitalization computation AND the posting REFUSE — never a
+ * fabricated rate (red line 5, the BR-055 family).
+ */
+export class Ias23RateUnverifiedError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("IAS23_RATE_UNVERIFIED", message, details);
+  }
+}
+
+/**
+ * The window law: a qualifying project carries at least one WBS task
+ * with BOTH schedule dates — the window [min start, max end] is the
+ * construction window; without it the capitalization refuses (never a
+ * fabricated window).
+ */
+export class Ias23WindowUndefinedError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("IAS23_WINDOW_UNDEFINED", message, details);
+  }
+}
+
+/**
+ * The scope law: the capitalization rides the APPROVED budget's lines
+ * (D-11) — a project with no APPROVED budget (or whose window overlaps
+ * no line) has nothing to capitalize and the typed refusal names it.
+ */
+export class Ias23ScopeEmptyError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("IAS23_SCOPE_EMPTY", message, details);
+  }
+}
+
+/**
+ * The never-future stop rule: the POSTING arm of the capitalization
+ * covers ELAPSED expenditure only — asOf beyond today is the typed
+ * refusal (the projection arm stays free: the preview computes at any
+ * asOf and says so).
+ */
+export class Ias23AsOfInFutureError extends DomainError {
+  constructor(message: string, details: { asOf: string; today: string }) {
+    super("IAS23_AS_OF_IN_FUTURE", message, details);
+  }
+}
+
+/**
+ * The honest-empty posting refusal: a capitalization run whose total
+ * capitalized amount is zero (every line's eligible accrual is zero —
+ * the rate may be 0, the window may not have started) has nothing to
+ * post and refuses rather than minting an empty entry.
+ */
+export class Ias23NothingToCapitalizeError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("IAS23_NOTHING_TO_CAPITALIZE", message, details);
+  }
+}
+
+/**
+ * The single-use posting stamp: a window already POSTED (the
+ * `ias23_capitalizations` rows carry status POSTED for this
+ * budget-line/window slice) refuses re-capitalization — the history is
+ * computation evidence (no delete, the 0103 law); a re-planned window
+ * opens a NEW slice, never a re-post of the old one.
+ */
+export class Ias23AlreadyPostedError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("IAS23_ALREADY_POSTED", message, details);
   }
 }

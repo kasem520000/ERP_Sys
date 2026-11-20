@@ -661,6 +661,66 @@ capitalization service over the WBS window (D-11 — REQUIRES_VERIFICATION).
 **Exit:** acceptance #4 + #5 green (EV never exceeds the approved budget;
 change orders inert until approved; the IAS-23 refusal arm proven).
 
+> **[Dated 2026-11-20 (W-10 DELIVERED — on the owner-accepted W-9 head
+> `e5efb29`, this session's working clone — the same-session evidence
+> rule's EIGHTEENTH consecutive wave): the unit-first law opened the wave
+> and caught the ×10² aggregate-percent scale bug in the pure fold's first
+> shape (the weightedPct/weightSum ratio ALREADY sits at the percent's
+> minor-2 scale — the W-9 rollup's own note; fixed before any consumer,
+> the 5-of-37 first-run red kept in the session record). T-08: the EVM
+> engine — PV EXCLUSIVELY from the approved curve (D-04's law through the
+> budget service's own read); the TWO EV disciplines (the structural
+> whole-tree aggregate × BAC from the EXACT rational — ONE rounding at
+> money — and the certificate-gated latest APPROVED percent × BAC) with
+> the delta the management signal; THE EV CEILING at every scope (the
+> typed refusal; the boundary EV = ceiling legal, pinned on a real 100%
+> node); AC from T-07's breakdown ALONE; BAC = the approved total + the
+> APPROVED deltas only — the EVM's BAC EQUALS the gate's own ceiling read
+> (one law, two engines); the per-node arm's honest shape (the node's own
+> cells + the W-9 per-node rollup + the labor-leg AC; nodes without cells
+> or labor absent, never zeroed; every honest cut disclosed). T-09: the
+> gate — BR-094's DRAFT→SUBMITTED→APPROVED/REJECTED CAS ladder with the
+> verdict stamps atomic; INERT until approved (the ceiling reads APPROVED
+> rows only); G-58's exactly-once effects (the price delta through the
+> REAL engine, DR/CR per the sign on the purpose-mapped CONTRACT_WIP/
+> CONTRACT_REVISE pair — fail-closed PURPOSE_NOT_MAPPED until the tenant
+> maps, the 038/0077 discipline, zero migration; the zero-delta order
+> posts nothing and still consumes its stamp; the all-or-nothing rollback
+> proven; the single-use stamp proven — exactly one entry, the ceiling
+> unmoved); the ceiling RECOMPUTED on every read (the retention register
+> + the deltas; BAC the same deltas — the gate the ONLY re-planning
+> path); the postings carry NO project stamp (INV-033 untouched —
+> pinned). D-11: the IAS-23 service — REQUIRES_VERIFICATION (the planted
+> register's three typed refusals: unset · malformed · unverified); the
+> WBS-schedule window; the approved-budget scope; the documented STOP
+> RULES (the start law · the completion law · the elapsed/never-future
+> law — the preview projects, the posting refuses asOf > today); the
+> posting DR IAS23_QUALIFYING_ASSET · CR IAS23_BORROWING_COST at Σ
+> capitalized (fail-closed until mapped; the 0011 shape CHECKs honored —
+> `ias_capitalization` / `post_YYYYMMDD`, the honest finding disclosed);
+> the single-use POSTED stamp on the (line, slice) rows. ROUTE_PERMISSIONS
+> 1007 → 1007 + 11 = 1018 (dated at the block — evm.view ·
+> change_order.view (the authoring — BR-094 makes it safe) ·
+> change_order.approve (THE GATE) · the IAS-23 rides budget.view/manage,
+> D-11's scope law). The `__db__/projects/` family grows: 9 + 7 + 10
+> (+26; the fixture gains the probe-guarded ensureP1BudgetWorld — every
+> W-10 spec standalone-runnable). Gates: the full DB suite 264/264 ·
+> 3,743/3,743 · 0 failed · 0 skipped in BOTH envelopes (the single-
+> process full run 554.04s WITHIN this session's cap — the W-9 machine
+> had been killed at its 598s — AND the precomputed five family-whole
+> chunks: the smoke 3·1,783 + the perf 6·24 + 86·644 + 85·672 (the
+> projects family whole) + 84·620, the plan built + coverage-verified
+> 264/264 BEFORE the first run) + the scratch check:rls 318/0 + every
+> standing checker green (the evidence `audit-evidence/phase048-w10/` +
+> the gate doc `docs/operations/gate-evidence/2026-11-20-phase048-w10.md`
+> — the FIVE honest disclosures recorded there: the unit-first catch; the
+> mistyped first chunk command (both envelopes kept — the accidental full
+> run GREEN under the stamp's own truth); the family-order discovery +
+> the test-only forward fix (the W-9 beforeAll's probe guard — its arms
+> byte-identical); the 0011 shape findings corrected at the call sites;
+> the four standalone/family/chunk/full envelopes). Exit criteria MET
+> (acceptance #4 + #5 green with evidence). NOT production approval.]**
+
 ### W-11 — The contracting core (T-10 + T-11 + T-12, orchestrator)
 Subcontracting (agreements + certificates + the AP linkage — D-08); the
 retention ledger + G-55/G-56 through the engine (D-09); the

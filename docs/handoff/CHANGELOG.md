@@ -1,8 +1,83 @@
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-9 the WBS + budgets + actuals engines delivered: the pure layer FIRST (the unit-first law caught three real scale bugs before any consumer) + T-05/T-06/T-07 + INV-033 + the WBS dimension's write-time coherence + the W-8 keys' first route binding (988 → 1007); the full DB suite 261/261 · 3,717/3,717 in five family-whole chunks + the scratch check:rls; W-10 the EVM + change orders + IAS 23 NEXT**) · earlier 2026-11-20 (W-8 the foundation wave: migrations 0100–0103 + every mirror; the A-1/A-2 amendments + the forward-progressive W-5 date repair)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-10 the EVM + change orders + IAS 23 engines delivered: the pure layer FIRST (the unit-first law caught the ×10² aggregate-percent scale bug before any consumer) + T-08 the EVM engine (PV from the approved curve alone · the two EV disciplines · the EV ceiling's typed refusal · AC from T-07 alone) + T-09 the change-order gate (BR-094 inert-until-approved · G-58's exactly-once delta through the REAL engine · the single-use stamp · the ceiling recomputed on every read) + the D-11 IAS-23 service (REQUIRES_VERIFICATION · the documented stop rules · the posting through the engine); ROUTE_PERMISSIONS 1007 → 1018 (+11 dated); the full DB suite 264/264 · 3,743/3,743 in BOTH envelopes (the single-process full run 554s within the cap + the precomputed five family-whole chunks) + the scratch check:rls; W-11 the contracting core NEXT**) · earlier 2026-11-20 (W-9 the WBS + budgets + actuals engines (the pure layer caught three scale bugs; T-05/T-06/T-07 + INV-033; 988 → 1007; 261/261 · 3,717/3,717 in five chunks); W-8 the foundation wave: migrations 0100–0103 + every mirror; the A-1/A-2 amendments + the forward-progressive W-5 date repair)
 
 > **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-20 — **PHASE-048 W-10 — THE EVM + CHANGE ORDERS + IAS 23
+  ENGINES DELIVERED** (T-08 + T-09 + the D-11 engine, the plan §3 W-10,
+  on the owner-accepted W-9 head `e5efb29`, this session's working clone
+  — the same-session evidence rule's EIGHTEENTH consecutive wave; the
+  owner's 2026-11-20 dispatch set the scope by the plan's literal texts
+  with the seven monitoring items — PV exclusively from the approved
+  curve · the EV ceiling at every node with the standardized rejection ·
+  AC from T-07's output alone · the gate the only re-planning path and
+  the G-58 stamp single-use · IAS 23 from the planted switch with the
+  documented stop rules · the constants · the family-whole chunk plan
+  precomputed): **THE PURE LAYER FIRST** — `evm-math.ts`
+  (aggregateWeightedPercent — BR-095's super-root corollary, the EXACT
+  sums so money rounds ONCE · earnedValue/earnedValueFromAggregate —
+  the per-node + structural folds with the TYPED EV-CEILING REFUSAL ·
+  the honest-null CPI/SPI indices · forecastAtCompletion — the exact
+  (BAC−EV)×AC/EV form with the documented REMAINDER fallback ·
+  ias23Window + ias23Split — the documented stop rules with
+  capitalized + expensed ≤ expenditures BY CONSTRUCTION) — **the
+  unit-first law caught the ×10² aggregate-percent scale bug in the
+  first shape (the weightedPct/weightSum ratio ALREADY sits at the
+  percent's minor-2 scale — the fold rendered 0.56 for the 56.44
+  world), fixed BEFORE any consumer landed** (the W-9 precedent
+  repeating; the 5-of-37 first-run red kept in the session record).
+  **T-08 (D-06)** — the EVM engine: PV EXCLUSIVELY from the approved
+  curve (the budget service's own read — D-04's law); the TWO EV
+  disciplines (the structural whole-tree aggregate × BAC from the
+  EXACT rational — ONE rounding at money — and the certificate-gated
+  latest APPROVED percent × BAC) with the delta the management signal
+  (NO_CERTIFICATE the honest absence); AC from T-07's breakdown ALONE;
+  BAC = the approved total + the APPROVED change-order deltas only —
+  the EVM's BAC EQUALS the gate's own ceiling read; the per-node arm's
+  honest shape (the node's own cells + the W-9 per-node rollup + the
+  labor-leg AC; nodes without cells or labor absent, never zeroed).
+  **T-09 (BR-094 + G-58 + D-07)** — the change-order gate: the
+  DRAFT→SUBMITTED→APPROVED/REJECTED CAS ladder (the verdict stamps
+  atomic, 0102's approval-link CHECK); INERT until approved (the
+  ceiling reads APPROVED rows ONLY); G-58's exactly-once effects — the
+  price delta through the REAL PostingService (INV-013 idempotent;
+  DR/CR per the sign on the purpose-mapped CONTRACT_WIP/CONTRACT_REVISE
+  pair, fail-closed PURPOSE_NOT_MAPPED until the tenant maps — the
+  038/0077 discipline, zero migration; the zero-delta order posts
+  nothing and still consumes its stamp); the single-use
+  effect_applied_at stamp (all-or-nothing with the posting — the
+  unmapped refusal rolls the verdict back to SUBMITTED, proven live);
+  the ceiling RECOMPUTED on every read (the retention register + Σ the
+  APPROVED deltas; the gate the ONLY re-planning path); the postings
+  carry NO project stamp — INV-033 untouched by construction (pinned).
+  **THE D-11 ENGINE** — the IAS-23 service: REQUIRES_VERIFICATION (the
+  planted register's three typed refusals — unset · malformed ·
+  unverified; never a fabricated rate); the WBS-schedule window; the
+  approved-budget scope; the documented STOP RULES (the start law ·
+  the completion law · the elapsed/never-future law); the posting DR
+  IAS23_QUALIFYING_ASSET · CR IAS23_BORROWING_COST at Σ capitalized
+  (fail-closed until mapped; NO project stamp); the single-use POSTED
+  stamp on the (line, slice) rows. **ROUTE_PERMISSIONS 1007 → 1018
+  (+11, dated at the block)** — evm.view · change_order.view (the
+  authoring — BR-094 makes it safe) · change_order.approve (THE GATE)
+  · the IAS-23 rides budget.view/manage (D-11's scope law); zero
+  migrations (journal 0103) · ENTITY_CATALOG 318 · drift 326 = 326 ·
+  i18n 6,433 + 371 · the report registry 110 · the ID_LEDGER
+  reservations STAND. **The `__db__/projects/` family grows**
+  (+26: the change-order gate 9 · the EVM 7 · the IAS-23 10 — every
+  figure hand-computed; the fixture gains the probe-guarded
+  ensureP1BudgetWorld). Gates: the full DB suite **264/264 · 3,743/
+  3,743 · 0 failed · 0 skipped in BOTH envelopes** (the single-process
+  full run 554.04s WITHIN this session's cap + the precomputed five
+  family-whole chunks — the plan built + coverage-verified 264/264
+  BEFORE the first run) + the scratch check:rls 318/0 + every standing
+  checker green (the evidence `audit-evidence/phase048-w10/` + the gate
+  doc `docs/operations/gate-evidence/2026-11-20-phase048-w10.md` — the
+  FIVE honest disclosures recorded there, incl. the mistyped first
+  chunk command (both envelopes kept) and the family-order discovery +
+  the test-only forward fix). Exit criteria MET (acceptance #4 + #5
+  green with evidence). **NOT production approval.**
 
 - 2026-11-20 — **PHASE-048 W-9 — THE WBS + BUDGETS + ACTUALS ENGINES
   DELIVERED** (T-05 + T-06 + T-07, the plan §3 W-9, on the owner-accepted

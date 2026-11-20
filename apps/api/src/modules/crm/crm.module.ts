@@ -21,6 +21,9 @@ import { ServiceOrderPosting } from "./application/service-order-posting";
 import { ProjectActualsService } from "./application/project-actuals-service";
 import { ProjectBudgetService } from "./application/project-budget-service";
 import { WbsService } from "./application/wbs-service";
+import { EvmService } from "./application/evm-service";
+import { ChangeOrderService } from "./application/change-order-service";
+import { Ias23Service } from "./application/ias23-service";
 import { LeadsController } from "./presentation/leads.controller";
 import { TasksController } from "./presentation/tasks.controller";
 import { ContractsController } from "./presentation/contracts.controller";
@@ -30,6 +33,9 @@ import { ServiceOrdersController } from "./presentation/service-orders.controlle
 import { ProjectsActualsController } from "./presentation/projects-actuals.controller";
 import { ProjectsBudgetsController } from "./presentation/projects-budgets.controller";
 import { ProjectsWbsController } from "./presentation/projects-wbs.controller";
+import { ProjectsEvmController } from "./presentation/projects-evm.controller";
+import { ChangeOrdersController } from "./presentation/change-orders.controller";
+import { ProjectsIas23Controller } from "./presentation/projects-ias23.controller";
 import * as store from "./infrastructure/crm.store";
 
 /**
@@ -115,6 +121,9 @@ export interface CrmContractBillingRunJobPayload {
     ProjectsWbsController,
     ProjectsBudgetsController,
     ProjectsActualsController,
+    ProjectsEvmController,
+    ChangeOrdersController,
+    ProjectsIas23Controller,
   ],
   providers: [
     LeadService,
@@ -129,8 +138,11 @@ export interface CrmContractBillingRunJobPayload {
     WbsService,
     ProjectActualsService,
     ProjectBudgetService,
+    EvmService,
+    ChangeOrderService,
+    Ias23Service,
   ],
-  exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService, WbsService, ProjectActualsService, ProjectBudgetService],
+  exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService, WbsService, ProjectActualsService, ProjectBudgetService, EvmService, ChangeOrderService, Ias23Service],
 })
 export class CrmModule implements OnModuleInit {
   constructor(

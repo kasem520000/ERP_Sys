@@ -11,6 +11,9 @@ import { DrizzleAuditStore } from "../../modules/audit/infrastructure/drizzle-au
 import { PostingService } from "../../modules/accounting/application/posting-service";
 import { PeriodService } from "../../modules/accounting/application/period-service";
 import { PartnerSubledgerService } from "../../modules/partners/application/subledger-service";
+import { ResolveEffectiveConfigService } from "../../modules/configuration/application/resolve/resolve-service";
+import { ConfigRepository } from "../../modules/configuration/infrastructure/config-repository";
+import { TimeEntryService } from "../../modules/crm/application/time-entry-service";
 import { ProjectActualsService } from "../../modules/crm/application/project-actuals-service";
 import { ProjectBudgetService } from "../../modules/crm/application/project-budget-service";
 import { WbsService } from "../../modules/crm/application/wbs-service";
@@ -582,4 +585,290 @@ export async function seedSubCertificate(input: {
   );
   await su.end();
   return { agreementId: agreement.rows[0]!.id, certificateId: certificate.rows[0]!.id };
+}
+
+// ── PHASE-048 (W-10 — T-08 + T-09 + D-11) — the wave's seed helpers ─────────
+
+/**
+ * The idempotent P1 coherent-world builder (the W-9 budget spec's own
+ * beforeAll shape, guarded by the most specific probe — the W-9 entry
+ * narrative): the family chunk's alphabetical order runs the W-9 spec
+ * FIRST (its beforeAll builds the world and this helper no-ops), and a
+ * STANDALONE run of any W-10 spec builds the same world itself — the
+ * hand-computed AC 10,945.3125 arms hold either way.
+ */
+export async function ensureP1BudgetWorld(): Promise<void> {
+  const fixture = await setupProjectsFixture();
+  await withTenant(TENANT_PJW, async () => {
+    const probe = await requireTenantContext().tx!.execute<{ n: number }>(
+      sql`SELECT count(*)::int AS n FROM crm_time_entries te
+          WHERE te.wbs_task_id = ${fixture.tasks.a} AND te.narrative = 'Ten hours on A'`,
+    );
+    if ((probe.rows[0]?.n ?? 0) > 0) return; // the W-9 world already stands
+
+    const resolveConfig = new ResolveEffectiveConfigService(new ConfigRepository());
+    const timeEntries = new TimeEntryService(new AuditService(new DrizzleAuditStore()), resolveConfig);
+    await timeEntries.create({
+      entryDate: "2026-03-02",
+      hours: "10",
+      feeItemId: fixture.feeItemId,
+      projectId: fixture.project1Id,
+      contractId: null,
+      feeEarnerUserId: fixture.feeEarnerUserId,
+      wbsTaskId: fixture.tasks.a,
+      unitRate: "250",
+      narrative: "Ten hours on A",
+      billable: true,
+      actorId: PJW_ACTOR,
+    });
+    await timeEntries.create({
+      entryDate: "2026-03-03",
+      hours: "2.5",
+      feeItemId: fixture.feeItemId,
+      projectId: fixture.project1Id,
+      contractId: null,
+      feeEarnerUserId: fixture.feeEarnerUserId,
+      wbsTaskId: fixture.tasks.b1,
+      unitRate: "250",
+      narrative: "Two and a half hours on B1",
+      billable: true,
+      actorId: PJW_ACTOR,
+    });
+    await timeEntries.create({
+      entryDate: "2026-03-03",
+      hours: "7.5",
+      feeItemId: fixture.feeItemId,
+      projectId: fixture.project2Id,
+      contractId: null,
+      feeEarnerUserId: fixture.feeEarnerUserId,
+      wbsTaskId: fixture.tasks.foreign,
+      unitRate: "250",
+      narrative: "P2 driver hours",
+      billable: true,
+      actorId: PJW_ACTOR,
+    });
+    await timeEntries.reviewTimesheet({ weekStart: "2026-03-02", actorId: PJW_ACTOR });
+
+    const materialsJournal = await mintJournal({
+      debitAccountId: fixture.projectCostAccountId,
+      creditAccountId: fixture.apControlAccountId,
+      amount: "500.0000",
+      entryDate: "2026-03-05",
+      projectId: fixture.project1Id,
+      partnerId: fixture.supplierPartnerId,
+      description: "P1 materials issue",
+    });
+    await seedIssueMove({ journalEntryId: materialsJournal, valueAmount: "500.0000", movedAt: "2026-03-05" });
+
+    await seedSubCertificate({
+      projectId: fixture.project1Id,
+      grossValue: "10000.0000",
+      retentionWithheld: "1000.0000",
+      netPayable: "9000.0000",
+      certificateDate: "2026-03-08",
+    });
+    await mintJournal({
+      debitAccountId: fixture.projectCostAccountId,
+      creditAccountId: fixture.apControlAccountId,
+      amount: "9000.0000",
+      entryDate: "2026-03-08",
+      projectId: fixture.project1Id,
+      partnerId: fixture.supplierPartnerId,
+      description: "P1 subcontract certificate (net)",
+    });
+    await mintJournal({
+      debitAccountId: fixture.overheadPoolAccountId,
+      creditAccountId: fixture.apControlAccountId,
+      amount: "1000.0000",
+      entryDate: "2026-03-10",
+      projectId: null,
+      partnerId: fixture.supplierPartnerId,
+      description: "The overhead pool (indirect — unprojected)",
+    });
+    await mintJournal({
+      debitAccountId: fixture.projectCostAccountId,
+      creditAccountId: fixture.overheadClearAccountId,
+      amount: "625.0000",
+      entryDate: "2026-03-10",
+      projectId: fixture.project1Id,
+      description: "P1 overhead allocation (12.5/20 share)",
+    });
+    await mintJournal({
+      debitAccountId: fixture.projectCostAccountId,
+      creditAccountId: fixture.apControlAccountId,
+      amount: "820.3125",
+      entryDate: "2026-03-12",
+      projectId: fixture.project1Id,
+      partnerId: fixture.supplierPartnerId,
+      description: "P1 labor cost (time × rate)",
+    });
+
+    const existing = await budgets.listBudgets(fixture.project1Id);
+    if (!existing.some((row) => row.name === "PB-1")) {
+      const draft = await budgets.createBudget({
+        projectId: fixture.project1Id,
+        name: "PB-1",
+        nameAr: null,
+        note: null,
+        actorId: PJW_ACTOR,
+      });
+      await budgets.replaceLines(
+        draft.id,
+        [
+          {
+            costType: "LABOR",
+            wbsTaskId: fixture.tasks.a,
+            periodStart: "2026-01-01",
+            periodEnd: "2026-01-31",
+            plannedAmount: "3100.0000",
+            note: null,
+          },
+          {
+            costType: "MATERIAL",
+            wbsTaskId: null,
+            periodStart: "2026-01-01",
+            periodEnd: "2026-01-10",
+            plannedAmount: "1000.0000",
+            note: null,
+          },
+        ],
+        PJW_ACTOR,
+      );
+      await budgets.approve(draft.id, PJW_ACTOR);
+    }
+  });
+}
+
+/** Ensure a project row by code (the fixture's own ensureProject shape,
+ * exposed for the W-10 dedicated worlds). */
+export async function ensureProjectByCode(code: string, name: string): Promise<string> {
+  await setupProjectsFixture();
+  let projectId = "";
+  await withTenant(TENANT_PJW, async () => {
+    const accounting = await import("../../modules/accounting/infrastructure/accounting.store");
+    const projects = await accounting.listProjects();
+    const existing = projects.find((row) => row.code === code);
+    projectId =
+      existing?.id ?? (await accounting.insertProject({ code, name, nameAr: null, parentId: null })).id;
+  });
+  return projectId;
+}
+
+/** Ensure a postable account by code (the W-10 posting pair's fixture
+ * homes — the 0077 parenting precedent: new leaves under existing
+ * groups). */
+export async function ensurePjwAccount(input: {
+  code: string;
+  name: string;
+  nameAr: string;
+  type: "ASSET" | "LIABILITY" | "EXPENSE" | "REVENUE" | "EQUITY";
+  parentCode: string;
+}): Promise<string> {
+  await setupProjectsFixture();
+  let accountId = "";
+  await withTenant(TENANT_PJW, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    const accounting = await import("../../modules/accounting/infrastructure/accounting.store");
+    const existing = await accounting.findAccountByCode(input.code);
+    if (existing !== undefined) {
+      accountId = existing.id;
+      return;
+    }
+    const parent = await accounting.findAccountByCode(input.parentCode);
+    if (parent === undefined) throw new Error(`fixture parent account ${input.parentCode} missing`);
+    accountId = (
+      await tenancy.insertAccount({
+        code: input.code,
+        name: input.name,
+        nameAr: input.nameAr,
+        type: input.type,
+        parentId: parent.id,
+        isPostable: true,
+      })
+    ).id;
+  });
+  return accountId;
+}
+
+/** Map a purpose key to an account (the tenant's own runtime surface —
+ * the same insertAccountPurpose call provisionCoaTemplate uses; the
+ * G-58/IAS-23 purposes are fail-closed unmapped until this lands, the
+ * 038/0077 discipline). */
+export async function mapPjwPurpose(purposeKey: string, accountId: string): Promise<void> {
+  await setupProjectsFixture();
+  await withTenant(TENANT_PJW, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    const existing = await tenancy.findActivePurpose(purposeKey);
+    if (existing !== undefined) return;
+    await tenancy.insertAccountPurpose({
+      purposeKey,
+      accountId,
+      activeFrom: "2026-01-01",
+    });
+  });
+}
+
+/** Seed an APPROVED progress certificate (the certificate-EV
+ * discipline's source — the 0103 substrate; the billing engine is
+ * W-11's). Carries the full approval link (submitted + approved). */
+export async function seedProgressCertificate(input: {
+  projectId: string;
+  certificateDate: string;
+  kind: "PROGRESS" | "ADVANCE" | "FINAL";
+  cumulativePercent: string;
+  grossValue: string;
+  retentionAmount: string;
+  netValue: string;
+  certificateNo?: string;
+}): Promise<string> {
+  const su = await superuserClient();
+  const no =
+    input.certificateNo ?? `PJW-PC-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const rows = await su.query<{ id: string }>(
+    `INSERT INTO progress_certificates (id, tenant_id, project_id, certificate_no, certificate_date, kind,
+                                        cumulative_percent, gross_value, retention_amount, net_value, currency_code,
+                                        status, submitted_at, submitted_by, approved_at, approved_by, created_by)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, 'SAR',
+             'APPROVED', now(), $10, now(), $10, $10)
+     RETURNING id`,
+    [
+      TENANT_PJW,
+      input.projectId,
+      no,
+      input.certificateDate,
+      input.kind,
+      input.cumulativePercent,
+      input.grossValue,
+      input.retentionAmount,
+      input.netValue,
+      PJW_ACTOR,
+    ],
+  );
+  await su.end();
+  return rows.rows[0]!.id;
+}
+
+/** Seed the CUSTOMER retention row — the customer contract's commercial
+ * register (the 0103 side law: ONE per project; the retention engine is
+ * W-11's, this is the ceiling's base). Idempotent per project. */
+export async function seedRetentionCustomer(input: {
+  projectId: string;
+  contractValue: string;
+  currencyCode: string;
+  holdPercent: string;
+}): Promise<void> {
+  const su = await superuserClient();
+  const existing = await su.query<{ id: string }>(
+    `SELECT id FROM retention_accounts WHERE tenant_id = $1 AND project_id = $2 AND kind = 'CUSTOMER' LIMIT 1`,
+    [TENANT_PJW, input.projectId],
+  );
+  if (existing.rows.length === 0) {
+    await su.query(
+      `INSERT INTO retention_accounts (id, tenant_id, project_id, kind, contract_value, currency_code,
+                                        hold_percent, status, created_by)
+       VALUES (gen_random_uuid(), $1, $2, 'CUSTOMER', $3, $4, $5, 'ACTIVE', $6)`,
+      [TENANT_PJW, input.projectId, input.contractValue, input.currencyCode, input.holdPercent, PJW_ACTOR],
+    );
+  }
+  await su.end();
 }
