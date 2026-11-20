@@ -6999,6 +6999,7 @@ export interface Dictionary {
   projectsContractingSubCertColNet: string;
   projectsContractingSubCertColStatus: string;
   projectsContractingSubNoSelection: string;
+  projectsContractingColActions: string;
 
   // PHASE-048 (W-13 — T-16): the projects field-service dispatch board
   // (the visits listing + the SLA clocks' evaluation panel; D-14's AR/EN
@@ -7046,6 +7047,28 @@ export interface Dictionary {
   projectsFieldserviceRefusalTitle: string;
   projectsFieldserviceRefusalDetails: string;
   projectsFieldserviceHoursSuffix: string;
+
+  // PHASE-048 (W-13 — T-16): the three bilingual contracting print
+  // templates' labels (D-14 — the payload builders read these
+  // EXCLUSIVELY; every figure stays the engine's own string).
+  projectsPrintCertificateTitle: string;
+  projectsPrintSubCertificateTitle: string;
+  projectsPrintRetentionStatementTitle: string;
+  projectsPrintAsOf: string;
+  projectsPrintHistoryTitle: string;
+  projectsPrintSubHistoryTitle: string;
+  projectsPrintLedgerTitle: string;
+  projectsPrintSignaturePrepared: string;
+  projectsPrintSignatureAuthorized: string;
+  projectsPrintSignatureApproved: string;
+  projectsPrintNote: string;
+  projectsPrintButton: string;
+  projectsPrintPreviewTitle: string;
+  projectsPrintPrintNow: string;
+  projectsPrintAdvanceApplied: string;
+  projectsPrintCumulativeBilling: string;
+  projectsPrintAgreementBlock: string;
+  projectsPrintRegisterBlock: string;
 }
 
 const ar: Dictionary = {
@@ -14033,6 +14056,7 @@ const ar: Dictionary = {
   projectsContractingSubCertColNet: "الصافي المستحق",
   projectsContractingSubCertColStatus: "الحالة",
   projectsContractingSubNoSelection: "اختر اتفاقية لعرض مستخلصاتها.",
+  projectsContractingColActions: "إجراءات",
 
   // PHASE-048 (W-13 — T-16): the projects field-service dispatch board.
   projectsFieldserviceTitle: "لوحة الخدمة الميدانية",
@@ -14078,6 +14102,26 @@ const ar: Dictionary = {
   projectsFieldserviceRefusalTitle: "رفض مُنمّط من المحرك",
   projectsFieldserviceRefusalDetails: "الحمولة الكاملة:",
   projectsFieldserviceHoursSuffix: "ساعة",
+
+  // PHASE-048 (W-13 — T-16): the three bilingual contracting print templates.
+  projectsPrintCertificateTitle: "مستخلص أعمال",
+  projectsPrintSubCertificateTitle: "مستخلص مقاول باطن",
+  projectsPrintRetentionStatementTitle: "كشف المحتجيات",
+  projectsPrintAsOf: "كما في",
+  projectsPrintHistoryTitle: "سجل المستخلصات",
+  projectsPrintSubHistoryTitle: "سجل مستخلصات الباطن",
+  projectsPrintLedgerTitle: "دفتر المحتجيات",
+  projectsPrintSignaturePrepared: "إعداد",
+  projectsPrintSignatureAuthorized: "المراجعة الفنية",
+  projectsPrintSignatureApproved: "الاعتماد",
+  projectsPrintNote: "ملاحظة: النسب والمبالغ في هذا المستند من مخرجات محركات الفوترة والمحتجيات كما هي دون أي إعادة احتساب (BR-092 / BR-093).",
+  projectsPrintButton: "طباعة",
+  projectsPrintPreviewTitle: "معاينة الطباعة",
+  projectsPrintPrintNow: "اطبع الآن",
+  projectsPrintAdvanceApplied: "المقدّم المطبّق",
+  projectsPrintCumulativeBilling: "الفوترة التراكمية",
+  projectsPrintAgreementBlock: "الاتفاقية",
+  projectsPrintRegisterBlock: "سجل العقد",
 };
 
 const en: Dictionary = {
@@ -21079,6 +21123,7 @@ const en: Dictionary = {
   projectsContractingSubCertColNet: "Net payable",
   projectsContractingSubCertColStatus: "Status",
   projectsContractingSubNoSelection: "Select an agreement to load its certificates.",
+  projectsContractingColActions: "Actions",
 
   // PHASE-048 (W-13 — T-16): the projects field-service dispatch board.
   projectsFieldserviceTitle: "Field service dispatch board",
@@ -21124,6 +21169,26 @@ const en: Dictionary = {
   projectsFieldserviceRefusalTitle: "Typed refusal from the engine",
   projectsFieldserviceRefusalDetails: "Full payload:",
   projectsFieldserviceHoursSuffix: "hours",
+
+  // PHASE-048 (W-13 — T-16): the three bilingual contracting print templates.
+  projectsPrintCertificateTitle: "Progress certificate",
+  projectsPrintSubCertificateTitle: "Subcontractor certificate",
+  projectsPrintRetentionStatementTitle: "Retention statement",
+  projectsPrintAsOf: "As of",
+  projectsPrintHistoryTitle: "Certificate history",
+  projectsPrintSubHistoryTitle: "Sub-certificate history",
+  projectsPrintLedgerTitle: "Retention ledger",
+  projectsPrintSignaturePrepared: "Prepared by",
+  projectsPrintSignatureAuthorized: "Technical review",
+  projectsPrintSignatureApproved: "Approval",
+  projectsPrintNote: "Note: the percentages and amounts in this document are the billing and retention engines' own outputs, rendered without any recomputation (BR-092 / BR-093).",
+  projectsPrintButton: "Print",
+  projectsPrintPreviewTitle: "Print preview",
+  projectsPrintPrintNow: "Print now",
+  projectsPrintAdvanceApplied: "Advance applied",
+  projectsPrintCumulativeBilling: "Cumulative billing",
+  projectsPrintAgreementBlock: "Agreement",
+  projectsPrintRegisterBlock: "Contract register",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

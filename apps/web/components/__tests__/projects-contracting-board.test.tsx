@@ -27,6 +27,11 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { ToastProvider } from "@erp/ui";
 
 import { bffFetch } from "../../lib/client-api";
+import {
+  progressCertificatePayload,
+  retentionStatementPayload,
+} from "../../lib/contracting-print";
+import { getDictionary } from "../../i18n/dictionaries";
 import type {
   ChangeOrderCeiling,
   ChangeOrderRow,
@@ -277,6 +282,7 @@ function renderBoard(
         initialProjects={PROJECTS}
         initialProjectId={PROJECTS[0]!.id}
         initialSurfaces={surfaces()}
+        tenantName="شركة الاختبار للتجارة"
         {...overrides}
       />
     </ToastProvider>,
@@ -460,5 +466,73 @@ describe("PHASE-048 W-13 — the projects contracting board", () => {
       expect(screen.getByText("SC-001")).toBeTruthy();
       expect(screen.getByText("10,800.00 SAR")).toBeTruthy();
     });
+  });
+
+  it("(i) THE PRINT PAYLOAD BUILDER — the labels from the dictionary EXCLUSIVELY, the figures the engines' own strings verbatim (zero parallel computation)", () => {
+    const ar = getDictionary("ar");
+    const en = getDictionary("en");
+    // The progress certificate's payload: every label is a dictionary
+    // string (both sides), every value the engine's own string.
+    const payload = progressCertificatePayload(
+      "en",
+      CERTIFICATES[0]!,
+      CERTIFICATES,
+      BILLING,
+      PROJECTS[0]!,
+      "شركة الاختبار للتجارة",
+    );
+    expect(payload.title).toEqual({
+      ar: ar.projectsPrintCertificateTitle,
+      en: en.projectsPrintCertificateTitle,
+    });
+    // The engine's BR-092 pair VERBATIM (no rounding, no recomputation).
+    const grossFigure = payload.figures.find(
+      (figure) => figure.label.en === en.projectsContractingCertColGross,
+    )!;
+    expect(grossFigure.value).toBe("45000.0000");
+    const retentionFigure = payload.figures.find(
+      (figure) => figure.label.en === en.projectsContractingCertColRetention,
+    )!;
+    expect(retentionFigure.value).toBe("2250.0000");
+    // The ceiling totals: the billing engine's own figures.
+    expect(payload.totals[payload.totals.length - 1]!.amount).toBe("30000.0000");
+    expect(payload.docNo).toBe("PC-001");
+    expect(payload.docDate).toBe("2026-10-31");
+    // The retention statement's payload: NO totals field by design (a
+    // cross-kind sum would be a parallel computation) + the register's
+    // own figures + asOf from the ledger's own data.
+    const statement = retentionStatementPayload("ar", RETENTION, PROJECTS[0]!, "T");
+    expect(statement.asOf).toBe("2026-11-01T00:00:00Z");
+    const accrued = statement.figures.find(
+      (figure) => figure.label.ar === ar.projectsContractingRetColAccrued,
+    )!;
+    expect(accrued.value).toBe("4500.0000");
+  });
+
+  it("(j) the print button opens the preview dialog with the SAME html the paper prints (AR renders RTL, EN LTR)", () => {
+    renderBoard("ar");
+    // The certificates table's row print action.
+    fireEvent.click(screen.getAllByRole("button", { name: "طباعة" })[0]!);
+    const dialog = screen.getByRole("dialog");
+    const frame = within(dialog).getByTitle("معاينة الطباعة");
+    expect(frame.getAttribute("srcDoc")).toContain('dir="rtl"');
+    expect(frame.getAttribute("srcDoc")).toContain("مستخلص أعمال");
+    // The engine's own figures ride the print verbatim.
+    expect(frame.getAttribute("srcDoc")).toContain("45000.0000");
+    expect(frame.getAttribute("srcDoc")).toContain("2250.0000");
+    expect(frame.getAttribute("srcDoc")).toContain("شركة الاختبار للتجارة");
+  });
+
+  it("(k) the EN print preview renders LTR with the EN labels", () => {
+    renderBoard("en");
+    fireEvent.mouseDown(screen.getByRole("tab", { name: "Retention" }));
+    fireEvent.click(screen.getByRole("button", { name: "Print" }));
+    const dialog = screen.getByRole("dialog");
+    const frame = within(dialog).getByTitle("Print preview");
+    expect(frame.getAttribute("srcDoc")).toContain('dir="ltr"');
+    expect(frame.getAttribute("srcDoc")).toContain("Retention statement");
+    // The register's accrued balance — the EXACT engine string (the print
+    // renders no thousands separators: zero reformatting).
+    expect(frame.getAttribute("srcDoc")).toContain("4500.0000");
   });
 });

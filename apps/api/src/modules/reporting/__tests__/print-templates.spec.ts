@@ -161,10 +161,13 @@ describe("receipt-58 / receipt-80 (POS roll prints, §1)", () => {
 });
 
 describe("template registry + fonts (§1–§2)", () => {
-  it("PRINT_TEMPLATE_VERSIONS freezes the four base templates (v2 for the QR-image templates)", () => {
+  it("PRINT_TEMPLATE_VERSIONS freezes the four base templates (v2 for the QR-image templates) + the three W-13 contracting additions (v1)", () => {
     expect(Object.keys(PRINT_TEMPLATE_VERSIONS).sort()).toEqual([
       "a4-document",
+      "a4-progress-certificate",
       "a4-report",
+      "a4-retention-statement",
+      "a4-sub-certificate",
       "receipt-58",
       "receipt-80",
     ]);
@@ -174,6 +177,12 @@ describe("template registry + fonts (§1–§2)", () => {
     expect(PRINT_TEMPLATE_VERSIONS["receipt-80"]).toBe(2);
     expect(PRINT_TEMPLATE_VERSIONS["receipt-58"]).toBe(2);
     expect(PRINT_TEMPLATE_VERSIONS["a4-report"]).toBe(1);
+    // PHASE-048 (W-13 — T-16): the three bilingual contracting templates
+    // (contracting-templates.ts) — v1 at introduction (additive registry
+    // keys; the base four unchanged above).
+    expect(PRINT_TEMPLATE_VERSIONS["a4-progress-certificate"]).toBe(1);
+    expect(PRINT_TEMPLATE_VERSIONS["a4-sub-certificate"]).toBe(1);
+    expect(PRINT_TEMPLATE_VERSIONS["a4-retention-statement"]).toBe(1);
   });
 
   it("the print stylesheet embeds the woff2 fonts as data URIs (no network fetch)", () => {

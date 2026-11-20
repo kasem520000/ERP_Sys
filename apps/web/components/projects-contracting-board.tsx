@@ -36,13 +36,20 @@ import type { JSX } from "react";
 
 import {
   Badge,
+  Button,
   DataTable,
+  Dialog,
   LoadingState,
   Tabs,
   formatMoneyDisplay,
   renderMoneyCell,
   type DataTableColumn,
 } from "@erp/ui";
+import {
+  renderProgressCertificate,
+  renderRetentionStatement,
+  renderSubcontractorCertificate,
+} from "@erp/ui/print";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
 import type {
@@ -57,7 +64,13 @@ import type {
   SubcontractCertificateRow,
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
+import {
+  progressCertificatePayload,
+  retentionStatementPayload,
+  subCertificatePayload,
+} from "../lib/contracting-print";
 import { localizedName } from "../lib/messages";
+import { printHtmlDocument } from "../lib/print-frame";
 import { Card } from "./card";
 import { DefList } from "./def-list";
 import { ErrorNotice } from "./notices";
@@ -122,6 +135,13 @@ interface SubCertsState {
   busy: boolean;
 }
 
+/** The print preview's state (the SAME html the paper prints —
+ * ADR-0011: screen preview and paper cannot diverge). */
+interface PrintState {
+  title: string;
+  html: string;
+}
+
 const isForbidden = (error: ApiErrorBody): boolean => error.code === "FORBIDDEN";
 
 export function ProjectsContractingBoard({
@@ -129,11 +149,15 @@ export function ProjectsContractingBoard({
   initialProjects,
   initialProjectId,
   initialSurfaces,
+  tenantName,
 }: {
   locale: Locale;
   initialProjects: readonly ProjectPoolRow[];
   initialProjectId: string | null;
   initialSurfaces: ContractingSurfaces;
+  /** The active tenant's own name (the print letterhead — the page's
+   * session read, engine data; never a client-side constant). */
+  tenantName: string;
 }): JSX.Element {
   const d = getDictionary(locale);
   const [tab, setTab] = useState("certificates");
@@ -148,6 +172,11 @@ export function ProjectsContractingBoard({
     error: null,
     busy: false,
   });
+  const [printDoc, setPrintDoc] = useState<PrintState | null>(null);
+
+  // The selected project's own pool row (the print's project block —
+  // the engine's own fields, from the pool the screen already holds).
+  const project = initialProjects.find((row) => row.id === state.projectId) ?? null;
 
   const loadProject = useCallback(async (projectId: string) => {
     setState((prev) => ({ ...prev, projectId, busy: true }));
@@ -191,6 +220,59 @@ export function ProjectsContractingBoard({
       error: result.ok ? null : result.error,
     }));
   }, []);
+
+  // -- the three bilingual prints (the payload builders' laws: the
+  // labels from the dictionary exclusively; the figures the engines'
+  // own strings; no wall-clock — the dates are the data's own) -------------
+
+  const printCertificate = useCallback(
+    (certificate: ProgressCertificateRow) => {
+      if (project === null) return;
+      const payload = progressCertificatePayload(
+        locale,
+        certificate,
+        state.certificates ?? [certificate],
+        state.billing,
+        project,
+        tenantName,
+      );
+      setPrintDoc({
+        title: `${d.projectsPrintCertificateTitle} — ${payload.docNo}`,
+        html: renderProgressCertificate(payload),
+      });
+    },
+    [d, locale, project, state.billing, state.certificates, tenantName],
+  );
+
+  const printStatement = useCallback(() => {
+    if (project === null || state.retention === null) return;
+    const payload = retentionStatementPayload(locale, state.retention, project, tenantName);
+    setPrintDoc({
+      title: `${d.projectsPrintRetentionStatementTitle} — ${project.code}`,
+      html: renderRetentionStatement(payload),
+    });
+  }, [d, locale, project, state.retention, tenantName]);
+
+  const printSubCertificate = useCallback(
+    (certificate: SubcontractCertificateRow) => {
+      if (project === null) return;
+      const agreement = state.subcontracts?.find((row) => row.id === certificate.agreementId) ?? null;
+      if (agreement === null) return;
+      const payload = subCertificatePayload(
+        locale,
+        certificate,
+        subCerts.rows ?? [certificate],
+        agreement,
+        project,
+        tenantName,
+      );
+      setPrintDoc({
+        title: `${d.projectsPrintSubCertificateTitle} — ${payload.docNo}`,
+        html: renderSubcontractorCertificate(payload),
+      });
+    },
+    [d, locale, project, state.subcontracts, subCerts.rows, tenantName],
+  );
 
   // -- the certificates tab's columns (the W-11 billing engine's rows) ------
   const certColumns: DataTableColumn<ProgressCertificateRow>[] = [
@@ -258,6 +340,16 @@ export function ProjectsContractingBoard({
       header: activeLocaleHeader(d.projectsContractingCertColApprovedAt),
       accessor: (row) => row.approvedAt ?? "—",
       render: (row) => (row.approvedAt === null ? "—" : monoCell(row.approvedAt)),
+    },
+    {
+      id: "actions",
+      header: activeLocaleHeader(d.projectsContractingColActions),
+      accessor: () => d.projectsPrintButton,
+      render: (row) => (
+        <Button variant="secondary" size="sm" onClick={() => printCertificate(row)}>
+          {d.projectsPrintButton}
+        </Button>
+      ),
     },
   ];
 
@@ -470,6 +562,16 @@ export function ProjectsContractingBoard({
       accessor: (row) => row.status,
       render: (row) => statusCell(row.status),
     },
+    {
+      id: "actions",
+      header: activeLocaleHeader(d.projectsContractingColActions),
+      accessor: () => d.projectsPrintButton,
+      render: (row) => (
+        <Button variant="secondary" size="sm" onClick={() => printSubCertificate(row)}>
+          {d.projectsPrintButton}
+        </Button>
+      ),
+    },
   ];
 
   /** A surface's render: the typed refusal, the 403 notice (its own key),
@@ -594,6 +696,23 @@ export function ProjectsContractingBoard({
           </div>
 
           <div data-slot="retention" className="flex flex-col gap-4">
+            {surface(
+              state.retention,
+              state.retentionError,
+              null,
+              () => (
+                <Card
+                  title={d.projectsPrintRetentionStatementTitle}
+                  actions={
+                    <Button variant="secondary" size="sm" onClick={printStatement}>
+                      {d.projectsPrintButton}
+                    </Button>
+                  }
+                >
+                  <p className="text-sm text-gray-600">{d.projectsPrintLedgerTitle}</p>
+                </Card>
+              ),
+            )}
             {surface(
               state.retention,
               state.retentionError,
@@ -735,6 +854,32 @@ export function ProjectsContractingBoard({
           </div>
         </Tabs>
       ) : null}
+
+      {/* the print preview — the SAME html the paper prints (ADR-0011:
+          screen preview and paper cannot diverge). */}
+      <Dialog
+        open={printDoc !== null}
+        onOpenChange={(open) => {
+          if (!open) setPrintDoc(null);
+        }}
+        title={printDoc?.title ?? d.projectsPrintPreviewTitle}
+        size="lg"
+      >
+        {printDoc !== null ? (
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-end">
+              <Button variant="primary" size="sm" onClick={() => printHtmlDocument(printDoc.html)}>
+                {d.projectsPrintPrintNow}
+              </Button>
+            </div>
+            <iframe
+              srcDoc={printDoc.html}
+              title={d.projectsPrintPreviewTitle}
+              className="h-[70vh] w-full rounded-md border border-subtle bg-white"
+            />
+          </div>
+        ) : null}
+      </Dialog>
     </div>
   );
 }

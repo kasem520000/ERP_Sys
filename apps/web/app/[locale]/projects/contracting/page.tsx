@@ -27,6 +27,7 @@ import type {
   ChangeOrderCeiling,
   ChangeOrderRow,
   ContractingBillingState,
+  CurrentSession,
   ProgressCertificateRow,
   ProjectPoolRow,
   RetentionAccountRow,
@@ -55,6 +56,17 @@ export default async function ProjectsContractingPage({
   if (!projects.ok && projects.status === 401) {
     redirect(`/${locale}/login`);
   }
+
+  // The active tenant's own name (the print letterhead — the session's
+  // own read; a failed read degrades to the honest generic name, the
+  // pdf-print precedent — never a fabricated tenant).
+  const session = await fetchApi<CurrentSession>("identity/sessions/current");
+  const tenantName =
+    session.ok && session.data.activeTenantId !== null
+      ? (session.data.memberships.find(
+          (membership) => membership.tenantId === session.data.activeTenantId,
+        )?.tenantName ?? "ERP")
+      : "ERP";
 
   let content: JSX.Element;
   if (!projects.ok) {
@@ -116,6 +128,7 @@ export default async function ProjectsContractingPage({
         initialProjects={projects.data}
         initialProjectId={first?.id ?? null}
         initialSurfaces={surfaces}
+        tenantName={tenantName}
       />
     );
   }

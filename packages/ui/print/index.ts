@@ -23,6 +23,18 @@ export {
   type LegalFooter,
   type BilingualText,
 } from "./templates";
+// PHASE-048 (W-13 — T-16, D-14): the three bilingual contracting print
+// templates (pure generators; the payload labels are the caller's —
+// the production callers read them from the app i18n dictionary).
+export {
+  renderProgressCertificate,
+  renderSubcontractorCertificate,
+  renderRetentionStatement,
+  type CertificatePrintPayload,
+  type RetentionStatementPrintPayload,
+  type CertificateFigure,
+  type CertificateSignature,
+} from "./contracting-templates";
 export { EMBEDDED_FONTS } from "./fonts";
 // PHASE-021: the webview reprint template's paper palette (the offline
 // console's cached-receipt reprint — apps/web components/offline).

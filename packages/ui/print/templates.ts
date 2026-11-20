@@ -103,6 +103,12 @@ export const PRINT_TEMPLATE_VERSIONS: Readonly<Record<string, number>> = Object.
   "a4-report": 1,
   "receipt-80": 2,
   "receipt-58": 2,
+  // PHASE-048 (W-13 — T-16, D-14): the three bilingual contracting
+  // templates (the pure generators in contracting-templates.ts) — v1
+  // at introduction; additive registry keys, the base four unchanged.
+  "a4-progress-certificate": 1,
+  "a4-sub-certificate": 1,
+  "a4-retention-statement": 1,
 });
 
 /**
@@ -121,7 +127,9 @@ function qrImageBlock(qrImageUri: string | undefined, locale: "ar" | "en"): stri
     `</div>`;
 }
 
-function esc(value: string): string {
+/** Escape a raw string for safe HTML interpolation (PHASE-048 W-13:
+ * exported for the contracting templates — the same escaper, one law). */
+export function esc(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -129,11 +137,15 @@ function esc(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function pick(text: BilingualText, locale: "ar" | "en"): string {
+/** Pick the locale's side of a bilingual label (PHASE-048 W-13:
+ * exported for the contracting templates). */
+export function pick(text: BilingualText, locale: "ar" | "en"): string {
   return esc(locale === "ar" ? text.ar : text.en);
 }
 
-function htmlDocument(locale: "ar" | "en", title: string, body: string, css: string): string {
+/** The html document wrapper (PHASE-048 W-13: exported for the
+ * contracting templates — the same wrapper, one law). */
+export function htmlDocument(locale: "ar" | "en", title: string, body: string, css: string): string {
   return `<!DOCTYPE html>
 <html lang="${locale}" dir="${locale === "ar" ? "rtl" : "ltr"}">
 <head>
