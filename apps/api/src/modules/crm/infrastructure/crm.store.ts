@@ -896,6 +896,8 @@ export interface TimeEntryRow {
   projectId: string | null;
   contractId: string | null;
   feeEarnerUserId: string | null;
+  /** PHASE-048 (W-9 — 0100's dimension): the optional WBS node. */
+  wbsTaskId: string | null;
   unitRate: string;
   narrative: string | null;
   billable: boolean;
@@ -906,7 +908,8 @@ export interface TimeEntryRow {
 const TIME_ENTRY_COLUMNS = sql`id, created_at::text AS "createdAt", updated_at::text AS "updatedAt",
   created_by AS "createdBy", entry_date::text AS "entryDate", hours, fee_item_id AS "feeItemId",
   project_id AS "projectId", contract_id AS "contractId", fee_earner_user_id AS "feeEarnerUserId",
-  unit_rate AS "unitRate", narrative, billable, status, billed_invoice_id AS "billedInvoiceId"`;
+  wbs_task_id AS "wbsTaskId", unit_rate AS "unitRate", narrative, billable, status,
+  billed_invoice_id AS "billedInvoiceId"`;
 
 export interface TimeEntryInsert {
   entryDate: string;
@@ -915,6 +918,9 @@ export interface TimeEntryInsert {
   projectId: string | null;
   contractId: string | null;
   feeEarnerUserId: string | null;
+  /** PHASE-048 (W-9): the optional WBS node (absent ≡ null — the
+   * 019-era callers stay source-compatible). */
+  wbsTaskId?: string | null;
   unitRate: string;
   narrative: string | null;
   billable: boolean;
@@ -926,11 +932,11 @@ export async function insertTimeEntry(input: TimeEntryInsert): Promise<TimeEntry
   const id = generateUuidV7();
   await tx.execute(sql`
     INSERT INTO crm_time_entries (id, tenant_id, created_by, entry_date, hours, fee_item_id,
-                                  project_id, contract_id, fee_earner_user_id, unit_rate,
-                                  narrative, billable, status)
+                                  project_id, contract_id, fee_earner_user_id, wbs_task_id,
+                                  unit_rate, narrative, billable, status)
     VALUES (${id}, erp.current_tenant_id(), ${input.actorId}, ${input.entryDate}, ${input.hours},
             ${input.feeItemId}, ${input.projectId}, ${input.contractId}, ${input.feeEarnerUserId},
-            ${input.unitRate}, ${input.narrative}, ${input.billable}, 'DRAFT')
+            ${input.wbsTaskId ?? null}, ${input.unitRate}, ${input.narrative}, ${input.billable}, 'DRAFT')
   `);
   const rows = await tx.execute(sql`
     SELECT ${TIME_ENTRY_COLUMNS} FROM crm_time_entries WHERE id = ${id} LIMIT 1
@@ -975,6 +981,7 @@ export async function patchTimeEntry(input: {
   projectId?: string | null;
   contractId?: string | null;
   feeEarnerUserId?: string | null;
+  wbsTaskId?: string | null;
   unitRate?: string;
   narrative?: string | null;
   billable?: boolean;
@@ -989,6 +996,7 @@ export async function patchTimeEntry(input: {
       contract_id = CASE WHEN ${input.contractId === undefined} THEN contract_id ELSE ${input.contractId ?? null} END,
       fee_earner_user_id = CASE WHEN ${input.feeEarnerUserId === undefined} THEN fee_earner_user_id
                                 ELSE ${input.feeEarnerUserId ?? null} END,
+      wbs_task_id = CASE WHEN ${input.wbsTaskId === undefined} THEN wbs_task_id ELSE ${input.wbsTaskId ?? null} END,
       unit_rate = COALESCE(${input.unitRate ?? null}, unit_rate),
       narrative = CASE WHEN ${input.narrative === undefined} THEN narrative ELSE ${input.narrative ?? null} END,
       billable = CASE WHEN ${input.billable === undefined} THEN billable ELSE ${input.billable ?? null} END,

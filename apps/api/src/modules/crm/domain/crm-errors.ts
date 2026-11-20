@@ -205,6 +205,18 @@ export class TimeEntryCaseRequiredError extends DomainError {
     );
   }
 }
+/**
+ * PHASE-048 (W-9 — 0100's recorded law): the WBS-task dimension's
+ * write-time coherence — a timeslip carrying a wbsTaskId must carry the
+ * task's OWN project on the same write (the task ∈ the entry's project;
+ * never a guessed default). The cross-row check is engine-side (the
+ * migration's own comment defers it here).
+ */
+export class TimeEntryWbsCoherenceError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("TIME_ENTRY_WBS_COHERENCE", message, details);
+  }
+}
 /** A weekly review whose window contains no DRAFT entries (§6). */
 export class TimesheetEmptyError extends DomainError {
   constructor(weekStart: string) {

@@ -614,6 +614,46 @@ the INV-033 reconciliation service (D-05).
 **Exit:** acceptance #2's API arms + #3 green with evidence (the
 rollup reconciles node-by-node; INV-033 holds to the cent).
 
+> **[Dated 2026-11-20 (W-9 DELIVERED — on the owner-accepted W-8 head
+> `916510f`, this session's fresh clone — the same-session evidence
+> rule's SEVENTEENTH consecutive wave): the unit-first law opened the
+> wave and caught three real scale bugs in the pure folds' first shape
+> (fixed BEFORE any consumer landed — the 047 talent-math precedent
+> repeating). T-05: the pure layer (detectDependencyCycle with the
+> cycle path + wouldCreateParentCycle + the leaf-recomputed rollup fold
+> with ONE rounding at the total + the curve's EXACT LCM interpolation +
+> the distributor fold + the payroll read-only rate fold) + the WBS
+> engine (both cycle guards before every write, the API the only move
+> path; the project boundary; the children-first law; the rollup
+> recomputed on every read) + 0100's write-time coherence on the time
+> entries (the task ∈ the entry's project, never a guessed default).
+> T-06: the budget lifecycle CAS + the DRAFT bulk-replace + THE
+> ONE-APPROVED LAW (D-07) + the CELL LAW + the APPROVED curve ALONE (the
+> pure exact fold) + the vs-actual rollup by type and node + the
+> over-allocation WARNING as the read-side signal (0101's law). T-07:
+> the four collectors (labor = the approved-class WBS-dimensioned
+> entries × the payroll cost rates — D-01 read-only, the rate
+> snapshotted at valuation, the unset divisor = UNPRICED never a
+> fabricated rate; materials = the 044 WMS issue paths at the MOVE's own
+> value via the posting's project stamp — the honest zero; subcontract
+> = the APPROVED certificates' nets; overhead = the tenant-configured
+> distributor over the pool accounts — the allocation postings credit
+> the CLEARING account never the pool) + INV-033 the typed refusal at
+> any residual. The settings keys `projects.labor_standard_monthly_hours`
+> + `projects.overhead_distributor` (the D-02 config-row precedent,
+> null-default + pin-neutral). ROUTE_PERMISSIONS 988 → 1007 (+19, dated
+> at the block — the W-8 keys' first binding). The `__db__/projects/`
+> family begins (15 + 13 arms; acceptance #2's triple agreement + #3's
+> coherent world AC 10,945.3125 = the GL dimension exactly, every GL
+> side through the real PostingService). Gates: the full DB suite
+> 261/261 · 3,717/3,717 · 0 failed · 0 skipped in five family-whole
+> chunks (the W-7 pattern) + the scratch check:rls 318/0 + every
+> standing checker green (the evidence `audit-evidence/phase048-w9/` +
+> the gate doc `docs/operations/gate-evidence/2026-11-20-phase048-w9.md`
+> — the three honest disclosures recorded there: the unit-first catch,
+> the chunking discovery, the command-cap + the true-up flake). Exit
+> criteria MET. NOT production approval.]**
+
 ### W-10 — EVM + change orders + IAS 23 (T-08 + T-09 + the D-11 engine, orchestrator)
 The EVM service (PV/EV/AC, CPI/SPI, EAC/ETC — D-06); the change-order
 approval gate + G-58's exactly-once effects (D-07); the IAS-23

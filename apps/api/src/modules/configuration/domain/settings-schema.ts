@@ -661,6 +661,43 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-048 (D-11/R-04 — IAS 23, added by v3.2/CR-50): the tenant's borrowing-costs capitalization rate register — the weighted-average rate over borrowings for qualifying construction assets, entered WITH source evidence (the citation/text the rate derives from) and the explicit verified:true acknowledgement. REQUIRES_VERIFICATION: while unset (null) or unverified the capitalization posting REFUSES (the W-14 engine's typed law — never a fabricated rate); the qualifying window is driven by the WBS schedule start/end.",
   }),
+  // PHASE-048 (W-9 — T-07/D-05, 2026-11-20): the labor cost-rate divisor —
+  // the tenant's standard monthly hours the hourly employee cost rate
+  // derives from (monthly employer cost ÷ standard hours, the rate
+  // snapshotted at valuation — D-01: payroll read-only). NO default ships
+  // (the payroll.variable.overtime_hours_per_day precedent): while unset
+  // the labor collector lands the entry UNPRICED with the explicit
+  // warning — never a fabricated rate (red line 5). Pin-neutral by
+  // construction (null default omitted from the §5 policies map).
+  "projects.labor_standard_monthly_hours": Object.freeze({
+    key: "projects.labor_standard_monthly_hours",
+    schema: z.number().int().min(1).max(744).nullable(),
+    default: null,
+    description:
+      "PHASE-048 (W-9, D-05/D-01): the tenant's standard monthly hours — the divisor the hourly employee cost rate derives from (the ACTIVE salary structure's monthly employer cost ÷ this divisor, read-only from the payroll data; the rate is snapshotted at valuation). NO default: while unset the labor actual collector lands entries UNPRICED with the explicit warning (the overtime_hours_per_day precedent — never a fabricated rate).",
+  }),
+  // PHASE-048 (W-9 — T-07/D-05, 2026-11-20): the overhead distributor —
+  // the tenant-configured allocation driver + the indirect-cost pool
+  // accounts. The collector reads the pool (the accounts' net GL carry)
+  // and distributes it over the projects by the driver share
+  // (LABOR_HOURS = the approved-class WBS-dimensioned hours;
+  // DIRECT_COST = labor + materials + subcontract). NO default ships:
+  // while unset the overhead leg is the honest zero with the degraded
+  // note (red line 5 — no fabricated allocation). Pin-neutral by
+  // construction (a structured setting never enters the §5 flat map;
+  // null is omitted).
+  "projects.overhead_distributor": Object.freeze({
+    key: "projects.overhead_distributor",
+    schema: z
+      .object({
+        driver: z.enum(["LABOR_HOURS", "DIRECT_COST"]),
+        pool_account_ids: z.array(z.string().uuid()).min(1).max(50),
+      })
+      .nullable(),
+    default: null,
+    description:
+      "PHASE-048 (W-9, D-05): the tenant's overhead distributor — the allocation driver (LABOR_HOURS or DIRECT_COST) and the indirect-cost pool accounts whose net GL carry distributes over the projects by the driver share (exact 4-dp arithmetic, one half-up rounding per project — the posting reads the SAME fold). While unset (null) the overhead actual is the honest zero with the degraded note, never a fabricated allocation.",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

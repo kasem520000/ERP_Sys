@@ -14,6 +14,7 @@ import {
   TimeEntryInputInvalidError,
   TimeEntryNotFoundError,
   TimeEntryStateError,
+  TimeEntryWbsCoherenceError,
   TimesheetEmptyError,
 } from "../domain/crm-errors";
 
@@ -42,6 +43,11 @@ export interface CreateTimeEntryInput {
   projectId: string | null;
   contractId: string | null;
   feeEarnerUserId: string | null;
+  /** PHASE-048 (W-9 — 0100's dimension): the optional WBS node the
+   * labor collector aggregates on; MUST belong to the entry's project
+   * (the write-time coherence — TimeEntryWbsCoherenceError). Absent ≡
+   * null (the 019-era callers stay source-compatible). */
+  wbsTaskId?: string | null;
   /** NULL ⇒ resolve the contract partner's price-list price; manual input
    * is required when no price resolves (§6 determinism). */
   unitRate: string | null;
@@ -57,6 +63,7 @@ export interface UpdateTimeEntryInput {
   projectId?: string | null;
   contractId?: string | null;
   feeEarnerUserId?: string | null;
+  wbsTaskId?: string | null;
   unitRate?: string;
   narrative?: string | null;
   billable?: boolean;
@@ -156,6 +163,34 @@ export class TimeEntryService {
       }
     }
 
+    // PHASE-048 (W-9 — 0100's recorded law): the WBS dimension's
+    // write-time coherence — the task ∈ the entry's project, never a
+    // guessed default (the cross-row check the migration defers to the
+    // engine).
+    const wbsTaskId = input.wbsTaskId ?? null;
+    if (wbsTaskId !== null) {
+      const { findWbsTaskProject } = await import("../infrastructure/projects.store");
+      const task = await findWbsTaskProject(wbsTaskId);
+      if (task === undefined) {
+        throw new TimeEntryWbsCoherenceError(
+          `WBS task ${wbsTaskId} does not exist in this tenant`,
+          { wbsTaskId },
+        );
+      }
+      if (input.projectId === null) {
+        throw new TimeEntryWbsCoherenceError(
+          `a time entry carrying WBS task ${wbsTaskId} must carry the task's project ${task.projectId} — the dimension never guesses (0100's law)`,
+          { wbsTaskId, taskProjectId: task.projectId },
+        );
+      }
+      if (task.projectId !== input.projectId) {
+        throw new TimeEntryWbsCoherenceError(
+          `WBS task ${wbsTaskId} belongs to project ${task.projectId}, not the entry's project ${input.projectId} — the dimension never crosses projects`,
+          { wbsTaskId, taskProjectId: task.projectId, projectId: input.projectId },
+        );
+      }
+    }
+
     // The optional contract link: ACTIVE only (§6).
     let contractPartnerId: string | null = null;
     if (input.contractId !== null) {
@@ -208,6 +243,7 @@ export class TimeEntryService {
       projectId: input.projectId,
       contractId: input.contractId,
       feeEarnerUserId: input.feeEarnerUserId,
+      wbsTaskId: input.wbsTaskId ?? null,
       unitRate,
       narrative: input.narrative,
       billable: input.billable,
@@ -224,6 +260,7 @@ export class TimeEntryService {
         feeItemId: input.feeItemId,
         projectId: input.projectId,
         contractId: input.contractId,
+        wbsTaskId: input.wbsTaskId,
         unitRate,
         billable: input.billable,
         status: entry.status,
@@ -283,6 +320,34 @@ export class TimeEntryService {
       throw new TimeEntryCaseRequiredError();
     }
 
+    // PHASE-048 (W-9 — 0100's law on the MERGED state): the WBS
+    // coherence re-check (a patch may move the project, the task, or
+    // both — the merged pair must stay coherent).
+    const effectiveWbsTaskId =
+      patch.wbsTaskId !== undefined ? patch.wbsTaskId : before.wbsTaskId;
+    if (effectiveWbsTaskId !== null) {
+      const { findWbsTaskProject } = await import("../infrastructure/projects.store");
+      const task = await findWbsTaskProject(effectiveWbsTaskId);
+      if (task === undefined) {
+        throw new TimeEntryWbsCoherenceError(
+          `WBS task ${effectiveWbsTaskId} does not exist in this tenant`,
+          { wbsTaskId: effectiveWbsTaskId },
+        );
+      }
+      if (effectiveProjectId === null) {
+        throw new TimeEntryWbsCoherenceError(
+          `a time entry carrying WBS task ${effectiveWbsTaskId} must carry the task's project ${task.projectId} — the dimension never guesses (0100's law)`,
+          { wbsTaskId: effectiveWbsTaskId, taskProjectId: task.projectId },
+        );
+      }
+      if (task.projectId !== effectiveProjectId) {
+        throw new TimeEntryWbsCoherenceError(
+          `WBS task ${effectiveWbsTaskId} belongs to project ${task.projectId}, not the entry's project ${effectiveProjectId} — the dimension never crosses projects`,
+          { wbsTaskId: effectiveWbsTaskId, taskProjectId: task.projectId, projectId: effectiveProjectId },
+        );
+      }
+    }
+
     await store.patchTimeEntry({
       id,
       entryDate: patch.entryDate,
@@ -294,6 +359,7 @@ export class TimeEntryService {
       projectId: patch.projectId,
       contractId: patch.contractId,
       feeEarnerUserId: patch.feeEarnerUserId,
+      wbsTaskId: patch.wbsTaskId,
       unitRate:
         patch.unitRate !== undefined
           ? new Decimal(patch.unitRate).toDecimalPlaces(6, Decimal.ROUND_HALF_UP).toFixed(6)

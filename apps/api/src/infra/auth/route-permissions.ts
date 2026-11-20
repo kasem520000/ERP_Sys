@@ -4755,6 +4755,117 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/hr/org/placement/:employeeId",
     permission: "hr.org.view",
   },
+
+  // PHASE-048 (W-9 — T-05 + T-06 + T-07, dated 2026-11-20; matrix §3.26):
+  // the /api/v1/projects/* families BEGIN — the W-8 keys-seed-first
+  // discipline's first binding wave (the fourteen projects.* keys seeded
+  // at 0103 §1 bind their routes as the W-9…W-13 waves ship; this block
+  // binds six of them: projects.wbs.view/manage ·
+  // projects.budget.view/manage · projects.allocation.manage ·
+  // projects.evm.view — 988 + 19 = 1007). The WBS board (wbs.view),
+  // the cost plan (budget.view/manage), the resource allocations
+  // (allocation.manage — the 14-key list carries no allocation.view:
+  // the allocation plane's read + write ride the manage key), and the
+  // actual collectors + INV-033 (evm.view — AC is the EVM plane's cost
+  // figure, the W-10 engine's input; the accountant's finance-read
+  // key). The entitlement plane rides the projects.wbs feature flag
+  // (the @RequireFeature decorator — the entitlement/authorization
+  // separation, D-16).
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/wbs",
+    permission: "projects.wbs.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/wbs/rollup",
+    permission: "projects.wbs.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/wbs/tasks",
+    permission: "projects.wbs.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/projects/wbs/tasks/:id",
+    permission: "projects.wbs.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/projects/wbs/tasks/:id",
+    permission: "projects.wbs.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/budgets",
+    permission: "projects.budget.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/budgets",
+    permission: "projects.budget.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/budgets/:id/lines",
+    permission: "projects.budget.view",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/projects/budgets/:id/lines",
+    permission: "projects.budget.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/budgets/:id/approve",
+    permission: "projects.budget.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/budgets/:id/close",
+    permission: "projects.budget.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/budget-curve",
+    permission: "projects.budget.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/budget-vs-actual",
+    permission: "projects.budget.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/allocations",
+    permission: "projects.allocation.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/allocations",
+    permission: "projects.allocation.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/projects/allocations/:id",
+    permission: "projects.allocation.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/allocation-warnings",
+    permission: "projects.allocation.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/actuals",
+    permission: "projects.evm.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/inv033",
+    permission: "projects.evm.view",
+  },
 ];
 
 /**

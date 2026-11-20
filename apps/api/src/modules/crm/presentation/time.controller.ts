@@ -38,6 +38,9 @@ const createSchema = z.object({
   projectId: UUID.nullable().optional(),
   contractId: UUID.nullable().optional(),
   feeEarnerUserId: UUID.nullable().optional(),
+  // PHASE-048 (W-9 — 0100's dimension): the optional WBS node (the
+  // write-time coherence is the service's typed law).
+  wbsTaskId: UUID.nullable().optional(),
   unitRate: QTY6.nullable().optional(),
   narrative: z.string().min(1).max(2000).nullable().optional(),
   billable: z.boolean().optional(),
@@ -50,6 +53,7 @@ const updateSchema = z.object({
   projectId: UUID.nullable().optional(),
   contractId: UUID.nullable().optional(),
   feeEarnerUserId: UUID.nullable().optional(),
+  wbsTaskId: UUID.nullable().optional(),
   unitRate: QTY6.optional(),
   narrative: z.string().min(1).max(2000).nullable().optional(),
   billable: z.boolean().optional(),
@@ -100,6 +104,7 @@ export class TimeController {
         projectId: input.projectId ?? null,
         contractId: input.contractId ?? null,
         feeEarnerUserId: input.feeEarnerUserId ?? null,
+        wbsTaskId: input.wbsTaskId ?? null,
         unitRate: input.unitRate ?? null,
         narrative: input.narrative ?? null,
         billable: input.billable ?? true,
@@ -122,6 +127,7 @@ export class TimeController {
         projectId: input.projectId,
         contractId: input.contractId,
         feeEarnerUserId: input.feeEarnerUserId,
+        wbsTaskId: input.wbsTaskId,
         unitRate: input.unitRate,
         narrative: input.narrative,
         billable: input.billable,

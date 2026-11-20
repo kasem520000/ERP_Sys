@@ -1,8 +1,81 @@
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-8 the foundation wave delivered: migrations 0100–0103 + every mirror/registry/catalog/matrix/pin in ONE increment (the fourteen projects.* keys 312 → 326 · ENTITY_CATALOG 307 → 318 · the A-suite +66 · the three feature flags + the manifest enablements · the IAS-23 register as the settings key); the full DB suite at the new count green + the chain re-proven from zero; the approval amendments A-1/A-2 + the forward-progressive W-5 date-defect repair; W-9 the engines NEXT)**
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-9 the WBS + budgets + actuals engines delivered: the pure layer FIRST (the unit-first law caught three real scale bugs before any consumer) + T-05/T-06/T-07 + INV-033 + the WBS dimension's write-time coherence + the W-8 keys' first route binding (988 → 1007); the full DB suite 261/261 · 3,717/3,717 in five family-whole chunks + the scratch check:rls; W-10 the EVM + change orders + IAS 23 NEXT**) · earlier 2026-11-20 (W-8 the foundation wave: migrations 0100–0103 + every mirror; the A-1/A-2 amendments + the forward-progressive W-5 date repair)
 
 > **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-20 — **PHASE-048 W-9 — THE WBS + BUDGETS + ACTUALS ENGINES
+  DELIVERED** (T-05 + T-06 + T-07, the plan §3 W-9, on the owner-accepted
+  W-8 head `916510f`, this session's fresh clone — the same-session
+  evidence rule's SEVENTEENTH consecutive wave; the owner's 2026-11-20
+  dispatch set the scope by the plan's literal texts with the expected
+  constants and the mid-wave scope law): **THE PURE LAYER FIRST** —
+  `projects-math.ts` (detectDependencyCycle with the cycle path ·
+  wouldCreateParentCycle — the 047 D-09 guard verbatim ·
+  rollupWeightedPercent — the leaf-recomputed fold, ONE rounding at the
+  total, the degenerate all-zero-weight subtree the equal-share mean ·
+  accruedThrough — the curve's EXACT LCM-denominator interpolation ·
+  allocateOverhead · the payroll read-only rate fold) — **the unit-first
+  law caught THREE REAL SCALE BUGS in the first shape (a ×10² in the
+  rollup ratio, a ×10⁴ in the rounding-scale convention, a ×10² in the
+  percent divisor), fixed BEFORE any consumer landed** (the 047
+  precedent repeating; the 14/27 first-run red kept in the session
+  record). **T-05 (BR-095/D-03)** — the WBS engine: both cycle guards
+  before every write (the API the ONLY move path — WbsCycleError
+  carries the path; the illegal state never saves), the project
+  boundary (parent + predecessor + budget line + time entry), the
+  children-first law, the rollup RECOMPUTED FROM THE LEAVES ON EVERY
+  READ (the DB spec's triple agreement: rollup read = tree read = the
+  pure fold over the live rows), the legal diamond, and **0100's
+  write-time coherence on `crm_time_entries`** (the task ∈ the entry's
+  project on every write incl. the merged-state update — never a
+  guessed default; absent ≡ null keeps the 019-era specs
+  byte-identical). **T-06 (D-04)** — the budget engine: the
+  DRAFT→APPROVED→CLOSED CAS lifecycle, the DRAFT bulk-replace, **THE
+  ONE-APPROVED LAW** (D-07), the CELL LAW (the typed 23505 refusal),
+  the APPROVED curve ALONE (the exact pure fold — PV's W-10 input),
+  the vs-actual rollup by cost type and by node, and **THE
+  OVER-ALLOCATION WARNING AS A READ SIGNAL** (the overlapping-window
+  sweep across all the tenant's projects — never a write refusal,
+  0101's recorded law). **T-07 (D-05 + INV-033)** — the four
+  collectors: LABOR = the APPROVED-class WBS-dimensioned entries × the
+  payroll cost rates (D-01 read-only; the rate SNAPSHOTTED AT
+  VALUATION — the rate card the evidence; the unset divisor = UNPRICED
+  with the explicit warning, never a fabricated rate) · MATERIALS =
+  the 044 WMS issue paths read-only (the MOVE's own value where the
+  posting carries the project stamp — the honest zero + the degraded
+  note) · SUBCONTRACT = the APPROVED certificates' NETS · OVERHEAD =
+  the tenant-configured distributor (the pure fold; the allocation
+  postings credit the CLEARING account, never the pool) · **INV-033**
+  — the typed reconciliation that REFUSES at any residual against the
+  GL project dimension, carrying the per-leg breakdown. **The settings
+  keys** (the D-02 config-row precedent, null-default + pin-neutral):
+  `projects.labor_standard_monthly_hours` +
+  `projects.overhead_distributor`. **ROUTE_PERMISSIONS 988 → 1007
+  (+19, dated at the block)** — the `/api/v1/projects/*` families
+  begin, binding the W-8 keys (wbs.view/manage · budget.view/manage ·
+  allocation.manage · evm.view); the entitlement plane rides the
+  projects.wbs flag. **The `__db__/projects/` spec family begins**:
+  `projects-wbs.db.spec.ts` (15 — acceptance #2's API arms) +
+  `projects-budgets-actuals.db.spec.ts` (13 — acceptance #3: the
+  coherent four-leg world LABOR 820.3125 + MATERIALS 500 + SUBCONTRACT
+  9,000 + OVERHEAD 625 = **AC 10,945.3125 = the GL project dimension
+  EXACTLY**, every GL side through the REAL PostingService; INV-033
+  green to the cent + four refusal arms). **Gates** (every log in
+  `audit-evidence/phase048-w9/`, 24 files): typecheck/lint 8/8 ·
+  depcruise 2,006 · 14,951 (addition-only) · unit 8/8 (api 61·739) ·
+  **THE FULL DB SUITE 261/261 · 3,717/3,717 · 0 failed · 0 skipped in
+  five family-whole chunks** (the W-7 pattern) + the standalone
+  scratch check:rls (the 103-chain from zero → 318/0) + every standing
+  checker green. **The honest disclosures** (the gate doc §9): the
+  unit-first catch; the chunking discovery (the round-robin plan's one
+  false failure — the 042 explain-budgets OEE plan probe's context
+  sensitivity — the plan rebuilt family-whole, zero production
+  change); the single-process attempt killed at the 598s command cap
+  with the 046 true-up arm's non-reproducing flake (the documented
+  serial-order/timing class; family-alone + chunk both green). —
+  PHASE-NNN — [W-9
+  evidence](../operations/gate-evidence/2026-11-20-phase048-w9.md)
 
 - 2026-11-20 — **PHASE-048 W-8 — THE FOUNDATION WAVE DELIVERED; THE
   PHASE'S CODE WAVES OPEN** (T-01 + T-02 + T-03 + T-04, the plan §3 W-8;

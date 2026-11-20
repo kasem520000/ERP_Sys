@@ -18,12 +18,18 @@ import { BillingRunService } from "./application/billing-run-service";
 import { DeferralService } from "./application/deferral-service";
 import { ServiceOrderService } from "./application/service-order-service";
 import { ServiceOrderPosting } from "./application/service-order-posting";
+import { ProjectActualsService } from "./application/project-actuals-service";
+import { ProjectBudgetService } from "./application/project-budget-service";
+import { WbsService } from "./application/wbs-service";
 import { LeadsController } from "./presentation/leads.controller";
 import { TasksController } from "./presentation/tasks.controller";
 import { ContractsController } from "./presentation/contracts.controller";
 import { TimeController } from "./presentation/time.controller";
 import { BillingController } from "./presentation/billing.controller";
 import { ServiceOrdersController } from "./presentation/service-orders.controller";
+import { ProjectsActualsController } from "./presentation/projects-actuals.controller";
+import { ProjectsBudgetsController } from "./presentation/projects-budgets.controller";
+import { ProjectsWbsController } from "./presentation/projects-wbs.controller";
 import * as store from "./infrastructure/crm.store";
 
 /**
@@ -106,6 +112,9 @@ export interface CrmContractBillingRunJobPayload {
     TimeController,
     BillingController,
     ServiceOrdersController,
+    ProjectsWbsController,
+    ProjectsBudgetsController,
+    ProjectsActualsController,
   ],
   providers: [
     LeadService,
@@ -117,8 +126,11 @@ export interface CrmContractBillingRunJobPayload {
     DeferralService,
     ServiceOrderService,
     ServiceOrderPosting,
+    WbsService,
+    ProjectActualsService,
+    ProjectBudgetService,
   ],
-  exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService],
+  exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService, WbsService, ProjectActualsService, ProjectBudgetService],
 })
 export class CrmModule implements OnModuleInit {
   constructor(
