@@ -1,0 +1,53 @@
+$ turbo run lint
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/api:lint: cache miss, executing 8bd309c0cf409564
+@erp/contracts:lint: cache hit, replaying logs 38072ab8ab58363f
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/erp-w9/ERP_Sys/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/ui:lint: cache hit, replaying logs 7d8b9a5fb5d14814
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/erp-w9/ERP_Sys/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/sync-core:lint: cache hit, replaying logs d1da34dd8f5962e0
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/erp-w9/ERP_Sys/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/mobile:lint: cache hit, replaying logs 2fa2da44903d545c
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/domain-core:lint: cache hit, replaying logs 1cc8b9f0d32a16d6
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/erp-w9/ERP_Sys/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/desktop:lint: cache hit, replaying logs a525f60a108f46ce
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/web:lint: cache hit, replaying logs 1b9286ff4c0c43c7
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/erp-w9/ERP_Sys/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    7 cached, 8 total
+  Time:    21.324s 
+
+EXIT=0

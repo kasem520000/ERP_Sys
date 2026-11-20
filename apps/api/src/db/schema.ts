@@ -10441,6 +10441,11 @@ export const subcontractorCertificates = pgTable(
     status: text("status").notNull().default("DRAFT"),
     approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
     approvedBy: uuid("approved_by"),
+    /** PHASE-048 (W-11, migration 0104 — D-08): the AP linkage's stamp —
+     * the journal that drove this certificate's subcontractor purchase
+     * obligation into the purchasing chain's AP leg (written
+     * in-transaction at approval; single-consumption). */
+    apJournalEntryId: uuid("ap_journal_entry_id"),
     note: text("note"),
     noteAr: text("note_ar"),
   },
@@ -10477,6 +10482,10 @@ export const retentionAccounts = pgTable(
     projectId: uuid("project_id").notNull(),
     kind: text("kind").notNull(),
     subcontractorAgreementId: uuid("subcontractor_agreement_id"),
+    /** PHASE-048 (W-11, migration 0104 — D-09): the contract's CUSTOMER
+     * (the register IS the commercial spine — the G-57 invoice's
+     * customer and the AR partner stamp's single source of truth). */
+    customerId: uuid("customer_id"),
     contractValue: numeric("contract_value", { precision: 19, scale: 4 }),
     currencyCode: text("currency_code"),
     holdPercent: numeric("hold_percent", { precision: 5, scale: 2 }),
@@ -10540,6 +10549,12 @@ export const progressCertificates = pgTable(
     voidedAt: timestamp("voided_at", { withTimezone: true, mode: "string" }),
     voidReason: text("void_reason"),
     salesInvoiceId: uuid("sales_invoice_id"),
+    /** PHASE-048 (W-11, migration 0104 — D-10): the customer-advance
+     * amortization state (the G-33 mirror — 0053's applied_amount law):
+     * Σ what later certificates' apply legs absorbed from THIS advance. */
+    advanceAppliedAmount: numeric("advance_applied_amount", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
     note: text("note"),
     noteAr: text("note_ar"),
   },

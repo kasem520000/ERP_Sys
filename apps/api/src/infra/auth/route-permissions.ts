@@ -4939,6 +4939,120 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/projects/:projectId/ias23/capitalizations",
     permission: "projects.budget.view",
   },
+
+  // PHASE-048 (W-11 — T-10 + T-11 + T-12, dated 2026-11-20; matrix
+  // §3.26): the contracting core — the W-8 keys' third binding wave
+  // (1018 + 20 = 1038). The authoring + read plane binds
+  // contracting.view (the W-10 gate's own reading: a DRAFT author
+  // moves nothing until an approver acts, so the view key carries the
+  // working plane); THE APPROVAL GATES (the sub certificate's approve
+  // — the AP linkage + G-55's sub-side hold — and the progress
+  // certificate's approve — BR-093's ceiling + G-57 + the generated
+  // invoice + the advance amortization) bind certificates.approve; the
+  // lifecycle moves (activate/close/cancel) + the voids bind
+  // contracting.manage; the register's authoring/schedule + G-56's
+  // release bind retention.manage. The entitlement plane rides the
+  // projects.contracting feature flag on every route (D-16).
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/subcontracts",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/subcontracts",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/subcontracts/:id",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/subcontracts/:id/activate",
+    permission: "projects.contracting.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/subcontracts/:id/close",
+    permission: "projects.contracting.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/subcontracts/:id/cancel",
+    permission: "projects.contracting.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/subcontracts/:id/certificates",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/subcontracts/:id/certificates",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/sub-certificates/:id/approve",
+    permission: "projects.certificates.approve",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/sub-certificates/:id/void",
+    permission: "projects.contracting.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/retention",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/retention/register",
+    permission: "projects.retention.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/retention/:id/schedule",
+    permission: "projects.retention.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/retention/:id/release",
+    permission: "projects.retention.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/billing",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/projects/:projectId/certificates",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/:projectId/certificates",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/certificates/:id/submit",
+    permission: "projects.contracting.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/certificates/:id/approve",
+    permission: "projects.certificates.approve",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/projects/certificates/:id/void",
+    permission: "projects.contracting.manage",
+  },
 ];
 
 /**

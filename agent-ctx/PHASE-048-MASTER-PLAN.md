@@ -729,6 +729,51 @@ amortization, the BR-092/093 ceiling — D-10).
 **Exit:** acceptance #6's posting arms + #7 green (the goldens' posting
 shapes proven with their db specs; the ceiling's typed refusal).
 
+> **[Dated 2026-11-20 (W-11 DELIVERED — on the owner-accepted W-10 head
+> `8a3534c`, this session's working clone — the same-session evidence
+> rule's NINETEENTH consecutive wave): the unit-first law opened the wave
+> (the pure folds: BR-092's retention with ONE rounding and the 0103
+> arithmetic floor BY CONSTRUCTION · BR-093's figures · the G-33-mirror
+> amortization plan · G-56's gates; the first run caught the SPEC'S OWN
+> hand-slip, corrected at the claim site). THE MIGRATION 0104 — the
+> owner's clause-4 DECLARATION («ما لم تصرّح الموجة بغيره»): three
+> additive stamp columns (the register's contract CUSTOMER · the AP
+> linkage's journal · the advance amortization state), each anticipated
+> by 0103's own note; no new tables — the catalog stays 318; the chain
+> re-proven from zero twice. T-10: the agreements' CAS lifecycle (the
+> ACTIVATION opens the agreement's SUBCONTRACTOR row — the SAME
+> retention ledger) + the certificates (APPROVED terminal) + BR-092 per
+> agreement + THE AP LINKAGE (the net obligation into AP through the
+> REAL engine, PROJECT-STAMPED at exactly the collector's read — the
+> approved extracts the SOLE actuals source, INV-033 green after EACH
+> posting) + G-55's sub-side hold (the unprojected cost-family debit ·
+> the SUBCONTRACT_RETENTION liability) + the single-consumption 0104
+> stamp (the all-or-nothing rollback proven). T-11: the CUSTOMER
+> register (ONE per project · the IMMUTABLE core — the change-order
+> gate the only re-planning path) + G-56's release (the schedule gates
+> · the single-use CAS · the customer mirror shape + the sub D-18
+> literal shape). T-12: the ladder + BR-092 fail-closed + BR-093 AT THE
+> STATUTE'S POSITION (the ChangeOrder gate's OWN ceiling read — one
+> law, three engines; the typed refusal with ALL five figures, no
+> silent truncation; the CO re-baseline through the REAL G-58) + G-57
+> the fused billing + THE GENERATED-IN-TRANSACTION INVOICE + the
+> advance amortization (the G-33 APPLY mirror, oldest-first). The
+> presentation decision record documented (D-09's own law). ROUTE
+> PERMISSIONS 1018 → 1038 (+20, dated at the block — the W-8 keys'
+> third binding wave). The `__db__/projects/` family grows:
+> `projects-contracting.db.spec.ts` (11 arms; P1's INV-033 unchanged at
+> 10,945.3125). Gates: the full DB suite 265/265 · 3,754/3,754 · 0
+> failed · 0 skipped in BOTH envelopes (the precomputed five
+> family-whole chunks — coverage-verified BEFORE the first run — AND
+> the single-process runs: 546.25s with ONE named timing flake
+> (re-proven standalone 21/21) then the RETRY GREEN at 552.58s; the
+> time ceiling COMPUTED before committing: projected ~555s) + the
+> scratch check:rls (the 104-chain from zero · 318/0) + every standing
+> checker green (the evidence `audit-evidence/phase048-w11/` — 26 files
+> — + the gate doc `docs/operations/gate-evidence/
+> 2026-11-20-phase048-w11.md` — the SIX honest disclosures recorded
+> there). Exit criteria MET. NOT production approval.]**
+
 ### W-12 — Field service + the web plane I (T-13 + T-14, orchestrator)
 The dispatch board API (the status machine, the SINGLE clock service with
 pause states, BR-096's escalation — D-12); the `/projects` WBS board +

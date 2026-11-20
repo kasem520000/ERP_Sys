@@ -292,3 +292,193 @@ export class Ias23AlreadyPostedError extends DomainError {
     super("IAS23_ALREADY_POSTED", message, details);
   }
 }
+
+// -- W-11 / T-10 + T-11 + T-12: the contracting core (D-08/D-09/D-10) --------
+
+/** Unknown or foreign subcontractor agreement id (A7). */
+export class SubcontractAgreementNotFoundError extends DomainError {
+  constructor(id: string) {
+    super(
+      "SUBCONTRACT_AGREEMENT_NOT_FOUND",
+      `subcontractor agreement ${id} does not exist in this tenant`,
+    );
+  }
+}
+
+/** Unknown or foreign subcontractor certificate id (A7). */
+export class SubcontractCertificateNotFoundError extends DomainError {
+  constructor(id: string) {
+    super(
+      "SUBCONTRACT_CERTIFICATE_NOT_FOUND",
+      `subcontractor certificate ${id} does not exist in this tenant`,
+    );
+  }
+}
+
+/** Contracting-plane input validation (money shapes, percents, dates,
+ * the retention terms, the void reason) — the 422 policy class. */
+export class ContractingInputInvalidError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("CONTRACTING_INPUT_INVALID", message, details);
+  }
+}
+
+/**
+ * The subcontract lifecycles' CAS law (0103): agreements
+ * DRAFT → ACTIVE → CLOSED/CANCELLED, certificates DRAFT → APPROVED/VOID
+ * — a wrong-state transition or a raced CAS move is the typed 409-class
+ * refusal (the verdict stamps land in the same guarded statement, the
+ * 0103 CHECKs' own shape).
+ */
+export class SubcontractStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("SUBCONTRACT_STATE", message, details);
+  }
+}
+
+/**
+ * The sub certificate's approved-history law: an APPROVED certificate
+ * is terminal evidence (no VOID, no re-decide — the 0103 approval-link
+ * CHECK pins voided_at to the never-approved path); the single-use AP
+ * stamp refuses a second linkage.
+ */
+export class SubcontractCertificateAlreadyApprovedError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("SUBCONTRACT_CERTIFICATE_ALREADY_APPROVED", message, details);
+  }
+}
+
+/** Unknown or foreign retention account id (A7). */
+export class RetentionAccountNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("RETENTION_ACCOUNT_NOT_FOUND", `retention account ${id} does not exist in this tenant`);
+  }
+}
+
+/** The register's input law (the commercial spine's own shapes). */
+export class RetentionInputInvalidError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("RETENTION_INPUT_INVALID", message, details);
+  }
+}
+
+/**
+ * THE ONE-REGISTER-PER-PROJECT LAW (0103's partial unique, the side
+ * law): the CUSTOMER row IS the customer contract's commercial spine —
+ * a second register for the same project is the typed 23505 refusal
+ * (never a silent replace).
+ */
+export class RetentionRegisterExistsError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("RETENTION_REGISTER_EXISTS", message, details);
+  }
+}
+
+/**
+ * THE REGISTER'S IMMUTABLE CORE: the contract value + currency never
+ * move after creation — the ONLY re-planning path is the approved
+ * change order (W-10's ruling, BR-093's ceiling base); the customer
+ * partner is the contract's counterparty. The patchable terms are the
+ * hold % (the contract's own retention terms), the release schedule
+ * and the notes.
+ */
+export class RetentionRegisterImmutableError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("RETENTION_REGISTER_IMMUTABLE", message, details);
+  }
+}
+
+/**
+ * The release's gate law (G-56's documented schedule): the retention
+ * releases only after the taking-over date (set and elapsed) and, when
+ * contracted, the defect-liability date elapsed — the retention secures
+ * the DLP, so releasing before it would defeat its purpose.
+ */
+export class RetentionReleaseGateError extends DomainError {
+  constructor(message: string, details: { blocker: string; [key: string]: unknown }) {
+    super("RETENTION_RELEASE_GATE", message, details);
+  }
+}
+
+/**
+ * The retention ledger's state law: a RELEASED row never re-releases
+ * (the single-consumption CAS); an ACTIVE row with a zero accrued
+ * balance has nothing to release (the honest refusal, never an empty
+ * posting).
+ */
+export class RetentionStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("RETENTION_STATE", message, details);
+  }
+}
+
+/** Unknown or foreign progress certificate id (A7). */
+export class ProgressCertificateNotFoundError extends DomainError {
+  constructor(id: string) {
+    super(
+      "PROGRESS_CERTIFICATE_NOT_FOUND",
+      `progress certificate ${id} does not exist in this tenant`,
+    );
+  }
+}
+
+/**
+ * THE BR-092 FAIL-CLOSED LAW (the retention % from the contract): a
+ * project with no CUSTOMER retention register (the contract's
+ * commercial spine) cannot bill — the hold % is tenant DATA per
+ * contract, never a global constant and never a guessed default; the
+ * approval refuses (the certificate stays SUBMITTED).
+ */
+export class RetentionRegisterMissingError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("RETENTION_REGISTER_MISSING", message, details);
+  }
+}
+
+/**
+ * THE BR-093 CEILING REFUSAL (the typed refusal, NO silent
+ * truncation): cumulative billing (Σ the APPROVED certificates' gross
+ * + THIS certificate's gross) never exceeds the approved contract
+ * value including approved change orders (the effective contract value
+ * — the retention register + Σ the APPROVED price deltas, W-10's
+ * one-law read). The refusal carries the full figures so the approver
+ * sees the exact overage.
+ */
+export class BillingCeilingExceededError extends DomainError {
+  constructor(
+    message: string,
+    details: {
+      projectId: string;
+      alreadyBilled: string;
+      thisGross: string;
+      cumulativeAfter: string;
+      ceiling: string;
+      overage: string;
+    },
+  ) {
+    super("BILLING_CEILING_EXCEEDED", message, details);
+  }
+}
+
+/**
+ * The customer certificate's lifecycle law (0103):
+ * DRAFT → SUBMITTED → APPROVED / VOID — the verdict stamps land in the
+ * same guarded CAS; an APPROVED certificate is terminal (the 0103
+ * approval-link CHECK pins VOID to the never-approved path).
+ */
+export class ProgressCertificateStateError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("PROGRESS_CERTIFICATE_STATE", message, details);
+  }
+}
+
+/**
+ * The certificate's invoice stamp is single-consumption: an APPROVED
+ * certificate that already generated its sales invoice never generates
+ * a second one (the guarded UPDATE refuses; INV-013 converges retries).
+ */
+export class CertificateInvoiceAlreadyGeneratedError extends DomainError {
+  constructor(message: string, details?: Readonly<Record<string, unknown>>) {
+    super("CERTIFICATE_INVOICE_ALREADY_GENERATED", message, details);
+  }
+}

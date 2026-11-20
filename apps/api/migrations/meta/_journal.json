@@ -721,6 +721,13 @@
       "when": 1797566400000,
       "tag": "0103_projects_contracting_fieldservice",
       "breakpoints": true
+    },
+    {
+      "idx": 103,
+      "version": "7",
+      "when": 1797652800000,
+      "tag": "0104_projects_contracting_stamps",
+      "breakpoints": true
     }
   ],
   "version": "7"

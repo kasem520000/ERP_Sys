@@ -24,6 +24,9 @@ import { WbsService } from "./application/wbs-service";
 import { EvmService } from "./application/evm-service";
 import { ChangeOrderService } from "./application/change-order-service";
 import { Ias23Service } from "./application/ias23-service";
+import { SubcontractService } from "./application/subcontract-service";
+import { RetentionService } from "./application/retention-service";
+import { ProgressBillingService } from "./application/progress-billing-service";
 import { LeadsController } from "./presentation/leads.controller";
 import { TasksController } from "./presentation/tasks.controller";
 import { ContractsController } from "./presentation/contracts.controller";
@@ -36,6 +39,7 @@ import { ProjectsWbsController } from "./presentation/projects-wbs.controller";
 import { ProjectsEvmController } from "./presentation/projects-evm.controller";
 import { ChangeOrdersController } from "./presentation/change-orders.controller";
 import { ProjectsIas23Controller } from "./presentation/projects-ias23.controller";
+import { ProjectsContractingController } from "./presentation/projects-contracting.controller";
 import * as store from "./infrastructure/crm.store";
 
 /**
@@ -124,6 +128,7 @@ export interface CrmContractBillingRunJobPayload {
     ProjectsEvmController,
     ChangeOrdersController,
     ProjectsIas23Controller,
+    ProjectsContractingController,
   ],
   providers: [
     LeadService,
@@ -141,8 +146,11 @@ export interface CrmContractBillingRunJobPayload {
     EvmService,
     ChangeOrderService,
     Ias23Service,
+    SubcontractService,
+    RetentionService,
+    ProgressBillingService,
   ],
-  exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService, WbsService, ProjectActualsService, ProjectBudgetService, EvmService, ChangeOrderService, Ias23Service],
+  exports: [LeadService, TaskService, ActivityService, ContractService, TimeEntryService, BillingRunService, WbsService, ProjectActualsService, ProjectBudgetService, EvmService, ChangeOrderService, Ias23Service, SubcontractService, RetentionService, ProgressBillingService],
 })
 export class CrmModule implements OnModuleInit {
   constructor(

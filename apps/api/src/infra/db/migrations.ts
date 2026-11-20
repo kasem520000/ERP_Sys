@@ -544,6 +544,18 @@ export const MIGRATIONS: readonly string[] = [
   "0101_projects_budgets_allocation",
   "0102_projects_change_orders",
   "0103_projects_contracting_fieldservice",
+  // PHASE-048 (W-11, T-10 + T-11 + T-12 — the owner's clause-4
+  // DECLARED additive wave, dated 2026-11-20): the contracting core's
+  // three stamp columns — the 0100 crm_time_entries additive-column
+  // precedent, each anticipated by 0103's own recorded note: the
+  // register's contract CUSTOMER (retention_accounts.customer_id —
+  // the commercial spine's own column, the G-57 AR stamp + the
+  // invoice's single source of truth), the AP linkage's journal
+  // (subcontractor_certificates.ap_journal_entry_id — single-use at
+  // approval), and the advance amortization state
+  // (progress_certificates.advance_applied_amount — the G-33 mirror's
+  // applied_amount law). No new tables (the catalog stays 318).
+  "0104_projects_contracting_stamps",
 ];
 
 /**

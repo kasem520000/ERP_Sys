@@ -1,0 +1,18 @@
+$ tsx scripts/validate-manifests.ts
+== industry manifests validation (industries/README §3): 13 shipped template(s) ==
+OK   industry.retail@1.0.0 — schema valid (content hash sha256:ac0a93342ae85cd9b870c96b2bf63cb13e5e815477ebd9d9679f08700080cbba)
+OK   industry.grocery@1.0.0 — schema valid (content hash sha256:c6ef7c8a82bdc3817e46e9068892e550ea2bbacb1583d0954f5c86704e29525e)
+OK   industry.restaurant@1.0.0 — schema valid (content hash sha256:894b764f81702ff27a2f877d61915e3a56cd2abeddb2a4e4fbb2b546f84a025d)
+OK   industry.automotive@1.0.0 — schema valid (content hash sha256:51ed444287022f6143c8848f6526520d7859ab36916d4749382e005ab6f552f3)
+OK   industry.distribution@1.0.0 — schema valid (content hash sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d)
+OK   industry.food_manufacturing@1.0.0 — schema valid (content hash sha256:f258fed91de8519a13c67937d30c2b736a9509ee0e40da3b7335258e022a6717)
+OK   industry.professional_services@1.0.0 — schema valid (content hash sha256:dd08b957aab40af33829ff4605dc883b1c0a01b8c84a3270f19e183643917728)
+OK   industry.education@1.0.0 — schema valid (content hash sha256:8f11c6435cead4da4336d3ebbb9aef6cb1cc1e05290e877b66e7f6fa5a4bf623)
+OK   industry.agriculture@1.0.0 — schema valid (content hash sha256:f30e4fa0b39f05672cb6331e324a8798cc65cda3887a75aa57daabd49f1b72ce)
+OK   industry.wholesale@1.0.0 — schema valid (content hash sha256:013c35ad9626cb58e1acb4d9115eebae47880badd36f10e4da82d0abfaa28f1f)
+OK   industry.electronics@1.0.0 — schema valid (content hash sha256:216f1e981ae4c457173c18ead7c1263780f8082c6d18807fb9308a507e6f51a9)
+OK   industry.healthcare@1.0.0 — schema valid (content hash sha256:607cc89a7fac4ec3ecb48f654b3561702118be6b5eceffcc23e2908ad309d2e0)
+OK   industry.rental_logistics@1.0.0 — schema valid (content hash sha256:8054ee3d0ed5cdf7df44cc75fb093808a3a28634ea0d32aa4e821a338f6bebc0)
+
+OK — 13 manifest(s) valid against §3; ids unique; versions semver; required_feature_keys non-empty.
+EXIT=0

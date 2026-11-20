@@ -273,7 +273,12 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // rate register is the settings-plane config registration (D-02's
     // "config row", the gosi_establishment_no no-default precedent — NOT
     // a table, the +11 catalog count stands).
-    expect(files.at(-1)?.tag).toBe("0103_projects_contracting_fieldservice");
+    // PHASE-048 (W-11, dated 2026-11-20 — the owner's clause-4 DECLARED
+    // additive wave): 0104 the contracting core's three stamp columns
+    // (the register's contract CUSTOMER · the AP linkage's journal · the
+    // advance amortization state — the 0100 additive-column precedent;
+    // no new tables, the catalog stays 318).
+    expect(files.at(-1)?.tag).toBe("0104_projects_contracting_stamps");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

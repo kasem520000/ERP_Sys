@@ -1,8 +1,50 @@
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-10 the EVM + change orders + IAS 23 engines delivered: the pure layer FIRST (the unit-first law caught the ×10² aggregate-percent scale bug before any consumer) + T-08 the EVM engine (PV from the approved curve alone · the two EV disciplines · the EV ceiling's typed refusal · AC from T-07 alone) + T-09 the change-order gate (BR-094 inert-until-approved · G-58's exactly-once delta through the REAL engine · the single-use stamp · the ceiling recomputed on every read) + the D-11 IAS-23 service (REQUIRES_VERIFICATION · the documented stop rules · the posting through the engine); ROUTE_PERMISSIONS 1007 → 1018 (+11 dated); the full DB suite 264/264 · 3,743/3,743 in BOTH envelopes (the single-process full run 554s within the cap + the precomputed five family-whole chunks) + the scratch check:rls; W-11 the contracting core NEXT**) · earlier 2026-11-20 (W-9 the WBS + budgets + actuals engines (the pure layer caught three scale bugs; T-05/T-06/T-07 + INV-033; 988 → 1007; 261/261 · 3,717/3,717 in five chunks); W-8 the foundation wave: migrations 0100–0103 + every mirror; the A-1/A-2 amendments + the forward-progressive W-5 date repair)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-11 the contracting core delivered: the pure layer FIRST + the DECLARED migration 0104 (three additive stamp columns — the owner's clause-4 escape) + T-10 the subcontracting engine (the AP linkage through the REAL engine at exactly the collector's read — the extracts the SOLE actuals source + G-55's sub-side hold + the single-consumption stamp) + T-11 the retention ledger (the CUSTOMER register — the commercial spine, the IMMUTABLE core + G-56's release both sides with the schedule gates) + T-12 the progress billing (BR-092 fail-closed · BR-093 at the statute's position through the gate's OWN ceiling read — one law three engines · G-57 the fused billing + the generated-in-transaction invoice + the G-33-mirror amortization); ROUTE_PERMISSIONS 1018 → 1038 (+20 dated); the full DB suite 265/265 · 3,754/3,754 in BOTH envelopes (the chunks coverage-verified BEFORE the first run + the single-process: 546.25s with one named timing flake re-proven standalone, the retry GREEN 552.58s — the ceiling COMPUTED first) + the scratch check:rls (the 104-chain · 318/0); W-12 field service + the web plane I NEXT**; earlier same day (W-10 the EVM + change orders + IAS 23 engines the pure layer FIRST (the unit-first law caught the ×10² aggregate-percent scale bug before any consumer) + T-08 the EVM engine (PV from the approved curve alone · the two EV disciplines · the EV ceiling's typed refusal · AC from T-07 alone) + T-09 the change-order gate (BR-094 inert-until-approved · G-58's exactly-once delta through the REAL engine · the single-use stamp · the ceiling recomputed on every read) + the D-11 IAS-23 service (REQUIRES_VERIFICATION · the documented stop rules · the posting through the engine); ROUTE_PERMISSIONS 1007 → 1018 (+11 dated); the full DB suite 264/264 · 3,743/3,743 in BOTH envelopes (the single-process full run 554s within the cap + the precomputed five family-whole chunks) + the scratch check:rls; W-11 the contracting core NEXT**) · earlier 2026-11-20 (W-9 the WBS + budgets + actuals engines (the pure layer caught three scale bugs; T-05/T-06/T-07 + INV-033; 988 → 1007; 261/261 · 3,717/3,717 in five chunks); W-8 the foundation wave: migrations 0100–0103 + every mirror; the A-1/A-2 amendments + the forward-progressive W-5 date repair)
 
 > **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-20 — **PHASE-048 W-11 — THE CONTRACTING CORE DELIVERED**
+  (T-10 + T-11 + T-12, the plan §3 W-11, on the owner-accepted W-10
+  head `8a3534c`, this session's working clone — the same-session
+  evidence rule's NINETEENTH consecutive wave; the owner's 2026-11-20
+  dispatch set the scope by the plan's literal texts with the eight
+  monitoring items — the ceilings at the statute's position with the
+  typed refusal and NO silent truncation · the approved extracts the
+  SOLE subcontractor-actuals source · the single ledger per party with
+  the full CAS ladder and the single-consumption stamps · every posting
+  through the PostingService fail-closed with INV-033 after each · the
+  pure layer first · the order-independent specs · the constants · the
+  family-complete plan with the coverage verified BEFORE the execution
+  and the time ceiling computed in advance). **THE MIGRATION 0104 — the
+  clause-4 DECLARATION**: three additive stamp columns (the register's
+  contract CUSTOMER · the AP linkage's journal · the advance
+  amortization state — each anticipated by 0103's own note; the 0100
+  additive-column precedent; NO new tables — the catalog stays 318; the
+  chain re-proven from zero twice). The engines: T-10 the subcontracting
+  (the AP linkage at exactly the collector's read — INV-033 green after
+  EACH posting · G-55's sub-side hold with the documented unprojected
+  cost-family debit · the single-consumption stamp with the
+  all-or-nothing rollback proven) · T-11 the retention ledger (the
+  register — ONE per project, the IMMUTABLE value/currency/customer
+  with the change-order gate the ONLY re-planning path · G-56's release
+  with the schedule gates and the two sides' documented shapes) · T-12
+  the progress billing (BR-092 fail-closed · BR-093 through the
+  ChangeOrder gate's OWN ceiling read — one law, three engines — with
+  the five-figure typed refusal and the REAL-gate re-baseline · G-57
+  the fused billing · the generated-in-transaction POSTED invoice ·
+  the G-33-mirror amortization oldest-first). ROUTE_PERMISSIONS
+  1018 → 1038 (+20, dated). The full DB suite 265/265 · 3,754/3,754 ·
+  0 failed · 0 skipped in BOTH envelopes (the five family-whole chunks
+  — coverage-verified 265/265 BEFORE the first run — AND the
+  single-process runs: 546.25s with the ONE named timing flake — the
+  identity TOTP arm, the runbook's documented class, re-proven
+  standalone 21/21 — then the RETRY GREEN at 552.58s; the time ceiling
+  COMPUTED before committing: projected ~555s) + the scratch check:rls
+  (initdb → the 104-chain from zero → 318/0). The SIX honest
+  disclosures in the gate doc (`docs/operations/gate-evidence/
+  2026-11-20-phase048-w11.md`; the evidence `audit-evidence/
+  phase048-w11/` — 26 files). **NOT production approval.**
 
 - 2026-11-20 — **PHASE-048 W-10 — THE EVM + CHANGE ORDERS + IAS 23
   ENGINES DELIVERED** (T-08 + T-09 + the D-11 engine, the plan §3 W-10,
