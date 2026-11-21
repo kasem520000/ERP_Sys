@@ -162,6 +162,26 @@ beforeAll(async () => {
     currencyCode: "SAR",
     holdPercent: "5.00",
   });
+
+  // ORDER-ROBUSTNESS (the change-orders spec's own precedent, applied
+  // here dated 2026-11-22 for W-14's goldens spec — the family chunk's
+  // file order is NOT guaranteed): a sibling spec (the W-14 goldens'
+  // G-55 transcript) may have mapped the sub pair before this file
+  // runs — supersede any standing mapping so arm (b)'s unmapped-refusal
+  // phase proves its law regardless of order (the supersede-then-map
+  // shape is the tenant's own runtime surface; activeTo = the mapping's
+  // own activeFrom honors the 0007 window CHECK for any stored
+  // from-date).
+  await withTenant(TENANT_PJW, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    const accounting = await import("../../modules/accounting/infrastructure/accounting.store");
+    for (const key of ["PROJECT_SUBCONTRACT_COST", "SUBCONTRACT_RETENTION"]) {
+      const active = await tenancy.findActivePurpose(key);
+      if (active !== undefined) {
+        await accounting.supersedePurpose(active.id, active.activeFrom);
+      }
+    }
+  });
 });
 
 /** The journal lines a source-keyed entry posted (direction + account
