@@ -11000,3 +11000,94 @@ export const assetTransfers = pgTable(
     ),
   ],
 );
+
+/** PHASE-049 (W-17, migration 0109 — D-03/D-04/D-05, BR-098/G-59/G-60):
+ * the work order's cost collectors — ONE line per leg (the per-leg XOR
+ * shape law): LABOR (the technician HR-read + hours + the rate SNAPSHOT
+ * at line creation — an unset rate is UNPRICED, never a fabricated
+ * rate), PARTS (the item + the issuing warehouse + qty; the value is
+ * the completion act's own inventory issue, stamped per line — the
+ * W-3 provenance), EXTERNAL (the supplier partner + the expected bill —
+ * the accrual leg the supplier bill's own posting supersedes). Master
+ * data WITH DELETE granted (the typed service refuses every touch after
+ * COMPLETION by name — WORK_ORDER_COMPLETED). */
+export const maintenanceCostLines = pgTable(
+  "maintenance_cost_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    workOrderId: uuid("work_order_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    legType: text("leg_type").notNull(),
+    employeeId: uuid("employee_id"),
+    hours: numeric("hours", { precision: 19, scale: 6 }),
+    unitRate: numeric("unit_rate", { precision: 19, scale: 6 }),
+    itemId: uuid("item_id"),
+    warehouseId: uuid("warehouse_id"),
+    qty: numeric("qty", { precision: 19, scale: 6 }),
+    partnerId: uuid("partner_id"),
+    amount: numeric("amount", { precision: 19, scale: 4 }),
+    description: text("description"),
+    descriptionAr: text("description_ar"),
+    issueUnitCost: numeric("issue_unit_cost", { precision: 19, scale: 6 }),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_maintenance_cost_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_maintenance_cost_lines_order_line").on(
+      table.tenantId,
+      table.workOrderId,
+      table.lineNo,
+    ),
+    index("ix_maintenance_cost_lines_tenant_order").on(table.tenantId, table.workOrderId),
+    index("ix_maintenance_cost_lines_tenant_item")
+      .on(table.tenantId, table.itemId)
+      .where(sql`${table.itemId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-049 (W-17, migration 0109 — D-08, BR-098): the plan's checklist
+ * CARRIED onto generated orders (the seq/title/instruction snapshot at
+ * generation — a later plan edit never rewrites a generated order's
+ * carried steps) with the per-step results (PASS/FAIL + the note + the
+ * recording stamp — the stamp law: result and stamp exist together or
+ * not at all). An OPEN step blocks completion; NO DELETE ever (the
+ * gate's integrity floor — an open step cannot be deleted to force
+ * completion). */
+export const maintenanceWorkOrderSteps = pgTable(
+  "maintenance_work_order_steps",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    workOrderId: uuid("work_order_id").notNull(),
+    sourceTaskId: uuid("source_task_id").notNull(),
+    seq: integer("seq").notNull(),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    instruction: text("instruction"),
+    instructionAr: text("instruction_ar"),
+    result: text("result"),
+    resultNote: text("result_note"),
+    resultNoteAr: text("result_note_ar"),
+    recordedAt: timestamp("recorded_at", { withTimezone: true, mode: "string" }),
+    recordedBy: uuid("recorded_by"),
+  },
+  (table) => [
+    uniqueIndex("uq_maintenance_work_order_steps_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_maintenance_work_order_steps_order_seq").on(
+      table.tenantId,
+      table.workOrderId,
+      table.seq,
+    ),
+    index("ix_maintenance_work_order_steps_tenant_order").on(
+      table.tenantId,
+      table.workOrderId,
+    ),
+  ],
+);

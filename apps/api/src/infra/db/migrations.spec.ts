@@ -291,7 +291,16 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // starter at the DECLARED NEUTRAL ZERO; the four manifest
     // enablements; the three CoA markers 5310/2138/2137). Eight tenant
     // tables; the catalog 318 → 326.
-    expect(files.at(-1)?.tag).toBe("0108_cmms_asset_extensions");
+    // PHASE-049 (W-17, the work-order engine + plans, 2026-11-21): 0109
+    // the D-02-dated honest +9/+10 provision (0105's own recorded note —
+    // nothing silent): maintenance_cost_lines (the three cost
+    // collectors, the per-leg XOR shape law + the snapshot pricing
+    // pairs) + maintenance_work_order_steps (the carried checklist with
+    // the per-step results — BR-098's gate; NO DELETE ever, the gate's
+    // integrity floor) + the stock_moves source widening
+    // ('maintenance_work_order', the 0073 DROP+ADD pattern). The
+    // catalog 326 → 328.
+    expect(files.at(-1)?.tag).toBe("0109_cmms_cost_lines_steps");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

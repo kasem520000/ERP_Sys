@@ -584,6 +584,18 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "asset_spares", deleteGranted: true },
   { table: "asset_tags", deleteGranted: true },
   { table: "asset_transfers" },
+  // PHASE-049 (W-17, the work-order engine + plans; migration 0109; the
+  // D-02-dated honest +9/+10 provision — 0105's own recorded note): the
+  // engine's two line tables. maintenance_cost_lines (the three cost
+  // collectors): master data WITH DELETE granted (0105's own class for
+  // service-guarded lifecycles — the typed service refuses every touch
+  // after COMPLETION by name, WORK_ORDER_COMPLETED; the open order's
+  // lines are the working surface). maintenance_work_order_steps (the
+  // carried checklist + per-step results): S/I/U only — NO DELETE ever
+  // (BR-098's integrity floor: an open step cannot be deleted to force
+  // completion). The auto-generated A-suite extends by +12.
+  { table: "maintenance_cost_lines", deleteGranted: true },
+  { table: "maintenance_work_order_steps" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

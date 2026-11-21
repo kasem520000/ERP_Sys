@@ -756,6 +756,13 @@
       "when": 1797998400000,
       "tag": "0108_cmms_asset_extensions",
       "breakpoints": true
+    },
+    {
+      "idx": 108,
+      "version": "7",
+      "when": 1798084800000,
+      "tag": "0109_cmms_cost_lines_steps",
+      "breakpoints": true
     }
   ],
   "version": "7"

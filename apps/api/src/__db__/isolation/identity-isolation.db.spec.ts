@@ -3631,6 +3631,33 @@ async function seedFixtures(superuser: {
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
+  // PHASE-049 (W-17, migration 0109 — the engine's two line tables; the
+  // fc8/fc9 prefixes continue the fc family): a cost line per order (an
+  // EXTERNAL leg — the supplier fixture partner b5b5b5b5) + a carried
+  // step per order (the plan-task fixture fc1c1c1c — the source-task
+  // RESTRICT reference).
+  await superuser.query(
+    `INSERT INTO maintenance_cost_lines (id, tenant_id, work_order_id, line_no, leg_type,
+                                         partner_id, amount, description)
+     VALUES
+       ('fc8c8c8c-0000-4000-8000-000000000001', $1, 'fc2c2c2c-0000-4000-8000-000000000001',
+        1, 'EXTERNAL', 'b5b5b5b5-0000-4000-8000-000000000001', 250, 'ISO calibration bill'),
+       ('fc8c8c8c-0000-4000-8000-000000000002', $2, 'fc2c2c2c-0000-4000-8000-000000000002',
+        1, 'EXTERNAL', 'b5b5b5b5-0000-4000-8000-000000000002', 250, 'ISO calibration bill')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO maintenance_work_order_steps (id, tenant_id, work_order_id, source_task_id,
+                                               seq, title)
+     VALUES
+       ('fc9c9c9c-0000-4000-8000-000000000001', $1, 'fc2c2c2c-0000-4000-8000-000000000001',
+        'fc1c1c1c-0000-4000-8000-000000000001', 1, 'Inspect belts'),
+       ('fc9c9c9c-0000-4000-8000-000000000002', $2, 'fc2c2c2c-0000-4000-8000-000000000002',
+        'fc1c1c1c-0000-4000-8000-000000000002', 1, 'Inspect belts')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
 
   // -- seedFixtures end --
 
@@ -4220,6 +4247,16 @@ const OWN_ROW: Record<string, [string, string]> = {
   asset_spares: ["fc5c5c5c-0000-4000-8000-000000000001", "fc5c5c5c-0000-4000-8000-000000000002"],
   asset_tags: ["fc6c6c6c-0000-4000-8000-000000000001", "fc6c6c6c-0000-4000-8000-000000000002"],
   asset_transfers: ["fc7c7c7c-0000-4000-8000-000000000001", "fc7c7c7c-0000-4000-8000-000000000002"],
+  // PHASE-049 (W-17, migration 0109 — the engine's two line tables; the
+  // fc8/fc9 prefixes continue the fc family).
+  maintenance_cost_lines: [
+    "fc8c8c8c-0000-4000-8000-000000000001",
+    "fc8c8c8c-0000-4000-8000-000000000002",
+  ],
+  maintenance_work_order_steps: [
+    "fc9c9c9c-0000-4000-8000-000000000001",
+    "fc9c9c9c-0000-4000-8000-000000000002",
+  ],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -5287,6 +5324,18 @@ const MISMATCHED_INSERT: Record<string, string> = {
      VALUES ('fc7c7c7c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
       'abababab-0000-4000-8000-000000000002', 'abababab-2000-4000-8000-000000000002',
       'Attack transfer', 'DRAFT')`,
+  // PHASE-049 (W-17, migration 0109 — the engine's two line tables): the
+  // mismatched-tenant attack rows (FK-consistent against tenant B's own
+  // fixtures; the RLS WITH CHECK is what must refuse — never an FK
+  // accident).
+  maintenance_cost_lines: `INSERT INTO maintenance_cost_lines (id, tenant_id, work_order_id,
+      line_no, leg_type, partner_id, amount, description)
+     VALUES ('fc8c8c8c-3000-4000-8000-000000000003', $1, 'fc2c2c2c-0000-4000-8000-000000000002',
+      2, 'EXTERNAL', 'b5b5b5b5-0000-4000-8000-000000000002', 300, 'Attack external bill')`,
+  maintenance_work_order_steps: `INSERT INTO maintenance_work_order_steps (id, tenant_id,
+      work_order_id, source_task_id, seq, title)
+     VALUES ('fc9c9c9c-3000-4000-8000-000000000003', $1, 'fc2c2c2c-0000-4000-8000-000000000002',
+      'fc1c1c1c-0000-4000-8000-000000000002', 2, 'Attack step')`,
 };
 
 beforeAll(async () => {
