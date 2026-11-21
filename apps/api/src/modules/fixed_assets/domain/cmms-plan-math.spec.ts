@@ -6,6 +6,7 @@ import {
   laborLineAmount,
   meterDelta,
   meterDue,
+  netBookValue,
   nextCalendarDue,
   reconcileWorkOrderCosts,
   sumAmounts,
@@ -186,5 +187,26 @@ describe("PHASE-049 W-17 — the INV-034 reconciliation fold (the per-leg breakd
       glExpenseDebit: "0",
     });
     expect(verdict.balanced).toBe(true);
+  });
+});
+
+describe("PHASE-049 W-18 — the NBV fold (D-06, G-61's reclassification amount)", () => {
+  it("NBV = cost − accumulated at the exact 4-dp quantum (the fixture asset: 100,000 − 25,000 = 75,000)", () => {
+    expect(netBookValue("100000", "25000")).toBe("75000");
+  });
+
+  it("a fully depreciated asset carries NBV 0 (the zero-NBV transfer's own shape — the approval flips the branch with no entry)", () => {
+    expect(netBookValue("100000", "100000")).toBe("0");
+    expect(netBookValue("0", "0")).toBe("0");
+  });
+
+  it("the 4-dp exactness holds (no float, no rounding — the scaled-integer core)", () => {
+    expect(netBookValue("100.0001", "0.0001")).toBe("100");
+    expect(netBookValue("1000000", "333333.3333")).toBe("666666.6667");
+  });
+
+  it("accumulated exceeding cost refuses (the register's own floor — never a negative NBV)", () => {
+    expect(() => netBookValue("1000", "1000.0001")).toThrow(/exceeds cost/);
+    expect(() => netBookValue("100", "-1")).toThrow(/non-negative/);
   });
 });

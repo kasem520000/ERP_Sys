@@ -221,6 +221,34 @@ export function sumAmounts(values: readonly string[]): string {
   return fromMinor(total, MONEY_SCALE);
 }
 
+// ── the NBV fold (D-06 — G-61's reclassification amount) ────────────────────
+
+/**
+ * NET BOOK VALUE at the exact 4-dp money quantum (W-18 — T-10, G-61):
+ * cost − accumulated depreciation. The fold is the reclassification's
+ * ONLY arithmetic (zero parallel computation — the transfer service
+ * passes the register's own columns and adds nothing). A fully
+ * depreciated asset carries NBV 0 (the approval then flips the branch
+ * without a journal — the 0107 gate's own allowance: the engine writes
+ * only positive amounts, so a zero-NBV transfer has no entry to write).
+ * An accumulated figure exceeding cost refuses (the register's own
+ * floor — never a fabricated credit-side reclassification amount).
+ */
+export function netBookValue(cost: string, accumulatedDepreciation: string): string {
+  const costM = toMinor(cost, MONEY_SCALE, "cost");
+  const accumM = toMinor(accumulatedDepreciation, MONEY_SCALE, "accumulatedDepreciation");
+  if (accumM < 0n) {
+    throw new Error(`accumulatedDepreciation must be non-negative: ${accumulatedDepreciation}`);
+  }
+  const nbv = costM - accumM;
+  if (nbv < 0n) {
+    throw new Error(
+      `accumulated depreciation ${accumulatedDepreciation} exceeds cost ${cost} — the register's own floor; the NBV never goes negative`,
+    );
+  }
+  return fromMinor(nbv, MONEY_SCALE);
+}
+
 // ── the INV-034 reconciliation fold (the per-leg typed breakdown) ──────────
 
 /** INV-034's verdict — every figure named, the difference exact. */
