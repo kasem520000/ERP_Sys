@@ -83,6 +83,17 @@ function nowIso(): string {
   return new Date().toISOString();
 }
 
+/** Pg constraint name over the drizzle cause chain. */
+function pgConstraintOf(error: unknown): string | undefined {
+  let candidate: unknown = error;
+  for (let step = 0; step < 5 && candidate !== null && candidate !== undefined; step += 1) {
+    const constraint = (candidate as { constraint?: string }).constraint;
+    if (typeof constraint === "string") return constraint;
+    candidate = (candidate as { cause?: unknown }).cause;
+  }
+  return undefined;
+}
+
 /** D-08's XOR shape law — the authoring-side named refusal (the 0105
  * CHECK is the floor; this is the surfaced first line). */
 function requireTriggerShape(input: {
@@ -391,18 +402,15 @@ export class MaintenancePlanService {
       throw new CmmsPlanTaskNotFoundError({ planId: input.planId, taskId: input.taskId });
     }
     // A task with CARRIED steps (generated orders) refuses the delete —
-    // the carried rows' source FK is RESTRICT; surface the name instead
-    // of the raw 23503 (deactivate the task instead — the honest edit).
-    try {
-      await store.deletePlanTask(input.taskId);
-    } catch (error) {
-      if ((error as { code?: string }).code === "23503") {
-        throw new CmmsInputInvalidError(
-          `checklist task ${input.taskId} has carried steps on generated orders (the source FK is RESTRICT) — deactivate the task instead (is_active = false)`,
-        );
-      }
-      throw error;
+    // the pre-check (the FK stays the raced floor; the pre-check refuses
+    // BEFORE any statement fails, keeping the transaction usable).
+    const carried = await store.countCarriedSteps(input.taskId);
+    if (carried > 0) {
+      throw new CmmsInputInvalidError(
+        `checklist task ${input.taskId} has ${carried} carried step(s) on generated orders (the source FK is RESTRICT) — deactivate the task instead (is_active = false)`,
+      );
     }
+    await store.deletePlanTask(input.taskId);
     await this.audit.record({
       action: "assets.maintenance_plan_task_removed",
       entityType: "maintenance_plan_task",
@@ -585,7 +593,7 @@ export class MaintenancePlanService {
       orderId = order.id;
       await this.numbering.bind(WORK_ORDER_NUMBER_FORMAT.docType, acquired.number, order.id);
     } catch (error) {
-      if ((error as { constraint?: string }).constraint === "uq_maintenance_work_orders_tenant_plan_open") {
+      if (pgConstraintOf(error) === "uq_maintenance_work_orders_tenant_plan_open") {
         throw new CmmsPlanWindowOpenError({
           planId: plan.id,
           assetId: plan.assetId,

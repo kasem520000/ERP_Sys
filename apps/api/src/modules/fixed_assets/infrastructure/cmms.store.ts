@@ -711,6 +711,16 @@ export async function deletePlanTask(taskId: string): Promise<void> {
   await tenantTx().execute(sql`DELETE FROM maintenance_plan_tasks WHERE id = ${taskId}`);
 }
 
+/** The task's CARRIED-step count (the delete's pre-check — the FK stays
+ * the raced floor; the pre-check refuses BEFORE any statement fails so
+ * the transaction stays usable). */
+export async function countCarriedSteps(taskId: string): Promise<number> {
+  const rows = await query<{ n: string }>(sql`
+    SELECT COUNT(*)::text AS n FROM maintenance_work_order_steps
+    WHERE source_task_id = ${taskId}`);
+  return Number.parseInt(rows[0]?.n ?? "0", 10);
+}
+
 /** The latest reading at or before a date (the METER evaluation's input
  * at the generation moment — W-18 wires the event-driven insert; the
  * explicit evaluation reads the log's own truth). */
