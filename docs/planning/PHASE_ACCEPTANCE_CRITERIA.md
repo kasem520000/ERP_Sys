@@ -527,6 +527,82 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
   index-driven, no seq-scan, the plans logged verbatim (the W-9-settled shape —
   never a forced plan).
 
+### PHASE-048 — Projects & Contracting
+
+- **Migrations 0100–0104 apply cleanly from zero with re-apply no-op** (the
+  chain re-proven at W-8, at the full sweeps, and standalone at the final
+  head — the scratch `check:rls` 318/0); Drizzle mirror parity held at every
+  wave; all 11 new tables (+ the time-entry WBS dimension + the three 0104
+  stamp columns) have ENTITY_CATALOG rows (307 → 318) and the column-level
+  TABLES doc (`docs/database/TABLES/projects-contracting.md`).
+- **The WBS board renders the tree, milestones and dependencies; BR-095's
+  rollup reconciles node-by-node; cycles rejected** — `projects-wbs.db.spec`
+  (the triple agreement: engine vs. store vs. the pure leaf-recomputed fold;
+  the legal diamond; the cycle refusals carrying the path; the 0100
+  write-time coherence on `crm_time_entries`); the `/projects` board + the
+  Gantt-ish timeline + the EVM tab (W-12).
+- **The cost rollup is complete and INV-033 holds to the cent** — the four
+  collectors (labor/materials/subcontractor/overhead) with the coherent
+  four-leg world 820.3125 + 500 + 9,000 + 625 = 10,945.3125 = the GL project
+  dimension EXACTLY (`projects-budgets-actuals.db.spec`, every GL side
+  through the REAL PostingService); the typed reconciliation refusing at any
+  residual with the per-leg breakdown; the INV-033 golden with the poisoned
+  world's typed refusal carrying the FULL per-leg payload (W-14).
+- **EVM per project and per node; EV never exceeds the approved budget (the
+  typed refusal); the forecast surface renders** — `projects-evm.db.spec`
+  (W-10) + the EVM tab (W-12) + `projects.evm-summary` with the
+  `evm-ac-gl-tie` block-on-fail assertion (W-14).
+- **Change orders inert until approved (BR-094); the approval adjusts
+  value/budget/ceiling exactly once (G-58)** — `projects-change-orders.
+  db.spec` (the DRAFT +9,999/REJECTED +500 inertness; the all-or-nothing
+  rollback; the single-use stamp; DR 1160 · CR 2150 at |+500|; the ceiling
+  re-baseline 150,000 → 170,000) + the golden transcript with its failure
+  packs (W-14).
+- **The goldens G-55…G-58 pass on the seeded chart through the posting
+  engine with balanced entries** — each mirrored by its golden transcript
+  with the MANDATORY failure pack (the typed refusals WITH their full
+  payloads, the zero residue, the flip-and-restore with the green re-run):
+  G-55 (the AP linkage + the sub-side hold), G-56 (the release at final
+  acceptance, the schedule's gates first), G-57 (the fused billing + the
+  in-transaction POSTED invoice), G-58 (the delta exactly once) + the
+  IAS-23 golden (the capitalization + the single-use stamp + the
+  unverified-register flip) — `projects-goldens.db.spec` (W-14) over the
+  W-11 posting arms.
+- **Progress certificates generate sales invoices with retention withheld;
+  advances post and amortize (the G-33 mirror); BR-093's ceiling holds** —
+  `projects-contracting.db.spec` (the five-figure refusal with NO silent
+  truncation; the re-baseline only through the REAL G-58 gate; the
+  oldest-first amortization bounded by every remaining balance; the
+  no-register fail-closed refusal both ways) + `/projects/contracting`
+  (W-13) + the two report contracts (W-14).
+- **Field service: the dispatch board assigns technicians; the pause-aware
+  clocks escalate on breach (BR-096); completion records notes and parts** —
+  `projects-fieldservice.db.spec` (the status machine with the stamp law;
+  the pause states; the escalation dedupe keys; the pause-subtraction golden
+  6h − 3h = 3h; the completed-while-paused law) + `/projects/fieldservice`
+  (W-13) + `projects.fieldservice-sla` (the PURE readout, nothing recorded —
+  the report-never-records law proven by the unchanged notification count).
+- **The CR-36 gates**: +14 keys zero-drift (312 → 326 = 326 at every wave) ·
+  i18n parity at the declared deltas (+49 W-12, +138 W-13, ZERO DELTA
+  declared W-14 — 6,620 = 6,620 + mobile 371) · the RLS attack matrix A1–A10
+  over all ELEVEN tables (the generated suite + the dedicated FK-chained
+  hostile worlds, the composite-FK law proven offensively — W-14) ·
+  flag/template gating verified (the D-16 composable units + the three
+  manifest enablements) · docs:validate 33/33 at every wave · the OA-06
+  EXPLAIN budgets (the rollup + the dispatch probes, index-driven, the plans
+  logged verbatim — W-14) · **the bilingual contracting prints rendering
+  AR/EN with RTL correctness** (the REAL Chromium print test, both
+  directions; the labels exclusively through `bi()`; deterministic
+  byte-identical across runs; the retention statement carrying NO totals by
+  design — W-13) · multi-currency contracts posting through the existing FX
+  discipline (the fail-closed missingFxRate — W-11).
+- **The completion report + the IMPLEMENTATION_STATUS flip + the archive
+  (OA-07, `ERP_PLATFORM_PHASE048.zip`, byte-verified members) + the tag
+  `phase/048`** — the W-15 closure wave; the cumulative acceptance ledger
+  #1–#10 walked and closed with every wave's evidence pointers (the W-13
+  administrative request (a)); the open-items log transferred explicitly
+  (the 043 hard review · RISK-031/032 · the 045 notes · the Tabs defect).
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),
