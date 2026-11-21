@@ -30,7 +30,17 @@ import { MaintenancePlanService } from "./application/maintenance-plan-service";
 import { AssetMetersService } from "./application/asset-meters-service";
 import { AssetSparesService } from "./application/asset-spares-service";
 import { AssetTransfersService } from "./application/asset-transfers-service";
+// PHASE-049 (W-19 — T-11/T-12): the tags + expiry-sweep + fleet-light
+// plane. AssetTagsService consumes the identity key material (the
+// capability-token precedent — the secret-envelope cross-module infra
+// shape) through the pure sign/verify folds; AssetExpirySweepService
+// consumes the notifications inbox (the P26-C wiring precedent) and the
+// configuration settings registry (the first 049 settings keys) through
+// the platform's exported validation + event bus.
+import { AssetTagsService } from "./application/asset-tags-service";
+import { AssetExpirySweepService } from "./application/asset-expiry-sweep-service";
 import { registerDepreciationJobs } from "./infrastructure/depreciation-assembly.job";
+import { registerAssetExpiryJob } from "./infrastructure/asset-expiry-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
 import { FixedAssetsController } from "./presentation/fixed-assets.controller";
 import { MaintenanceController } from "./presentation/maintenance.controller";
@@ -39,6 +49,13 @@ import { MaintenancePlansController } from "./presentation/maintenance-plans.con
 import { AssetMetersController } from "./presentation/asset-meters.controller";
 import { AssetSparesController } from "./presentation/asset-spares.controller";
 import { AssetTransfersController } from "./presentation/asset-transfers.controller";
+// PHASE-049 (W-19 — T-11/T-12): the tags + scan + expiry-sweep config +
+// fleet-light routes.
+import { AssetScanController, AssetTagsController } from "./presentation/asset-tags.controller";
+import {
+  AssetExpirySweepController,
+  AssetFleetLightController,
+} from "./presentation/asset-expiry.controller";
 
 /**
  * Fixed-assets module (PHASE-026; DR-002 option A): purpose-linked asset
@@ -68,6 +85,12 @@ import { AssetTransfersController } from "./presentation/asset-transfers.control
     AssetMetersController,
     AssetSparesController,
     AssetTransfersController,
+    // PHASE-049 (W-19): the tags + scan + expiry-sweep config + fleet-
+    // light routes (matrix §3.27's W-19 dated note — nine rows).
+    AssetTagsController,
+    AssetScanController,
+    AssetExpirySweepController,
+    AssetFleetLightController,
   ],
   providers: [
     CategoryService,
@@ -92,6 +115,12 @@ import { AssetTransfersController } from "./presentation/asset-transfers.control
     AssetMetersService,
     AssetSparesService,
     AssetTransfersService,
+    // PHASE-049 (W-19 — T-11/T-12): the tags + expiry-sweep + fleet-light
+    // plane (the signed codes' pure folds; the sweep's derived-step
+    // probes with the structural dedupe and the after-success seal; the
+    // fleet register's read model over the substrate).
+    AssetTagsService,
+    AssetExpirySweepService,
   ],
   exports: [
     CategoryService,
@@ -113,9 +142,14 @@ import { AssetTransfersController } from "./presentation/asset-transfers.control
     AssetMetersService,
     AssetSparesService,
     AssetTransfersService,
+    // PHASE-049 (W-19): the tags + expiry-sweep + fleet-light plane.
+    AssetTagsService,
+    AssetExpirySweepService,
   ],
 })
 export class FixedAssetsModule implements OnModuleInit {
+  constructor(private readonly sweep: AssetExpirySweepService) {}
+
   /**
    * P26-B (T6, ADR-0008): the bounded depreciation-assembly queue registers
    * on boot — serial createQueue, degrade-the-feature-never-the-platform
@@ -123,6 +157,13 @@ export class FixedAssetsModule implements OnModuleInit {
    */
   async onModuleInit(): Promise<void> {
     await registerDepreciationJobs(getBoss()).catch((error) => {
+      void error;
+    });
+    // PHASE-049 (W-19 — T-12): the asset-expiry-sweep's daily queue (the
+    // named schedule is idempotent — NO DOUBLE LAUNCH; the structural
+    // dedupe makes raced passes converge; the 047 hr-expiry-sweep
+    // precedent's registration shape).
+    await registerAssetExpiryJob(getBoss(), this.sweep).catch((error) => {
       void error;
     });
   }

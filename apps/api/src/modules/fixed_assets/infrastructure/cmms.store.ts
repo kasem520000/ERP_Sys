@@ -1282,3 +1282,376 @@ export async function findBranchLite(
     SELECT id, code, name, is_active AS "isActive" FROM branches WHERE id = ${branchId} LIMIT 1`);
   return rows[0];
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PHASE-049 (W-19 — T-11/T-12): the tags + the expiry sweep + the fleet-light
+// register + the sweep's settings surface. Every statement rides the caller's
+// ambient tenant UoW; the tags' CAS is the same guarded-UPDATE law as the
+// machine's; the sweep's probes derive their dates from the database's own
+// CURRENT_DATE (the derived step — NO JS wall-clock arithmetic anywhere in
+// the sweep's path, the owner's W-19 clock law).
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── the signed tags (D-09 — 0106's asset_tags) ─────────────────────────────
+
+export interface TagRow {
+  id: string;
+  assetId: string;
+  code: string;
+  printedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+const TAG_SELECT = sql`
+  SELECT id, asset_id AS "assetId", code, printed_at::text AS "printedAt",
+    note, note_ar AS "noteAr", created_by AS "createdBy",
+    created_at::text AS "createdAt", updated_at::text AS "updatedAt", version
+  FROM asset_tags`;
+
+/** Insert one generated code — the structural uq_asset_tags_tenant_code is
+ * the uniqueness floor (a 2^-256 collision surfaces as the no-rows return;
+ * the service's bounded regeneration loop is the honest non-event). */
+export async function insertTag(input: {
+  assetId: string;
+  code: string;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}): Promise<TagRow | undefined> {
+  const id = generateUuidV7();
+  const rows = await query<TagRow>(sql`
+    INSERT INTO asset_tags (id, tenant_id, created_by, asset_id, code, note, note_ar)
+    VALUES (${id}, ${requireTenantContext().tenantId}, ${input.createdBy}, ${input.assetId},
+      ${input.code}, ${input.note}, ${input.noteAr})
+    ON CONFLICT ("tenant_id", "code") DO NOTHING
+    RETURNING ${TAG_SELECT}`);
+  return rows[0];
+}
+
+export async function findTagById(tagId: string): Promise<TagRow | undefined> {
+  const rows = await query<TagRow>(sql`${TAG_SELECT} WHERE id = ${tagId} LIMIT 1`);
+  return rows[0];
+}
+
+/** The RLS-scoped resolution read — the scan surface's ONLY lookup (a
+ * foreign tenant's row is invisible here by policy: the typed 404's
+ * substrate, never a cross-tenant oracle). */
+export async function findTagByCode(code: string): Promise<TagRow | undefined> {
+  const rows = await query<TagRow>(sql`${TAG_SELECT} WHERE code = ${code} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listTags(filter: { assetId?: string }): Promise<TagRow[]> {
+  const assetClause =
+    filter.assetId === undefined ? sql`` : sql` WHERE asset_id = ${filter.assetId}`;
+  return query<TagRow>(sql`${TAG_SELECT}${assetClause} ORDER BY created_at, id`);
+}
+
+/**
+ * THE PRINTED STAMP'S CAS (the single-consumption seal — the 0105
+ * completion-stamp precedent's tags sibling): ONE guarded UPDATE pinning
+ * `printed_at IS NULL`; zero rows means the already-printed (or raced)
+ * tag — the service's TAG_ALREADY_PRINTED names it with the standing
+ * stamp. A re-print is the honest refusal: print a NEW tag instead (the
+ * old label's code dies with its row; the scan 404s thereafter).
+ */
+export async function stampTagPrinted(input: {
+  tagId: string;
+  printedAt: string;
+  actorId: string | null;
+}): Promise<TagRow | undefined> {
+  const rows = await query<{ id: string }>(sql`
+    UPDATE asset_tags SET
+      printed_at = ${input.printedAt},
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.tagId} AND printed_at IS NULL
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findTagById(input.tagId);
+}
+
+/** The register-hygiene delete (the 0106 DELETE grant's service law): a
+ * mistyped batch's cleanup or a retired physical label — the code stops
+ * resolving the moment the row dies (the audit carries the before). */
+export async function deleteTag(tagId: string): Promise<boolean> {
+  const rows = await query<{ id: string }>(sql`
+    DELETE FROM asset_tags WHERE id = ${tagId} RETURNING id`);
+  return rows[0] !== undefined;
+}
+
+/** The pending print sheet's batch — the UNPRINTED tags for one asset
+ * (one sheet per tag batch — the payload the W-21 print plane renders
+ * deterministically with `bi()`; ZERO parallel accounting: the batch is
+ * DERIVED from the rows, never a stored list). */
+export async function listUnprintedTags(assetId: string): Promise<TagRow[]> {
+  return query<TagRow>(sql`
+    ${TAG_SELECT} WHERE asset_id = ${assetId} AND printed_at IS NULL
+    ORDER BY created_at, id`);
+}
+
+// ── the asset card's resolution payload (the scan surface, D-09/D-11) ──────
+
+export interface AssetCardRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string;
+  categoryId: string;
+  categoryCode: string;
+  categoryName: string;
+  branchId: string;
+  branchCode: string;
+  branchName: string;
+  status: string;
+  custodianUserId: string | null;
+  warrantyExpiry: string | null;
+  insuranceExpiry: string | null;
+  licenseExpiry: string | null;
+  inspectionExpiry: string | null;
+  parentAssetId: string | null;
+  costCenterId: string | null;
+}
+
+export async function findAssetCard(assetId: string): Promise<AssetCardRow | undefined> {
+  const rows = await query<AssetCardRow>(sql`
+    SELECT a.id, a.code, a.name, a.name_ar AS "nameAr",
+      a.category_id AS "categoryId", c.code AS "categoryCode",
+      c.name AS "categoryName", a.branch_id AS "branchId", b.code AS "branchCode",
+      b.name AS "branchName", a.status, a.custodian_user_id AS "custodianUserId",
+      a.warranty_expiry::text AS "warrantyExpiry",
+      a.insurance_expiry::text AS "insuranceExpiry",
+      a.license_expiry::text AS "licenseExpiry",
+      a.inspection_expiry::text AS "inspectionExpiry",
+      a.parent_asset_id AS "parentAssetId", a.cost_center_id AS "costCenterId"
+    FROM assets a
+    JOIN asset_categories c ON c.id = a.category_id
+    JOIN branches b ON b.id = a.branch_id
+    WHERE a.id = ${assetId} LIMIT 1`);
+  return rows[0];
+}
+
+/** The card's maintenance context: the OPEN work orders + the ACTIVE plans
+ * (the service-history timeline's live head — the chronology itself is
+ * W-21's surface; the counts are the card's honest summary). */
+export async function assetMaintenanceSummary(assetId: string): Promise<{
+  openWorkOrders: number;
+  activePlans: number;
+}> {
+  const rows = await query<{ openOrders: string; activePlans: string }>(sql`
+    SELECT
+      (SELECT count(*) FROM maintenance_work_orders
+        WHERE asset_id = ${assetId} AND status <> 'COMPLETED')::text AS "openOrders",
+      (SELECT count(*) FROM maintenance_plans
+        WHERE asset_id = ${assetId} AND is_active)::text AS "activePlans"`);
+  return {
+    openWorkOrders: Number(rows[0]?.openOrders ?? 0),
+    activePlans: Number(rows[0]?.activePlans ?? 0),
+  };
+}
+
+/** The card's odometer binding (R-10): the asset's ONE designated KM meter
+ * with its live snapshot — NULL when the tenant tracks none. */
+export async function findAssetOdometer(
+  assetId: string,
+): Promise<
+  | { meterId: string; name: string; nameAr: string | null; unit: string; lastValue: string }
+  | undefined
+> {
+  const rows = await query<{
+    meterId: string;
+    name: string;
+    nameAr: string | null;
+    unit: string;
+    lastValue: string;
+  }>(sql`
+    SELECT id AS "meterId", name, name_ar AS "nameAr", unit,
+      last_value::text AS "lastValue"
+    FROM asset_meters
+    WHERE asset_id = ${assetId} AND is_odometer AND type = 'KM'
+    LIMIT 1`);
+  return rows[0];
+}
+
+// ── the expiry sweep's probes (D-10 — the derived-step clock law) ───────────
+
+export interface ExpiringAssetRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string;
+  expiry: string;
+}
+
+/**
+ * ONE class's banded probe — ACTIVE assets only (a disposed/written-off
+ * asset left the register: no alerts — D-01's status-guard spirit). THE
+ * DERIVED STEP: the band edges resolve against the database's own
+ * CURRENT_DATE inside the statement — the whole sweep's clock law (no
+ * Date.now()+delta anywhere in JS; the band arithmetic is the pure fold's,
+ * the date arithmetic is the database's own).
+ */
+export async function scanExpiringAssets(input: {
+  assetExpiryClass: "warranty" | "insurance" | "license" | "inspection";
+  band: { threshold: number; fromDays: number | null; toDays: number };
+  limit: number;
+}): Promise<ExpiringAssetRow[]> {
+  const column =
+    input.assetExpiryClass === "warranty"
+      ? sql`warranty_expiry`
+      : input.assetExpiryClass === "insurance"
+        ? sql`insurance_expiry`
+        : input.assetExpiryClass === "license"
+          ? sql`license_expiry`
+          : sql`inspection_expiry`;
+  return query<ExpiringAssetRow>(sql`
+    SELECT id, code, name, name_ar AS "nameAr", ${column}::text AS expiry
+    FROM assets
+    WHERE status = 'ACTIVE'
+      AND ${column} IS NOT NULL
+      AND ${column} <= (CURRENT_DATE + ${input.band.toDays}::int)
+      AND (${input.band.fromDays ?? null}::int IS NULL
+        OR ${column} > (CURRENT_DATE + ${input.band.fromDays ?? null}::int))
+    ORDER BY ${column}, id
+    LIMIT ${input.limit}`);
+}
+
+// ── the fleet-light register (R-10 — the view over the substrate) ──────────
+
+export interface FleetLightRow {
+  assetId: string;
+  code: string;
+  name: string;
+  nameAr: string;
+  status: string;
+  categoryId: string;
+  categoryCode: string;
+  categoryName: string;
+  branchCode: string;
+  branchName: string;
+  warrantyExpiry: string | null;
+  warrantyDays: number | null;
+  insuranceExpiry: string | null;
+  insuranceDays: number | null;
+  licenseExpiry: string | null;
+  licenseDays: number | null;
+  inspectionExpiry: string | null;
+  inspectionDays: number | null;
+  odometerMeterId: string | null;
+  odometerName: string | null;
+  odometerUnit: string | null;
+  odometerValue: string | null;
+}
+
+/**
+ * THE FLEET-LIGHT REGISTER (R-10, the owner's CR-50 light-only decision):
+ * a READ MODEL over the substrate — every asset with its four expiry
+ * chips (the days-to-expiry derived from the database's own CURRENT_DATE
+ * — the same derived-step law) + the odometer binding (the ONE designated
+ * KM meter's snapshot). ZERO new tables, ZERO parallel accounting (the
+ * register derives from assets + asset_meters alone); the vehicle-class
+ * grouping is the CALLER's category filter (categories are tenant data —
+ * the platform never hard-codes which category is a "vehicle"; full
+ * fuel/violations management stays the recorded sectoral non-goal).
+ */
+export async function fleetLightRegister(filter: {
+  categoryIds?: readonly string[];
+  limit: number;
+}): Promise<FleetLightRow[]> {
+  const categoryClause =
+    filter.categoryIds === undefined || filter.categoryIds.length === 0
+      ? sql``
+      : sql` AND a.category_id IN (${sql.join(
+          filter.categoryIds.map((id) => sql`${id}`),
+          sql`, `,
+        )})`;
+  return query<FleetLightRow>(sql`
+    SELECT a.id AS "assetId", a.code, a.name, a.name_ar AS "nameAr", a.status,
+      a.category_id AS "categoryId", c.code AS "categoryCode", c.name AS "categoryName",
+      b.code AS "branchCode", b.name AS "branchName",
+      a.warranty_expiry::text AS "warrantyExpiry",
+      (a.warranty_expiry - CURRENT_DATE)::int AS "warrantyDays",
+      a.insurance_expiry::text AS "insuranceExpiry",
+      (a.insurance_expiry - CURRENT_DATE)::int AS "insuranceDays",
+      a.license_expiry::text AS "licenseExpiry",
+      (a.license_expiry - CURRENT_DATE)::int AS "licenseDays",
+      a.inspection_expiry::text AS "inspectionExpiry",
+      (a.inspection_expiry - CURRENT_DATE)::int AS "inspectionDays",
+      m.id AS "odometerMeterId", m.name AS "odometerName", m.unit AS "odometerUnit",
+      m.last_value::text AS "odometerValue"
+    FROM assets a
+    JOIN asset_categories c ON c.id = a.category_id
+    JOIN branches b ON b.id = a.branch_id
+    LEFT JOIN asset_meters m ON m.asset_id = a.id AND m.is_odometer AND m.type = 'KM'
+    WHERE a.status = 'ACTIVE'${categoryClause}
+    ORDER BY c.code, a.code
+    LIMIT ${filter.limit}`);
+}
+
+// ── the sweep's settings surface (the first 049 settings keys) ─────────────
+
+export interface SweepSettingsRow {
+  key: string;
+  value: unknown;
+  updatedAt: string;
+}
+
+/** The stored row read (undefined = no stored row — the registry default
+ * fires; the reader's stored ∪ default posture). */
+export async function findSweepSetting(): Promise<SweepSettingsRow | undefined> {
+  const rows = await query<SweepSettingsRow>(sql`
+    SELECT key, value, updated_at::text AS "updatedAt"
+    FROM tenant_settings WHERE key = 'assets.expiry_sweep_thresholds' LIMIT 1`);
+  return rows[0];
+}
+
+/**
+ * The thresholds write — THE SAME single settings home the generic tenancy
+ * surface writes (tenant_settings' structural unique on (tenant, key) is
+ * the one-row-per-key floor; ZERO parallel accounting: no second store,
+ * the typed surface and the generic surface write the SAME row). The
+ * invalidation event rides the configuration module's exported
+ * publishTenancyEvent — the SAME bus the SettingsService uses (the
+ * cachedTenantSettings cache invalidates identically from either path).
+ */
+export async function upsertSweepSetting(input: {
+  value: readonly number[];
+  actorId: string | null;
+}): Promise<SweepSettingsRow> {
+  const id = generateUuidV7();
+  const rows = await query<{ key: string }>(sql`
+    INSERT INTO tenant_settings (id, tenant_id, key, value, updated_by)
+    VALUES (${id}, ${requireTenantContext().tenantId}, 'assets.expiry_sweep_thresholds',
+      ${JSON.stringify(input.value)}::jsonb, ${input.actorId})
+    ON CONFLICT ("tenant_id", "key") DO UPDATE SET
+      value = EXCLUDED.value, updated_at = now(),
+      version = tenant_settings.version + 1, updated_by = EXCLUDED.updated_by
+    RETURNING key`);
+  const saved = rows[0];
+  if (saved === undefined) {
+    return findSweepSetting() as Promise<SweepSettingsRow>;
+  }
+  const after = await findSweepSetting();
+  return after as SweepSettingsRow;
+}
+
+/** The sweep's LAST-RUN SEAL read — the latest audit record of the run
+ * action (the audit plane IS the job log; no parallel stats row — the
+ * sales.store's action-keyed audit read precedent). */
+export async function lastSweepRun(): Promise<
+  { at: string; outcome: { windows: number[]; flagged: number; notified: number } } | undefined
+> {
+  const rows = await query<{ at: string; after: { windows: number[]; flagged: number; notified: number } }>(sql`
+    SELECT at::text AS at, after
+    FROM audit_events
+    WHERE action = 'assets.expiry_sweep_run'
+    ORDER BY at DESC LIMIT 1`);
+  const row = rows[0];
+  return row === undefined ? undefined : { at: row.at, outcome: row.after };
+}

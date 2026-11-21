@@ -5388,6 +5388,66 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/assets/transfers/:id/reject",
     permission: "assets.transfer.approve",
   },
+  // PHASE-049 (W-19 — T-11/T-12, the tags + sweep + fleet-light wave):
+  // the 0108-seeded keys' THIRD binding wave + the 0111 key's first
+  // (1,093 + 9 = 1,102 — the dated delta in matrix §3.27's W-19 note).
+  // The tags family rides its single assets.tags.manage key (the batch
+  // create with the signed-code generation, the list, THE PRINT SHEET
+  // payload, THE PRINTED STAMP — the single-consumption CAS seal — and
+  // the register-hygiene delete). THE SCAN ROUTE rides
+  // assets.maintenance.view — the DECLARED INTERPRETATION: the scan
+  // resolves INTO the maintenance plane's asset card (the technician's
+  // surface); the register's own reads stay on fixed_assets.assets.view.
+  // THE FLEET-LIGHT REGISTER (R-10) rides assets.expiry.view (the
+  // renewal-register read plane). The sweep config family rides the NEW
+  // 0111-seeded assets.expiry.manage key (the sweep threshold settings
+  // surface — the first 049 settings keys). The web planes (W-20/W-21)
+  // bind on the same keys.
+  {
+    method: "POST",
+    path: "/api/v1/assets/tags",
+    permission: "assets.tags.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/tags",
+    permission: "assets.tags.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/tags/print-sheet",
+    permission: "assets.tags.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/tags/:id/print",
+    permission: "assets.tags.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/assets/tags/:id",
+    permission: "assets.tags.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/scan/:code",
+    permission: "assets.maintenance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/fleet-light",
+    permission: "assets.expiry.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/expiry-sweep",
+    permission: "assets.expiry.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/assets/expiry-sweep",
+    permission: "assets.expiry.manage",
+  },
 ];
 
 /**

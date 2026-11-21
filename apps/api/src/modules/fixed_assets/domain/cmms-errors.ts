@@ -497,3 +497,70 @@ export class CmmsTransferRejectReasonRequiredError extends DomainError {
     );
   }
 }
+
+// -- the signed tags + the expiry sweep (W-19 — T-11/T-12, D-09/D-10) ──────
+
+/**
+ * THE SIGNATURE REFUSAL (D-09's own mitigation, verbatim: «an
+ * unsigned/forged code refuses at the signature, never at a lookup»):
+ * the pre-lookup gate's named rejection — a malformed or wrongly-signed
+ * code NEVER touches the database (no oracle, no lookup, no log noise
+ * that would distinguish exists-from-not).
+ */
+export class CmmsTagCodeInvalidError extends DomainError {
+  constructor() {
+    super(
+      "TAG_CODE_INVALID",
+      `the presented code is not a valid signed tag token (the shape or the signature refused — an unsigned/forged code never reaches a lookup; only platform-signed codes resolve) / الرمز المعروض ليس رمز بطاقة موقّعًا صالحًا — الرفض عند التوقيع لا عند البحث`,
+    );
+  }
+}
+
+/**
+ * THE TYPED 404 (D-09: «a foreign tenant's scan is a typed 404 — never a
+ * cross-tenant oracle»): a validly-signed code this tenant never
+ * registered — invisible under RLS, indistinguishable from a
+ * never-issued code. The scan and the register reads share the name.
+ */
+export class CmmsTagNotFoundError extends DomainError {
+  constructor(details: { tagId?: string; code?: string }) {
+    super(
+      "TAG_NOT_FOUND",
+      `no tag ${details.tagId !== undefined ? `with id ${details.tagId}` : `for the presented code`} exists in this tenant (a validly-signed code resolves only against this tenant's own register — RLS) / لا توجد بطاقة بهذا المعرف أو الرمز في هذا المستأجر`,
+      details,
+    );
+  }
+}
+
+/**
+ * THE SINGLE-CONSUMPTION SEAL'S NAMED REFUSAL (the printed stamp's CAS —
+ * the 0105 completion-stamp precedent's tags sibling): a tag already
+ * printed refuses the re-print BY NAME carrying the standing stamp — the
+ * honest alternative is a NEW tag (a fresh code; the old label dies with
+ * its row).
+ */
+export class CmmsTagAlreadyPrintedError extends DomainError {
+  constructor(details: { tagId: string; printedAt: string }) {
+    super(
+      "TAG_ALREADY_PRINTED",
+      `tag ${details.tagId} was already printed at ${details.printedAt} — the printed stamp is single-use (print a NEW tag instead: a fresh signed code; the old label's code dies with its row) / البطاقة مطبوعة بالفعل — الختم أحادي الاستخدام؛ اطبع بطاقة جديدة برمز موقّع جديد`,
+      details,
+    );
+  }
+}
+
+/**
+ * The sweep's thresholds write refusal (the settings registry's typed
+ * validation surfaced under the sweep's own name): a malformed ladder
+ * never lands — the registry schema (an array of 1…12 integers ≥ 0) is
+ * the floor; the pure fold normalizes what lands (dedup, descending).
+ */
+export class CmmsSweepThresholdsInvalidError extends DomainError {
+  constructor(details: { message: string }) {
+    super(
+      "SWEEP_THRESHOLDS_INVALID",
+      `the expiry-sweep threshold ladder is invalid (${details.message} — an array of 1…12 integer day-values ≥ 0; the documented default is [30,7,0]) / سلما عتبات الكنس غير صالحة — مصفوفة من قيم أيام صحيحة موجبة`,
+      details,
+    );
+  }
+}
