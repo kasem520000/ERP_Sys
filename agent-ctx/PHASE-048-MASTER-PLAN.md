@@ -846,6 +846,38 @@ IAS-23 golden; the RLS attack tests A1–A10 on all new tables; the OA-06
 EXPLAIN budgets (D-17).
 **Exit:** acceptance #6's golden transcripts + #9's RLS/OA-06 arms green.
 
+> **[Dated 2026-11-22 (W-14 DELIVERED — on the owner-accepted W-13 head
+> `ce78bc7`, this session's working clone — the same-session evidence
+> rule's TWENTY-SECOND consecutive wave; the step commits `0aae7f1`
+> (T-17) + `de09c8f` (T-18) pushed per the owner's push-each-step
+> instruction): ZERO migrations (the chain stays 0104 · the catalog 318,
+> the scratch re-proven from zero) — T-17 THE FOUR CONTRACTS (the
+> registry 110 → 114 BROKEN BY DESIGN AND DECLARED at ALL pin sites
+> together: the eight count pins + the four known-permission catalogs +
+> the catalog doc 114/114 + the matrix note; the `projects` category +
+> DataSourceModule at phase 48 with the window 45 → 48 DECLARED;
+> ROUTE_PERMISSIONS stays 1,052 — zero routes; zero new keys; every
+> contract reading the engines' outputs VERBATIM — zero parallel
+> computation, the retention statement NO totals by design, the SLA
+> report the PURE readout with NOTHING recorded) + T-18 THE PROOF PACK
+> (the goldens G-55…G-58 with the failure packs — the refusals WITH
+> their full payloads, the flip-and-restore — + the INV-033 golden with
+> the poisoned world's per-leg payload + the IAS-23 golden; the RLS
+> attack matrix A1–A10 × the eleven tables on two dedicated probe
+> tenants with the app-role-seeded FK-chained worlds; the OA-06 EXPLAIN
+> budgets — the rollup + the dispatch probes, index-driven, the plans
+> logged verbatim) — the full DB suite 271/271 · 3,807/3,807 · 0 failed
+> · 0 skipped in BOTH envelopes (the precomputed five chunks
+> coverage-verified 271/271 BEFORE the first run + the single-process
+> run GREEN at 554.42s inside the pre-computed ~590s ceiling, the named
+> soak timing flake re-proven at BOTH heads per the W-11 precedent) +
+> every standing checker green + the same-session evidence
+> (`audit-evidence/phase048-w14/` — 24 files — + the gate doc with the
+> FOUR honest disclosures) + THE CUMULATIVE LEDGER UPDATED (#6 closed
+> WHOLE + #9's two remaining arms closed — #1…#9 all green; #10 is
+> W-15's alone). EXIT MET: acceptance #6's golden transcripts + #9's
+> RLS/OA-06 arms green with evidence. NOT production approval.]**
+
 ### W-15 — Docs + gates + closure (T-19 + T-20, orchestrator)
 The canon docs (JOURNAL_RULES G-55…G-58 + ACCOUNTING_INVARIANTS INV-033 +
 BUSINESS_RULES BR-092…096 in the D-18 wordings + ENTITY_CATALOG +

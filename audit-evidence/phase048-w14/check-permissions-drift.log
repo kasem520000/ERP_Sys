@@ -1,0 +1,3 @@
+$ tsx scripts/check-permissions-drift.ts
+[permissions-drift] OK — matrix 326 keys, seed 326 keys
+EXIT=0

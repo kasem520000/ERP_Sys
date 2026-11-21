@@ -1,0 +1,5 @@
+$ dependency-cruiser apps packages --config .dependency-cruiser.cjs
+
+✔ no dependency violations found (2054 modules, 15372 dependencies cruised)
+
+EXIT=0
