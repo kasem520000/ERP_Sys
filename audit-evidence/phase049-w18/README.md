@@ -318,9 +318,12 @@ registry recount — zero change).
    replaced runs preserved in this note).
 2. **THE ROUTE-COUNT CHECKER SCRIPT NAMES**: the first capture sweep of the standing
    checkers used wrong script spellings (254-class failures — `check:i18n-parity` is a
-   colon-script; `validate:manifests` not `validate-manifests`); the re-run with the
-   correct names is the envelope's set of logs. Recorded here for the four-quarters
-   honesty (the failed invocations never ran the checkers themselves).
+   colon-script; `validate:manifests` not `validate-manifests`); one wrong spelling was
+   SILENT-green — `pnpm docs` (the docs-URL echo, exit 0) stood in the docs-validate
+   log until the content check caught it (the log must carry the PASS lines, never a
+   URL echo); the re-runs with the correct names are the envelope's set of logs
+   (docs-validate re-captured: **33 PASS lines, 0 FAIL**). Recorded here for the
+   four-quarters honesty (the failed invocations never ran the checkers themselves).
 
 ## THE STANDING RECALLS (الاسترجاعات — carried, none closed)
 
