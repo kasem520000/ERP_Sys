@@ -1,8 +1,47 @@
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-20 (**PHASE-048 IN PROGRESS — W-11 the contracting core delivered: the pure layer FIRST + the DECLARED migration 0104 (three additive stamp columns — the owner's clause-4 escape) + T-10 the subcontracting engine (the AP linkage through the REAL engine at exactly the collector's read — the extracts the SOLE actuals source + G-55's sub-side hold + the single-consumption stamp) + T-11 the retention ledger (the CUSTOMER register — the commercial spine, the IMMUTABLE core + G-56's release both sides with the schedule gates) + T-12 the progress billing (BR-092 fail-closed · BR-093 at the statute's position through the gate's OWN ceiling read — one law three engines · G-57 the fused billing + the generated-in-transaction invoice + the G-33-mirror amortization); ROUTE_PERMISSIONS 1018 → 1038 (+20 dated); the full DB suite 265/265 · 3,754/3,754 in BOTH envelopes (the chunks coverage-verified BEFORE the first run + the single-process: 546.25s with one named timing flake re-proven standalone, the retry GREEN 552.58s — the ceiling COMPUTED first) + the scratch check:rls (the 104-chain · 318/0); W-12 field service + the web plane I NEXT**; earlier same day (W-10 the EVM + change orders + IAS 23 engines the pure layer FIRST (the unit-first law caught the ×10² aggregate-percent scale bug before any consumer) + T-08 the EVM engine (PV from the approved curve alone · the two EV disciplines · the EV ceiling's typed refusal · AC from T-07 alone) + T-09 the change-order gate (BR-094 inert-until-approved · G-58's exactly-once delta through the REAL engine · the single-use stamp · the ceiling recomputed on every read) + the D-11 IAS-23 service (REQUIRES_VERIFICATION · the documented stop rules · the posting through the engine); ROUTE_PERMISSIONS 1007 → 1018 (+11 dated); the full DB suite 264/264 · 3,743/3,743 in BOTH envelopes (the single-process full run 554s within the cap + the precomputed five family-whole chunks) + the scratch check:rls; W-11 the contracting core NEXT**) · earlier 2026-11-20 (W-9 the WBS + budgets + actuals engines (the pure layer caught three scale bugs; T-05/T-06/T-07 + INV-033; 988 → 1007; 261/261 · 3,717/3,717 in five chunks); W-8 the foundation wave: migrations 0100–0103 + every mirror; the A-1/A-2 amendments + the forward-progressive W-5 date repair)
-
-> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-19 (PHASE-047 W-6 — the reports + proof wave delivered: the four report contracts (registry 106 → 110) + the dedicated talent RLS attack suite + the OA-06 EXPLAIN budgets, with the honest disclosure + structural repair of the vitest suite-failure exit-0 finding (the second NF-4-class repair); W-5 — the web plane; W-4 — the external bridges + the NF-9/NF-10/NF-11 fixes; W-3 + the NF-7/NF-8 fixes; 2026-11-18: W-2 + the NF-4/NF-5 fixes; W-1; the 029 maintenance wave; the plan APPROVED with five binding amendments + the 0071/029 rulings + W-0)
+> **Status:** LIVING DOCUMENT — append-only, newest first · **Updated:** 2026-11-21 (**PHASE-048 COMPLETE — W-15 the closure wave delivered on the owner-accepted W-14 head a932b1e, this session's FRESH CLONE after the environment reset: the canon docs in the D-18 wordings + THE ID_LEDGER FLIP atomic with them (implemented G 58 · INV 33 · BR 96) + THE FULL GATE SWEEP at the final head (the FULL DB SUITE 271/271 · 3,807/3,807 · 0 failed · 0 skipped in BOTH envelopes — the eight-part plan with the three time-sensitive isolates + the single-process run 553.18s inside the declared 680s ceiling) + the completion report (the cumulative W-8…W-15 reconciliation · the battery scope map · the FULL unit-package table) + the triple flip + the archive ERP_PLATFORM_PHASE048.zip + the tag phase/048; the four honest disclosures incl. the two flake protocols with both logs kept; earlier 2026-11-21: W-14 the reports + the proof (the registry 110 → 114, the goldens with the failure packs, the RLS A1–A10, the OA-06 budgets); earlier 2026-11-20: W-13 the web plane II + the print pack · W-12 the field service + the web plane I · W-11 the contracting core · W-10 the EVM + change orders + IAS 23 · W-9 the WBS + budgets + actuals · W-8 the foundation; PHASE-049 (CMMS) NEXT**)
 
 Format: `DATE — item — type` where type ∈ {BLUEPRINT, PHASE-NNN, DOCS, BREAKING-ARCH, DECISION}.
+
+- 2026-11-21 — **PHASE-048 COMPLETE — THE CLOSURE WAVE (W-15) DELIVERED**
+  (T-19 + T-20, the plan §3 W-15, on the owner-accepted W-14 head
+  `a932b1e`, this session's fresh clone after the environment reset —
+  the same-session evidence rule's TWENTY-THIRD consecutive wave). **The
+  canon docs in the D-18 wordings** (JOURNAL_RULES §7 G-55…G-58 + note
+  18 with the worked examples and the non-ledger note ·
+  ACCOUNTING_INVARIANTS' Projects-exactness section INV-033 ·
+  BUSINESS_RULES' Projects & Contracting section BR-092…096 ·
+  NAVIGATION_MODEL §1.11 + the §9 LIVE row · FEATURE_CATALOG §29 · the
+  NEW TABLES doc `docs/database/TABLES/projects-contracting.md` · the
+  PHASE_ACCEPTANCE_CRITERIA §PHASE-048 entry) landed atomically WITH
+  **THE ID_LEDGER FLIP** (every 048 reservation resolved — nothing
+  silently dropped, the seals consumed once, no intermediate state;
+  implemented G 58 · INV 33 · BR 96; the checker's self-test probe (7)
+  moved to G-59/PHASE-049). **THE FULL GATE SWEEP at the final head**:
+  the scratch chain from zero (initdb → 104 → 318/0) · typecheck/lint
+  8/8 · depcruise 2,054 · 15,372 unchanged · unit 8/8 (141 files ·
+  1,803 tests) · **THE FULL DB SUITE 271/271 · 3,807/3,807 · 0 failed ·
+  0 skipped in BOTH envelopes** — the eight-part coverage-verified plan
+  (smoke 3·1,783 + the soak isolate 1·1 + perf-rest 5·23 + the fcm
+  isolate 1·8 + the email isolate 1·5 + a 82·596 + b-rest 98·772 + c
+  80·619) + the single-process run GREEN 553.18s inside the declared
+  680s ceiling · drift 326 = 326 · i18n 6,620 + 371 · tokens 130/130 +
+  50/50 · manifests 13/13 · docs 33/33 · id-ledger 0 + self-test OK ·
+  secrets 0 (the two tag anchors verified untouched) · capabilities
+  agree · shells PASS · the boundary PASS. **The four honest
+  disclosures**: the email chunk flake + the soak full-run flake (the
+  two-head protocol with both RED logs kept; the three-isolate
+  restructure declared) · the environment-reset recovery (the fresh
+  clone + the chromium headless-shell 1248 env-prep) · the typecheck
+  cache-hit replacement · the F1 ledger-date correction (2026-11-22 →
+  2026-11-21 at the claim site). **The closure acts:** the completion
+  report (the cumulative W-8…W-15 reconciliation · the battery scope
+  map · the FULL unit-package table — the W-14 omission repaired · the
+  acceptance ledger #1–#10 closed · the open-items log transferred
+  explicitly: the 043 hard review · RISK-031/032 · the 045 notes · the
+  Tabs defect) + the triple flip + the archive `ERP_PLATFORM_PHASE048.zip`
+  (OA-07, byte-verified, ADDITIVE-ONLY) + the tag `phase/048`.
+  **PHASE-049 (CMMS — Asset Maintenance) UNBLOCKED. NOT production
+  approval.**
 
 - 2026-11-20 — **PHASE-048 W-11 — THE CONTRACTING CORE DELIVERED**
   (T-10 + T-11 + T-12, the plan §3 W-11, on the owner-accepted W-10
