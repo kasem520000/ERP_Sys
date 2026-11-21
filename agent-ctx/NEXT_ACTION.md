@@ -1,24 +1,74 @@
-# NEXT ACTION — PHASE-048 COMPLETE (all eight waves delivered, the triple flip + the archive + the tag landed 2026-11-21); PHASE-049 (CMMS — Asset Maintenance) NEXT
+# NEXT ACTION — PHASE-049 (CMMS — Asset Maintenance) — THE PLAN DELIVERED 2026-11-21, AWAITING THE OWNER'S APPROVAL; NO CODE WAVE OPENS BEFORE IT
 
-**THE PHASE-048 CLOSURE (2026-11-21, W-15 on the owner-accepted W-14 head `a932b1e`, this session's FRESH CLONE after the environment reset — the same-session evidence rule's TWENTY-THIRD consecutive wave):** all eight waves delivered — W-8 the foundation (migrations 0100–0103 + every mirror/registry/catalog/matrix/pin + the +14 keys 312 → 326 + the D-16 flags/manifests + the approval amendments A-1/A-2) · W-9 the WBS + budgets + actuals engines (the pure layer first — three real scale bugs caught; BR-095's leaf-recomputed rollup; INV-033's typed reconciliation; ROUTE_PERMISSIONS 988 → 1007) · W-10 the EVM + change orders + IAS 23 (the two EV disciplines; BR-094/G-58's exactly-once gate; the REQUIRES_VERIFICATION register; 1007 → 1018) · W-11 the contracting core (**the declared migration 0104**; THE AP LINKAGE + G-55; the retention ledger + G-56; the progress billing + BR-092/093 + G-57 + the in-transaction invoice + the amortization; 1018 → 1038) · W-12 the field service + the web plane I (**THE SINGLE CLOCK SERVICE** — pause-aware, BR-096; the dispatch board API; the /projects WBS board; i18n 6,433 → 6,482; 1038 → 1051) · W-13 the web plane II + the print pack (the /projects/contracting screen; the /projects/fieldservice board; **the three bilingual prints** — `bi()` exclusively, deterministic, NO totals on the statement; i18n 6,482 → 6,620; 1051 → 1052; **the cumulative acceptance-criteria ledger opened**) · W-14 the reports + the proof (**the four contracts — registry 110 → 114**, all pins together; **the goldens G-55…G-58 with their failure packs**; the INV-033 + IAS-23 goldens; **the RLS A1–A10**; the OA-06 budgets; #1…#9 ALL GREEN) · **W-15 the closure: the canon docs in the D-18 wordings (JOURNAL_RULES G-55…G-58 + note 18 · ACCOUNTING_INVARIANTS INV-033 · BUSINESS_RULES BR-092…096 · NAVIGATION_MODEL §1.11 + the LIVE row · FEATURE_CATALOG §29 · the NEW TABLES doc `projects-contracting.md` · the PHASE_ACCEPTANCE_CRITERIA §PHASE-048 entry) + THE ID_LEDGER FLIP atomic with the canon rows (implemented G 58 · INV 33 · BR 96; the self-test all-probes-OK with probe (7) moved to G-59/PHASE-049) + the full gate sweep at the final head (typecheck/lint 8/8 · depcruise 2,054 · 15,372 unchanged · unit 8/8 — 141 files · 1,803 tests · **THE FULL DB SUITE 271/271 · 3,807/3,807 · 0 failed · 0 skipped in BOTH envelopes** — the EIGHT-PART plan with the THREE time-sensitive isolates (soak · fcm · email — the pre-isolation mandate, the regrouping declared) + the single-process run GREEN 553.18s inside the declared 680s ceiling; the scratch chain from zero 318/0 · drift 326 = 326 · i18n 6,620 + 371 · tokens 130/130 + 50/50 · manifests 13/13 · docs 33/33 · id-ledger 0 + self-test OK · secrets 0 (the two tag anchors verified untouched) · capabilities agree · shells PASS · the boundary PASS; **the four honest disclosures**: the email chunk flake + the soak full-run flake (the two-head protocol, both logs kept at each) · the environment-reset recovery (the fresh clone + the chromium headless-shell 1248 env-prep) · the typecheck cache-hit replacement; the F1 ledger-date correction 2026-11-22 → 2026-11-21 at the claim site) + the completion report (the cumulative W-8…W-15 reconciliation · the battery scope map · the FULL unit-package table · the ledger #1–#10 closed · the open-items log transferred) + THE TRIPLE FLIP (the phase doc header · the IMPLEMENTATION_STATUS row · this file) + the archive `ERP_PLATFORM_PHASE048.zip` (OA-07, the members byte-verified, the ADDITIVE-ONLY law verbatim — w8…w15 all intact) + THE TAG `phase/048`**. The completion report: `docs/implementation/phases/reports/PHASE-048-COMPLETION.md`. The W-15 evidence: `docs/operations/gate-evidence/2026-11-21-phase048-w15.md` + `audit-evidence/phase048-w15/`.
+**THE PLAN WAVE (W-0, delivered 2026-11-21 on the `ba459ff` delivery head —
+the tag `phase/048` — the same-session evidence rule's TWENTY-FOURTH
+consecutive wave):** `agent-ctx/PHASE-049-MASTER-PLAN.md` — the 046/047/048
+pattern (the plan-first reads over the phase doc + the gap analysis + the
+register constraints → the settled design decisions D-01…D-15 → the honest
+migration slots **0105–0108** (the journal ends `0104`, idx 103; the phase
+doc's 0083…0086 are stale blueprint slots, its own note defers — the 048 D-02
+precedent) → the task waves **W-16…W-23 over T-01…T-19** (§7 (a) — the
+numbering open input) → the test matrix with **the pre-isolation mandate from
+W-16** → the gate list → the red lines §6.1–§6.15). **The owner's three
+amended laws carried verbatim as red lines §6.13–§6.15 + §0b:** (1) THE
+CEILING LAW — السقف الفعلي = min(التوقع، حد الأمر − هامش) — a declared
+ceiling never above 570s, runs split BEFORE attempted (the 680>600
+contradiction class structurally impossible); (2) THE TIME-SENSITIVITY CLASS
+at seven → **EIGHT incidents** (the plan wave's own TOTP window-boundary
+flake — a NEW VARIANT, named: `identity-flows.db.spec.ts`'s M-06/M-07
+fresh-code login, `currentTimestep(Date.now() + 31_000)` in the last second
+of a 30s window resolves to step n+2 outside ±1 drift — NOT load-shaped;
+the spec standalone GREEN 21/21, the chunk GREEN on attempt 3, all three
+logs kept) — **RISK-033 added to the register** (the named open risk) + the
+isolate trio declared from the start; (3) THE ARCHIVE LAW — أرشفة الأرشيف
+ممنوعة — the 049 zip ALWAYS excludes the standing platform zips. **The
+acceptance-criteria ledger OPENED with the plan**
+(`PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-049 — the ten criteria, each with its
+ARMS and its WAVES; closes at W-23). **The owner's new law executed as the
+session's FIRST act:** the remote verified (`main` @ `ba459ff` = the tag
+`phase/048`; the three tags in place) → the fresh clone → the working tree
+reconciled (**312 missing files recovered from the remote** — 274 evidence
+logs the sandbox snapshot drops + the web unit test file + …; the post-restore
+diff CLEAN — on the unrestored tree the web package would have counted 16
+files against the owner's verified 17 · 147) — **البعيد مصدر الحقيقة
+الوحيد، وكل موجة 049 تبدأ بالتحقق أن المحلي = البعيد قبل أول سطر.**
 
-**NEXT — PHASE-049 (CMMS — Asset Maintenance, CR-19):** read the phase doc
-(`docs/implementation/phases/PHASE-049.md`) + the register row; the ID_LEDGER
-reservations stand (G-59…G-61 · INV-034 · BR-097…BR-100); the 048 handoff
-notes (the completion report §11): the work-order status machine, the board
-patterns and THE SINGLE CLOCK SERVICE (pause-aware SLA) shipped here are
-reused by maintenance work orders; the `project_resource_allocations` asset
-side hands the CMMS phase its cross-branch asset movement context; the 044
-asset register is the substrate. The first wave is the plan-authoring wave
-(the 046/047/048 pattern: read the phase doc + the gap-analysis sections +
-the register constraints → the master plan with the binding-amendment slots
-→ the owner's approval). **Standing constraints carried:** the same-session
-evidence rule (twenty-three consecutive waves and counting) · the scope-label
-law · the pre-isolation mandate for the time-sensitive specs (W-15's law —
-the three-isolate restructure) + the two-head protocol with both logs kept
-· the 043 hard review OPEN · RISK-031/032 OPEN · §7(b)'s three 045 remarks
-+ PHASE-047's §7(b) remarks (the owner's open inputs, never restated) · the
-register's exactly-two narrowed items · the 045 self-board Tabs defect (the
-owner dispatches) · the time-sensitivity class NUMBERED OPEN at seven
-incidents · **NOT production approval** (the tag `phase/048` is DELIVERY,
-never acceptance — the §1a (a) ruling).
+**The plan wave's evidence envelope** (`audit-evidence/phase049-plan/` —
+every log this session, the guarded wrapper): typecheck 8/8 (`--force`) ·
+lint 8/8 · depcruise **2,054 · 15,372 (the W-15 count EXACT)** · unit 8/8 —
+**141 · 1,803 = the owner's verified ledger EXACT (816+147+840)** · **THE
+FULL DB SUITE 271/271 · 3,807/3,807 · 0 failed · 0 skipped — the
+EIGHT-PART ENVELOPE** (the three isolates standalone FIRST — soak 228.34s ·
+fcm · email; then smoke 3·1,783 + perf-rest 5·23 + a 86·651 + b-rest 86·625
++ c 88·711; the coverage verified BEFORE the first run — union == inventory
+271/271; the parts' sum 640.61s; **the single-process one-command run NOT
+attempted — its ≈615s expectation exceeds the 570s effective ceiling →
+split before attempted, the law's own prescription**) · the standalone
+scratch `check:rls` **318/0** (the 104-chain from zero) · drift **326 =
+326** · i18n **6,620 = 6,620** + mobile **371 = 371** + tokens **130/130 +
+50/50** · manifests **13/13** · docs:validate **33/33** · id-ledger **0
+errors + self-test all-probes-OK** (implemented G 58 · INV 33 · BR 96;
+reservations 16 · 45) · secrets **0** (the THREE tag anchors verified
+untouched) · capabilities agree · shells PASS · boundary PASS. **The three
+honest disclosures:** the environment-reset recovery + the 312-file restore
+(§0a) · the TOTP boundary incident (three logs kept; the spec-side
+one-liner forward fix recorded for W-16's entry — the owner dispatches) ·
+the two i18n-checker invocation slips (replaced immediately, disclosed).
+
+**NEXT — BLOCKED ON THE OWNER'S APPROVAL DISPATCH** (الإطلاق بإذني بعد
+موافقة الخطة، وليست موافقة إنتاج): the plan's §7 open inputs — **(a)** the
+wave numbering (the plan proposes the global continuation W-16…W-23 per the
+§1a (b) no-collision precedent; the dispatch's «من W-1» read as "from the
+first implementation wave" — the owner confirms or overrides) · **(b)** the
+RISK-033 register row (added with this plan; the owner confirms or amends
+the wording) · **(c)** the G-59/G-60 presentation decision (the fused-entry
+shape proposed, D-05; the owner may rule the two-entry shape) · **(d)** the
+standing carried items — the 043 hard review OPEN · RISK-031/032 OPEN ·
+§7(b)'s three 045 remarks + PHASE-047's §7(b) remarks · the register's
+exactly-two narrowed items (SANED 15,000 + EOSB M/51 Art. 84) · the 045
+self-board Tabs defect (the owner dispatches) · the time class at EIGHT
+(RISK-033) · **NOT production approval.** On approval: **W-16 — the
+foundation** (migrations 0105–0108 + every mirror/registry/catalog/matrix/
+pin in ONE increment; +10 keys 326 → 336; the flags + the four template
+manifests; the pre-isolation mandate from this wave; the TOTP spec fix if
+dispatched).

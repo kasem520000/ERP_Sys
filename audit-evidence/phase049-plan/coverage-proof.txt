@@ -1,0 +1,37 @@
+PHASE-049 PLAN-WAVE PRECOMPUTED COVERAGE PROOF (built BEFORE the first run — the
+owner's clause-9 pattern, the W-15 shape; every number this session's own count)
+
+THE EIGHT-PART ENVELOPE (the W-15 restructure inherited as the standing shape —
+the plan §0b (2): the isolate trio declared from the start, the pre-isolation
+mandate applied at the PLAN wave itself — the isolates run standalone FIRST):
+  chunk-smoke     3 files (migrations + the isolation family)   1,783 tests expected
+  isolate-soak    1 file  (performance/soak-shaped)                 1 test  expected
+  chunk-perf-rest 5 files (the perf family minus soak)             23 tests expected
+  isolate-fcm     1 file  (notifications/fcm-channel)               8 tests expected
+  isolate-email   1 file  (notifications-email — the flake isolate) 5 tests expected
+  chunk-a        86 files
+  chunk-b-rest   86 files
+  chunk-c        88 files
+TOTAL: 271 files · 3,807 tests (the W-15 delivered count — the plan wave ships
+ZERO production code; the tree is the ba459ff delivery head restored byte-faithful
+from the remote, §0a of the plan).
+COVERAGE VERIFIED BEFORE THE FIRST RUN: union == disk inventory 271 == 271,
+unique 271 — no duplicates — comm diff EMPTY (the lists: coverage-inventory.txt
++ coverage-union.txt + parts.json).
+
+THE TIME CEILING — COMPUTED BEFORE THE RUNS UNDER THE AMENDED LAW (the owner's
+2026-11-21 dispatch, §0b (1) of the plan): السقف الفعلي = min(التوقع، حد الأمر −
+هامش).
+- The expectation: the W-15 single-process delivered run 553.18s at the same
+  271 · 3,807 count on a speed-equal machine (the W-15 boot-normalized
+  comparison precedent); this session's estimate ~555s ± variance.
+- The harness command cap: 600s; the safety margin: 30s → the EFFECTIVE CEILING
+  **570s** — min(666, 570) = 570. **THE 680>600 CONTRADICTION CLASS IS
+  STRUCTURALLY IMPOSSIBLE UNDER THIS LAW**: no declared ceiling may exceed 570s
+  for any single-command run, and a run whose full-command expectation (the
+  vitest duration + the PG boot + the chain + the teardown ≈ 555 + ~60 ≈ 615s)
+  EXCEEDS the effective ceiling is SPLIT BEFORE IT IS ATTEMPTED — which is why
+  this plan wave runs the EIGHT-PART ENVELOPE (every part's full command well
+  under the cap) and does NOT attempt the single-process run in one command.
+  The eight parts' expected sum ≈ 632s + eight PG boots, each part standalone
+  inside the cap — declared here, before the first run.

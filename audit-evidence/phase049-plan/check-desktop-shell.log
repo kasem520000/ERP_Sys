@@ -1,0 +1,53 @@
+
+> erp-platform@0.1.0 check:desktop-shell /home/z/my-project/ERP_Sys
+> tsx scripts/check-desktop-shell.ts --silent
+
+check:desktop-shell — PHASE-021 T1/T12 structural gate (source-only shell; CI compiles)
+
+== 1. src-tauri/tauri.conf.json invariants
+  ✓ identifier is "com.erp.desktop"
+  ✓ productName is "ERP Desktop"
+  ✓ frontendDist resolves to apps/web/out-desktop (from src-tauri: "../../web/out-desktop")
+  ✓ bundle targets include nsis + msi
+  ✓ bundle.createUpdaterArtifacts enabled (updater .sig artifacts)
+  ✓ updater endpoints carry the {{target}}/{{current_version}} channel template
+  ✓ updater pubkey present (CI injects the real key — placeholder <set-by-CI> documented)
+
+== 2. DesktopBridge contract ↔ Rust command parity
+  ✓ contract member groups parsed: sync(2), keychain(3), sql(2), http(1), updater(2), system(2), print(2), connectivity(2) — 16 members
+  ✓ Rust #[tauri::command] fns: 15
+  ✓ generate_handler! registrations: 15
+  ✓ sync.syncNow → sync_sync_now (#[tauri::command] + registered)
+  ✓ sync.pushNow → sync_push_now (#[tauri::command] + registered)
+  ✓ keychain.get → keychain_get (#[tauri::command] + registered)
+  ✓ keychain.set → keychain_set (#[tauri::command] + registered)
+  ✓ keychain.delete → keychain_delete (#[tauri::command] + registered)
+  ✓ sql.execute → sql_execute (#[tauri::command] + registered)
+  ✓ sql.query → sql_query (#[tauri::command] + registered)
+  ✓ http.request → http_request (#[tauri::command] + registered)
+  ✓ updater.checkNow → updater_check_now (#[tauri::command] + registered)
+  ✓ updater.install → updater_install (#[tauri::command] + registered)
+  ✓ system.webview2Version → system_webview2_version (#[tauri::command] + registered)
+  ✓ system.osInfo → system_os_info (#[tauri::command] + registered)
+  ✓ print.printRaw → print_print_raw (#[tauri::command] + registered)
+  ✓ print.printHtml → print_print_html (#[tauri::command] + registered)
+  ✓ connectivity.onChange → event "erp:connectivity" present in the Rust sources
+  ✓ connectivity.isOnline → connectivity_is_online (#[tauri::command] + registered)
+  ✓ reverse parity: all 15 registered commands map to contract members
+
+== 3. apps/web/desktop.routes.json — the shell export manifest
+  ✓ include: [offline, unlock]
+  ✓ reserved server surfaces (api, middleware) are never shadowed
+  ✓ every manifest route exists as app/[locale]/<route>/page.tsx (2/2)
+
+== 4. apps/web/out-desktop — the exported shell (skipped when not built)
+  ○ export not built (run pnpm --filter @erp/web build:desktop) — PASS with note
+
+== 5. secret scan — shell configs
+  ✓ src-tauri/tauri.conf.json: no key-looking material
+  ✓ src-tauri/Cargo.toml: no key-looking material
+  ✓ src-tauri/capabilities/default.json: no key-looking material
+
+check:desktop-shell: PASS — shell sources structurally valid
+  (honest note: the Rust crate is compiled only by .github/workflows/desktop-release.yml)
+EXIT=0

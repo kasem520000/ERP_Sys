@@ -1,0 +1,103 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-21 05:08:09.556 UTC [8120] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-21 05:08:09.556 UTC [8120] LOG:  listening on IPv6 address "::1", port 35073
+2026-11-21 05:08:09.556 UTC [8120] LOG:  listening on IPv4 address "127.0.0.1", port 35073
+
+2026-11-21 05:08:09.556 UTC [8120] LOG:  listening on Unix socket "/tmp/.s.PGSQL.35073"
+
+2026-11-21 05:08:09.557 UTC [8123] LOG:  database system was shut down at 2026-11-21 05:08:09 UTC
+
+2026-11-21 05:08:09.559 UTC [8120] LOG:  database system is ready to accept connections
+
+{"level":40,"time":1795237696177,"service":"erp-api","module":"identity","user_id":"01a1fc81-502d-7000-8c62-f9a0ffd03789","msg":"temporary lockout engaged (R-01)"}
+{"level":40,"time":1795237696319,"service":"erp-api","module":"identity","email_hash":"405489a6a8e8","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696596,"service":"erp-api","module":"identity","email_hash":"fe90e9be6563","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696597,"service":"erp-api","module":"identity","email_hash":"236f1b9d195a","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696598,"service":"erp-api","module":"identity","email_hash":"0b62835181c6","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696599,"service":"erp-api","module":"identity","email_hash":"1c3ae17b41ed","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696600,"service":"erp-api","module":"identity","email_hash":"f794a635dbba","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696601,"service":"erp-api","module":"identity","email_hash":"a0a18e76e0be","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696601,"service":"erp-api","module":"identity","email_hash":"6411faf0d2b7","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696602,"service":"erp-api","module":"identity","email_hash":"3bea867b9b16","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696603,"service":"erp-api","module":"identity","email_hash":"3b789b5ed688","msg":"login attempt for unknown email"}
+{"level":40,"time":1795237696603,"service":"erp-api","module":"identity","email_hash":"2b71691224f2","msg":"login attempt for unknown email"}
+{"level":30,"time":1795237697624,"service":"erp-api","module":"identity","user_id":"01a1fc81-57ce-7000-8e64-c309d7010801","msg":"password reset consumed; all sessions revoked"}
+ ✓ src/__db__/identity-flows.db.spec.ts (21 tests) 4600ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > argon2id-verified login issues a rotating session and records user.login  335ms
+   ✓ login + progressive lockout (R-01, R-02, acceptance 1/2) > progressive lockout: N failures → temporary lock, never permanent; counters reset on success (R-01)  920ms
+   ✓ TOTP MFA (M-06, M-07, acceptance 3) > enroll → verify confirms; same-code replay rejected; recovery codes single-use  552ms
+   ✓ invitations (acceptance flow; single-use/expiry/revocation) > issue → accept creates membership + PENDING user path with password; token single-use  304ms
+   ✓ route × role permission checklist (acceptance 5) > every protected route: owner template grants it, viewer template does not (identity/audit plane)  308ms
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  05:08:08
+   Duration  10.90s (transform 588ms, setup 0ms, collect 1.33s, tests 4.60s, environment 0ms, prepare 59ms)
+
+2026-11-21 05:08:19.644 UTC [8120] LOG:  received fast shutdown request
+
+2026-11-21 05:08:19.644 UTC [8120] LOG:  aborting any active transactions
+2026-11-21 05:08:19.644 UTC [8213] FATAL:  terminating connection due to administrator command
+2026-11-21 05:08:19.645 UTC [8120] LOG:  background worker "logical replication launcher" (PID 8126) exited with exit code 1
+
+2026-11-21 05:08:19.647 UTC [8211] FATAL:  terminating connection due to administrator command
+
+2026-11-21 05:08:19.650 UTC [8121] LOG:  shutting down
+2026-11-21 05:08:19.650 UTC [8121] LOG:  checkpoint starting: shutdown immediate
+
+(node:8183) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:8183) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-21 05:08:19.674 UTC [8121] LOG:  checkpoint complete: wrote 2938 buffers (17.9%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.017 s, sync=0.008 s, total=0.025 s; sync files=2614, longest=0.001 s, average=0.001 s; distance=28799 kB, estimate=28799 kB; lsn=0/30FE6E0, redo lsn=0/30FE6E0
+
+2026-11-21 05:08:19.682 UTC [8120] LOG:  database system is shut down
+
+VITEST_EXIT=0

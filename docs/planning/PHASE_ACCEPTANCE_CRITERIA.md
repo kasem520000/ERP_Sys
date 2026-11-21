@@ -603,6 +603,87 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
   administrative request (a)); the open-items log transferred explicitly
   (the 043 hard review · RISK-031/032 · the 045 notes · the Tabs defect).
 
+### PHASE-049 — CMMS — Asset Maintenance (OPENED AT PLAN 2026-11-21 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-049-MASTER-PLAN.md` §3/§4 is the binding division)
+
+1. **Migrations 0105–0108 apply cleanly from zero with re-apply no-op;
+   Drizzle mirror parity; all 8 new tables + the `assets` column family have
+   ENTITY_CATALOG rows (318 → 326) and the fixed-assets TABLES doc
+   extension.** — *Arms:* the migration chain spec pinned to 108 (the
+   from-zero boot embedded in every full run) · the standalone scratch
+   `check:rls` 326/0 · the drift checker **336 = 336** (the +10 keys
+   seeded). *Waves:* W-16 (opens) · re-proven at every full sweep · W-23
+   (closes with the standalone scratch at the final head).
+2. **The work-order status machine enforces REQUESTED→PLANNED→IN_PROGRESS→
+   ON_HOLD→COMPLETED only; completion is BLOCKED while checklist steps are
+   open (BR-098) or cost lines are unposted/unpriced.** — *Arms:*
+   `cmms-workorders.db.spec` — the legal ladder walks, every illegal
+   transition refused BY NAME, the open-step completion refusal carrying the
+   open count, the unpriced-labor completion refusal (an unset rate =
+   UNPRICED, never a fabricated rate). *Waves:* W-17 (proves) · W-20 (the
+   board renders the machine's states verbatim).
+3. **The goldens pass on the seeded chart through the posting engine with
+   balanced entries: G-59 (maintenance expense at completion — labor +
+   parts + external, the asset's cost and depreciation UNTOUCHED) · G-60
+   (spares consumption — the inventory-issue leg under BR-099's
+   no-negative-stock floor) · G-61 (transfer approval — the NBV
+   reclassification between branch cost centers, posted exactly once,
+   BR-100)** — all idempotent (INV-013), with the failure packs. — *Arms:*
+   the posting arms at W-17/W-18 + **W-22's golden transcripts with the
+   MANDATORY failure packs** (the typed refusals WITH their full payloads,
+   the zero residue, the flip-and-restore with the green re-run). *Waves:*
+   W-17 (G-59) · W-18 (G-60/G-61) · W-22 (the transcripts close).
+4. **INV-034 holds: per work order, the GL maintenance expense equals the
+   sum of its labor, parts and external source lines TO THE CENT; no
+   posting occurs before completion.** — *Arms:* the cost collectors' typed
+   reconciliation with the per-leg breakdown + **W-22's INV-034 golden (the
+   poisoned world's typed refusal — the INV-033 pattern)**. *Waves:* W-17
+   (opens with the collectors) · W-22 (the golden closes).
+5. **Preventive plans behave: a CALENDAR plan generates on its day interval;
+   a METER plan generates when the reading delta crosses its threshold; at
+   most one open order per asset per trigger window (BR-097); back-dated
+   readings cannot double-trigger.** — *Arms:* `cmms-plans.db.spec` — the
+   calendar due-date walk, the meter-threshold crossing, the single-open
+   refusal, the back-dated no-double-trigger arm (the anchor is the
+   generation's own stamp). *Waves:* W-17 (the calendar side + the plans
+   API) · W-18 (the meter side completes it).
+6. **Meter readings validate monotonically per meter with effective-date
+   order; the last-reading snapshot and the usage views reconcile with the
+   log.** — *Arms:* `cmms-meters.db.spec` — the monotonic refusal carrying
+   both values, the effective-date insertion order, the snapshot/usage
+   reconciliation, the JOB-source readings. *Waves:* W-18.
+7. **Asset tags: generated codes are unguessable and unique; scanning
+   resolves to the asset card (the standard auth + RLS stack — a foreign
+   tenant's scan is a typed 404); the print sheet renders AR/EN with RTL
+   correctness, deterministic byte-identical.** — *Arms:* `cmms-tags.db.spec`
+   (the code entropy/uniqueness, the signature verification, the scan
+   resolution + the foreign-tenant refusal) + the print spec (both
+   directions, `bi()` exclusively — the W-13 law). *Waves:* W-19 (the API
+   arms) · W-21 (the print + the scan surface close it).
+8. **The `asset-expiry-sweep` fires 30/7/0-day alerts for warranty,
+   insurance and license — and inspection where a tenant tracks it (the
+   R-10 fleet-light class) — deduplicated; evidence in the job log and the
+   notification records.** — *Arms:* `cmms-expiry-sweep.db.spec` — the three
+   windows + the fourth class, the dedupe key per asset+class+window+day.
+   *Waves:* W-19.
+9. **The CR-36 gates: +10 permission keys with zero-drift equality (326 →
+   336 = 336 at every wave) · i18n parity BY BOTH COUNTS from the first
+   surface wave (each web wave declares its delta; mobile 371 standing) ·
+   the RLS attack matrix A1–A10 over all EIGHT new tables (the hostile
+   worlds, the composite-FK law offensively proven) · flag/template gating
+   verified (the D-16 composable units; automotive-workshop, rental-
+   logistics, healthcare, food-manufacturing compose by default) ·
+   `docs:validate` green · the OA-06 budgets (indexes + EXPLAIN on the
+   readings insert, the boards and the service-history timeline).** —
+   *Waves:* W-16 (the keys) · W-20/W-21 (the i18n both counts + the flag
+   gating + the boards) · W-22 (the RLS + the OA-06 close them).
+10. **The completion report `reports/PHASE-049-COMPLETION.md` with the
+    cumulative ledger #1–#10 walked and closed (every wave's evidence
+    pointers) + the IMPLEMENTATION_STATUS flip + the archive
+    `ERP_PLATFORM_PHASE049.zip` (OA-07 — EXCLUDING every standing platform
+    zip: the amended archive law, أرشفة الأرشيف ممنوعة) + the tag
+    `phase/049` (DELIVERY, never acceptance).** — *Waves:* W-23 (closes the
+    ledger and the phase; the open-items log transferred explicitly).
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

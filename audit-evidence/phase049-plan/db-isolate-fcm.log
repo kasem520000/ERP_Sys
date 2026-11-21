@@ -1,0 +1,104 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-21 05:02:57.744 UTC [4348] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-21 05:02:57.744 UTC [4348] LOG:  listening on IPv6 address "::1", port 42445
+2026-11-21 05:02:57.744 UTC [4348] LOG:  listening on IPv4 address "127.0.0.1", port 42445
+
+2026-11-21 05:02:57.744 UTC [4348] LOG:  listening on Unix socket "/tmp/.s.PGSQL.42445"
+
+2026-11-21 05:02:57.745 UTC [4351] LOG:  database system was shut down at 2026-11-21 05:02:57 UTC
+
+2026-11-21 05:02:57.747 UTC [4348] LOG:  database system is ready to accept connections
+
+{"level":30,"time":1795237390287,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795237390824,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795237390858,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795237391321,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ab2b-7000-a947-8166d10e1fa1","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":174,"msg":"request completed"}
+{"level":30,"time":1795237391472,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-abe0-7000-826b-bf5ce4481210","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":144,"msg":"request completed"}
+{"level":30,"time":1795237391509,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ac75-7000-a24b-1765f4dc3652","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a90d-7000-bd50-af010f73892f/push-token","status":200,"duration_ms":32,"msg":"request completed"}
+{"level":30,"time":1795237391512,"service":"erp-api","module":"notifications","channel":"fcm","template":"invoice_posted_to_customer","rendered_for":"ar","ok":true,"provider_message_id":"projects/fake-project/messages/fcm-0001","msg":"fcm send resolved"}
+{"level":30,"time":1795237391534,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ac9b-7000-9b94-c0224b08c0ff","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a923-7000-87a1-86b034c15493/push-token","status":200,"duration_ms":19,"msg":"request completed"}
+{"level":30,"time":1795237391536,"service":"erp-api","module":"notifications","channel":"fcm","template":"receipt_confirmed","rendered_for":"en","ok":true,"provider_message_id":"projects/fake-project/messages/fcm-0002","msg":"fcm send resolved"}
+{"level":30,"time":1795237391553,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-acb3-7000-bd33-528fa444b0e4","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a90d-7000-bd50-af010f73892f/push-token","status":200,"duration_ms":14,"msg":"request completed"}
+{"level":30,"time":1795237391573,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-accb-7000-a9e8-338c04956a8a","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a90d-7000-bd50-af010f73892f/push-token","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":40,"time":1795237391575,"service":"erp-api","module":"notifications","channel":"fcm","dropped":["amount","price","total","balance","qty","value"],"tenant_id":"53535353-5353-5353-5353-535353535353","msg":"fcm data keys dropped (not in the safe mobile whitelist)"}
+{"level":30,"time":1795237391576,"service":"erp-api","module":"notifications","channel":"fcm","template":"invoice_posted_to_customer","rendered_for":"ar","ok":true,"provider_message_id":"projects/fake-project/messages/fcm-0003","msg":"fcm send resolved"}
+{"level":40,"time":1795237391577,"service":"erp-api","module":"notifications","channel":"fcm","tenant_id":"53535353-5353-5353-5353-535353535353","inWindow":3,"limit":2,"msg":"fcm send over per-tenant quota — reported ok:false (counted, not thrown)"}
+{"level":40,"time":1795237391577,"service":"erp-api","module":"notifications","channel":"fcm","tenant_id":"53535353-5353-5353-5353-535353535353","inWindow":4,"limit":2,"msg":"fcm send over per-tenant quota — reported ok:false (counted, not thrown)"}
+{"level":40,"time":1795237391702,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel disabled (FCM_CREDENTIALS unset) — sends are no-ops reported as ok:false"}
+{"level":30,"time":1795237391708,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad59-7000-ad74-70310a81d64c","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a926-7000-a505-f6e7394580db/push-token","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795237391718,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad5e-7000-98ac-f54a09898156","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a926-7000-a505-f6e7394580db/push-token","status":403,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795237391729,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad68-7000-b5c6-a516ca66a137","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a925-7000-bd80-bb8310c622d3/push-token","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795237391750,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad73-7000-88fc-2a32a546b129","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a925-7000-bd80-bb8310c622d3/push-token","status":422,"duration_ms":19,"msg":"request completed"}
+{"level":30,"time":1795237391762,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad88-7000-801a-207803768103","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a925-7000-bd80-bb8310c622d3/push-token","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1795237391773,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad94-7000-8812-e6ded8154193","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a925-7000-bd80-bb8310c622d3/push-token","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795237391783,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-ad9f-7000-aa55-44188a341672","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a926-7000-a505-f6e7394580db/push-token","status":422,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795237391814,"service":"erp-api","module":"http","correlation_id":"01a1fc7c-adc0-7000-9280-9bda02d47535","action":"request","method":"PUT","path":"/api/v1/devices/01a1fc7c-a925-7000-bd80-bb8310c622d3/push-token","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795237391844,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/notifications/fcm-channel.spec.ts (8 tests) 1600ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  05:02:56
+   Duration  14.91s (transform 5.11s, setup 0ms, collect 8.98s, tests 1.60s, environment 0ms, prepare 56ms)
+
+2026-11-21 05:03:11.860 UTC [4348] LOG:  received fast shutdown request
+
+2026-11-21 05:03:11.860 UTC [4348] LOG:  aborting any active transactions
+
+2026-11-21 05:03:11.862 UTC [4348] LOG:  background worker "logical replication launcher" (PID 4354) exited with exit code 1
+2026-11-21 05:03:11.863 UTC [4349] LOG:  shutting down
+2026-11-21 05:03:11.863 UTC [4349] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-21 05:03:11.886 UTC [4349] LOG:  checkpoint complete: wrote 3026 buffers (18.5%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.015 s, sync=0.009 s, total=0.024 s; sync files=2938, longest=0.001 s, average=0.001 s; distance=29254 kB, estimate=29254 kB; lsn=0/31700E0, redo lsn=0/31700E0
+
+2026-11-21 05:03:11.894 UTC [4348] LOG:  database system is shut down
+
+VITEST_EXIT=0

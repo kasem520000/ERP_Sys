@@ -1,0 +1,41 @@
+
+> erp-platform@0.1.0 docs:validate /home/z/my-project/ERP_Sys
+> python3 scripts/validate_docs.py --silent
+
+PASS  1a. all relative links resolve
+PASS  1b. 13 extracted manifests parse with industry.* ids
+PASS  2. phase refs within 001-065 (v3.0) and canon client labels (desktop=021/android=022)
+PASS  3a. DEF-001 per-type money patterns present (API_CONVENTIONS §7)
+PASS  3b. DEF-001 ADR-0009 corrected (blanket 1,8 regex gone from money line)
+PASS  3c. DEF-004 enums registered (VAT_PLANNED_EINVOICING + FAILED)
+PASS  3d. DEF-007 permission keys follow ownership (sales.receipts / purchasing.payments in matrix)
+PASS  3e. DEF-007 no residual treasury.receipts./treasury.payments. permission keys
+PASS  3f. DEF-006 no residual CASH_BANK purpose key (outside the defect-log descriptions)
+PASS  3g. DEF-006 OPENING_EQUITY purpose registered
+PASS  3h. DEF-008 canonical machine ids in template index
+PASS  3i. DEF-009 validation-report count corrected
+PASS  3j. DEF-010 deferred balance trigger present
+PASS  3k. CD-05 marketing rule present
+PASS  3l. CD-04 login idempotency exclusion present
+PASS  3m. CD-10 status badge binding present
+PASS  3n. CD-03 tafqit present
+PASS  3o. CD-01 effect-matrix gate present
+PASS  3p. CD-11 costing-picking decoupling present
+PASS  3q. AD-17 ADR-0017 present and indexed
+PASS  4a. authoritative consolidated documents exist
+PASS  4b. ADR set 0001..0019 complete
+PASS  4c. 68 phase documents present (34 baseline + 31 v3.0 + 3 v3.1)
+INFO  total markdown files under docs/: 451
+PASS  4d. EXPANSION_REGISTER present with ED-01..ED-19
+PASS  4e. six v2.0 modules present in FEATURE_CATALOG
+PASS  4f. v2.0 entities present in ENTITY_CATALOG
+PASS  4g. v2.0 decision records + ADR-0018 present and indexed
+PASS  4h. PHASE-026..034 present with 8 canonical headings
+PASS  4i. v2.0 cross-references registered (G-21..32, INV-023..26, BR-041..056, reports, perms, nav)
+PASS  8a. v3.0/v3.1 register + roadmap present (CR-01..CR-48, phases 035..068)
+PASS  8b. PHASE-035..068 present with 8 canonical headings + planned status
+PASS  8c. the three first-round audit reports + the two v3.1 layer files + the v3.2 residual file preserved under planning/gap-analysis/
+PASS  8d. v3.2 residual-layer artifacts (Layer-3 file R-01..R-15 + directive + CR-49..52 + roadmap §6.5/548)
+
+33/33 checks passed.
+EXIT=0
