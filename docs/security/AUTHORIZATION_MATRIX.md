@@ -895,6 +895,25 @@ assets.expiry.view — INV-034's GL reconciliation plane + the renewal registers
 operational keys stay owner-only — maintenance operations are tenant-granted beyond the
 baseline). The alert surfaces ride the notifications' own permission plane — no new key.
 
+> **[Dated 2026-11-21 (PHASE-049 W-18 — T-08/T-09/T-10, the meters + spares +
+> transfers wave): the second binding wave — ROUTE_PERMISSIONS 1,077 + 16 =
+> 1,093.]** Three families bind: the `/api/v1/assets/meters*` family (6 rows —
+> the reads on `assets.meters.view`; THE READINGS, the event surface that
+> evaluates the METER plans in the reading's own transaction, on
+> `assets.meters.record`; the meter AUTHORING — the register + R-10's odometer
+> designation — on `assets.maintenance.manage`, the DECLARED INTERPRETATION:
+> the meters keys are view/record only and the designation is a
+> maintenance-management act, the maintenance plane's operational write), the
+> `/api/v1/assets/spares*` family (4 rows on the single `assets.spares.manage`
+> key — the BOM's own key set above), and the `/api/v1/assets/transfers*`
+> family (6 rows with THE SoD SPLIT: the reads on `assets.transfer.view`; the
+> authoring + the submission on `assets.maintenance.manage` — the CREATOR's
+> key; the VERDICTS — approve (the G-61 gate) + reject — on
+> `assets.transfer.approve`, the APPROVER's key; creator ≠ approver at the key
+> plane AND at the service's SoD backstop, §4). The tsx recount this wave:
+> **1,093 rows, 41 on the assets.* keys** (25 + 16). The tags/expiry families
+> bind with W-19/W-20; the web planes (W-20/W-21) on the same keys.
+
 > **[Dated 2026-11-21 (PHASE-049 W-17 — T-05/T-06/T-07, the work-order engine + plans): the
 > first binding wave — ROUTE_PERMISSIONS 1,052 + 25 = 1,077.]** The 0108-seeded keys' first
 > route rows land: the `/api/v1/assets/maintenance/orders*` family (14 rows — the board's

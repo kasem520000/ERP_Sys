@@ -26,11 +26,19 @@ import { FixedAssetsReconciliationService } from "./application/fixed-assets-rec
 // core's plain functions (the service-order-posting precedent).
 import { MaintenanceWorkOrderService } from "./application/maintenance-work-order-service";
 import { MaintenancePlanService } from "./application/maintenance-plan-service";
+// PHASE-049 (W-18 — T-08/T-09/T-10): the meters + spares + transfers plane.
+import { AssetMetersService } from "./application/asset-meters-service";
+import { AssetSparesService } from "./application/asset-spares-service";
+import { AssetTransfersService } from "./application/asset-transfers-service";
 import { registerDepreciationJobs } from "./infrastructure/depreciation-assembly.job";
 import { getBoss } from "../../infra/jobs/boss";
 import { FixedAssetsController } from "./presentation/fixed-assets.controller";
 import { MaintenanceController } from "./presentation/maintenance.controller";
 import { MaintenancePlansController } from "./presentation/maintenance-plans.controller";
+// PHASE-049 (W-18 — T-08/T-09/T-10).
+import { AssetMetersController } from "./presentation/asset-meters.controller";
+import { AssetSparesController } from "./presentation/asset-spares.controller";
+import { AssetTransfersController } from "./presentation/asset-transfers.controller";
 
 /**
  * Fixed-assets module (PHASE-026; DR-002 option A): purpose-linked asset
@@ -52,7 +60,15 @@ import { MaintenancePlansController } from "./presentation/maintenance-plans.con
  */
 @Module({
   imports: [AccountingModule, AuditModule, NotificationsModule],
-  controllers: [FixedAssetsController, MaintenanceController, MaintenancePlansController],
+  controllers: [
+    FixedAssetsController,
+    MaintenanceController,
+    MaintenancePlansController,
+    // PHASE-049 (W-18): the meters + spares + transfers routes.
+    AssetMetersController,
+    AssetSparesController,
+    AssetTransfersController,
+  ],
   providers: [
     CategoryService,
     AssetService,
@@ -68,6 +84,14 @@ import { MaintenancePlansController } from "./presentation/maintenance-plans.con
     // PHASE-049 (W-17): the CMMS plane.
     MaintenanceWorkOrderService,
     MaintenancePlanService,
+    // PHASE-049 (W-18 — T-08/T-09/T-10): the meters + spares + transfers
+    // plane (the meters service consumes the plan-evaluation fold through
+    // the plan service; the transfers service posts G-61 through the REAL
+    // engine; the spares BOM never writes inventory — the consumption is
+    // the W-17 completion act's REAL WMS path).
+    AssetMetersService,
+    AssetSparesService,
+    AssetTransfersService,
   ],
   exports: [
     CategoryService,
@@ -85,6 +109,10 @@ import { MaintenancePlansController } from "./presentation/maintenance-plans.con
     // plan-evaluation fold through the plan service).
     MaintenanceWorkOrderService,
     MaintenancePlanService,
+    // PHASE-049 (W-18): the meters + spares + transfers plane.
+    AssetMetersService,
+    AssetSparesService,
+    AssetTransfersService,
   ],
 })
 export class FixedAssetsModule implements OnModuleInit {

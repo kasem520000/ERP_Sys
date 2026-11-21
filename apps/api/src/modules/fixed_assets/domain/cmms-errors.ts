@@ -284,3 +284,216 @@ export class CmmsMeterNotFoundError extends DomainError {
     );
   }
 }
+
+// ═══ W-18 (T-08/T-09/T-10) — the meters + spares + transfers plane ══════════
+
+// -- the meters (D-07 — R-10's write-path arms, the monotonic law) ----------
+
+/**
+ * R-10's KM-only odometer law (0106's ck_asset_meters_odometer_gated made
+ * typed): the odometer designation is the KM-type meter's — never a
+ * hours/production/custom odometer (the fleet register reads THE odometer
+ * of a vehicle-class asset).
+ */
+export class CmmsOdometerNotKmError extends DomainError {
+  constructor(details: { meterId?: string; type: string; action: string }) {
+    super(
+      "ODOMETER_NOT_KM",
+      `the odometer designation is the KM-type meter's — a ${details.type} meter never carries it (${details.action}; R-10's fleet-light binding: the register reads THE odometer of a vehicle-class asset) / تعيين عداد المسافة لعدّاد من نوع كم فقط — ربط أسطول R-10`,
+      details,
+    );
+  }
+}
+
+/**
+ * R-10's one-per-asset designation (0106's uq_asset_meters_tenant_asset_
+ * odometer made typed): ONE odometer per asset — the second designation
+ * refuses BY NAME carrying the standing one.
+ */
+export class CmmsOdometerAlreadyDesignatedError extends DomainError {
+  constructor(details: {
+    assetId: string;
+    existingMeterId: string;
+    existingMeterName: string;
+    action: string;
+  }) {
+    super(
+      "ODOMETER_ALREADY_DESIGNATED",
+      `asset ${details.assetId} already carries its odometer (meter ${details.existingMeterName} — ${details.existingMeterId}); ONE odometer designation per asset (${details.action}; R-10) / عدّاد مسافة واحد لكل أصل — R-10`,
+      details,
+    );
+  }
+}
+
+/**
+ * D-07's monotonic law (the 0106 header's own W-18 assignment): a reading
+ * below the meter's current snapshot refuses — the typed error carries
+ * BOTH values (the snapshot and the refused reading).
+ */
+export class CmmsMeterRegressionError extends DomainError {
+  constructor(details: { meterId: string; snapshotValue: string; readingValue: string }) {
+    super(
+      "METER_REGRESSION",
+      `meter ${details.meterId} stands at ${details.snapshotValue} — the reading ${details.readingValue} is below the current snapshot (the monotonic law: a reading below the meter's snapshot refuses, both values named; a back-dated-but-HIGHER reading is legal and moves the snapshot) / قراءة أدنى من لقطة العدّاد تُرفض بالقيمتين — والقراءة المؤخّرة الأعلى قانونية وتحرّك اللقطة`,
+      details,
+    );
+  }
+}
+
+/**
+ * D-07's JOB-link law (0106's ck_asset_meter_readings_job_link made
+ * typed): the JOB source and the work-order link exist together or not at
+ * all — and the linked order is a COMPLETED one (the technician's
+ * completion-time entry; a mid-job reading is the MANUAL source).
+ */
+export class CmmsReadingJobLinkError extends DomainError {
+  constructor(details: {
+    message: string;
+    workOrderStatus?: string;
+  }) {
+    super("READING_JOB_LINK", details.message, details);
+  }
+}
+
+/** A reading's linked work order must exist in this tenant (the FK's
+ * typed first line). */
+export class CmmsReadingWorkOrderNotFoundError extends DomainError {
+  constructor(details: { workOrderId: string }) {
+    super(
+      "READING_WORK_ORDER_NOT_FOUND",
+      `work order ${details.workOrderId} does not exist in this tenant — a JOB reading links a real work order (0106's FK)`,
+      details,
+    );
+  }
+}
+
+// -- the spares BOM (D-05 — BR-099's save-time drift mitigation) -------------
+
+export class CmmsSpareNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("ASSET_SPARE_NOT_FOUND", `spare BOM line ${id} does not exist in this tenant`);
+  }
+}
+
+/**
+ * The phase doc's own drift mitigation, made typed: a discontinued item
+ * refuses at BOM save — the BOM never points at a dead item (the parts
+ * picking surface stays honest).
+ */
+export class CmmsSpareItemDiscontinuedError extends DomainError {
+  constructor(details: { itemId: string; sku: string; status: string }) {
+    super(
+      "SPARE_ITEM_DISCONTINUED",
+      `item ${details.sku} (${details.itemId}) is ${details.status} — a discontinued item refuses at BOM save (the phase doc's own drift mitigation; the BOM never points at a dead item) / صنف موقوف لا يدخل قائمة قطع الغيار`,
+      details,
+    );
+  }
+}
+
+// -- the transfers ladder (D-06 — BR-100/G-61) --------------------------------
+
+export class CmmsTransferNotFoundError extends DomainError {
+  constructor(id: string) {
+    super("ASSET_TRANSFER_NOT_FOUND", `asset transfer ${id} does not exist in this tenant`);
+  }
+}
+
+/**
+ * The ladder's own named refusal (0107's ck_asset_transfers_stamps made
+ * typed): every illegal move refuses with the transfer's current state
+ * and the refused move — a submit on a submitted/approved/rejected row,
+ * a verdict on a draft, a re-verdict on a decided row. Both ends named.
+ */
+export class CmmsTransferStateError extends DomainError {
+  constructor(details: {
+    transferId: string;
+    from: string;
+    to: string;
+    reason: string;
+  }) {
+    super(
+      "TRANSFER_STATE_ERROR",
+      `asset transfer ${details.transferId} is ${details.from} — the move to ${details.to} is illegal (${details.reason}; the ladder is DRAFT → SUBMITTED → APPROVED/REJECTED, the verdict XOR — never both) / حركة غير قانونية على سلم النقل`,
+      details,
+    );
+  }
+}
+
+/** The raced/stale verdict (the CAS guard) — reload and retry. */
+export class CmmsTransferRaceError extends DomainError {
+  constructor(details: { transferId: string; action: string }) {
+    super(
+      "TRANSFER_RACE",
+      `asset transfer ${details.transferId} left the expected state concurrently (${details.action}) — the verdict stamps are single-use; reload the transfer`,
+      details,
+    );
+  }
+}
+
+/**
+ * The honest-transfer floor: a transfer's from-branch is the asset's
+ * CURRENT branch — a transfer authored (or idling) while the asset moved
+ * on refuses BY NAME with both branches (never a silent wrong-side flip).
+ */
+export class CmmsTransferStaleError extends DomainError {
+  constructor(details: {
+    transferId: string;
+    fromBranchId: string;
+    assetBranchId: string;
+  }) {
+    super(
+      "TRANSFER_STALE",
+      `asset transfer ${details.transferId} departs branch ${details.fromBranchId} but the asset now sits in branch ${details.assetBranchId} — a stale transfer never flips (another approved transfer moved the asset; author a new transfer from its current branch) / نقل متقادم لا يُقلب الفرع — أنشئ نقلًا جديدًا من الفرع الحالي`,
+      details,
+    );
+  }
+}
+
+/**
+ * SoD (AUTHORIZATION_MATRIX §4, the disposal/treasury pattern): the
+ * transfer's creator never approves their own transfer — the approver is
+ * a second user (a system-created transfer with createdBy NULL never
+ * trips).
+ */
+export class CmmsTransferSelfApprovalError extends DomainError {
+  constructor(details: { transferId: string; userId: string }) {
+    super(
+      "TRANSFER_SELF_APPROVAL_BLOCKED",
+      `the creator cannot approve their own transfer (SoD, AUTHORIZATION_MATRIX §4 — the G-61 approver must be a second user) / لا يعتمد منشئ النقل نقله بنفسه — فصل المهام`,
+      details,
+    );
+  }
+}
+
+/**
+ * G-61's mapping check (0107's own law, fail-closed BEFORE the flip): a
+ * branch without its mapped asset account refuses BY NAME — the branch↔
+ * account pair resolves through the EXISTING per-branch FIXED_ASSET
+ * purpose mapping (`FIXED_ASSET_{BRANCH_CODE}`, the account_purposes
+ * mechanism 0108 declared — "no new marker"); PURPOSE_NOT_MAPPED is the
+ * name (the posting engine's own fail-closed vocabulary).
+ */
+export class CmmsTransferBranchUnmappedError extends DomainError {
+  constructor(details: {
+    branchId: string;
+    branchCode: string;
+    purposeKey: string;
+  }) {
+    super(
+      "PURPOSE_NOT_MAPPED",
+      `branch ${details.branchCode} has no mapped asset account — map the purpose ${details.purposeKey} to an active account first (G-61 fails closed until the tenant maps the branch↔account pair; the check runs BEFORE the flip, the 038/0077 discipline) / لا اعتماد قبل ربط فرع النقل بحساب أصوله — الفشل مغلق`,
+      details,
+    );
+  }
+}
+
+/** The verdict is never silent: a rejection carries its reason. */
+export class CmmsTransferRejectReasonRequiredError extends DomainError {
+  constructor(details: { transferId: string }) {
+    super(
+      "TRANSFER_REJECT_REASON_REQUIRED",
+      `the rejection of transfer ${details.transferId} carries its reason (the verdict is never silent — 0107's stamp law) / الرفض لا يكون صامتًا — سبب الرفض مطلوب`,
+      details,
+    );
+  }
+}

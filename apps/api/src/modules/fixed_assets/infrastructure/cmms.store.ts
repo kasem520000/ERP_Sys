@@ -761,3 +761,524 @@ export async function findPartnerLite(
     SELECT id FROM partners WHERE id = ${partnerId} LIMIT 1`);
   return rows[0];
 }
+
+// ═══ W-18 (T-08/T-09/T-10) — the meters + spares + transfers plane ══════════
+//
+// The store stays the ONLY writer of the CMMS plane's tables (0106/0107):
+// every statement runs in the caller's ambient tenant UoW so the reading's
+// event-driven evaluation, the transfer's approval act (the G-61 entry, the
+// branch flip, the seals) and the BOM's lifecycle commit together or not at
+// all (INV-018). journal_entries/journal_lines are NEVER written here
+// (ADR-0007 — the posting engine exclusively); item_stock/stock_moves are
+// written only through the inventory movement core (the REAL WMS path).
+
+// ── the meters + the readings log (0106 — D-07, R-10) ───────────────────────
+
+export interface MeterRow {
+  id: string;
+  assetId: string;
+  name: string;
+  nameAr: string | null;
+  type: string;
+  unit: string;
+  isOdometer: boolean;
+  lastValue: string;
+  lastReadingAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+const METER_SELECT = sql`
+  SELECT id, asset_id AS "assetId", name, name_ar AS "nameAr", type, unit,
+    is_odometer AS "isOdometer", last_value::text AS "lastValue",
+    last_reading_at AS "lastReadingAt", note, note_ar AS "noteAr",
+    created_by AS "createdBy", created_at AS "createdAt", updated_at AS "updatedAt", version
+  FROM asset_meters`;
+
+export async function insertMeter(input: {
+  assetId: string;
+  name: string;
+  nameAr: string | null;
+  type: "HOURS" | "KM" | "PRODUCTION" | "CUSTOM";
+  unit: string;
+  isOdometer: boolean;
+  lastValue: string;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}): Promise<MeterRow> {
+  const id = generateUuidV7();
+  const rows = await query<{ id: string }>(sql`
+    INSERT INTO asset_meters (id, tenant_id, created_by, asset_id, name, name_ar,
+      type, unit, is_odometer, last_value, note, note_ar)
+    VALUES (${id}, ${requireTenantContext().tenantId}, ${input.createdBy}, ${input.assetId},
+      ${input.name}, ${input.nameAr}, ${input.type}, ${input.unit}, ${input.isOdometer},
+      ${input.lastValue}, ${input.note}, ${input.noteAr})
+    RETURNING id`);
+  return findMeterById(rows[0]!.id) as Promise<MeterRow>;
+}
+
+export async function findMeterById(id: string): Promise<MeterRow | undefined> {
+  const rows = await query<MeterRow>(sql`
+    ${METER_SELECT} WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listMeters(filter: {
+  assetId?: string;
+  limit?: number;
+}): Promise<MeterRow[]> {
+  const rows = await query<MeterRow>(sql`
+    ${METER_SELECT}
+    WHERE (${filter.assetId ?? null}::uuid IS NULL OR asset_id = ${filter.assetId ?? null})
+    ORDER BY created_at DESC
+    LIMIT ${filter.limit ?? 200}`);
+  return rows;
+}
+
+/** Patch the meter's own descriptive fields + the odometer designation
+ * (R-10's write path — the KM gate and the one-per-asset law are the
+ * service's typed first lines; the 0106 CHECK/partial unique the floor). */
+export async function patchMeter(input: {
+  meterId: string;
+  name?: string;
+  nameAr?: string | null;
+  unit?: string;
+  isOdometer?: boolean;
+  note?: string | null;
+  noteAr?: string | null;
+  actorId: string | null;
+}): Promise<MeterRow | undefined> {
+  const rows = await query<{ id: string }>(sql`
+    UPDATE asset_meters SET
+      name = COALESCE(${input.name ?? null}, name),
+      name_ar = COALESCE(${input.nameAr ?? null}, name_ar),
+      unit = COALESCE(${input.unit ?? null}, unit),
+      is_odometer = COALESCE(${input.isOdometer ?? null}, is_odometer),
+      note = COALESCE(${input.note ?? null}, note),
+      note_ar = COALESCE(${input.noteAr ?? null}, note_ar),
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.meterId}
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findMeterById(input.meterId);
+}
+
+/** R-10's one-per-asset read: the asset's CURRENT odometer designation
+ * (excluding the meter being patched) — the typed first line before the
+ * 0106 partial unique's raced floor. */
+export async function findOdometerDesignation(
+  assetId: string,
+  excludeMeterId: string | null,
+): Promise<MeterRow | undefined> {
+  const rows = await query<MeterRow>(sql`
+    ${METER_SELECT}
+    WHERE asset_id = ${assetId} AND is_odometer
+      AND (${excludeMeterId ?? null}::uuid IS NULL OR id <> ${excludeMeterId ?? null})
+    LIMIT 1`);
+  return rows[0];
+}
+
+export interface ReadingRow {
+  id: string;
+  meterId: string;
+  value: string;
+  effectiveDate: string;
+  source: string;
+  workOrderId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+const READING_SELECT = sql`
+  SELECT id, meter_id AS "meterId", value::text AS value,
+    effective_date::text AS "effectiveDate", source,
+    work_order_id AS "workOrderId", note, note_ar AS "noteAr",
+    created_by AS "createdBy", created_at AS "createdAt"
+  FROM asset_meter_readings`;
+
+export async function insertReading(input: {
+  meterId: string;
+  value: string;
+  effectiveDate: string;
+  source: "MANUAL" | "JOB" | "IMPORT";
+  workOrderId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}): Promise<ReadingRow> {
+  const id = generateUuidV7();
+  const rows = await query<{ id: string }>(sql`
+    INSERT INTO asset_meter_readings (id, tenant_id, created_by, meter_id, value,
+      effective_date, source, work_order_id, note, note_ar)
+    VALUES (${id}, ${requireTenantContext().tenantId}, ${input.createdBy}, ${input.meterId},
+      ${input.value}, ${input.effectiveDate}, ${input.source}, ${input.workOrderId},
+      ${input.note}, ${input.noteAr})
+    RETURNING id`);
+  const found = await query<ReadingRow>(sql`
+    ${READING_SELECT} WHERE id = ${rows[0]!.id} LIMIT 1`);
+  return found[0]!;
+}
+
+export async function listReadings(meterId: string, limit = 200): Promise<ReadingRow[]> {
+  const rows = await query<ReadingRow>(sql`
+    ${READING_SELECT} WHERE meter_id = ${meterId}
+    ORDER BY effective_date DESC, created_at DESC
+    LIMIT ${limit}`);
+  return rows;
+}
+
+/**
+ * D-07's snapshot law: last_value recomputed to the MAX (a back-dated-but-
+ * higher reading is LEGAL and moves it; a lower one was already refused by
+ * the service's monotonic law) — one guarded UPDATE in the reading's own
+ * transaction.
+ */
+export async function advanceMeterSnapshot(input: {
+  meterId: string;
+  value: string;
+  at: string;
+  actorId: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE asset_meters SET
+      last_value = GREATEST(last_value, ${input.value}::numeric),
+      last_reading_at = ${input.at},
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.meterId}`);
+}
+
+/** The event-driven wiring's plan read: the ACTIVE METER plans bound to a
+ * meter (T-08 — the reading's own transaction evaluates exactly these). */
+export async function activePlansByMeter(
+  meterId: string,
+): Promise<{ id: string }[]> {
+  const rows = await query<{ id: string }>(sql`
+    SELECT id FROM maintenance_plans
+    WHERE meter_id = ${meterId} AND is_active
+    ORDER BY created_at`);
+  return rows;
+}
+
+// ── the spare-parts BOM (0106 — D-05, BR-099) ───────────────────────────────
+
+export interface SpareRow {
+  id: string;
+  assetId: string;
+  itemId: string;
+  qty: string;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+const SPARE_SELECT = sql`
+  SELECT id, asset_id AS "assetId", item_id AS "itemId", qty::text AS qty,
+    note, note_ar AS "noteAr", created_by AS "createdBy",
+    created_at AS "createdAt", updated_at AS "updatedAt", version
+  FROM asset_spares`;
+
+export async function insertSpare(input: {
+  assetId: string;
+  itemId: string;
+  qty: string;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}): Promise<SpareRow> {
+  const id = generateUuidV7();
+  const rows = await query<{ id: string }>(sql`
+    INSERT INTO asset_spares (id, tenant_id, created_by, asset_id, item_id, qty, note, note_ar)
+    VALUES (${id}, ${requireTenantContext().tenantId}, ${input.createdBy}, ${input.assetId},
+      ${input.itemId}, ${input.qty}, ${input.note}, ${input.noteAr})
+    RETURNING id`);
+  const found = await query<SpareRow>(sql`
+    ${SPARE_SELECT} WHERE id = ${rows[0]!.id} LIMIT 1`);
+  return found[0]!;
+}
+
+export async function findSpareById(id: string): Promise<SpareRow | undefined> {
+  const rows = await query<SpareRow>(sql`
+    ${SPARE_SELECT} WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listSpares(filter: {
+  assetId?: string;
+  limit?: number;
+}): Promise<SpareRow[]> {
+  const rows = await query<SpareRow>(sql`
+    ${SPARE_SELECT}
+    WHERE (${filter.assetId ?? null}::uuid IS NULL OR asset_id = ${filter.assetId ?? null})
+    ORDER BY created_at DESC
+    LIMIT ${filter.limit ?? 200}`);
+  return rows;
+}
+
+export async function patchSpare(input: {
+  spareId: string;
+  qty?: string;
+  note?: string | null;
+  noteAr?: string | null;
+  actorId: string | null;
+}): Promise<SpareRow | undefined> {
+  const rows = await query<{ id: string }>(sql`
+    UPDATE asset_spares SET
+      qty = COALESCE(${input.qty ?? null}, qty),
+      note = COALESCE(${input.note ?? null}, note),
+      note_ar = COALESCE(${input.noteAr ?? null}, note_ar),
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.spareId}
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findSpareById(input.spareId);
+}
+
+export async function deleteSpare(spareId: string): Promise<void> {
+  await tenantTx().execute(sql`DELETE FROM asset_spares WHERE id = ${spareId}`);
+}
+
+/** The BOM's item-master read (the phase doc's own drift mitigation): the
+ * item's existence + its discontinued flag — the typed refusal's input. */
+export async function findItemLite(
+  itemId: string,
+): Promise<{ id: string; status: string; sku: string } | undefined> {
+  const rows = await query<{ id: string; status: string; sku: string }>(sql`
+    SELECT id, status, sku FROM items WHERE id = ${itemId} LIMIT 1`);
+  return rows[0];
+}
+
+// ── the transfers ladder (0107 — D-06, BR-100/G-61) ─────────────────────────
+
+export interface TransferRow {
+  id: string;
+  assetId: string;
+  fromBranchId: string;
+  toBranchId: string;
+  reason: string;
+  reasonAr: string | null;
+  status: string;
+  submittedAt: string | null;
+  submittedBy: string | null;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  rejectedAt: string | null;
+  rejectedBy: string | null;
+  rejectReason: string | null;
+  journalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+const TRANSFER_SELECT = sql`
+  SELECT id, asset_id AS "assetId", from_branch_id AS "fromBranchId",
+    to_branch_id AS "toBranchId", reason, reason_ar AS "reasonAr", status,
+    submitted_at AS "submittedAt", submitted_by AS "submittedBy",
+    approved_at AS "approvedAt", approved_by AS "approvedBy",
+    rejected_at AS "rejectedAt", rejected_by AS "rejectedBy",
+    reject_reason AS "rejectReason", journal_entry_id AS "journalEntryId",
+    note, note_ar AS "noteAr", created_by AS "createdBy",
+    created_at AS "createdAt", updated_at AS "updatedAt", version
+  FROM asset_transfers`;
+
+export async function insertTransfer(input: {
+  assetId: string;
+  fromBranchId: string;
+  toBranchId: string;
+  reason: string;
+  reasonAr: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}): Promise<TransferRow> {
+  const id = generateUuidV7();
+  const rows = await query<{ id: string }>(sql`
+    INSERT INTO asset_transfers (id, tenant_id, created_by, asset_id, from_branch_id,
+      to_branch_id, reason, reason_ar, note, note_ar)
+    VALUES (${id}, ${requireTenantContext().tenantId}, ${input.createdBy}, ${input.assetId},
+      ${input.fromBranchId}, ${input.toBranchId}, ${input.reason}, ${input.reasonAr},
+      ${input.note}, ${input.noteAr})
+    RETURNING id`);
+  return findTransferById(rows[0]!.id) as Promise<TransferRow>;
+}
+
+export async function findTransferById(id: string): Promise<TransferRow | undefined> {
+  const rows = await query<TransferRow>(sql`
+    ${TRANSFER_SELECT} WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listTransfers(filter: {
+  assetId?: string;
+  status?: string;
+  limit?: number;
+}): Promise<TransferRow[]> {
+  const rows = await query<TransferRow>(sql`
+    ${TRANSFER_SELECT}
+    WHERE (${filter.assetId ?? null}::uuid IS NULL OR asset_id = ${filter.assetId ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY created_at DESC
+    LIMIT ${filter.limit ?? 100}`);
+  return rows;
+}
+
+/** DRAFT → SUBMITTED — ONE guarded CAS (the submission stamps land in the
+ * same statement; zero rows = raced/stale, surfaced BY NAME). */
+export async function casSubmitTransfer(input: {
+  id: string;
+  submittedAt: string;
+  actorId: string | null;
+}): Promise<TransferRow | undefined> {
+  const rows = await query<{ id: string }>(sql`
+    UPDATE asset_transfers SET
+      status = 'SUBMITTED',
+      submitted_at = ${input.submittedAt},
+      submitted_by = ${input.actorId},
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.id} AND status = 'DRAFT'
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findTransferById(input.id);
+}
+
+/**
+ * THE APPROVAL'S CAS + SEALS (BR-100's exactly-once floor): the verdict
+ * stamps and — on the NBV>0 path — the journal link land in ONE guarded
+ * UPDATE pinning status = 'SUBMITTED' AND approved_at IS NULL AND
+ * journal_entry_id IS NULL (the single consumption); the G-61 entry and
+ * the branch flip have ALREADY succeeded in the same ambient transaction
+ * when this statement runs (the seals land AFTER the operation, D-06 —
+ * the 0105 completion-stamp precedent). The zero-NBV path passes
+ * journalEntryId NULL (the 0107 gate's own allowance).
+ */
+export async function sealTransferApproved(input: {
+  id: string;
+  journalEntryId: string | null;
+  approvedAt: string;
+  actorId: string | null;
+}): Promise<TransferRow | undefined> {
+  const rows = await query<{ id: string }>(sql`
+    UPDATE asset_transfers SET
+      status = 'APPROVED',
+      approved_at = ${input.approvedAt},
+      approved_by = ${input.actorId},
+      journal_entry_id = ${input.journalEntryId},
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.id}
+      AND status = 'SUBMITTED'
+      AND approved_at IS NULL
+      AND rejected_at IS NULL
+      AND journal_entry_id IS NULL
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findTransferById(input.id);
+}
+
+/** SUBMITTED → REJECTED — the verdict XOR's other side (the reason is
+ * never silent; one guarded CAS). */
+export async function sealTransferRejected(input: {
+  id: string;
+  rejectedAt: string;
+  rejectReason: string;
+  actorId: string | null;
+}): Promise<TransferRow | undefined> {
+  const rows = await query<{ id: string }>(sql`
+    UPDATE asset_transfers SET
+      status = 'REJECTED',
+      rejected_at = ${input.rejectedAt},
+      rejected_by = ${input.actorId},
+      reject_reason = ${input.rejectReason},
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.id}
+      AND status = 'SUBMITTED'
+      AND approved_at IS NULL
+      AND rejected_at IS NULL
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findTransferById(input.id);
+}
+
+/** The branch flip — the approval act's own second guarded statement in
+ * the SAME ambient transaction (the asset's cost/accumulated columns are
+ * NEVER touched — D-01: the branch dimension carries the move). */
+export async function flipAssetBranch(input: {
+  assetId: string;
+  toBranchId: string;
+  actorId: string | null;
+}): Promise<void> {
+  await tenantTx().execute(sql`
+    UPDATE assets SET
+      branch_id = ${input.toBranchId},
+      updated_at = now(),
+      updated_by = ${input.actorId},
+      version = version + 1
+    WHERE id = ${input.assetId}`);
+}
+
+/** The approval act's register read: the asset's branch + status + the
+ * NBV's own inputs (cost + the live accumulated — opening + Σ posted
+ * unreversed depreciation lines, the INV-023 read model's shape). The
+ * ARITHMETIC is the pure fold's (netBookValue) — never a parallel sum. */
+export async function findAssetTransferBasis(
+  assetId: string,
+): Promise<
+  | {
+      id: string;
+      status: string;
+      branchId: string;
+      cost: string;
+      accumulated: string;
+    }
+  | undefined
+> {
+  const rows = await query<{
+    id: string;
+    status: string;
+    branchId: string;
+    cost: string;
+    accumulated: string;
+  }>(sql`
+    SELECT a.id, a.status, a.branch_id AS "branchId", a.cost::text AS cost,
+      (COALESCE(a.opening_accumulated, 0) + COALESCE((
+        SELECT SUM(dl.period_amount) FROM depreciation_lines dl
+        JOIN depreciation_runs r ON r.id = dl.run_id
+        WHERE dl.asset_id = ${assetId} AND r.status = 'POSTED' AND r.reversed_at IS NULL
+      ), 0))::text AS accumulated
+    FROM assets a WHERE a.id = ${assetId} LIMIT 1`);
+  return rows[0];
+}
+
+/** The branch read (the ladder's own subject — existence + code, the
+ * derived purpose key's input). */
+export async function findBranchLite(
+  branchId: string,
+): Promise<{ id: string; code: string; name: string; isActive: boolean } | undefined> {
+  const rows = await query<{ id: string; code: string; name: string; isActive: boolean }>(sql`
+    SELECT id, code, name, is_active AS "isActive" FROM branches WHERE id = ${branchId} LIMIT 1`);
+  return rows[0];
+}

@@ -5290,6 +5290,104 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/assets/plans/evaluate",
     permission: "assets.maintenance.plan",
   },
+  // PHASE-049 (W-18 — T-08/T-09/T-10, the meters + spares + transfers
+  // wave): the 0108-seeded keys' SECOND binding wave (1,077 + 16 = 1,093
+  // — the dated delta in matrix §3.27). The SoD split on the transfers
+  // family: the reads on assets.transfer.view; the authoring + the
+  // submission on assets.maintenance.manage (the CREATOR's key — the
+  // maintenance plane's operational write); the VERDICTS (the G-61 gate:
+  // approve + reject) on assets.transfer.approve (the APPROVER's key —
+  // creator ≠ approver at the key plane and at the service's SoD
+  // backstop). The meters family: the reads on assets.meters.view, the
+  // readings (the event surface — a reading evaluates the METER plans in
+  // its own transaction) on assets.meters.record, and the meter
+  // AUTHORING (the register + R-10's odometer designation) on
+  // assets.maintenance.manage — the declared interpretation (the meters
+  // keys are view/record only; the designation is a maintenance-
+  // management act), recorded in the W-18 dated note. The spares family
+  // rides its single assets.spares.manage key (the matrix's own set).
+  // The tags/expiry families bind with W-19/W-20; the web planes
+  // (W-20/W-21) on the same keys.
+  {
+    method: "GET",
+    path: "/api/v1/assets/meters",
+    permission: "assets.meters.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/meters",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/meters/:id",
+    permission: "assets.meters.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/assets/meters/:id",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/meters/:id/readings",
+    permission: "assets.meters.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/meters/:id/readings",
+    permission: "assets.meters.record",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/spares",
+    permission: "assets.spares.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/spares",
+    permission: "assets.spares.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/assets/spares/:id",
+    permission: "assets.spares.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/assets/spares/:id",
+    permission: "assets.spares.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/transfers",
+    permission: "assets.transfer.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/transfers",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/transfers/:id",
+    permission: "assets.transfer.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/transfers/:id/submit",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/transfers/:id/approve",
+    permission: "assets.transfer.approve",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/transfers/:id/reject",
+    permission: "assets.transfer.approve",
+  },
 ];
 
 /**
