@@ -203,7 +203,11 @@ describe("seeds (acceptance 9)", () => {
     // + 10 = 336 after 0108 — the ten PHASE-049 CMMS assets keys (matrix
     // §3.27, the W-16 foundation wave 2026-11-21; the drift CLI agrees:
     // matrix 336 = seed 336).
-    expect(result.rows[0]?.n).toBe(336);
+    // + 1 = 337 after 0111 — the ONE PHASE-049 W-19 sweep threshold key
+    // (assets.expiry.manage — the sweep's threshold settings surface over
+    // the first 049 settings keys; matrix §3.27's W-19 dated note; the
+    // drift CLI agrees: matrix 337 = seed 337).
+    expect(result.rows[0]?.n).toBe(337);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

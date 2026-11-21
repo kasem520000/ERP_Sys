@@ -770,6 +770,13 @@
       "when": 1798171200000,
       "tag": "0110_cmms_source_shape_repair",
       "breakpoints": true
+    },
+    {
+      "idx": 110,
+      "version": "7",
+      "when": 1798257600000,
+      "tag": "0111_cmms_sweep_settings",
+      "breakpoints": true
     }
   ],
   "version": "7"

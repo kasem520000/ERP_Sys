@@ -587,6 +587,16 @@ export const MIGRATIONS: readonly string[] = [
   "0108_cmms_asset_extensions",
   "0109_cmms_cost_lines_steps",
   "0110_cmms_source_shape_repair",
+  // PHASE-049 (W-19 — T-11/T-12, dated 2026-11-21): 0111 = the sweep
+  // settings page + the notifications category widening — 'assets' joins
+  // both CHECK domains (the 0099 §2 pattern, the shared-scope union law
+  // honored: the union of every member every migration ever defined) +
+  // THE DATA PAGE (the 0098 pattern): the sweep threshold key
+  // assets.expiry.manage (matrix §3.27; the drift 336 → 337) over the
+  // FIRST 049 SETTINGS KEYS (assets.expiry_sweep_thresholds — the typed
+  // registry key, the documented fail-closed default [30,7,0]). ZERO
+  // table delta — the catalog stays 328; the chain 110 → 111.
+  "0111_cmms_sweep_settings",
 ];
 
 /**

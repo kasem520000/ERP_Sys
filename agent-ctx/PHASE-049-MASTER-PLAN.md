@@ -56,6 +56,23 @@ before the first line. **This session executed exactly that, first:**
   the clean-tree check), recorded in that wave's gate doc. A wave never opens
   on an unreconciled tree.
 
+  **[Dated 2026-11-21 (W-19 — THE GATE-DOCUMENTATION DECISION, the owner's
+  ruling on the 048-custom gap: «وثائق بوابة الموجة (عرف 048) توقفت في 049
+  بصمت... اختر مصرّحًا» — option (a) ratified, the owner's stated
+  preference).** 049's standing custom, codified HERE as law: **the wave's
+  GATE RECORD is its evidence README** (`audit-evidence/phase049-w*/README.md`
+  — the W-16…W-18 envelopes are the delivered precedent: the §0a record, the
+  exit, the constants with dated deltas, the honest disclosures, the parts
+  tables, the logs' declarations — every element the 048 wave-gate documents
+  carried, same-session and additive-only), and **THE CENTRAL LEDGER —
+  `docs/planning/PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-049 — is the
+  accumulation place**: every criterion's ARMS and WAVES accumulate there
+  from W-0 to the W-23 closure, giving W-23 its ONE CITABLE CUMULATIVE
+  RECORD (the owner's own requirement). No retroactive gate documents for
+  W-16…W-18 — their READMEs ARE their gate records (this note ratifies what
+  already shipped, never rewrites it); the plan's every «wave gate doc»/
+  «gate-evidence» reference reads as the evidence README from here on.
+
 ## 0b. The owner's W-15 acceptance + the THREE AMENDED LAWS (recorded 2026-11-21, binding on all 049 waves)
 
 The owner's dispatch accepted W-15 and closed PHASE-048 at the tag `phase/048`
@@ -400,6 +417,21 @@ synced entity added).
 | 0106 | `0106_cmms_meters_spares.sql` | `asset_meters` (+ the odometer designation) + `asset_meter_readings` + `asset_spares` (the BOM) + `asset_tags` (the signed codes) |
 | 0107 | `0107_cmms_transfers.sql` | `asset_transfers` (from/to branch, reason, the approval ladder + the verdict stamps) |
 | 0108 | `0108_cmms_asset_extensions.sql` | THE ALTER on `assets`: `warranty_expiry` · `insurance_expiry` · `license_expiry` · `inspection_expiry` · `cost_center_id` · `parent_asset_id` + THE DATA-ONLY grants block (the 0098/0103 pattern) |
+
+**[Dated 2026-11-21 (W-19 — THE HONEST SLOTS' AMENDMENT, the D-02 disclosure
+law's own prescription): 0111 `0111_cmms_sweep_settings.sql` — the sweep
+settings page + the notifications category widening.]** The W-19 wave
+(T-11/T-12) lands the owner-ordered provision: §1 the notifications category
+widening ('assets' joins BOTH CHECK domains — the 0023/0056/0099 pattern, the
+shared-scope union law honored) + §2 THE DATA PAGE (the 0098 pattern): the
+sweep threshold key `assets.expiry.manage` (the drift 336 → 337, dated) over
+THE FIRST 049 SETTINGS KEYS (`assets.expiry_sweep_thresholds` — the typed
+registry key, the documented fail-closed default [30,7/0]). **THIS
+PROVISION'S FINAL EXPECTED FINGERPRINT (announced in the wave's own envelope,
+the new law's FIRST APPLICATION): the chain 111 · ENTITY_CATALOG 328 (zero
+table delta) · the drift 337 · ROUTE_PERMISSIONS 1,093 + 9 = 1,102.**
+(0109/0110 — the W-17 provision + the source-shape repair — are recorded in
+the phase doc §4's dated amendment; the slots-pinned-honestly law stands.)
 
 All four: tenant_id prefix + RLS policies (the A1–A10 law), Drizzle mirrors,
 `tables.registry.ts` +8 (318 → 326), ENTITY_CATALOG rows (318 → 326),

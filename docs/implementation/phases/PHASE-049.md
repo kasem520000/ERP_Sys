@@ -140,6 +140,27 @@ without it
   >    0073's list and missed 0077's `contract_mfg`). Standing proof: the schema
   >    spec's `stock_moves` scope arm (W-18) enumerates the members explicitly and
   >    asserts the live constraint equals the all-migrations union.
+  >
+  > **[Dated 2026-11-21 (PHASE-049 W-19 — THE SWEEP SETTINGS PROVISION, the D-02
+  > disclosure law's FIRST APPLICATION as the envelope-announced fingerprint:
+  > «مفاتيح عتبات الكنس — أول مفاتيح settings في 049: صفحة بيانات بنمط 0098،
+  > الدفت 336 → 336+n بدلتا مؤرخة، والبصمة النهائية المتوقعة معلنة في مغلّف
+  > الموجة نفسه»).]** Migration **0111 `0111_cmms_sweep_settings.sql`** lands the
+  > W-19 provision: §1 the notifications category widening ('assets' joins BOTH
+  > CHECK domains — the 0099 §2 pattern; the shared-scope union law honored: the
+  > widened list is the union of every member every migration has ever defined, and
+  > the schema spec's notifications-category arm — W-19 — enumerates the members
+  > and asserts the live constraint equals the union) + §2 THE DATA PAGE (the 0098
+  > pattern): the ONE sweep threshold key **`assets.expiry.manage`** (matrix §3.27;
+  > **the drift 336 → 337** — the dated delta) — the sweep's threshold settings
+  > surface over **THE FIRST 049 SETTINGS KEYS**: the typed registry key
+  > `assets.expiry_sweep_thresholds` (SETTINGS_REGISTRY — the
+  > projects.fieldservice_sla_targets precedent), the documented fail-closed default
+  > **[30,7,0]**. **THIS PROVISION'S FINAL EXPECTED FINGERPRINT, ANNOUNCED IN THE
+  > WAVE'S OWN ENVELOPE: the chain 110 → 111 · ENTITY_CATALOG 328 (zero table
+  > delta) · the drift 337 · ROUTE_PERMISSIONS 1,093 + 9 = 1,102 (the tags family's
+  > five · the scan · the fleet-light register · the sweep config's two).** The
+  > fingerprint is final through W-23 unless a dated provision lands.
 - **Entities**: +8 tenant tables → SQL + Drizzle mirror + `ENTITY_CATALOG.md` rows
   (CR-36a); +column family on `assets`.
 - **Permissions**: +10 keys — `assets.maintenance.view/manage/plan`,

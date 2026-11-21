@@ -67,7 +67,12 @@ export type NotificationCategory =
   // the hr-expiry-sweep's four probes (document-expiry,
   // certification-expiry, probation-end, review-due), the BR-091-deduped
   // inbox notifications (D-06).
-  | "hr";
+  | "hr"
+  // PHASE-049 (W-19, 0111 category widening): the asset-expiry sweep's
+  // family — the four classes (warranty/insurance/license/inspection —
+  // D-10; the inspection class is the R-10 fleet-light fourth), the
+  // per-asset-per-class-per-threshold deduped inbox notifications.
+  | "assets";
 export type NotificationSeverity = "info" | "warning" | "critical";
 
 export interface BilingualText {

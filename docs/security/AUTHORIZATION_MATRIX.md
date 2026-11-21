@@ -852,14 +852,16 @@ notifications' own permission plane — no new key.
 > three project-carrying templates compose them by default (0103 §3) — the
 > entitlement/authorization divergence above, the §3.25 precedent.
 
-### §3.27 CMMS — asset maintenance (PHASE-049; catalog 326 → 336)
+### §3.27 CMMS — asset maintenance (PHASE-049; catalog 326 → 336 at W-16, → 337 at W-19)
 
 The CMMS cluster (CR-19, extended by v3.2/CR-50 — the maintenance work-order machine on the
 044 asset register, the preventive plans with calendar/meter triggers, the meters and their
 readings log, the spare-parts BOM whose consumption is an inventory issue, the branch
 transfers with the NBV reclassification, the signed tags, and the expiry registers with the
-30/7/0 sweep). **All ten keys seed in migration `0108` §1 — the permission catalog extends
-326 → 336 (seed = mirror, zero drift).** The entitlement/authorization divergence (the
+30/7/0 sweep). **The first ten keys seed in migration `0108` §1 (the W-16 foundation — the
+permission catalog extends 326 → 336); the ELEVENTH — `assets.expiry.manage`, the sweep
+threshold settings surface — seeds in `0111` §2 (the W-19 wave, 336 → 337; seed = mirror,
+zero drift).** The entitlement/authorization divergence (the
 §3.25/§3.26 precedent, deliberate): the TWO FEATURE FLAGS — `assets.maintenance` ·
 `assets.transfer` (the phase doc's composable units, the §3 manifest schema's single-segment
 module.feature shape) — are the ENTITLEMENT keys: business + enterprise carry them (0108 §2)
@@ -885,15 +887,39 @@ approver, §4), the posting itself is the engine's.
 | `assets.transfer.approve` | Approve asset transfers (the G-61 gate — the NBV reclassification) / اعتماد نقل الأصول (بوابة G-61) | owner | tenant | **yes** (approval flips the asset's branch AND posts the NBV reclassification between the branch asset accounts in ONE transaction, exactly once (BR-100); fail-closed PURPOSE_NOT_MAPPED until the tenant maps the branch↔account pair) |
 | `assets.tags.manage` | Manage signed asset tags and their print sheets / إدارة بطاقات الأصول الموقعة وصفحات طباعتها | owner | tenant | **yes** (the codes are unguessable signed tokens — regeneration changes what physical QR labels resolve; the print sheet is deterministic by law) |
 | `assets.expiry.view` | View the warranty/insurance/license/inspection expiry registers / عرض سجلات انتهاء الضمان والتأمين والترخيص والفحص | owner, accountant | tenant | no (read-only over the renewal registers — the sweep's 30/7/0 alert classes) |
+| `assets.expiry.manage` | Manage the asset-expiry sweep's threshold ladder and its settings (the first 049 settings keys) / إدارة سلالم عتبات كنس انتهاء الصلاحية وإعداداته | owner | tenant | no (a settings act, never a ledger write — the thresholds are tenant-configurable DATA over the typed `assets.expiry_sweep_thresholds` registry key with the documented fail-closed default [30,7/0]; a garbage ladder never silently disables the sweep — the pure fold reads it as the default) |
 
 **Guarded routes** (ROUTE_PERMISSIONS — the keys-seed-first discipline, the §3.23–§3.26
 precedent): the `/api/v1/assets/{maintenance,plans,meters,spares,transfers,tags,expiry}`
 families land with the W-17…W-19 service waves, each route on the exact keys above, and the
-web planes (W-20/W-21) on the same keys. Role grants per 0108 §1: the owner template holds
-all ten; the accountant the TWO finance-read keys (assets.maintenance.view ·
-assets.expiry.view — INV-034's GL reconciliation plane + the renewal registers; the
-operational keys stay owner-only — maintenance operations are tenant-granted beyond the
-baseline). The alert surfaces ride the notifications' own permission plane — no new key.
+web planes (W-20/W-21) on the same keys. Role grants per 0108 §1 (+ 0111 §2): the owner
+template holds all eleven; the accountant the TWO finance-read keys
+(assets.maintenance.view · assets.expiry.view — INV-034's GL reconciliation plane + the
+renewal registers; the operational keys stay owner-only — maintenance operations are
+tenant-granted beyond the baseline). The alert surfaces ride the notifications' own
+permission plane — no new key.
+
+> **[Dated 2026-11-21 (PHASE-049 W-19 — T-11/T-12, the tags + sweep + fleet-light wave):
+> the third binding wave + THE ELEVENTH KEY — ROUTE_PERMISSIONS 1,093 + 9 = 1,102; the
+> drift 336 → 337 (0111 §2, the 0098 data-page pattern).]** Migration 0111 seeds the ONE
+> sweep threshold key `assets.expiry.manage` — the sweep's threshold settings surface over
+> THE FIRST 049 SETTINGS KEYS (the typed registry key
+> `assets.expiry_sweep_thresholds`, the documented fail-closed default [30,7/0]) — and
+> widens the notifications category domains with 'assets' (the 0099 §2 pattern; the
+> shared-scope union law honored). NINE route rows bind: the `/api/v1/assets/tags*`
+> family (5 rows on the single `assets.tags.manage` key — the batch create with the
+> signed-code generation, the list, THE PRINT SHEET payload, THE PRINTED STAMP (the
+> single-consumption CAS seal), and the register hygiene delete), THE SCAN ROUTE
+> `GET /api/v1/assets/scan/:code` (1 row on `assets.maintenance.view` — the DECLARED
+> INTERPRETATION: the scan resolves INTO the maintenance plane's asset card, the
+> technician's surface; the register's own reads stay on `fixed_assets.assets.view`),
+> THE FLEET-LIGHT REGISTER `GET /api/v1/assets/fleet-light` (1 row on
+> `assets.expiry.view` — R-10's register view over the substrate: the four expiry chips +
+> the odometer binding, zero new tables), and THE SWEEP CONFIG family
+> `/api/v1/assets/expiry-sweep` (2 rows on the new `assets.expiry.manage` key — the
+> effective-ladder read + the audited thresholds write through the settings key). The
+> tsx recount this wave: **1,102 rows, 50 on the assets.* keys** (41 + 9). The web planes
+> (W-20/W-21) bind on the same keys.
 
 > **[Dated 2026-11-21 (PHASE-049 W-18 — T-08/T-09/T-10, the meters + spares +
 > transfers wave): the second binding wave — ROUTE_PERMISSIONS 1,077 + 16 =

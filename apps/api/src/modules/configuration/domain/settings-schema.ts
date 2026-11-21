@@ -718,6 +718,29 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-048 (W-12, D-12/BR-096): the tenant's field-service SLA targets — the response clock (dispatch → first response) and the resolution clock (dispatch → completion) target HOURS (fractional hours allowed, e.g. 1.5 = 90 minutes). Both clocks are pause-aware (the paused time never counts). While unset (null) the evaluation reports the honest NO_TARGET absence and asserts no breach — never a fabricated target (red line 5).",
   }),
+  // PHASE-049 (W-19 — T-12, D-10): THE FIRST 049 SETTINGS KEYS — the
+  // asset-expiry sweep's threshold ladder (the owner's W-19 order: «مفاتيح
+  // عتبات الكنس — أول مفاتيح settings في 049»). The documented fail-closed
+  // default [30,7,0] (red line 5: tenant-configurable DATA, never
+  // hard-coded law — the 0099 hr_alert_jobs precedent's thresholds, now on
+  // the typed settings registry); the pure normalize fold (integer ≥ 0,
+  // dedup, sort descending; an empty/garbage residue reads as the default
+  // — a tenant who registers garbage never silently disables the sweep)
+  // is the fixed_assets domain's, unit-tested FIRST. One ladder governs
+  // all four classes (warranty, insurance, license, inspection — the
+  // inspection class is the R-10 fleet-light fourth, used where a tenant
+  // tracks it). Written through the sweep's typed config surface (the
+  // assets.expiry.manage key) or the generic tenancy settings write.
+  "assets.expiry_sweep_thresholds": Object.freeze({
+    key: "assets.expiry_sweep_thresholds",
+    schema: z
+      .array(z.number().int().min(0))
+      .min(1)
+      .max(12),
+    default: [30, 7, 0],
+    description:
+      "PHASE-049 (W-19, D-10): the asset-expiry sweep's threshold ladder — the day-values before each expiry date at which the sweep alerts (the documented default [30,7,0]; the dedupe is per asset per class per threshold pass, so an item descends band by band across nights). One ladder governs all four classes: warranty, insurance, license, inspection.",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

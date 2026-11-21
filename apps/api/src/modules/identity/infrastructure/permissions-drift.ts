@@ -213,6 +213,14 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // INV-034's GL reconciliation plane; expiry.view — the renewal
   // registers); the operational keys stay owner-only.
   "apps/api/migrations/0108_cmms_asset_extensions.sql",
+  // PHASE-049 (W-19 — the tags + sweep wave, 2026-11-21): 0111 §2 seeds
+  // the ONE sweep threshold key (matrix §3.27; 336 → 337) —
+  // assets.expiry.manage: the sweep's threshold settings surface over
+  // the first 049 settings keys (assets.expiry_sweep_thresholds). Role
+  // grants: the owner template holds it; no other system role (the
+  // sweep's configuration is an operational act; the accountant's
+  // finance-read plane stays at assets.expiry.view).
+  "apps/api/migrations/0111_cmms_sweep_settings.sql",
 ];
 
 export async function main(): Promise<void> {
