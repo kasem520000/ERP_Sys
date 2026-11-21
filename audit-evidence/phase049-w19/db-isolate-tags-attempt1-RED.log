@@ -1,0 +1,404 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-21 22:47:48.261 UTC [30586] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-21 22:47:48.261 UTC [30586] LOG:  listening on IPv6 address "::1", port 38575
+2026-11-21 22:47:48.261 UTC [30586] LOG:  listening on IPv4 address "127.0.0.1", port 38575
+
+2026-11-21 22:47:48.262 UTC [30586] LOG:  listening on Unix socket "/tmp/.s.PGSQL.38575"
+
+2026-11-21 22:47:48.263 UTC [30589] LOG:  database system was shut down at 2026-11-21 22:47:48 UTC
+
+2026-11-21 22:47:48.265 UTC [30586] LOG:  database system is ready to accept connections
+
+2026-11-21 22:47:53.837 UTC [30667] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-21 22:47:53.837 UTC [30667] DETAIL:  Failing row contains (5a8284a4-6d8c-4392-952a-88008f92e0a4, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.837423+00, 2026-11-21 22:47:53.837423+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, da2a8ddb-5f4f-4388-9b5d-6e74fe327eaa, MO-REQ-STAMP, Won't start, null, null, null, MEDIUM, null, REQUESTED, null, 2026-02-01 08:00:00+00, null, null, 0.0000, 0.0000, 0.0000, null, null, null).
+2026-11-21 22:47:53.837 UTC [30667] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-21 22:47:53.848 UTC [30667] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-21 22:47:53.848 UTC [30667] DETAIL:  Failing row contains (876edb53-e279-4860-b46e-a3d4443590b0, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.848125+00, 2026-11-21 22:47:53.848125+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, e78b0d2b-0f47-44c1-b7d8-df00715ea618, MO-PLN-STAMP, Won't start, null, null, null, MEDIUM, null, PLANNED, null, 2026-02-01 08:00:00+00, 2026-02-01 09:00:00+00, null, 0.0000, 0.0000, 0.0000, null, null, null).
+2026-11-21 22:47:53.848 UTC [30667] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-21 22:47:53.857 UTC [30667] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-21 22:47:53.857 UTC [30667] DETAIL:  Failing row contains (8098276b-50ea-4d97-a475-d1e577472d4a, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.857349+00, 2026-11-21 22:47:53.857349+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 3a469588-76f3-4e11-bd7a-b30030e0b4e0, MO-CMP-NOSTAMP, Won't start, null, null, null, MEDIUM, null, COMPLETED, null, 2026-02-01 08:00:00+00, 2026-02-01 09:00:00+00, null, 0.0000, 0.0000, 0.0000, 11111111-1111-4111-8111-111111111111, null, null).
+2026-11-21 22:47:53.857 UTC [30667] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-21 22:47:53.867 UTC [30667] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_journal_gated"
+2026-11-21 22:47:53.867 UTC [30667] DETAIL:  Failing row contains (7876a623-008d-4e24-8e02-96c1e921e8c5, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.866815+00, 2026-11-21 22:47:53.866815+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, e1b4f4f7-b766-4fbf-a5ad-dd041a402ec1, MO-JOURNAL-GATE, Won't start, null, null, null, MEDIUM, null, REQUESTED, null, null, null, null, 0.0000, 0.0000, 0.0000, 11111111-1111-4111-8111-111111111112, null, null).
+2026-11-21 22:47:53.867 UTC [30667] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-21 22:47:53.877 UTC [30667] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-21 22:47:53.877 UTC [30667] DETAIL:  Failing row contains (2855d14b-a941-4964-86fb-4ad5e99943a1, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.877112+00, 2026-11-21 22:47:53.877112+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 34072297-00e4-433b-8ec8-1907ac995241, MO-BAD-STATUS, x, null, null, null, MEDIUM, null, CANCELLED, null, null, null, null, 0.0000, 0.0000, 0.0000, null, null, null).
+2026-11-21 22:47:53.877 UTC [30667] STATEMENT:  INSERT INTO maintenance_work_orders
+	             (id, tenant_id, asset_id, order_no, problem, status, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'MO-BAD-STATUS', 'x', 'CANCELLED', $3)
+
+2026-11-21 22:47:53.891 UTC [30667] ERROR:  duplicate key value violates unique constraint "uq_maintenance_work_orders_tenant_plan_open"
+2026-11-21 22:47:53.891 UTC [30667] DETAIL:  Key (tenant_id, asset_id, plan_id)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 00a6a1f1-5170-44c2-9d15-540b16d80aa9, 470342a5-c0c4-47f7-849a-57a17bef005b) already exists.
+2026-11-21 22:47:53.891 UTC [30667] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-21 22:47:53.915 UTC [30667] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_trigger_shape"
+2026-11-21 22:47:53.915 UTC [30667] DETAIL:  Failing row contains (a0664838-0e0c-434f-9f5a-30b2465a0f2e, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.915067+00, 2026-11-21 22:47:53.915067+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 4f5627c4-b97b-453e-8dd6-da6318bb06b4, Mixed plan, null, null, null, CALENDAR, 30, 2026-03-01, e89a0a44-b888-4d63-8fda-83cb8a799f78, 100.000000, null, null, t, null, null).
+2026-11-21 22:47:53.915 UTC [30667] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-21 22:47:53.925 UTC [30667] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_trigger_shape"
+2026-11-21 22:47:53.925 UTC [30667] DETAIL:  Failing row contains (0992badf-6eb0-4033-82bd-35aea504e592, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.925289+00, 2026-11-21 22:47:53.925289+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, b9c2c629-34c5-4441-8478-59a09d586097, Thresholdless plan, null, null, null, METER, null, null, 98d51545-f674-42e2-a893-a3f9581746ae, null, null, null, t, null, null).
+2026-11-21 22:47:53.925 UTC [30667] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-21 22:47:53.935 UTC [30667] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_trigger_shape"
+2026-11-21 22:47:53.935 UTC [30667] DETAIL:  Failing row contains (6fd0db19-0a3b-4cb7-814e-d9b92348684a, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.93531+00, 2026-11-21 22:47:53.93531+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 58649eaf-11dc-44a1-80a1-1a18f9f0f9a3, Over-carried plan, null, null, null, METER, 30, 2026-03-01, 92fedc4f-877c-49db-9a40-b9ea239c11c2, 250.000000, null, null, t, null, null).
+2026-11-21 22:47:53.935 UTC [30667] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-21 22:47:53.945 UTC [30667] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_anchor_gated"
+2026-11-21 22:47:53.945 UTC [30667] DETAIL:  Failing row contains (132b5395-718f-423f-8105-ca2e549352dc, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.945643+00, 2026-11-21 22:47:53.945643+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 9dfef492-a782-4fe6-83e5-b94385224399, Anchored calendar plan, null, null, null, CALENDAR, 30, 2026-03-01, null, null, 1000.000000, null, t, null, null).
+2026-11-21 22:47:53.945 UTC [30667] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-21 22:47:53.954 UTC [30667] ERROR:  new row for relation "asset_meters" violates check constraint "ck_asset_meters_odometer_gated"
+2026-11-21 22:47:53.954 UTC [30667] DETAIL:  Failing row contains (9a0be38c-05c4-46dd-a1d2-0a5161cfa045, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.954694+00, 2026-11-21 22:47:53.954694+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 98faced2-5320-41bb-99f7-c1c11aefa1f1, Engine hours, null, HOURS, h, t, 0.000000, null, null, null).
+2026-11-21 22:47:53.954 UTC [30667] STATEMENT:  INSERT INTO asset_meters (id, tenant_id, asset_id, name, type, unit, is_odometer, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'Engine hours', 'HOURS', 'h', true, $3)
+
+2026-11-21 22:47:53.966 UTC [30667] ERROR:  duplicate key value violates unique constraint "uq_asset_meters_tenant_asset_odometer"
+2026-11-21 22:47:53.966 UTC [30667] DETAIL:  Key (tenant_id, asset_id)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 17e23c2b-b486-4b6e-9806-b2ce0149e41b) already exists.
+2026-11-21 22:47:53.966 UTC [30667] STATEMENT:  INSERT INTO asset_meters (id, tenant_id, asset_id, name, type, unit, is_odometer, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'Second odometer', 'KM', 'km', true, $3)
+
+2026-11-21 22:47:53.977 UTC [30667] ERROR:  new row for relation "asset_meter_readings" violates check constraint "ck_asset_meter_readings_value"
+2026-11-21 22:47:53.977 UTC [30667] DETAIL:  Failing row contains (94c4ad4d-b3fd-448d-9247-3bd7ab69a3a8, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.976826+00, 2026-11-21 22:47:53.976826+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, d9415062-92d0-404a-a5bc-4890a78c96d5, -5.000000, 2026-02-01, MANUAL, null, null, null).
+2026-11-21 22:47:53.977 UTC [30667] STATEMENT:  INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, -5, '2026-02-01', 'MANUAL', $3)
+
+2026-11-21 22:47:53.986 UTC [30667] ERROR:  new row for relation "asset_meter_readings" violates check constraint "ck_asset_meter_readings_job_link"
+2026-11-21 22:47:53.986 UTC [30667] DETAIL:  Failing row contains (8a0805f3-2a1a-4be0-a1bb-b6562a06450e, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.986747+00, 2026-11-21 22:47:53.986747+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, c8569192-b0f9-4764-b82f-a1ca323f47ea, 100.000000, 2026-02-01, JOB, null, null, null).
+2026-11-21 22:47:53.986 UTC [30667] STATEMENT:  INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 100, '2026-02-01', 'JOB', $3)
+
+2026-11-21 22:47:53.997 UTC [30667] ERROR:  new row for relation "asset_meter_readings" violates check constraint "ck_asset_meter_readings_job_link"
+2026-11-21 22:47:53.997 UTC [30667] DETAIL:  Failing row contains (279354ed-e44e-434e-b07a-5fa38ae4e800, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:53.997734+00, 2026-11-21 22:47:53.997734+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 72c05fff-c206-4649-ab76-1074ee55195d, 100.000000, 2026-02-01, MANUAL, 8b8f55d8-96b7-48f3-bede-881e29eef398, null, null).
+2026-11-21 22:47:53.997 UTC [30667] STATEMENT:  INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source, work_order_id, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 100, '2026-02-01', 'MANUAL', $3, $4)
+
+2026-11-21 22:47:54.011 UTC [30667] ERROR:  new row for relation "asset_spares" violates check constraint "ck_asset_spares_qty"
+2026-11-21 22:47:54.011 UTC [30667] DETAIL:  Failing row contains (da8638a4-c167-432e-af96-7b348ef739c8, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.011384+00, 2026-11-21 22:47:54.011384+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 341e5262-57f3-44d4-b3b1-2004736fb1ad, 4e108658-a313-47c5-8588-058f93c79edb, 0.000000, null, null).
+2026-11-21 22:47:54.011 UTC [30667] STATEMENT:  INSERT INTO asset_spares (id, tenant_id, asset_id, item_id, qty, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, $3, 0, $4)
+
+2026-11-21 22:47:54.023 UTC [30667] ERROR:  duplicate key value violates unique constraint "uq_asset_spares_tenant_asset_item"
+2026-11-21 22:47:54.023 UTC [30667] DETAIL:  Key (tenant_id, asset_id, item_id)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, cb8176cf-f16d-4f29-93db-90ac56f0cf38, 9004c7da-683b-4e23-81c1-cde5625cd4d9) already exists.
+2026-11-21 22:47:54.023 UTC [30667] STATEMENT:  INSERT INTO asset_spares (id, tenant_id, asset_id, item_id, qty, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, $3, 3, $4)
+
+2026-11-21 22:47:54.033 UTC [30667] ERROR:  new row for relation "asset_tags" violates check constraint "ck_asset_tags_code"
+2026-11-21 22:47:54.033 UTC [30667] DETAIL:  Failing row contains (827a7f16-df61-4a81-bab0-617e06be40e7, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.033356+00, 2026-11-21 22:47:54.033356+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, d4cc6a0a-7209-405b-aa20-f9b08187d431, short, null, null, null).
+2026-11-21 22:47:54.033 UTC [30667] STATEMENT:  INSERT INTO asset_tags (id, tenant_id, asset_id, code, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'short', $3)
+
+2026-11-21 22:47:54.051 UTC [30667] ERROR:  duplicate key value violates unique constraint "uq_asset_tags_tenant_code"
+2026-11-21 22:47:54.051 UTC [30667] DETAIL:  Key (tenant_id, code)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, tag-dup-fixed-signed-token-payload-0123456789abcdef) already exists.
+2026-11-21 22:47:54.051 UTC [30667] STATEMENT:  INSERT INTO asset_tags (id, tenant_id, asset_id, code, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, $3, $4)
+
+2026-11-21 22:47:54.072 UTC [30667] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_branches"
+2026-11-21 22:47:54.072 UTC [30667] DETAIL:  Failing row contains (069148ad-169e-4ab6-9faf-d81ee035d61c, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.072734+00, 2026-11-21 22:47:54.072734+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, e318a942-d39e-4d08-830f-2c0966a1a97c, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, Relocation, null, DRAFT, null, null, null, null, null, null, null, null, null, null).
+2026-11-21 22:47:54.072 UTC [30667] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-21 22:47:54.083 UTC [30667] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-21 22:47:54.083 UTC [30667] DETAIL:  Failing row contains (269bdb97-8b66-4aa7-b659-edcecc85f729, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.083099+00, 2026-11-21 22:47:54.083099+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 2c86fe5a-09e3-4dda-bb03-d6b0075791d2, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, 3cfee421-527d-4244-8ff0-f4d8c3a8e4c6, Relocation, null, DRAFT, null, null, 2026-02-01 10:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, null, null, null, null, null, null).
+2026-11-21 22:47:54.083 UTC [30667] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-21 22:47:54.093 UTC [30667] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-21 22:47:54.093 UTC [30667] DETAIL:  Failing row contains (e8a86315-0bc2-4c25-9509-1608b65e146b, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.093196+00, 2026-11-21 22:47:54.093196+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, b9110437-d333-4057-a3ce-1a89fe971016, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, 52410e41-3397-4a95-9161-be9d9e15050f, Relocation, null, APPROVED, null, null, null, null, null, null, null, null, null, null).
+2026-11-21 22:47:54.093 UTC [30667] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-21 22:47:54.104 UTC [30667] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-21 22:47:54.104 UTC [30667] DETAIL:  Failing row contains (1bfcab14-f402-42e5-b6c7-f16c60481357, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.104423+00, 2026-11-21 22:47:54.104423+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 01644dcc-7eea-4aea-aea5-d7705d8888d7, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, 09aac94b-c169-409d-8511-eb1ee7c76595, Relocation, null, REJECTED, 2026-02-01 08:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, null, null, 2026-02-01 09:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, null, null, null, null).
+2026-11-21 22:47:54.104 UTC [30667] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-21 22:47:54.115 UTC [30667] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-21 22:47:54.115 UTC [30667] DETAIL:  Failing row contains (f652c8d5-da87-49c9-b9de-f6087b7ad961, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.115084+00, 2026-11-21 22:47:54.115084+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 3244b77a-6975-4351-b270-4b3d4b747617, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, e1d5cedd-279d-4f15-a65a-3bde726e7d86, Relocation, null, APPROVED, 2026-02-01 08:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, 2026-02-01 09:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, 2026-02-01 10:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, both, null, null, null).
+2026-11-21 22:47:54.115 UTC [30667] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-21 22:47:54.124 UTC [30667] ERROR:  new row for relation "assets" violates check constraint "ck_assets_parent_not_self"
+2026-11-21 22:47:54.124 UTC [30667] DETAIL:  Failing row contains (81d8a8b0-2155-4d3e-a111-af9dbbef9a81, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-21 22:47:54.120153+00, 2026-11-21 22:47:54.120153+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, EXT-SELF, Asset EXT-SELF, أصل EXT-SELF, 38af090c-1669-400b-ad2c-651ef5cabca4, 2026-01-15, 100000.0000, 0.0000, 0.0000, 60, STRAIGHT_LINE, null, 6f0af5ab-8e10-4e67-97de-c7160ee89c34, null, ACTIVE, null, null, null, null, null, null, 2027-01-15, null, null, null, null, 81d8a8b0-2155-4d3e-a111-af9dbbef9a81).
+2026-11-21 22:47:54.124 UTC [30667] STATEMENT:  UPDATE assets SET parent_asset_id = id WHERE id = $1
+
+2026-11-21 22:47:54.126 UTC [30667] ERROR:  insert or update on table "assets" violates foreign key constraint "fk_assets_cost_center"
+2026-11-21 22:47:54.126 UTC [30667] DETAIL:  Key (cost_center_id, tenant_id)=(00000000-0000-4000-8000-00000000dead, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c) is not present in table "cost_centers".
+2026-11-21 22:47:54.126 UTC [30667] STATEMENT:  INSERT INTO assets (id, tenant_id, code, name, name_ar, category_id,
+	              acquisition_date, cost, useful_life_months, branch_id, cost_center_id, created_by)
+	           VALUES (gen_random_uuid(), $1, 'EXT-BADCC', 'x', 'س', $2, '2026-01-15', 100, 60, $3,
+	              '00000000-0000-4000-8000-00000000dead', $4)
+
+ ✓ src/__db__/cmms/cmms-schema.db.spec.ts (32 tests) 387ms
+2026-11-21 22:47:54.280 UTC [30700] ERROR:  syntax error at or near "SELECT" at character 200
+2026-11-21 22:47:54.280 UTC [30700] STATEMENT:  
+	    INSERT INTO asset_tags (id, tenant_id, created_by, asset_id, code, note, note_ar)
+	    VALUES ($1, $2, $3, $4,
+	      $5, $6, $7)
+	    ON CONFLICT ("tenant_id", "code") DO NOTHING
+	    RETURNING 
+	  SELECT id, asset_id AS "assetId", code, printed_at::text AS "printedAt",
+	    note, note_ar AS "noteAr", created_by AS "createdBy",
+	    created_at::text AS "createdAt", updated_at::text AS "updatedAt", version
+	  FROM asset_tags
+
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts (7 tests | 6 failed) 86ms
+   × PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > the batch create: 1…50 signed codes per act, all unique, inside the DB floor; the audit row lands 33ms
+     → Failed query: 
+    INSERT INTO asset_tags (id, tenant_id, created_by, asset_id, code, note, note_ar)
+    VALUES ($1, $2, $3, $4,
+      $5, $6, $7)
+    ON CONFLICT ("tenant_id", "code") DO NOTHING
+    RETURNING 
+  SELECT id, asset_id AS "assetId", code, printed_at::text AS "printedAt",
+    note, note_ar AS "noteAr", created_by AS "createdBy",
+    created_at::text AS "createdAt", updated_at::text AS "updatedAt", version
+  FROM asset_tags
+params: 01a2004b-72a7-7000-a1fe-17a869d68c2e,3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c,3c3c3c3c-0000-4000-8000-0000000003c1,88b95269-91c5-43e2-8e72-a645c166ddbb,z039PB6zqgscqdU57s15ml0F1sS1DXl-JEp6M1qZXhA.M349wOOUF_zHg_jK-TMR3i_OtE7H39XHMsIN9vd8boc,Batch A,
+   ✓ PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > a disposed asset takes no new labels (D-01's authoring guard — the typed refusal) 20ms
+   × PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE SCAN resolves the card: the register brief + the four expiry chips + the maintenance context + the odometer binding (R-10) 14ms
+     → the presented code is not a valid signed tag token (the shape or the signature refused — an unsigned/forged code never reaches a lookup; only platform-signed codes resolve) / الرمز المعروض ليس رمز بطاقة موقّعًا صالحًا — الرفض عند التوقيع لا عند البحث
+   × PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE SIGNATURE GATE: a forged/malformed code refuses at the signature (TAG_CODE_INVALID) — never at a lookup 2ms
+     → Cannot read properties of undefined (reading 'slice')
+   × PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE TYPED 404: a foreign tenant's scan of this tenant's validly-signed code finds nothing (RLS — never a cross-tenant oracle) 4ms
+     → expected CmmsTagCodeInvalidError: the presented co… { …(2) } to be an instance of CmmsTagNotFoundError
+   × PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE PRINTED STAMP — the single-consumption CAS seal: print once → stamped; the re-print refuses BY NAME carrying the standing stamp 3ms
+     → Cannot read properties of undefined (reading 'id')
+   × PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > the register hygiene delete: the code stops resolving the moment the row dies (the typed 404 thereafter) 2ms
+     → Cannot read properties of undefined (reading 'id')
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/cmms/cmms-tags.db.spec.ts > PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > the batch create: 1…50 signed codes per act, all unique, inside the DB floor; the audit row lands
+Error: Failed query: 
+    INSERT INTO asset_tags (id, tenant_id, created_by, asset_id, code, note, note_ar)
+    VALUES ($1, $2, $3, $4,
+      $5, $6, $7)
+    ON CONFLICT ("tenant_id", "code") DO NOTHING
+    RETURNING 
+  SELECT id, asset_id AS "assetId", code, printed_at::text AS "printedAt",
+    note, note_ar AS "noteAr", created_by AS "createdBy",
+    created_at::text AS "createdAt", updated_at::text AS "updatedAt", version
+  FROM asset_tags
+params: 01a2004b-72a7-7000-a1fe-17a869d68c2e,3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c,3c3c3c3c-0000-4000-8000-0000000003c1,88b95269-91c5-43e2-8e72-a645c166ddbb,z039PB6zqgscqdU57s15ml0F1sS1DXl-JEp6M1qZXhA.M349wOOUF_zHg_jK-TMR3i_OtE7H39XHMsIN9vd8boc,Batch A,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/fixed_assets/infrastructure/cmms.store.ts:43:18
+     41|  * index signature our row interfaces deliberately lack). */
+     42| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     43|   const result = await tenantTx().execute(statement);
+       |                  ^
+     44|   return result.rows as unknown as T[];
+     45| }
+ ❯ Module.insertTag src/modules/fixed_assets/infrastructure/cmms.store.ts:1327:16
+ ❯ AssetTagsService.createTags src/modules/fixed_assets/application/asset-tags-service.ts:103:15
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:72:23
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:71:5
+
+Caused by: error: syntax error at or near "SELECT"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/fixed_assets/infrastructure/cmms.store.ts:43:18
+ ❯ Module.insertTag src/modules/fixed_assets/infrastructure/cmms.store.ts:1327:16
+ ❯ AssetTagsService.createTags src/modules/fixed_assets/application/asset-tags-service.ts:103:15
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:72:23
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:71:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 96, severity: 'ERROR', code: '42601', detail: undefined, hint: undefined, position: '200', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'scan.l', routine: 'scanner_yyerror' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/__db__/cmms/cmms-tags.db.spec.ts > PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE SCAN resolves the card: the register brief + the four expiry chips + the maintenance context + the odometer binding (R-10)
+CmmsTagCodeInvalidError: the presented code is not a valid signed tag token (the shape or the signature refused — an unsigned/forged code never reaches a lookup; only platform-signed codes resolve) / الرمز المعروض ليس رمز بطاقة موقّعًا صالحًا — الرفض عند التوقيع لا عند البحث
+ ❯ AssetTagsService.scanCode src/modules/fixed_assets/application/asset-tags-service.ts:250:13
+    248|     const verified = verifyTagCode(keyMaterialForTokens(), input.code);
+    249|     if (verified === null) {
+    250|       throw new CmmsTagCodeInvalidError();
+       |             ^
+    251|     }
+    252|     const tag = await store.findTagByCode(input.code);
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:114:35
+ ❯ src/infra/db/tenant-context.ts:78:14
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:113:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/__db__/cmms/cmms-tags.db.spec.ts > PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE SIGNATURE GATE: a forged/malformed code refuses at the signature (TAG_CODE_INVALID) — never at a lookup
+TypeError: Cannot read properties of undefined (reading 'slice')
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:130:72
+    128|   it("THE SIGNATURE GATE: a forged/malformed code refuses at the signa…
+    129|     await withTenant(TENANT_CMMS, async () => {
+    130|       for (const forged of ["not-a-tag-code", "abc.def", `${spec.code!…
+       |                                                                        ^
+    131|         const refused = await tags.scanCode({ code: forged }).catch((e…
+    132|         expect(refused).toBeInstanceOf(CmmsTagCodeInvalidError);
+ ❯ src/infra/db/tenant-context.ts:78:14
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:129:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/__db__/cmms/cmms-tags.db.spec.ts > PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE TYPED 404: a foreign tenant's scan of this tenant's validly-signed code finds nothing (RLS — never a cross-tenant oracle)
+AssertionError: expected CmmsTagCodeInvalidError: the presented co… { …(2) } to be an instance of CmmsTagNotFoundError
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:140:23
+    138|     await withTenant(TENANT_CMMS_RLS, async () => {
+    139|       const refused = await tags.scanCode({ code: spec.code! }).catch(…
+    140|       expect(refused).toBeInstanceOf(CmmsTagNotFoundError);
+       |                       ^
+    141|     });
+    142|   });
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:138:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/__db__/cmms/cmms-tags.db.spec.ts > PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > THE PRINTED STAMP — the single-consumption CAS seal: print once → stamped; the re-print refuses BY NAME carrying the standing stamp
+TypeError: Cannot read properties of undefined (reading 'id')
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:148:58
+    146|       const listed = await tags.listTags({ assetId: spec.assetId! });
+    147|       const first = listed[0]!;
+    148|       const stamped = await tags.printTag({ tagId: first.id, actorId: …
+       |                                                          ^
+    149|       expect(stamped.printedAt).not.toBeNull();
+    150| 
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:145:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/__db__/cmms/cmms-tags.db.spec.ts > PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan-resolvable) > the register hygiene delete: the code stops resolving the moment the row dies (the typed 404 thereafter)
+TypeError: Cannot read properties of undefined (reading 'id')
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:172:44
+    170|       const listed = await tags.listTags({ assetId: spec.assetId! });
+    171|       const victim = listed[0]!;
+    172|       await tags.deleteTag({ tagId: victim.id, actorId: CM_ACTOR });
+       |                                            ^
+    173|       const scan = await tags.scanCode({ code: victim.code }).catch((e…
+    174|       expect(scan).toBeInstanceOf(CmmsTagNotFoundError);
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/cmms/cmms-tags.db.spec.ts:169:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  6 failed | 33 passed (39)
+   Start at  22:47:47
+   Duration  6.97s (transform 558ms, setup 0ms, collect 1.31s, tests 473ms, environment 0ms, prepare 57ms)
+
+2026-11-21 22:47:54.358 UTC [30586] LOG:  received fast shutdown request
+2026-11-21 22:47:54.358 UTC [30586] LOG:  aborting any active transactions
+2026-11-21 22:47:54.358 UTC [30700] FATAL:  terminating connection due to administrator command
+2026-11-21 22:47:54.360 UTC [30667] FATAL:  terminating connection due to administrator command
+2026-11-21 22:47:54.362 UTC [30586] LOG:  background worker "logical replication launcher" (PID 30592) exited with exit code 1
+2026-11-21 22:47:54.363 UTC [30587] LOG:  shutting down
+2026-11-21 22:47:54.363 UTC [30587] LOG:  checkpoint starting: shutdown immediate
+
+(node:30645) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:30645) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-21 22:47:54.388 UTC [30587] LOG:  checkpoint complete: wrote 2936 buffers (17.9%); 0 WAL file(s) added, 0 removed, 1 recycled; write=0.018 s, sync=0.008 s, total=0.026 s; sync files=2695, longest=0.001 s, average=0.001 s; distance=27203 kB, estimate=27203 kB; lsn=0/2F6F640, redo lsn=0/2F6F640
+
+2026-11-21 22:47:54.396 UTC [30586] LOG:  database system is shut down
+
+VITEST_EXIT=1

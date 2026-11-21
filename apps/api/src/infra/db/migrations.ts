@@ -597,6 +597,15 @@ export const MIGRATIONS: readonly string[] = [
   // registry key, the documented fail-closed default [30,7,0]). ZERO
   // table delta — the catalog stays 328; the chain 110 → 111.
   "0111_cmms_sweep_settings",
+  // PHASE-049 (W-19, dated 2026-11-21): 0112 = THE NOTIFICATIONS-CATEGORY
+  // UNION REPAIR — the honest catch of the wave's own schema arm (the
+  // shared-scope union law's second application, the 0110 precedent):
+  // 0043 §12 widened both category CHECK domains with 'payroll' and
+  // 0051's DROP+ADD silently rebuilt both lists WITHOUT it (the G-48
+  // class — a latent drift, nothing ever wrote the category); this slot
+  // restores the complete SEVENTEEN-member union. The journal 111 → 112;
+  // the catalog stays 328 (no tables).
+  "0112_cmms_notifications_category_repair",
 ];
 
 /**

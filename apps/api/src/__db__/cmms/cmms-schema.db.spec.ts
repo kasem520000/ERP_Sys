@@ -892,3 +892,98 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
     ).toEqual({ missing: [], extra: [] });
   });
 });
+
+describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-scope union law's second application)", () => {
+  /**
+   * THE OWNER'S LAW (the W-17 acceptance, standing from W-18), applied to
+   * the SECOND shared domain: the notifications/notification_prefs category
+   * CHECKs are recomputed from the UNION of every member every migration
+   * has EVER defined — never a single migration's list. This arm's first
+   * run CAUGHT A REAL PRE-EXISTING DEFECT (the G-48 class, recorded in
+   * 0112's header): 0043 §12 widened both domains with 'payroll' and
+   * 0051's DROP+ADD silently rebuilt both lists WITHOUT it — latent (no
+   * writer ever used the category), caught here by the law's own proof.
+   * The repair (0112, the 0110 precedent's shape) restores the complete
+   * union; a future partial DROP+ADD goes RED here naming the missing
+   * member.
+   */
+  it("both live category domains equal the UNION of every member every migration ever defined — enumerated explicitly (the 0112 catch: 'payroll' restored)", async () => {
+    const { readdirSync, readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const migrationsDir = join(process.cwd(), "migrations");
+    const sites = new Map<string, Set<string>>();
+    for (const file of readdirSync(migrationsDir).filter((name) => name.endsWith(".sql"))) {
+      const text = readFileSync(join(migrationsDir, file), "utf8");
+      for (const constraint of [
+        "ck_notifications_category_values",
+        "ck_notification_prefs_category_values",
+      ]) {
+        const pattern = new RegExp(
+          `(?:ADD CONSTRAINT|CONSTRAINT)\\s+${constraint}\\s+CHECK\\s*\\(\\s*"category"\\s+IN\\s*\\(([^)]+)\\)`,
+          "g",
+        );
+        for (const match of text.matchAll(pattern)) {
+          const members = new Set(
+            [...match[1]!.matchAll(/'([^']+)'/g)].map((hit) => hit[1]!),
+          );
+          const key = `${file}:${constraint}`;
+          sites.set(key, members);
+        }
+      }
+    }
+    expect(sites.size).toBeGreaterThan(0);
+    // The union — every member every migration has EVER defined (both
+    // domains share one lineage).
+    const union = new Set<string>();
+    for (const members of sites.values()) {
+      for (const member of members) union.add(member);
+    }
+
+    // The members ENUMERATED EXPLICITLY (seventeen at the 112 chain —
+    // every category family the platform has ever defined, 'payroll'
+    // among them):
+    expect([...union].sort()).toEqual([
+      "assets",
+      "budgeting",
+      "collections",
+      "crm",
+      "einvoicing",
+      "hr",
+      "installments",
+      "invoice_overdue",
+      "limits",
+      "notes",
+      "payroll",
+      "purchasing",
+      "reconciliation",
+      "stock",
+      "subscription",
+      "templates",
+      "warranties",
+    ]);
+
+    // The LIVE constraints, from the catalog itself — BOTH domains.
+    for (const [table, constraint] of [
+      ["notifications", "ck_notifications_category_values"],
+      ["notification_prefs", "ck_notification_prefs_category_values"],
+    ] as const) {
+      const live = await su.query<{ definition: string }>(
+        `SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+         WHERE conname = '${constraint}' AND conrelid = 'public.${table}'::regclass`,
+      );
+      expect(live.rows).toHaveLength(1);
+      const liveMembers = new Set(
+        [...live.rows[0]!.definition.matchAll(/'([^']+)'/g)].map((hit) => hit[1]!),
+      );
+      // THE LAW: live == the all-migrations union (a partial DROP+ADD goes
+      // RED here — the difference named, member by member; this arm's own
+      // first run named 'payroll' — the 0112 repair's cause).
+      const missing = [...union].filter((member) => !liveMembers.has(member));
+      const extra = [...liveMembers].filter((member) => !union.has(member));
+      expect(
+        { table, missing, extra },
+        `the live ${table} category domain must equal the union of every member every migration ever defined (the shared-scope union law)`,
+      ).toEqual({ table, missing: [], extra: [] });
+    }
+  });
+});

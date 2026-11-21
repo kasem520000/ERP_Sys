@@ -1324,13 +1324,14 @@ export async function insertTag(input: {
   createdBy: string | null;
 }): Promise<TagRow | undefined> {
   const id = generateUuidV7();
-  const rows = await query<TagRow>(sql`
+  const rows = await query<{ id: string }>(sql`
     INSERT INTO asset_tags (id, tenant_id, created_by, asset_id, code, note, note_ar)
     VALUES (${id}, ${requireTenantContext().tenantId}, ${input.createdBy}, ${input.assetId},
       ${input.code}, ${input.note}, ${input.noteAr})
     ON CONFLICT ("tenant_id", "code") DO NOTHING
-    RETURNING ${TAG_SELECT}`);
-  return rows[0];
+    RETURNING id`);
+  if (rows[0] === undefined) return undefined;
+  return findTagById(id);
 }
 
 export async function findTagById(tagId: string): Promise<TagRow | undefined> {

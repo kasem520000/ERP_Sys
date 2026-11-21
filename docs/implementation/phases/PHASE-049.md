@@ -141,26 +141,33 @@ without it
   >    spec's `stock_moves` scope arm (W-18) enumerates the members explicitly and
   >    asserts the live constraint equals the all-migrations union.
   >
-  > **[Dated 2026-11-21 (PHASE-049 W-19 — THE SWEEP SETTINGS PROVISION, the D-02
-  > disclosure law's FIRST APPLICATION as the envelope-announced fingerprint:
-  > «مفاتيح عتبات الكنس — أول مفاتيح settings في 049: صفحة بيانات بنمط 0098،
-  > الدفت 336 → 336+n بدلتا مؤرخة، والبصمة النهائية المتوقعة معلنة في مغلّف
-  > الموجة نفسه»).]** Migration **0111 `0111_cmms_sweep_settings.sql`** lands the
-  > W-19 provision: §1 the notifications category widening ('assets' joins BOTH
-  > CHECK domains — the 0099 §2 pattern; the shared-scope union law honored: the
-  > widened list is the union of every member every migration has ever defined, and
-  > the schema spec's notifications-category arm — W-19 — enumerates the members
-  > and asserts the live constraint equals the union) + §2 THE DATA PAGE (the 0098
-  > pattern): the ONE sweep threshold key **`assets.expiry.manage`** (matrix §3.27;
-  > **the drift 336 → 337** — the dated delta) — the sweep's threshold settings
+  > **[Dated 2026-11-21 (PHASE-049 W-19 — THE SWEEP SETTINGS PROVISION + THE
+  > UNION REPAIR, the D-02 disclosure law's FIRST APPLICATION as the
+  > envelope-announced fingerprint: «مفاتيح عتبات الكنس — أول مفاتيح settings
+  > في 049: صفحة بيانات بنمط 0098، الدفت 336 → 336+n بدلتا مؤرخة، والبصمة
+  > النهائية المتوقعة معلنة في مغلّف الموجة نفسه»).]** Migration **0111
+  > `0111_cmms_sweep_settings.sql`** lands the W-19 provision: §1 the
+  > notifications category widening ('assets' joins BOTH CHECK domains —
+  > the 0099 §2 pattern) + §2 THE DATA PAGE (the 0098 pattern): the ONE
+  > sweep threshold key **`assets.expiry.manage`** (matrix §3.27; **the
+  > drift 336 → 337** — the dated delta) — the sweep's threshold settings
   > surface over **THE FIRST 049 SETTINGS KEYS**: the typed registry key
   > `assets.expiry_sweep_thresholds` (SETTINGS_REGISTRY — the
-  > projects.fieldservice_sla_targets precedent), the documented fail-closed default
-  > **[30,7,0]**. **THIS PROVISION'S FINAL EXPECTED FINGERPRINT, ANNOUNCED IN THE
-  > WAVE'S OWN ENVELOPE: the chain 110 → 111 · ENTITY_CATALOG 328 (zero table
-  > delta) · the drift 337 · ROUTE_PERMISSIONS 1,093 + 9 = 1,102 (the tags family's
-  > five · the scan · the fleet-light register · the sweep config's two).** The
-  > fingerprint is final through W-23 unless a dated provision lands.
+  > projects.fieldservice_sla_targets precedent), the documented fail-closed
+  > default **[30,7,0]**. **[Dated the same session — THE 0112 AMENDMENT, the
+  > F1 correction at this original site: the wave's own notifications-
+  > category union arm (the shared-scope union law's second application,
+  > the schema spec's new arm) caught 0051's silent drop of 0043's
+  > 'payroll' member — the G-48 class, latent (no writer ever used it);
+  > migration 0112 `0112_cmms_notifications_category_repair.sql` (the
+  > 0110 precedent — 0111 already published, never touched) restores the
+  > complete SEVENTEEN-member union to both domains.]** **THIS WAVE'S FINAL
+  > EXPECTED FINGERPRINT, ANNOUNCED IN ITS OWN ENVELOPE (as amended by the
+  > 0112 catch): the chain 110 → 112 · ENTITY_CATALOG 328 (zero table
+  > delta) · the drift 337 · ROUTE_PERMISSIONS 1,093 + 9 = 1,102 (the tags
+  > family's five · the scan · the fleet-light register · the sweep
+  > config's two).** The fingerprint is final through W-23 unless a dated
+  > provision lands.
 - **Entities**: +8 tenant tables → SQL + Drizzle mirror + `ENTITY_CATALOG.md` rows
   (CR-36a); +column family on `assets`.
 - **Permissions**: +10 keys — `assets.maintenance.view/manage/plan`,

@@ -777,6 +777,13 @@
       "when": 1798257600000,
       "tag": "0111_cmms_sweep_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 111,
+      "version": "7",
+      "when": 1798344000000,
+      "tag": "0112_cmms_notifications_category_repair",
+      "breakpoints": true
     }
   ],
   "version": "7"

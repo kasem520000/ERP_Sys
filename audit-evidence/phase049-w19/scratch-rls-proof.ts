@@ -1,6 +1,6 @@
 /**
  * PHASE-049 W-19 — THE STANDALONE SCRATCH PROOF (the W-16/W-17/W-18 shape):
- * initdb a scratch embedded PG16 → apply the 111-chain from zero → run
+ * initdb a scratch embedded PG16 → apply the 112-chain from zero → run
  * check-rls against it → clean shutdown. One process, one log. Run
  * TWICE (السلسلة من الصفر مرتين) — both logs kept.
  */
@@ -47,7 +47,7 @@ async function main(): Promise<number> {
     await pg.stop();
     return 1;
   }
-  console.log("CHAIN_111_APPLIED");
+  console.log("CHAIN_112_APPLIED");
 
   console.log("RLS_CHECK");
   const rls = spawnSync("pnpm", ["run", "check:rls"], {

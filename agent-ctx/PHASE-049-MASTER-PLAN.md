@@ -419,19 +419,26 @@ synced entity added).
 | 0108 | `0108_cmms_asset_extensions.sql` | THE ALTER on `assets`: `warranty_expiry` · `insurance_expiry` · `license_expiry` · `inspection_expiry` · `cost_center_id` · `parent_asset_id` + THE DATA-ONLY grants block (the 0098/0103 pattern) |
 
 **[Dated 2026-11-21 (W-19 — THE HONEST SLOTS' AMENDMENT, the D-02 disclosure
-law's own prescription): 0111 `0111_cmms_sweep_settings.sql` — the sweep
-settings page + the notifications category widening.]** The W-19 wave
-(T-11/T-12) lands the owner-ordered provision: §1 the notifications category
-widening ('assets' joins BOTH CHECK domains — the 0023/0056/0099 pattern, the
-shared-scope union law honored) + §2 THE DATA PAGE (the 0098 pattern): the
-sweep threshold key `assets.expiry.manage` (the drift 336 → 337, dated) over
-THE FIRST 049 SETTINGS KEYS (`assets.expiry_sweep_thresholds` — the typed
-registry key, the documented fail-closed default [30,7/0]). **THIS
-PROVISION'S FINAL EXPECTED FINGERPRINT (announced in the wave's own envelope,
-the new law's FIRST APPLICATION): the chain 111 · ENTITY_CATALOG 328 (zero
-table delta) · the drift 337 · ROUTE_PERMISSIONS 1,093 + 9 = 1,102.**
-(0109/0110 — the W-17 provision + the source-shape repair — are recorded in
-the phase doc §4's dated amendment; the slots-pinned-honestly law stands.)
+law's own prescription): 0111 `0111_cmms_sweep_settings.sql` + 0112
+`0112_cmms_notifications_category_repair.sql` — the sweep settings page +
+the notifications category widening + the union repair.]** The W-19 wave
+(T-11/T-12) lands the owner-ordered provisions: 0111 §1 the notifications
+category widening ('assets' joins BOTH CHECK domains — the 0023/0056/0099
+pattern) + §2 THE DATA PAGE (the 0098 pattern): the sweep threshold key
+`assets.expiry.manage` (the drift 336 → 337, dated) over THE FIRST 049
+SETTINGS KEYS (`assets.expiry_sweep_thresholds` — the typed registry key,
+the documented fail-closed default [30,7/0]); **0112 — THE UNION REPAIR
+(the 0110 precedent's exact shape, the wave's own schema arm's catch):
+0043 §12 widened both category domains with 'payroll' and 0051's DROP+ADD
+silently rebuilt both lists without it (the G-48 class, a latent drift —
+nothing ever wrote the category); the slot restores the complete
+SEVENTEEN-member union.** **THE FINAL EXPECTED FINGERPRINT (announced in
+the wave's own envelope, the new law's FIRST APPLICATION — AMENDED by the
+0112 catch, the F1 dated correction at this original site): the chain 112
+· ENTITY_CATALOG 328 (zero table delta) · the drift 337 ·
+ROUTE_PERMISSIONS 1,093 + 9 = 1,102.** (0109/0110 — the W-17 provision +
+the source-shape repair — are recorded in the phase doc §4's dated
+amendment; the slots-pinned-honestly law stands.)
 
 All four: tenant_id prefix + RLS policies (the A1–A10 law), Drizzle mirrors,
 `tables.registry.ts` +8 (318 → 326), ENTITY_CATALOG rows (318 → 326),
