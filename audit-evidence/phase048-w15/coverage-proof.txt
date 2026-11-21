@@ -1,0 +1,36 @@
+W-15 PRECOMPUTED COVERAGE PROOF (built BEFORE the first run — the owner's clause 9;
+re-verified at the honest restructure below)
+Original plan: the W-14 five-chunk plan with the TWO time-sensitive specs isolated
+standalone (the pre-isolation mandate): soak-shaped pulled OUT of perf (6->5),
+fcm-channel pulled OUT of chunk b (100->99).
+THE HONEST RESTRUCTURE (declared — the regrouping-declaration law): chunk b's
+FIRST attempt failed TWO arms of notifications-email.db.spec.ts (the pg-boss async
+delivery race under the 99-file load — the same class as the W-14 fcm flake; the
+spec GREEN standalone 5/5 in 6.9s immediately after, both logs kept). The spec
+joined the isolated set (the third isolate) and chunk b shed it (99 -> 98).
+FINAL PLAN (eight runs, coverage-verified: union == disk inventory 271 == 271,
+unique 271 — no duplicates — comm diff EMPTY):
+  chunk-smoke     3 files (migrations + the isolation family)   1,783 tests expected
+  isolate-soak    1 file  (performance/soak-shaped)                 1 test  expected
+  chunk-perf-rest 5 files (the perf family minus soak)             23 tests expected
+  isolate-fcm     1 file  (notifications/fcm-channel)               8 tests expected
+  isolate-email   1 file  (notifications-email — the flake isolate) 5 tests expected
+  chunk-a        82 files                                         596 tests expected
+  chunk-b-rest   98 files (the W-14 chunk b minus fcm minus email) 772 tests expected
+  chunk-c        80 files                                         619 tests expected
+TOTAL: 271 files · 3,807 tests (W-14's delivered count — W-15 ships ZERO production
+code changes; the byte-identity of apps/ and packages/ between the W-14 head
+a932b1e and the W-15 head is the two-head protocol's diff evidence).
+The disk inventory list: coverage-inventory.txt; the union list: coverage-union.txt.
+
+THE TIME CEILING — COMPUTED BEFORE THE FULL RUN (double caution, the owner's clause 9):
+- The eight parts' measured sum: 631.81s across EIGHT PG boots (W-14: five boots).
+- Boot-normalized: 631.81 − 3 extra boots ≈ 595.8s vs W-14's parts sum 594.96s —
+  the machines are speed-equal; W-14's delivered full run: 554.42s (one boot).
+- Estimate: ~555s ± variance; CEILING DECLARED: 680s (the estimate × 1.2 —
+  double caution: the soak's 214s + the email/fcm async arms weighed carefully,
+  the flake class's five-incident history priced in).
+- The harness's own command cap (600s) is BELOW the declared ceiling — recorded
+  honestly: if the single run busts the harness cap, the partial log + the retry
+  policy apply (both logs kept); the eight-part envelope above is ALREADY the
+  complete 271/3,807 coverage proof with every part green.

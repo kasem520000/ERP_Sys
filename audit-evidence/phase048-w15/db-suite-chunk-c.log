@@ -1,0 +1,759 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-21 02:09:26.239 UTC [13013] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-21 02:09:26.239 UTC [13013] LOG:  listening on IPv6 address "::1", port 39223
+2026-11-21 02:09:26.239 UTC [13013] LOG:  listening on IPv4 address "127.0.0.1", port 39223
+
+2026-11-21 02:09:26.240 UTC [13013] LOG:  listening on Unix socket "/tmp/.s.PGSQL.39223"
+
+2026-11-21 02:09:26.241 UTC [13016] LOG:  database system was shut down at 2026-11-21 02:09:26 UTC
+
+2026-11-21 02:09:26.242 UTC [13013] LOG:  database system is ready to accept connections
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-01 duplicate deliveries: receipt:create_field_collection delivered 4× from the FILE store → one ledger effect set, byte-equal inbox replays, the drain replays duplicate:true
+[C-01/expo] seed=3585
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-02 reorder (FIELD EMPHASIS): the dependent van:confirm_unload arrives before its confirm_load predecessor → INSUFFICIENT_STOCK referencing the van snapshot (no orphans); the predecessor lands; the resubmission succeeds; the double-load rejects STALE_VERSION
+[C-02/expo] seed=3586
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-03 partial batch: 5 captured collections, #3 PERIOD_LOCKED → 4 ACKED + 1 typed REJECTED in the file, zero residue
+[C-03/expo] seed=3587
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-04 crash post-commit pre-ack on the FILE: close + reopen the DB → recoveryPass IN_FLIGHT→QUEUED → the re-push replays the original result — no second journal
+[C-04/expo] seed=3588
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-05 connectivity flap mid-sync (FIELD EMPHASIS): a fetched page is discarded → the FILE cursor not advanced, nothing materialized; the re-pull from cursor N serves the same page; the full drain converges (items + the field feed caches)
+[C-05/expo] seed=3589
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-06 revoke mid-queue (FIELD EMPHASIS): pull throws DEVICE_REVOKED, pushes per-item DEVICE_REVOKED, the FILE queue pending (no silent loss), queue unresolvable + surfaced, reconciliation lists the device
+[C-06/expo] seed=3590
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-07 clock skew ±48h (FIELD EMPHASIS): the captured command's advisory timestamps are ignored — server-authoritative ledger dates (valueDate + the server clock), same-second dedupe by id
+[C-07/expo] seed=3591
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-08 contract downgrade: per-item rejects; the gate trips through the REAL MobileSyncHost (read-only, outbox untouched, prompt once) → the updated build + restored server → gate cleared, writable, clean resume, zero corruption
+[C-08/expo] seed=3592
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-09 20 queued field commands, 2 engineered rejects → 18 ACKED (receipts + the load confirm + the credit-note draft), typed rejects with user actions in the FILE, honest states survive close+reopen
+[C-09/expo] seed=3593
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-09 20 queued field commands, 2 engineered rejects → 18 ACKED (receipts + the load confirm + the credit-note draft), typed rejects with user actions in the FILE, honest states survive close+reopen
+[C-09/expo] engineered rejects: #20 (over-unload) #3 (inactive partner)
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-10 two EXPO devices edit the same draft → non-owner FORBIDDEN, owner-stale STALE_VERSION, owner-current ACCEPTED (one resolution path, two files)
+[C-10/expo] seed=3594
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-11 tombstone: soft-deleted item pulls op:DELETE + payload:null into the FILE; the van_stocks vanished-key DELETE diff empties the mobile cache; stale pushes reject ITEM_INACTIVE; unknown-row tombstones no-op
+[C-11/expo] seed=3595
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-11b push budget (the per-device token bucket): burst past the bucket → DEFERRED RATE_LIMITED with retryAfterMs, nothing executed, nothing in the inbox; the expo outbox paces the retry (next_attempt_at) and drains after the window
+[C-11b/expo] seed=3611
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-12 cursor beyond the feed head → resync directive (fresh 0-cursor); the expo client honors it; the reset persists in the FILE; ledger untouched
+[C-12/expo] seed=3596
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-13 cross-tenant references (FIELD EMPHASIS): foreign ids reject with the SAME error shape as unknown ids, zero effects (tenant B byte-identical)
+[C-13/expo] seed=3597
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-14 suspension mid-queue: pushes TENANT_SUSPENDED per-item; restore → the expo device resumes from its parked FILE cursor, no duplicates, the pending command EXECUTES
+[C-14/expo] seed=3598
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-15 tampered payloads: the captured FILE rows are tampered post-capture (negative amount, malformed decimal, negative qty) → typed rejects, no partial ledger
+[C-15/expo] seed=3599
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-16 storage-full at capture on the FILE: loud typed failure while armed, the queue persists on disk, drains after recovery
+[C-16/expo] seed=3600
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > P-01 the personal class profile (DR-P22-08b): pull-only cycles materialize the linked partner's scoped read models; push is REFUSED on three layers; out-of-group pulls get the typed rejection; tampered cursors never widen the scope
+[P-01/expo] seed=3601
+
+stdout | src/__db__/sync/expo/expo-chaos.spec.ts > PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > F-01 fault soup (battery/connectivity realism, SYNC_TESTS §5): airplane windows, a dropped push response, a duplicate delivery, a Doze-deferred background (≥ 15 min simulated) and a mid-soup crash reboot — deterministically seeded; the store converges, oracles hold
+[F-01/expo] seed=1521 schedule: airplaneCycle=3 duplicateBeforeDoze=true
+
+ ✓ src/__db__/sync/expo/expo-chaos.spec.ts (19 tests) 11348ms
+   ✓ PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-09 20 queued field commands, 2 engineered rejects → 18 ACKED (receipts + the load confirm + the credit-note draft), typed rejects with user actions in the FILE, honest states survive close+reopen  350ms
+   ✓ PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > C-11b push budget (the per-device token bucket): burst past the bucket → DEFERRED RATE_LIMITED with retryAfterMs, nothing executed, nothing in the inbox; the expo outbox paces the retry (next_attempt_at) and drains after the window  8447ms
+   ✓ PHASE-022 expo chaos matrix C-01…C-16 (SYNC_TESTS §5 field-sales phone profile; MASTER-PLAN §9) > F-01 fault soup (battery/connectivity realism, SYNC_TESTS §5): airplane windows, a dropped push response, a duplicate delivery, a Doze-deferred background (≥ 15 min simulated) and a mid-soup crash reboot — deterministically seeded; the store converges, oracles hold  301ms
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-01 duplicate deliveries: pos_sale delivered 4× from the FILE store → one ledger effect set, byte-equal inbox replays, the drain replays duplicate:true
+[C-01/desktop] seed=3329
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-02 reorder: the dependent update_draft arrives first → VALIDATION_ERROR referencing the missing dependency (recorded REJECTED in the file); resubmit after the predecessor lands
+[C-02/desktop] seed=3330
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-03 partial batch: 5 captured sales, #3 PERIOD_LOCKED → 4 ACKED + 1 typed REJECTED in the file, zero residue
+[C-03/desktop] seed=3331
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-04 crash post-commit pre-ack on the FILE: close + reopen the DB → recoveryPass IN_FLIGHT→QUEUED → the re-push replays the original result — no second journal
+[C-04/desktop] seed=3332
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-05 flap mid-pull: a fetched page is discarded → the FILE cursor not advanced; the re-pull serves the same page; the full drain equals the oracle
+[C-05/desktop] seed=3333
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-06 revoke mid-queue: pull throws DEVICE_REVOKED, pushes per-item DEVICE_REVOKED, the FILE queue pending (no silent loss), reconciliation lists the device
+[C-06/desktop] seed=3334
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-07 clock skew ±48h: the captured command's advisory timestamps are ignored — server-authoritative ledger dates, same-second dedupe by id
+[C-07/desktop] seed=3335
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-08 stale contract + REAL signed update: per-item rejects; the gate trips (outbox untouched) → the updater installs a REAL minisign-signed build → server restored → gate cleared, writable, clean resume, zero corruption
+[C-08/desktop] seed=3336
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-09 20 queued sales, 2 engineered rejects → 18 official numbers, typed rejects with user actions in the FILE, PENDING_SYNC never posted; the state survives close+reopen
+[C-09/desktop] seed=3337
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-09 20 queued sales, 2 engineered rejects → 18 official numbers, typed rejects with user actions in the FILE, PENDING_SYNC never posted; the state survives close+reopen
+[C-09/desktop] engineered rejects: #5 (stock) #9 (inactive item)
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-09b PRICE_CHANGED: a captured sale with a stale unit price rejects PRICE_CHANGED (details {itemId, resolved, provided} in the FILE), zero residue; override-allowed lane posts
+[C-09b/desktop] seed=3483
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-10 two DESKTOP devices edit the same draft → non-owner FORBIDDEN, owner-stale STALE_VERSION, owner-current ACCEPTED (one resolution path, two files)
+[C-10/desktop] seed=3338
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-11 tombstone: soft-deleted item pulls op:DELETE + payload:null into the FILE, stale pushes reject ITEM_INACTIVE, unknown-row tombstones no-op
+[C-11/desktop] seed=3339
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-11b: a pos_sale referencing a soft-deleted (tombstoned) item rejects ITEM_INACTIVE resubmittable:false CANCEL_WITH_REASON (deactivated master data vocabulary)
+[C-11b/desktop] seed=3355
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-12 cursor beyond the feed head → resync directive (fresh 0-cursor); the desktop client honors it; the reset persists in the FILE; ledger untouched
+[C-12/desktop] seed=3340
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-13 cross-tenant references: foreign ids reject with the SAME error shape as unknown ids, zero effects (tenant B byte-identical)
+[C-13/desktop] seed=3341
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-14 suspension mid-session: pushes TENANT_SUSPENDED per-item; restore → the desktop device resumes from its parked FILE cursor, no duplicates, the pending command EXECUTES
+[C-14/desktop] seed=3342
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-15 tampered payloads: the captured FILE rows are tampered post-capture (negative qty, price/tender mismatch, zero price) → typed rejects, no partial ledger
+[C-15/desktop] seed=3343
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-16 storage-full at capture on the FILE: loud typed failure while armed, the queue persists on disk, drains after recovery
+[C-16/desktop] seed=3344
+
+stdout | src/__db__/sync/desktop/desktop-chaos.spec.ts > PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > D-06 updater attack postures in the DB-suite context (in-test HTTP manifest server; REAL minisign crypto): unsigned rejected, tampered bundle rejected, downgrade rejected, min-version forces update
+[D-06/desktop] seed=3334
+
+ ✓ src/__db__/sync/desktop/desktop-chaos.spec.ts (19 tests) 2997ms
+   ✓ PHASE-021 desktop chaos matrix C-01…C-16 (SYNC_TESTS §5 desktop profile; MASTER-PLAN §9) > C-09 20 queued sales, 2 engineered rejects → 18 official numbers, typed rejects with user actions in the FILE, PENDING_SYNC never posted; the state survives close+reopen  859ms
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-01 duplicate batches: pos_sale ×4 deliveries → one ledger effect set, byte-equal replays, duplicate:true
+[C-01] seed=3073
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-02 reorder: the dependent batch arrives first → VALIDATION_ERROR referencing the missing dependency, no orphans; resubmit after the predecessor lands
+[C-02] seed=3074
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-03 partial batch: 5 commands, #3 PERIOD_LOCKED → 1,2,4,5 committed, #3 typed reject, zero residue
+[C-03] seed=3075
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-04 crash post-commit pre-ack: the response is dropped, the re-push replays the original result — no second journal
+[C-04] seed=3076
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-05 flap mid-pull: a fetched page is discarded → cursor not advanced; the re-pull serves the same page; the full drain equals the oracle
+[C-05] seed=3077
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-06 revoke mid-queue: pull throws DEVICE_REVOKED, push per-item DEVICE_REVOKED, zero ledger, reconciliation lists the device
+[C-06] seed=3078
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-07 clock skew ±48h: client timestamps advisory, server-authoritative ledger dates, same-second dedupe by id
+[C-07] seed=3079
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-08 stale contract: per-item CONTRACT_VERSION_UNSUPPORTED, nothing executed/inbox; the sync-core store goes readOnly
+[C-08] seed=3080
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-09 20 queued sales, 2 engineered rejects → 18 official numbers, typed rejects with user actions, PENDING_SYNC never posted
+[C-09] seed=3081
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-09 20 queued sales, 2 engineered rejects → 18 official numbers, typed rejects with user actions, PENDING_SYNC never posted
+[C-09] engineered rejects: #16 (stock) #12 (inactive item)
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-09b PRICE_CHANGED: a pos_sale pushed with a stale unit price (base 100, pushed 90, consistent tenders) rejects PRICE_CHANGED with details {itemId, resolved, provided} — zero residue (BR-003 gate now on the POS path)
+[C-09b] seed=3227
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-10 two devices edit the same draft → non-owner FORBIDDEN, owner-stale STALE_VERSION, owner-current ACCEPTED (one resolution path)
+[C-10] seed=3082
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-11 tombstone: soft-deleted item pulls op:DELETE + payload:null, stale pushes reject, unknown-row tombstones no-op
+[C-11] seed=3083
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-11b: a pos_sale referencing a soft-deleted (tombstoned) item rejects ITEM_INACTIVE with resubmittable:false and action CANCEL_WITH_REASON (deactivated master data vocabulary)
+[C-11b] seed=3099
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-12 cursor beyond the feed head → resync directive (fresh 0-cursor, zero changes); the client honors it; ledger untouched
+[C-12] seed=3084
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-13 cross-tenant references: foreign ids reject with the SAME error shape as unknown ids, zero effects
+[C-13] seed=3085
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-14 suspension mid-session: pushes TENANT_SUSPENDED per-item; restore → resume from cursor, no duplicates (inbox replay)
+[C-14] seed=3086
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-15 tampered payloads: negative qty + price tamper → typed rejects, no partial ledger (INV-013/018)
+[C-15] seed=3087
+
+stdout | src/__db__/sync/chaos-matrix.spec.ts > PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-16 storage-full at capture: loud typed failure, queue persists, drains after recovery (C-09 semantics)
+[C-16] seed=3088
+
+ ✓ src/__db__/sync/chaos-matrix.spec.ts (19 tests) 2294ms
+   ✓ PHASE-020 chaos matrix C-01…C-16 (SYNC_TESTS §2; MASTER-PLAN §14) > C-09 20 queued sales, 2 engineered rejects → 18 official numbers, typed rejects with user actions, PENDING_SYNC never posted  844ms
+2026-11-21 02:09:50.786 UTC [13126] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-21 02:09:50.786 UTC [13126] STATEMENT:  
+	    UPDATE employees SET user_id = $1::uuid, updated_at = now(), version = version + 1
+	    WHERE id = $2::uuid AND user_id IS NULL
+	    RETURNING id
+	  
+
+ ✓ src/__db__/hr/hr-writer-races.spec.ts (20 tests) 1154ms
+{"level":30,"time":1795226997827,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795226997869,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795226998266,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1563-7000-88e7-91532b9a1beb","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":151,"msg":"request completed"}
+{"level":30,"time":1795226998399,"service":"erp-api","module":"http","correlation_id":"01a1fbde-15fe-7000-a3b1-c7ee52488bc1","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":129,"msg":"request completed"}
+{"level":30,"time":1795226998421,"service":"erp-api","module":"http","correlation_id":"01a1fbde-168a-7000-b7e9-b7b58270cc00","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/e9badb78-34b4-435a-b27e-e29913715d44/verify","status":401,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795226998432,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1697-7000-bb16-20dbe8f49cb9","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/e9badb78-34b4-435a-b27e-e29913715d44/verify","status":403,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795226998457,"service":"erp-api","module":"http","correlation_id":"01a1fbde-16b1-7000-a2b2-6d6e3bfb8af0","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/167d14a5-72c7-4ea2-9751-30f3fb8e5021/verify","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795226998485,"service":"erp-api","module":"http","correlation_id":"01a1fbde-16cf-7001-8222-d70320ef2ce7","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/850ae1cb-3bbd-4652-b596-62b7cea997b5/verify","status":409,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795226998514,"service":"erp-api","module":"http","correlation_id":"01a1fbde-16eb-7000-872c-bc5ff75fddab","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/b83bcd4d-1207-4909-a36f-cc6bbf8c6020/verify","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795226998524,"service":"erp-api","module":"http","correlation_id":"01a1fbde-16f4-7000-8a97-ebf32978bd01","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/b83bcd4d-1207-4909-a36f-cc6bbf8c6020/verify","status":409,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795226998549,"service":"erp-api","module":"http","correlation_id":"01a1fbde-170c-7000-8f29-0fe4fae66329","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/9a344e78-ae4b-4586-90a8-2c81bff7bbc8/verify","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795226998551,"service":"erp-api","module":"http","correlation_id":"01a1fbde-170d-7000-8408-ac9dbf7a34f4","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/9a344e78-ae4b-4586-90a8-2c81bff7bbc8/verify","status":409,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1795226998571,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1725-7000-9f5e-8389ff8e4066","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/00000000-0000-4000-8000-00000000dea1/verify","status":404,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226998576,"service":"erp-api","module":"http","correlation_id":"01a1fbde-172c-7000-a019-ec0144470504","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1347-7000-89b2-0706c030a4c2/remittance-export","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795226998578,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1732-7000-85ff-7420c87db65c","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1347-7000-89b2-0706c030a4c2/remittance-export","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1795226998586,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1733-7000-af6c-7f2a7e04b93d","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1368-7000-a072-90e3a8158b96/remittance-export","status":409,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795226998593,"service":"erp-api","module":"http","correlation_id":"01a1fbde-173b-7000-8889-0d6a5d51fd0e","action":"request","method":"GET","path":"/api/v1/payroll/runs/00000000-0000-4000-8000-00000000dea2/remittance-export","status":404,"duration_ms":6,"msg":"request completed"}
+(node:13072) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{"level":30,"time":1795226998633,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1743-7000-a50b-9a54cab32f32","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1347-7000-89b2-0706c030a4c2/remittance-export?format=xlsx&locale=ar","status":200,"duration_ms":38,"msg":"request completed"}
+{"level":30,"time":1795226998669,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1785-7000-9020-c1ae6bb24377","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1347-7000-89b2-0706c030a4c2/remittance-export?format=csv&locale=en","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795226998689,"service":"erp-api","module":"http","correlation_id":"01a1fbde-178f-7000-b847-dce8dd678495","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1347-7000-89b2-0706c030a4c2/remittance-export?format=xlsx&locale=en","status":200,"duration_ms":18,"msg":"request completed"}
+{"level":30,"time":1795226998714,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17b1-7000-9705-866b4ec2348b","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1fbde-1347-7000-89b2-0706c030a4c2/remittance-export?format=csv&locale=en","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795226998731,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17cb-7000-9582-2326d716793a","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1795226998737,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17cc-7000-a7fa-ad3e1ced5901","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795226998739,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17d2-7000-99c7-d71198cf86a4","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795226998777,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17d5-7000-ad06-c31c148d89ef","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":403,"duration_ms":36,"msg":"request completed"}
+{"level":30,"time":1795226998780,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17fb-7000-ae19-288ab6487812","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795226998787,"service":"erp-api","module":"http","correlation_id":"01a1fbde-17fd-7000-aacd-20aed808b3ad","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":403,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226998794,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1804-7000-88a0-8981febc722d","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226998802,"service":"erp-api","module":"http","correlation_id":"01a1fbde-180c-7000-9701-bf4800a08504","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles?jurisdiction=SA","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226998811,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1813-7000-ad66-6c50a4370ae8","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795226998840,"service":"erp-api","module":"http","correlation_id":"01a1fbde-181c-7000-9247-2788a616bc97","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":200,"duration_ms":28,"msg":"request completed"}
+{"level":30,"time":1795226998842,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1839-7000-ba67-38c1288e13e7","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795226998847,"service":"erp-api","module":"http","correlation_id":"01a1fbde-183b-7000-9334-19aeae8a32a8","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795226998849,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1840-7000-b542-a35e1849a639","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795226998853,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1841-7000-a311-0adaf53331e6","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795226998860,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1846-7000-8ce7-bc6f9f6de277","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226998865,"service":"erp-api","module":"http","correlation_id":"01a1fbde-184d-7000-b8ed-239b3f05338c","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795226999162,"service":"erp-api","module":"http","correlation_id":"01a1fbde-18e3-7000-873f-b7205a527868","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":151,"msg":"request completed"}
+{"level":30,"time":1795226999169,"service":"erp-api","module":"http","correlation_id":"01a1fbde-197b-7000-b986-0992b92750db","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226999177,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1983-7000-a33e-72e5832798b3","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":403,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795226999210,"service":"erp-api","module":"http","correlation_id":"01a1fbde-1993-7001-822a-471d1899a6d1","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":200,"duration_ms":22,"msg":"request completed"}
+{"level":30,"time":1795226999230,"service":"erp-api","module":"http","correlation_id":"01a1fbde-19ba-7000-b9ea-20c34eb4f348","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795226999241,"service":"erp-api","module":"http","correlation_id":"01a1fbde-19bf-7000-ac44-f9334b4e8f4c","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation?employeeId=01a1fbde-1343-7000-bb23-a807eb8638a4","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1795226999245,"service":"erp-api","module":"http","correlation_id":"01a1fbde-19cc-7000-9eef-579ae7969bf5","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795226999253,"service":"erp-api","module":"http","correlation_id":"01a1fbde-19ce-7000-b765-3d42296eaa63","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":422,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795226999274,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/payroll/statutory-routes.spec.ts (16 tests) 2217ms
+   ✓ PHASE-046 W-5 T-10/T-11 — the compliance lists + the EOSB views + the true-up trigger > (c) THE TRUE-UP KEY LAW: the management key does NOT carry the posting act — a statutory manager (both management keys, no ledger key) reads the views but takes the 403 naming payroll.runs.post  319ms
+2026-11-21 02:09:59.539 UTC [13216] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-performance.db.spec.ts (14 tests) 517ms
+ ✓ src/__db__/sync/desktop-intents.spec.ts (23 tests) 298ms
+ ✓ src/__db__/sync/field-intents.spec.ts (18 tests) 533ms
+2026-11-21 02:10:00.850 UTC [13232] ERROR:  permission denied for table payroll_run_lines
+2026-11-21 02:10:00.850 UTC [13232] STATEMENT:  UPDATE payroll_run_lines SET net_amount = 99999 WHERE run_id = $1
+
+ ✓ src/__db__/payroll/payroll-rules.spec.ts (14 tests) 523ms
+ ✓ src/__db__/payroll/payroll-writer-races.spec.ts (10 tests) 749ms
+ ✓ src/__db__/hr/talent-bridges.db.spec.ts (13 tests) 153ms
+stdout | src/__db__/sync/expo/d-expo-store.spec.ts > PHASE-022 D-01/D-02/D-04 + the 128 MB prune drill on the mobile store (MASTER-PLAN §9; DR-P22-08/09) > D-01 revocation on the EXPO store: host phase revoked + onRevocation → purgeOnRevocation empties the field store's business/outbox/cursors — and the FILE no longer contains the tenant row data (binary grep); the personal read models purge the same way
+[D-01/expo] seed=3537
+
+stdout | src/__db__/sync/expo/d-expo-store.spec.ts > PHASE-022 D-01/D-02/D-04 + the 128 MB prune drill on the mobile store (MASTER-PLAN §9; DR-P22-08/09) > D-02(a) secret-scan on the REAL file: SecureStore-held secrets seeded through the real flows NEVER appear in the DB bytes; D-02(b) the honest cipher note — the node build is plain SQLite (the cipher inspection is the device-farm leg)
+[D-02/expo] seed=3538
+
+stdout | src/__db__/sync/expo/d-expo-store.spec.ts > PHASE-022 D-01/D-02/D-04 + the 128 MB prune drill on the mobile store (MASTER-PLAN §9; DR-P22-08/09) > D-04 on the EXPO store: the REAL permissions snapshot makes the policy writable; 7d+1h degrades to read-only + online-required (the engine refuses captures LOUD, nothing half-captured); a REAL role change restores writability; the two-layer no-snapshot boundary is asserted honestly
+[D-04/expo] seed=3540
+
+stdout | src/__db__/sync/expo/d-expo-store.spec.ts > PHASE-022 D-01/D-02/D-04 + the 128 MB prune drill on the mobile store (MASTER-PLAN §9; DR-P22-08/09) > the 128 MB prune-budget drill: byte-exact dbstat accounting under a tiny budget (LRU batches, dirty + non-SYNCED rows never pruned, machinery untouched) AND under the DELETE-refusing storage fault (the host records the prune failure, the cycle outcome is unaffected, the store converges once the fault clears)
+[D-128MB/expo] seed=3541
+
+ ✓ src/__db__/sync/expo/d-expo-store.spec.ts (4 tests) 386ms
+ ✓ src/__db__/treasury/golden.spec.ts (14 tests) 537ms
+ ✓ src/__db__/sync/devices.spec.ts (9 tests) 270ms
+ ✓ src/__db__/sync/push.spec.ts (9 tests) 1435ms
+   ✓ PHASE-020 push (T-P20-2b): unified flow > 6. rate limit: burst past the bucket → DEFERRED RATE_LIMITED, nothing executed, nothing in the inbox  814ms
+ ✓ src/__db__/sync/policies.spec.ts (8 tests) 162ms
+2026-11-21 02:10:05.558 UTC [13324] ERROR:  new row for relation "eosb_calculations" violates check constraint "ck_eosb_calculations_delta"
+2026-11-21 02:10:05.558 UTC [13324] DETAIL:  Failing row contains (7f24294e-1379-4562-a732-8d81093f207b, 9d9d9d9d-9d9d-9d9d-9d9d-9d9d9d9d9d9d, 2026-11-21 02:10:05.55743+00, 2026-11-21 02:10:05.55743+00, 1, bcabcbcb-0000-4000-8000-0000000000ea, 01a1fbde-31c4-7000-a4bc-a991e6cc55ce, PERIOD_TRUE_UP, 7.00, [], {}, 40500.0000, 0.0000, 99999.0000, null, COMPUTED, null, null, 2026-06-04, null).
+2026-11-21 02:10:05.558 UTC [13324] STATEMENT:  INSERT INTO eosb_calculations
+	           (id, tenant_id, employee_id, kind, service_years, tier_breakdown, wage_base_snapshot,
+	            entitlement_amount, provision_balance, delta, status, entry_date, created_by)
+	         VALUES (gen_random_uuid(), $1, $2, 'PERIOD_TRUE_UP', 7.00, '[]'::jsonb, '{}'::jsonb,
+	                 40500.0000, 0.0000, 99999.0000, 'COMPUTED', DATE '2026-06-04', $3)
+
+ ✓ src/__db__/payroll/statutory-goldens.spec.ts (5 tests) 277ms
+ ✓ src/__db__/hr/shifts-roster.spec.ts (7 tests) 7934ms
+   ✓ PHASE-045 T-03 — shifts, the roster grid, and the rotation pattern generator > (e) THE DECLARED CEILING 200 × 92 (the joint review round): a full-size rotation run — 200 employees over 92 days = 18,400 cells, 92,000 bind parameters — succeeds under the CHUNKED write (pre-fix the single INSERT broke PostgreSQL's 65,535-parameter protocol limit) and the paginated grid retrieves EVERY cell  7854ms
+2026-11-21 02:10:13.712 UTC [13341] ERROR:  new row violates row-level security policy for table "performance_cycles"
+2026-11-21 02:10:13.712 UTC [13341] STATEMENT:  INSERT INTO performance_cycles (id, tenant_id, name, period_start, period_end) VALUES ($1, $2, 'Forged Cycle', '2026-01-01', '2026-12-31')
+
+2026-11-21 02:10:13.718 UTC [13342] ERROR:  new row violates row-level security policy for table "performance_reviews"
+2026-11-21 02:10:13.718 UTC [13342] STATEMENT:  INSERT INTO performance_reviews (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind) VALUES ($1, $2, $3, $4, $5, 'MANAGER')
+
+2026-11-21 02:10:13.724 UTC [13343] ERROR:  new row violates row-level security policy for table "competencies"
+2026-11-21 02:10:13.724 UTC [13343] STATEMENT:  INSERT INTO competencies (id, tenant_id, code, name) VALUES ($1, $2, 'FORGED', 'Forged')
+
+2026-11-21 02:10:13.730 UTC [13344] ERROR:  new row violates row-level security policy for table "competency_levels"
+2026-11-21 02:10:13.730 UTC [13344] STATEMENT:  INSERT INTO competency_levels (id, tenant_id, level, name, name_ar, descriptor, descriptor_ar) VALUES ($1, $2, 9, 'Forged', 'مزيف', 'Forged', 'مزيف')
+
+2026-11-21 02:10:13.736 UTC [13345] ERROR:  new row violates row-level security policy for table "goals"
+2026-11-21 02:10:13.736 UTC [13345] STATEMENT:  INSERT INTO goals (id, tenant_id, cycle_id, owner_employee_id, title, weight) VALUES ($1, $2, $3, $4, 'Forged Goal', '100.00')
+
+2026-11-21 02:10:13.742 UTC [13346] ERROR:  new row violates row-level security policy for table "vacancies"
+2026-11-21 02:10:13.742 UTC [13346] STATEMENT:  INSERT INTO vacancies (id, tenant_id, code, title, headcount) VALUES ($1, $2, 'FORGED-V', 'Forged', 1)
+
+2026-11-21 02:10:13.748 UTC [13347] ERROR:  new row violates row-level security policy for table "applicants"
+2026-11-21 02:10:13.748 UTC [13347] STATEMENT:  INSERT INTO applicants (id, tenant_id, vacancy_id, full_name) VALUES ($1, $2, $3, 'Forged Applicant')
+
+2026-11-21 02:10:13.754 UTC [13348] ERROR:  new row violates row-level security policy for table "interviews"
+2026-11-21 02:10:13.754 UTC [13348] STATEMENT:  INSERT INTO interviews (id, tenant_id, applicant_id, round, panelist_employee_id, scheduled_start, scheduled_end, mode) VALUES ($1, $2, $3, 1, $4, '2026-08-01 09:00:00+00', '2026-08-01 10:00:00+00', 'ONSITE')
+
+2026-11-21 02:10:13.760 UTC [13349] ERROR:  new row violates row-level security policy for table "training_programs"
+2026-11-21 02:10:13.760 UTC [13349] STATEMENT:  INSERT INTO training_programs (id, tenant_id, code, name, kind) VALUES ($1, $2, 'FORGED-TR', 'Forged', 'COURSE')
+
+2026-11-21 02:10:13.766 UTC [13350] ERROR:  new row violates row-level security policy for table "training_enrollments"
+2026-11-21 02:10:13.766 UTC [13350] STATEMENT:  INSERT INTO training_enrollments (id, tenant_id, program_id, employee_id) VALUES ($1, $2, $3, $4)
+
+2026-11-21 02:10:13.772 UTC [13351] ERROR:  new row violates row-level security policy for table "certifications"
+2026-11-21 02:10:13.772 UTC [13351] STATEMENT:  INSERT INTO certifications (id, tenant_id, employee_id, name, issuer, issue_date) VALUES ($1, $2, $3, 'Forged Cert', 'Forged', '2026-01-01')
+
+2026-11-21 02:10:13.779 UTC [13352] ERROR:  new row violates row-level security policy for table "org_units"
+2026-11-21 02:10:13.779 UTC [13352] STATEMENT:  INSERT INTO org_units (id, tenant_id, code, name, path) VALUES ($1, $2, 'FORGED-OU', 'Forged', '/FORGED')
+
+2026-11-21 02:10:13.785 UTC [13353] ERROR:  new row violates row-level security policy for table "positions"
+2026-11-21 02:10:13.785 UTC [13353] STATEMENT:  INSERT INTO positions (id, tenant_id, code, title) VALUES ($1, $2, 'FORGED-POS', 'Forged')
+
+2026-11-21 02:10:13.791 UTC [13354] ERROR:  new row violates row-level security policy for table "employee_documents"
+2026-11-21 02:10:13.791 UTC [13354] STATEMENT:  INSERT INTO employee_documents (id, tenant_id, employee_id, kind) VALUES ($1, $2, $3, 'IQAMA')
+
+2026-11-21 02:10:13.842 UTC [13361] ERROR:  permission denied for table performance_reviews
+2026-11-21 02:10:13.842 UTC [13361] STATEMENT:  DELETE FROM performance_reviews WHERE id = $1
+
+2026-11-21 02:10:14.140 UTC [13377] ERROR:  insert or update on table "performance_reviews" violates foreign key constraint "fk_performance_reviews_cycle"
+2026-11-21 02:10:14.140 UTC [13377] DETAIL:  Key is not present in table "performance_cycles".
+2026-11-21 02:10:14.140 UTC [13377] STATEMENT:  INSERT INTO performance_reviews (id, tenant_id, cycle_id, reviewer_employee_id, reviewee_employee_id, kind)
+	         VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, $2, $3, 'MANAGER')
+
+ ✓ src/__db__/hr/talent-rls.db.spec.ts (10 tests) 618ms
+ ✓ src/__db__/hr/inv031.spec.ts (7 tests) 5404ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (P2) the balance-cap property matrix — 12 generated configurations through the real engine, INV-031 after every step  4815ms
+   ✓ PHASE-045 T-17 — the INV-031 invariant suite + the BR-082…083 guards + the feed-totals tie > (BR-083) the year-crossing span charges the START year's cell ONLY — the next year stays untouched  308ms
+ ✓ src/__db__/hr/attendance.spec.ts (5 tests) 169ms
+{"level":30,"time":1795227020336,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795227020353,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795227020358,"service":"erp-api","module":"notifications","template":"login_notification","correlation_id":"01a1fbde-1563-7000-88e7-91532b9a1beb","msg":"email delivered"}
+{"level":30,"time":1795227020548,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6c76-7000-a23d-163a119e745e","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":142,"msg":"request completed"}
+{"level":30,"time":1795227020560,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d07-7000-bb4a-93e15f80d3d9","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":200,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795227020566,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d11-7000-8054-37acb08037f7","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227020573,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d18-7000-bd58-8335e32b3b2e","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227020578,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d1e-7000-8cd5-8220bc573eb6","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":422,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227020584,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d23-7000-a7d8-1103d1ef5c07","action":"request","method":"GET","path":"/api/v1/accounting/projects","status":200,"duration_ms":5,"msg":"request completed"}
+2026-11-21 02:10:20.592 UTC [13320] ERROR:  duplicate key value violates unique constraint "uq_projects_tenant_code"
+2026-11-21 02:10:20.592 UTC [13320] STATEMENT:  
+	    INSERT INTO projects (id, tenant_id, code, name, name_ar, parent_id)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3, $4, $5)
+	    RETURNING id, code, name, name_ar AS "nameAr", parent_id AS "parentId", status
+	  
+
+{"level":30,"time":1795227020593,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d2a-7000-8f76-45d2173986a2","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":409,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795227020600,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d33-7000-8e80-fb628e17e38b","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/11111111-2222-4333-8444-555555555555","status":404,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227020606,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d3a-7000-96be-4453c2b526d5","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a1fbde-6bd7-7000-a19d-7eca6c255253","status":404,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227020613,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d40-7000-9309-35d82c04fcbc","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a1fbde-6d15-7000-928a-e009895262c1","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227020622,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d47-7000-88df-df027470e8db","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a1fbde-6d15-7000-928a-e009895262c1","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795227020628,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6d4f-7000-870a-0de80c2b9f89","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a1fbde-6d15-7000-928a-e009895262c1","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227020740,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6db3-7000-baf7-5bc39e51d8de","action":"request","method":"GET","path":"/api/v1/accounting/gl/accounts?projectId=01a1fbde-6d0d-7000-acbc-c539d48b4b02","status":200,"duration_ms":17,"msg":"request completed"}
+{"level":30,"time":1795227020746,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6dc5-7000-a126-0260e1b3d215","action":"request","method":"GET","path":"/api/v1/accounting/gl/accounts/01a1fbde-6b30-7001-a537-4910ee172b07/movements?projectId=01a1fbde-6d0d-7000-acbc-c539d48b4b02","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227020751,"service":"erp-api","module":"http","correlation_id":"01a1fbde-6dcb-7000-af83-0aa987242b97","action":"request","method":"GET","path":"/api/v1/accounting/gl/journal-register?projectId=01a1fbde-6d0d-7000-acbc-c539d48b4b02","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227020807,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/accounting/projects.spec.ts (7 tests) 894ms
+ ✓ src/__db__/payroll/run-statutory.spec.ts (7 tests) 306ms
+2026-11-21 02:10:21.547 UTC [13419] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/hr/talent-recruitment.db.spec.ts (16 tests) 320ms
+stdout | src/__db__/sync/device-security.spec.ts > PHASE-020 device security (SECURITY_TEST_PLAN §10; SECURITY_AND_DEVICE_MANAGEMENT §3) > D-01 revocation pre-exec: pull typed DEVICE_REVOKED, push per-item DEVICE_REVOKED with zero ledger, queue unresolvable, reconciliation lists the device
+[D-01] seed=3329
+
+stdout | src/__db__/sync/device-security.spec.ts > PHASE-020 device security (SECURITY_TEST_PLAN §10; SECURITY_AND_DEVICE_MANAGEMENT §3) > D-03 malformed/oversized payloads: contract-shape violations reject as typed VALIDATION_ERROR items — never executed, never in the inbox
+[D-03] seed=3331
+
+stdout | src/__db__/sync/device-security.spec.ts > PHASE-020 device security (SECURITY_TEST_PLAN §10; SECURITY_AND_DEVICE_MANAGEMENT §3) > D-04 permission-snapshot expiry: > 7d watermark → store read-only (loud SyncReadOnlyError), fresh pull restores writability, the server stays the final authority
+[D-04] seed=3332
+
+stdout | src/__db__/sync/device-security.spec.ts > PHASE-020 device security (SECURITY_TEST_PLAN §10; SECURITY_AND_DEVICE_MANAGEMENT §3) > spoof: tenant A's user device inside tenant B's context → B's rows only, A's permission keys never leak, both ledgers untouched
+[spoof] seed=1525
+
+ ✓ src/__db__/sync/device-security.spec.ts (5 tests) 315ms
+stdout | src/__db__/sync/desktop/d-filestore.spec.ts > PHASE-021 D-01/D-02/D-04 on the desktop file store (MASTER-PLAN §9; DR-P21-02) > D-01 revocation on the FILE: host phase revoked + onRevocation → purgeOnRevocation empties business/outbox/cursors, keeps local_events scrubbed — and the FILE no longer contains the tenant row data (binary grep)
+[D-01/file] seed=3537
+
+stdout | src/__db__/sync/desktop/d-filestore.spec.ts > PHASE-021 D-01/D-02/D-04 on the desktop file store (MASTER-PLAN §9; DR-P21-02) > D-02(a) secret-scan on the REAL file: keychain-held secrets seeded through the real flows NEVER appear in the DB bytes
+[D-02a/file] seed=3538
+
+stdout | src/__db__/sync/desktop/d-filestore.spec.ts > PHASE-021 D-01/D-02/D-04 on the desktop file store (MASTER-PLAN §9; DR-P21-02) > D-02(b) cipher-profile binary inspection: encryption on the stock build fails CLOSED; the standard profile is readable plaintext (the RECORDED CAVEAT, DR-P21-02)
+[D-02b/file] seed=3538
+
+stdout | src/__db__/sync/desktop/d-filestore.spec.ts > PHASE-021 D-01/D-02/D-04 on the desktop file store (MASTER-PLAN §9; DR-P21-02) > D-04 on the FILE store: the REAL permission snapshot unlocks full mode; 7d+1h ages to readonly SNAPSHOT_EXPIRED (loud capture refusal); a REAL role change restores writability; no snapshot → readonly NO_SNAPSHOT
+[D-04/file] seed=3540
+
+ ✓ src/__db__/sync/desktop/d-filestore.spec.ts (4 tests) 349ms
+{"level":60,"time":1795227022707,"service":"erp-api","module":"posting-service","metric":"erp_posting_invariant_failures_total","code":"ENTRY_NOT_BALANCED","spec":{"docType":"journal_entry","docId":"01a1fbde-7570-7002-ab66-852acb07b2c2","operation":"post"},"msg":"POSTING INVARIANT FAILURE: the engine rejected an unbalanced entry (INV-001/002, RISK-009 — zero tolerance, auto-SEV-1) — investigate immediately"}
+ ✓ src/__db__/accounting/golden/golden.spec.ts (8 tests) 371ms
+ ✓ src/__db__/sync/pull-fields.spec.ts (5 tests) 455ms
+{"level":40,"time":1795227023629,"service":"erp-api","module":"sync-jobs","tenantId":"27272727-2727-2727-2727-272727272727","deviceId":"01a1fbde-77b4-7002-a116-b2e7a8164946","deviceName":"Van tablet 27","entities":["items"],"maxLagMs":864000002,"horizonDays":7,"msg":"sync cursor stall: device cursors are past the lag horizon"}
+{"level":40,"time":1795227023648,"service":"erp-api","module":"sync-jobs","tenantId":"27272727-2727-2727-2727-272727272727","deviceId":"01a1fbde-77b4-7002-a116-b2e7a8164946","deviceName":"Van tablet 27","entities":["items"],"maxLagMs":864000023,"horizonDays":7,"msg":"sync cursor stall: device cursors are past the lag horizon"}
+{"level":40,"time":1795227023688,"service":"erp-api","module":"sync-jobs","tenantId":"27272727-2727-2727-2727-272727272727","activeDevices":1,"stalls":[{"entityType":"items","lagMs":1200027}],"thresholdMs":600000,"msg":"sync feed stall: entities stopped changing while devices are pulling"}
+{"level":40,"time":1795227023689,"service":"erp-api","module":"sync-jobs","tenantId":"27272727-2727-2727-2727-272727272727","activeDevices":1,"stalls":[{"entityType":"items","lagMs":1200028}],"thresholdMs":600000,"msg":"sync feed stall: entities stopped changing while devices are pulling"}
+ ✓ src/__db__/sync/jobs.spec.ts (6 tests) 442ms
+ ✓ src/__db__/communication/outbox.db.spec.ts (8 tests) 133ms
+ ✓ src/__db__/sync/push-isolation.spec.ts (4 tests) 271ms
+ ✓ src/__db__/hr/leave.spec.ts (5 tests) 1490ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (b) THE ACCRUAL RUN — the annual grant with joiner proration (the mid-year hire), the monthly vesting, idempotence, and the INV-031 preservation  736ms
+   ✓ PHASE-045 T-07 — the leave engine: the catalog, INV-031, the lifecycle, the accrual, the rollover > (d) THE CARRY-OVER ROLLOVER — min(remaining, cap) with the truncation audited; a 0-cap carries nothing; idempotent  679ms
+{"level":30,"time":1795227026204,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795227026219,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795227026222,"service":"erp-api","module":"notifications","template":"login_notification","correlation_id":"01a1fbde-15fe-7000-a3b1-c7ee52488bc1","msg":"email delivered"}
+{"level":30,"time":1795227026413,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8362-7000-a079-8b571bb42702","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":139,"msg":"request completed"}
+{"level":30,"time":1795227026575,"service":"erp-api","module":"http","correlation_id":"01a1fbde-83ef-7000-b1c4-3427dbc4cb7d","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":160,"msg":"request completed"}
+{"level":30,"time":1795227026707,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8491-7000-b1a2-e0a28d2118c7","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":130,"msg":"request completed"}
+{"level":30,"time":1795227026711,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8515-7000-998c-2c69b74c05b6","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":401,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795227026716,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8518-7000-9d5b-92c67bfbab63","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026723,"service":"erp-api","module":"http","correlation_id":"01a1fbde-851e-7000-8886-e3b84a491dfe","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227026725,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8524-7000-ab9e-c2d04ed540e3","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795227026729,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8526-7000-b97b-131e9e336ffa","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795227026734,"service":"erp-api","module":"http","correlation_id":"01a1fbde-852a-7000-b7e0-ea88c3f24b20","action":"request","method":"GET","path":"/api/v1/hr/recruitment/vacancies","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026736,"service":"erp-api","module":"http","correlation_id":"01a1fbde-852f-7000-8f44-10932f4c3923","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795227026740,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8530-7000-861f-178f6004015e","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026745,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8535-7000-b7d1-d73c18d46499","action":"request","method":"GET","path":"/api/v1/hr/training/programs","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026746,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8539-7000-8408-ce74eb46ca73","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795227026750,"service":"erp-api","module":"http","correlation_id":"01a1fbde-853b-7000-b979-f37cc0d21114","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795227026755,"service":"erp-api","module":"http","correlation_id":"01a1fbde-853f-7000-b170-3380e66f4181","action":"request","method":"GET","path":"/api/v1/hr/org/units","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026760,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8544-7000-8df7-94412026c084","action":"request","method":"GET","path":"/api/v1/hr/org/placement/0523ca68-1c9a-4667-8d33-f76474097989","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026765,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8549-7000-af10-05369f8c3e69","action":"request","method":"GET","path":"/api/v1/hr/org/placement/4fc53f62-d5fb-40d2-ab4f-0cdcd726e74b","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026772,"service":"erp-api","module":"http","correlation_id":"01a1fbde-854f-7000-b77b-e4cbac49792a","action":"request","method":"GET","path":"/api/v1/hr/performance/reviews/for-employee/4fc53f62-d5fb-40d2-ab4f-0cdcd726e74b","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227026777,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8555-7000-827c-860331717e7a","action":"request","method":"GET","path":"/api/v1/hr/goals/for-employee/4fc53f62-d5fb-40d2-ab4f-0cdcd726e74b","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026783,"service":"erp-api","module":"http","correlation_id":"01a1fbde-855a-7000-ada3-469c1303cad2","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/4fc53f62-d5fb-40d2-ab4f-0cdcd726e74b","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227026793,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8560-7000-a759-977e975afb8b","action":"request","method":"POST","path":"/api/v1/hr/recruitment/applicants/01a1fbde-82cd-7000-a53b-cbfb7286c22a/hire","status":201,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795227026797,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8569-7000-8872-31f4fc8f5e44","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/4fc53f62-d5fb-40d2-ab4f-0cdcd726e74b","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026802,"service":"erp-api","module":"http","correlation_id":"01a1fbde-856e-7000-ad6d-f1eba1c6eea2","action":"request","method":"GET","path":"/api/v1/hr/recruitment/applicants/by-employee/0523ca68-1c9a-4667-8d33-f76474097989","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795227026809,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8573-7000-9e00-542cd78e4ffa","action":"request","method":"POST","path":"/api/v1/hr/performance/reviews/submit","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795227026816,"service":"erp-api","module":"http","correlation_id":"01a1fbde-857b-7000-a23b-1535786d28ec","action":"request","method":"POST","path":"/api/v1/hr/performance/cycles/01a1fbde-82bf-7000-a821-22e6f7411327/close","status":409,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227026823,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8582-7000-917e-a9d793d94105","action":"request","method":"POST","path":"/api/v1/hr/recruitment/applicants/01a1fbde-82cd-7000-a53b-cbfb7286c22a/stage","status":422,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795227026827,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8588-7000-a527-e2329a85dc2d","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795227026832,"service":"erp-api","module":"http","correlation_id":"01a1fbde-858d-7000-a791-ce12c5632500","action":"request","method":"POST","path":"/api/v1/hr/performance/cycles","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795227026840,"service":"erp-api","module":"http","correlation_id":"01a1fbde-8590-7000-b39f-eb91d1d24a5f","action":"request","method":"GET","path":"/api/v1/hr/performance/cycles","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795227026846,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/hr/talent-routes.spec.ts (9 tests) 1133ms
+2026-11-21 02:10:27.175 UTC [13489] ERROR:  permission denied for table cash_movements
+2026-11-21 02:10:27.175 UTC [13489] STATEMENT:  UPDATE cash_movements SET amount = 999 WHERE id = $1
+
+2026-11-21 02:10:27.175 UTC [13489] ERROR:  permission denied for table cash_movements
+2026-11-21 02:10:27.175 UTC [13489] STATEMENT:  DELETE FROM cash_movements WHERE id = $1
+
+2026-11-21 02:10:27.182 UTC [13490] ERROR:  cash_movements are append-only (INV-019): UPDATE on row 01a1fbde-868e-7000-b7d0-4abaad320d2e is forbidden
+2026-11-21 02:10:27.182 UTC [13490] CONTEXT:  PL/pgSQL function erp.cash_movements_guard() line 3 at RAISE
+2026-11-21 02:10:27.182 UTC [13490] STATEMENT:  UPDATE cash_movements SET amount = 999 WHERE id = $1
+
+ ✓ src/__db__/treasury/invariants.spec.ts (7 tests) 307ms
+ ✓ src/__db__/hr/talent-training-org.db.spec.ts (10 tests) 147ms
+ ✓ src/__db__/hr/overtime.spec.ts (4 tests) 93ms
+ ✓ src/__db__/payroll/variable-lines.spec.ts (5 tests) 255ms
+ ✓ src/__db__/hr/self-service.spec.ts (11 tests) 253ms
+[oa06-budgets] P1 bracket-set resolution:
+Incremental Sort  (cost=8.18..8.23 rows=2 width=68)
+  Sort Key: code, sort
+  Presorted Key: code
+  ->  Index Scan using uq_payroll_tax_brackets_set_sort on payroll_tax_brackets  (cost=0.15..8.17 rows=1 width=68)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (jurisdiction_code = 'SA'::text) AND (effective_from <= '2026-03-31'::date))
+        Filter: ((effective_to IS NULL) OR (effective_to >= '2026-03-31'::date))
+[oa06-budgets] P2a the EOSB tier resolution:
+Sort  (cost=8.19..8.19 rows=1 width=53)
+  Sort Key: from_years
+  ->  Index Scan using ix_eosb_rules_tenant_jurisdiction_effective on eosb_rules  (cost=0.15..8.18 rows=1 width=53)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (jurisdiction_code = 'SA'::text) AND (effective_from <= '2026-06-30'::date))
+        Filter: (((effective_to IS NULL) OR (effective_to >= '2026-06-30'::date)) AND ((contract_type IS NULL) OR (contract_type = 'FULL_TIME'::text)))
+[oa06-budgets] P2b the per-employee calculations walk:
+Limit  (cost=7.33..7.34 rows=2 width=67)
+  ->  Sort  (cost=7.33..7.34 rows=2 width=67)
+        Sort Key: created_at DESC, id DESC
+        ->  Bitmap Heap Scan on eosb_calculations  (cost=4.17..7.32 rows=2 width=67)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '7f7a8d9a-31b9-44ac-9100-d671db3345cc'::uuid))
+              ->  Bitmap Index Scan on ix_eosb_calculations_tenant_employee_kind  (cost=0.00..4.17 rows=2 width=0)
+                    Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = '7f7a8d9a-31b9-44ac-9100-d671db3345cc'::uuid))
+[oa06-budgets] P3 the statutory-summary walk:
+Sort  (cost=67.83..67.83 rows=3 width=106)
+  Sort Key: p.name, ((entry.value ->> 'code'::text))
+  ->  HashAggregate  (cost=67.71..67.80 rows=3 width=106)
+        Group Key: p.name, (entry.value ->> 'code'::text)
+        ->  Nested Loop  (cost=10.73..65.71 rows=80 width=74)
+              ->  Nested Loop  (cost=10.72..51.62 rows=80 width=510)
+                    ->  Nested Loop  (cost=8.50..17.51 rows=2 width=26)
+                          Join Filter: (p.id = r.fiscal_period_id)
+                          ->  Bitmap Heap Scan on payroll_runs r  (cost=4.18..7.28 rows=4 width=32)
+                                Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (status = ANY ('{PENDING_APPROVAL,POSTED}'::text[])))
+                                Filter: (status = 'POSTED'::text)
+                                ->  Bitmap Index Scan on uq_payroll_runs_one_live  (cost=0.00..4.18 rows=4 width=0)
+                                      Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                          ->  Materialize  (cost=4.32..10.05 rows=3 width=26)
+                                ->  Bitmap Heap Scan on fiscal_periods p  (cost=4.32..10.04 rows=3 width=26)
+                                      Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (start_date >= '2026-01-01'::date) AND (start_date <= '2026-06-30'::date))
+                                      ->  Bitmap Index Scan on ix_fiscal_periods_tenant_dates  (cost=0.00..4.32 rows=3 width=0)
+                                            Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (start_date >= '2026-01-01'::date) AND (start_date <= '2026-06-30'::date))
+                    ->  Bitmap Heap Scan on payroll_run_lines l  (cost=2.22..17.00 rows=6 width=516)
+                          Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (run_id = r.id))
+                          ->  Bitmap Index Scan on ix_payroll_run_lines_tenant_run  (cost=0.00..2.22 rows=6 width=0)
+                                Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (run_id = r.id))
+              ->  Memoize  (cost=0.01..1.51 rows=1 width=32)
+                    Cache Key: l.statutory_breakdown
+                    Cache Mode: binary
+                    ->  Function Scan on jsonb_array_elements entry  (cost=0.00..1.50 rows=1 width=32)
+                          Filter: ((value ->> 'kind'::text) = 'CONTRIBUTION'::text)
+[oa06-budgets] P4 the remittance liability read:
+Limit  (cost=4.20..7.35 rows=1 width=262)
+  ->  Bitmap Heap Scan on payroll_runs  (cost=4.20..7.35 rows=1 width=262)
+        Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+        Filter: (id = 'f56b92be-ce9f-4af1-9ad3-7595f56be05f'::uuid)
+        ->  Bitmap Index Scan on ix_payroll_runs_tenant_period_status  (cost=0.00..4.19 rows=6 width=0)
+              Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+ ✓ src/__db__/payroll/oa06-budgets.spec.ts (4 tests) 52ms
+{"level":60,"time":1795227028177,"service":"erp-api","module":"posting-service","metric":"erp_posting_invariant_failures_total","code":"ENTRY_NOT_BALANCED","spec":{"docType":"journal_entry","docId":"01a1fbde-8acd-7000-93a6-ea7cd500d9a4","operation":"post"},"msg":"POSTING INVARIANT FAILURE: the engine rejected an unbalanced entry (INV-001/002, RISK-009 — zero tolerance, auto-SEV-1) — investigate immediately"}
+{"level":60,"time":1795227028188,"service":"erp-api","module":"posting-service","metric":"erp_posting_invariant_failures_total","code":"ENTRY_NOT_BALANCED","spec":{"docType":"journal_entry","docId":"01a1fbde-8ad9-7000-8260-eab6aabf0652","operation":"post"},"msg":"POSTING INVARIANT FAILURE: the engine rejected an unbalanced entry (INV-001/002, RISK-009 — zero tolerance, auto-SEV-1) — investigate immediately"}
+2026-11-21 02:10:28.200 UTC [13507] ERROR:  permission denied for table journal_lines
+2026-11-21 02:10:28.200 UTC [13507] STATEMENT:  UPDATE journal_lines SET amount = 999 WHERE id = $1
+
+2026-11-21 02:10:28.201 UTC [13507] ERROR:  permission denied for table journal_entries
+2026-11-21 02:10:28.201 UTC [13507] STATEMENT:  DELETE FROM journal_entries WHERE id = $1
+
+2026-11-21 02:10:28.202 UTC [13507] ERROR:  permission denied for table journal_entries
+2026-11-21 02:10:28.202 UTC [13507] STATEMENT:  UPDATE journal_entries SET description = 'hacked' WHERE id = $1
+
+2026-11-21 02:10:28.217 UTC [13508] ERROR:  journal_entries are append-only (INV-003): only the reversal link (status→REVERSED, reversed_by_id) may change
+2026-11-21 02:10:28.217 UTC [13508] CONTEXT:  PL/pgSQL function erp.journal_entries_guard() line 28 at RAISE
+2026-11-21 02:10:28.217 UTC [13508] STATEMENT:  UPDATE journal_entries SET status = 'REVERSED', version = version + 1 WHERE id = $1
+
+{"level":60,"time":1795227028272,"service":"erp-api","module":"posting-service","metric":"erp_posting_invariant_failures_total","code":"ENTRY_NOT_BALANCED","spec":{"docType":"journal_entry","docId":"01a1fbde-8b2d-7000-a87c-b1727a9c81e0","operation":"post"},"msg":"POSTING INVARIANT FAILURE: the engine rejected an unbalanced entry (INV-001/002, RISK-009 — zero tolerance, auto-SEV-1) — investigate immediately"}
+ ✓ src/__db__/accounting/invariants/INV-001-009.spec.ts (16 tests) 171ms
+ ✓ src/__db__/hr/talent-documents-sweep.db.spec.ts (6 tests) 161ms
+ ✓ src/__db__/sync/expo/kill-matrix.spec.ts (4 tests) 3021ms
+   ✓ PHASE-022 kill matrix on the EXPO store — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at pre-commit (server committed, response dropped) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  955ms
+   ✓ PHASE-022 kill matrix on the EXPO store — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at post-commit pre-ack (results applied, ack never sent) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  693ms
+   ✓ PHASE-022 kill matrix on the EXPO store — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at mid-pull (page 1 committed, page 2 in flight) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  679ms
+   ✓ PHASE-022 kill matrix on the EXPO store — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at immediate-kill control (everything queued, nothing in flight) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  689ms
+ ✓ src/__db__/sync/desktop/kill-matrix.spec.ts (4 tests) 2943ms
+   ✓ PHASE-021 kill matrix — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at pre-commit (server committed, response dropped) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  847ms
+   ✓ PHASE-021 kill matrix — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at post-commit pre-ack (results applied, ack never sent) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  699ms
+   ✓ PHASE-021 kill matrix — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at mid-pull (page 1 committed, page 2 in flight) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  696ms
+   ✓ PHASE-021 kill matrix — real SIGKILL crash windows (C-04 semantics; MASTER-PLAN §9) > kill at immediate-kill control (everything queued, nothing in flight) → WAL recovers, outbox intact, re-converges, inbox dedupe holds  699ms
+ ✓ src/__db__/payroll/eosb.spec.ts (9 tests) 238ms
+ ✓ src/__db__/hr/attendance-import.spec.ts (5 tests) 81ms
+ ✓ src/__db__/sync/enroll.spec.ts (6 tests) 214ms
+ ✓ src/__db__/sync/pull-personal.spec.ts (5 tests) 595ms
+ ✓ src/__db__/accounting/periods/periods.spec.ts (5 tests) 201ms
+ ✓ src/__db__/installments/installments-rules.spec.ts (7 tests) 402ms
+ ✓ src/__db__/sync/register-partner-link.spec.ts (6 tests) 351ms
+ ✓ src/__db__/hr/leave-posting.spec.ts (3 tests) 180ms
+2026-11-21 02:10:37.197 UTC [13877] ERROR:  PERIOD_LOCKED: entry date falls in a LOCKED fiscal period
+2026-11-21 02:10:37.197 UTC [13877] CONTEXT:  PL/pgSQL function erp.journal_entry_period_check() line 9 at RAISE
+2026-11-21 02:10:37.197 UTC [13877] STATEMENT:  COMMIT
+
+2026-11-21 02:10:37.294 UTC [13879] ERROR:  duplicate key value violates unique constraint "uq_number_assignments_scope_number"
+2026-11-21 02:10:37.294 UTC [13879] DETAIL:  Key (tenant_id, doc_type, COALESCE(branch_id, '00000000-0000-0000-0000-000000000000'::uuid), number)=(33333333-3333-3333-3333-333333333333, probe_doc, 00000000-0000-0000-0000-000000000000, PRB-2026-000001) already exists.
+2026-11-21 02:10:37.294 UTC [13879] STATEMENT:  INSERT INTO number_assignments (id, tenant_id, doc_type, period_key, number, value)
+	         VALUES ($1, $2, 'probe_doc', '2026', $3, 999)
+
+ ✓ src/__db__/accounting/invariants/INV-011-022.spec.ts (8 tests) 194ms
+ ✓ src/__db__/sync/pull.spec.ts (9 tests) 125ms
+ ✓ src/__db__/hr/feed.spec.ts (4 tests) 482ms
+ ✓ src/__db__/treasury/treasury-rules.spec.ts (7 tests) 204ms
+ ✓ src/__db__/pos/golden.spec.ts (5 tests) 228ms
+ ✓ src/__db__/sync/wms-tasks.spec.ts (5 tests) 235ms
+ ✓ src/__db__/partners/vehicles.spec.ts (13 tests) 113ms
+[talent-explain-budgets] P1 the pipeline board read:
+Limit  (cost=17.89..17.96 rows=29 width=53)
+  ->  Sort  (cost=17.89..17.96 rows=29 width=53)
+        Sort Key: created_at DESC, full_name
+        ->  Bitmap Heap Scan on applicants  (cost=4.46..17.18 rows=29 width=53)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (vacancy_id = '60932c1b-857a-4e32-bab0-5579c54436a3'::uuid))
+              ->  Bitmap Index Scan on ix_applicants_tenant_vacancy  (cost=0.00..4.45 rows=29 width=0)
+                    Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (vacancy_id = '60932c1b-857a-4e32-bab0-5579c54436a3'::uuid))
+[talent-explain-budgets] P2 the pipeline report fold:
+Sort  (cost=60.28..60.33 rows=20 width=59)
+  Sort Key: v.code
+  ->  HashAggregate  (cost=59.30..59.85 rows=20 width=59)
+        Group Key: v.id
+        ->  Hash Right Join  (cost=21.56..48.80 rows=300 width=53)
+              Hash Cond: (a.vacancy_id = v.id)
+              ->  Bitmap Heap Scan on applicants a  (cost=12.81..38.31 rows=600 width=54)
+                    Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                    ->  Bitmap Index Scan on ix_applicants_tenant_stage  (cost=0.00..12.66 rows=600 width=0)
+                          Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+              ->  Hash  (cost=8.50..8.50 rows=20 width=47)
+                    ->  Index Scan using ix_vacancies_tenant_position on vacancies v  (cost=0.15..8.50 rows=20 width=47)
+                          Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+[talent-explain-budgets] P3 the 360 aggregation fold:
+Bitmap Heap Scan on performance_reviews  (cost=4.32..10.08 rows=3 width=26)
+  Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (reviewee_employee_id = '6b6928f7-7feb-4bd1-bc05-9784b2b5b8dd'::uuid))
+  Filter: ((status = ANY ('{SUBMITTED,CALIBRATED}'::text[])) AND (kind = ANY ('{SELF,PEER,SUBORDINATE}'::text[])))
+  ->  Bitmap Index Scan on ix_performance_reviews_tenant_reviewee  (cost=0.00..4.32 rows=4 width=0)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (reviewee_employee_id = '6b6928f7-7feb-4bd1-bc05-9784b2b5b8dd'::uuid))
+[talent-explain-budgets] P4 the cycle review-set read:
+Sort  (cost=24.51..24.66 rows=59 width=40)
+  Sort Key: reviewee_employee_id
+  ->  Bitmap Heap Scan on performance_reviews r  (cost=10.32..22.77 rows=59 width=40)
+        Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (cycle_id = '0c40b8d5-08f2-4e5a-b70f-2808f53a3f60'::uuid))
+        Filter: ((status = ANY ('{SUBMITTED,CALIBRATED}'::text[])) AND (kind = 'MANAGER'::text))
+        ->  Bitmap Index Scan on ix_performance_reviews_tenant_cycle  (cost=0.00..10.31 rows=215 width=0)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (cycle_id = '0c40b8d5-08f2-4e5a-b70f-2808f53a3f60'::uuid))
+ ✓ src/__db__/hr/talent-explain-budgets.db.spec.ts (5 tests) 79ms
+ ✓ src/__db__/payroll/statutory.spec.ts (7 tests) 104ms
+ ✓ src/__db__/hr/holiday.spec.ts (3 tests) 72ms
+2026-11-21 02:10:39.266 UTC [13922] ERROR:  duplicate key value violates unique constraint "uq_employees_tenant_user"
+2026-11-21 02:10:39.266 UTC [13922] DETAIL:  Key (tenant_id, user_id)=(7a7a7a7a-7a7a-7a7a-7a7a-7a7a7a7a7a7a, 01a1fbde-b5f1-7000-b849-a7f2af9c368d) already exists.
+2026-11-21 02:10:39.266 UTC [13922] STATEMENT:  UPDATE employees SET user_id = $1, updated_at = now(), version = version + 1
+	          WHERE id = $2 AND tenant_id = $3
+
+ ✓ src/__db__/hr/bridge.spec.ts (3 tests) 60ms
+ ✓ src/__db__/treasury/bank-rec.spec.ts (11 tests) 115ms
+ ✓ src/__db__/hr/oa06-budgets.spec.ts (6 tests) 373ms
+ ✓ src/__db__/sync/chaos-submissions.spec.ts (5 tests) 514ms
+ ✓ src/__db__/sync/duplicates.spec.ts (5 tests) 644ms
+ ✓ src/__db__/communication/digest-nudges.db.spec.ts (4 tests) 172ms
+ ✓ src/__db__/installments/overdue-job.spec.ts (4 tests) 601ms
+ ✓ src/__db__/communication/calendar.db.spec.ts (4 tests) 45ms
+ ✓ src/__db__/communication/preferences.db.spec.ts (4 tests) 35ms
+2026-11-21 02:10:42.062 UTC [13935] ERROR:  duplicate key value violates unique constraint "uq_journal_entries_tenant_source_op"
+2026-11-21 02:10:42.062 UTC [13935] STATEMENT:  
+	    INSERT INTO journal_entries (id, tenant_id, entry_no, entry_date, fiscal_period_id, currency_code,
+	                                 exchange_rate, status, source_type, source_id, operation,
+	                                 reversal_of_id, description, description_ar, post_reason, posted_by)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3,
+	            $4, $5, $6, 'POSTED',
+	            $7, $8, $9, $10,
+	            $11, $12,
+	            $13, $14)
+	    RETURNING id, entry_no AS "entryNo", entry_date AS "entryDate",
+	  fiscal_period_id AS "fiscalPeriodId", currency_code AS "currencyCode", exchange_rate AS "exchangeRate",
+	  status, source_type AS "sourceType", source_id AS "sourceId", operation,
+	  reversal_of_id AS "reversalOfId", reversed_by_id AS "reversedById",
+	  description, description_ar AS "descriptionAr", post_reason AS "postReason",
+	  posted_at AS "postedAt", posted_by AS "postedBy"
+	  
+
+2026-11-21 02:10:42.591 UTC [13951] ERROR:  PERIOD_LOCKED: entry date falls in a LOCKED fiscal period
+2026-11-21 02:10:42.591 UTC [13951] CONTEXT:  PL/pgSQL function erp.journal_entry_period_check() line 9 at RAISE
+2026-11-21 02:10:42.591 UTC [13951] STATEMENT:  commit
+
+2026-11-21 02:10:42.592 UTC [13951] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/accounting/concurrency/concurrency.spec.ts (4 tests) 606ms
+   ✓ CC-03 — sequence numbering race (50 parallel posts) > 50 unique official numbers, no gaps/collisions, no deadlocks  515ms
+ ✓ src/__db__/communication/explain-budgets.db.spec.ts (4 tests) 58ms
+ ✓ src/__db__/installments/spoof.spec.ts (5 tests) 98ms
+ ✓ src/__db__/payroll/pit.spec.ts (6 tests) 22ms
+ ✓ src/__db__/payroll/spoof.spec.ts (5 tests) 24ms
+ ✓ src/__db__/treasury/parsers.spec.ts (7 tests) 45ms
+ ✓ src/__db__/treasury/spoof.spec.ts (5 tests) 26ms
+ ✓ src/__db__/communication/inbox.db.spec.ts (3 tests) 15ms
+ ✓ src/__db__/accounting/gl-perf.db.spec.ts (3 tests) 98ms
+stdout | src/__db__/accounting/posting-smoke.local.spec.ts > PHASE-007 posting smoke (k6-equivalent, smoke tier) > posts under 5 concurrent workers measure p95 < 500ms with zero failures
+[posting-smoke] n=100 p50=27.4ms p95=56.2ms max=68.4ms failures=0
+
+ ✓ src/__db__/accounting/posting-smoke.local.spec.ts (1 test) 686ms
+   ✓ PHASE-007 posting smoke (k6-equivalent, smoke tier) > posts under 5 concurrent workers measure p95 < 500ms with zero failures  686ms
+
+ Test Files  80 passed (80)
+      Tests  619 passed (619)
+   Start at  02:09:25
+   Duration  78.65s (transform 6.38s, setup 0ms, collect 11.10s, tests 62.19s, environment 0ms, prepare 51ms)
+
+2026-11-21 02:10:43.861 UTC [13013] LOG:  received fast shutdown request
+2026-11-21 02:10:43.861 UTC [13013] LOG:  aborting any active transactions
+2026-11-21 02:10:43.861 UTC [13953] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.861 UTC [13959] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.863 UTC [13952] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.864 UTC [13958] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.864 UTC [13957] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.865 UTC [13950] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.866 UTC [13955] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.867 UTC [13949] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.867 UTC [13954] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.868 UTC [13947] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.868 UTC [13944] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.869 UTC [13942] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.869 UTC [13945] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.870 UTC [13943] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.870 UTC [13941] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.871 UTC [13935] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.872 UTC [13471] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.873 UTC [13948] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.875 UTC [13116] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.876 UTC [13946] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.876 UTC [13951] FATAL:  terminating connection due to administrator command
+2026-11-21 02:10:43.877 UTC [13956] FATAL:  terminating connection due to administrator command
+
+2026-11-21 02:10:43.880 UTC [13013] LOG:  background worker "logical replication launcher" (PID 13019) exited with exit code 1
+
+2026-11-21 02:10:43.885 UTC [13014] LOG:  shutting down
+
+2026-11-21 02:10:43.885 UTC [13014] LOG:  checkpoint starting: shutdown immediate
+
+(node:13072) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:13072) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-21 02:10:44.001 UTC [13014] LOG:  checkpoint complete: wrote 8847 buffers (54.0%); 0 WAL file(s) added, 0 removed, 6 recycled; write=0.090 s, sync=0.026 s, total=0.116 s; sync files=2989, longest=0.015 s, average=0.001 s; distance=102344 kB, estimate=102344 kB; lsn=0/78D0B80, redo lsn=0/78D0B80
+
+2026-11-21 02:10:44.014 UTC [13013] LOG:  database system is shut down
+
+VITEST_EXIT=0

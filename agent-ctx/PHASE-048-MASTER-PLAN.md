@@ -894,6 +894,40 @@ directories and files ONLY; NO moving, NO deleting, NO renaming of ANY
 existing directory.
 **Exit:** acceptance #10 green; PHASE-048 COMPLETE.
 
+> **[Dated 2026-11-21 (W-15 DELIVERED — the closure wave, T-19 + T-20, on
+> the owner-accepted W-14 head `a932b1e`, this session's FRESH CLONE after
+> the environment reset — the same-session evidence rule's TWENTY-THIRD
+> consecutive wave): the canon docs in the D-18 wordings (JOURNAL_RULES
+> G-55…G-58 + note 18 · ACCOUNTING_INVARIANTS INV-033 · BUSINESS_RULES
+> BR-092…096 · NAVIGATION_MODEL §1.11 + the LIVE row · FEATURE_CATALOG §29
+> · the NEW TABLES doc `projects-contracting.md` · PHASE_ACCEPTANCE_CRITERIA
+> §PHASE-048) landed in step commit `35c8239` TOGETHER WITH the ID_LEDGER
+> flip — atomic, no intermediate state (the reservation row and the canon
+> rows moved in one transaction; the checker green at the commit:
+> implemented G 58 · INV 33 · BR 96, reservations 16 · 45, the self-test
+> all-probes-OK with probe (7) moved to G-59/PHASE-049); THE FULL GATE
+> SWEEP at the final head green in BOTH envelopes — the eight-part
+> coverage-verified plan (the W-14 five-chunk plan restructured with the
+> THREE time-sensitive isolates: soak · fcm · email — the pre-isolation
+> mandate; the regrouping declared) + the single-process run GREEN
+> 271/271 · 3,807/3,807 · 0 failed · 0 skipped · 553.18s inside the
+> declared 680s ceiling (computed before the run, double caution) — with
+> TWO honest flake disclosures (the email chunk red → the isolate + the
+> retry, both logs kept; the soak full-run red → the retry, both logs
+> kept — the two-head protocol with the apps/packages byte-identity
+> between the W-14 and W-15 heads as the diff evidence) + the environment
+> -reset recovery disclosure (the fresh clone + the chromium headless-shell
+> 1248 env-prep) + the typecheck cache-hit replacement note; every
+> standing checker green (drift 326 = 326 · i18n 6,620 + 371 · tokens
+> 130/130 + 50/50 · manifests 13/13 · docs 33/33 · id-ledger 0 + self-test
+> · secrets 0 with the two tag anchors verified untouched · capabilities
+> agree · shells PASS · boundary PASS · the scratch chain from zero 318/0).
+> The completion report + the triple flip + the archive (OA-07,
+> ADDITIVE-ONLY) + the tag `phase/048` ride the delivery commit. The F1
+> date correction: the flip's first wording said 2026-11-22; the true UTC
+> session clock is 2026-11-21 — corrected at the claim site. NOT production
+> approval.]**
+
 ## 4. Test matrix (the permanent suites)
 
 - **Unit (pure, first):** `detectCycle` (the WBS dependency graph); the

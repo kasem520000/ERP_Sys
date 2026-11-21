@@ -42,7 +42,7 @@ corrections never move a slot.)*
 | ~~PHASE-045 (HR Core)~~ **DELIVERED 2026-11-16** — its slots are now IMPLEMENTED (G-50…G-51 · INV-031 · BR-082…084; see §1) and no longer reservations | — | — | — | ~~BR-081…BR-083~~ (BR-081 taken by the 043-completion round — the reservation hard protection, re-coordinated 2026-11-14; the original plan's BR-068…070 were already consumed by 039–042) |
 | ~~PHASE-046 (HR Payroll)~~ **DELIVERED 2026-11-17** — its slots are now IMPLEMENTED (G-52…G-54 · INV-032 · BR-085…087; see §1) and no longer reservations | — | — | — | G-53…G-55 · INV-031 · BR-071…073 (consumed by 039–042/044); ~~BR-084…086~~ shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | ~~PHASE-047 (HR Growth)~~ **DELIVERED 2026-11-19** — its slots are now IMPLEMENTED (BR-088…091; see §1 — the phase is LEDGER-FREE by design: no G/INV reservations, the four BR laws are the phase doc's own + amendment A-2's confirmed BR-091 wording) and no longer reservations | — | — | — | BR-057…060 (consumed by 036/037); ~~BR-087…090~~ shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
-| ~~PHASE-048 (Projects & Contracting)~~ **DELIVERED 2026-11-22** — its slots are now IMPLEMENTED (G-55…G-58 · INV-033 · BR-092…096; see §1 — the D-18 wordings binding at approval, carried into the canon at the W-15 closure) and no longer reservations | — | — | — | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| ~~PHASE-048 (Projects & Contracting)~~ **DELIVERED 2026-11-21** — its slots are now IMPLEMENTED (G-55…G-58 · INV-033 · BR-092…096; see §1 — the D-18 wordings binding at approval, carried into the canon at the W-15 closure) and no longer reservations | — | — | — | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | PHASE-049 (CMMS) | G-59…G-61 | INV-034 | BR-097…BR-100 | G-60…G-62 · INV-033 · BR-066…069 (consumed by 040/042); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | PHASE-050 (QMS) | G-62…G-63 | INV-035 | BR-101…BR-104 | G-63…G-64 · INV-034 · BR-070…073 (consumed by 042/044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | PHASE-051 (FTL) | G-64…G-66 | INV-036 | BR-105…BR-108 | G-65…G-67 · INV-035 · BR-074…077 (consumed by 044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
@@ -62,13 +62,13 @@ corrections never move a slot.)*
 | PHASE-065…068 | — | — | — | none claimed |
 
 **Coordination arithmetic** (the checker re-derives it): goldens — implemented
-ends at G-58 (PHASE-048 delivered 2026-11-22); 049 59–61,
+ends at G-58 (PHASE-048 delivered 2026-11-21); 049 59–61,
 050 62–63, 051 64–66, 052 67, 053 68–70, 054 71–72,
 056 73–74, 060 75–76, 061 77–78, 063 79 — contiguous, no overlap. Invariants —
 implemented ends at INV-033 (PHASE-048 delivered); 049 034,
 050 035, 051 036, 052 037, 053 038, 054 039, 055 040, 056 041, 058 042,
 060 043, 061 044, 064 045 — contiguous. Business rules — implemented ends at
-BR-096 (PHASE-048 delivered 2026-11-22); 049 097–100,
+BR-096 (PHASE-048 delivered 2026-11-21); 049 097–100,
 050 101–104, 051 105–108 — contiguous (every phase after 043
 shifted +1 by the completion round's BR-081, re-coordinated 2026-11-14).
 
