@@ -1,0 +1,565 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-21 17:37:51.458 UTC [16764] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-21 17:37:51.458 UTC [16764] LOG:  listening on IPv6 address "::1", port 44695
+
+2026-11-21 17:37:51.458 UTC [16764] LOG:  listening on IPv4 address "127.0.0.1", port 44695
+
+2026-11-21 17:37:51.459 UTC [16764] LOG:  listening on Unix socket "/tmp/.s.PGSQL.44695"
+
+2026-11-21 17:37:51.460 UTC [16767] LOG:  database system was shut down at 2026-11-21 17:37:51 UTC
+
+2026-11-21 17:37:51.462 UTC [16764] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/notes/pdc-calendar-perf.db.spec.ts (1 test) 7423ms
+   ✓ PDC calendar volume bound (100k notes, p95 < 30 s) > computePdcCalendar folds 100k notes with p95 < 30 s  4317ms
+{"level":30,"time":1795282693041,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795282693071,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795282693506,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ecd4-7000-bdab-4138bb95c02e","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":174,"msg":"request completed"}
+{"level":30,"time":1795282693664,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ed8a-7000-9284-2db7d6800ee2","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":150,"msg":"request completed"}
+{"level":30,"time":1795282693688,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ee2d-7000-ba16-524023d0cab1","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/d0c889de-9511-4f30-81fb-b8eb24d62b01/verify","status":401,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795282693702,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ee3a-7000-932b-4cbbc7514777","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/d0c889de-9511-4f30-81fb-b8eb24d62b01/verify","status":403,"duration_ms":12,"msg":"request completed"}
+{"level":30,"time":1795282693728,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ee56-7000-934e-d2326440b8f0","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/009eca5e-841f-4d6a-bba6-83c7648bf221/verify","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1795282693760,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ee78-7000-973a-a099bd1a61b8","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/06969556-e48e-4b70-b574-cac8b16ce652/verify","status":409,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795282693791,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ee97-7000-b85c-3a9e8814ddbf","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/c0d05fde-c132-4790-ba81-4fddce29a621/verify","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795282693799,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eea0-7000-b7ce-9b38158f6248","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/c0d05fde-c132-4790-ba81-4fddce29a621/verify","status":409,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282693828,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eeb9-7000-8573-d9232bf1a7ba","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/5b2bad83-1625-43f9-bad0-6534ecad3e63/verify","status":200,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795282693830,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eeba-7000-a172-7d019c3a3912","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/5b2bad83-1625-43f9-bad0-6534ecad3e63/verify","status":409,"duration_ms":12,"msg":"request completed"}
+{"level":30,"time":1795282693852,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eed5-7000-97ea-ae3fb1091404","action":"request","method":"POST","path":"/api/v1/payroll/statutory/profiles/00000000-0000-4000-8000-00000000dea1/verify","status":404,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795282693859,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eede-7000-89da-33d65a413ffa","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ea9b-7000-bd73-d73849f67c71/remittance-export","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282693862,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eee5-7000-9f8c-371d24db6346","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ea9b-7000-bd73-d73849f67c71/remittance-export","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795282693871,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eee7-7000-b869-a89dcd685f0f","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ead0-7000-873f-109898d0036b/remittance-export","status":409,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795282693878,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eef0-7000-a2be-808eed9432c6","action":"request","method":"GET","path":"/api/v1/payroll/runs/00000000-0000-4000-8000-00000000dea2/remittance-export","status":404,"duration_ms":6,"msg":"request completed"}
+(node:16824) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+{"level":30,"time":1795282693919,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-eef7-7000-a4c9-57a6e9cd80ea","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ea9b-7000-bd73-d73849f67c71/remittance-export?format=xlsx&locale=ar","status":200,"duration_ms":40,"msg":"request completed"}
+{"level":30,"time":1795282693955,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef39-7000-a301-554c05165d0f","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ea9b-7000-bd73-d73849f67c71/remittance-export?format=csv&locale=en","status":200,"duration_ms":10,"msg":"request completed"}
+{"level":30,"time":1795282693976,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef44-7000-97a6-31cf8b535e23","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ea9b-7000-bd73-d73849f67c71/remittance-export?format=xlsx&locale=en","status":200,"duration_ms":20,"msg":"request completed"}
+{"level":30,"time":1795282694010,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef6a-7000-857c-8bbacfd1cbd8","action":"request","method":"GET","path":"/api/v1/payroll/runs/01a1ff2f-ea9b-7000-bd73-d73849f67c71/remittance-export?format=csv&locale=en","status":200,"duration_ms":16,"msg":"request completed"}
+{"level":30,"time":1795282694028,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef8b-7000-a8ac-c5e44271b3dc","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795282694034,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef8d-7000-96fd-2d1104e4b259","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282694036,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef93-7000-9938-b002cf43d29a","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795282694041,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef94-7000-8e71-c4c13b40f346","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":403,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282694043,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef9a-7000-8e5c-6bc58ab7f83d","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795282694048,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-ef9c-7000-9fef-3a12f4d82416","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282694056,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efa1-7000-80d3-3fef0da085e5","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795282694063,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efa9-7000-959d-40e656d193f6","action":"request","method":"GET","path":"/api/v1/payroll/statutory/profiles?jurisdiction=SA","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694070,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efb0-7000-a796-171d5f739ec5","action":"request","method":"GET","path":"/api/v1/payroll/statutory/brackets","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694077,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efb7-7000-95ea-7725f202be58","action":"request","method":"GET","path":"/api/v1/payroll/statutory/eosb-rules","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694079,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efbe-7000-9f41-6873e1d46b73","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795282694086,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efc0-7000-9afc-73c333ddf107","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":403,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694088,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efc7-7000-b977-d89fba4263cb","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":401,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1795282694092,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efc8-7000-8948-caa3c653b0f6","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":403,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282694099,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efcd-7000-a098-76628f9aaa71","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694106,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-efd4-7000-a062-4e6be2d43880","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694405,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f075-7000-91a6-d25266375c7c","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":144,"msg":"request completed"}
+{"level":30,"time":1795282694426,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f106-7000-a136-0b33a3730c73","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation","status":200,"duration_ms":19,"msg":"request completed"}
+{"level":30,"time":1795282694435,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f11d-7000-8e19-a11ce9a3949f","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":403,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282694472,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f12d-7000-87bc-823d1ec0193f","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":200,"duration_ms":27,"msg":"request completed"}
+{"level":30,"time":1795282694491,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f157-7000-a1b1-ba9483528335","action":"request","method":"GET","path":"/api/v1/payroll/eosb/calculations","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282694500,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f15c-7000-bf63-808cd7c42ec9","action":"request","method":"GET","path":"/api/v1/payroll/eosb/reconciliation?employeeId=01a1ff2f-ea97-7000-b822-ccbf67a9478f","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795282694505,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f168-7001-a7dd-d4965a9d4ad4","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":401,"duration_ms":1,"msg":"request completed"}
+{"level":30,"time":1795282694513,"service":"erp-api","module":"http","correlation_id":"01a1ff2f-f16a-7001-a17a-27c8cb276b9c","action":"request","method":"POST","path":"/api/v1/payroll/eosb/true-up","status":422,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795282694531,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/payroll/statutory-routes.spec.ts (16 tests) 2498ms
+   ✓ PHASE-046 W-5 T-10/T-11 — the compliance lists + the EOSB views + the true-up trigger > (c) THE TRUE-UP KEY LAW: the management key does NOT carry the posting act — a statutory manager (both management keys, no ledger key) reads the views but takes the 403 naming payroll.runs.post  336ms
+{"level":30,"time":1795282694568,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+ ✓ src/__db__/jobs.db.spec.ts (4 tests) 2568ms
+   ✓ pg-boss queue infrastructure > test job executes exactly once for duplicate enqueues (dedupe contract, acceptance 5)  2515ms
+{"level":30,"time":1795282697127,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+{"level":30,"time":1795282697537,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795282697554,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795282697557,"service":"erp-api","module":"notifications","template":"login_notification","correlation_id":"01a1ff2f-ecd4-7000-bdab-4138bb95c02e","msg":"email delivered"}
+{"level":30,"time":1795282697934,"service":"erp-api","module":"identity","user_id":"01a1ff2f-fc58-7000-89b3-235461f81975","msg":"login refused: policy-mandated mfa enrollment required"}
+{"level":30,"time":1795282698494,"service":"erp-api","module":"identity","user_id":"01a1ff2f-fc58-7000-89b3-235461f81975","msg":"mfa enrollment bootstrap session issued"}
+{"level":40,"time":1795282699244,"service":"erp-api","module":"identity","admin_id":"01a1ff2f-fc58-7000-89b3-235461f81975","target_user_id":"01a1ff2f-fc58-7000-89b3-235461f81975","factors_removed":1,"msg":"admin-assisted mfa reset"}
+{"level":30,"time":1795282699387,"service":"erp-api","module":"identity","user_id":"01a1ff2f-fc58-7000-89b3-235461f81975","msg":"login refused: policy-mandated mfa enrollment required"}
+{"level":30,"time":1795282699527,"service":"erp-api","module":"identity","user_id":"01a1ff2f-fc58-7000-89b3-235461f81975","msg":"login refused: policy-mandated mfa enrollment required"}
+{"level":30,"time":1795282699528,"service":"erp-api","module":"http","correlation_id":"01a1ff30-047e-7000-a9fb-9b531ade3468","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":423,"duration_ms":138,"msg":"request completed"}
+{"level":30,"time":1795282699556,"service":"erp-api","module":"notifications","template":"login_notification","correlation_id":"01a1ff2f-ed8a-7000-9284-2db7d6800ee2","msg":"email delivered"}
+{"level":30,"time":1795282699677,"service":"erp-api","module":"identity","user_id":"01a1ff2f-fc58-7000-89b3-235461f81975","msg":"mfa enrollment bootstrap session issued"}
+{"level":30,"time":1795282699677,"service":"erp-api","module":"http","correlation_id":"01a1ff30-050a-7000-af33-240085ddb3a0","action":"request","method":"POST","path":"/api/v1/identity/mfa/bootstrap","status":200,"duration_ms":147,"msg":"request completed"}
+{"level":30,"time":1795282699681,"service":"erp-api","module":"http","correlation_id":"01a1ff30-059f-7000-9bea-a7206e237381","action":"request","method":"GET","path":"/api/v1/tenancy/entitlements","status":423,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795282699688,"service":"erp-api","module":"http","correlation_id":"01a1ff30-05a2-7000-a8f3-65133d5f5c7c","action":"request","method":"GET","path":"/api/v1/identity/sessions/current","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282699695,"service":"erp-api","module":"http","correlation_id":"01a1ff30-05a9-7000-88c4-dd0139e1b11f","action":"request","method":"POST","path":"/api/v1/identity/mfa/totp/enroll","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282699704,"service":"erp-api","module":"http","correlation_id":"01a1ff30-05b1-7000-8fd8-09a6bc992cdf","action":"request","method":"POST","path":"/api/v1/identity/mfa/totp/verify","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795282699710,"service":"erp-api","module":"http","correlation_id":"01a1ff30-05b9-7000-bfed-0bc87af55c50","action":"request","method":"GET","path":"/api/v1/tenancy/entitlements","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282699716,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/mfa-policy.db.spec.ts (9 tests) 2571ms
+   ✓ MFA enforcement matrix (PHASE-024 T4; ADR-0015 §4) > bootstrap → gated session → enroll+verify → gate flips → code login works  438ms
+   ✓ MFA enforcement at the HTTP surface (the golden path) > 423 MFA_REQUIRED carries details.enrollmentRequired; bootstrap issues the gated session; the route gate holds; verify unlocks  322ms
+2026-11-21 17:38:21.781 UTC [16908] WARNING:  there is no transaction in progress
+
+ ✓ src/__db__/inventory/wms-backfill-races.spec.ts (5 tests) 2122ms
+   ✓ PHASE-044 audit fix wave 2 — the migration-vs-movement race (the advisory lock vs the item_stock row lock) > a binless ISSUE committing while the pass is mid-flight: the plan re-derives FRESH under the position lock (never the stale row.stockQty)  547ms
+   ✓ PHASE-044 audit fix wave 2 — the migration-vs-movement race (the advisory lock vs the item_stock row lock) > a RECEIPT committing while the pass is mid-flight: no spurious rollback — the fold lands exact on the post-receipt position  835ms
+   ✓ PHASE-044 audit fix wave 2 — the migration-vs-movement race (the advisory lock vs the item_stock row lock) > a movement QUEUING behind the pass waits, then issues from the HEALED bins (binless → binned, no drift)  537ms
+ ✓ src/__db__/manufacturing/reservation-hard-review.spec.ts (5 tests) 1614ms
+   ✓ the hard-review regression tests — the negative-stock bypass and the delivery identity hole, both closed > (l) THE DELIVERY IDENTITY CONTRACT: a foreign order line, an item mismatch, a warehouse mismatch, and duplicate bindings are REJECTED at create AND at post (create bypassed — zero residue); partial and concurrent settlements still settle exactly; a post that fails after its plans leaves ZERO residue  527ms
+{"level":40,"time":1795282703946,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1ff30-1506-7000-b3c5-3503255b3a9e","killed_sessions":0,"msg":"tenant suspended"}
+{"level":40,"time":1795282704282,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1ff30-1701-7000-b9a9-c19be7441208","killed_sessions":0,"msg":"tenant suspended"}
+{"level":40,"time":1795282704513,"service":"erp-api","module":"files","action":"delete-objects","count":11,"msg":"storage objects deleted (purge)"}
+{"level":40,"time":1795282704553,"service":"erp-api","module":"offboarding-purge","tenant_id":"01a1ff30-1506-7000-b3c5-3503255b3a9e","tables":6,"rows":6,"storage_objects":11,"audit_rows_anonymized":3,"msg":"tenant purged (deletion certificate written)"}
+{"level":40,"time":1795282704565,"service":"erp-api","module":"offboarding-purge","tenant_id":"01a1ff30-1701-7000-b9a9-c19be7441208","msg":"purge blocked by legal hold (audited)"}
+{"level":40,"time":1795282704845,"service":"erp-api","module":"identity","user_id":"01a1ff30-1594-7000-830d-85927b01172d","msg":"authenticated user has no active membership"}
+{"level":40,"time":1795282704850,"service":"erp-api","module":"offboarding-purge","tenant_id":"01a1ff30-1701-7000-b9a9-c19be7441208","msg":"purge blocked by legal hold (audited)"}
+ ✓ src/__db__/offboarding-purge.db.spec.ts (7 tests) 1236ms
+   ✓ Journey H — offboarding end-to-end (the staging drill) > H5: the purge sweep — verification, certificate, anonymization, restore impossible  555ms
+ ✓ src/__db__/manufacturing/reservation-hard-protection.spec.ts (10 tests) 1372ms
+ ✓ src/__db__/manufacturing/mto-reservation-page.spec.ts (2 tests) 1302ms
+   ✓ PHASE-043 audit round 3 — the reservation query limits (the settlement sees the WHOLE MTO chain, never a page) > arm (a) — THE 200-RESERVATION PAGE: 201 newer manual reservations push the MTO holder off the newest-200 page; the order's CANCEL still releases it (pre-fix: the holder leaked ACTIVE forever)  691ms
+   ✓ PHASE-043 audit round 3 — the reservation query limits (the settlement sees the WHOLE MTO chain, never a page) > arm (b) — THE 100-MO PAGE: 100 filler DRAFT MOs keep the victim MO off the oldest-100 page; the order's CANCEL still releases its holder (pre-fix: the victim's holder leaked ACTIVE forever)  568ms
+ ✓ src/__db__/notes/notes-rules.spec.ts (25 tests) 1138ms
+{"level":30,"time":1795282709130,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795282709145,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795282709148,"service":"erp-api","module":"notifications","template":"login_notification","correlation_id":"01a1ff2f-f075-7000-91a6-d25266375c7c","msg":"email delivered"}
+{"level":30,"time":1795282709349,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2ad2-7000-a44c-47e978416af2","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":147,"msg":"request completed"}
+{"level":30,"time":1795282709487,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2b68-7000-83d2-dad4cc289fa0","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":135,"msg":"request completed"}
+{"level":30,"time":1795282709501,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2bf2-7000-991a-09ffe9da96f4","action":"request","method":"POST","path":"/api/v1/partners/partners","status":200,"duration_ms":11,"msg":"request completed"}
+{"level":30,"time":1795282709508,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2bfe-7000-b965-fb2f49afe07c","action":"request","method":"GET","path":"/api/v1/partners/partners","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282709512,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c05-7000-a1fd-67761d6eddc7","action":"request","method":"POST","path":"/api/v1/partners/partners","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282709517,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c0a-7000-96ce-cb23009b14fe","action":"request","method":"POST","path":"/api/v1/items/import-jobs","status":403,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282709521,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c0e-7000-8b4e-c86b8055afc0","action":"request","method":"POST","path":"/api/v1/partners/partners","status":422,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282709535,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c1a-7000-952b-f3c1348fa1b3","action":"request","method":"POST","path":"/api/v1/partners/partners","status":404,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282709557,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c30-7000-b179-ff6345f106fc","action":"request","method":"PATCH","path":"/api/v1/partners/partners/01a1ff30-2bfa-7000-aa00-ebd35aab9a97","status":404,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282709569,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c3c-7001-8fa8-5de9d8cfa7e0","action":"request","method":"GET","path":"/api/v1/partners/partners/01a1ff30-2c3c-7000-8b86-917a9be23f6e","status":404,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282709573,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c41-7000-bd5a-8d5d9b36c12e","action":"request","method":"GET","path":"/api/v1/partners/partners/01a1ff30-299c-7000-af8a-4ea474656e1e","status":404,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709578,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c46-7000-8adf-d1b18e9e5314","action":"request","method":"GET","path":"/api/v1/partners/partners","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709584,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c4c-7000-8088-5e5c254f4fb3","action":"request","method":"GET","path":"/api/v1/items/uoms","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709589,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c51-7000-8a66-069dd84002ed","action":"request","method":"GET","path":"/api/v1/partners/credit-terms","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709596,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c57-7000-9662-bf5583f4516f","action":"request","method":"POST","path":"/api/v1/partners/partners","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282709604,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c5e-7000-905c-d1bdc721f8cc","action":"request","method":"POST","path":"/api/v1/partners/partners","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282709613,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c65-7000-a478-5d9ebf5f9fb9","action":"request","method":"POST","path":"/api/v1/partners/partners","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795282709620,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c6e-7000-9301-7121b62648cc","action":"request","method":"POST","path":"/api/v1/partners/partners","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282709626,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c75-7000-85bd-eeb1758758a6","action":"request","method":"POST","path":"/api/v1/partners/partners","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282709631,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c7b-7000-9038-40deb2ce2f66","action":"request","method":"GET","path":"/api/v1/partners/partners?limit=3","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709636,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c80-7000-90c9-804df097df8d","action":"request","method":"GET","path":"/api/v1/partners/partners?limit=3&cursor=eyJvZmZzZXQiOjN9","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709641,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c85-7000-a46b-9d98af4b8f78","action":"request","method":"GET","path":"/api/v1/partners/search?q=%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85%D9%8A%D8%A9","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709656,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c91-7000-9896-6892d219612b","action":"request","method":"POST","path":"/api/v1/items/items","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795282709662,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2c9a-7000-b7e7-8c883d9dd0bd","action":"request","method":"POST","path":"/api/v1/items/resolve-price","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282709668,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/master-data-http.db.spec.ts (10 tests) 789ms
+{"level":30,"time":1795282709726,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795282710094,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795282710111,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795282710113,"service":"erp-api","module":"notifications","template":"login_notification","correlation_id":"01a1ff30-2ad2-7000-a44c-47e978416af2","msg":"email delivered"}
+{"level":30,"time":1795282710354,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2e9e-7000-b1c6-b57f5aa37d6c","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":180,"msg":"request completed"}
+{"level":30,"time":1795282710494,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2f54-7000-86bc-08224693abaa","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":138,"msg":"request completed"}
+{"level":30,"time":1795282710528,"service":"erp-api","module":"http","correlation_id":"01a1ff30-2ffa-7000-aaad-a26a3e435fb3","action":"request","method":"GET","path":"/api/v1/notifications/unread-count","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795282710532,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3001-7000-a58b-192e191f19f5","action":"request","method":"GET","path":"/api/v1/notifications?limit=50","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282710537,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3006-7000-a92f-fa24a6fff454","action":"request","method":"PATCH","path":"/api/v1/notifications/01a1ff30-2fe2-7000-a6a0-0f54c28fe2f8/read","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282710543,"service":"erp-api","module":"http","correlation_id":"01a1ff30-300a-7000-85f9-85a8dc602bc6","action":"request","method":"GET","path":"/api/v1/notifications/unread-count","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795282710547,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3010-7001-9c8d-1b8882e1684e","action":"request","method":"PATCH","path":"/api/v1/notifications/01a1ff30-2fe2-7000-a6a0-0f54c28fe2f8/read","status":200,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795282710552,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3015-7000-b266-291cd51f5be9","action":"request","method":"PUT","path":"/api/v1/notifications/preferences","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282710556,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3019-7000-bea3-28dd2e881ef6","action":"request","method":"GET","path":"/api/v1/notifications/preferences","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282710561,"service":"erp-api","module":"http","correlation_id":"01a1ff30-301f-7000-bd35-ec4548ed0df4","action":"request","method":"GET","path":"/api/v1/notifications?limit=50","status":200,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795282710565,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3022-7000-83ce-1f21ea5be2b9","action":"request","method":"GET","path":"/api/v1/notifications/unread-count","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282710569,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3026-7000-b70c-20c3310339b7","action":"request","method":"GET","path":"/api/v1/notifications?unread=true&limit=50","status":200,"duration_ms":3,"msg":"request completed"}
+{"level":30,"time":1795282710580,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3030-7001-9d17-7e120053d515","action":"request","method":"PUT","path":"/api/v1/notifications/preferences","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795282710583,"service":"erp-api","module":"http","correlation_id":"01a1ff30-3035-7000-9f33-1e0e2bd0f3dc","action":"request","method":"GET","path":"/api/v1/notifications/preferences","status":200,"duration_ms":2,"msg":"request completed"}
+{"level":30,"time":1795282710590,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/notifications/inbox.db.spec.ts (8 tests) 873ms
+ ✓ src/__db__/manufacturing/mto-surplus-cancel.spec.ts (5 tests) 796ms
+ ✓ src/__db__/projects/projects-fieldservice.db.spec.ts (21 tests) 694ms
+ ✓ src/__db__/payroll/payroll-writer-races.spec.ts (10 tests) 803ms
+2026-11-21 17:38:33.379 UTC [17072] ERROR:  new row violates row-level security policy for table "project_wbs_tasks"
+2026-11-21 17:38:33.379 UTC [17072] STATEMENT:  INSERT INTO project_wbs_tasks (id, tenant_id, project_id, wbs_code, name, is_milestone, percent_complete)
+	         VALUES (gen_random_uuid(), $1, $2, 'X', 'forged', false, 0)
+
+2026-11-21 17:38:33.386 UTC [17073] ERROR:  new row violates row-level security policy for table "project_budgets"
+2026-11-21 17:38:33.386 UTC [17073] STATEMENT:  INSERT INTO project_budgets (id, tenant_id, project_id, name, status, approved_at)
+	         VALUES (gen_random_uuid(), $1, $2, 'PB-FORGE', 'APPROVED', now())
+
+2026-11-21 17:38:33.393 UTC [17074] ERROR:  new row violates row-level security policy for table "project_budget_lines"
+2026-11-21 17:38:33.393 UTC [17074] STATEMENT:  INSERT INTO project_budget_lines (id, tenant_id, budget_id, cost_type, period_start, period_end, planned_amount)
+	         VALUES (gen_random_uuid(), $1, $2, 'LABOR', '2026-02-01', '2026-02-28', 100)
+
+2026-11-21 17:38:33.401 UTC [17075] ERROR:  new row violates row-level security policy for table "project_resource_allocations"
+2026-11-21 17:38:33.401 UTC [17075] STATEMENT:  INSERT INTO project_resource_allocations (id, tenant_id, project_id, resource_kind, employee_id, start_date, end_date, allocation_percent)
+	         VALUES (gen_random_uuid(), $1, $2, 'EMPLOYEE', $3, '2026-02-01', '2026-02-28', 10)
+
+2026-11-21 17:38:33.408 UTC [17076] ERROR:  new row violates row-level security policy for table "change_orders"
+2026-11-21 17:38:33.408 UTC [17076] STATEMENT:  INSERT INTO change_orders (id, tenant_id, project_id, co_no, title, price_delta, status)
+	         VALUES (gen_random_uuid(), $1, $2, 'CO-FORGE', 'forged', 100, 'DRAFT')
+
+2026-11-21 17:38:33.415 UTC [17077] ERROR:  new row violates row-level security policy for table "subcontractor_agreements"
+2026-11-21 17:38:33.415 UTC [17077] STATEMENT:  INSERT INTO subcontractor_agreements (id, tenant_id, project_id, partner_id, agreement_no, title, agreement_value, currency_code, retention_percent, status)
+	         VALUES (gen_random_uuid(), $1, $2, $3, 'SA-FORGE', 'forged', 1000, 'SAR', 10, 'DRAFT')
+
+2026-11-21 17:38:33.421 UTC [17078] ERROR:  new row violates row-level security policy for table "subcontractor_certificates"
+2026-11-21 17:38:33.421 UTC [17078] STATEMENT:  INSERT INTO subcontractor_certificates (id, tenant_id, agreement_id, certificate_date, progress_percent, gross_value, retention_withheld, net_payable, status)
+	         VALUES (gen_random_uuid(), $1, $2, '2026-03-02', 10, 100, 10, 90, 'DRAFT')
+
+2026-11-21 17:38:33.428 UTC [17079] ERROR:  new row violates row-level security policy for table "retention_accounts"
+2026-11-21 17:38:33.428 UTC [17079] STATEMENT:  INSERT INTO retention_accounts (id, tenant_id, project_id, kind, contract_value, currency_code, hold_percent, status)
+	         VALUES (gen_random_uuid(), $1, $2, 'CUSTOMER', 1000, 'SAR', 10, 'ACTIVE')
+
+2026-11-21 17:38:33.434 UTC [17080] ERROR:  new row violates row-level security policy for table "progress_certificates"
+2026-11-21 17:38:33.434 UTC [17080] STATEMENT:  INSERT INTO progress_certificates (id, tenant_id, project_id, certificate_date, kind, cumulative_percent, gross_value, retention_amount, net_value, currency_code, status)
+	         VALUES (gen_random_uuid(), $1, $2, '2026-04-02', 'PROGRESS', 10, 100, 10, 90, 'SAR', 'DRAFT')
+
+2026-11-21 17:38:33.441 UTC [17081] ERROR:  new row violates row-level security policy for table "service_visits"
+2026-11-21 17:38:33.441 UTC [17081] STATEMENT:  INSERT INTO service_visits (id, tenant_id, service_order_id, scheduled_start, scheduled_end, status)
+	         VALUES (gen_random_uuid(), $1, $2, '2026-11-22T08:00:00Z', '2026-11-22T12:00:00Z', 'NEW')
+
+2026-11-21 17:38:33.447 UTC [17082] ERROR:  new row violates row-level security policy for table "ias23_capitalizations"
+2026-11-21 17:38:33.447 UTC [17082] STATEMENT:  INSERT INTO ias23_capitalizations (id, tenant_id, project_id, budget_line_id, window_start, window_end, expenditures_amount, capitalized_amount, expensed_amount, rate_snapshot, status)
+	         VALUES (gen_random_uuid(), $1, $2, $3, '2026-02-01', '2026-02-28', 100, 5, 95, '0.050000', 'POSTED')
+
+2026-11-21 17:38:33.550 UTC [17097] ERROR:  permission denied for table project_budgets
+2026-11-21 17:38:33.550 UTC [17097] STATEMENT:  WITH deleted AS (DELETE FROM project_budgets WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.569 UTC [17100] ERROR:  permission denied for table change_orders
+2026-11-21 17:38:33.569 UTC [17100] STATEMENT:  WITH deleted AS (DELETE FROM change_orders WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.581 UTC [17102] ERROR:  permission denied for table subcontractor_certificates
+2026-11-21 17:38:33.581 UTC [17102] STATEMENT:  WITH deleted AS (DELETE FROM subcontractor_certificates WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.587 UTC [17103] ERROR:  permission denied for table retention_accounts
+2026-11-21 17:38:33.587 UTC [17103] STATEMENT:  WITH deleted AS (DELETE FROM retention_accounts WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.594 UTC [17104] ERROR:  permission denied for table progress_certificates
+2026-11-21 17:38:33.594 UTC [17104] STATEMENT:  WITH deleted AS (DELETE FROM progress_certificates WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.599 UTC [17105] ERROR:  permission denied for table service_visits
+2026-11-21 17:38:33.599 UTC [17105] STATEMENT:  WITH deleted AS (DELETE FROM service_visits WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.605 UTC [17106] ERROR:  permission denied for table ias23_capitalizations
+2026-11-21 17:38:33.605 UTC [17106] STATEMENT:  WITH deleted AS (DELETE FROM ias23_capitalizations WHERE tenant_id = $1 RETURNING 1) SELECT count(*)::int AS n FROM deleted
+
+2026-11-21 17:38:33.681 UTC [17115] ERROR:  insert or update on table "project_budget_lines" violates foreign key constraint "fk_project_budget_lines_budget"
+2026-11-21 17:38:33.681 UTC [17115] DETAIL:  Key (budget_id, tenant_id)=(74ab8d8c-5e6f-4974-8f4e-f9ba400b4d35, 6b6b6b6b-0000-4000-8000-00000000611b) is not present in table "project_budgets".
+2026-11-21 17:38:33.681 UTC [17115] STATEMENT:  INSERT INTO project_budget_lines (id, tenant_id, budget_id, cost_type, period_start, period_end, planned_amount)
+	         VALUES (gen_random_uuid(), $1, $2, 'LABOR', '2026-03-01', '2026-03-31', 100)
+
+ ✓ src/__db__/projects/projects-rls.db.spec.ts (10 tests) 639ms
+ ✓ src/__db__/manufacturing/planning-goldens.spec.ts (13 tests) 596ms
+{"level":30,"time":1795282714626,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1ff30-3fca-7000-9c85-2baeabd6d115","country":"SA","msg":"tenant registered via public flow"}
+{"level":30,"time":1795282714817,"service":"erp-api","module":"tenancy-registration","tenant_id":"01a1ff30-4090-7000-830e-83daa03afbef","country":"YE","msg":"tenant registered via public flow"}
+{"level":40,"time":1795282714837,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1ff30-3fca-7000-9c85-2baeabd6d115","killed_sessions":1,"msg":"tenant suspended"}
+{"level":40,"time":1795282714879,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1ff30-3fca-7000-9c85-2baeabd6d115","killed_sessions":0,"msg":"tenant suspended"}
+{"level":40,"time":1795282715019,"service":"erp-api","module":"tenancy-lifecycle","tenant_id":"01a1ff30-4090-7000-830e-83daa03afbef","killed_sessions":0,"msg":"tenant suspended"}
+ ✓ src/__db__/platform-lifecycle.db.spec.ts (16 tests) 612ms
+ ✓ src/__db__/inventory/wms-core.spec.ts (15 tests) 583ms
+2026-11-21 17:38:35.724 UTC [17139] ERROR:  permission denied for table payroll_run_lines
+2026-11-21 17:38:35.724 UTC [17139] STATEMENT:  UPDATE payroll_run_lines SET net_amount = 99999 WHERE run_id = $1
+
+ ✓ src/__db__/payroll/payroll-rules.spec.ts (14 tests) 483ms
+ ✓ src/__db__/inventory/wms-quarantine.spec.ts (9 tests) 441ms
+ ✓ src/__db__/inventory/wms-cycle-counts.spec.ts (8 tests) 457ms
+ ✓ src/__db__/manufacturing/qc.spec.ts (6 tests) 482ms
+ ✓ src/__db__/notes/pdc-calendar.spec.ts (7 tests) 397ms
+ ✓ src/__db__/manufacturing/orders.spec.ts (7 tests) 459ms
+ ✓ src/__db__/manufacturing/mrp-scope-closure.spec.ts (3 tests) 290ms
+ ✓ src/__db__/manufacturing/mto-cancel-complete-race.spec.ts (5 tests) 423ms
+ ✓ src/__db__/inventory/wms-alerts-policies.spec.ts (4 tests) 306ms
+2026-11-21 17:38:39.750 UTC [17016] ERROR:  duplicate key value violates unique constraint "uq_subcontractor_agreements_tenant_project_no"
+2026-11-21 17:38:39.750 UTC [17016] STATEMENT:  
+	    INSERT INTO subcontractor_agreements (id, tenant_id, created_by, project_id, partner_id,
+	                                           agreement_no, title, title_ar, scope, agreement_value,
+	                                           currency_code, retention_percent, start_date, end_date,
+	                                           note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3, $4,
+	            $5, $6, $7, $8,
+	            $9, $10, $11,
+	            $12, $13, $14, $15)
+	  
+
+ ✓ src/__db__/projects/projects-contracting.db.spec.ts (11 tests) 308ms
+ ✓ src/__db__/manufacturing/mto-lifecycle.spec.ts (5 tests) 353ms
+ ✓ src/__db__/inventory/wms-backfill-conflicts.spec.ts (7 tests) 214ms
+ ✓ src/__db__/inventory/wms-picking.spec.ts (3 tests) 322ms
+ ✓ src/__db__/projects/projects-goldens.db.spec.ts (7 tests) 313ms
+ ✓ src/__db__/projects/projects-print-render.db.spec.ts (3 tests) 1656ms
+   ✓ PHASE-048 W-13 — the contracting prints in the REAL browser (both directions, long tables) > the progress certificate: 60-row history paginates across ≥2 pages with the repeating thead (AR + EN)  354ms
+   ✓ PHASE-048 W-13 — the contracting prints in the REAL browser (both directions, long tables) > the subcontractor certificate: the 60-row sub history paginates (AR + EN)  303ms
+2026-11-21 17:38:43.154 UTC [17305] ERROR:  new row for relation "item_standard_costs" violates check constraint "ck_item_standard_costs_total"
+2026-11-21 17:38:43.154 UTC [17305] STATEMENT:  INSERT INTO item_standard_costs
+	           (id, tenant_id, item_id, version_no, status, material_cost, labor_cost,
+	            overhead_cost, total_cost, overhead_sub_splits, source)
+	         VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, 99, 'DRAFT',
+	                 10, 3, 2, 16, '[]'::jsonb, 'MANUAL')
+
+ ✓ src/__db__/manufacturing/standard-costing.spec.ts (12 tests) 276ms
+2026-11-21 17:38:43.635 UTC [17306] ERROR:  new row for relation "production_order_operations" violates check constraint "ck_production_order_operations_scrap"
+2026-11-21 17:38:43.635 UTC [17306] STATEMENT:  INSERT INTO production_order_operations
+	           (id, tenant_id, order_id, routing_id, sequence, work_center_id, status,
+	            std_setup_time, std_run_time, std_fixed_rate, std_var_rate, scrap_qty, scrap_reason_code)
+	         VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, $2, 30, $3, 'PENDING',
+	                 0, 0, 0, 0, 5, NULL)
+
+ ✓ src/__db__/manufacturing/routing-execution.spec.ts (11 tests) 299ms
+ ✓ src/__db__/inventory/wms-tracked-backfill.spec.ts (7 tests) 243ms
+ ✓ src/__db__/payroll/run-statutory.spec.ts (7 tests) 267ms
+ ✓ src/__db__/inventory/wms-backfill-bins-no-ledger.spec.ts (9 tests) 353ms
+ ✓ src/__db__/inventory/wms-backfill-placed-registry.spec.ts (7 tests) 295ms
+2026-11-21 17:38:45.171 UTC [17317] ERROR:  new row for relation "eosb_calculations" violates check constraint "ck_eosb_calculations_delta"
+2026-11-21 17:38:45.171 UTC [17317] DETAIL:  Failing row contains (afea1460-a1eb-4175-b456-00b582846de3, 9d9d9d9d-9d9d-9d9d-9d9d-9d9d9d9d9d9d, 2026-11-21 17:38:45.170279+00, 2026-11-21 17:38:45.170279+00, 1, bcabcbcb-0000-4000-8000-0000000000ea, 01a1ff30-689f-7000-a6bf-dd35f437de6e, PERIOD_TRUE_UP, 7.00, [], {}, 40500.0000, 0.0000, 99999.0000, null, COMPUTED, null, null, 2026-06-04, null).
+2026-11-21 17:38:45.171 UTC [17317] STATEMENT:  INSERT INTO eosb_calculations
+	           (id, tenant_id, employee_id, kind, service_years, tier_breakdown, wage_base_snapshot,
+	            entitlement_amount, provision_balance, delta, status, entry_date, created_by)
+	         VALUES (gen_random_uuid(), $1, $2, 'PERIOD_TRUE_UP', 7.00, '[]'::jsonb, '{}'::jsonb,
+	                 40500.0000, 0.0000, 99999.0000, 'COMPUTED', DATE '2026-06-04', $3)
+
+ ✓ src/__db__/payroll/statutory-goldens.spec.ts (5 tests) 222ms
+ ✓ src/__db__/manufacturing/bom.spec.ts (11 tests) 222ms
+ ✓ src/__db__/pos/golden.spec.ts (5 tests) 221ms
+ ✓ src/__db__/inventory/wms-budgets-backfill.spec.ts (5 tests) 218ms
+ ✓ src/__db__/payroll/variable-lines.spec.ts (5 tests) 220ms
+ ✓ src/__db__/inventory/wms-inv029.spec.ts (2 tests) 189ms
+ ✓ src/__db__/manufacturing/reservation-basis.spec.ts (6 tests) 212ms
+ ✓ src/__db__/payroll/eosb.spec.ts (9 tests) 209ms
+ ✓ src/__db__/manufacturing/mrp-coproduct-order.spec.ts (4 tests) 215ms
+ ✓ src/__db__/projects/projects-reports.db.spec.ts (8 tests) 215ms
+ ✓ src/__db__/notes/inv-024.spec.ts (2 tests) 142ms
+ ✓ src/__db__/inventory/valuation-ledger.spec.ts (6 tests) 158ms
+ ✓ src/__db__/inventory/tracking.spec.ts (6 tests) 132ms
+ ✓ src/__db__/manufacturing/costing.spec.ts (9 tests) 128ms
+ ✓ src/__db__/inventory/wms-putaway.spec.ts (4 tests) 145ms
+ ✓ src/__db__/notes/rc-11.spec.ts (2 tests) 144ms
+ ✓ src/__db__/manufacturing/rework-costing.spec.ts (7 tests) 136ms
+ ✓ src/__db__/inventory/wms-kitting.spec.ts (3 tests) 173ms
+ ✓ src/__db__/inventory/reorder-inapp.db.spec.ts (4 tests) 146ms
+ ✓ src/__db__/manufacturing/atp-ctp-expiry.spec.ts (5 tests) 134ms
+2026-11-21 17:38:49.139 UTC [17353] ERROR:  new row for relation "downtime_records" violates check constraint "ck_downtime_records_duration"
+2026-11-21 17:38:49.139 UTC [17353] STATEMENT:  INSERT INTO downtime_records
+	           (id, tenant_id, work_center_id, reason_code, started_at, ended_at, duration_minutes)
+	         VALUES (gen_random_uuid(), erp.current_tenant_id(), $1, 'OTHER', now(), NULL, 2000)
+
+ ✓ src/__db__/manufacturing/downtime-oee.spec.ts (8 tests) 136ms
+ ✓ src/__db__/master-data-flows.db.spec.ts (14 tests) 114ms
+ ✓ src/__db__/manufacturing/atp-contract.spec.ts (5 tests) 131ms
+ ✓ src/__db__/manufacturing/mrp-timing.spec.ts (3 tests) 92ms
+ ✓ src/__db__/inventory/wms-serial-ledger.spec.ts (5 tests) 95ms
+ ✓ src/__db__/projects/projects-evm.db.spec.ts (7 tests) 92ms
+ ✓ src/__db__/inventory/wms-consignment.spec.ts (7 tests) 100ms
+ ✓ src/__db__/manufacturing/wip-recon.spec.ts (4 tests) 84ms
+2026-11-21 17:38:50.186 UTC [17362] ERROR:  duplicate key value violates unique constraint "uq_project_budget_lines_cell_project"
+2026-11-21 17:38:50.186 UTC [17362] STATEMENT:  
+	      INSERT INTO project_budget_lines (id, tenant_id, budget_id, cost_type, wbs_task_id,
+	                                        period_start, period_end, planned_amount, note)
+	      VALUES ($1, erp.current_tenant_id(), $2, $3,
+	              $4, $5, $6, $7,
+	              $8)
+	    
+
+ ✓ src/__db__/projects/projects-budgets-actuals.db.spec.ts (13 tests) 111ms
+ ✓ src/__db__/payroll/statutory.spec.ts (7 tests) 79ms
+ ✓ src/__db__/notes/spoof.spec.ts (5 tests) 89ms
+ ✓ src/__db__/manufacturing/reservation-overcommit.spec.ts (5 tests) 72ms
+2026-11-21 17:38:50.614 UTC [17362] ERROR:  duplicate key value violates unique constraint "uq_change_orders_tenant_project_no"
+2026-11-21 17:38:50.614 UTC [17362] STATEMENT:  
+	    INSERT INTO change_orders (id, tenant_id, created_by, project_id, co_no, title, title_ar,
+	                               scope_delta, scope_delta_ar, price_delta, schedule_delta_days,
+	                               note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3, $4,
+	            $5, $6, $7, $8,
+	            $9, $10, $11, $12)
+	  
+
+ ✓ src/__db__/projects/projects-change-orders.db.spec.ts (9 tests) 88ms
+ ✓ src/__db__/partners/vehicles.spec.ts (13 tests) 81ms
+ ✓ src/__db__/inventory/reservations-sweep.spec.ts (3 tests) 83ms
+ ✓ src/__db__/projects/projects-ias23.db.spec.ts (10 tests) 102ms
+2026-11-21 17:38:51.012 UTC [17362] ERROR:  duplicate key value violates unique constraint "uq_project_wbs_tasks_tenant_project_code"
+2026-11-21 17:38:51.012 UTC [17362] STATEMENT:  
+	    INSERT INTO project_wbs_tasks (id, tenant_id, created_by, project_id, parent_task_id,
+	                                   predecessor_task_id, wbs_code, name, name_ar, is_milestone,
+	                                   start_date, end_date, weight, percent_complete, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3,
+	            $4, $5, $6, $7,
+	            $8, $9, $10, $11,
+	            $12, $13, $14, $15)
+	  
+
+ ✓ src/__db__/projects/projects-wbs.db.spec.ts (15 tests) 69ms
+ ✓ src/__db__/manufacturing/planning-explain-budgets.db.spec.ts (4 tests) 78ms
+ ✓ src/__db__/manufacturing/atp-unreserved-promise.spec.ts (1 test) 53ms
+ ✓ src/__db__/manufacturing/genealogy.spec.ts (10 tests) 53ms
+[oa06-budgets] P1 bracket-set resolution:
+Incremental Sort  (cost=8.18..8.23 rows=2 width=69)
+  Sort Key: code, sort
+  Presorted Key: code
+  ->  Index Scan using uq_payroll_tax_brackets_set_sort on payroll_tax_brackets  (cost=0.15..8.17 rows=1 width=69)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (jurisdiction_code = 'SA'::text) AND (effective_from <= '2026-03-31'::date))
+        Filter: ((effective_to IS NULL) OR (effective_to >= '2026-03-31'::date))
+[oa06-budgets] P2a the EOSB tier resolution:
+Sort  (cost=8.19..8.19 rows=1 width=54)
+  Sort Key: from_years
+  ->  Index Scan using ix_eosb_rules_tenant_jurisdiction_effective on eosb_rules  (cost=0.15..8.18 rows=1 width=54)
+        Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (jurisdiction_code = 'SA'::text) AND (effective_from <= '2026-06-30'::date))
+        Filter: (((effective_to IS NULL) OR (effective_to >= '2026-06-30'::date)) AND ((contract_type IS NULL) OR (contract_type = 'FULL_TIME'::text)))
+[oa06-budgets] P2b the per-employee calculations walk:
+Limit  (cost=7.99..8.00 rows=2 width=67)
+  ->  Sort  (cost=7.99..8.00 rows=2 width=67)
+        Sort Key: created_at DESC, id DESC
+        ->  Bitmap Heap Scan on eosb_calculations  (cost=4.17..7.98 rows=2 width=67)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = 'dc6d1c24-d75e-44ed-92cf-9f8f284f6407'::uuid))
+              ->  Bitmap Index Scan on ix_eosb_calculations_tenant_employee_kind  (cost=0.00..4.17 rows=2 width=0)
+                    Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (employee_id = 'dc6d1c24-d75e-44ed-92cf-9f8f284f6407'::uuid))
+[oa06-budgets] P3 the statutory-summary walk:
+Sort  (cost=66.29..66.30 rows=3 width=106)
+  Sort Key: p.name, ((entry.value ->> 'code'::text))
+  ->  HashAggregate  (cost=66.17..66.26 rows=3 width=106)
+        Group Key: p.name, (entry.value ->> 'code'::text)
+        ->  Nested Loop  (cost=10.61..64.17 rows=80 width=74)
+              ->  Nested Loop  (cost=10.60..50.08 rows=80 width=509)
+                    ->  Nested Loop  (cost=8.38..15.83 rows=2 width=26)
+                          Join Filter: (p.id = r.fiscal_period_id)
+                          ->  Bitmap Heap Scan on payroll_runs r  (cost=4.18..7.28 rows=4 width=32)
+                                Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (status = ANY ('{PENDING_APPROVAL,POSTED}'::text[])))
+                                Filter: (status = 'POSTED'::text)
+                                ->  Bitmap Index Scan on uq_payroll_runs_one_live  (cost=0.00..4.18 rows=4 width=0)
+                                      Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                          ->  Materialize  (cost=4.20..8.38 rows=3 width=26)
+                                ->  Bitmap Heap Scan on fiscal_periods p  (cost=4.20..8.37 rows=3 width=26)
+                                      Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                                      Filter: ((start_date >= '2026-01-01'::date) AND (start_date <= '2026-06-30'::date))
+                                      ->  Bitmap Index Scan on ix_fiscal_periods_tenant_year  (cost=0.00..4.20 rows=6 width=0)
+                                            Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                    ->  Bitmap Heap Scan on payroll_run_lines l  (cost=2.22..17.07 rows=6 width=515)
+                          Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (run_id = r.id))
+                          ->  Bitmap Index Scan on ix_payroll_run_lines_tenant_run  (cost=0.00..2.22 rows=6 width=0)
+                                Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (run_id = r.id))
+              ->  Memoize  (cost=0.01..1.51 rows=1 width=32)
+                    Cache Key: l.statutory_breakdown
+                    Cache Mode: binary
+                    ->  Function Scan on jsonb_array_elements entry  (cost=0.00..1.50 rows=1 width=32)
+                          Filter: ((value ->> 'kind'::text) = 'CONTRIBUTION'::text)
+[oa06-budgets] P4 the remittance liability read:
+Limit  (cost=4.20..7.35 rows=1 width=255)
+  ->  Bitmap Heap Scan on payroll_runs  (cost=4.20..7.35 rows=1 width=255)
+        Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+        Filter: (id = 'd115d5b5-c568-46ee-b7f3-c2119fb6732b'::uuid)
+        ->  Bitmap Index Scan on ix_payroll_runs_tenant_period_status  (cost=0.00..4.19 rows=6 width=0)
+              Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+ ✓ src/__db__/payroll/oa06-budgets.spec.ts (4 tests) 52ms
+ ✓ src/__db__/manufacturing/mrp-conversion-race.spec.ts (3 tests) 44ms
+[projects-explain-budgets] P1 the WBS rollup read:
+Sort  (cost=19.40..19.64 rows=93 width=104)
+  Sort Key: wbs_code
+  ->  Bitmap Heap Scan on project_wbs_tasks  (cost=9.11..16.36 rows=93 width=104)
+        Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (project_id = 'f11a7f75-25c7-41a7-af9a-db8e91905bb2'::uuid))
+        ->  Bitmap Index Scan on ix_project_wbs_tasks_tenant_parent  (cost=0.00..9.08 rows=93 width=0)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (project_id = 'f11a7f75-25c7-41a7-af9a-db8e91905bb2'::uuid))
+[projects-explain-budgets] P2 the dispatch board read:
+Limit  (cost=47.02..47.52 rows=200 width=108)
+  ->  Sort  (cost=47.02..47.62 rows=240 width=108)
+        Sort Key: sv.scheduled_start, sv.id
+        ->  Nested Loop Left Join  (cost=18.38..37.53 rows=240 width=108)
+              ->  Hash Left Join  (cost=18.23..30.34 rows=240 width=64)
+                    Hash Cond: (sv.service_order_id = so.id)
+                    ->  Bitmap Heap Scan on service_visits sv  (cost=10.02..21.42 rows=240 width=66)
+                          Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                          ->  Bitmap Index Scan on ix_service_visits_tenant_order  (cost=0.00..9.96 rows=240 width=0)
+                                Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+                    ->  Hash  (cost=8.18..8.18 rows=2 width=30)
+                          ->  Index Scan using ix_service_orders_tenant_partner on service_orders so  (cost=0.15..8.18 rows=2 width=30)
+                                Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+              ->  Memoize  (cost=0.15..0.25 rows=1 width=76)
+                    Cache Key: sv.technician_employee_id
+                    Cache Mode: logical
+                    ->  Index Scan using pk_employees on employees emp  (cost=0.14..0.24 rows=1 width=76)
+                          Index Cond: (id = sv.technician_employee_id)
+                          Filter: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+[projects-explain-budgets] P3 the technician-filtered board:
+Limit  (cost=28.75..29.16 rows=162 width=66)
+  ->  Sort  (cost=28.75..29.16 rows=162 width=66)
+        Sort Key: scheduled_start, id
+        ->  Bitmap Heap Scan on service_visits sv  (cost=10.00..22.81 rows=162 width=66)
+              Recheck Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+              Filter: (technician_employee_id = 'a4f92071-6676-44c5-b871-daefbc4e2afb'::uuid)
+              ->  Bitmap Index Scan on ix_service_visits_tenant_order  (cost=0.00..9.96 rows=240 width=0)
+                    Index Cond: (tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid)
+[projects-explain-budgets] P4 the order-filtered board:
+Limit  (cost=12.02..12.09 rows=27 width=66)
+  ->  Sort  (cost=12.02..12.09 rows=27 width=66)
+        Sort Key: scheduled_start, id
+        ->  Bitmap Heap Scan on service_visits sv  (cost=4.50..11.38 rows=27 width=66)
+              Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (service_order_id = 'cae452ba-2332-45a0-869c-1f7983159fc4'::uuid) AND (status = 'DISPATCHED'::text))
+              ->  Bitmap Index Scan on ix_service_visits_tenant_order  (cost=0.00..4.50 rows=27 width=0)
+                    Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (service_order_id = 'cae452ba-2332-45a0-869c-1f7983159fc4'::uuid) AND (status = 'DISPATCHED'::text))
+ ✓ src/__db__/projects/projects-explain-budgets.db.spec.ts (4 tests) 88ms
+ ✓ src/__db__/payroll/spoof.spec.ts (5 tests) 95ms
+ ✓ src/__db__/manufacturing/explain-budgets.db.spec.ts (3 tests) 29ms
+ ✓ src/__db__/payroll/pit.spec.ts (6 tests) 20ms
+
+ Test Files  86 passed (86)
+      Tests  625 passed (625)
+   Start at  17:37:50
+   Duration  61.32s (transform 6.50s, setup 0ms, collect 11.24s, tests 44.58s, environment 0ms, prepare 56ms)
+
+2026-11-21 17:38:51.744 UTC [16764] LOG:  received fast shutdown request
+
+2026-11-21 17:38:51.744 UTC [16764] LOG:  aborting any active transactions
+2026-11-21 17:38:51.744 UTC [17403] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.744 UTC [17379] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.745 UTC [17105] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.746 UTC [17104] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.746 UTC [17106] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.746 UTC [17102] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.747 UTC [17100] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.748 UTC [17103] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.748 UTC [17362] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.749 UTC [17097] FATAL:  terminating connection due to administrator command
+2026-11-21 17:38:51.750 UTC [16764] LOG:  background worker "logical replication launcher" (PID 16770) exited with exit code 1
+
+2026-11-21 17:38:51.752 UTC [16765] LOG:  shutting down
+
+2026-11-21 17:38:51.752 UTC [16765] LOG:  checkpoint starting: shutdown immediate
+
+(node:16824) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(node:16824) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-21 17:38:51.820 UTC [16765] LOG:  checkpoint complete: wrote 9583 buffers (58.5%); 0 WAL file(s) added, 0 removed, 8 recycled; write=0.058 s, sync=0.010 s, total=0.068 s; sync files=3079, longest=0.001 s, average=0.001 s; distance=130231 kB, estimate=130231 kB; lsn=0/940C7E8, redo lsn=0/940C7E8
+
+2026-11-21 17:38:51.836 UTC [16764] LOG:  database system is shut down
+
+VITEST_EXIT=0

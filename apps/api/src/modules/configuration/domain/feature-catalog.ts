@@ -328,6 +328,16 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "projects.wbs": ["accounting.projects"],
   "projects.contracting": ["accounting.projects", "sales.invoices"],
   "projects.fieldservice": ["crm.service_orders"],
+  // PHASE-049 (CR-19, extended by v3.2/CR-50 — CMMS Asset Maintenance,
+  // the W-16 foundation wave, 2026-11-21): the two feature flags ride
+  // the EXISTING 044 fixed-assets substrate (the plan's D-01 — the
+  // register is extended, never replaced; the ten permission keys are
+  // the separate authorization surface, matrix §3.27): the maintenance
+  // plane (work orders, plans, meters, spares, tags) and the transfer
+  // plane both stand on the asset register; branches and the posting
+  // engine are platform baseline.
+  "assets.maintenance": ["fixed_assets.register"],
+  "assets.transfer": ["fixed_assets.register"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

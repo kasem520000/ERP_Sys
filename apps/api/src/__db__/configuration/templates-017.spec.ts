@@ -68,7 +68,11 @@ const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   // gains the THREE PROJECTS FLAGS (the projects-plane enablement, D-16 /
   // 0103 §3; canonical + stored + docs mirror + pins moved together, the
   // 0098 §3 procedure).
-  "industry.automotive": "sha256:51ed444287022f6143c8848f6526520d7859ab36916d4749382e005ab6f552f3",
+  // PHASE-049 (W-16, 2026-11-21): re-pinned again — required_feature_keys
+  // gains the TWO CMMS FLAGS (the CMMS-plane enablement, D-11/D-16 /
+  // 0108 §3; canonical + stored + docs mirror + pins moved together, the
+  // 0098 §3 procedure).
+  "industry.automotive": "sha256:2f847473908d59276ec5bd4338016ecb0612fb40b0fe3d66d93f5ffdc3dc4d88",
   "industry.distribution": "sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d",
 });
 

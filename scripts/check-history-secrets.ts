@@ -60,6 +60,16 @@ const ALLOWLIST: readonly { readonly path: string; readonly reason: string }[] =
   { path: "scripts/", reason: "dev/CI tooling (db-dev-credentials, migration-tests Testcontainers URL) — the documented dev-credentials pattern" },
   { path: "apps/desktop/__tests__/", reason: "telemetry redaction fixtures (postgres URLs as redaction PROOF material)" },
   { path: "apps/web/tests/", reason: "web security probe fixtures (wrong-password login attempts)" },
+  // PHASE-049 (W-16, 2026-11-21): the evidence archive's scratch proofs
+  // and logs (the phase049-plan/W-16 scratch-rls-proof.ts family — the
+  // embedded-PG16 scratch boots carrying the documented
+  // postgres:postgres@127.0.0.1 dev-credentials pattern, exactly the
+  // scripts/ class). Found by THIS scan's own first run over the plan
+  // commit (the plan wave's capture ran pre-commit — honest then; the
+  // committed scratch file is immutable evidence now, the additive-only
+  // archive law) — the same-class extension procedure this header
+  // prescribes.
+  { path: "audit-evidence/", reason: "the evidence archive's scratch proofs + logs quote the documented embedded-PG dev-credentials pattern (postgres:postgres@127.0.0.1) — never production secrets; the additive-only archive law makes them immutable history" },
 ];
 
 /** Lockfiles: never scanned (generated dependency graphs). */

@@ -6123,6 +6123,21 @@ export const assets = pgTable(
     noteAr: text("note_ar"),
     disposedAt: timestamp("disposed_at", { withTimezone: true, mode: "string" }),
     writtenOffAt: timestamp("written_off_at", { withTimezone: true, mode: "string" }),
+    // PHASE-049 (W-16 — migration 0108, the frozen-substrate extension
+    // family, D-01): the four expiry registers (the 30/7/0 sweep's
+    // classes — W-19; inspection is the R-10 fleet-light fourth, used
+    // where a tenant tracks it), the cost-center grouping (riding the
+    // EXISTING cost_centers tree, never a new dimension), and the
+    // component link (components carry their own meters and spares and
+    // roll up into the parent's service history; the self-reference DB
+    // floor + the write-time ancestor-cycle guard is the W-17 service's
+    // — the 047 org-tree precedent).
+    warrantyExpiry: date("warranty_expiry"),
+    insuranceExpiry: date("insurance_expiry"),
+    licenseExpiry: date("license_expiry"),
+    inspectionExpiry: date("inspection_expiry"),
+    costCenterId: uuid("cost_center_id"),
+    parentAssetId: uuid("parent_asset_id"),
   },
   (table) => [
     uniqueIndex("uq_assets_id_tenant").on(table.id, table.tenantId),
@@ -6135,6 +6150,12 @@ export const assets = pgTable(
     ),
     index("ix_assets_tenant_custodian").on(table.tenantId, table.custodianUserId),
     index("ix_assets_tenant_source").on(table.tenantId, table.sourceType, table.sourceId),
+    index("ix_assets_tenant_cost_center")
+      .on(table.tenantId, table.costCenterId)
+      .where(sql`${table.costCenterId} IS NOT NULL`),
+    index("ix_assets_tenant_parent")
+      .on(table.tenantId, table.parentAssetId)
+      .where(sql`${table.parentAssetId} IS NOT NULL`),
   ],
 );
 
@@ -10664,6 +10685,318 @@ export const ias23Capitalizations = pgTable(
       table.tenantId,
       table.projectId,
       table.windowStart,
+    ),
+  ],
+);
+
+/** PHASE-049 (T-01, migration 0105 — D-08, BR-097): per-asset preventive
+ * plans — trigger CALENDAR (interval days + the recomputed next_due) or
+ * METER (the chosen meter + the delta threshold), the XOR shape law, and
+ * the generation anchor (the GENERATION's own reading stamp — a back-dated
+ * reading never double-triggers; a window already generated never re-arms).
+ * Master data (DELETE granted — the typed service guards own the
+ * lifecycle; generated orders' plan FK RESTRICT protects the plans with
+ * history). */
+export const maintenancePlans = pgTable(
+  "maintenance_plans",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    assetId: uuid("asset_id").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    description: text("description"),
+    descriptionAr: text("description_ar"),
+    triggerType: text("trigger_type").notNull(),
+    intervalDays: integer("interval_days"),
+    nextDueDate: date("next_due_date"),
+    meterId: uuid("meter_id"),
+    thresholdDelta: numeric("threshold_delta", { precision: 19, scale: 6 }),
+    lastAnchorValue: numeric("last_anchor_value", { precision: 19, scale: 6 }),
+    lastGeneratedAt: timestamp("last_generated_at", { withTimezone: true, mode: "string" }),
+    isActive: boolean("is_active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_maintenance_plans_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_maintenance_plans_tenant_asset_name").on(
+      table.tenantId,
+      table.assetId,
+      table.name,
+    ),
+    index("ix_maintenance_plans_tenant_asset").on(
+      table.tenantId,
+      table.assetId,
+      table.isActive,
+    ),
+  ],
+);
+
+/** PHASE-049 (T-01, migration 0105 — D-08, BR-098): the preventive plan's
+ * checklist steps (seq-ordered, bilingual) carried onto generated work
+ * orders with per-step results (the results land with W-17's generation
+ * API — the carry-over law); the plan's own rows CASCADE with the plan
+ * (the 0101 budget_lines precedent). */
+export const maintenancePlanTasks = pgTable(
+  "maintenance_plan_tasks",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    planId: uuid("plan_id").notNull(),
+    seq: integer("seq").notNull(),
+    title: text("title").notNull(),
+    titleAr: text("title_ar"),
+    instruction: text("instruction"),
+    instructionAr: text("instruction_ar"),
+    isActive: boolean("is_active").notNull().default(true),
+  },
+  (table) => [
+    uniqueIndex("uq_maintenance_plan_tasks_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_maintenance_plan_tasks_tenant_plan_seq").on(
+      table.tenantId,
+      table.planId,
+      table.seq,
+    ),
+    index("ix_maintenance_plan_tasks_tenant_plan").on(table.tenantId, table.planId),
+  ],
+);
+
+/** PHASE-049 (T-01, migration 0105 — D-03, the phase doc's own machine):
+ * maintenance work orders — REQUESTED → PLANNED → IN_PROGRESS ↔ ON_HOLD →
+ * COMPLETED (forward-only with the pause both-ways law), the problem/
+ * solution text, the priority, the assigned technician (an HR READ — 049
+ * never writes an HR table), the three cost-leg totals (ADR-0009 money;
+ * the cost LINES are W-17's collectors — a cost-lines table would be the
+ * D-02-dated +9), the single-use completion stamp, and the BR-097
+ * single-open partial unique on generated orders per (asset, plan).
+ * Evidence discipline: no DELETE (the order history is the
+ * service-history timeline's spine). */
+export const maintenanceWorkOrders = pgTable(
+  "maintenance_work_orders",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    assetId: uuid("asset_id").notNull(),
+    orderNo: text("order_no").notNull(),
+    problem: text("problem").notNull(),
+    problemAr: text("problem_ar"),
+    solution: text("solution"),
+    solutionAr: text("solution_ar"),
+    priority: text("priority").notNull().default("MEDIUM"),
+    technicianEmployeeId: uuid("technician_employee_id"),
+    status: text("status").notNull().default("REQUESTED"),
+    planId: uuid("plan_id"),
+    plannedAt: timestamp("planned_at", { withTimezone: true, mode: "string" }),
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "string" }),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    laborTotal: numeric("labor_total", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    partsTotal: numeric("parts_total", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    externalTotal: numeric("external_total", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    journalEntryId: uuid("journal_entry_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_maintenance_work_orders_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_maintenance_work_orders_tenant_no").on(table.tenantId, table.orderNo),
+    index("ix_maintenance_work_orders_tenant_asset").on(
+      table.tenantId,
+      table.assetId,
+      table.status,
+    ),
+    index("ix_maintenance_work_orders_tenant_status").on(table.tenantId, table.status),
+    index("ix_maintenance_work_orders_tenant_technician")
+      .on(table.tenantId, table.technicianEmployeeId)
+      .where(sql`${table.technicianEmployeeId} IS NOT NULL`),
+    index("ix_maintenance_work_orders_tenant_plan")
+      .on(table.tenantId, table.planId)
+      .where(sql`${table.planId} IS NOT NULL`),
+    uniqueIndex("uq_maintenance_work_orders_tenant_plan_open")
+      .on(table.tenantId, table.assetId, table.planId)
+      .where(
+        sql`${table.planId} IS NOT NULL AND ${table.status} IN ('REQUESTED', 'PLANNED', 'IN_PROGRESS', 'ON_HOLD')`,
+      ),
+  ],
+);
+
+/** PHASE-049 (T-02, migration 0106 — D-07, FA-F-05): asset meters —
+ * HOURS/KM/PRODUCTION/CUSTOM with the unit, the last-reading snapshot
+ * (recomputed to the max — a back-dated-but-higher reading is legal) and
+ * the R-10 odometer designation (ONE KM-type meter per asset, the partial
+ * unique). Master data (DELETE granted; readings' FK RESTRICT protects
+ * the meters with history). */
+export const assetMeters = pgTable(
+  "asset_meters",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    assetId: uuid("asset_id").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    type: text("type").notNull(),
+    unit: text("unit").notNull(),
+    isOdometer: boolean("is_odometer").notNull().default(false),
+    lastValue: numeric("last_value", { precision: 19, scale: 6 })
+      .notNull()
+      .default("0"),
+    lastReadingAt: timestamp("last_reading_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_asset_meters_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_asset_meters_tenant_asset_name").on(
+      table.tenantId,
+      table.assetId,
+      table.name,
+    ),
+    index("ix_asset_meters_tenant_asset").on(table.tenantId, table.assetId),
+    uniqueIndex("uq_asset_meters_tenant_asset_odometer")
+      .on(table.tenantId, table.assetId)
+      .where(sql`${table.isOdometer}`),
+  ],
+);
+
+/** PHASE-049 (T-02, migration 0106 — D-07): the readings log — value,
+ * effective date, source MANUAL/JOB/IMPORT (JOB carries its work-order
+ * link, the XOR gate). The usage views derive from the log, never a
+ * stored sum (the BR-089 zero-residue spirit). Evidence discipline: no
+ * DELETE. */
+export const assetMeterReadings = pgTable(
+  "asset_meter_readings",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    meterId: uuid("meter_id").notNull(),
+    value: numeric("value", { precision: 19, scale: 6 }).notNull(),
+    effectiveDate: date("effective_date").notNull(),
+    source: text("source").notNull().default("MANUAL"),
+    workOrderId: uuid("work_order_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_asset_meter_readings_id_tenant").on(table.id, table.tenantId),
+    index("ix_asset_meter_readings_tenant_meter").on(
+      table.tenantId,
+      table.meterId,
+      table.effectiveDate,
+    ),
+    index("ix_asset_meter_readings_tenant_work_order")
+      .on(table.tenantId, table.workOrderId)
+      .where(sql`${table.workOrderId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-049 (T-02, migration 0106 — D-05, BR-099): the spare-parts BOM
+ * per asset — the item-master FK (discontinued items refuse at BOM save,
+ * the W-18 service's typed law). Master data (DELETE granted). */
+export const assetSpares = pgTable(
+  "asset_spares",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    assetId: uuid("asset_id").notNull(),
+    itemId: uuid("item_id").notNull(),
+    qty: numeric("qty", { precision: 19, scale: 6 }).notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_asset_spares_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_asset_spares_tenant_asset_item").on(
+      table.tenantId,
+      table.assetId,
+      table.itemId,
+    ),
+    index("ix_asset_spares_tenant_asset").on(table.tenantId, table.assetId),
+    index("ix_asset_spares_tenant_item").on(table.tenantId, table.itemId),
+  ],
+);
+
+/** PHASE-049 (T-02, migration 0106 — D-09, FA-F-06): the unguessable
+ * signed tag codes — unique per tenant, created/printed stamps; the scan
+ * surface resolves through the standard auth + RLS stack (a foreign
+ * tenant's scan is a typed 404; a forged code refuses at the signature —
+ * W-19's API). Master data (DELETE granted). */
+export const assetTags = pgTable(
+  "asset_tags",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    assetId: uuid("asset_id").notNull(),
+    code: text("code").notNull(),
+    printedAt: timestamp("printed_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_asset_tags_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_asset_tags_tenant_code").on(table.tenantId, table.code),
+    index("ix_asset_tags_tenant_asset").on(table.tenantId, table.assetId),
+  ],
+);
+
+/** PHASE-049 (T-03, migration 0107 — D-06, BR-100/G-61): asset transfers
+ * between branches — the DRAFT → SUBMITTED → APPROVED/REJECTED ladder
+ * with the verdict stamps; on approval the branch flip + the NBV
+ * reclassification post in ONE transaction (exactly once, fail-closed
+ * until the branch↔account pair is mapped; the asset's own carrying
+ * value UNTOUCHED — the branch dimension carries the move). Evidence
+ * discipline: no DELETE (REJECTED stays readable). */
+export const assetTransfers = pgTable(
+  "asset_transfers",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    assetId: uuid("asset_id").notNull(),
+    fromBranchId: uuid("from_branch_id").notNull(),
+    toBranchId: uuid("to_branch_id").notNull(),
+    reason: text("reason").notNull(),
+    reasonAr: text("reason_ar"),
+    status: text("status").notNull().default("DRAFT"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    submittedBy: uuid("submitted_by"),
+    approvedAt: timestamp("approved_at", { withTimezone: true, mode: "string" }),
+    approvedBy: uuid("approved_by"),
+    rejectedAt: timestamp("rejected_at", { withTimezone: true, mode: "string" }),
+    rejectedBy: uuid("rejected_by"),
+    rejectReason: text("reject_reason"),
+    journalEntryId: uuid("journal_entry_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_asset_transfers_id_tenant").on(table.id, table.tenantId),
+    index("ix_asset_transfers_tenant_asset").on(table.tenantId, table.assetId),
+    index("ix_asset_transfers_tenant_status").on(table.tenantId, table.status),
+    index("ix_asset_transfers_tenant_to_branch").on(
+      table.tenantId,
+      table.toBranchId,
+      table.status,
     ),
   ],
 );

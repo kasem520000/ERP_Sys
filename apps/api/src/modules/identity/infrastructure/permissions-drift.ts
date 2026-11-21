@@ -203,6 +203,16 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // projects.fieldservice.view/dispatch. Role grants: the owner template
   // holds all fourteen; the accountant the five finance-read view keys.
   "apps/api/migrations/0103_projects_contracting_fieldservice.sql",
+  // PHASE-049 (Blueprint v3.0 · CR-19 extended by v3.2/CR-50, the W-16
+  // foundation wave, 2026-11-21): 0108 §1 seeds the TEN assets keys
+  // (matrix §3.27; 326 → 336) — assets.maintenance.view/manage/plan ·
+  // assets.meters.view/record · assets.spares.manage ·
+  // assets.transfer.view/approve · assets.tags.manage ·
+  // assets.expiry.view. Role grants: the owner template holds all ten;
+  // the accountant the two finance-read view keys (maintenance.view —
+  // INV-034's GL reconciliation plane; expiry.view — the renewal
+  // registers); the operational keys stay owner-only.
+  "apps/api/migrations/0108_cmms_asset_extensions.sql",
 ];
 
 export async function main(): Promise<void> {

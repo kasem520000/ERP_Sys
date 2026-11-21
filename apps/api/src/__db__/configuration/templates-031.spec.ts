@@ -107,7 +107,11 @@ const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
 // required_feature_keys gains the hr block (the workforce-industry
 // enablement; the migration seed, the docs mirror, and the contracts
 // verbatim moved together — the 0066 §9 re-pin procedure).
-  "industry.healthcare": "sha256:607cc89a7fac4ec3ecb48f654b3561702118be6b5eceffcc23e2908ad309d2e0",
+  // PHASE-049 (W-16, 2026-11-21): re-pinned — the healthcare manifest's
+  // required_feature_keys gains the TWO CMMS FLAGS (the CMMS-plane
+  // enablement, D-11/D-16 / 0108 §3; canonical + stored + docs mirror +
+  // pins moved together, the 0098 §3 procedure).
+  "industry.healthcare": "sha256:1feda082097b49038bc3d053b444ea9b37368c4293b26f613e29ac5441709bef",
 });
 
 // -- tenant A: the healthcare apply + the claim-capture legs ------------------

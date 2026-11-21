@@ -132,6 +132,10 @@ const EXPECTED_ROWS_PER_TENANT: Record<string, number> = {
   // (the CUSTOMER register row + the SUBCONTRACTOR row per agreement —
   // the one-ledger-both-sides law, D-09).
   retention_accounts: 2,
+  // PHASE-049 (CR-19 — the CMMS cluster, W-16): the transfers' from ≠ to
+  // law needs a SECOND branch per tenant (the abababab-2000 pair — the
+  // warehouses/warehouses-2 precedent).
+  branches: 2,
 };
 function expectedRowsFor(table: string): number {
   return EXPECTED_ROWS_PER_TENANT[table] ?? 1;
@@ -3527,6 +3531,106 @@ async function seedFixtures(superuser: {
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
+  // PHASE-049 (CR-19 — the CMMS cluster, migrations 0105–0107; the W-16
+  // foundation wave, 2026-11-21): the fc-prefixed hex ids (fc0=plans,
+  // fc1=plan tasks, fc2=work orders, fc3=meters, fc4=readings, fc5=spares,
+  // fc6=tags, fc7=transfers — the fa-prefix precedent; the B row doubles
+  // as the A4/A7 foreign probe target). The chain rides the EXISTING
+  // fixtures: the assets (fa1a), the items (baba), the branches (abab).
+  await superuser.query(
+    `INSERT INTO maintenance_plans (id, tenant_id, asset_id, name, trigger_type,
+                                    interval_days, next_due_date)
+     VALUES
+       ('fc0c0c0c-0000-4000-8000-000000000001', $1, 'fa1a1a1a-0000-4000-8000-000000000001',
+        'ISO Monthly service', 'CALENDAR', 30, '2026-03-01'),
+       ('fc0c0c0c-0000-4000-8000-000000000002', $2, 'fa1a1a1a-0000-4000-8000-000000000002',
+        'ISO Monthly service', 'CALENDAR', 30, '2026-03-01')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO maintenance_plan_tasks (id, tenant_id, plan_id, seq, title)
+     VALUES
+       ('fc1c1c1c-0000-4000-8000-000000000001', $1, 'fc0c0c0c-0000-4000-8000-000000000001',
+        1, 'Inspect belts'),
+       ('fc1c1c1c-0000-4000-8000-000000000002', $2, 'fc0c0c0c-0000-4000-8000-000000000002',
+        1, 'Inspect belts')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO maintenance_work_orders (id, tenant_id, asset_id, order_no, problem, status)
+     VALUES
+       ('fc2c2c2c-0000-4000-8000-000000000001', $1, 'fa1a1a1a-0000-4000-8000-000000000001',
+        'MO-ISO-1', 'Won''t start', 'REQUESTED'),
+       ('fc2c2c2c-0000-4000-8000-000000000002', $2, 'fa1a1a1a-0000-4000-8000-000000000002',
+        'MO-ISO-1', 'Won''t start', 'REQUESTED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO asset_meters (id, tenant_id, asset_id, name, type, unit)
+     VALUES
+       ('fc3c3c3c-0000-4000-8000-000000000001', $1, 'fa1a1a1a-0000-4000-8000-000000000001',
+        'Engine hours', 'HOURS', 'h'),
+       ('fc3c3c3c-0000-4000-8000-000000000002', $2, 'fa1a1a1a-0000-4000-8000-000000000002',
+        'Engine hours', 'HOURS', 'h')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source)
+     VALUES
+       ('fc4c4c4c-0000-4000-8000-000000000001', $1, 'fc3c3c3c-0000-4000-8000-000000000001',
+        100, '2026-02-01', 'MANUAL'),
+       ('fc4c4c4c-0000-4000-8000-000000000002', $2, 'fc3c3c3c-0000-4000-8000-000000000002',
+        100, '2026-02-01', 'MANUAL')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO asset_spares (id, tenant_id, asset_id, item_id, qty)
+     VALUES
+       ('fc5c5c5c-0000-4000-8000-000000000001', $1, 'fa1a1a1a-0000-4000-8000-000000000001',
+        'babababa-0000-4000-8000-000000000001', 2),
+       ('fc5c5c5c-0000-4000-8000-000000000002', $2, 'fa1a1a1a-0000-4000-8000-000000000002',
+        'babababa-0000-4000-8000-000000000002', 2)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO asset_tags (id, tenant_id, asset_id, code)
+     VALUES
+       ('fc6c6c6c-0000-4000-8000-000000000001', $1, 'fa1a1a1a-0000-4000-8000-000000000001',
+        'iso-signed-tag-code-0001-payload-0123456789abcdef'),
+       ('fc6c6c6c-0000-4000-8000-000000000002', $2, 'fa1a1a1a-0000-4000-8000-000000000002',
+        'iso-signed-tag-code-0001-payload-0123456789abcdef')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  // The transfers' destination branch (ONE branch per tenant existed —
+  // the ladder's from ≠ to law needs a second; the abababab-2000 pair).
+  await superuser.query(
+    `INSERT INTO branches (id, tenant_id, code, name, name_ar)
+     VALUES
+       ('abababab-2000-4000-8000-000000000001', $1, 'CMMS', 'Branch A CMMS', 'فرع أ للصيانة'),
+       ('abababab-2000-4000-8000-000000000002', $2, 'CMMS', 'Branch B CMMS', 'فرع ب للصيانة')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO asset_transfers (id, tenant_id, asset_id, from_branch_id, to_branch_id,
+                                 reason, status)
+     VALUES
+       ('fc7c7c7c-0000-4000-8000-000000000001', $1, 'fa1a1a1a-0000-4000-8000-000000000001',
+        'abababab-0000-4000-8000-000000000001', 'abababab-2000-4000-8000-000000000001',
+        'Relocation', 'DRAFT'),
+       ('fc7c7c7c-0000-4000-8000-000000000002', $2, 'fa1a1a1a-0000-4000-8000-000000000002',
+        'abababab-0000-4000-8000-000000000002', 'abababab-2000-4000-8000-000000000002',
+        'Relocation', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
 
   // -- seedFixtures end --
 
@@ -4105,6 +4209,17 @@ const OWN_ROW: Record<string, [string, string]> = {
   progress_certificates: ["e9e9e9e9-0000-4000-8000-000000000001", "e9e9e9e9-0000-4000-8000-000000000002"],
   service_visits: ["eaeaeaea-0000-4000-8000-000000000001", "eaeaeaea-0000-4000-8000-000000000002"],
   ias23_capitalizations: ["ebebebeb-0000-4000-8000-000000000001", "ebebebeb-0000-4000-8000-000000000002"],
+  // PHASE-049 (CR-19 — the CMMS cluster, migrations 0105–0107): the
+  // fc-prefixed ids (the fa-prefix precedent — the B row doubles as the
+  // A4/A7 foreign probe target).
+  maintenance_plans: ["fc0c0c0c-0000-4000-8000-000000000001", "fc0c0c0c-0000-4000-8000-000000000002"],
+  maintenance_plan_tasks: ["fc1c1c1c-0000-4000-8000-000000000001", "fc1c1c1c-0000-4000-8000-000000000002"],
+  maintenance_work_orders: ["fc2c2c2c-0000-4000-8000-000000000001", "fc2c2c2c-0000-4000-8000-000000000002"],
+  asset_meters: ["fc3c3c3c-0000-4000-8000-000000000001", "fc3c3c3c-0000-4000-8000-000000000002"],
+  asset_meter_readings: ["fc4c4c4c-0000-4000-8000-000000000001", "fc4c4c4c-0000-4000-8000-000000000002"],
+  asset_spares: ["fc5c5c5c-0000-4000-8000-000000000001", "fc5c5c5c-0000-4000-8000-000000000002"],
+  asset_tags: ["fc6c6c6c-0000-4000-8000-000000000001", "fc6c6c6c-0000-4000-8000-000000000002"],
+  asset_transfers: ["fc7c7c7c-0000-4000-8000-000000000001", "fc7c7c7c-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -5142,6 +5257,36 @@ const MISMATCHED_INSERT: Record<string, string> = {
       rate_snapshot, status)
      VALUES ('ebebebeb-3000-4000-8000-000000000003', $1, 'a1a1a1a1-0000-4000-8000-000000000002',
       '9d9d9d9d-0000-4000-8000-000000000002', '2026-01-01', '2026-03-31', 1000, 70, 930, 0.07, 'DRAFT')`,
+  // PHASE-049 (CR-19 — the CMMS cluster): the mismatched-tenant attack
+  // rows (FK-consistent against tenant B's own fixtures; the RLS WITH
+  // CHECK is what must refuse — never an FK accident).
+  maintenance_plans: `INSERT INTO maintenance_plans (id, tenant_id, asset_id, name, trigger_type,
+      interval_days, next_due_date)
+     VALUES ('fc0c0c0c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
+      'ATK CMMS plan', 'CALENDAR', 30, '2026-03-01')`,
+  maintenance_plan_tasks: `INSERT INTO maintenance_plan_tasks (id, tenant_id, plan_id, seq, title)
+     VALUES ('fc1c1c1c-3000-4000-8000-000000000003', $1, 'fc0c0c0c-0000-4000-8000-000000000002',
+      1, 'Attack task')`,
+  maintenance_work_orders: `INSERT INTO maintenance_work_orders (id, tenant_id, asset_id, order_no, problem, status)
+     VALUES ('fc2c2c2c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
+      'MO-ATK', 'Attack order', 'REQUESTED')`,
+  asset_meters: `INSERT INTO asset_meters (id, tenant_id, asset_id, name, type, unit)
+     VALUES ('fc3c3c3c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
+      'Attack meter', 'HOURS', 'h')`,
+  asset_meter_readings: `INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source)
+     VALUES ('fc4c4c4c-3000-4000-8000-000000000003', $1, 'fc3c3c3c-0000-4000-8000-000000000002',
+      200, '2026-02-02', 'MANUAL')`,
+  asset_spares: `INSERT INTO asset_spares (id, tenant_id, asset_id, item_id, qty)
+     VALUES ('fc5c5c5c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
+      'babababa-0000-4000-8000-000000000002', 1)`,
+  asset_tags: `INSERT INTO asset_tags (id, tenant_id, asset_id, code)
+     VALUES ('fc6c6c6c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
+      'atk-signed-tag-code-0003-payload-0123456789abcdef')`,
+  asset_transfers: `INSERT INTO asset_transfers (id, tenant_id, asset_id, from_branch_id, to_branch_id,
+      reason, status)
+     VALUES ('fc7c7c7c-3000-4000-8000-000000000003', $1, 'fa1a1a1a-0000-4000-8000-000000000002',
+      'abababab-0000-4000-8000-000000000002', 'abababab-2000-4000-8000-000000000002',
+      'Attack transfer', 'DRAFT')`,
 };
 
 beforeAll(async () => {

@@ -728,6 +728,34 @@
       "when": 1797652800000,
       "tag": "0104_projects_contracting_stamps",
       "breakpoints": true
+    },
+    {
+      "idx": 104,
+      "version": "7",
+      "when": 1797739200000,
+      "tag": "0105_cmms_work_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 105,
+      "version": "7",
+      "when": 1797825600000,
+      "tag": "0106_cmms_meters_spares",
+      "breakpoints": true
+    },
+    {
+      "idx": 106,
+      "version": "7",
+      "when": 1797912000000,
+      "tag": "0107_cmms_transfers",
+      "breakpoints": true
+    },
+    {
+      "idx": 107,
+      "version": "7",
+      "when": 1797998400000,
+      "tag": "0108_cmms_asset_extensions",
+      "breakpoints": true
     }
   ],
   "version": "7"

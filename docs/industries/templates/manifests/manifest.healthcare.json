@@ -18,7 +18,9 @@
     "hr.performance",
     "hr.recruitment",
     "hr.training",
-    "hr.org"
+    "hr.org",
+    "assets.maintenance",
+    "assets.transfer"
   ],
   "default_modules_enabled": [
     "accounting",

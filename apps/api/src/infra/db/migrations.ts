@@ -556,6 +556,35 @@ export const MIGRATIONS: readonly string[] = [
   // (progress_certificates.advance_applied_amount — the G-33 mirror's
   // applied_amount law). No new tables (the catalog stays 318).
   "0104_projects_contracting_stamps",
+  // PHASE-049 (Blueprint v3.0 · CR-19, extended by v3.2/CR-50 — CMMS,
+  // Asset Maintenance; the plan §2's honest slots, the journal's actual
+  // 0104 end respected — the 047 D-03/048 D-02 precedent; delivered
+  // 2026-11-21 at W-16, the foundation wave): 0105 the work-order
+  // engine's substrate (maintenance_plans with the CALENDAR/METER XOR
+  // trigger law + the generation anchor + maintenance_plan_tasks the
+  // checklist + maintenance_work_orders the REQUESTED→PLANNED→
+  // IN_PROGRESS↔ON_HOLD→COMPLETED machine with the three cost-leg
+  // totals + the single-use completion stamp + BR-097's single-open
+  // partial unique; the plans' meter FK deferred to 0106's asset_meters
+  // — the 0100/0104 additive precedent), 0106 the meters cluster
+  // (asset_meters with the R-10 odometer partial unique +
+  // asset_meter_readings the JOB-link-gated log + asset_spares the BOM +
+  // asset_tags the signed codes + THE ADDITIVE plans→meters FK), 0107
+  // asset_transfers (the DRAFT→SUBMITTED→APPROVED/REJECTED ladder, the
+  // G-61 journal gate), 0108 THE ALTER on the frozen assets substrate
+  // (the four expiry registers + cost_center_id + parent_asset_id with
+  // the self-reference floor) + THE DATA-ONLY GRANTS BLOCK (the TEN
+  // assets.* permission keys — matrix §3.27, 326 → 336; the two feature
+  // flags' plan grants on business+enterprise with starter at the
+  // DECLARED NEUTRAL ZERO; the four CMMS-carrying templates' manifest
+  // enablements — the 0098/0103 pattern) + the three CoA template
+  // markers (MAINTENANCE_EXPENSE 5310 · LABOR_CLEARING 2138 ·
+  // EXTERNAL_ACCRUAL 2137 — D-04's own dependency, the 0077 §6
+  // pattern). Eight tenant tables; the catalog 318 → 326.
+  "0105_cmms_work_orders",
+  "0106_cmms_meters_spares",
+  "0107_cmms_transfers",
+  "0108_cmms_asset_extensions",
 ];
 
 /**

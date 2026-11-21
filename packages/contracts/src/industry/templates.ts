@@ -848,6 +848,13 @@ export const AUTOMOTIVE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     "projects.wbs",
     "projects.contracting",
     "projects.fieldservice",
+    // PHASE-049 (W-16 — D-11/D-16, the CMMS-plane enablement, CR-36f,
+    // 2026-11-21): the TWO FEATURE FLAGS ride the CMMS-carrying
+    // templates by default (0108 §3 — the stored registry's guarded
+    // append; the ten PERMISSION keys ride ROLES, matrix §3.27; starter
+    // carries NEITHER flag — the declared neutral zero).
+    "assets.maintenance",
+    "assets.transfer",
   ],
   default_modules_enabled: [
     "accounting",
@@ -1403,6 +1410,13 @@ export const FOOD_MANUFACTURING_TEMPLATE_MANIFEST: IndustryTemplateManifest = de
     "hr.recruitment",
     "hr.training",
     "hr.org",
+    // PHASE-049 (W-16 — D-11/D-16, the CMMS-plane enablement, CR-36f,
+    // 2026-11-21): the TWO FEATURE FLAGS ride the CMMS-carrying
+    // templates by default (0108 §3 — the stored registry's guarded
+    // append; the ten PERMISSION keys ride ROLES, matrix §3.27; starter
+    // carries NEITHER flag — the declared neutral zero).
+    "assets.maintenance",
+    "assets.transfer",
   ],
   default_modules_enabled: [
     "accounting",
@@ -3152,7 +3166,14 @@ export const HEALTHCARE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     "hr.recruitment",
     "hr.training",
     "hr.org",
-  
+
+    // PHASE-049 (W-16 — D-11/D-16, the CMMS-plane enablement, CR-36f,
+    // 2026-11-21): the TWO FEATURE FLAGS ride the CMMS-carrying
+    // templates by default (0108 §3 — the stored registry's guarded
+    // append; the ten PERMISSION keys ride ROLES, matrix §3.27; starter
+    // carries NEITHER flag — the declared neutral zero).
+    "assets.maintenance",
+    "assets.transfer",
   ],
   default_modules_enabled: [
     "accounting",
@@ -3469,6 +3490,13 @@ export const RENTAL_LOGISTICS_TEMPLATE_MANIFEST: IndustryTemplateManifest = deep
     "projects.wbs",
     "projects.contracting",
     "projects.fieldservice",
+    // PHASE-049 (W-16 — D-11/D-16, the CMMS-plane enablement, CR-36f,
+    // 2026-11-21): the TWO FEATURE FLAGS ride the CMMS-carrying
+    // templates by default (0108 §3 — the stored registry's guarded
+    // append; the ten PERMISSION keys ride ROLES, matrix §3.27; starter
+    // carries NEITHER flag — the declared neutral zero).
+    "assets.maintenance",
+    "assets.transfer",
   ],
   default_modules_enabled: [
     "accounting",

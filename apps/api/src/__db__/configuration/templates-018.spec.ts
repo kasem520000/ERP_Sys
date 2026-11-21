@@ -79,8 +79,13 @@ import {
  *  kickoff decision's coherent change: the migration seed, the docs
  *  mirror, and the contracts verbatim copy moved together — the 0066
  *  §9 re-pin procedure).
+ *
+ *  PHASE-049 (W-16, 2026-11-21): re-pinned — the manifest's
+ *  required_feature_keys gains the TWO CMMS FLAGS (the CMMS-plane
+ *  enablement, D-11/D-16 / 0108 §3; canonical + stored + docs mirror +
+ *  pins moved together, the 0098 §3 procedure).
  */
-const KNOWN_HASH = "sha256:f258fed91de8519a13c67937d30c2b736a9509ee0e40da3b7335258e022a6717";
+const KNOWN_HASH = "sha256:1e4995ddc0f6054454f00ce8cc549e7b647f80c287625afbbaececa8d7248010";
 
 /** The 0026 plan-grant manufacturing set (the "manufacturing add-on"). */
 const MANUFACTURING_KEYS: readonly string[] = [
@@ -695,6 +700,12 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
     // and BR-040 closure adds the hr keys' own dependency
     // payroll.employees (FEATURE_DEPS — the employees substrate; the
     // starter set carries no hr/payroll surface at all).
+    // PHASE-049 (W-16, 2026-11-21 — the CMMS-plane enablement, 0108 §3):
+    // the backstop now also carries the TWO CMMS FLAGS + the closure's
+    // fixed_assets.register (the assets keys' FEATURE_DEPS substrate,
+    // granted by 0037 to business + enterprise — starter gets NEITHER
+    // flag NOR the substrate: the DECLARED NEUTRAL ZERO, the tier-4
+    // posture; the 048 W-8 three-flags extension's exact shape).
     await expect(
       withTenant(starterTenant, () =>
         applyService.apply(starterOwner, {
@@ -706,6 +717,9 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
       code: "configuration/template-prerequisites-blocked",
       templateKey: "industry.food_manufacturing",
       missingChain: [
+        "assets.maintenance",
+        "assets.transfer",
+        "fixed_assets.register",
         "hr.attendance",
         "hr.leave",
         "hr.org",

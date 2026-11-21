@@ -278,7 +278,20 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // (the register's contract CUSTOMER · the AP linkage's journal · the
     // advance amortization state — the 0100 additive-column precedent;
     // no new tables, the catalog stays 318).
-    expect(files.at(-1)?.tag).toBe("0104_projects_contracting_stamps");
+    // PHASE-049 (CR-19, extended by v3.2/CR-50 — CMMS Asset Maintenance,
+    // the W-16 foundation wave, 2026-11-21): 0105–0108 the honest slots
+    // (the plan §2 — the phase doc's "0083…0086" are stale blueprint
+    // slots, its own note defers to the journal): the plans/checklist/
+    // work-orders substrate with BR-097's single-open partial unique, the
+    // meters/readings/spares/tags cluster with the R-10 odometer partial
+    // unique + the additive plans→meters FK, the transfers ladder with
+    // the G-61 journal gate, and THE ALTER on assets (the four expiry
+    // registers + cost_center_id + parent_asset_id) + the DATA-ONLY
+    // grants (ten keys 326 → 336, matrix §3.27; the two flags with
+    // starter at the DECLARED NEUTRAL ZERO; the four manifest
+    // enablements; the three CoA markers 5310/2138/2137). Eight tenant
+    // tables; the catalog 318 → 326.
+    expect(files.at(-1)?.tag).toBe("0108_cmms_asset_extensions");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

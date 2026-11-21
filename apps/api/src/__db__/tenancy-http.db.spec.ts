@@ -216,8 +216,8 @@ describe("owner journey: login → onboarding → branches → settings", () => 
     // set (64 accounts / 41 purposes: 2170/2180/2190 SALARIES_PAYABLE /
     // DEDUCTIONS_PAYABLE / EOS_PROVISION + 5270/5280/5295 SALARIES_EXPENSE /
     // EMPLOYER_CONTRIBUTIONS / EOS_PROVISION_EXPENSE).
-    expect(diff.accounts.created).toBe(76); // 64 + 3220 CONSOLIDATION_ADJUSTMENT (0041 — restored-lineage drift, repaired in PHASE-036) + 4 PHASE-042 markers (0065/0066) + 4 PHASE-044 markers (0067 §10: 4895 DEPOSIT_FORFEITURE · 0070 §8: 1290 QUARANTINE_INVENTORY · 2135 CONSIGNATION_PAYABLE · 4990 TRANSFER_PRICING_ADJUSTMENT) + 3 PHASE-043 tolling markers (0077 §6: 1420/2136/5126)
-    expect(diff.purposes.created).toBe(53); // 41 + CONSOLIDATION_ADJUSTMENT + the four PHASE-042 purposes + the four PHASE-044 purposes + the three PHASE-043 tolling purposes (0077 §6)
+    expect(diff.accounts.created).toBe(79); // 64 + 3220 CONSOLIDATION_ADJUSTMENT (0041 — restored-lineage drift, repaired in PHASE-036) + 4 PHASE-042 markers (0065/0066) + 4 PHASE-044 markers (0067 §10: 4895 DEPOSIT_FORFEITURE · 0070 §8: 1290 QUARANTINE_INVENTORY · 2135 CONSIGNATION_PAYABLE · 4990 TRANSFER_PRICING_ADJUSTMENT) + 3 PHASE-043 tolling markers (0077 §6: 1420/2136/5126) + 3 PHASE-049 CMMS markers (0108 §4: 5310 MAINTENANCE_EXPENSE · 2138 LABOR_CLEARING · 2137 EXTERNAL_ACCRUAL)
+    expect(diff.purposes.created).toBe(56); // 41 + CONSOLIDATION_ADJUSTMENT + the four PHASE-042 purposes + the four PHASE-044 purposes + the three PHASE-043 tolling purposes (0077 §6) + the three PHASE-049 CMMS purposes (0108 §4: MAINTENANCE_EXPENSE · LABOR_CLEARING · EXTERNAL_ACCRUAL)
 
     const reRun = await request(
       "POST",

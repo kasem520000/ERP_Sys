@@ -63,6 +63,10 @@ const SEED_PATHS = [
   // projects keys and joins both lists together (matrix §3.26,
   // 312 → 326) — the same lesson carried forward.
   join(process.cwd(), "migrations", "0103_projects_contracting_fieldservice.sql"), // PHASE-048 the fourteen projects keys (312 → 326)
+  // PHASE-049 (CR-19 extended by v3.2/CR-50, W-16, 2026-11-21): 0108 §1
+  // seeds the ten CMMS assets keys and joins both lists together (matrix
+  // §3.27, 326 → 336) — the same lesson carried forward.
+  join(process.cwd(), "migrations", "0108_cmms_asset_extensions.sql"), // PHASE-049 the ten assets keys (326 → 336)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

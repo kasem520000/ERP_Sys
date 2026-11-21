@@ -305,6 +305,22 @@ const BUSINESS_KEYS: readonly string[] = [
   // keys ride ROLES per 0103 §1, never the plans — matrix §3.26's
   // entitlement/authorization divergence note.)
   "projects.wbs", "projects.contracting", "projects.fieldservice",
+  // PHASE-049 (W-16, 2026-11-21) transcription of the 0108 §2 plan grants
+  // (the TWO FEATURE FLAGS → business + enterprise, the tier-4 precedent;
+  // STARTER GETS NEITHER — the declared neutral zero: the CMMS plane is
+  // not a starter feature): assets.maintenance · assets.transfer — the
+  // phase doc's composable units (D-11/D-16). The four CMMS-carrying
+  // templates' (0108 §3: automotive + rental_logistics + healthcare +
+  // food_manufacturing) REQUIRED chains resolve through exactly these
+  // grants — the CMMS manifest enablement. The dependency substrate
+  // (fixed_assets.register granted by 0037 to business + enterprise —
+  // transcribed HERE at its first consumer, the closure-driven
+  // transcription rule's 0088 catch-up precedent shape: the assets keys'
+  // BR-040 closures resolve through it). (The ten PERMISSION keys ride
+  // ROLES per 0108 §1, never the plans — matrix §3.27's
+  // entitlement/authorization divergence note.)
+  "fixed_assets.register",
+  "assets.maintenance", "assets.transfer",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

@@ -852,6 +852,62 @@ notifications' own permission plane — no new key.
 > three project-carrying templates compose them by default (0103 §3) — the
 > entitlement/authorization divergence above, the §3.25 precedent.
 
+### §3.27 CMMS — asset maintenance (PHASE-049; catalog 326 → 336)
+
+The CMMS cluster (CR-19, extended by v3.2/CR-50 — the maintenance work-order machine on the
+044 asset register, the preventive plans with calendar/meter triggers, the meters and their
+readings log, the spare-parts BOM whose consumption is an inventory issue, the branch
+transfers with the NBV reclassification, the signed tags, and the expiry registers with the
+30/7/0 sweep). **All ten keys seed in migration `0108` §1 — the permission catalog extends
+326 → 336 (seed = mirror, zero drift).** The entitlement/authorization divergence (the
+§3.25/§3.26 precedent, deliberate): the TWO FEATURE FLAGS — `assets.maintenance` ·
+`assets.transfer` (the phase doc's composable units, the §3 manifest schema's single-segment
+module.feature shape) — are the ENTITLEMENT keys: business + enterprise carry them (0108 §2)
+and the FOUR CMMS-carrying industry templates (automotive — the workshop template ·
+rental_logistics · healthcare · food_manufacturing) compose them by default (0108 §3).
+**STARTER GETS NEITHER FLAG — the declared neutral zero (the tier-4 posture verbatim: the
+CMMS plane is not a starter feature; zero starter keys move).** The ten keys below are the
+AUTHORIZATION surface and ride ROLES (0108 §1) — never the plans. **NOT ledger-free**:
+`assets.maintenance.manage` and `assets.transfer.approve` gate the G-59 completion act and
+the G-61 approval act — every posting still rides the centralized engine with registered
+source keys under INV-013 idempotency; the approval keys are the SoD surface (creator ≠
+approver, §4), the posting itself is the engine's.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `assets.maintenance.view` | View maintenance work orders, their status machine and cost collectors / عرض أوامر الصيانة وحالاتها ومجمعات تكاليفها | owner, accountant | tenant | no (read-only over the maintenance plane; INV-034's reconciliation reads these figures) |
+| `assets.maintenance.manage` | Manage work orders and drive the status machine (REQUESTED→…→COMPLETED) / إدارة أوامر الصيانة وتشغيل حالاتها | owner | tenant | **yes** (the completion act posts G-59 (maintenance expense: labor + parts + external) through the engine — the SoD surface over the posting; the asset's cost and depreciation are UNTOUCHED by law) |
+| `assets.maintenance.plan` | Manage preventive plans and their checklists (BR-097/BR-098) / إدارة خطط الصيانة الوقائية وقوائم فحصها | owner | tenant | **yes** (plans generate work orders automatically — the single-open-per-window law BR-097 is the structural floor; a misconfigured meter threshold floods the board) |
+| `assets.meters.view` | View asset meters and the readings log / عرض عدادات الأصل وسجل القراءات | owner | tenant | no (read-only over the meter plane) |
+| `assets.meters.record` | Record meter readings (MANUAL/JOB/IMPORT sources) / تسجيل قراءات العدادات | owner | tenant | **yes** (readings drive METER triggers event-driven in the reading's own transaction — a wrong reading generates real work orders; the monotonic law and the effective-date semantics are the floors) |
+| `assets.spares.manage` | Manage the per-asset spare-parts BOM (BR-099) / إدارة قائمة قطع الغيار لكل أصل | owner | tenant | **yes** (the BOM feeds the parts lines whose consumption posts as an inventory issue (G-60) — the no-negative-stock floor is checked at line creation; discontinued items refuse at BOM save) |
+| `assets.transfer.view` | View asset transfers and their approval ladder / عرض نقل الأصول وسلم موافقتها | owner | tenant | no (read-only; REJECTED transfers stay readable — the contract history) |
+| `assets.transfer.approve` | Approve asset transfers (the G-61 gate — the NBV reclassification) / اعتماد نقل الأصول (بوابة G-61) | owner | tenant | **yes** (approval flips the asset's branch AND posts the NBV reclassification between the branch asset accounts in ONE transaction, exactly once (BR-100); fail-closed PURPOSE_NOT_MAPPED until the tenant maps the branch↔account pair) |
+| `assets.tags.manage` | Manage signed asset tags and their print sheets / إدارة بطاقات الأصول الموقعة وصفحات طباعتها | owner | tenant | **yes** (the codes are unguessable signed tokens — regeneration changes what physical QR labels resolve; the print sheet is deterministic by law) |
+| `assets.expiry.view` | View the warranty/insurance/license/inspection expiry registers / عرض سجلات انتهاء الضمان والتأمين والترخيص والفحص | owner, accountant | tenant | no (read-only over the renewal registers — the sweep's 30/7/0 alert classes) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — the keys-seed-first discipline, the §3.23–§3.26
+precedent): the `/api/v1/assets/{maintenance,plans,meters,spares,transfers,tags,expiry}`
+families land with the W-17…W-19 service waves, each route on the exact keys above, and the
+web planes (W-20/W-21) on the same keys. Role grants per 0108 §1: the owner template holds
+all ten; the accountant the TWO finance-read keys (assets.maintenance.view ·
+assets.expiry.view — INV-034's GL reconciliation plane + the renewal registers; the
+operational keys stay owner-only — maintenance operations are tenant-granted beyond the
+baseline). The alert surfaces ride the notifications' own permission plane — no new key.
+
+> **[Dated 2026-11-21 (PHASE-049 W-16 — T-01…T-04, the foundation wave): the ten
+> keys seeded; ROUTE_PERMISSIONS stays 1,052 = 1,052.]** Migration 0108 §1 seeds the
+> catalog 326 → 336 with ZERO route rows added — the keys land first and the
+> `/api/v1/assets/*` families bind them as the W-17…W-19 service waves ship (the
+> §3.23–§3.26 keys-seed-first precedent; every future route-row addition carries its
+> own dated note here, the 1,052 ledger discipline — W-13's `(1051 + 1 = 1052)` block
+> remains the last route delta). The TWO FEATURE FLAGS (assets.maintenance ·
+> assets.transfer) grant to business + enterprise (0108 §2 — starter at the DECLARED
+> NEUTRAL ZERO) and the four CMMS-carrying templates compose them by default
+> (0108 §3) — the entitlement/authorization divergence above, the §3.26 precedent.
+> The three G-59/G-61 CoA template markers (MAINTENANCE_EXPENSE 5310 · LABOR_CLEARING
+> 2138 · EXTERNAL_ACCRUAL 2137) are account-template rows, never permission keys.
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

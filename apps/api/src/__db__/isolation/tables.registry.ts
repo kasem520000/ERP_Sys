@@ -563,6 +563,27 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "progress_certificates" },
   { table: "service_visits" },
   { table: "ias23_capitalizations" },
+  // PHASE-049 (CR-19, extended by v3.2/CR-50 — CMMS Asset Maintenance;
+  // migrations 0105–0107; the W-16 foundation wave, 2026-11-21): the
+  // CMMS cluster — EIGHT tables. Master data (DELETE granted — the typed
+  // service guards own the lifecycles; generated history's FKs protect
+  // the parents): maintenance_plans, maintenance_plan_tasks (the
+  // checklist CASCADEs with its plan — the 0101 budget_lines precedent),
+  // asset_meters, asset_spares (the BOM), asset_tags (the signed codes).
+  // The evidence discipline (SELECT/INSERT/UPDATE only — the audited
+  // history): maintenance_work_orders (the machine + the G-59 completion
+  // stamp — the order history is the service timeline's spine),
+  // asset_meter_readings (the readings log the usage views derive from),
+  // asset_transfers (the approval ladder — REJECTED stays readable, the
+  // change_orders precedent). The auto-generated A-suite extends by +48.
+  { table: "maintenance_plans", deleteGranted: true },
+  { table: "maintenance_plan_tasks", deleteGranted: true },
+  { table: "maintenance_work_orders" },
+  { table: "asset_meters", deleteGranted: true },
+  { table: "asset_meter_readings" },
+  { table: "asset_spares", deleteGranted: true },
+  { table: "asset_tags", deleteGranted: true },
+  { table: "asset_transfers" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

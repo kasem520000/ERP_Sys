@@ -17,7 +17,9 @@
     "treasury.cash_accounts",
     "projects.wbs",
     "projects.contracting",
-    "projects.fieldservice"
+    "projects.fieldservice",
+    "assets.maintenance",
+    "assets.transfer"
   ],
   "default_modules_enabled": [
     "accounting",

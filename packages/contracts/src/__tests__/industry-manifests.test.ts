@@ -1004,6 +1004,10 @@ describe("shipped industry template manifests (v1.0.0 — retail / grocery / res
     // the THREE PROJECTS FLAGS join the required chain (0103 §3 — the
     // stored registry's guarded append; the canonical + docs mirrors moved
     // together, the 0098 §3 procedure).
+    // PHASE-049 (W-16, 2026-11-21 — D-11/D-16, the CMMS-plane enablement):
+    // the TWO CMMS FLAGS join the required chain (0108 §3 — the same
+    // guarded append + coherent change; rental_logistics is one of the
+    // four CMMS-carrying templates, matrix §3.27).
     expect(RENTAL_LOGISTICS_TEMPLATE_MANIFEST.required_feature_keys).toEqual([
       "industry.template_engine",
       "crm.service_contracts",
@@ -1015,6 +1019,8 @@ describe("shipped industry template manifests (v1.0.0 — retail / grocery / res
       "projects.wbs",
       "projects.contracting",
       "projects.fieldservice",
+      "assets.maintenance",
+      "assets.transfer",
     ]);
     expect(RENTAL_LOGISTICS_TEMPLATE_MANIFEST.capability_prerequisites.rental_contracts).toEqual({
       level: "REQUIRED",

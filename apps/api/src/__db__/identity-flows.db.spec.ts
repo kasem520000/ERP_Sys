@@ -200,7 +200,10 @@ describe("seeds (acceptance 9)", () => {
     // + 14 = 326 after 0103 — the fourteen PHASE-048 projects keys
     // (matrix §3.26, the W-8 foundation wave 2026-11-20; the drift CLI
     // agrees: matrix 326 = seed 326).
-    expect(result.rows[0]?.n).toBe(326);
+    // + 10 = 336 after 0108 — the ten PHASE-049 CMMS assets keys (matrix
+    // §3.27, the W-16 foundation wave 2026-11-21; the drift CLI agrees:
+    // matrix 336 = seed 336).
+    expect(result.rows[0]?.n).toBe(336);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {
@@ -487,9 +490,20 @@ describe("TOTP MFA (M-06, M-07, acceptance 3)", () => {
     ).rejects.toThrow(MfaRequiredError);
 
     // A fresh code logs in fine; recovery codes then work once each (M-07).
+    // PHASE-049 W-16 (the owner's dispatch, 2026-11-21 — RISK-033's EIGHTH
+    // incident, the plan wave's own TOTP boundary flake, the fix the owner
+    // ordered at approval): the fresh-code derivation is DETERMINISTIC —
+    // `currentTimestep(Date.now()) + 1`, exactly one step ahead of the
+    // verify code's base, inside the ±TOTP_DRIFT_STEPS window at any real
+    // test speed (the mfa-policy.db.spec PHASE-038 repair's shape). The
+    // prior `currentTimestep(Date.now() + 31_000)` landed TWO steps ahead
+    // whenever the generation ran in the last second of a 30s window
+    // (offset r ≥ 29s: 31s crosses T+1 and T+2), outside the drift window
+    // → the MfaRequiredError the plan wave's chunk-a RED attempts recorded
+    // (both logs kept in audit-evidence/phase049-plan/).
     const freshCode = hotp(
       base32Decode(enrollment.secret),
-      currentTimestep(Date.now() + 31_000),
+      currentTimestep(Date.now()) + 1,
     );
     const loggedIn = await login.login({
       email: user.email,

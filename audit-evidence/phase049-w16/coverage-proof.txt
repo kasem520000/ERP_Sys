@@ -1,0 +1,15 @@
+inventory files: 272
+union files:     272
+union == inventory: True
+missing from union: NONE
+extra in union: NONE
+duplicates: False
+
+chunk-smoke: 3 files
+isolate-soak: 1
+chunk-perf-rest: 5
+isolate-fcm: 1
+isolate-email: 1
+chunk-a: 87 (was 86 + the cmms family's first spec)
+chunk-b-rest: 86
+chunk-c: 88
