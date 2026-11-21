@@ -112,6 +112,34 @@ without it
   (ALTER on `assets` for the three expiry columns + cost-center grouping + the DATA-ONLY
   grants block). Exact numbers confirmed against the Drizzle journal at implementation
   time.
+  > **[Dated 2026-11-21 (PHASE-049 W-18 — THE FINGERPRINT AMENDMENT, ratified by the
+  > owner's W-17 acceptance: «انحراف البصمة 0109/0110 يُقبل بالآلية ويُصدَّق تعديله:
+  > السلسلة 110 · الكتالوج 328 بدل 0108·326 — بملاحظة تعديل مؤرخة في وثيقة الخطة
+  > ضمن أول التزام في W-18»).]** The stale blueprint slots above ("0083…0086") landed
+  > as the honest journal slots **0105–0108** (the W-16 foundation wave) + the
+  > **D-02-dated provision 0109/0110** (the W-17 wave: 0109 = 0105's own recorded note
+  > — the cost LINES as W-17's collectors — landing its TWO tables
+  > `maintenance_cost_lines` (the +9) + `maintenance_work_order_steps` (the +10); 0110
+  > = the stock-moves source-shape repair, the honest catch of the W-17 envelope). The
+  > phase's amended fingerprint: **the chain 110 · ENTITY_CATALOG 328** (was expected
+  > 0108 · 326 at the W-16 report — the deviation accepted by mechanism, the amendment
+  > recorded HERE per the owner's own order). The fingerprint holds through W-23 unless
+  > a dated D-02 provision lands (the law below).
+  >
+  > **THE TWO LAWS PLANTED (the owner's W-17 acceptance, standing from W-18):**
+  > 1. **The D-02 disclosure law:** any D-02 expectation planted in a migration log is
+  >    disclosed in the report of its OWN wave — with the FINAL EXPECTED FINGERPRINT
+  >    (the chain number and the catalog count the provision will produce). The W-16
+  >    report declared 0108/326 while 0105's published note already expected growth —
+  >    that shape never recurs: a wave that plants a provision reports the fingerprint
+  >    the provision will produce, dated, in the same envelope.
+  > 2. **The shared-scope union law:** a constraint over a SHARED domain (a CHECK over
+  >    `stock_moves.source_type`'s kind, or any sibling) is recomputed from the UNION
+  >    of every member every migration has EVER defined — never from a single
+  >    migration's list (the G-48 lesson: 0109's DROP+ADD rebuilt the domain from
+  >    0073's list and missed 0077's `contract_mfg`). Standing proof: the schema
+  >    spec's `stock_moves` scope arm (W-18) enumerates the members explicitly and
+  >    asserts the live constraint equals the all-migrations union.
 - **Entities**: +8 tenant tables → SQL + Drizzle mirror + `ENTITY_CATALOG.md` rows
   (CR-36a); +column family on `assets`.
 - **Permissions**: +10 keys — `assets.maintenance.view/manage/plan`,

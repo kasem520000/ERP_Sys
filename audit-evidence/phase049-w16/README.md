@@ -94,6 +94,27 @@ ENTITY_CATALOG **326** (both scratch runs) · the CoA template markers **+3** (5
 2138 · 2137 — the provisioning pins moved 76/53 → 79/56, the dated notes at all four
 sites).
 
+## THE PARTS-LEDGER MOVEMENT NOTE (dated 2026-11-21, W-18 — retroactive, استرجاعًا قائمًا)
+
+**The owner's parts-ledger arithmetic found an informational gap in THIS README's
+`a 87 · 681` declaration, and the investigation closes it here (the new law: a
+metrics/tree conflict opens the investigation in its OWN wave, never the next):**
+the movement into chunk-a did NOT happen during W-16 — it happened at THE PLAN WAVE
+(`20b56d3`, the same 2026-11-21), when `parts.json` was introduced and the three load
+chunks were **re-partitioned by domain family**: **162 of the 260 load files moved
+between the parts (gross)** — `a→b 26 · a→c 34 · b→a 26 · b→c 25 · c→a 38 · c→b 13`
+(verified: the W-15 logs' per-file rosters vs the plan wave's `parts.json`; the
+coverage union identical, 271 = 271 — a pure re-partition) — with the NET deltas
+**chunk-a 82·596 → 86·651 (+4 files · +55 tests) · chunk-b-rest 98·772 → 86·625
+(−12 · −147) · chunk-c 80·619 → 88·711 (+8 · +92)**, the total unchanged
+271 · 3,807. **W-16 itself moved NOTHING between parts**: `a 87·681` = the plan
+wave's `86·651` + the declared cmms schema spec `1·30` EXACT. The plan wave's README
+declared its own parts but never declared the RE-PARTITION as a movement against
+W-15's — the gap. The owner's lower bound («4 ملفات·7 اختبارات على الأقل») is
+correctED here to the exact figures: **+4 files · +55 tests net into a** (the gross
+162 files named above). Standing law from W-18: every future re-partition declares
+its movement — the file list, the net and the gross — in its own wave's report.
+
 ## THE FIVE HONEST DISCLOSURES
 
 1. **THE F1 WEB FILE-COUNT CORRECTION (dated 2026-11-21, W-16 — the original claim
