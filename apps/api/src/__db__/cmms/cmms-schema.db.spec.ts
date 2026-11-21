@@ -793,3 +793,102 @@ describe("PHASE-049 W-16 — the frozen-substrate extension (D-01, migration 010
     });
   });
 });
+
+describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union law)", () => {
+  /**
+   * THE OWNER'S LAW (the W-17 acceptance, standing from W-18): a
+   * constraint over a SHARED domain is recomputed from the UNION of every
+   * member every migration has EVER defined — never a single migration's
+   * list. This arm turns the G-48 lesson (0109's DROP+ADD rebuilt the
+   * stock_moves source domain from 0073's list and missed 0077's
+   * contract_mfg) into a standing proof: it parses EVERY migration file
+   * for the constraint's definitions, unions all members ever defined,
+   * and asserts the LIVE constraint (pg_get_constraintdef) equals that
+   * union — with the members ENUMERATED EXPLICITLY (the owner's «تعدّ
+   * أعضاء نطاق stock_moves صراحة»). A future partial DROP+ADD goes RED
+   * here naming the missing member.
+   */
+  it("the live source-shape domain equals the UNION of every member every migration ever defined — enumerated explicitly", async () => {
+    const { readdirSync, readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const migrationsDir = join(process.cwd(), "migrations");
+    const constraintSites = new Map<string, Set<string>>();
+    const addOrInline =
+      /(?:ADD CONSTRAINT|CONSTRAINT)\s+ck_stock_moves_source_shape\s+CHECK\s*\(\s*"source_type"\s+IN\s*\(([^)]+)\)/g;
+    for (const file of readdirSync(migrationsDir).filter((name) => name.endsWith(".sql"))) {
+      const text = readFileSync(join(migrationsDir, file), "utf8");
+      for (const match of text.matchAll(addOrInline)) {
+        const members = new Set(
+          [...match[1]!.matchAll(/'([^']+)'/g)].map((hit) => hit[1]!),
+        );
+        constraintSites.set(file, members);
+      }
+    }
+    // The union — every member every migration has EVER defined.
+    const union = new Set<string>();
+    for (const members of constraintSites.values()) {
+      for (const member of members) union.add(member);
+    }
+    expect(union.size).toBeGreaterThan(0);
+    // The definitions' lineage is on record (the sites enumerated).
+    expect([...constraintSites.keys()].sort()).toEqual([
+      "0014_inventory_core.sql",
+      "0016_purchasing_core.sql",
+      "0018_sales_core.sql",
+      "0025_automotive_distribution.sql",
+      "0026_manufacturing.sql",
+      "0027_crm_projects.sql",
+      "0073_stock_moves_wms_sources.sql",
+      "0077_contract_manufacturing.sql",
+      "0109_cmms_cost_lines_steps.sql",
+      "0110_cmms_source_shape_repair.sql",
+    ]);
+
+    // The LIVE constraint, from the catalog itself.
+    const live = await su.query<{ definition: string }>(
+      `SELECT pg_get_constraintdef(oid) AS definition FROM pg_constraint
+       WHERE conname = 'ck_stock_moves_source_shape' AND conrelid = 'public.stock_moves'::regclass`,
+    );
+    expect(live.rows).toHaveLength(1);
+    const liveMembers = new Set(
+      [...live.rows[0]!.definition.matchAll(/'([^']+)'/g)].map((hit) => hit[1]!),
+    );
+
+    // The members ENUMERATED EXPLICITLY (23 at the 110 chain — every
+    // source family the platform has ever defined):
+    expect([...liveMembers].sort()).toEqual([
+      "consignment_settlement",
+      "contract_mfg",
+      "credit_note",
+      "cross_dock",
+      "cycle_count",
+      "delivery_note",
+      "goods_receipt",
+      "job_card",
+      "landed_cost",
+      "maintenance_work_order",
+      "manual_issue",
+      "manual_receipt",
+      "method_switch",
+      "opening_balance_doc",
+      "production_order",
+      "quarantine_disposition",
+      "sales_invoice",
+      "service_order",
+      "stock_adjustment",
+      "stock_count",
+      "stock_transfer",
+      "supplier_invoice",
+      "warehouse_kit",
+    ]);
+
+    // THE LAW: live == the all-migrations union (a partial DROP+ADD goes
+    // RED here — the difference named, member by member).
+    const missing = [...union].filter((member) => !liveMembers.has(member));
+    const extra = [...liveMembers].filter((member) => !union.has(member));
+    expect(
+      { missing, extra },
+      "the live stock_moves source domain must equal the union of every member every migration ever defined (the shared-scope union law — the G-48 lesson)",
+    ).toEqual({ missing: [], extra: [] });
+  });
+});

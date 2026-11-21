@@ -1225,7 +1225,8 @@ export async function sealTransferRejected(input: {
 
 /** The branch flip — the approval act's own second guarded statement in
  * the SAME ambient transaction (the asset's cost/accumulated columns are
- * NEVER touched — D-01: the branch dimension carries the move). */
+ * NEVER touched — D-01: the branch dimension carries the move; the
+ * register's own column family has no updated_by — the 0037 shape). */
 export async function flipAssetBranch(input: {
   assetId: string;
   toBranchId: string;
@@ -1235,7 +1236,6 @@ export async function flipAssetBranch(input: {
     UPDATE assets SET
       branch_id = ${input.toBranchId},
       updated_at = now(),
-      updated_by = ${input.actorId},
       version = version + 1
     WHERE id = ${input.assetId}`);
 }

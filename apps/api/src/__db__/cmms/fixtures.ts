@@ -218,3 +218,142 @@ export async function ensureCmmsG59World(): Promise<CmmsG59World> {
   };
   return g59World;
 }
+
+// ── W-18: the G-61 world (the transfers golden's substrate) ─────────────────
+
+/** The second actor (the SoD's approver — the creator never approves). */
+export const CM_ACTOR2 = "3c3c3c3c-0000-4000-8000-0000000003c2";
+
+export interface CmmsG61World {
+  branchCmId: string;
+  branchCm2Id: string;
+  /** BR-CM3: the UNMAPPED branch (the fail-closed arm's own subject). */
+  branchUnmappedId: string;
+  fromAccountId: string;
+  toAccountId: string;
+}
+
+let g61World: CmmsG61World | undefined;
+let g61FromAccountId: string | undefined;
+let g61ToAccountId: string | undefined;
+
+/**
+ * THE G-61 WORLD (idempotent): the G-59 substrate (the CoA + the OPEN
+ * periods) + the SECOND branch BR-CM2 + the UNMAPPED third branch BR-CM3 +
+ * the two per-branch asset accounts (1211/1212) with their purpose mappings
+ * (FIXED_ASSET_BR_CM / FIXED_ASSET_BR_CM2 — 0108's declared per-branch
+ * FIXED_ASSET mechanism, "no new marker": the tenant's own mappings through
+ * account_purposes). BR-CM3 deliberately maps NOTHING — the fail-closed
+ * arm's own world.
+ */
+export async function ensureCmmsG61World(): Promise<CmmsG61World> {
+  if (g61World !== undefined) return g61World;
+  const base = await setupCmmsFixture();
+  await ensureCmmsG59World();
+  const su: Client = await superuserClient();
+  await su.query(
+    `INSERT INTO users (id, email, full_name, password_hash, status) VALUES
+       ($1, 'cmms-approver@fixture.test', 'CMMS Approver', 'x', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [CM_ACTOR2],
+  );
+  const branch2 = await su.query<{ id: string }>(
+    `INSERT INTO branches (id, tenant_id, code, name, name_ar)
+     VALUES (gen_random_uuid(), $1, 'BR-CM2', 'CMMS Branch 2', 'الفرع الثاني')
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS],
+  );
+  const branch3 = await su.query<{ id: string }>(
+    `INSERT INTO branches (id, tenant_id, code, name, name_ar)
+     VALUES (gen_random_uuid(), $1, 'BR-CM3', 'CMMS Branch 3 (unmapped)', 'الفرع الثالث غير المربوط')
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS],
+  );
+  await su.end();
+  // The per-branch asset accounts + their purpose mappings — inside the
+  // tenant scope (the tenancy store's own ambient law).
+  await withTenant(TENANT_CMMS, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    const today = new Date().toISOString().slice(0, 10);
+    let fromAccount = await tenancy.findAccountByCode("1211");
+    if (fromAccount === undefined) {
+      fromAccount = await tenancy.insertAccount({
+        code: "1211",
+        name: "CM Branch Assets",
+        nameAr: "أصول فرع الصيانة",
+        type: "ASSET",
+        parentId: null,
+        isPostable: true,
+      });
+    }
+    let toAccount = await tenancy.findAccountByCode("1212");
+    if (toAccount === undefined) {
+      toAccount = await tenancy.insertAccount({
+        code: "1212",
+        name: "CM Branch 2 Assets",
+        nameAr: "أصول الفرع الثاني",
+        type: "ASSET",
+        parentId: null,
+        isPostable: true,
+      });
+    }
+    if ((await tenancy.findActivePurpose("FIXED_ASSET_BR_CM")) === undefined) {
+      await tenancy.insertAccountPurpose({
+        purposeKey: "FIXED_ASSET_BR_CM",
+        accountId: fromAccount.id,
+        activeFrom: today,
+      });
+    }
+    if ((await tenancy.findActivePurpose("FIXED_ASSET_BR_CM2")) === undefined) {
+      await tenancy.insertAccountPurpose({
+        purposeKey: "FIXED_ASSET_BR_CM2",
+        accountId: toAccount.id,
+        activeFrom: today,
+      });
+    }
+    g61FromAccountId = fromAccount.id;
+    g61ToAccountId = toAccount.id;
+  });
+  g61World = {
+    branchCmId: base.branchId,
+    branchCm2Id: branch2.rows[0]!.id,
+    branchUnmappedId: branch3.rows[0]!.id,
+    fromAccountId: g61FromAccountId!,
+    toAccountId: g61ToAccountId!,
+  };
+  return g61World;
+}
+
+/**
+ * A FRESH TRANSFER ASSET per arm: cost 100,000 with the opening
+ * accumulated 25,000 (NBV 75,000 — the golden's own figure) unless the
+ * arm overrides (the zero-NBV world passes the full cost as accumulated).
+ */
+export async function freshTransferAsset(
+  code: string,
+  overrides: { openingAccumulated?: string } = {},
+): Promise<string> {
+  const base = await setupCmmsFixture();
+  const su: Client = await superuserClient();
+  const rows = await su.query<{ id: string }>(
+    `INSERT INTO assets (id, tenant_id, code, name, name_ar, category_id,
+        acquisition_date, cost, opening_accumulated, useful_life_months, branch_id, created_by)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, '2026-01-15', 100000, $6, 60, $7, $8)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [
+      TENANT_CMMS,
+      code,
+      `Asset ${code}`,
+      `أصل ${code}`,
+      base.categoryId,
+      overrides.openingAccumulated ?? "25000",
+      base.branchId,
+      CM_ACTOR,
+    ],
+  );
+  await su.end();
+  return rows.rows[0]!.id;
+}
