@@ -5152,6 +5152,144 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/projects/fieldservice/visits/:id/close",
     permission: "projects.fieldservice.dispatch",
   },
+
+  // PHASE-049 (W-17 — T-05/T-06/T-07, dated 2026-11-21; matrix §3.27):
+  // the CMMS plane's first two route families — the maintenance
+  // work-order engine (the status machine, the cost collectors, the step
+  // results, and THE G-59 COMPLETION ACT on the manage key — the SoD
+  // surface over the posting) and the preventive plans (BR-097's
+  // single-open window + the checklist carry-over on the plan key).
+  // The 0108-seeded keys' FIRST binding wave (1,052 + 25 = 1,077 — the
+  // keys-seed-first discipline: the keys landed at W-16, the routes bind
+  // as the service waves ship). The meters/spares/transfers/tags/expiry
+  // families land with W-18/W-19; the web planes (W-20/W-21) on the same
+  // keys. The entitlement plane rides the assets.maintenance feature
+  // flag (D-16).
+  {
+    method: "GET",
+    path: "/api/v1/assets/maintenance/orders",
+    permission: "assets.maintenance.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/maintenance/orders/:id",
+    permission: "assets.maintenance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/maintenance/orders/:id/lines",
+    permission: "assets.maintenance.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/maintenance/orders/:id/steps",
+    permission: "assets.maintenance.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/plan",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/start",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/hold",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/resume",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/complete",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/lines",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/assets/maintenance/orders/:id/lines/:lineId",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/assets/maintenance/orders/:id/lines/:lineId",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/maintenance/orders/:id/steps/:stepId/result",
+    permission: "assets.maintenance.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/plans",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/plans",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/plans/:id",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/assets/plans/:id",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/assets/plans/:id/tasks",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/plans/:id/tasks",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/assets/plans/:id/tasks/:taskId",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/assets/plans/:id/tasks/:taskId",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/plans/:id/evaluate",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/plans/:id/generate",
+    permission: "assets.maintenance.plan",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/assets/plans/evaluate",
+    permission: "assets.maintenance.plan",
+  },
 ];
 
 /**

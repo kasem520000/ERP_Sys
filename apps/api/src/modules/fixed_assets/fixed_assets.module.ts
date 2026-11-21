@@ -18,9 +18,19 @@ import { RunService } from "./application/run-service";
 import { RevaluationService } from "./application/revaluation-service";
 import { DisposalService } from "./application/disposal-service";
 import { FixedAssetsReconciliationService } from "./application/fixed-assets-reconciliation";
+// PHASE-049 (W-17 — T-05/T-06/T-07): the CMMS plane — the work-order
+// engine (the status machine + the cost collectors + G-59's fused
+// completion act) and the plans API (BR-097's single-open window + the
+// checklist carry-over). PostingService + NumberingService ride the
+// AccountingModule import; the parts issue rides the inventory movement
+// core's plain functions (the service-order-posting precedent).
+import { MaintenanceWorkOrderService } from "./application/maintenance-work-order-service";
+import { MaintenancePlanService } from "./application/maintenance-plan-service";
 import { registerDepreciationJobs } from "./infrastructure/depreciation-assembly.job";
 import { getBoss } from "../../infra/jobs/boss";
 import { FixedAssetsController } from "./presentation/fixed-assets.controller";
+import { MaintenanceController } from "./presentation/maintenance.controller";
+import { MaintenancePlansController } from "./presentation/maintenance-plans.controller";
 
 /**
  * Fixed-assets module (PHASE-026; DR-002 option A): purpose-linked asset
@@ -42,7 +52,7 @@ import { FixedAssetsController } from "./presentation/fixed-assets.controller";
  */
 @Module({
   imports: [AccountingModule, AuditModule, NotificationsModule],
-  controllers: [FixedAssetsController],
+  controllers: [FixedAssetsController, MaintenanceController, MaintenancePlansController],
   providers: [
     CategoryService,
     AssetService,
@@ -55,6 +65,9 @@ import { FixedAssetsController } from "./presentation/fixed-assets.controller";
     RevaluationService,
     DisposalService,
     FixedAssetsReconciliationService,
+    // PHASE-049 (W-17): the CMMS plane.
+    MaintenanceWorkOrderService,
+    MaintenancePlanService,
   ],
   exports: [
     CategoryService,
@@ -68,6 +81,10 @@ import { FixedAssetsController } from "./presentation/fixed-assets.controller";
     RevaluationService,
     DisposalService,
     FixedAssetsReconciliationService,
+    // PHASE-049 (W-17): the CMMS plane (W-18's meters API consumes the
+    // plan-evaluation fold through the plan service).
+    MaintenanceWorkOrderService,
+    MaintenancePlanService,
   ],
 })
 export class FixedAssetsModule implements OnModuleInit {

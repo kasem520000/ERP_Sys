@@ -895,6 +895,18 @@ assets.expiry.view — INV-034's GL reconciliation plane + the renewal registers
 operational keys stay owner-only — maintenance operations are tenant-granted beyond the
 baseline). The alert surfaces ride the notifications' own permission plane — no new key.
 
+> **[Dated 2026-11-21 (PHASE-049 W-17 — T-05/T-06/T-07, the work-order engine + plans): the
+> first binding wave — ROUTE_PERMISSIONS 1,052 + 25 = 1,077.]** The 0108-seeded keys' first
+> route rows land: the `/api/v1/assets/maintenance/orders*` family (14 rows — the board's
+> reads on `assets.maintenance.view`; the machine's transitions, the cost collectors, the
+> step results, and THE G-59 COMPLETION ACT on `assets.maintenance.manage`, the SoD surface
+> over the posting) and the `/api/v1/assets/plans*` family (11 rows — the register, the
+> checklist template, the evaluation and the forced generation on `assets.maintenance.plan`,
+> the risky key: plans generate work orders automatically). The tsx recount this wave:
+> **1,077 rows, 25 on the assets.* keys** (the tsx recount script, this session). The
+> meters/spares/transfers/tags/expiry families bind with W-18/W-19; the web planes
+> (W-20/W-21) on the same keys.
+
 > **[Dated 2026-11-21 (PHASE-049 W-16 — T-01…T-04, the foundation wave): the ten
 > keys seeded; ROUTE_PERMISSIONS stays 1,052 = 1,052.]** Migration 0108 §1 seeds the
 > catalog 326 → 336 with ZERO route rows added — the keys land first and the

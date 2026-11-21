@@ -3,6 +3,12 @@ import type { Client } from "pg";
 import { appClient, ensureTestDb, seedTenants, superuserClient } from "../test-db";
 import { closeDb } from "../../infra/db/client";
 import { withTenant } from "../../infra/db/tenant-context";
+import { AuditService } from "../../modules/audit/api/audit";
+import { DrizzleAuditStore } from "../../modules/audit/infrastructure/drizzle-audit.store";
+import { PeriodService } from "../../modules/accounting/application/period-service";
+import { PostingService } from "../../modules/accounting/application/posting-service";
+import { PartnerSubledgerService } from "../../modules/partners/application/subledger-service";
+import { NumberingService } from "../../modules/accounting/application/numbering-service";
 
 /**
  * PHASE-049 (W-16, the foundation wave) — the CMMS suite's LEAN fixture
@@ -13,6 +19,15 @@ import { withTenant } from "../../infra/db/tenant-context";
  * owner's «أذرع الرفض كلٌّ على عالمه» law: a rejection arm never shares
  * mutable rows with another arm; the heavy service worlds (work orders,
  * plans, meters, spares, transfers) land with their W-17/W-18 waves.
+ *
+ * W-17 extends the family with THE G-59 WORLD (the posting-engine
+ * substrate — the projects fixtures' shape): the onboarding-shaped CoA
+ * instantiation (provisionCoaTemplate materializes the 0108 §4 markers
+ * MAINTENANCE_EXPENSE 5310 · LABOR_CLEARING 2138 · EXTERNAL_ACCRUAL
+ * 2137 + the standing INVENTORY purpose), FY2026's OPEN periods, the
+ * technician employee (the HR read), the supplier partner, and the
+ * parts arm's stock (the item + the warehouse + the WAC position —
+ * D-04's worked example: 20 × 40 = 800).
  */
 
 export const TENANT_CMMS = "3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c";
@@ -107,3 +122,99 @@ export async function freshAsset(
 }
 
 export { appClient, closeDb, superuserClient, withTenant };
+
+// ── W-17: the G-59 world (the posting substrate + the service singletons) ──
+
+/** The service singletons (the projects fixtures' shape — direct
+ * construction, no Nest container; the specs run inside withTenant). */
+const audit = new AuditService(new DrizzleAuditStore());
+export const posting = new PostingService(audit, new PartnerSubledgerService());
+export const numbering = new NumberingService(audit);
+const periods = new PeriodService(audit);
+export { periods };
+
+export interface CmmsG59World {
+  technicianEmployeeId: string;
+  supplierPartnerId: string;
+  itemId: string;
+  warehouseId: string;
+}
+
+let g59World: CmmsG59World | undefined;
+
+/**
+ * THE G-59 WORLD (idempotent — the projects fixtures' shape): the CoA
+ * template instantiation (the 0108 §4 markers included), FY2026's OPEN
+ * periods (today's postings resolve), the technician, the supplier, and
+ * the parts stock (100 × 40 WAC — D-04's worked example issues 20 × 40
+ * = 800).
+ */
+export async function ensureCmmsG59World(): Promise<CmmsG59World> {
+  if (g59World !== undefined) return g59World;
+  const base = await setupCmmsFixture();
+  await withTenant(TENANT_CMMS, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    await tenancy.seedMasterDataBasics();
+    await tenancy.provisionCoaTemplate();
+    // FY2026's OPEN REGULAR periods (today's postings resolve; the
+    // service is itself idempotent on the name).
+    await periods.createYear(CM_ACTOR, {
+      name: "FY2026-CM",
+      startDate: "2026-01-01",
+      endDate: "2026-12-31",
+    });
+  });
+  const su: Client = await superuserClient();
+  // The technician (the HR read — the labor leg's subject).
+  const employee = await su.query<{ id: string }>(
+    `INSERT INTO employees (id, tenant_id, code, name, name_ar, hire_date, contract_type,
+        basic_salary, branch_id)
+     VALUES (gen_random_uuid(), $1, 'CM-TECH', 'CM Technician', 'فني الصيانة', '2025-01-01',
+        'FULL_TIME', 6000,
+        (SELECT id FROM branches WHERE tenant_id = $1 AND code = 'BR-CM' LIMIT 1))
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS],
+  );
+  // The supplier partner (the external leg's subject).
+  const partner = await su.query<{ id: string }>(
+    `INSERT INTO partners (id, tenant_id, kind, code, name, name_ar)
+     VALUES (gen_random_uuid(), $1, 'SUPPLIER', 'CM-SUP', 'CM Calibration Co', 'شركة المعايرة')
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS],
+  );
+  // The parts arm's stock: the item (WAC, plain — no batch/serial), the
+  // warehouse (on the fixture branch), the on-hand position 100 × 40.
+  const warehouse = await su.query<{ id: string }>(
+    `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id)
+     VALUES (gen_random_uuid(), $1, 'CM-WH', 'CM Main Warehouse', 'مستودع الصيانة', $2)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS, base.branchId],
+  );
+  const item = await su.query<{ id: string }>(
+    `INSERT INTO items (id, tenant_id, sku, name, name_ar, kind, uom_id, costing_method,
+        base_price)
+     VALUES (gen_random_uuid(), $1, 'CM-PART', 'CM Filter Kit', 'طقم فلاتر', 'STOCK',
+        (SELECT id FROM uoms WHERE tenant_id = $1 AND code = 'PCS' LIMIT 1), 'WAC', 45)
+     ON CONFLICT (tenant_id, sku) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS],
+  );
+  await su.query(
+    `INSERT INTO item_stock (id, tenant_id, item_id, warehouse_id, qty, avg_cost)
+     VALUES (gen_random_uuid(), $1, $2, $3, 100, 40)
+     ON CONFLICT (tenant_id, item_id, warehouse_id)
+     DO UPDATE SET qty = EXCLUDED.qty, avg_cost = EXCLUDED.avg_cost`,
+    [TENANT_CMMS, item.rows[0]!.id, warehouse.rows[0]!.id],
+  );
+  await su.end();
+  g59World = {
+    technicianEmployeeId: employee.rows[0]!.id,
+    supplierPartnerId: partner.rows[0]!.id,
+    itemId: item.rows[0]!.id,
+    warehouseId: warehouse.rows[0]!.id,
+  };
+  return g59World;
+}
