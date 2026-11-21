@@ -1,0 +1,4 @@
+npm warn Unknown project config "hoist-pattern". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+erp-platform docs available at the following URL:
+https://www.npmjs.com/package/erp-platform
+EXIT=0
