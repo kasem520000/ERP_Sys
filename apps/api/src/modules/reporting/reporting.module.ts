@@ -172,6 +172,17 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "hr.recruitment.view",
   "hr.training.view",
   "hr.documents.manage",
+  // PHASE-048 (0103 §1 seed, matrix §3.26 — W-14, T-17, dated
+  // 2026-11-22): the projects report keys — the four contracts ride the
+  // module's own read keys (the same §12 convention): the EVM summary on
+  // projects.evm.view, the contract progress and the retention statement
+  // on projects.contracting.view (the contracting screen's own read
+  // plane — the same key the certificates/retention tabs and the W-13
+  // prints ride), and the field-service SLA posture on
+  // projects.fieldservice.view (the dispatch board's own read key).
+  "projects.evm.view",
+  "projects.contracting.view",
+  "projects.fieldservice.view",
 ]);
 
 @Module({

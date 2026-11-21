@@ -41,6 +41,7 @@ const CATEGORIES: readonly ReportCategory[] = [
   "platform",
   "industry",
   "hr", // PHASE-045: the workforce registers (attendance / leave balances / overtime)
+  "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects plane (WBS/EVM/contracting/field service)
 ];
 
 const SOURCE_MODULES: readonly DataSourceModule[] = [
@@ -67,6 +68,7 @@ const SOURCE_MODULES: readonly DataSourceModule[] = [
   "consolidation", // PHASE-034: the consolidation query surface (consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots)
   "communication", // PHASE-041: the communication query surface (the outbound delivery log)
   "hr", // PHASE-045: the hr query surface (attendance register / leave balances / overtime summary)
+  "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects query surface (the W-9…W-12 engines the four projects contracts read verbatim — WBS rollup · budgets/actuals · EVM · change orders · contracting · field service)
 ];
 
 const dataSourceSchema = z.object({
@@ -201,16 +203,19 @@ const MODULE_DATA_PHASE: Readonly<Record<DataSourceModule, number>> = Object.fre
   consolidation: 34, // PHASE-034: consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots
   communication: 41, // PHASE-041: the outbound delivery log over the send ledger
   hr: 45, // PHASE-045: attendance register / leave balances / overtime summary query surfaces
+  projects: 48, // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects engines (WBS rollup · budgets/actuals + INV-033 · EVM · change orders · contracting registers · field service — the query surfaces the four projects contracts read)
 });
 
-const REGISTERED_PHASE_WINDOW = 45; // PHASE-013 window, widened by the
+const REGISTERED_PHASE_WINDOW = 48; // PHASE-013 window, widened by the
 // delivering phases that registered contracts over real query surfaces:
 // 15 (industry reports) + 16 (the POS set) + 17 (distribution) + 18
 // (manufacturing) + 19 (CRM) + 26 (fixed assets) + 27 (notes/installments) +
 // 28 (budgeting — see MODULE_DATA_PHASE) + 29 (payroll — see
 // MODULE_DATA_PHASE) + 34 (consolidation — see MODULE_DATA_PHASE) + 41
 // (communication — see MODULE_DATA_PHASE) + 45 (hr — see
-// MODULE_DATA_PHASE).
+// MODULE_DATA_PHASE) + 48 (projects — see MODULE_DATA_PHASE; the W-14
+// widening, dated 2026-11-22: the four projects contracts register over
+// the PHASE-048 engine surfaces — declared, never silent).
 
 /** Financial reports must carry the §11 minimum assertion set (§16 checklist). */
 const FINANCIAL_MINIMUM_ASSERTIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({

@@ -143,6 +143,13 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "hr.recruitment.view",
   "hr.training.view",
   "hr.documents.manage",
+  // PHASE-048 (0103 §1 seed, matrix §3.26 — W-14, T-17, dated
+  // 2026-11-22): the projects report keys (the same §12 convention —
+  // the four contracts ride the module's own read keys the /projects
+  // routes ride).
+  "projects.evm.view",
+  "projects.contracting.view",
+  "projects.fieldservice.view",
 ]);
 
 /** A minimal but type-complete stored envelope for cache/CSV/XLSX tests. */
@@ -190,16 +197,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 110 frozen contracts validate against the known-permission catalog", () => { // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
+  it("the 114 frozen contracts validate against the known-permission catalog", () => { // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
+    expect(result.count).toBe(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent)
+    expect(snapshot).toHaveLength(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");

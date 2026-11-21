@@ -118,6 +118,28 @@ export interface SlaEvaluation {
   }[];
 }
 
+/** PHASE-048 (W-14 — T-17, dated 2026-11-22): the PURE SLA readout the
+ * `projects.fieldservice-sla` report rides — the SAME single fold
+ * (the 0103 stamps + the audit-trail pause history + the tenant's
+ * register), with BR-096's escalation decisions surfaced as
+ * `pendingEscalations` and NOTHING recorded: a report is NEVER the
+ * evaluation act (the W-12 design law — the deduped inbox notification
+ * fires only through the operator's per-visit evaluation surface, the
+ * one write path). */
+export interface SlaReadout {
+  readonly visitId: string;
+  readonly targets: { readonly responseHours: number; readonly resolutionHours: number } | null;
+  readonly response: SlaClockReading;
+  readonly resolution: SlaClockReading;
+  /** The would-escalate decisions (BR-096's pure fold — no inbox write
+   * ever happens through this read). */
+  readonly pendingEscalations: readonly {
+    readonly clock: SlaClockKind;
+    readonly overMs: number;
+    readonly dedupeKey: string;
+  }[];
+}
+
 const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})$/;
 
 @Injectable()
@@ -516,24 +538,14 @@ export class FieldserviceService {
    * notification (once per (visit, clock) ever — the key is the proof).
    */
   async slaEvaluation(id: string): Promise<SlaEvaluation> {
-    const visit = await this.find(id);
-    const targets = await this.readTargets();
-    const events = await this.pauseHistory(id);
-    const clocks = evaluateSlaClocks({
-      dispatchedAt: visit.dispatchedAt,
-      firstRespondedAt: visit.firstRespondedAt,
-      completedAt: visit.completedAt,
-      pauses: pauseIntervals(events, Date.now()),
-      now: Date.now(),
-      targets,
-    });
+    const { visit, targets, clocks, decisions } = await this.evaluateVisit(id);
     const escalations: {
       readonly clock: SlaClockKind;
       readonly overMs: number;
       readonly dedupeKey: string;
       readonly notified: boolean;
     }[] = [];
-    for (const decision of escalationDecisions(id, clocks)) {
+    for (const decision of decisions) {
       const order = await crmStore.findServiceOrderById(visit.serviceOrderId);
       const orderLabel = order?.orderNo ?? visit.serviceOrderId;
       const clockLabel =
@@ -576,6 +588,51 @@ export class FieldserviceService {
       resolution: clocks.resolution,
       escalations,
     };
+  }
+
+  /**
+   * PHASE-048 (W-14 — T-17, dated 2026-11-22): the PURE SLA readout —
+   * the SAME fold `slaEvaluation` rides, with the escalation decisions
+   * surfaced and NOTHING recorded (a report is never the evaluation
+   * act; BR-096's inbox notification fires only through the operator's
+   * evaluation surface). Additive: `slaEvaluation`'s behavior is
+   * byte-identical (its spec unchanged is the proof).
+   */
+  async slaReadout(id: string): Promise<SlaReadout> {
+    const { targets, clocks, decisions } = await this.evaluateVisit(id);
+    return {
+      visitId: id,
+      targets:
+        targets === null
+          ? null
+          : {
+              responseHours: targets.responseTargetMs / 3_600_000,
+              resolutionHours: targets.resolutionTargetMs / 3_600_000,
+            },
+      response: clocks.response,
+      resolution: clocks.resolution,
+      pendingEscalations: decisions,
+    };
+  }
+
+  /** The shared single fold (the W-12 engine's own read): the visit's
+   * stamps + the pause history + the tenant register → the two clocks'
+   * readings + BR-096's pure escalation decisions. NO side effects —
+   * the recording is the callers' own concern (the evaluation act
+   * records; the readout never does). */
+  private async evaluateVisit(id: string) {
+    const visit = await this.find(id);
+    const targets = await this.readTargets();
+    const events = await this.pauseHistory(id);
+    const clocks = evaluateSlaClocks({
+      dispatchedAt: visit.dispatchedAt,
+      firstRespondedAt: visit.firstRespondedAt,
+      completedAt: visit.completedAt,
+      pauses: pauseIntervals(events, Date.now()),
+      now: Date.now(),
+      targets,
+    });
+    return { visit, targets, clocks, decisions: escalationDecisions(id, clocks) };
   }
 
   // -- the shared guards --------------------------------------------------------

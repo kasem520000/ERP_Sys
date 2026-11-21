@@ -188,6 +188,13 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "hr.recruitment.view",
   "hr.training.view",
   "hr.documents.manage",
+  // PHASE-048 (0103 §1 seed, matrix §3.26 — W-14, T-17, dated
+  // 2026-11-22): the projects report keys (the same §12 convention —
+  // the four contracts ride the module's own read keys the /projects
+  // routes ride; the grants the fullContext actor needs to run them).
+  "projects.evm.view",
+  "projects.contracting.view",
+  "projects.fieldservice.view",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

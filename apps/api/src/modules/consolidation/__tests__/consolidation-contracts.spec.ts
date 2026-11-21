@@ -100,6 +100,12 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "hr.recruitment.view",
   "hr.training.view",
   "hr.documents.manage",
+  // PHASE-048 (0103 §1 seed, matrix §3.26 — W-14, T-17, dated
+  // 2026-11-22): the projects report keys — the four contracts ride the
+  // module's own read keys.
+  "projects.evm.view",
+  "projects.contracting.view",
+  "projects.fieldservice.view",
   "crm.contracts.manage",
   "fixed_assets.reports.view",
   "notes.notes.view",
@@ -131,12 +137,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
+    expect(result.count).toBe(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
+    expect(snapshot).toHaveLength(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();

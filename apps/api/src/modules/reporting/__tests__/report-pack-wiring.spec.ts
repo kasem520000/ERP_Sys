@@ -42,8 +42,8 @@ import { REPORT_CONTRACTS } from "../registry";
 describe("report-pack wiring (industries/reports/README v2.0 mapping; register §J closed)", () => {
   const liveKeys = new Set(REPORT_CONTRACTS.map((contract) => contract.id));
 
-  it("the live registry carries the 110 contracts (76 base + the 028/029 budgeting/payroll rows from the restored lineage + the 034 consolidation rows + the 035 tax.e-invoicing-log activation row + the 038 sourcing rows + the 039 returns/collections rows + the 041 communications delivery-log row + the 042 manufacturing-execution rows + the 044 WMS intelligence rows + the 043 planning rows + the 045 hr rows + the 046 payroll compliance rows + the 047 talent rows; no other new report keys since PHASE-031)", () => {
-    expect(REPORT_CONTRACTS).toHaveLength(110); // PHASE-047 (W-6, T-15): 106 → 110 (+4 talent: performance-cycle-results, recruitment-pipeline, training-completions, document-expiry)
+  it("the live registry carries the 114 contracts (76 base + the 028/029 budgeting/payroll rows from the restored lineage + the 034 consolidation rows + the 035 tax.e-invoicing-log activation row + the 038 sourcing rows + the 039 returns/collections rows + the 041 communications delivery-log row + the 042 manufacturing-execution rows + the 044 WMS intelligence rows + the 043 planning rows + the 045 hr rows + the 046 payroll compliance rows + the 047 talent rows + the 048 projects rows; no other new report keys since PHASE-031)", () => {
+    expect(REPORT_CONTRACTS).toHaveLength(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
   });
 
   it("every wholesale report pin resolves in the live registry", () => {

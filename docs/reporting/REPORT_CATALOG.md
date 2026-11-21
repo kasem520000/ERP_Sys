@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-19 (PHASE-047 — hr.performance-cycle-results + hr.recruitment-pipeline + hr.training-completions + hr.document-expiry; registry 106 → 110. Earlier: PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-22 (PHASE-048 — projects.evm-summary + projects.contract-progress + projects.retention-statement + projects.fieldservice-sla; registry 110 → 114. Earlier: PHASE-047 — hr.performance-cycle-results + hr.recruitment-pipeline + hr.training-completions + hr.document-expiry; registry 106 → 110. Earlier: PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -399,6 +399,40 @@ design); the contracts are the aggregate/outcome views of the talent planes:
 | `hr.training-completions` | Training Completions / إتمامات التدريب | hr · `hrQueries.trainingCompletions` · training_enrollments (+ programs/employees joins; COMPLETED only, the once-stamped completed_at) | dateFrom/To, programId?, employeeId? | `hr.training.view` | PDF · XLSX · CSV | PHASE-047 |
 | `hr.document-expiry` | Document Expiry / انتهاء وثائق الموظفين | hr · `hrQueries.documentExpiry` · employee_documents (+ employees; the band folded from the tenant's hr_alert_jobs thresholds — the sweep's own source) | daysAhead (default 30), employeeId?, kind? (PASSPORT/IQAMA/VISA/CONTRACT/CERTIFICATE/OTHER) | `hr.documents.manage` | PDF · XLSX · CSV | PHASE-047 |
 
+**Shipped (PHASE-048, category `projects`)** — the four projects contracts over
+the PHASE-013 engine (registry 110 → 114; permissions reuse the 0103-seeded
+module keys — the §12 module-register convention, matrix §3.26): every contract
+reads the W-9…W-12 engines' own outputs VERBATIM (zero parallel computation —
+D-15's law: no client-side sums, the totals are the engines' own figures, one
+rounding at display only); the new `projects` data-source module registers at
+phase 48 (the window widened 45 → 48, declared at the runtime):
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `projects.evm-summary` | EVM Summary / ملخص القيمة المكتسبة | projects · `EvmService.snapshot` + `ProjectActualsService.inv033` (the W-10 snapshot's own nodes + figures verbatim; the totals the snapshot's own outputs; the engine's disclosures carried verbatim as notes) | projectId, asOf? | `projects.evm.view` | PDF · XLSX · CSV | PHASE-048 |
+| `projects.contract-progress` | Contract Progress & Ceiling / مستخلصات العقد والسقف | projects · `ProgressBillingService.list` + `billingState` (the W-11 certificates register + the BR-093 ceiling card's own read as the totals; the BR-092 pair as the engine derived it) | projectId | `projects.contracting.view` | PDF · XLSX · CSV | PHASE-048 |
+| `projects.retention-statement` | Retention Statement / كشف الاحتجاز | projects · `RetentionService.ledger` (the whole ledger verbatim — the customer register + every sub row; NO amount totals by design: a cross-kind total would be a parallel sum — the W-13 print law) | projectId | `projects.contracting.view` | PDF · XLSX · CSV | PHASE-048 |
+| `projects.fieldservice-sla` | Field Service SLA Posture / موقف مستوى الخدمة الميدانية | projects · `FieldserviceService.board` + `slaReadout` (the W-12 single clock's PURE readout — the same fold the evaluation surface rides, NOTHING recorded: a report is never the evaluation act; the ms the engine's integers verbatim, the hours display-only) | serviceOrderId?, status?, limit? (1–500, default 200) | `projects.fieldservice.view` | PDF · XLSX · CSV | PHASE-048 |
+
+Notes: `projects.evm-summary` carries the `evm-ac-gl-tie` block-on-fail
+assertion (INV-033: the AC total reconciles to the GL project dimension to the
+cent — the W-9 reconciliation service's OWN output, PASS carries the compared
+figures, the typed refusal at a residual becomes the FAIL and blocks the
+export); `projects.contract-progress` carries `br-092-pair-integrity` (every
+row re-checked: net + retention = gross on the engine's own strings,
+exact-decimal compare — the reader's independent re-check) and the totals are
+the BR-093 ceiling card's own read (approvedCertificates · cumulativeGross ·
+effectiveContractValue · remaining — never a client-side sum);
+`projects.retention-statement` carries `retention-ledger-shape` (the side
+vocabulary CUSTOMER/SUBCONTRACTOR, the status vocabulary ACTIVE/RELEASED, and
+the single-customer-register law — at most one CUSTOMER row per project, the
+0103 partial unique's own law re-checked by the reader) and renders NO amount
+totals by design (the row count is the statement's only total);
+`projects.fieldservice-sla` carries `sla-no-fabricated-target` (BR-096's
+fail-closed posture: a clock with NO configured target renders the honest
+absence — target '—' — and never breaches) and its freshness TTL is 0 (running
+clocks advance by the millisecond — a cached reading is a stale reading).
+
 Notes: `hr.performance-cycle-results` carries the `performance-manager-only-source`
 block-on-fail assertion (every row is a MANAGER-review outcome and the projection
 carries no reviewer axis — the 360 inputs never ship; the W-4 appraisal-bridge
@@ -510,6 +544,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-045 | the three hr workforce contracts added (§9: the attendance register over the derived day verdicts + minute facts with the status-vocabulary/session-shape block-on-fail checks, the leave balance cells with the render-time INV-031 cap re-check + the pending-span days, and the overtime folds with BR-084's feeding law as first-class columns — the never-fed pre-approval exception hours); registry 101 → 104 |
 | PHASE-046 | the two payroll compliance contracts added (§9: the statutory contributions summary over the frozen statutory_breakdown/statutory_summary folds — the per (period × profile row) base/shares/capped-counts + the accrued-vs-remitted remittance liability, with the three-way `statutory-totals-tie` INV-032(b) check; and the EOSB liability view per employee — service years, tier days, the computed entitlement, the standing provision (the 029 balance + the accumulated G-54 deltas), settled, the delta — with the standing-model `eosb-provision-tie`); registry 104 → 106 |
 | PHASE-047 | the four talent contracts added (§9's hr workforce additions: the appraisal cycle results — one row per (cycle × reviewee) MANAGER review in SUBMITTED/CALIBRATED with BR-090's manager-outcomes-only posture structural (the `performance-manager-only-source` block-on-fail check; the 360 inputs never ship); the recruitment funnel — BR-088's FIXED ladder as count columns with the `pipeline-stage-total-tie` check, counts only (the applicants' personal data never crosses into exports — amendment A-4); the training completions — the once-stamped completed_at + the result vocabulary with the `training-completion-shape` check; and the document expiry register — the band folded from the tenant's configured sweep thresholds with the `document-band-vocabulary` check, the document number never ships (amendment A-4)); registry 106 → 110 |
+| PHASE-048 | the four projects contracts added (§9's PHASE-048 rows: the EVM summary — the W-10 engine's own snapshot with the `evm-ac-gl-tie` INV-033 block-on-fail check and the snapshot's own figures as the totals (zero parallel computation); the contract progress — the W-11 certificates register + the BR-093 ceiling card's own read with the `br-092-pair-integrity` re-check; the retention statement — the whole ledger verbatim with the `retention-ledger-shape` check and NO amount totals by design (the W-13 print law); and the field-service SLA posture — the W-12 single clock's PURE readout (`slaReadout`, nothing recorded: a report is never the evaluation act) with the `sla-no-fabricated-target` fail-closed check); registry 110 → 114 (the `projects` data-source module registered at phase 48 — the window widened 45 → 48, declared) |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 
@@ -580,3 +615,14 @@ A report cannot be registered before its data phase — the registry cross-check
    re-walked at delivery (each of `hr.performance-cycle-results`,
    `hr.recruitment-pipeline`, `hr.training-completions`, `hr.document-expiry`
    appears exactly once in §9 and once in the live registry).
+7. PHASE-048 (2026-11-22, W-14 T-17) catalog↔registry reconciliation extended:
+   every one of the 114 registry keys has exactly one catalog row (114/114) —
+   the four projects contracts added above (§9's PHASE-048 rows); the
+   reconciliation was re-walked at delivery (each of `projects.evm-summary`,
+   `projects.contract-progress`, `projects.retention-statement`,
+   `projects.fieldservice-sla` appears exactly once in §9 and once in the live
+   registry — the four rows' pins re-pinned together at ALL sites: the eight
+   count pins (report-pack-wiring · reporting-unit ×2 · consolidation-contracts
+   ×2 · golden ×2 · industry-018 · industry-019) + the three known-permission
+   catalogs (the boot list, the db fixtures, the unit spec) + the
+   consolidation spec's own catalog — no partial anchoring).

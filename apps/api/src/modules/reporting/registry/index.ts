@@ -187,6 +187,15 @@ import { hrPerformanceCycleResultsContract } from "./hr/performance-cycle-result
 import { hrRecruitmentPipelineContract } from "./hr/recruitment-pipeline.contract";
 import { hrTrainingCompletionsContract } from "./hr/training-completions.contract";
 import { hrDocumentExpiryContract } from "./hr/document-expiry.contract";
+// PHASE-048 (W-14 — T-17, dated 2026-11-22) · the projects set
+// (REPORT_CATALOG §9's PHASE-048 rows — the four report contracts,
+// registry 110 → 114): every contract reads the W-9…W-12 engines'
+// own outputs VERBATIM (zero parallel computation — D-15's law) and
+// rides the module's own read keys (the §12 convention, matrix §3.26).
+import { projectsEvmSummaryContract } from "./projects/evm-summary.contract";
+import { projectsContractProgressContract } from "./projects/contract-progress.contract";
+import { projectsRetentionStatementContract } from "./projects/retention-statement.contract";
+import { projectFieldserviceSlaContract } from "./projects/fieldservice-sla.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -383,6 +392,19 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   hrRecruitmentPipelineContract,
   hrTrainingCompletionsContract,
   hrDocumentExpiryContract,
+  // §10 projects — PHASE-048 rows (REPORT_CATALOG §9's PHASE-048
+  // additions; W-14, T-17, dated 2026-11-22): the projects set — the
+  // EVM summary (the W-10 snapshot's own figures + the INV-033
+  // block-on-fail tie), the contract progress (the W-11 certificates
+  // register + the BR-093 ceiling card's own read, with BR-092's pair
+  // re-check), the retention statement (the whole ledger verbatim,
+  // NO amount totals by design — the W-13 print law), and the
+  // field-service SLA posture (the pure single-clock readout, nothing
+  // recorded — the no-fabricated-target check).
+  projectsEvmSummaryContract,
+  projectsContractProgressContract,
+  projectsRetentionStatementContract,
+  projectFieldserviceSlaContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

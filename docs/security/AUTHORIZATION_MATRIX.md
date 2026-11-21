@@ -1,6 +1,6 @@
 # Authorization Matrix
 
-> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-19 (PHASE-047 W-6 — §3.25 the four talent report contracts on the module keys; the reporting registry 106 → 110, no key/route delta) · 2026-11-18 (PHASE-047 W-1 — §3.25 the twelve talent keys; catalog 300 → 312, migration 0098 §1; the four template compositions per 0098 §3) · 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
+> **Status:** STABLE · **Owner:** Security Architecture · **Updated:** 2026-11-22 (PHASE-048 W-14 — §3.26 the four projects report contracts on the module keys; the reporting registry 110 → 114, no key/route delta) · 2026-11-19 (PHASE-047 W-6 — §3.25 the four talent report contracts on the module keys; the reporting registry 106 → 110, no key/route delta) · 2026-11-18 (PHASE-047 W-1 — §3.25 the twelve talent keys; catalog 300 → 312, migration 0098 §1; the four template compositions per 0098 §3) · 2026-11-16 (PHASE-046 W-1 — §3.24 the payroll compliance keys; catalog 297 → 300, migration 0092 §1) · 2026-11-16 (PHASE-045 T-16/T-18 — the three hr report contracts documented on their module keys in §3.23; catalog stays 297; the simple-approval decision record DR-045-01 filed) · 2026-11-15 (PHASE-045 T-09 — the employee ↔ user identity bridge's SoD note in §3.23's guarded routes; the phase runs in parallel with the 043-completion review per the owner's directive)
 
 The normative permission catalog: every permission key, its description (EN + AR), the
 minimal role template(s) that carry it, its scope, and whether it is approval-separated
@@ -827,6 +827,19 @@ projects.contracting.view · projects.evm.view — the finance side's read plane
 projects substrate; the dispatch board's view key stays owner-only — field-service
 operations are tenant-granted beyond the baseline). The alert surfaces ride the
 notifications' own permission plane — no new key.
+
+> **[Dated 2026-11-22 (PHASE-048 W-14 — T-17): the reporting registry binds three
+> of the fourteen keys — 110 → 114.** The four projects report contracts
+> (`projects.evm-summary` on `projects.evm.view` · `projects.contract-progress`
+> + `projects.retention-statement` on `projects.contracting.view` ·
+> `projects.fieldservice-sla` on `projects.fieldservice.view`) register over the
+> engines these keys guard — the §12 module-register convention (REPORT_CATALOG
+> §17 #7); every contract's `requiredPermission` is boot-validated against the
+> known-permission catalog. No new key, no route: the contracts ride the
+> existing `/api/v1/reporting/report-runs` engine route (ROUTE_PERMISSIONS
+> stays 1,052 — the reporting plane's own `reporting.reports.run` guard;
+> the per-contract key is enforced AT RUN by the run service's
+> ForbiddenAtRunError).]
 
 > **[Dated 2026-11-20 (W-8 — T-01…T-04, the foundation wave): the fourteen
 > keys seeded; ROUTE_PERMISSIONS stays 988 = 988.]** Migration 0103 §1 seeds

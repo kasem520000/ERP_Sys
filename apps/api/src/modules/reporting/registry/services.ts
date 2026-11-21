@@ -22,6 +22,22 @@ import { SourcingQueriesService } from "./sourcing/sourcing-queries";
 import { ReturnsDunningQueriesService } from "./sales/returns-dunning-queries";
 import { CommunicationQueriesService } from "./communication/outbound-delivery-queries";
 import { HrQueriesService } from "./hr/hr-queries";
+import { ProjectActualsService } from "../../crm/application/project-actuals-service";
+import { ProjectBudgetService } from "../../crm/application/project-budget-service";
+import { EvmService } from "../../crm/application/evm-service";
+import { ChangeOrderService } from "../../crm/application/change-order-service";
+import { SubcontractService } from "../../crm/application/subcontract-service";
+import { RetentionService } from "../../crm/application/retention-service";
+import { ProgressBillingService } from "../../crm/application/progress-billing-service";
+import { FieldserviceService } from "../../crm/application/fieldservice-service";
+import { ServiceOrderPosting } from "../../crm/application/service-order-posting";
+import { SalesInvoiceService } from "../../sales/application/invoices";
+import { ReservationService } from "../../inventory/application/reservation-service";
+import { InboxService } from "../../notifications/application/inbox-service";
+import { TaxResolverService } from "../../tax/application/tax-resolver-service";
+import { NumberingService } from "../../accounting/application/numbering-service";
+import { PostingService } from "../../accounting/application/posting-service";
+import { PartnerSubledgerService } from "../../partners/application/subledger-service";
 import { ManufacturingExecutionQueriesService } from "./manufacturing/queries";
 import { PlanningQueriesService } from "./manufacturing/planning-queries";
 import { WmsQueriesService } from "./operational/wms-queries";
@@ -97,6 +113,19 @@ export interface ReportingServices {
   tax: TaxQueriesService;
   users: UserQueriesService;
   audit: AuditService;
+  /** PHASE-048 (W-14 — T-17, dated 2026-11-22) · the projects query
+   * surface — the W-9…W-12 engines the four projects contracts read
+   * VERBATIM (zero parallel computation: every figure is the engine's
+   * own string; stateless readers over the ambient tenant transaction,
+   * the same direct-construction graph the db fixtures build). */
+  projectsActuals: ProjectActualsService;
+  projectsBudgets: ProjectBudgetService;
+  projectsEvm: EvmService;
+  projectsChangeOrders: ChangeOrderService;
+  projectsSubcontracts: SubcontractService;
+  projectsRetention: RetentionService;
+  projectsBilling: ProgressBillingService;
+  projectsFieldservice: FieldserviceService;
 }
 
 let bundle: ReportingServices | undefined;
@@ -135,6 +164,37 @@ export function reportingServices(): ReportingServices {
       tax: new TaxQueriesService(),
       users: new UserQueriesService(),
       audit: new AuditService(new DrizzleAuditStore()),
+      // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects engines —
+      // the same dependency graph the __db__/projects fixtures build
+      // (audit + posting + numbering shared, actuals the root reader).
+      projectsActuals: new ProjectActualsService(),
+      projectsBudgets: new ProjectBudgetService(new AuditService(new DrizzleAuditStore()), new ProjectActualsService()),
+      projectsChangeOrders: new ChangeOrderService(new AuditService(new DrizzleAuditStore()), new PostingService(new AuditService(new DrizzleAuditStore()), new PartnerSubledgerService())),
+      projectsSubcontracts: new SubcontractService(new AuditService(new DrizzleAuditStore()), new PostingService(new AuditService(new DrizzleAuditStore()), new PartnerSubledgerService()), new ProjectActualsService()),
+      projectsRetention: new RetentionService(new AuditService(new DrizzleAuditStore()), new PostingService(new AuditService(new DrizzleAuditStore()), new PartnerSubledgerService()), new ProjectActualsService()),
+      projectsBilling: (() => {
+        const audit = new AuditService(new DrizzleAuditStore());
+        const posting = new PostingService(audit, new PartnerSubledgerService());
+        return new ProgressBillingService(
+          audit,
+          posting,
+          new NumberingService(audit),
+          new ProjectActualsService(),
+          new ChangeOrderService(audit, posting),
+        );
+      })(),
+      projectsEvm: new EvmService(
+        new ProjectBudgetService(new AuditService(new DrizzleAuditStore()), new ProjectActualsService()),
+        new ProjectActualsService(),
+      ),
+      projectsFieldservice: (() => {
+        const audit = new AuditService(new DrizzleAuditStore());
+        const posting = new PostingService(audit, new PartnerSubledgerService());
+        const numbering = new NumberingService(audit);
+        const invoices = new SalesInvoiceService(audit, posting, numbering, new TaxResolverService());
+        const postings = new ServiceOrderPosting(posting, invoices, new ReservationService(audit));
+        return new FieldserviceService(audit, new InboxService(), postings);
+      })(),
     };
   }
   return bundle;
