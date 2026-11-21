@@ -300,7 +300,16 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // integrity floor) + the stock_moves source widening
     // ('maintenance_work_order', the 0073 DROP+ADD pattern). The
     // catalog 326 → 328.
-    expect(files.at(-1)?.tag).toBe("0109_cmms_cost_lines_steps");
+    // PHASE-049 (W-17, dated 2026-11-21 — THE HONEST CATCH): 0110 the
+    // stock-moves source-shape REPAIR — 0109's DROP+ADD rebuilt the
+    // domain from 0073's list and MISSED 'contract_mfg' (0077 §3's
+    // tolling source); the G-48 tolling golden caught it in the load
+    // envelope's first chunk-b-rest run (two RED arms, the log kept:
+    // audit-evidence/phase049-w17/db-chunk-b-rest-first-red.log); 0109
+    // is published (pushed at the step-2 checkpoint — the constants
+    // law), so the repair is this additive slot with the COMPLETE
+    // domain. No tables; the catalog stays 328.
+    expect(files.at(-1)?.tag).toBe("0110_cmms_source_shape_repair");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

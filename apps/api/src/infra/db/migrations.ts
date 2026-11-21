@@ -586,6 +586,7 @@ export const MIGRATIONS: readonly string[] = [
   "0107_cmms_transfers",
   "0108_cmms_asset_extensions",
   "0109_cmms_cost_lines_steps",
+  "0110_cmms_source_shape_repair",
 ];
 
 /**

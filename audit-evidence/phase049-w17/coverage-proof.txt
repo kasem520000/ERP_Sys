@@ -1,0 +1,6 @@
+disk inventory: 274 files
+parts union: 274 files
+missing: NONE ([])
+extra: NONE ([])
+duplicates: NONE (274 == 274)
+VERDICT: 274 = 274 — the union == the disk inventory (W-17: the cmms family's +2 service specs joined chunk-a beside the schema spec)
