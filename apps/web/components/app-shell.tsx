@@ -218,6 +218,10 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "fixed-assets/depreciation": { group: "navAccounting", label: "faDepTitle" },
   "fixed-assets/disposals": { group: "navAccounting", label: "faDisposalsTitle" },
   "fixed-assets/reports": { group: "navAccounting", label: "faReportsTitle" },
+  // PHASE-049 (W-20 — T-13): the maintenance board's fallback crumb (the
+  // support-sessions rule — the sidebar itself is registry-driven through
+  // the NAV_ITEMS row `assets.maintenance`).
+  "assets/maintenance": { group: "navAccounting", label: "assetsMaintenanceTitle" },
   // -- PHASE-027 (wave F): cheques & notes + the PDC calendar (treasury)
   // and installment plans (sales). Registry rows (contracts NAV_ITEMS)
   // drive the sidebar; these fallbacks cover nav-fetch failure for the

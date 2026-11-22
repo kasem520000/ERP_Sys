@@ -818,6 +818,26 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 70,
   },
+  // PHASE-049 (W-20 — T-13): the maintenance board — the work-order board
+  // + the plans admin + the checklist entry (the 048 board patterns; the
+  // data-slot shape immune to the 045 Tabs defect). Feature key the exact
+  // D-16 composable unit `assets.maintenance` (0108-seeded; the four
+  // composing templates ride it); permission the W-16 viewer key the
+  // board's primary read enforces (matrix §3.27). The meters / transfers /
+  // scan surfaces (W-21) ride the same /assets route tree through their
+  // own registry rows.
+  {
+    id: "assets.maintenance",
+    parentGroup: "accounting",
+    label: { ar: "الصيانة", en: "Maintenance" },
+    icon: "settings",
+    route: "/assets/maintenance",
+    featureKey: "assets.maintenance",
+    permission: "assets.maintenance.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 71,
+  },
   // PHASE-028 (T9): budgets — the period-column planning grid. The v2.0
   // registry row `accounting.budgets` (NAVIGATION_MODEL §1.1; ED-12):
   // featureKey the exact FEATURE_CATALOG `budgeting.budgets` string;
