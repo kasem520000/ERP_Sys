@@ -1,0 +1,3 @@
+npm warn Unknown project config "hoist-pattern". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+[permissions-drift] OK — matrix 337 keys, seed 337 keys
+EXIT=0

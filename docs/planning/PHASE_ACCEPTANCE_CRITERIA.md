@@ -605,6 +605,52 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
 
 ### PHASE-049 — CMMS — Asset Maintenance (OPENED AT PLAN 2026-11-21 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-049-MASTER-PLAN.md` §3/§4 is the binding division)
 
+**[Dated 2026-11-22 (W-22 DELIVERED — THE ACCUMULATION PLACE per the ratified
+عرف 049 option (a); the W-16…W-21 records stand ratified, never rewritten).
+WITH THIS WAVE THE LEDGER'S #1…#9 ARE ALL GREEN — this section is now the phase's
+SINGLE CITABLE EXIT RECORD; #10 (the closure wave) is W-23's alone.]** This
+wave's accumulated deliveries: **T-16 + T-17 DELIVERED** — THE FOUR CMMS REPORT
+CONTRACTS (`assets.maintenance-costs` — the engine's own three legs + the LIVE
+`inv034-expense-tie` block-on-fail check (the GL maintenance-expense debit vs
+the order's own source lines to the cent + the no-posting-before-completion
+arm) · `assets.maintenance-backlog` — the overdue ACTIVE plans by their OWN
+next-due date + the open orders, the days derived from the database's
+CURRENT_DATE (the sweep's derived-step clock law), the `backlog-honest-shape`
+check · `assets.meter-readings` — the engine's own log rows with the
+`readings-log-shape` check · `assets.expiry-register` — R-10's engine read
+verbatim with the `fleet-odometer-single-binding` check) with the registry
+**114 → 118 BROKEN BY DESIGN AND DECLARED** at ALL fixation points together
+(the 048-W14 law — no partial anchoring) on the EXISTING §3.27 read keys (the
+§12 convention; zero new keys, zero new routes) · **THE GOLDEN TRANSCRIPTS
+G-59/G-60/G-61 with their MANDATORY FAILURE PACKS** (the refusals WITH their
+full payloads, the zero residue, the flip-and-restore with the green re-runs —
+`cmms-goldens.db.spec` 7/7) · **THE INV-034 GOLDEN فعل-واحد-بشهادتين** (act
+one, witness two: the engine's own verdict and the journal's own landed lines
+agreeing TO THE CENT, and no posting before the act) — **#3's transcripts arm
+and #4's golden arm CLOSED** · **THE RLS ATTACK MATRIX A1–A10 over the TEN
+cmms family tables** (the plan's eight + the two 0109 D-02 tables — the
+declared superset; two dedicated probe tenants with FULL FK-chained worlds
+through the app-role path; `cmms-rls.db.spec` 10/10) + **the independent
+scratch from zero TWICE** (CHAIN_112_APPLIED · check-rls OK — 328, both logs)
+— **#9's RLS arm CLOSED** · **THE OA-06 EXPLAIN BUDGETS** (the readings
+insert P0 + the readings log P1 + the boards P2/P3 + the timeline's transfers
+leg P4 — no seq scan anywhere, never a forced plan, never an isolated probe;
+`cmms-explain-budgets.db.spec` 5/5) — **#9's OA-06 arm CLOSED — #9 WHOLE**.
+The constants: chain 112 · catalog 328 · drift 337 · routes 1,102 UNCHANGED;
+**the report registry 114 → 118 (the authorized broken constant)**; i18n
+**6,955 = 6,955 by both counts, ZERO DELTA as declared (registry-bilingual)**
++ mobile 371 standing; unit 8/8 — **148 · 1,868 unchanged** (the pure DB
+wave); **THE NINTH DB ENVELOPE RE-ANNOUNCED AT THIS WAVE'S OWN HEAD — 283
+files · 3,984 tests · 0 failed · 0 skipped** (the coverage verified before
+the first load run: 283 = 283, missing NONE, extra NONE, duplicates NONE; the
+one reassembly movement declared: the four W-22 specs join chunk-a 93 → 97 ·
+731 → 764); depcruise 2,110 · 15,821 (+9/+83 dated). The structural repairs
+the family run caught: the per-arm parts world (freshPartsWorld — no spec's
+consumption moves another's stock assertions) + the BR-CM3 order-robustness
+supersede dance (both refusal arms provable regardless of file order). The
+evidence: `audit-evidence/phase049-w22/` (the gate record — with the W-21
+physical-count clarification line: 21 files = 20 logs + the README itself).**
+
 **[Dated 2026-11-22 (W-21 DELIVERED — THE ACCUMULATION PLACE per the ratified
 عرف 049 option (a); the W-16…W-20 records stand ratified, never rewritten).** This wave's
 accumulated deliveries: **T-14 + T-15 DELIVERED** — `/assets/meters` (the meters board +
