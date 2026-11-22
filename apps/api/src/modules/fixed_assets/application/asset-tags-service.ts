@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
+import QRCode from "qrcode";
 
 import { AuditService } from "../../audit/api/audit";
 import { keyMaterialForTokens } from "../../identity/infrastructure/reset-token-key";
@@ -200,13 +201,16 @@ export class AssetTagsService {
 
   // -- the print sheet (the batch payload — the W-21 plane renders it) -----
 
-  /** ONE SHEET PER TAG BATCH (D-09): the asset brief + its UNPRINTED tags
-   * — the payload the print plane renders deterministically with `bi()`
-   * (the W-13 law). ZERO PARALLEL ACCOUNTING: the batch derives from the
-   * rows, never a stored list. */
+  /** ONE SHEET PER TAG BATCH (D-09): the asset brief + its UNPRINTED tags,
+   * each carrying its PRE-RENDERED QR data URI — the payload the print
+   * plane renders deterministically with `bi()` (the W-13 law: the print
+   * templates never compute a QR; the pixels are derived here, server-side,
+   * exactly as the ZATCA renderer derives its images at print — same
+   * qrcode options, deterministic for the same code string). ZERO PARALLEL
+   * ACCOUNTING: the batch derives from the rows, never a stored list. */
   async printSheet(input: { assetId: string }): Promise<{
     asset: { id: string; code: string; name: string; nameAr: string };
-    tags: store.TagRow[];
+    tags: (store.TagRow & { qrImageUri: string })[];
   }> {
     if (!UUID_RE.test(input.assetId)) {
       throw new CmmsInputInvalidError(`assetId must be a UUID: ${input.assetId}`);
@@ -216,9 +220,19 @@ export class AssetTagsService {
       throw new CmmsInputInvalidError(`asset ${input.assetId} does not exist in this tenant`);
     }
     const tags = await store.listUnprintedTags(input.assetId);
+    const withQr = await Promise.all(
+      tags.map(async (tag) => ({
+        ...tag,
+        qrImageUri: await QRCode.toDataURL(tag.code, {
+          errorCorrectionLevel: "M",
+          margin: 1,
+          width: 256,
+        }),
+      })),
+    );
     return {
       asset: { id: card.id, code: card.code, name: card.name, nameAr: card.nameAr },
-      tags,
+      tags: withQr,
     };
   }
 

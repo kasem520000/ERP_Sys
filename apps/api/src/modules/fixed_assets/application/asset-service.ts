@@ -138,7 +138,7 @@ export interface CreateAssetInput {
 export class AssetService {
   constructor(@Inject(AuditService) private readonly audit: AuditService) {}
 
-  async list(filter: store.AssetListFilter): Promise<store.AssetRow[]> {
+  async list(filter: store.AssetListFilter): Promise<store.AssetListRow[]> {
     return store.listAssets(filter);
   }
 
@@ -160,13 +160,17 @@ export class AssetService {
     accumulated: string;
     netBookValue: string;
     depreciationHistory: Awaited<ReturnType<typeof store.listDepreciationLinesByAsset>>;
+    /** The component tree's one level (PHASE-049 W-21 — F-12): the children
+     * by the parent link — each component carries its own full row. */
+    components: store.AssetRow[];
   }> {
     const asset = await this.find(id);
     const category = await store.findAssetCategoryById(asset.categoryId);
     const accumulated = await store.assetAccumulated(id);
     const netBookValue = await store.assetNbv(id);
     const depreciationHistory = await store.listDepreciationLinesByAsset(id);
-    return { asset, category: category ?? null, accumulated, netBookValue, depreciationHistory };
+    const components = await store.listChildAssets(id);
+    return { asset, category: category ?? null, accumulated, netBookValue, depreciationHistory, components };
   }
 
   /**
@@ -325,6 +329,13 @@ export class AssetService {
       custodianUserId?: string | null;
       note?: string | null;
       noteAr?: string | null;
+      /** The 0108 column family (PHASE-049 W-21 — T-15's write path). */
+      warrantyExpiry?: string | null;
+      insuranceExpiry?: string | null;
+      licenseExpiry?: string | null;
+      inspectionExpiry?: string | null;
+      costCenterId?: string | null;
+      parentAssetId?: string | null;
     },
     actorId: string | null,
   ): Promise<store.AssetRow> {
@@ -345,6 +356,62 @@ export class AssetService {
     ) {
       await requireCustodianMembership(patch.custodianUserId);
     }
+    // The 0108 family's validations (W-21): the cost-center grouping must
+    // resolve in THIS tenant (fail-closed, the branch law's shape) and the
+    // parent link must exist, be operable, and never form a cycle (the
+    // ancestor walk refuses self, direct, and deep cycles BY NAME).
+    if (
+      patch.costCenterId !== undefined &&
+      patch.costCenterId !== null &&
+      patch.costCenterId !== current.costCenterId
+    ) {
+      const { findCostCenterById } = await import(
+        "../../accounting/infrastructure/accounting.store"
+      );
+      const costCenter = await findCostCenterById(patch.costCenterId);
+      if (costCenter === undefined) {
+        throw new InvalidAssetInputError(
+          `cost center ${patch.costCenterId} does not exist in this tenant`,
+        );
+      }
+    }
+    if (
+      patch.parentAssetId !== undefined &&
+      patch.parentAssetId !== null &&
+      patch.parentAssetId !== current.parentAssetId
+    ) {
+      if (patch.parentAssetId === id) {
+        throw new InvalidAssetInputError("an asset is never its own parent (self-link refused)");
+      }
+      const parent = await store.findAssetById(patch.parentAssetId);
+      if (parent === undefined) {
+        throw new InvalidAssetInputError(
+          `parent asset ${patch.parentAssetId} does not exist in this tenant`,
+        );
+      }
+      if (parent.status !== "ACTIVE") {
+        throw new InvalidAssetInputError(
+          `parent asset ${parent.code} is ${parent.status} — the component tree roots at operable assets`,
+        );
+      }
+      // THE ANCESTOR WALK (the cycle law): walking up from the NEW parent,
+      // this asset must never appear — a link forming a cycle is refused
+      // BY NAME with the chain that would close.
+      const chain: string[] = [parent.code];
+      let cursor: store.AssetRow | undefined = parent;
+      for (let depth = 0; depth < 100; depth += 1) {
+        if (cursor === undefined || cursor.parentAssetId === null) break;
+        const next = await store.findAssetById(cursor.parentAssetId);
+        if (next === undefined) break;
+        if (next.id === id) {
+          throw new InvalidAssetInputError(
+            `parent link refused: ${current.code} → ${parent.code} would close the cycle ${chain.join(" → ")} → ${current.code}`,
+          );
+        }
+        chain.push(next.code);
+        cursor = next;
+      }
+    }
     const updated = await store.updateAsset(id, {
       name: patch.name !== undefined ? patch.name.trim() : undefined,
       nameAr: patch.nameAr !== undefined ? patch.nameAr.trim() : undefined,
@@ -352,6 +419,12 @@ export class AssetService {
       custodianUserId: patch.custodianUserId,
       note: patch.note,
       noteAr: patch.noteAr,
+      warrantyExpiry: patch.warrantyExpiry,
+      insuranceExpiry: patch.insuranceExpiry,
+      licenseExpiry: patch.licenseExpiry,
+      inspectionExpiry: patch.inspectionExpiry,
+      costCenterId: patch.costCenterId,
+      parentAssetId: patch.parentAssetId,
     });
     if (updated === undefined) throw new AssetNotFoundError(id);
     await this.audit.record({

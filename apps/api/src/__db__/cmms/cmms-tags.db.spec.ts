@@ -167,6 +167,17 @@ describe("PHASE-049 W-19 — the signed tags (D-09 — unguessable, unique, scan
       expect(sheet.asset.code).toBe("TAG-CARD");
       expect(sheet.tags.map((tag) => tag.id)).not.toContain(first.id);
       expect(sheet.tags.length).toBe(listed.length - 1);
+      // PHASE-049 W-21: every pending tag carries its PRE-RENDERED QR data
+      // URI (the print templates never compute a QR — the W-13 law), and
+      // the render is DETERMINISTIC (two payloads for the same code string
+      // are byte-identical — the W-13 determinism law at the source).
+      for (const tag of sheet.tags) {
+        expect(tag.qrImageUri).toMatch(/^data:image\/png;base64,/);
+      }
+      const sheetAgain = await tags.printSheet({ assetId: spec.assetId! });
+      expect(sheetAgain.tags.map((tag) => tag.qrImageUri)).toEqual(
+        sheet.tags.map((tag) => tag.qrImageUri),
+      );
     });
   });
 

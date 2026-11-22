@@ -110,6 +110,15 @@ const updateAssetSchema = z
     custodianUserId: UUID.nullable().optional(),
     note: TEXT,
     noteAr: TEXT,
+    // The 0108 column family (PHASE-049 W-21 — T-15's write path): the four
+    // expiry chips (clearable — null stops the sweep/fleet reads), the
+    // cost-center grouping, and the parent-asset link (the component tree).
+    warrantyExpiry: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    insuranceExpiry: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    licenseExpiry: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    inspectionExpiry: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+    costCenterId: UUID.nullable().optional(),
+    parentAssetId: UUID.nullable().optional(),
   })
   .refine((value) => Object.keys(value).length > 0, { message: "empty patch" });
 

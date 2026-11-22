@@ -438,3 +438,175 @@ describe("BR-044 — revaluation is audited; the delta posts to REVALUATION_RESE
     ).rejects.toMatchObject({ code: "ASSET_STATUS_INVALID" });
   });
 });
+
+// -- PHASE-049 W-21 (the 0108 write path + the register's computed
+// columns + the component tree — T-15's provisions) --------------------------
+
+describe("PHASE-049 W-21 — the 0108 column family's write path (T-15)", () => {
+  it("the PATCH lands the four expiry chips + the cost-center grouping + the parent link; detail() returns the component tree", async () => {
+    const parent = await withTenant(TENANT_F, () =>
+      assets.create({
+        code: "F-W21-PARENT",
+        name: "W-21 parent machine",
+        nameAr: "الآلة الأم",
+        categoryId: fixture.vehicleCategoryId,
+        branchId: fixture.branchId,
+        acquisitionDate: "2026-03-01",
+        cost: "8000.0000",
+        salvageValue: "0.0000",
+        usefulLifeMonths: 48,
+        depreciationMethod: "STRAIGHT_LINE",
+        actorId: F_ACTOR,
+      }),
+    );
+    const child = await withTenant(TENANT_F, () =>
+      assets.create({
+        code: "F-W21-CHILD",
+        name: "W-21 pump component",
+        nameAr: "مكوّن المضخة",
+        categoryId: fixture.vehicleCategoryId,
+        branchId: fixture.branchId,
+        acquisitionDate: "2026-03-01",
+        cost: "800.0000",
+        salvageValue: "0.0000",
+        usefulLifeMonths: 24,
+        depreciationMethod: "STRAIGHT_LINE",
+        actorId: F_ACTOR,
+      }),
+    );
+    // The PATCH carries the six 0108 fields (the write path W-16 provisioned
+    // but no surface ever delivered — the honest completion).
+    const edited = await withTenant(TENANT_F, () =>
+      assets.edit(
+        child.id,
+        {
+          warrantyExpiry: "2027-03-01",
+          insuranceExpiry: "2026-12-01",
+          licenseExpiry: null,
+          inspectionExpiry: "2026-09-01",
+          parentAssetId: parent.id,
+        },
+        F_ACTOR,
+      ),
+    );
+    expect(edited.warrantyExpiry).toBe("2027-03-01");
+    expect(edited.insuranceExpiry).toBe("2026-12-01");
+    expect(edited.licenseExpiry).toBeNull();
+    expect(edited.inspectionExpiry).toBe("2026-09-01");
+    expect(edited.parentAssetId).toBe(parent.id);
+
+    // detail() returns the component tree's one level (the parent link).
+    const detail = await withTenant(TENANT_F, () => assets.detail(parent.id));
+    expect(detail.components.map((row) => row.id)).toEqual([child.id]);
+    const childDetail = await withTenant(TENANT_F, () => assets.detail(child.id));
+    expect(childDetail.components).toEqual([]);
+    expect(childDetail.asset.parentAssetId).toBe(parent.id);
+
+    // Clearing works (null stops the sweep/fleet reads — the honest off).
+    const cleared = await withTenant(TENANT_F, () =>
+      assets.edit(child.id, { warrantyExpiry: null, parentAssetId: null }, F_ACTOR),
+    );
+    expect(cleared.warrantyExpiry).toBeNull();
+    expect(cleared.parentAssetId).toBeNull();
+  });
+
+  it("the cycle law: a self-link and a reverse link are refused BY NAME; the cost center fails closed", async () => {
+    const parent = await withTenant(TENANT_F, () =>
+      assets.create({
+        code: "F-W21-CYC-P",
+        name: "cycle parent",
+        nameAr: "أصل الأب",
+        categoryId: fixture.vehicleCategoryId,
+        branchId: fixture.branchId,
+        acquisitionDate: "2026-03-01",
+        cost: "100.0000",
+        salvageValue: "0.0000",
+        usefulLifeMonths: 12,
+        depreciationMethod: "STRAIGHT_LINE",
+        actorId: F_ACTOR,
+      }),
+    );
+    const child = await withTenant(TENANT_F, () =>
+      assets.create({
+        code: "F-W21-CYC-C",
+        name: "cycle child",
+        nameAr: "أصل الابن",
+        categoryId: fixture.vehicleCategoryId,
+        branchId: fixture.branchId,
+        acquisitionDate: "2026-03-01",
+        cost: "50.0000",
+        salvageValue: "0.0000",
+        usefulLifeMonths: 12,
+        depreciationMethod: "STRAIGHT_LINE",
+        actorId: F_ACTOR,
+      }),
+    );
+    await withTenant(TENANT_F, () => assets.edit(child.id, { parentAssetId: parent.id }, F_ACTOR));
+
+    // Self-link refused.
+    await expect(
+      withTenant(TENANT_F, () => assets.edit(parent.id, { parentAssetId: parent.id }, F_ACTOR)),
+    ).rejects.toMatchObject({ code: "INVALID_AMOUNT" });
+
+    // Reverse link refused BY NAME (the ancestor walk names the cycle).
+    await expect(
+      withTenant(TENANT_F, () => assets.edit(parent.id, { parentAssetId: child.id }, F_ACTOR)),
+    ).rejects.toMatchObject({
+      code: "INVALID_AMOUNT",
+      message: expect.stringContaining("would close the cycle"),
+    });
+
+    // The cost center fails closed (a foreign/unknown id never groups).
+    await expect(
+      withTenant(TENANT_F, () =>
+        assets.edit(child.id, { costCenterId: "11111111-1111-4111-8111-111111111111" }, F_ACTOR),
+      ),
+    ).rejects.toMatchObject({
+      code: "INVALID_AMOUNT",
+      message: expect.stringContaining("cost center"),
+    });
+  });
+
+  it("the register's computed columns reconcile with assetAccumulated/assetNbv exactly (the 044 wire contract finally real)", async () => {
+    const asset = await withTenant(TENANT_F, () =>
+      assets.create({
+        code: "F-W21-REG",
+        name: "register computed",
+        nameAr: "المحسوب في السجل",
+        categoryId: fixture.vehicleCategoryId,
+        branchId: fixture.branchId,
+        acquisitionDate: "2026-01-15",
+        cost: "6000.0000",
+        salvageValue: "0.0000",
+        usefulLifeMonths: 24,
+        depreciationMethod: "STRAIGHT_LINE",
+        actorId: F_ACTOR,
+      }),
+    );
+    const march = fixture.periodIds["FY2026-03"]!;
+    const assembled = await withTenant(TENANT_F, () =>
+      depreciation.assembleRun({ fiscalPeriodId: march, actorId: F_ACTOR }),
+    );
+    await withTenant(TENANT_F, () => runs.postRun({ runId: assembled.run.id, actorId: F_ACTOR }));
+
+    const listed = await withTenant(TENANT_F, () =>
+      assets.list({ search: "F-W21-REG", limit: 10 }),
+    );
+    const row = listed.find((entry) => entry.id === asset.id);
+    expect(row).toBeDefined();
+    // The ONE-LAW reconciliation: the register's computed columns equal the
+    // dedicated reads exactly (opening 0 + one posted 250 line).
+    expect(row!.accumulatedToDate).toBe("250.0000");
+    expect(row!.nbv).toBe("5750.0000");
+    const accumulated = await withTenant(TENANT_F, async () => {
+      const store = await import("../../modules/fixed_assets/infrastructure/fixed-assets.store");
+      return store.assetAccumulated(asset.id);
+    });
+    const nbv = await withTenant(TENANT_F, async () => {
+      const store = await import("../../modules/fixed_assets/infrastructure/fixed-assets.store");
+      return store.assetNbv(asset.id);
+    });
+    expect(row!.accumulatedToDate).toBe(accumulated);
+    expect(row!.nbv).toBe(nbv);
+  });
+});

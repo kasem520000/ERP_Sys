@@ -190,6 +190,14 @@ export interface AssetRow {
   status: string;
   sourceType: string | null;
   sourceId: string | null;
+  /** The 0108 column family (PHASE-049): the four expiry chips + the
+   * cost-center grouping + the parent-asset link (F-11/F-12/F-13). */
+  warrantyExpiry: string | null;
+  insuranceExpiry: string | null;
+  licenseExpiry: string | null;
+  inspectionExpiry: string | null;
+  costCenterId: string | null;
+  parentAssetId: string | null;
   note: string | null;
   noteAr: string | null;
   disposedAt: string | null;
@@ -200,6 +208,17 @@ export interface AssetRow {
   version: number;
 }
 
+/** The register row (the W-21 provision, 2026-11-22): AssetRow + the two
+ * computed figures the 044 register's own wire contract declared but the
+ * list read never delivered (the honest catch of the wire-type drift — the
+ * G-48 class; the accumulation semantics mirror assetAccumulated/assetNbv
+ * exactly: opening + posted, non-reversed depreciation; NBV = cost −
+ * accumulated). */
+export interface AssetListRow extends AssetRow {
+  accumulatedToDate: string;
+  nbv: string;
+}
+
 export const ASSET_SELECT = sql`
   SELECT id, code, name, name_ar AS "nameAr", category_id AS "categoryId",
     acquisition_date AS "acquisitionDate", cost, salvage_value AS "salvageValue",
@@ -207,7 +226,11 @@ export const ASSET_SELECT = sql`
     depreciation_method AS "depreciationMethod",
     total_estimated_units AS "totalEstimatedUnits", branch_id AS "branchId",
     custodian_user_id AS "custodianUserId", status, source_type AS "sourceType",
-    source_id AS "sourceId", note, note_ar AS "noteAr", disposed_at AS "disposedAt",
+    source_id AS "sourceId",
+    warranty_expiry AS "warrantyExpiry", insurance_expiry AS "insuranceExpiry",
+    license_expiry AS "licenseExpiry", inspection_expiry AS "inspectionExpiry",
+    cost_center_id AS "costCenterId", parent_asset_id AS "parentAssetId",
+    note, note_ar AS "noteAr", disposed_at AS "disposedAt",
     written_off_at AS "writtenOffAt", created_by AS "createdBy",
     created_at AS "createdAt", updated_at AS "updatedAt", version
   FROM assets`;
@@ -271,7 +294,7 @@ export interface AssetListFilter {
   offset?: number;
 }
 
-export async function listAssets(filter: AssetListFilter): Promise<AssetRow[]> {
+export async function listAssets(filter: AssetListFilter): Promise<AssetListRow[]> {
   const clauses = [sql`TRUE`];
   if (filter.search !== undefined && filter.search !== "") {
     const like = `%${filter.search}%`;
@@ -283,9 +306,37 @@ export async function listAssets(filter: AssetListFilter): Promise<AssetRow[]> {
   if (filter.custodianUserId !== undefined)
     clauses.push(sql`custodian_user_id = ${filter.custodianUserId}`);
   const where = sql.join(clauses, sql` AND `);
+  // The W-21 provision (2026-11-22): the register's two computed figures —
+  // the SAME correlated-subquery semantics as assetAccumulated/assetNbv
+  // (opening + posted, non-reversed depreciation; NBV = cost − accumulated),
+  // computed per row so the 044 register's declared wire contract finally
+  // carries real figures. The aliased ASSET_SELECT rides as the subquery so
+  // every camelCase field keeps its exact register shape.
   const rows = await tenantTx().execute(sql`
-    ${ASSET_SELECT} WHERE ${where}
-    ORDER BY code LIMIT ${filter.limit ?? 50} OFFSET ${filter.offset ?? 0}
+    SELECT s.*, agg."accumulatedToDate",
+      (s.cost::numeric - agg."accumulatedToDate"::numeric)::text AS nbv
+    FROM (
+      ${ASSET_SELECT} WHERE ${where}
+      ORDER BY code LIMIT ${filter.limit ?? 50} OFFSET ${filter.offset ?? 0}
+    ) s
+    CROSS JOIN LATERAL (
+      SELECT (s."openingAccumulated"::numeric + COALESCE((
+        SELECT SUM(dl.period_amount) FROM depreciation_lines dl
+        JOIN depreciation_runs r ON r.id = dl.run_id
+        WHERE dl.asset_id = s.id AND r.status = 'POSTED' AND r.reversed_at IS NULL
+      ), 0))::text AS "accumulatedToDate"
+    ) agg
+  `);
+  return rows.rows as unknown as AssetListRow[];
+}
+
+/** The component tree's one level (PHASE-049 W-21 — F-12): the assets whose
+ * parent_asset_id is this asset — each component carries its own row (its own
+ * meters/spares/history ride their own reads; the parent link is the tree). */
+export async function listChildAssets(parentAssetId: string): Promise<AssetRow[]> {
+  const rows = await tenantTx().execute(sql`
+    ${ASSET_SELECT} WHERE parent_asset_id = ${parentAssetId}
+    ORDER BY code LIMIT 100
   `);
   return rows.rows as unknown as AssetRow[];
 }
@@ -304,6 +355,13 @@ export async function updateAsset(
     writtenOffAt?: string | null;
     sourceType?: string | null;
     sourceId?: string | null;
+    /** The 0108 column family (PHASE-049 W-21 — T-15's write path). */
+    warrantyExpiry?: string | null;
+    insuranceExpiry?: string | null;
+    licenseExpiry?: string | null;
+    inspectionExpiry?: string | null;
+    costCenterId?: string | null;
+    parentAssetId?: string | null;
   },
 ): Promise<AssetRow | undefined> {
   const sets = [sql`updated_at = now(), version = version + 1`];
@@ -319,9 +377,15 @@ export async function updateAsset(
   if (patch.writtenOffAt !== undefined) sets.push(sql`written_off_at = ${patch.writtenOffAt}`);
   if (patch.sourceType !== undefined) sets.push(sql`source_type = ${patch.sourceType}`);
   if (patch.sourceId !== undefined) sets.push(sql`source_id = ${patch.sourceId}`);
+  if (patch.warrantyExpiry !== undefined) sets.push(sql`warranty_expiry = ${patch.warrantyExpiry}`);
+  if (patch.insuranceExpiry !== undefined) sets.push(sql`insurance_expiry = ${patch.insuranceExpiry}`);
+  if (patch.licenseExpiry !== undefined) sets.push(sql`license_expiry = ${patch.licenseExpiry}`);
+  if (patch.inspectionExpiry !== undefined) sets.push(sql`inspection_expiry = ${patch.inspectionExpiry}`);
+  if (patch.costCenterId !== undefined) sets.push(sql`cost_center_id = ${patch.costCenterId}`);
+  if (patch.parentAssetId !== undefined) sets.push(sql`parent_asset_id = ${patch.parentAssetId}`);
   const rows = await tenantTx().execute(sql`
     UPDATE assets SET ${sql.join(sets, sql`, `)} WHERE id = ${id}
-    RETURNING ${sql.raw("id, code, name, name_ar AS \"nameAr\", category_id AS \"categoryId\", acquisition_date AS \"acquisitionDate\", cost, salvage_value AS \"salvageValue\", opening_accumulated AS \"openingAccumulated\", useful_life_months AS \"usefulLifeMonths\", depreciation_method AS \"depreciationMethod\", total_estimated_units AS \"totalEstimatedUnits\", branch_id AS \"branchId\", custodian_user_id AS \"custodianUserId\", status, source_type AS \"sourceType\", source_id AS \"sourceId\", note, note_ar AS \"noteAr\", disposed_at AS \"disposedAt\", written_off_at AS \"writtenOffAt\", created_by AS \"createdBy\", created_at AS \"createdAt\", updated_at AS \"updatedAt\", version")}
+    RETURNING ${sql.raw("id, code, name, name_ar AS \"nameAr\", category_id AS \"categoryId\", acquisition_date AS \"acquisitionDate\", cost, salvage_value AS \"salvageValue\", opening_accumulated AS \"openingAccumulated\", useful_life_months AS \"usefulLifeMonths\", depreciation_method AS \"depreciationMethod\", total_estimated_units AS \"totalEstimatedUnits\", branch_id AS \"branchId\", custodian_user_id AS \"custodianUserId\", status, source_type AS \"sourceType\", source_id AS \"sourceId\", warranty_expiry AS \"warrantyExpiry\", insurance_expiry AS \"insuranceExpiry\", license_expiry AS \"licenseExpiry\", inspection_expiry AS \"inspectionExpiry\", cost_center_id AS \"costCenterId\", parent_asset_id AS \"parentAssetId\", note, note_ar AS \"noteAr\", disposed_at AS \"disposedAt\", written_off_at AS \"writtenOffAt\", created_by AS \"createdBy\", created_at AS \"createdAt\", updated_at AS \"updatedAt\", version")}
   `);
   return (rows.rows as unknown as AssetRow[])[0];
 }
