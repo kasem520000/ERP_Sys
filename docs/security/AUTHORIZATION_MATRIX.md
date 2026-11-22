@@ -899,6 +899,21 @@ renewal registers; the operational keys stay owner-only — maintenance operatio
 tenant-granted beyond the baseline). The alert surfaces ride the notifications' own
 permission plane — no new key.
 
+> **[Dated 2026-11-22 (PHASE-049 W-22 — T-16, the four CMMS report contracts): the
+> reports bind the module's own read keys — the registry 114 → 118, ZERO new keys
+> (the drift stands 337 = 337).]** The four REPORT_CATALOG §9 PHASE-049 contracts
+> ride the EXISTING §3.27 read keys per the §12 module-register reuse convention
+> (the 048-W14 projects precedent): `assets.maintenance-costs` +
+> `assets.maintenance-backlog` on `assets.maintenance.view` (the orders board's own
+> key — INV-034's GL reconciliation plane is a read), `assets.meter-readings` on
+> `assets.meters.view`, and `assets.expiry-register` on `assets.expiry.view` (the
+> fleet register's own key). ROUTE_PERMISSIONS stays 1,102 (zero routes: the
+> contracts ride the EXISTING `/api/v1/reporting/report-runs` engine route); the
+> four known-permission catalogs (the reporting boot list · the reporting db
+> fixtures · the reporting unit spec · the consolidation spec's own catalog) gain
+> the three keys with this dated note — all count pins re-pinned together
+> 114 → 118 at every site (the 048-W14 law, no partial anchoring).
+
 > **[Dated 2026-11-21 (PHASE-049 W-19 — T-11/T-12, the tags + sweep + fleet-light wave):
 > the third binding wave + THE ELEVENTH KEY — ROUTE_PERMISSIONS 1,093 + 9 = 1,102; the
 > drift 336 → 337 (0111 §2, the 0098 data-page pattern).]** Migration 0111 seeds the ONE

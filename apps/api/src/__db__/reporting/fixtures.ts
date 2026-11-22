@@ -195,6 +195,13 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "projects.evm.view",
   "projects.contracting.view",
   "projects.fieldservice.view",
+  // PHASE-049 (0108 §1 seed, matrix §3.27 — W-22, T-16, dated
+  // 2026-11-22): the CMMS report keys (the same §12 convention — the
+  // four contracts ride the module's own read keys the /assets routes
+  // ride; the grants the fullContext actor needs to run them).
+  "assets.maintenance.view",
+  "assets.meters.view",
+  "assets.expiry.view",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

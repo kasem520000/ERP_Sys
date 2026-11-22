@@ -1106,7 +1106,7 @@ describe("registry integration (the shared contract)", () => {
       expect(contract!.executionClass).toBe("inline");
       expect(ALL_KNOWN_PERMISSIONS.has(permission), permission).toBe(true);
     }
-    expect(snapshot).toHaveLength(114); // … PHASE-044: +4 WMS intelligence; PHASE-043: +2 planning (mrp-exceptions, atp-position); PHASE-045: +3 hr registers; PHASE-046 (W-6, T-13): +2 payroll compliance (statutory-summary, eosb-liability); PHASE-047 (W-6, T-15): +4 talent (performance-cycle-results, recruitment-pipeline, training-completions, document-expiry); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
+    expect(snapshot).toHaveLength(118); // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register); … PHASE-044: +4 WMS intelligence; PHASE-043: +2 planning (mrp-exceptions, atp-position); PHASE-045: +3 hr registers; PHASE-046 (W-6, T-13): +2 payroll compliance (statutory-summary, eosb-liability); PHASE-047 (W-6, T-15): +4 talent (performance-cycle-results, recruitment-pipeline, training-completions, document-expiry); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
   });
 
   it("exports flow through the shared contract (CSV renderer over the stored envelope)", async () => {

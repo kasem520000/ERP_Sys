@@ -116,6 +116,15 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "crm.contracts.manage",
   // PHASE-026 (0037 seed): the fixed-assets report keys
   "fixed_assets.reports.view",
+  // PHASE-049 (0108 §1 seed, matrix §3.27 — W-22, T-16, dated
+  // 2026-11-22): the CMMS report keys (the same §12 module-register
+  // convention — the four contracts ride the module's own read keys
+  // the /assets routes ride: maintenance-costs + maintenance-backlog on
+  // the orders key, meter-readings on the meters key, expiry-register
+  // on the renewal-registers key).
+  "assets.maintenance.view",
+  "assets.meters.view",
+  "assets.expiry.view",
   // PHASE-027 (0038 seed): the notes/installments report keys
   "notes.notes.view",
   "installments.plans.view",

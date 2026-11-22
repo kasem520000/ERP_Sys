@@ -12,6 +12,7 @@ import { DistributionQueriesService } from "./industry/distribution-queries";
 import { ManufacturingQueriesService } from "./industry/manufacturing-queries";
 import { CrmQueriesService } from "./industry/crm-queries";
 import { FixedAssetsQueriesService } from "./fixed-assets/fixed-assets-queries";
+import { CmmsQueriesService } from "./fixed-assets/cmms-queries";
 import { NotesQueriesService } from "./notes/notes-queries";
 import { InstallmentsQueriesService } from "./installments/installments-queries";
 import { BudgetingQueriesService } from "./budgeting/budgeting-queries";
@@ -77,6 +78,13 @@ export interface ReportingServices {
   crm: CrmQueriesService;
   /** PHASE-026 · the fixed_assets query surface (as-of asset register + fa-cost-tie/fa-accum-tie, depreciation schedule, movements with journal provenance). */
   fixedAssets: FixedAssetsQueriesService;
+  /** PHASE-049 (W-22 — T-16, dated 2026-11-22) · the CMMS query surface
+   * — the W-17…W-19 engines' own reads VERBATIM (the work-order
+   * register with its own totals + the live INV-034 GL witness, the
+   * backlog's active plans + open orders with the DB-derived day
+   * counts, the meters + readings log, R-10's fleet-light register);
+   * the registry query-service convention (the 042/044 pattern). */
+  cmmsQueries: CmmsQueriesService;
   /** PHASE-027 · the notes query surface (as-of maturity calendar + inv024-custody-tie, aging + notes-open-tie/notes-payable-tie, the dishonored register with G-26 provenance). */
   notes: NotesQueriesService;
   /** PHASE-027 · the installments query surface (one plan's schedule + schedule-sum-tie/lines-count-tie, the aging with the installments-inv016-tie sanity). */
@@ -147,6 +155,11 @@ export function reportingServices(): ReportingServices {
       manufacturing: new ManufacturingQueriesService(),
       crm: new CrmQueriesService(),
       fixedAssets: new FixedAssetsQueriesService(),
+      // PHASE-049 (W-22 — T-16, dated 2026-11-22): the CMMS engines —
+      // the same direct-construction graph the __db__/cmms fixtures
+      // build (audit + posting + numbering shared; the meters service
+      // carries the plans service, the sweep the inbox).
+      cmmsQueries: new CmmsQueriesService(),
       notes: new NotesQueriesService(),
       installments: new InstallmentsQueriesService(),
       budgeting: new BudgetingQueriesService(),

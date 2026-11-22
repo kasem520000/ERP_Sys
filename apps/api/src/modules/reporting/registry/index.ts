@@ -105,6 +105,10 @@ import {
 import { fixedAssetsAssetRegisterContract } from "./fixed-assets/asset-register.contract";
 import { fixedAssetsDepreciationScheduleContract } from "./fixed-assets/depreciation-schedule.contract";
 import { fixedAssetsMovementsContract } from "./fixed-assets/movements.contract";
+import { fixedAssetsMaintenanceCostsContract } from "./fixed-assets/maintenance-costs.contract";
+import { fixedAssetsMaintenanceBacklogContract } from "./fixed-assets/maintenance-backlog.contract";
+import { fixedAssetsMeterReadingsContract } from "./fixed-assets/meter-readings.contract";
+import { fixedAssetsExpiryRegisterContract } from "./fixed-assets/expiry-register.contract";
 import { notesMaturityCalendarContract } from "./notes/maturity-calendar.contract";
 import { notesAgingContract } from "./notes/aging.contract";
 import { notesDishonoredRegisterContract } from "./notes/dishonored-register.contract";
@@ -299,6 +303,24 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   fixedAssetsAssetRegisterContract,
   fixedAssetsDepreciationScheduleContract,
   fixedAssetsMovementsContract,
+  // §9 financial depth — PHASE-049 rows (REPORT_CATALOG §9's PHASE-049
+  // additions; W-22, T-16, dated 2026-11-22): the CMMS set — the
+  // work-order cost register with the LIVE INV-034 tie (the GL
+  // maintenance-expense debit vs the order's own source legs, plus the
+  // no-posting-before-completion arm), the maintenance backlog (the
+  // overdue ACTIVE plans by their OWN next-due date + the open orders,
+  // the days derived from the database's CURRENT_DATE), the meter
+  // readings log (the engine's own rows with the source vocabulary +
+  // the JOB work-order link check), and the fleet expiry register
+  // (R-10's engine read verbatim — the four chips + the single
+  // designated-odometer binding) — every figure the engines' own,
+  // zero parallel computation; the §12 module-register key reuse
+  // (assets.maintenance.view ×2 · assets.meters.view ·
+  // assets.expiry.view).
+  fixedAssetsMaintenanceCostsContract,
+  fixedAssetsMaintenanceBacklogContract,
+  fixedAssetsMeterReadingsContract,
+  fixedAssetsExpiryRegisterContract,
   // §9 financial depth — PHASE-027 rows (REPORT_CATALOG §9): the
   // notes/installments set — the as-of maturity calendar with the
   // inv024-custody-tie block-on-fail check, the notes aging with the

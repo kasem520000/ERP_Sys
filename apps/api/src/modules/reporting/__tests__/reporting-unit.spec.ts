@@ -100,6 +100,13 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "crm.contracts.manage",
   // PHASE-026 (0037 seed): the fixed-assets report keys
   "fixed_assets.reports.view",
+  // PHASE-049 (0108 §1 seed, matrix §3.27 — W-22, T-16, dated
+  // 2026-11-22): the CMMS report keys (the same §12 convention —
+  // the four contracts ride the module's own read keys the /assets
+  // routes ride; the grants the fullContext actor needs to run them).
+  "assets.maintenance.view",
+  "assets.meters.view",
+  "assets.expiry.view",
   // PHASE-027 (0038 seed): the notes/installments report keys
   "notes.notes.view",
   "installments.plans.view",
@@ -197,16 +204,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 114 frozen contracts validate against the known-permission catalog", () => { // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
+  it("the 118 frozen contracts validate against the known-permission catalog", () => { // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
+    expect(result.count).toBe(118); // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(114); // PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects: evm-summary, contract-progress, retention-statement, fieldservice-sla)
+    expect(snapshot).toHaveLength(118); // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");
