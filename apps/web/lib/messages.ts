@@ -3055,3 +3055,112 @@ export function localizedTalentError(
       return localizedApiError(d, error, retryAfterSeconds);
   }
 }
+
+// -- PHASE-049 (W-20 — T-13): the maintenance board's vocabularies ----------
+
+/** Work-order statuses (the machine's fixed enum — REQUESTED → PLANNED →
+ * IN_PROGRESS → ON_HOLD → COMPLETED; D-03's ladder). */
+export function localizedMaintenanceStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    REQUESTED: d.assetsMaintenanceStatusRequested,
+    PLANNED: d.assetsMaintenanceStatusPlanned,
+    IN_PROGRESS: d.assetsMaintenanceStatusInProgress,
+    ON_HOLD: d.assetsMaintenanceStatusOnHold,
+    COMPLETED: d.assetsMaintenanceStatusCompleted,
+  };
+  return map[status] ?? status;
+}
+
+/** Work-order priorities (LOW/MEDIUM/HIGH/CRITICAL). */
+export function localizedMaintenancePriority(d: Dictionary, priority: string): string {
+  const map: Record<string, string> = {
+    LOW: d.assetsMaintenancePriorityLow,
+    MEDIUM: d.assetsMaintenancePriorityMedium,
+    HIGH: d.assetsMaintenancePriorityHigh,
+    CRITICAL: d.assetsMaintenancePriorityCritical,
+  };
+  return map[priority] ?? priority;
+}
+
+/** Cost-line leg types (the three collectors — LABOR/PARTS/EXTERNAL). */
+export function localizedMaintenanceLegType(d: Dictionary, legType: string): string {
+  const map: Record<string, string> = {
+    LABOR: d.assetsMaintenanceLegLabor,
+    PARTS: d.assetsMaintenanceLegParts,
+    EXTERNAL: d.assetsMaintenanceLegExternal,
+  };
+  return map[legType] ?? legType;
+}
+
+/** Plan trigger types (CALENDAR/METER — FA-F-01/FA-F-03). */
+export function localizedMaintenanceTriggerType(d: Dictionary, triggerType: string): string {
+  const map: Record<string, string> = {
+    CALENDAR: d.assetsMaintenanceTriggerCalendar,
+    METER: d.assetsMaintenanceTriggerMeter,
+  };
+  return map[triggerType] ?? triggerType;
+}
+
+/** Checklist step results (PASS/FAIL; null is the unset label). */
+export function localizedMaintenanceStepResult(
+  d: Dictionary,
+  result: string | null,
+): string {
+  if (result === null) {
+    return d.assetsMaintenanceResultUnset;
+  }
+  const map: Record<string, string> = {
+    PASS: d.assetsMaintenanceResultPass,
+    FAIL: d.assetsMaintenanceResultFail,
+  };
+  return map[result] ?? result;
+}
+
+/** The plan evaluation's NAMED skips (BR-097's own report rows). */
+export function localizedMaintenanceSkipReason(d: Dictionary, reason: string): string {
+  const map: Record<string, string> = {
+    PLAN_NOT_DUE: d.assetsMaintenanceSkipPlanNotDue,
+    PLAN_WINDOW_OPEN: d.assetsMaintenanceSkipPlanWindowOpen,
+    PLAN_INACTIVE: d.assetsMaintenanceSkipPlanInactive,
+    METER_NO_READING: d.assetsMaintenanceSkipMeterNoReading,
+  };
+  return map[reason] ?? reason;
+}
+
+/** CMMS typed refusals (the cmms-errors codes the board can meet; the
+ * engine's own messages ride the TypedRefusalPanel's details — this is
+ * the one-line localized summary, never a replacement for the payload). */
+export function localizedCmmsError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "WORK_ORDER_STATE_ERROR":
+      return d.assetsErrWorkOrderState;
+    case "WORK_ORDER_COMPLETED":
+      return d.assetsErrWorkOrderCompleted;
+    case "WORK_ORDER_STEPS_OPEN":
+      return d.assetsErrWorkOrderStepsOpen;
+    case "WORK_ORDER_ZERO_TOTAL":
+      return d.assetsErrWorkOrderZeroTotal;
+    case "WORK_ORDER_COMPLETION_RACE":
+      return d.assetsErrWorkOrderCompletionRace;
+    case "WORK_ORDER_STEP_NOT_FOUND":
+      return d.assetsErrWorkOrderStepNotFound;
+    case "COST_LINE_NOT_FOUND":
+      return d.assetsErrCostLineNotFound;
+    case "COST_LINE_UNPRICED":
+      return d.assetsErrCostLineUnpriced;
+    case "CMMS_INPUT_INVALID":
+      return d.assetsErrCmmsInput;
+    case "ASSET_NOT_OPERABLE":
+      return d.assetsErrAssetNotOperable;
+    case "PLAN_TRIGGER_SHAPE":
+      return d.assetsErrPlanTriggerShape;
+    case "PLAN_WINDOW_OPEN":
+      return d.assetsErrPlanWindowOpen;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}

@@ -7069,6 +7069,178 @@ export interface Dictionary {
   projectsPrintCumulativeBilling: string;
   projectsPrintAgreementBlock: string;
   projectsPrintRegisterBlock: string;
+
+  // PHASE-049 (W-20 — T-13): the maintenance board family (the orders
+  // board + the plans admin + the checklist entry).
+  assetsMaintenanceTitle: string;
+  assetsMaintenanceSubtitle: string;
+  assetsMaintenancePaneOrders: string;
+  assetsMaintenancePanePlans: string;
+  assetsMaintenanceStatusAll: string;
+  assetsMaintenanceStatusRequested: string;
+  assetsMaintenanceStatusPlanned: string;
+  assetsMaintenanceStatusInProgress: string;
+  assetsMaintenanceStatusOnHold: string;
+  assetsMaintenanceStatusCompleted: string;
+  assetsMaintenancePriorityLow: string;
+  assetsMaintenancePriorityMedium: string;
+  assetsMaintenancePriorityHigh: string;
+  assetsMaintenancePriorityCritical: string;
+  assetsMaintenanceOrdersEmpty: string;
+  assetsMaintenanceColOrderNo: string;
+  assetsMaintenanceColAsset: string;
+  assetsMaintenanceColProblem: string;
+  assetsMaintenanceColPriority: string;
+  assetsMaintenanceColStatus: string;
+  assetsMaintenanceColTechnician: string;
+  assetsMaintenanceColCreatedAt: string;
+  assetsMaintenanceFilterStatus: string;
+  assetsMaintenanceFilterAsset: string;
+  assetsMaintenanceAssetAll: string;
+  assetsMaintenanceRefresh: string;
+  assetsMaintenanceOpen: string;
+  assetsMaintenanceCreate: string;
+  assetsMaintenanceCreateTitle: string;
+  assetsMaintenanceProblem: string;
+  assetsMaintenanceProblemAr: string;
+  assetsMaintenanceNote: string;
+  assetsMaintenanceNoteAr: string;
+  assetsMaintenanceTechnicianNone: string;
+  assetsMaintenanceCreatedToast: string;
+  assetsMaintenanceWorkspaceTitle: string;
+  assetsMaintenancePlannedAt: string;
+  assetsMaintenanceStartedAt: string;
+  assetsMaintenanceCompletedAt: string;
+  assetsMaintenanceSolution: string;
+  assetsMaintenanceSolutionAr: string;
+  assetsMaintenanceJournalEntry: string;
+  assetsMaintenanceEngineTotals: string;
+  assetsMaintenanceLaborTotal: string;
+  assetsMaintenancePartsTotal: string;
+  assetsMaintenanceExternalTotal: string;
+  assetsMaintenanceActionPlan: string;
+  assetsMaintenanceActionStart: string;
+  assetsMaintenanceActionHold: string;
+  assetsMaintenanceActionResume: string;
+  assetsMaintenanceActionComplete: string;
+  assetsMaintenanceTransitionToast: string;
+  assetsMaintenanceCompletedToast: string;
+  assetsMaintenanceLinesTitle: string;
+  assetsMaintenanceColLineNo: string;
+  assetsMaintenanceColLegType: string;
+  assetsMaintenanceColDescription: string;
+  assetsMaintenanceColHours: string;
+  assetsMaintenanceColUnitRate: string;
+  assetsMaintenanceColItem: string;
+  assetsMaintenanceColWarehouse: string;
+  assetsMaintenanceColQty: string;
+  assetsMaintenanceColPartner: string;
+  assetsMaintenanceColAmount: string;
+  assetsMaintenanceColIssueUnitCost: string;
+  assetsMaintenanceColIssuedAt: string;
+  assetsMaintenanceLegLabor: string;
+  assetsMaintenanceLegParts: string;
+  assetsMaintenanceLegExternal: string;
+  assetsMaintenanceAddLine: string;
+  assetsMaintenanceAddLineTitle: string;
+  assetsMaintenanceLineEmployee: string;
+  assetsMaintenancePriceLine: string;
+  assetsMaintenancePriceLineTitle: string;
+  assetsMaintenanceRemoveLine: string;
+  assetsMaintenanceRemoveLineTitle: string;
+  assetsMaintenanceLineAddedToast: string;
+  assetsMaintenanceLinePricedToast: string;
+  assetsMaintenanceLineRemovedToast: string;
+  assetsMaintenanceUnpricedHint: string;
+  assetsMaintenanceStepsTitle: string;
+  assetsMaintenanceColSeq: string;
+  assetsMaintenanceColStepTitle: string;
+  assetsMaintenanceColInstruction: string;
+  assetsMaintenanceColResult: string;
+  assetsMaintenanceColRecordedAt: string;
+  assetsMaintenanceResultPass: string;
+  assetsMaintenanceResultFail: string;
+  assetsMaintenanceResultUnset: string;
+  assetsMaintenanceRecordResult: string;
+  assetsMaintenanceRecordResultTitle: string;
+  assetsMaintenanceResultNote: string;
+  assetsMaintenanceStepToast: string;
+  assetsMaintenanceCompleteTitle: string;
+  assetsMaintenanceCompleteConfirm: string;
+  assetsMaintenancePlansEmpty: string;
+  assetsMaintenancePlanActiveOnly: string;
+  assetsMaintenancePlanAll: string;
+  assetsMaintenanceColPlanName: string;
+  assetsMaintenanceColTrigger: string;
+  assetsMaintenanceColIntervalDays: string;
+  assetsMaintenanceColNextDue: string;
+  assetsMaintenanceColMeter: string;
+  assetsMaintenanceColThreshold: string;
+  assetsMaintenanceColLastGenerated: string;
+  assetsMaintenanceColActive: string;
+  assetsMaintenanceTriggerCalendar: string;
+  assetsMaintenanceTriggerMeter: string;
+  assetsMaintenancePlanCreate: string;
+  assetsMaintenancePlanCreateTitle: string;
+  assetsMaintenancePlanName: string;
+  assetsMaintenancePlanNameAr: string;
+  assetsMaintenancePlanDescription: string;
+  assetsMaintenancePlanDescriptionAr: string;
+  assetsMaintenancePlanIntervalDays: string;
+  assetsMaintenancePlanNextDue: string;
+  assetsMaintenancePlanMeter: string;
+  assetsMaintenancePlanThreshold: string;
+  assetsMaintenancePlanMeterHint: string;
+  assetsMaintenancePlanCreatedToast: string;
+  assetsMaintenancePlanSavedToast: string;
+  assetsMaintenancePlanEdit: string;
+  assetsMaintenancePlanEditTitle: string;
+  assetsMaintenancePlanActiveBadge: string;
+  assetsMaintenancePlanInactiveBadge: string;
+  assetsMaintenancePlanToggleActive: string;
+  assetsMaintenancePlanToggleInactive: string;
+  assetsMaintenanceTasksTitle: string;
+  assetsMaintenanceTaskAdd: string;
+  assetsMaintenanceTaskAddTitle: string;
+  assetsMaintenanceTaskEdit: string;
+  assetsMaintenanceTaskEditTitle: string;
+  assetsMaintenanceTaskTitle: string;
+  assetsMaintenanceTaskTitleAr: string;
+  assetsMaintenanceTaskInstruction: string;
+  assetsMaintenanceTaskInstructionAr: string;
+  assetsMaintenanceTaskSeq: string;
+  assetsMaintenanceTaskDelete: string;
+  assetsMaintenanceTaskDeleteTitle: string;
+  assetsMaintenanceTaskSavedToast: string;
+  assetsMaintenanceTaskDeletedToast: string;
+  assetsMaintenanceTasksEmpty: string;
+  assetsMaintenanceEvaluate: string;
+  assetsMaintenanceGenerateNow: string;
+  assetsMaintenanceEvaluateAll: string;
+  assetsMaintenanceEvaluationTitle: string;
+  assetsMaintenanceEvaluationGenerated: string;
+  assetsMaintenanceEvaluationSkipped: string;
+  assetsMaintenanceSkipPlanNotDue: string;
+  assetsMaintenanceSkipPlanWindowOpen: string;
+  assetsMaintenanceSkipPlanInactive: string;
+  assetsMaintenanceSkipMeterNoReading: string;
+  assetsMaintenanceGeneratedToast: string;
+  assetsMaintenanceEvaluatedAllToast: string;
+  assetsMaintenanceEvaluationPlan: string;
+  assetsMaintenanceRefusalTitle: string;
+  assetsMaintenanceRefusalDetails: string;
+  assetsErrWorkOrderState: string;
+  assetsErrWorkOrderCompleted: string;
+  assetsErrWorkOrderStepsOpen: string;
+  assetsErrWorkOrderZeroTotal: string;
+  assetsErrWorkOrderCompletionRace: string;
+  assetsErrWorkOrderStepNotFound: string;
+  assetsErrCostLineNotFound: string;
+  assetsErrCostLineUnpriced: string;
+  assetsErrCmmsInput: string;
+  assetsErrAssetNotOperable: string;
+  assetsErrPlanTriggerShape: string;
+  assetsErrPlanWindowOpen: string;
 }
 
 const ar: Dictionary = {
@@ -14122,6 +14294,178 @@ const ar: Dictionary = {
   projectsPrintCumulativeBilling: "الفوترة التراكمية",
   projectsPrintAgreementBlock: "الاتفاقية",
   projectsPrintRegisterBlock: "سجل العقد",
+
+  // PHASE-049 (W-20 — T-13): الصيانة — لوحة أوامر الصيانة وإدارة الخطط الوقائية.
+  assetsMaintenanceTitle: "الصيانة",
+  assetsMaintenanceSubtitle:
+    "أوامر الصيانة بحالاتها المعتمدة وخطط الصيانة الوقائية (تقويم أو عدّاد) مع قوائم الفحص — كل الأرقام من مخرجات المحرك كما هي.",
+  assetsMaintenancePaneOrders: "أوامر الصيانة",
+  assetsMaintenancePanePlans: "الخطط الوقائية",
+  assetsMaintenanceStatusAll: "كل الحالات",
+  assetsMaintenanceStatusRequested: "مطلوب",
+  assetsMaintenanceStatusPlanned: "مخطط",
+  assetsMaintenanceStatusInProgress: "جارٍ",
+  assetsMaintenanceStatusOnHold: "معلّق",
+  assetsMaintenanceStatusCompleted: "مكتمل",
+  assetsMaintenancePriorityLow: "منخفضة",
+  assetsMaintenancePriorityMedium: "متوسطة",
+  assetsMaintenancePriorityHigh: "عالية",
+  assetsMaintenancePriorityCritical: "حرجة",
+  assetsMaintenanceOrdersEmpty: "لا توجد أوامر صيانة بعد.",
+  assetsMaintenanceColOrderNo: "رقم الأمر",
+  assetsMaintenanceColAsset: "الأصل",
+  assetsMaintenanceColProblem: "المشكلة",
+  assetsMaintenanceColPriority: "الأولوية",
+  assetsMaintenanceColStatus: "الحالة",
+  assetsMaintenanceColTechnician: "الفني",
+  assetsMaintenanceColCreatedAt: "أُنشئ في",
+  assetsMaintenanceFilterStatus: "الحالة",
+  assetsMaintenanceFilterAsset: "الأصل",
+  assetsMaintenanceAssetAll: "كل الأصول",
+  assetsMaintenanceRefresh: "تحديث",
+  assetsMaintenanceOpen: "فتح",
+  assetsMaintenanceCreate: "أمر صيانة جديد",
+  assetsMaintenanceCreateTitle: "إنشاء أمر صيانة",
+  assetsMaintenanceProblem: "وصف المشكلة",
+  assetsMaintenanceProblemAr: "وصف المشكلة (عربي)",
+  assetsMaintenanceNote: "ملاحظة",
+  assetsMaintenanceNoteAr: "ملاحظة (عربي)",
+  assetsMaintenanceTechnicianNone: "— بدون فني —",
+  assetsMaintenanceCreatedToast: "أُنشئ أمر الصيانة {no}.",
+  assetsMaintenanceWorkspaceTitle: "أمر الصيانة {no}",
+  assetsMaintenancePlannedAt: "تخطيط",
+  assetsMaintenanceStartedAt: "بدء",
+  assetsMaintenanceCompletedAt: "إكمال",
+  assetsMaintenanceSolution: "الحل",
+  assetsMaintenanceSolutionAr: "الحل (عربي)",
+  assetsMaintenanceJournalEntry: "قيد G-59",
+  assetsMaintenanceEngineTotals: "تكاليف الأمر (أرقام المحرك)",
+  assetsMaintenanceLaborTotal: "العمالة",
+  assetsMaintenancePartsTotal: "القطع",
+  assetsMaintenanceExternalTotal: "الخارجي",
+  assetsMaintenanceActionPlan: "تخطيط",
+  assetsMaintenanceActionStart: "بدء",
+  assetsMaintenanceActionHold: "تعليق",
+  assetsMaintenanceActionResume: "استئناف",
+  assetsMaintenanceActionComplete: "إكمال",
+  assetsMaintenanceTransitionToast: "انتقل الأمر إلى «{status}».",
+  assetsMaintenanceCompletedToast: "اكتمل الأمر ورُحّل قيدُ الصيانة {journal}.",
+  assetsMaintenanceLinesTitle: "سطور التكلفة",
+  assetsMaintenanceColLineNo: "السطر",
+  assetsMaintenanceColLegType: "النوع",
+  assetsMaintenanceColDescription: "الوصف",
+  assetsMaintenanceColHours: "الساعات",
+  assetsMaintenanceColUnitRate: "السعر/الوحدة",
+  assetsMaintenanceColItem: "الصنف",
+  assetsMaintenanceColWarehouse: "المستودع",
+  assetsMaintenanceColQty: "الكمية",
+  assetsMaintenanceColPartner: "المورّد",
+  assetsMaintenanceColAmount: "المبلغ",
+  assetsMaintenanceColIssueUnitCost: "تكلفة الوحدة المصروفة",
+  assetsMaintenanceColIssuedAt: "تاريخ الصرف",
+  assetsMaintenanceLegLabor: "عمالة",
+  assetsMaintenanceLegParts: "قطع",
+  assetsMaintenanceLegExternal: "خارجي",
+  assetsMaintenanceAddLine: "سطر تكلفة جديد",
+  assetsMaintenanceAddLineTitle: "إضافة سطر تكلفة",
+  assetsMaintenanceLineEmployee: "الموظف",
+  assetsMaintenancePriceLine: "تسعير",
+  assetsMaintenancePriceLineTitle: "تسعير السطر",
+  assetsMaintenanceRemoveLine: "حذف",
+  assetsMaintenanceRemoveLineTitle: "حذف سطر التكلفة",
+  assetsMaintenanceLineAddedToast: "أُضيف سطر التكلفة.",
+  assetsMaintenanceLinePricedToast: "سُعّر السطر.",
+  assetsMaintenanceLineRemovedToast: "حُذف سطر التكلفة.",
+  assetsMaintenanceUnpricedHint: "غير مسعّر",
+  assetsMaintenanceStepsTitle: "قائمة الفحص",
+  assetsMaintenanceColSeq: "التسلسل",
+  assetsMaintenanceColStepTitle: "الخطوة",
+  assetsMaintenanceColInstruction: "التعليمات",
+  assetsMaintenanceColResult: "النتيجة",
+  assetsMaintenanceColRecordedAt: "سُجّلت في",
+  assetsMaintenanceResultPass: "مطابقة",
+  assetsMaintenanceResultFail: "غير مطابقة",
+  assetsMaintenanceResultUnset: "لم تُسجّل",
+  assetsMaintenanceRecordResult: "تسجيل النتيجة",
+  assetsMaintenanceRecordResultTitle: "تسجيل نتيجة الفحص",
+  assetsMaintenanceResultNote: "ملاحظة النتيجة",
+  assetsMaintenanceStepToast: "سُجّلت نتيجة الخطوة.",
+  assetsMaintenanceCompleteTitle: "إكمال أمر الصيانة",
+  assetsMaintenanceCompleteConfirm: "إكمال وترحيل",
+  assetsMaintenancePlansEmpty: "لا توجد خطط وقائية بعد.",
+  assetsMaintenancePlanActiveOnly: "النشطة فقط",
+  assetsMaintenancePlanAll: "كل الخطط",
+  assetsMaintenanceColPlanName: "الخطة",
+  assetsMaintenanceColTrigger: "المُطلِق",
+  assetsMaintenanceColIntervalDays: "الفترة (أيام)",
+  assetsMaintenanceColNextDue: "الاستحقاق القادم",
+  assetsMaintenanceColMeter: "العدّاد",
+  assetsMaintenanceColThreshold: "عتبة الفرق",
+  assetsMaintenanceColLastGenerated: "آخر توليد",
+  assetsMaintenanceColActive: "النشاط",
+  assetsMaintenanceTriggerCalendar: "تقويم",
+  assetsMaintenanceTriggerMeter: "عدّاد",
+  assetsMaintenancePlanCreate: "خطة وقائية جديدة",
+  assetsMaintenancePlanCreateTitle: "إنشاء خطة وقائية",
+  assetsMaintenancePlanName: "اسم الخطة",
+  assetsMaintenancePlanNameAr: "اسم الخطة (عربي)",
+  assetsMaintenancePlanDescription: "الوصف",
+  assetsMaintenancePlanDescriptionAr: "الوصف (عربي)",
+  assetsMaintenancePlanIntervalDays: "الفترة بالأيام",
+  assetsMaintenancePlanNextDue: "تاريخ الاستحقاق القادم",
+  assetsMaintenancePlanMeter: "العدّاد",
+  assetsMaintenancePlanThreshold: "عتبة فرق القراءة",
+  assetsMaintenancePlanMeterHint: "عدادات الأصل المحدد فقط",
+  assetsMaintenancePlanCreatedToast: "أُنشئت الخطة الوقائية.",
+  assetsMaintenancePlanSavedToast: "حُفظت تعديلات الخطة.",
+  assetsMaintenancePlanEdit: "تعديل",
+  assetsMaintenancePlanEditTitle: "تعديل الخطة الوقائية",
+  assetsMaintenancePlanActiveBadge: "نشطة",
+  assetsMaintenancePlanInactiveBadge: "متوقفة",
+  assetsMaintenancePlanToggleActive: "تنشيط الخطة",
+  assetsMaintenancePlanToggleInactive: "إيقاف الخطة",
+  assetsMaintenanceTasksTitle: "قائمة الفحص (القالب)",
+  assetsMaintenanceTaskAdd: "خطوة جديدة",
+  assetsMaintenanceTaskAddTitle: "إضافة خطوة فحص",
+  assetsMaintenanceTaskEdit: "تعديل",
+  assetsMaintenanceTaskEditTitle: "تعديل خطوة الفحص",
+  assetsMaintenanceTaskTitle: "عنوان الخطوة",
+  assetsMaintenanceTaskTitleAr: "عنوان الخطوة (عربي)",
+  assetsMaintenanceTaskInstruction: "التعليمات",
+  assetsMaintenanceTaskInstructionAr: "التعليمات (عربي)",
+  assetsMaintenanceTaskSeq: "التسلسل",
+  assetsMaintenanceTaskDelete: "حذف",
+  assetsMaintenanceTaskDeleteTitle: "حذف خطوة الفحص",
+  assetsMaintenanceTaskSavedToast: "حُفظت الخطوة.",
+  assetsMaintenanceTaskDeletedToast: "حُذفت الخطوة.",
+  assetsMaintenanceTasksEmpty: "لا توجد خطوات في القالب بعد — الخطوة تُحمل إلى أوامر الصيانة المولّدة.",
+  assetsMaintenanceEvaluate: "تقييم",
+  assetsMaintenanceGenerateNow: "توليد الآن",
+  assetsMaintenanceEvaluateAll: "تقييم كل الخطط",
+  assetsMaintenanceEvaluationTitle: "نتيجة التقييم",
+  assetsMaintenanceEvaluationGenerated: "وُلّد أمر {no}",
+  assetsMaintenanceEvaluationSkipped: "تخطٍّ:",
+  assetsMaintenanceSkipPlanNotDue: "الخطة لم تستحق بعد",
+  assetsMaintenanceSkipPlanWindowOpen: "يوجد أمر مفتوح لنافذة التوليد",
+  assetsMaintenanceSkipPlanInactive: "الخطة متوقفة",
+  assetsMaintenanceSkipMeterNoReading: "لا قراءة على العدّاد",
+  assetsMaintenanceGeneratedToast: "وُلّد أمر الصيانة {no}.",
+  assetsMaintenanceEvaluatedAllToast: "قُيّمت {count} خطة.",
+  assetsMaintenanceEvaluationPlan: "الخطة",
+  assetsMaintenanceRefusalTitle: "رفض مُنمّط",
+  assetsMaintenanceRefusalDetails: "التفاصيل الكاملة",
+  assetsErrWorkOrderState: "حالة الأمر لا تسمح بهذه الخطوة — الانتقالات المعتمدة: مطلوب ← مخطط ← جارٍ ← معلّق ← مكتمل.",
+  assetsErrWorkOrderCompleted: "الأمر مكتمل — الترحيل تمّ؛ لا تعديل على السجلات المرحّلة.",
+  assetsErrWorkOrderStepsOpen: "لا اكتمال مع خطوات فحص مفتوحة — سجّل نتائج كل الخطوات أولًا (BR-098).",
+  assetsErrWorkOrderZeroTotal: "مجموع تكاليف الأمر صفر — سجّل سطر تكلفة مسعّرًا واحدًا على الأقل قبل الإكمال.",
+  assetsErrWorkOrderCompletionRace: "اكتمل الأمر في معاملة متزامنة — أعد تحميل الأمر.",
+  assetsErrWorkOrderStepNotFound: "خطوة الفحص غير موجودة في هذا الأمر.",
+  assetsErrCostLineNotFound: "سطر التكلفة غير موجود في هذا الأمر.",
+  assetsErrCostLineUnpriced: "لا اكتمال مع سطر تكلفة غير مسعّر — سعّر الأسطر أولًا.",
+  assetsErrCmmsInput: "قيمة إدخال غير صالحة — راجع الحقول وعُد.",
+  assetsErrAssetNotOperable: "الأصل مستبعد أو مشطوب — لا أمر صيانة ولا خطة لأصلٍ مجمّد.",
+  assetsErrPlanTriggerShape: "شكل المُطلِق غير مكتمل — خطة التقويم تحمل الفترة، وخطة العدّاد تحمل العدّاد والعتبة.",
+  assetsErrPlanWindowOpen: "توجد نافذة توليد مفتوحة لهذا الأصل — أمر واحد مفتوح لكل نافذة (BR-097).",
 };
 
 const en: Dictionary = {
@@ -21189,6 +21533,179 @@ const en: Dictionary = {
   projectsPrintCumulativeBilling: "Cumulative billing",
   projectsPrintAgreementBlock: "Agreement",
   projectsPrintRegisterBlock: "Contract register",
+
+  // PHASE-049 (W-20 — T-13): maintenance — the work-order board and the
+  // preventive-plans admin.
+  assetsMaintenanceTitle: "Maintenance",
+  assetsMaintenanceSubtitle:
+    "Work orders on the engine's own status machine and preventive plans (calendar or meter triggers) with their checklists — every figure is an engine output, verbatim.",
+  assetsMaintenancePaneOrders: "Work orders",
+  assetsMaintenancePanePlans: "Preventive plans",
+  assetsMaintenanceStatusAll: "All statuses",
+  assetsMaintenanceStatusRequested: "Requested",
+  assetsMaintenanceStatusPlanned: "Planned",
+  assetsMaintenanceStatusInProgress: "In progress",
+  assetsMaintenanceStatusOnHold: "On hold",
+  assetsMaintenanceStatusCompleted: "Completed",
+  assetsMaintenancePriorityLow: "Low",
+  assetsMaintenancePriorityMedium: "Medium",
+  assetsMaintenancePriorityHigh: "High",
+  assetsMaintenancePriorityCritical: "Critical",
+  assetsMaintenanceOrdersEmpty: "No work orders yet.",
+  assetsMaintenanceColOrderNo: "Order no.",
+  assetsMaintenanceColAsset: "Asset",
+  assetsMaintenanceColProblem: "Problem",
+  assetsMaintenanceColPriority: "Priority",
+  assetsMaintenanceColStatus: "Status",
+  assetsMaintenanceColTechnician: "Technician",
+  assetsMaintenanceColCreatedAt: "Created",
+  assetsMaintenanceFilterStatus: "Status",
+  assetsMaintenanceFilterAsset: "Asset",
+  assetsMaintenanceAssetAll: "All assets",
+  assetsMaintenanceRefresh: "Refresh",
+  assetsMaintenanceOpen: "Open",
+  assetsMaintenanceCreate: "New work order",
+  assetsMaintenanceCreateTitle: "Create work order",
+  assetsMaintenanceProblem: "Problem description",
+  assetsMaintenanceProblemAr: "Problem description (Arabic)",
+  assetsMaintenanceNote: "Note",
+  assetsMaintenanceNoteAr: "Note (Arabic)",
+  assetsMaintenanceTechnicianNone: "— no technician —",
+  assetsMaintenanceCreatedToast: "Work order {no} created.",
+  assetsMaintenanceWorkspaceTitle: "Work order {no}",
+  assetsMaintenancePlannedAt: "Planned",
+  assetsMaintenanceStartedAt: "Started",
+  assetsMaintenanceCompletedAt: "Completed",
+  assetsMaintenanceSolution: "Solution",
+  assetsMaintenanceSolutionAr: "Solution (Arabic)",
+  assetsMaintenanceJournalEntry: "G-59 journal entry",
+  assetsMaintenanceEngineTotals: "Order costs (engine figures)",
+  assetsMaintenanceLaborTotal: "Labor",
+  assetsMaintenancePartsTotal: "Parts",
+  assetsMaintenanceExternalTotal: "External",
+  assetsMaintenanceActionPlan: "Plan",
+  assetsMaintenanceActionStart: "Start",
+  assetsMaintenanceActionHold: "Hold",
+  assetsMaintenanceActionResume: "Resume",
+  assetsMaintenanceActionComplete: "Complete",
+  assetsMaintenanceTransitionToast: "The order moved to “{status}”.",
+  assetsMaintenanceCompletedToast: "Order completed — maintenance journal {journal} posted.",
+  assetsMaintenanceLinesTitle: "Cost lines",
+  assetsMaintenanceColLineNo: "Line",
+  assetsMaintenanceColLegType: "Type",
+  assetsMaintenanceColDescription: "Description",
+  assetsMaintenanceColHours: "Hours",
+  assetsMaintenanceColUnitRate: "Rate/unit",
+  assetsMaintenanceColItem: "Item",
+  assetsMaintenanceColWarehouse: "Warehouse",
+  assetsMaintenanceColQty: "Qty",
+  assetsMaintenanceColPartner: "Supplier",
+  assetsMaintenanceColAmount: "Amount",
+  assetsMaintenanceColIssueUnitCost: "Issued unit cost",
+  assetsMaintenanceColIssuedAt: "Issued at",
+  assetsMaintenanceLegLabor: "Labor",
+  assetsMaintenanceLegParts: "Parts",
+  assetsMaintenanceLegExternal: "External",
+  assetsMaintenanceAddLine: "Add cost line",
+  assetsMaintenanceAddLineTitle: "Add cost line",
+  assetsMaintenanceLineEmployee: "Employee",
+  assetsMaintenancePriceLine: "Price",
+  assetsMaintenancePriceLineTitle: "Price the line",
+  assetsMaintenanceRemoveLine: "Remove",
+  assetsMaintenanceRemoveLineTitle: "Remove cost line",
+  assetsMaintenanceLineAddedToast: "Cost line added.",
+  assetsMaintenanceLinePricedToast: "Line priced.",
+  assetsMaintenanceLineRemovedToast: "Cost line removed.",
+  assetsMaintenanceUnpricedHint: "unpriced",
+  assetsMaintenanceStepsTitle: "Checklist",
+  assetsMaintenanceColSeq: "Seq",
+  assetsMaintenanceColStepTitle: "Step",
+  assetsMaintenanceColInstruction: "Instruction",
+  assetsMaintenanceColResult: "Result",
+  assetsMaintenanceColRecordedAt: "Recorded",
+  assetsMaintenanceResultPass: "Pass",
+  assetsMaintenanceResultFail: "Fail",
+  assetsMaintenanceResultUnset: "not recorded",
+  assetsMaintenanceRecordResult: "Record result",
+  assetsMaintenanceRecordResultTitle: "Record the check result",
+  assetsMaintenanceResultNote: "Result note",
+  assetsMaintenanceStepToast: "Step result recorded.",
+  assetsMaintenanceCompleteTitle: "Complete work order",
+  assetsMaintenanceCompleteConfirm: "Complete & post",
+  assetsMaintenancePlansEmpty: "No preventive plans yet.",
+  assetsMaintenancePlanActiveOnly: "Active only",
+  assetsMaintenancePlanAll: "All plans",
+  assetsMaintenanceColPlanName: "Plan",
+  assetsMaintenanceColTrigger: "Trigger",
+  assetsMaintenanceColIntervalDays: "Interval (days)",
+  assetsMaintenanceColNextDue: "Next due",
+  assetsMaintenanceColMeter: "Meter",
+  assetsMaintenanceColThreshold: "Delta threshold",
+  assetsMaintenanceColLastGenerated: "Last generated",
+  assetsMaintenanceColActive: "Active",
+  assetsMaintenanceTriggerCalendar: "Calendar",
+  assetsMaintenanceTriggerMeter: "Meter",
+  assetsMaintenancePlanCreate: "New preventive plan",
+  assetsMaintenancePlanCreateTitle: "Create preventive plan",
+  assetsMaintenancePlanName: "Plan name",
+  assetsMaintenancePlanNameAr: "Plan name (Arabic)",
+  assetsMaintenancePlanDescription: "Description",
+  assetsMaintenancePlanDescriptionAr: "Description (Arabic)",
+  assetsMaintenancePlanIntervalDays: "Interval in days",
+  assetsMaintenancePlanNextDue: "Next due date",
+  assetsMaintenancePlanMeter: "Meter",
+  assetsMaintenancePlanThreshold: "Reading delta threshold",
+  assetsMaintenancePlanMeterHint: "only the selected asset's meters",
+  assetsMaintenancePlanCreatedToast: "Preventive plan created.",
+  assetsMaintenancePlanSavedToast: "Plan changes saved.",
+  assetsMaintenancePlanEdit: "Edit",
+  assetsMaintenancePlanEditTitle: "Edit preventive plan",
+  assetsMaintenancePlanActiveBadge: "active",
+  assetsMaintenancePlanInactiveBadge: "inactive",
+  assetsMaintenancePlanToggleActive: "Activate plan",
+  assetsMaintenancePlanToggleInactive: "Deactivate plan",
+  assetsMaintenanceTasksTitle: "Checklist template",
+  assetsMaintenanceTaskAdd: "Add step",
+  assetsMaintenanceTaskAddTitle: "Add checklist step",
+  assetsMaintenanceTaskEdit: "Edit",
+  assetsMaintenanceTaskEditTitle: "Edit checklist step",
+  assetsMaintenanceTaskTitle: "Step title",
+  assetsMaintenanceTaskTitleAr: "Step title (Arabic)",
+  assetsMaintenanceTaskInstruction: "Instruction",
+  assetsMaintenanceTaskInstructionAr: "Instruction (Arabic)",
+  assetsMaintenanceTaskSeq: "Seq",
+  assetsMaintenanceTaskDelete: "Delete",
+  assetsMaintenanceTaskDeleteTitle: "Delete checklist step",
+  assetsMaintenanceTaskSavedToast: "Step saved.",
+  assetsMaintenanceTaskDeletedToast: "Step deleted.",
+  assetsMaintenanceTasksEmpty: "No template steps yet — steps carry onto generated work orders.",
+  assetsMaintenanceEvaluate: "Evaluate",
+  assetsMaintenanceGenerateNow: "Generate now",
+  assetsMaintenanceEvaluateAll: "Evaluate all plans",
+  assetsMaintenanceEvaluationTitle: "Evaluation result",
+  assetsMaintenanceEvaluationGenerated: "order {no} generated",
+  assetsMaintenanceEvaluationSkipped: "skipped:",
+  assetsMaintenanceSkipPlanNotDue: "plan not due yet",
+  assetsMaintenanceSkipPlanWindowOpen: "an open order holds the trigger window",
+  assetsMaintenanceSkipPlanInactive: "plan inactive",
+  assetsMaintenanceSkipMeterNoReading: "no reading on the meter",
+  assetsMaintenanceGeneratedToast: "Work order {no} generated.",
+  assetsMaintenanceEvaluatedAllToast: "{count} plans evaluated.",
+  assetsMaintenanceEvaluationPlan: "Plan",
+  assetsMaintenanceRefusalTitle: "Typed refusal",
+  assetsMaintenanceRefusalDetails: "Full details",
+  assetsErrWorkOrderState: "The order's state refuses this move — the legal ladder is REQUESTED → PLANNED → IN_PROGRESS → ON_HOLD → COMPLETED.",
+  assetsErrWorkOrderCompleted: "The order is completed — the posting stands; the frozen record refuses changes.",
+  assetsErrWorkOrderStepsOpen: "No completion with open checklist steps — record every step's result first (BR-098).",
+  assetsErrWorkOrderZeroTotal: "The order's cost total is zero — record at least one priced cost line before completing.",
+  assetsErrWorkOrderCompletionRace: "The order completed in a concurrent transaction — reload the order.",
+  assetsErrWorkOrderStepNotFound: "The checklist step does not exist on this order.",
+  assetsErrCostLineNotFound: "The cost line does not exist on this order.",
+  assetsErrCostLineUnpriced: "No completion with unpriced cost lines — price the lines first.",
+  assetsErrCmmsInput: "An input value is invalid — check the fields and retry.",
+  assetsErrAssetNotOperable: "The asset is disposed or written off — no work order or plan on a frozen substrate.",
+  assetsErrPlanTriggerShape: "The trigger shape is incomplete — a CALENDAR plan carries its interval; a METER plan carries its meter and threshold.",
+  assetsErrPlanWindowOpen: "A generation window is open for this asset — at most one open order per window (BR-097).",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };
@@ -21227,6 +21744,7 @@ export const monthNames: Record<Locale, readonly string[]> = {
     "November",
     "December",
   ],
+
 };
 
 /**

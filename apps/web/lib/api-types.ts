@@ -4980,6 +4980,151 @@ export interface FixedAssetListRow extends FixedAssetRow {
 }
 
 // ---------------------------------------------------------------------------
+// PHASE-049 wire types (GET/POST /assets/maintenance/* + /assets/plans/* —
+// the CMMS board). Field names mirror the cmms.store rows EXACTLY
+// (camelCase as the API returns); money/qty values are canonical decimal
+// strings (ADR-0009 — the engine-output law: the board renders the
+// engine's own figures verbatim, zero client recomputation).
+
+/** GET /assets/maintenance/orders → rows (the orders board list). */
+export interface MaintenanceWorkOrderRow {
+  id: string;
+  assetId: string;
+  orderNo: string;
+  problem: string;
+  problemAr: string | null;
+  solution: string | null;
+  solutionAr: string | null;
+  priority: string;
+  technicianEmployeeId: string | null;
+  status: string;
+  planId: string | null;
+  plannedAt: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  laborTotal: string;
+  partsTotal: string;
+  externalTotal: string;
+  journalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET /assets/maintenance/orders/:id/lines → rows (the three cost collectors). */
+export interface MaintenanceCostLineRow {
+  id: string;
+  workOrderId: string;
+  lineNo: number;
+  legType: string;
+  employeeId: string | null;
+  hours: string | null;
+  unitRate: string | null;
+  itemId: string | null;
+  warehouseId: string | null;
+  qty: string | null;
+  partnerId: string | null;
+  amount: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  issueUnitCost: string | null;
+  issuedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+}
+
+/** GET /assets/maintenance/orders/:id/steps → rows (the carried checklist). */
+export interface MaintenanceStepRow {
+  id: string;
+  workOrderId: string;
+  sourceTaskId: string | null;
+  seq: number;
+  title: string;
+  titleAr: string | null;
+  instruction: string | null;
+  instructionAr: string | null;
+  result: string | null;
+  resultNote: string | null;
+  resultNoteAr: string | null;
+  recordedAt: string | null;
+  recordedBy: string | null;
+}
+
+/** The completion act's own report (POST /assets/maintenance/orders/:id/complete):
+ * the order + the G-59 journal link + the INV-034 reconciliation verdict + the
+ * WMS issue moves — every figure the engine returned, verbatim. */
+export interface MaintenanceCompletionResult {
+  order: MaintenanceWorkOrderRow;
+  journalEntryId: string;
+  reconciliation: {
+    balanced: boolean;
+    labor: string;
+    parts: string;
+    external: string;
+    sourceTotal: string;
+    glExpenseDebit: string;
+    difference: string;
+  };
+  issueMoveIds: readonly string[];
+}
+
+/** GET /assets/plans → rows (the preventive plans register). */
+export interface MaintenancePlanRow {
+  id: string;
+  assetId: string;
+  name: string;
+  nameAr: string | null;
+  description: string | null;
+  descriptionAr: string | null;
+  triggerType: string;
+  intervalDays: number | null;
+  nextDueDate: string | null;
+  meterId: string | null;
+  thresholdDelta: string | null;
+  lastAnchorValue: string | null;
+  lastGeneratedAt: string | null;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET /assets/plans/:id/tasks → rows (the checklist template). */
+export interface MaintenancePlanTaskRow {
+  id: string;
+  planId: string;
+  seq: number;
+  title: string;
+  titleAr: string | null;
+  instruction: string | null;
+  instructionAr: string | null;
+  isActive: boolean;
+}
+
+/** POST /assets/plans/:id/evaluate (and /evaluate) → the evaluation's own
+ * report rows — generated carries orderId/orderNo; the skips are NAMED. */
+export interface MaintenancePlanEvaluationRow {
+  planId: string;
+  assetId: string;
+  triggerType: string;
+  generated: boolean;
+  skipReason?: string;
+  orderId?: string;
+  orderNo?: string;
+}
+
+/** POST /assets/plans/:id/generate → the forced generation's result. */
+export interface MaintenancePlanGenerationRow {
+  orderId: string;
+  orderNo: string;
+}
+
+// ---------------------------------------------------------------------------
 // PHASE-027 wire types (GET/POST /notes + /installment-plans). Field names
 // mirror the modules' store rows EXACTLY (camelCase as the API returns);
 // money values are canonical decimal strings (ADR-0009).
