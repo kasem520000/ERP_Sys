@@ -7125,6 +7125,14 @@ export interface Dictionary {
   assetsMaintenanceActionComplete: string;
   assetsMaintenanceTransitionToast: string;
   assetsMaintenanceCompletedToast: string;
+  assetsMaintenanceColActions: string;
+  assetsMaintenanceInvTitle: string;
+  assetsMaintenanceInvSource: string;
+  assetsMaintenanceInvGlDebit: string;
+  assetsMaintenanceInvDifference: string;
+  assetsMaintenanceInvBalanced: string;
+  assetsMaintenanceLinesEmpty: string;
+  assetsMaintenanceStepsEmpty: string;
   assetsMaintenanceLinesTitle: string;
   assetsMaintenanceColLineNo: string;
   assetsMaintenanceColLegType: string;
@@ -14350,6 +14358,14 @@ const ar: Dictionary = {
   assetsMaintenanceActionComplete: "إكمال",
   assetsMaintenanceTransitionToast: "انتقل الأمر إلى «{status}».",
   assetsMaintenanceCompletedToast: "اكتمل الأمر ورُحّل قيدُ الصيانة {journal}.",
+  assetsMaintenanceColActions: "إجراءات",
+  assetsMaintenanceInvTitle: "تطابق INV-034",
+  assetsMaintenanceInvSource: "المصدر = عمالة + قطع + خارجي",
+  assetsMaintenanceInvGlDebit: "مدين مصروف الصيانة في الأستاذ",
+  assetsMaintenanceInvDifference: "الفرق",
+  assetsMaintenanceInvBalanced: "متوازن",
+  assetsMaintenanceLinesEmpty: "لا سطور تكلفة بعد.",
+  assetsMaintenanceStepsEmpty: "لا خطوات فحص على هذا الأمر.",
   assetsMaintenanceLinesTitle: "سطور التكلفة",
   assetsMaintenanceColLineNo: "السطر",
   assetsMaintenanceColLegType: "النوع",
@@ -21590,6 +21606,14 @@ const en: Dictionary = {
   assetsMaintenanceActionComplete: "Complete",
   assetsMaintenanceTransitionToast: "The order moved to “{status}”.",
   assetsMaintenanceCompletedToast: "Order completed — maintenance journal {journal} posted.",
+  assetsMaintenanceColActions: "Actions",
+  assetsMaintenanceInvTitle: "INV-034 reconciliation",
+  assetsMaintenanceInvSource: "Source = labor + parts + external",
+  assetsMaintenanceInvGlDebit: "GL maintenance-expense debit",
+  assetsMaintenanceInvDifference: "Difference",
+  assetsMaintenanceInvBalanced: "Balanced",
+  assetsMaintenanceLinesEmpty: "No cost lines yet.",
+  assetsMaintenanceStepsEmpty: "No checklist steps on this order.",
   assetsMaintenanceLinesTitle: "Cost lines",
   assetsMaintenanceColLineNo: "Line",
   assetsMaintenanceColLegType: "Type",

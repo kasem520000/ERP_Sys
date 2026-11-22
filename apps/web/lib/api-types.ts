@@ -5124,6 +5124,25 @@ export interface MaintenancePlanGenerationRow {
   orderNo: string;
 }
 
+/** GET /assets/meters → rows (the meters pool for METER plans and the
+ * odometer designation reads — the W-18 engine's own row). */
+export interface AssetMeterRow {
+  id: string;
+  assetId: string;
+  name: string;
+  nameAr: string | null;
+  type: string;
+  unit: string;
+  isOdometer: boolean;
+  lastValue: string;
+  lastReadingAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ---------------------------------------------------------------------------
 // PHASE-027 wire types (GET/POST /notes + /installment-plans). Field names
 // mirror the modules' store rows EXACTLY (camelCase as the API returns);
