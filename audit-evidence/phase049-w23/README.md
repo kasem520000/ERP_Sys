@@ -26,6 +26,16 @@ re-proves every doc-sensitive checker at the final head (the logs below).
 5. **THE ARCHIVE `ERP_PLATFORM_PHASE049.zip`** (OA-07 — the git-tracked tree at the
    closure commit, EXCLUDING every standing platform zip: أرشفة الأرشيف ممنوعة; the
    commit hash as the first entry — the 048 shape verbatim).
+   **[F-050a, dated 2026-11-22 (PHASE-050 W-24, the owner's correction order riding
+   W-24): the parenthetical «the 048 shape verbatim» above was IMPRECISE about the
+   physical shapes — this session's own zip inspection (the F1 law: verify before
+   writing) confirms: 048 = the commit hash in the ZIP COMMENT + folder (directory)
+   entries (4,130 entries = 702 dirs + 3,428 files, the hash `00fc42f1…` riding the
+   comment, no hash file entry); 049 = FLAT (zero directory entries; 3,773 = the
+   3,772 git-tracked files + the commit-hash `b6812a7…` as the FIRST ENTRY, no zip
+   comment) — 049's archive is its OWN physical shape, never 048's. The declared 050
+   form (the plan §5/F-4) = the PHYSICAL shape of 049: flat, the commit-hash first
+   entry, ADDITIVE-ONLY, excluding every standing zip.]**
 6. **THE TAG `phase/049`** (DELIVERY, never acceptance — the §1a (a) ruling).
 
 ## THE CLOSURE SWEEP (every log this session, every stamp EXIT=0)

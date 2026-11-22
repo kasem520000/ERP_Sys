@@ -100,6 +100,17 @@ this plan wave, at their claim sites, dated 2026-11-22:
    أرشفة الأرشيف ممنوعة** (the zip never contains another zip), the members
    byte-verified, the standing zips verified untouched, delivered with the tag
    **`phase/050`** — DELIVERY, never acceptance (the §1a (a) ruling).
+   **[F-050a, dated 2026-11-22 (the owner's correction order riding W-24): the
+   parenthetical «the 048/049 shape verbatim» above was IMPRECISE about the
+   physical shapes — the W-24 session's own zip inspection confirms: 048 = the
+   commit hash in the ZIP COMMENT + folder (directory) entries (4,130 entries =
+   702 dirs + 3,428 files, no hash file entry); 049 = FLAT (zero directory
+   entries; 3,773 = the 3,772 git-tracked files + the commit-hash `b6812a7…` as
+   the FIRST ENTRY, no zip comment) — 049's archive is its OWN physical shape,
+   never 048's, and the two are NOT the same shape. The declared 050 form = the
+   PHYSICAL shape of 049: FLAT, the commit-hash as the FIRST ENTRY,
+   ADDITIVE-ONLY, excluding every standing zip; §5's declaration block and the
+   w23/README claim site carry this same dated note.]**
 5. **THE ARCHIVE-FORM ACKNOWLEDGMENT (إقرار شكل الأرشيف):** acknowledged and
    recorded by this plan — the 050 closure wave (W-32, §3) executes EXACTLY the
    form declared in F-4, nothing wider, nothing narrower: one zip, additive
@@ -503,9 +514,17 @@ delivery · same-session evidence only · **the local-vs-remote verification as
 every wave's first act (§0a)**.
 
 **THE 050 ARCHIVE FORM — DECLARED EXPLICITLY (correction F-4, the
-dispatch's own demand):** the closure wave (W-32) delivers
+dispatch's own demand; amended by F-050a, dated 2026-11-22 — the owner's
+correction order riding W-24):** the closure wave (W-32) delivers
 **`ERP_PLATFORM_PHASE050.zip`** = **the git-tracked tree at the closure head**
 (the commit-hash as the zip's FIRST entry — the 048/049 shape verbatim) ·
+**[F-050a's amendment: the phrase «the 048/049 shape verbatim» was IMPRECISE —
+048 = the hash in the ZIP COMMENT + folder entries; 049 = FLAT + the hash as
+the FIRST ENTRY (this session's own inspection: 048 carries 702 directory
+entries and a 40-char comment hash, 049 carries zero directories and the hash
+file `b6812a7…` first); the declared 050 form = the PHYSICAL shape of 049:
+FLAT, the commit-hash as the FIRST ENTRY — §0b-F-4 and the w23/README claim
+site carry this same dated note.]** ·
 **THE ADDITIVE-ONLY LAW** (members byte-verified) · **EXCLUDING every standing
 platform zip: أرشفة الأرشيف ممنوعة — the zip never contains another zip** ·
 the standing zips (034_FINAL…049) verified untouched · delivered with the tag
