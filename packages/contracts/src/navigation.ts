@@ -838,6 +838,57 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 71,
   },
+  // PHASE-049 (W-21 — T-14): the meters board — the meters register + the
+  // readings log + the R-10 odometer designation + the fleet register (the
+  // four expiry columns with SQL-derived days). Feature key the D-16
+  // composable unit `assets.maintenance` (the composable unit the meters
+  // ride — the same key as the W-20 board, 0108-seeded); permission the
+  // W-18 viewer key the primary read enforces (matrix §3.27).
+  {
+    id: "assets.meters",
+    parentGroup: "accounting",
+    label: { ar: "عدادات الأصول", en: "Asset meters" },
+    icon: "clock",
+    route: "/assets/meters",
+    featureKey: "assets.maintenance",
+    permission: "assets.meters.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 72,
+  },
+  // PHASE-049 (W-21 — T-14): the transfers board — the approval ladder
+  // (DRAFT → SUBMITTED → APPROVED/REJECTED) with the G-61 NBV
+  // reclassification verdict on approval. Feature key the exact composable
+  // unit `assets.transfer`; permission the W-18 viewer key the primary read
+  // enforces (matrix §3.27).
+  {
+    id: "assets.transfers",
+    parentGroup: "accounting",
+    label: { ar: "نقل الأصول", en: "Asset transfers" },
+    icon: "arrow-left-right",
+    route: "/assets/transfers",
+    featureKey: "assets.transfer",
+    permission: "assets.transfer.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 73,
+  },
+  // PHASE-049 (W-21 — T-14): the QR scan surface + the tags admin (one
+  // route carries both — the resolver and the tag register). Feature key
+  // the composable unit `assets.maintenance` (the maintenance plane's own
+  // unit); permission the scan resolution route's viewer key.
+  {
+    id: "assets.scan",
+    parentGroup: "accounting",
+    label: { ar: "مسح البطاقات", en: "Scan tags" },
+    icon: "qr-code",
+    route: "/assets/scan",
+    featureKey: "assets.maintenance",
+    permission: "assets.maintenance.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 74,
+  },
   // PHASE-028 (T9): budgets — the period-column planning grid. The v2.0
   // registry row `accounting.budgets` (NAVIGATION_MODEL §1.1; ED-12):
   // featureKey the exact FEATURE_CATALOG `budgeting.budgets` string;

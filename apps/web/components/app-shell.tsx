@@ -222,6 +222,12 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   // support-sessions rule — the sidebar itself is registry-driven through
   // the NAV_ITEMS row `assets.maintenance`).
   "assets/maintenance": { group: "navAccounting", label: "assetsMaintenanceTitle" },
+  // PHASE-049 (W-21 — T-14): the meters / transfers / scan surfaces'
+  // fallback crumbs (the same rule — the sidebar is registry-driven through
+  // the NAV_ITEMS rows `assets.meters` / `assets.transfers` / `assets.scan`).
+  "assets/meters": { group: "navAccounting", label: "assetsMetersTitle" },
+  "assets/transfers": { group: "navAccounting", label: "assetsTransfersTitle" },
+  "assets/scan": { group: "navAccounting", label: "assetsScanTitle" },
   // -- PHASE-027 (wave F): cheques & notes + the PDC calendar (treasury)
   // and installment plans (sales). Registry rows (contracts NAV_ITEMS)
   // drive the sidebar; these fallbacks cover nav-fetch failure for the

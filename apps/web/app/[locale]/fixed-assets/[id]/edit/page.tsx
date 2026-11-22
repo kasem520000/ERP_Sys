@@ -17,7 +17,7 @@ import { getDictionary, isLocale, type Locale } from "../../../../../i18n/dictio
 import type {
   BranchRow,
   FixedAssetCategoryRow,
-  FixedAssetDetailRow,
+  FixedAssetDetailPayload,
   TenantProfile,
   TenantUserRow,
 } from "../../../../../lib/api-types";
@@ -38,7 +38,10 @@ export default async function EditFixedAssetPage({
 
   await requireSessionToken(localeValue);
 
-  const detail = await fetchApi<FixedAssetDetailRow>(`fixed-assets/assets/${id}`);
+  // PHASE-049 (W-21 — T-15 — the honest repair of the 044 wire drift): the
+  // detail endpoint returns the NESTED payload; the edit form consumes the
+  // REGISTER row (payload.asset) — one mapping at the page boundary.
+  const detail = await fetchApi<FixedAssetDetailPayload>(`fixed-assets/assets/${id}`);
   if (!detail.ok && detail.status === 401) {
     redirect(`/${locale}/login`);
   }
@@ -64,7 +67,14 @@ export default async function EditFixedAssetPage({
     );
   }
 
-  const row = detail.data;
+  // The edit form consumes the REGISTER row + the NBV read model (the
+  // FixedAssetListRow shape) — mapped once from the nested payload.
+  const payload = detail.data;
+  const row = {
+    ...payload.asset,
+    accumulatedToDate: payload.accumulated,
+    nbv: payload.netBookValue,
+  };
   const [categories, branches, users, profile] = await Promise.all([
     fetchApi<readonly FixedAssetCategoryRow[]>("fixed-assets/categories"),
     fetchApi<readonly BranchRow[]>("tenancy/branches"),
