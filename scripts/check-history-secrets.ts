@@ -8,6 +8,29 @@
  * this script exists so the pattern set + allowlist decisions are
  * reviewable and runnable locally/without GitHub.
  *
+ * **[Dated 2026-11-22 (PHASE-049 W-20 — THE RESUMABLE-SLICES AMENDMENT, the
+ * environmental adaptation class): the fifth environment reset's sandbox
+ * reaps every process between tool invocations (no background run
+ * survives) and caps each invocation at 600s, while the sequential scan
+ * costs ~6s per commit × ~203 sampled commits ≈ 20 minutes — a single-shot
+ * run cannot complete. The amendment adds a RESUMABLE mode that preserves
+ * the check EXACTLY — same deterministic sample (last SAMPLE_SIZE + every
+ * tag anchor), same PATTERNS, same allowlist, same verdict logic, with a
+ * coverage assertion at finalize — and leaves the DEFAULT single-shot path
+ * byte-identical:
+ *   `--slice N/M --state <path>` scan the Nth of M contiguous slices of
+ *                               the same sample, appending one JSONL row
+ *                               per scanned commit (its raw hits + its
+ *                               allowlisted count) to the state file;
+ *   `--finalize  --state <path>` merge the state, ASSERT FULL COVERAGE
+ *                               (every sampled commit scanned exactly
+ *                               once — missing, extra, or duplicate rows
+ *                               all refuse), apply the allowlist + the
+ *                               verdict, and print the single-shot summary
+ *                               shape plus the slices' coverage line.
+ * The slice scans carry the raw hits; ONLY the finalize invocation decides
+ * the verdict (a slice run never exits non-zero on hit content).]**
+ *
  * Sampling (tractability): by default the LAST 200 COMMITS plus the FIRST
  * COMMIT OF EVERY PHASE TAG (`git tag` → `git rev-list -n1`) — enough to
  * cover recent history + every phase boundary. `--full` scans every commit
@@ -24,6 +47,7 @@
  * pattern is a VIOLATION → exit 1 with `commit path:line` for each hit.
  */
 import { execFileSync } from "node:child_process";
+import { appendFileSync, readFileSync } from "node:fs";
 
 /**
  * Bounded pattern set (gitleaks-class shapes, ERE alternation — passed to
@@ -152,6 +176,21 @@ function scanCommit(commit: string): { hits: Hit[]; allowlisted: number } {
 function main(): void {
   const full = process.argv.includes("--full");
 
+  // -- PHASE-049 W-20: the resumable-slices flags (the dated header note) --
+  const sliceMatch = /--slice (\d+)\/(\d+)/.exec(process.argv.join(" "));
+  const stateMatch = /--state (\S+)/.exec(process.argv.join(" "));
+  const finalize = process.argv.includes("--finalize");
+  if ((sliceMatch !== null || finalize) && stateMatch === null) {
+    console.error("check-history-secrets: --slice/--finalize require --state <path>");
+    process.exitCode = 2;
+    return;
+  }
+  if (sliceMatch !== null && finalize) {
+    console.error("check-history-secrets: --slice and --finalize are exclusive");
+    process.exitCode = 2;
+    return;
+  }
+
   const allCommits = git(["log", "--all", "--format=%H"])
     .split("\n")
     .filter((line) => line !== "");
@@ -170,6 +209,106 @@ function main(): void {
   }
 
   const commits = allCommits.filter((commit) => sampled.has(commit));
+
+  // -- the resumable slice scan: same sample, contiguous slice N of M ----
+  if (sliceMatch !== null && stateMatch !== null) {
+    const sliceIndex = Number(sliceMatch[1]);
+    const sliceCount = Number(sliceMatch[2]);
+    if (!Number.isInteger(sliceIndex) || !Number.isInteger(sliceCount) || sliceIndex < 1 || sliceCount < 1 || sliceIndex > sliceCount) {
+      console.error(`check-history-secrets: invalid --slice ${sliceIndex}/${sliceCount}`);
+      process.exitCode = 2;
+      return;
+    }
+    // Integer slice arithmetic (no Math.* — the ADR-0009 lint floor): slices
+    // 1..remainder carry one extra commit, the boundaries derive exactly.
+    const base = (commits.length - (commits.length % sliceCount)) / sliceCount;
+    const extra = commits.length % sliceCount;
+    const size = sliceIndex <= extra ? base + 1 : base;
+    const start =
+      sliceIndex <= extra
+        ? (sliceIndex - 1) * (base + 1)
+        : extra * (base + 1) + (sliceIndex - 1 - extra) * base;
+    const chunk = commits.slice(start, start + size);
+    let sliceHits = 0;
+    let sliceAllowlisted = 0;
+    for (const commit of chunk) {
+      const { hits, allowlisted } = scanCommit(commit);
+      sliceHits += hits.length;
+      sliceAllowlisted += allowlisted;
+      appendFileSync(
+        stateMatch[1],
+        `${JSON.stringify({ kind: "commit", commit, allowlisted, hits })}\n`,
+        "utf8",
+      );
+    }
+    console.log(
+      `check-history-secrets: slice ${sliceIndex}/${sliceCount} scanned ${chunk.length} commit(s) — ${sliceHits} raw hit(s), ${sliceAllowlisted} allowlisted (raw hits ride the state file; the verdict is the finalize invocation's)`,
+    );
+    return;
+  }
+
+  // -- the finalize: merge the state, ASSERT FULL COVERAGE, decide -------
+  if (finalize && stateMatch !== null) {
+    let rows: { kind: string; commit: string; allowlisted: number; hits: Hit[] }[];
+    try {
+      rows = readFileSync(stateMatch[1], "utf8")
+        .split("\n")
+        .filter((line) => line !== "")
+        .map((line) => JSON.parse(line) as { kind: string; commit: string; allowlisted: number; hits: Hit[] });
+    } catch {
+      console.error(`check-history-secrets: cannot read the state file ${stateMatch[1]}`);
+      process.exitCode = 2;
+      return;
+    }
+    if (rows.some((row) => row.kind !== "commit")) {
+      console.error("check-history-secrets: state file carries a foreign row kind");
+      process.exitCode = 2;
+      return;
+    }
+    // COVERAGE: every sampled commit scanned EXACTLY ONCE — missing,
+    // extra, or duplicate rows all refuse.
+    const scanned = new Map<string, number>();
+    for (const row of rows) {
+      scanned.set(row.commit, (scanned.get(row.commit) ?? 0) + 1);
+    }
+    const missing = commits.filter((commit) => !scanned.has(commit));
+    const extra = [...scanned.keys()].filter((commit) => !sampled.has(commit));
+    const duplicated = [...scanned.entries()].filter(([, count]) => count > 1).map(([commit]) => commit);
+    if (missing.length > 0 || extra.length > 0 || duplicated.length > 0) {
+      console.error(
+        `check-history-secrets: slice coverage REFUSED — ${missing.length} missing, ${extra.length} extra, ${duplicated.length} duplicated (the sample is ${commits.length} commits; the state carries ${rows.length} rows)`,
+      );
+      process.exitCode = 2;
+      return;
+    }
+    const violations: Hit[] = [];
+    let allowlistedTotal = 0;
+    for (const row of rows) {
+      violations.push(...row.hits);
+      allowlistedTotal += row.allowlisted;
+    }
+    console.log(
+      `check-history-secrets: ${full ? "FULL" : `sampled (last ${SAMPLE_SIZE} + ${tagAnchors.length} tag anchor${tagAnchors.length === 1 ? "" : "s"})`} — ${commits.length}/${allCommits.length} commits across all refs (RESUMED across ${new Set(rows.map((row) => row.commit)).size} slice-scanned commits, coverage asserted EXACT)`,
+    );
+    for (const anchor of tagAnchors) {
+      console.log(`  anchor ${anchor}`);
+    }
+    for (const hit of violations) {
+      console.error(`SECRET-SHAPED HIT ${hit.commit} ${hit.path}:${hit.line}: ${hit.content}`);
+    }
+    console.log(
+      `check-history-secrets: ${violations.length} violation(s) · ${allowlistedTotal} allowlisted fixture hit(s) across ${ALLOWLIST.length} documented allowlist paths`,
+    );
+    console.log(
+      "check-history-secrets: authoritative full-history gate = CI gitleaks job (ci.yml); this local substitute documents the pattern set + fixture allowlist.",
+    );
+    if (violations.length > 0) {
+      process.exitCode = 1;
+    }
+    return;
+  }
+
+  // -- the default single-shot path (unchanged) --------------------------
   console.log(
     `check-history-secrets: ${full ? "FULL" : `sampled (last ${SAMPLE_SIZE} + ${tagAnchors.length} tag anchor${tagAnchors.length === 1 ? "" : "s"})`} — ${commits.length}/${allCommits.length} commits across all refs`,
   );

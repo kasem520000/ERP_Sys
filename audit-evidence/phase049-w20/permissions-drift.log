@@ -1,0 +1,6 @@
+
+> erp-platform@0.1.0 check:permissions-drift /home/z/my-project/ERP_Sys
+> tsx scripts/check-permissions-drift.ts
+
+[permissions-drift] OK — matrix 337 keys, seed 337 keys
+EXIT=0

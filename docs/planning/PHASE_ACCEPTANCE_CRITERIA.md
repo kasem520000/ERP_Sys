@@ -605,6 +605,22 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
 
 ### PHASE-049 — CMMS — Asset Maintenance (OPENED AT PLAN 2026-11-21 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-049-MASTER-PLAN.md` §3/§4 is the binding division)
 
+**[Dated 2026-11-22 (W-20 DELIVERED — THE ACCUMULATION PLACE per the ratified
+عرف 049 option (a); the W-16…W-19 records stand ratified, never rewritten).** This
+wave's accumulated deliveries: **T-13 DELIVERED** — `/assets/maintenance` (the orders
+board + the plans admin + the checklist entry; the 048 board patterns; the data-slot
+two-pane switch immune to the 045 Tabs defect) with **i18n BY BOTH COUNTS** (the
+FIRST SURFACE WAVE: 6,620 → 6,797 per side, the +177 `assetsMaintenance*` delta, AND
+mobile 371 = 371 standing) and the flag-gating registered (the NAV_ITEMS row
+`assets.maintenance` on the exact D-16 composable unit — the sidebar + the ⌘K palette
+ride it); the board renders the engines' figures VERBATIM (the engine-output law —
+the engine totals, the completion's OWN INV-034 verdict, the evaluation's NAMED
+skips; the 8 component-test arms green). The constants: chain 112 · catalog 328 ·
+drift 337 · routes 1,102 all UNCHANGED (the pure web wave); unit 8/8 — **144 ·
+1,852**; the DB suite NOT re-run per the scope-label law (the standing 279 · 3,951
+at `b7ed567` rides; W-23 re-runs it). The evidence: `audit-evidence/phase049-w20/`
+(the gate record).**
+
 **[Dated 2026-11-21 (W-19 DELIVERED at `b7ed567` — THE ACCUMULATION PLACE per the
 ratified عرف 049 option (a): this ledger accumulates every wave's delivered arms from
 W-0 to the W-23 closure, giving the closure its ONE CITABLE CUMULATIVE RECORD; the

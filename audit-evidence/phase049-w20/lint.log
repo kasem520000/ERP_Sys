@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/my-project/ERP_Sys
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/api:lint: cache miss, executing a84ece52fbc892eb
+@erp/sync-core:lint: cache miss, executing 58fd09d95d7f991f
+@erp/ui:lint: cache miss, executing 142bf3f6bf28b136
+@erp/desktop:lint: cache miss, executing e4b36008e02754c5
+@erp/mobile:lint: cache miss, executing 50851bebd4a89593
+@erp/domain-core:lint: cache miss, executing c24920749dc23a5f
+@erp/contracts:lint: cache miss, executing 5a93729cce7dce27
+@erp/web:lint: cache miss, executing 23f474e2f50e109d
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/my-project/ERP_Sys/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/my-project/ERP_Sys/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/my-project/ERP_Sys/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/my-project/ERP_Sys/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/my-project/ERP_Sys/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/my-project/ERP_Sys/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/my-project/ERP_Sys/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/my-project/ERP_Sys/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    48.738s 
+
+EXIT=0
