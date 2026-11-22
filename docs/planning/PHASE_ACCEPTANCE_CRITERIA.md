@@ -605,6 +605,33 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
 
 ### PHASE-049 — CMMS — Asset Maintenance (OPENED AT PLAN 2026-11-21 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-049-MASTER-PLAN.md` §3/§4 is the binding division)
 
+**[Dated 2026-11-21 (W-19 DELIVERED at `b7ed567` — THE ACCUMULATION PLACE per the
+ratified عرف 049 option (a): this ledger accumulates every wave's delivered arms from
+W-0 to the W-23 closure, giving the closure its ONE CITABLE CUMULATIVE RECORD; the
+W-16/W-17/W-18 deliveries are recorded in their own evidence READMEs — their gate
+records — and ratified, never rewritten).** This wave's accumulated deliveries: **#7's
+API arms DELIVERED** (the signed codes' entropy/uniqueness + the pre-lookup signature
+gate + the RLS-scoped scan resolving the asset card + the CAS printed stamp + the
+zero-parallel print payload — `cmms-tags.db.spec` 7 arms green; the print sheet's
+`bi()` surface closes at W-21) · **#8 DELIVERED** (the `asset-expiry-sweep`: the
+30/7/0 ladder × the four classes with the S-15 severities, the structural dedupe
+`assets:{class}:{assetId}:{threshold}`, the no-arming/no-double-launch convergence,
+the seal-after-success audit record `assets.expiry_sweep_run` in the same
+transaction, the typed settings surface over `assets.expiry_sweep_thresholds`, the
+fleet-light register's four chips + the odometer binding — `cmms-expiry-sweep.db.spec`
+4 arms green as THE FOURTH ISOLATE) · **#1's from-zero arm re-proven at the 112
+chain** (both scratch runs: `CHAIN_112_APPLIED`, check-rls OK — 328; the honest slots
+0111+0112 per the plan §2's W-19 dated amendment) · **#9's keys arm advanced by the
+dated amendment**: the drift equality is now **337 = 337** (336 + the ONE sweep
+threshold key `assets.expiry.manage`, matrix §3.27's W-19 note; zero-drift re-proven).
+The evidence: `audit-evidence/phase049-w19/README.md` (the gate record — the battery
+279 · 3,951 · 0 failed · 0 skipped; the final expected fingerprint CONFIRMED: chain
+112 · catalog 328 · drift 337 · routes 1,102). The prior waves' accumulation: W-16
+delivered #1's opening (the migrations + the catalog 326 + the zero-drift 336, the
+plan-wave envelope `audit-evidence/phase049-w16/`) · W-17 delivered #2's ladder, #3's
+G-59, #4's collectors, #5's calendar side (`audit-evidence/phase049-w17/`) · W-18
+delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18/`).**]
+
 1. **Migrations 0105–0108 apply cleanly from zero with re-apply no-op;
    Drizzle mirror parity; all 8 new tables + the `assets` column family have
    ENTITY_CATALOG rows (318 → 326) and the fixed-assets TABLES doc

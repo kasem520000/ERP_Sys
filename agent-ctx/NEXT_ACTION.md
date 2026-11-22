@@ -1,78 +1,65 @@
-# NEXT ACTION — PHASE-049 (CMMS — Asset Maintenance) — W-16 DELIVERED 2026-11-21 AWAITING THE OWNER'S ACCEPTANCE DISPATCH; W-17 (THE WORK-ORDER ENGINE + PLANS) IS NEXT
+# NEXT ACTION — PHASE-049 (CMMS — Asset Maintenance) — W-19 DELIVERED 2026-11-21 AT `b7ed567` + THE DELIVERY STEPS; W-20 (THE WEB PLANE I) IS NEXT — UNDER THE OWNER'S STANDING ORDER «واصل العمل لانهاء المرحلة PHASE-049»
 
-**W-16 (the foundation, delivered 2026-11-21 on the owner-approved plan head
-`20b56d3` — the same-session evidence rule's TWENTY-FIFTH consecutive wave):**
-the plan §3's foundation wave executed under the owner's approval dispatch
-(launch authorization, NEVER production approval) — `audit-evidence/phase049-w16/`
-(36 physical files, every one declared). **§0a as the session's FIRST act:** the
-remote verified (`main` @ `20b56d3`, the plan commit over the delivery head
-`ba459ff` = the tag `phase/048`; the three tags untouched) → the fresh clone →
-the tree CLEAN — المحلي = البعيد قبل أول سطر.
+**W-19 (the tags + the expiry sweep + fleet light, delivered 2026-11-21 on the W-18
+acceptance head `cf0248c` — the same-session evidence rule's TWENTY-EIGHTH consecutive
+wave, the fresh-clone envelope `audit-evidence/phase049-w19/`, 38 physical files every
+one declared):** the owner's six-point dispatch executed across the pushed steps
+`4544f2a` (the 0111 provision + THE GATE-DOCUMENTATION DECISION ratified as عرف 049
+option (a) — the wave's gate record is its evidence README, THIS ledger
+`PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-049 is the accumulation place — + the final
+expected fingerprint ANNOUNCED in the envelope, the new law's first application) →
+`3f80c9a` (the pure layer: the sweep-math folds STRICTER than the hr precedent — the
+coercion class refused; the signed-code folds — 256-bit entropy, the pre-lookup
+timing-safe gate; 2 files · 18 unit tests) → `ffc7782` (the services + the nine
+routes: the CAS printed stamp refusing BY NAME; the zero-parallel print payload; the
+sweep — the clock law's derived step, no arming, the seal after success in the same
+transaction; the fleet-light register; the pg-boss job daily 04:30 UTC;
+ROUTE_PERMISSIONS 1,093 + 9 = 1,102) → `b7ed567` (the DB specs + THE 0112 UNION
+REPAIR — the wave's own honest catch: the G-48-class latent defect, 'payroll' dropped
+from both notifications category domains by 0051's silent DROP+ADD, restored to the
+complete seventeen-member union; the sweep spec as THE FOURTH ISOLATE) → the delivery
+steps (the battery + the envelope + the central-ledger accumulation).
 
-**What shipped (T-01…T-04, ONE increment):** migrations **0105–0108** (the
-plans/checklist/work-orders substrate with BR-097's single-open partial unique +
-the machine's stamp law + the single-use G-59 completion gate · the
-meters/readings/spares/tags cluster with the R-10 odometer partial unique + the
-additive plans→meters FK · the transfers ladder with the verdict-XOR + the G-61
-journal gate · THE ALTER on the frozen assets substrate — the four expiry
-registers + cost_center_id + parent_asset_id — + THE DATA-ONLY grants block:
-ten keys 326 → 336, matrix §3.27; the two flags on business+enterprise with
-STARTER AT THE DECLARED NEUTRAL ZERO; the four CMMS-carrying templates'
-manifest enablements; + the three CoA template markers 5310/2138/2137 per D-04's
-own dependency, the 0077 §6 pattern) + every mirror (Drizzle +8 + the assets
-family · tables.registry +8 → the A-suite +48 · ENTITY_CATALOG 318 → 326 · the
-journal/manifest/spec pins to 108 · the permissions-drift list + the matrix
-§3.27 with the keys-seed-first dated note · feature-catalog FEATURE_DEPS +
-the layer-fixtures catch-up · canonical templates.ts + the four docs json
-mirrors + every literal hash re-pinned: 017/018/031 + the golden
-effective-configs' TWENTY-EIGHT rows) + **the TOTP fix under its ordered
-acceptance** (`currentTimestep(Date.now()) + 1` — standalone 21/21 · in-part
-chunk-a green first attempt · in-unit 7/7; the plan wave's red logs preserved)
-+ **the `__db__/cmms/` family opened** (fixtures + cmms-schema.db.spec 1·30,
-every rejection arm on its own world — the hr precedent).
+**The battery (this session, at `b7ed567` after §0a — the fourth environment reset
+reconciled: the remote verified, the fresh clone, ZERO content diffs, ZERO unpushed
+work):** the 112-chain from zero TWICE (both scratch runs: `CHAIN_112_APPLIED`,
+check-rls OK — **328**) · the four isolates standalone FIRST (soak 1·1 · fcm 1·8 ·
+email 1·5 · **the sweep isolate 1·4**) · the coverage verified BEFORE the first load
+run (279 = 279, missing NONE, extra NONE, duplicates NONE) · **THE NINE-PART ENVELOPE
+— 279 files · 3,951 tests · 0 failed · 0 skipped** (smoke 3·1,843 · perf-rest 5·23 ·
+chunk-a 93·731 · b-rest 86·625 · c 88·711 — every part inside the amended 570s ceiling,
+the single-command expectation ≈ 664s split BEFORE attempted) · typecheck 8/8 · lint
+8/8 · depcruise clean 2,086·15,610 (+11/+71 dated) · unit 8/8 — **143 files · 1,844
+tests** (api 68·857 = 66·839 + 2 specs +18; the ledger arithmetic 1,844 = 857+147+940
+EXACT) · i18n 6,620 = 6,620 + mobile 371 = 371 (no delta, as declared) · drift **337 =
+337** (the +1 sweep threshold key) · manifests 13/13 · docs:validate 33/33 · id-ledger
+0 errors + self-test OK (reservations 16 · 45 — the flip is W-23's) · history-secrets
+0 (6,460 hits, 12 paths, +28 dated; the three tag anchors untouched) · capabilities
+agree · shells PASS/PASS · boundary PASS. **THE FINAL EXPECTED FINGERPRINT —
+ANNOUNCED IN THE ENVELOPE, CONFIRMED: chain 112 · ENTITY_CATALOG 328 · drift 337 ·
+ROUTE_PERMISSIONS 1,102 (50 rows on the assets.* keys).** RISK-033: EIGHT incidents,
+ZERO new this wave (the sweep's clock law is the class's own prophylaxis).
 
-**The battery:** the chain from zero TWICE (both scratch runs: 108 applied ·
-check:rls OK — 326) · the three isolates standalone FIRST (§0b (2)) · the
-coverage verified before the first load run (union == inventory 272/272) ·
-**the full DB suite 272 files · 3,885 tests · 0 failed · 0 skipped in the
-EIGHT-PART envelope** (smoke 3·1,831 = 1,783+48 · perf-rest 5·23 · chunk-a
-87·681 green first attempt · b-rest 86·625 · c 88·711 — the c sequence's three
-reds kept verbatim: the CoA pins 76/53 → 79/56) · typecheck 8/8 · lint 8/8 ·
-depcruise 2,056·15,380 (+2/+8 dated) · unit 8/8 — **140 files · 1,803 tests**
-(the tests ledger EXACT; the file count F1-corrected — see the README's
-disclosure 1: web has counted 16 files in every actual log since W-13; the
-17/141 pairing was a W-13 README phantom; the owner's 1,803 = 816+147+840
-arithmetic stands EXACT) · i18n 6,620 = 6,620 + mobile 371 = 371 (no delta,
-as declared) · drift 336 = 336 · manifests 13/13 · docs:validate 33/33 ·
-id-ledger 0 errors + self-test OK (reservations 16 · 45 — the flip is W-23's)
-· history-secrets 0 (the dated audit-evidence/ allowlist entry — the twelfth
-path) · capabilities agree · shells PASS/PASS · boundary PASS · ROUTE_PERMISSIONS
-1,052 unchanged. **RISK-033's counter: EIGHT incidents, ZERO new this wave**
-(the eighth's ordered fix landed; the register row stays OPEN — it closes only
-by the owner's order).
+**The five honest disclosures** (the README carries them whole): the env prep (the
+fourth reset; the 1248 headless-shell installed BEFORE the runs — the W-18 lesson
+applied, 0 skipped on the first attempt) · **the two stale pin mirrors caught by the
+battery's first unit run** (the CLI checker green 337=337 while the unit-side mirrors
+still read the 336-era terminals — the 0086 lesson re-enforced at both sites, the RED
+log kept) · the stamp-shape re-captures (the replaced-run law; the W-6 wrapper's
+conventional VITEST_EXIT stamps) · the sweep isolate's two green logs (the step-4 head
+kept + this session's envelope head — additive) · the 0112 union repair (the wave's
+own honest catch). Plus the eight declared interpretations (one line each in the
+README: the scan's key · the signature's non-expiry · the pre-lookup gate · the
+zero-parallel print payload · the clock law · no-arming/no-double-launch + the seal
+after success · the one-data-home settings · the fleet-light grouping).
 
-**The five honest disclosures** (the README carries them whole): the F1
-web-file-count correction (17→16 · 141→140, dated at the original claim sites)
-· the chunk-b-rest first run's three skips (headless-shell 1248 missed in the
-env re-provisioning — installed, re-run 0 skipped) · the chunk-c three-red
-re-pin sequence (four logs kept) · the history-secrets allowlist extension
-(dated, the same-class procedure) · the smoke chunk's two fixture catches
-(the A-suite maps + the second branch). Plus the three declared
-interpretations (الإعدادات = the starter neutral zero · the family start per
-hr · the CoA markers per D-04) — one line each in the README for the owner's
-review.
-
-**NEXT — W-17 (T-05 + T-06 + T-07, the work-order engine + plans):** the PURE
-layer first (the plan-evaluation arithmetic — calendar due dates, meter
-thresholds, the single-open window, the anchor semantics — unit-first, the
-047/048 law); the work-order API (the status machine D-03, the cost
-collectors, the completion gate BR-098); **G-59's posting** (D-04 — if the
-cost lines land a ninth table, the D-02-dated +9 note records it, nothing
-silent); the plans API (BR-097's single-open + the checklist carry-over,
-D-08). Exit: acceptance #2's arms + #3's G-59 arm + #5's calendar side green
-with evidence. The standing carried items ride every wave: the 043 hard
-review OPEN · RISK-031/032 OPEN · §7(b)'s remarks (045 + 047) · the register's
-two narrowed items · the 045 Tabs defect · RISK-033 (eight incidents) · the
-pre-isolation mandate + the §0a local=remote first act + the amended ceiling
-law on every timed run. **Waits on the owner's dispatch. NOT production
-approval.**
+**NEXT — W-20 (T-13, the web plane I):** `/assets/maintenance` — the orders board +
+the plans admin + the checklist entry (D-11; the 048 board patterns; the 045
+Tabs-defect immunity by the data-slot shape) · **i18n BY BOTH COUNTS from this wave**
+(the first surface wave: the declared delta + mobile 371 standing) · the flag-gating
+verified (the D-16 composable units). Exit: the board renders the engines' figures
+VERBATIM; the declared i18n delta green. The standing carried items ride every wave:
+the 043 hard review OPEN · RISK-031/032 OPEN · §7(b)'s remarks (045 + 047) · the
+register's two narrowed items · the 045 Tabs defect · RISK-033 (eight incidents) ·
+the pre-isolation mandate + the §0a local=remote first act + the amended ceiling law
+on every timed run. **Delivered as delivery — NOT production approval.**

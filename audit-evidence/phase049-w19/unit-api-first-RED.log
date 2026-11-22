@@ -1,0 +1,138 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+ ❯ src/infra/db/migrations.spec.ts (4 tests | 1 failed) 47ms
+   × migration manifest (MIGRATION_STRATEGY §1) > manifest matches the SQL files on disk 25ms
+     → expected '0112_cmms_notifications_category_repa…' to be '0110_cmms_source_shape_repair' // Object.is equality
+   ✓ migration manifest (MIGRATION_STRATEGY §1) > journal entries mirror the manifest order (drizzle-kit manifest) 1ms
+   ✓ migration manifest (MIGRATION_STRATEGY §1) > every migration upserts its own schema-state number (readiness mirror) 11ms
+   ✓ migration manifest (MIGRATION_STRATEGY §1) > fail-closed drift signal: an unexpected file breaks readMigrationFiles 9ms
+ ❯ src/modules/identity/infrastructure/permissions-drift.spec.ts (5 tests | 1 failed) 27ms
+   ✓ permissions drift checker (PHASE-003 T2) > parses §3 of the matrix: compact rows expand, non-catalog sections excluded 3ms
+   ✓ permissions drift checker (PHASE-003 T2) > seed parses to the same key shape as the matrix 6ms
+   × permissions drift checker (PHASE-003 T2) > current docs ↔ seed is drift-free (matrix §9.1 CI contract) 12ms
+     → expected [ 'assets.expiry.manage' ] to deeply equal []
+   ✓ permissions drift checker (PHASE-003 T2) > negative fixture: a key present in the matrix but missing from the seed fails 2ms
+   ✓ permissions drift checker (PHASE-003 T2) > negative fixture: a seeded key absent from the matrix fails 2ms
+ ✓ src/modules/fixed_assets/application/depreciation-math.spec.ts (17 tests) 1422ms
+   ✓ INV-023 — STRAIGHT_LINE: Σ over the life = cost − salvage EXACTLY > absorbs the final-period residual across randomized (cost, salvage, life) tuples  686ms
+   ✓ INV-023 — DECLINING_BALANCE: floor-capped decay, residual absorbed > rate = 12 / useful_life_months on opening NBV (DR-002 default); Σ = base exactly  683ms
+ ✓ src/modules/configuration/__tests__/config-resolution.spec.ts (47 tests) 548ms
+ ✓ src/modules/tax/__tests__/zatca-qr-decode.spec.ts (3 tests) 413ms
+ ✓ src/modules/manufacturing/domain/mrp/netting.spec.ts (23 tests) 144ms
+ ✓ src/modules/configuration/__tests__/golden-effective-configs.spec.ts (41 tests) 172ms
+ ✓ src/modules/payroll/__tests__/statutory-properties.spec.ts (6 tests) 155ms
+ ✓ src/modules/reporting/__tests__/reporting-unit.spec.ts (42 tests) 135ms
+ ✓ src/modules/inventory/domain/valuation/valuation.spec.ts (12 tests) 94ms
+ ✓ src/modules/communication/__tests__/adapter-contract.spec.ts (26 tests) 91ms
+ ✓ src/modules/accounting/domain/property.spec.ts (5 tests) 90ms
+ ✓ src/modules/configuration/__tests__/template-prerequisites.spec.ts (37 tests) 33ms
+ ✓ src/infra/observability/slo.burn.spec.ts (24 tests) 30ms
+ ✓ src/modules/reporting/__tests__/contracting-print-templates.spec.ts (6 tests) 26ms
+ ✓ src/modules/fixed_assets/domain/cmms-tag-code.spec.ts (8 tests) 21ms
+ ✓ src/modules/consolidation/__tests__/consolidation-contracts.spec.ts (6 tests) 16ms
+ ✓ src/modules/configuration/__tests__/healthcare-no-clinical-surfaces.spec.ts (7 tests) 12ms
+ ✓ src/health/health.controller.spec.ts (4 tests) 10ms
+ ✓ src/modules/reporting/__tests__/print-templates.spec.ts (8 tests) 10ms
+ ✓ src/modules/payroll/__tests__/variable-lines.spec.ts (9 tests) 8ms
+ ✓ src/modules/fixed_assets/application/disposal-math.spec.ts (19 tests) 9ms
+ ✓ src/modules/accounting/domain/posting-engine/posting-engine.spec.ts (17 tests) 10ms
+ ✓ src/modules/identity/infrastructure/secret-envelope-rotation.spec.ts (8 tests) 8ms
+ ✓ src/modules/payroll/__tests__/statutory-math.spec.ts (26 tests) 9ms
+ ✓ src/modules/fixed_assets/domain/cmms-plan-math.spec.ts (23 tests) 10ms
+{"level":40,"time":1795305117887,"service":"erp-api","module":"identity","account_hash":"bd7662a5eeb41614e720d477abfcb2272e19a8a70a93b7e3bc8560d44ad326e9","msg":"reset email suppressed (per-account flood limit R-05)"}
+{"level":30,"time":1795305117889,"service":"erp-api","module":"identity","email_domain":"example.com","msg":"reset requested for unknown email"}
+{"level":40,"time":1795305117890,"service":"erp-api","module":"identity","account_hash":"b454f82c5857ebabf342b7258e5cf7def78b7cd975814119462973de9a38df10","msg":"reset email suppressed (per-account flood limit R-05)"}
+{"level":40,"time":1795305117891,"service":"erp-api","module":"identity","account_hash":"bd7662a5eeb41614e720d477abfcb2272e19a8a70a93b7e3bc8560d44ad326e9","msg":"reset email suppressed (per-account flood limit R-05)"}
+ ✓ src/modules/identity/application/recovery-flood.spec.ts (5 tests) 9ms
+ ✓ src/modules/manufacturing/domain/mrp/explosion.spec.ts (17 tests) 8ms
+ ✓ src/modules/hr/__tests__/talent-bridge.spec.ts (19 tests) 9ms
+ ✓ src/modules/consolidation/__tests__/snapshot.spec.ts (12 tests) 9ms
+ ✓ src/modules/crm/__tests__/evm-math.spec.ts (37 tests) 8ms
+ ✓ src/infra/http/tenant-rate-limit.spec.ts (7 tests) 8ms
+ ✓ src/modules/communication/__tests__/template-service.spec.ts (10 tests) 8ms
+ ✓ src/modules/hr/__tests__/talent-math.spec.ts (26 tests) 7ms
+ ✓ src/modules/communication/__tests__/provider-config.spec.ts (10 tests) 7ms
+ ✓ src/modules/identity/domain/identity-unit.spec.ts (9 tests) 7ms
+ ✓ src/modules/purchasing/__tests__/sourcing-math.spec.ts (16 tests) 6ms
+ ✓ src/modules/configuration/__tests__/capability-matrix-reconciliation.spec.ts (6 tests) 6ms
+ ✓ src/modules/sales/__tests__/dunning-ladder.spec.ts (15 tests) 6ms
+ ✓ src/modules/crm/__tests__/projects-math.spec.ts (27 tests) 15ms
+ ✓ src/modules/inventory/__tests__/reservation-sweep.spec.ts (5 tests) 9ms
+ ✓ src/modules/tax/__tests__/zatca-phase1.unit.spec.ts (9 tests) 7ms
+ ✓ src/modules/crm/__tests__/contracting-math.spec.ts (16 tests) 7ms
+ ✓ src/modules/consolidation/__tests__/fx-translation.spec.ts (14 tests) 6ms
+ ✓ src/modules/tenancy/__tests__/billing-unit.spec.ts (11 tests) 6ms
+ ✓ src/modules/items/__tests__/composites.spec.ts (19 tests) 6ms
+ ✓ src/modules/crm/__tests__/fieldservice-math.spec.ts (18 tests) 6ms
+ ✓ src/modules/reporting/__tests__/report-pack-wiring.spec.ts (5 tests) 6ms
+ ✓ src/modules/files/application/files.service.spec.ts (5 tests) 6ms
+ ✓ src/modules/consolidation/__tests__/elimination-lines.spec.ts (11 tests) 5ms
+ ✓ src/modules/tenancy/__tests__/webhook-rotation.spec.ts (7 tests) 6ms
+ ✓ src/modules/fixed_assets/domain/cmms-sweep-math.spec.ts (10 tests) 5ms
+ ✓ src/modules/configuration/__tests__/activity-mapping.spec.ts (5 tests) 5ms
+ ✓ src/modules/identity/domain/totp.spec.ts (7 tests) 5ms
+ ✓ src/config/env.spec.ts (3 tests) 5ms
+ ✓ src/modules/hr/__tests__/rotation-schema.spec.ts (5 tests) 5ms
+ ✓ src/modules/notifications/application/fcm-templates.spec.ts (6 tests) 5ms
+{"level":30,"time":1795305129954,"service":"erp-api","module":"http","correlation_id":"01a20086-47e1-7000-ab16-660133774d3c","action":"request","method":"GET","path":"/health/live","status":200,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1795305129956,"service":"erp-api","module":"http","correlation_id":"aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee","action":"request","method":"GET","path":"/health/live","status":200,"duration_ms":0,"msg":"request completed"}
+{"level":30,"time":1795305129956,"service":"erp-api","module":"http","correlation_id":"01a20086-47e4-7000-8f07-348fc57a6ff2","action":"request","method":"GET","path":"/health/live","status":200,"duration_ms":0,"msg":"request completed"}
+ ✓ src/infra/observability/request-id.middleware.spec.ts (3 tests) 5ms
+ ✓ src/modules/communication/__tests__/calendar-matching.spec.ts (6 tests) 5ms
+ ✓ src/modules/notifications/application/templates.spec.ts (8 tests) 5ms
+ ✓ src/modules/consolidation/__tests__/consolidation-math.spec.ts (7 tests) 5ms
+ ✓ src/modules/audit/application/audit.service.spec.ts (4 tests) 5ms
+ ✓ src/infra/observability/request-context.spec.ts (3 tests) 5ms
+ ✓ src/infra/db/tenant-context.spec.ts (3 tests) 4ms
+ ✓ src/modules/sales/__tests__/rma-bounding.spec.ts (7 tests) 3ms
+ ✓ src/infra/http/security-headers.spec.ts (3 tests) 3ms
+ ✓ src/modules/hr/__tests__/attendance-classification.spec.ts (5 tests) 3ms
+ ✓ src/modules/configuration/__tests__/template-drift.spec.ts (3 tests) 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/infra/db/migrations.spec.ts > migration manifest (MIGRATION_STRATEGY §1) > manifest matches the SQL files on disk
+AssertionError: expected '0112_cmms_notifications_category_repa…' to be '0110_cmms_source_shape_repair' // Object.is equality
+
+Expected: "0110_cmms_source_shape_repair"
+Received: "0112_cmms_notifications_category_repair"
+
+ ❯ src/infra/db/migrations.spec.ts:312:31
+    310|     // law), so the repair is this additive slot with the COMPLETE
+    311|     // domain. No tables; the catalog stays 328.
+    312|     expect(files.at(-1)?.tag).toBe("0110_cmms_source_shape_repair");
+       |                               ^
+    313|   });
+    314| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/modules/identity/infrastructure/permissions-drift.spec.ts > permissions drift checker (PHASE-003 T2) > current docs ↔ seed is drift-free (matrix §9.1 CI contract)
+AssertionError: expected [ 'assets.expiry.manage' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "assets.expiry.manage",
++ ]
+
+ ❯ src/modules/identity/infrastructure/permissions-drift.spec.ts:111:34
+    109|     const seedSql = SEED_PATHS.map((path) => readFileSync(path, "utf8"…
+    110|     const result = diffDrift(parseMatrixKeys(matrixMarkdown), parseSee…
+    111|     expect(result.missingInSeed).toEqual([]);
+       |                                  ^
+    112|     expect(result.unknownInSeed).toEqual([]);
+    113|     expect(result.ok).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 66 passed (68)
+      Tests  2 failed | 855 passed (857)
+   Start at  23:51:38
+   Duration  36.83s (transform 2.87s, setup 0ms, collect 21.29s, tests 3.81s, environment 10ms, prepare 3.74s)
+
+EXIT=1

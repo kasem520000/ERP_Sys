@@ -67,6 +67,16 @@ const SEED_PATHS = [
   // seeds the ten CMMS assets keys and joins both lists together (matrix
   // §3.27, 326 → 336) — the same lesson carried forward.
   join(process.cwd(), "migrations", "0108_cmms_asset_extensions.sql"), // PHASE-049 the ten assets keys (326 → 336)
+  // PHASE-049 (W-19 — the tags + expiry-sweep wave, 2026-11-21): 0111 §2
+  // seeds the ONE sweep threshold key assets.expiry.manage (matrix §3.27,
+  // 336 → 337) over the first 049 settings keys
+  // (assets.expiry_sweep_thresholds) and joins both lists together —
+  // the 0086/0092/0098/0103/0108 lesson carried: the spec's copy
+  // extends in the SAME change (caught by the W-19 battery's first
+  // unit run: the CLI checker was green 337 = 337 while this mirror
+  // still read the 336-era union — the RED log kept,
+  // unit-api-first-RED.log).
+  join(process.cwd(), "migrations", "0111_cmms_sweep_settings.sql"), // PHASE-049 the sweep threshold key (336 → 337)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

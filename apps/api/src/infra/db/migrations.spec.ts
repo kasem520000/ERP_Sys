@@ -309,7 +309,24 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // is published (pushed at the step-2 checkpoint — the constants
     // law), so the repair is this additive slot with the COMPLETE
     // domain. No tables; the catalog stays 328.
-    expect(files.at(-1)?.tag).toBe("0110_cmms_source_shape_repair");
+    // PHASE-049 (W-19 — the tags + expiry-sweep wave, 2026-11-21): 0111
+    // the sweep settings provision (the 0099 §2 pattern + the 0098 data
+    // page): the notifications category widening — 'assets' joins BOTH
+    // CHECK domains — + THE DATA PAGE seeding the ONE sweep threshold
+    // key assets.expiry.manage (matrix §3.27, 336 → 337) over the first
+    // 049 settings keys (assets.expiry_sweep_thresholds with the
+    // documented fail-closed default [30,7,0]). No tables; the catalog
+    // stays 328.
+    // PHASE-049 (W-19, dated 2026-11-21 — THE UNION REPAIR, the wave's
+    // own schema-arm catch, the 0110 precedent's exact shape): 0043 §12
+    // widened BOTH category domains with 'payroll' and 0051's DROP+ADD
+    // silently rebuilt both lists WITHOUT it (the G-48 class, latent —
+    // no writer ever used the category); 0112 restores the complete
+    // SEVENTEEN-member union (the schema spec's 32nd arm asserts BOTH
+    // live constraints equal the all-migrations union — a future
+    // partial DROP+ADD goes RED naming the missing member). No tables;
+    // the catalog stays 328.
+    expect(files.at(-1)?.tag).toBe("0112_cmms_notifications_category_repair");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {
