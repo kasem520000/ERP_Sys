@@ -1,6 +1,6 @@
 # PHASE-049 — CMMS — Asset Maintenance
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.2/CR-50) · **Wave:** 2 / Stage 13 · **Register:** [CR-19](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** **COMPLETE — DELIVERED 2026-11-22** (W-16 through W-23; the tag `phase/049` — DELIVERY, never acceptance; the [completion report](reports/PHASE-049-COMPLETION.md)) — was NOT_STARTED — PLANNED (Blueprint v3.0, scope extended by v3.2/CR-50) · **Wave:** 2 / Stage 13 · **Register:** [CR-19](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-15) · §9 (FA-F-01…FA-F-09, F-11/F-12/F-13) · [gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md](../../planning/gap-analysis/GAP_ANALYSIS_LAYER3_RESIDUAL.md) (R-10 fleet light — the v3.2 scope extension) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2/§6.5
 
 ## 1. Phase Overview

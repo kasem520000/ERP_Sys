@@ -1,0 +1,4 @@
+npm warn Unknown project config "hoist-pattern". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+[check-id-ledger] implemented: G 61 · INV 34 · BR 100 | reservations: 15 phases, 37 ids | phase docs scanned: 68 (95 claim ids, 2517 reference ids)
+[check-id-ledger] 0 errors, 0 warning(s) — OK
+EXIT=0

@@ -882,8 +882,8 @@ function runSelfTest(): boolean {
   );
 
   // (7) A reference to an EXISTING id under a DIFFERENT OWNER: the ledger's
-  // cross-ref table row claiming G-59 for PHASE-050 while §2 reserves it
-  // for PHASE-049 — the owner-mismatch finding, never a pass.
+  // cross-ref table row claiming G-62 for PHASE-051 while §2 reserves it
+  // for PHASE-050 — the owner-mismatch finding, never a pass.
   // (Fixture drift note: pre-045-delivery this probe pinned G-51 for
   // PHASE-046 vs PHASE-045's reservation; PHASE-045's 2026-11-16 delivery
   // flipped G-50/G-51 to implemented, so the probe moved to the next
@@ -892,17 +892,18 @@ function runSelfTest(): boolean {
   // G-55, reserved for PHASE-048; PHASE-047 held no golden reservation, so
   // the mismatched claimant stayed 047. PHASE-048's 2026-11-22 delivery
   // (the W-15 closure) flipped G-55…G-58 to implemented, so the probe
-  // moved to G-59, reserved for PHASE-049; PHASE-050 holds G-62…G-63, so
-  // the mismatched claimant is 050.)
+  // moved to G-59, reserved for PHASE-049; PHASE-049's 2026-11-22 delivery
+  // (the W-23 closure) flipped G-59…G-61 to implemented, so the probe
+  // moved to G-62, reserved for PHASE-050; the mismatched claimant is 051.)
   const ownerMismatch = checkCrossRefs(
-    [{ inPhase: "PHASE-050", refs: ["G-59"], ownedBy: "PHASE-050" }],
+    [{ inPhase: "PHASE-051", refs: ["G-62"], ownedBy: "PHASE-051" }],
     RESERVED_BY,
   );
   check(
     "(7) existing id referenced under a different owner — the cross-ref owner mismatch is flagged",
     ownerMismatch.length === 1 &&
       ownerMismatch[0]!.kind === "cross-ref-owner-mismatch" &&
-      ownerMismatch[0]!.detail.includes("owned by PHASE-049"),
+      ownerMismatch[0]!.detail.includes("owned by PHASE-050"),
   );
 
   // (8) A claim of an IMPLEMENTED id under a different meaning — the

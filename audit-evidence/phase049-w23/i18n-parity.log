@@ -1,0 +1,4 @@
+npm warn Unknown project config "hoist-pattern". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+== i18n key parity: ar=6955 keys, en=6955 keys ==
+ar/en catalogs at 100% key parity; no empty values.
+EXIT=0
