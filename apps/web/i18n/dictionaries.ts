@@ -7249,6 +7249,167 @@ export interface Dictionary {
   assetsErrAssetNotOperable: string;
   assetsErrPlanTriggerShape: string;
   assetsErrPlanWindowOpen: string;
+
+  // PHASE-049 (W-21 — T-14+T-15): the meters / transfers / scan / tags
+  // surfaces + the asset-card extensions.
+  assetsMetersTitle: string;
+  assetsMetersSubtitle: string;
+  assetsMetersEmpty: string;
+  assetsMetersPaneMeters: string;
+  assetsMetersPaneFleet: string;
+  assetsMetersColAsset: string;
+  assetsMetersColName: string;
+  assetsMetersColType: string;
+  assetsMetersColUnit: string;
+  assetsMetersColOdometer: string;
+  assetsMetersColLastValue: string;
+  assetsMetersColLastReading: string;
+  assetsMetersCreate: string;
+  assetsMetersCreateTitle: string;
+  assetsMetersName: string;
+  assetsMetersNameAr: string;
+  assetsMetersType: string;
+  assetsMetersUnit: string;
+  assetsMetersOdometer: string;
+  assetsMetersCreatedToast: string;
+  assetsMetersOpen: string;
+  assetsMetersReadingsTitle: string;
+  assetsMetersReadingsEmpty: string;
+  assetsMetersColValue: string;
+  assetsMetersColEffectiveDate: string;
+  assetsMetersColSource: string;
+  assetsMetersColWorkOrder: string;
+  assetsMetersRecord: string;
+  assetsMetersRecordTitle: string;
+  assetsMetersValue: string;
+  assetsMetersEffectiveDate: string;
+  assetsMetersSource: string;
+  assetsMetersJobOrder: string;
+  assetsMetersReadingNote: string;
+  assetsMetersRecordedToast: string;
+  assetsMetersEvaluations: string;
+  assetsMetersDesignate: string;
+  assetsMetersUndesignate: string;
+  assetsMetersDesignatedToast: string;
+  assetsMetersTypeHours: string;
+  assetsMetersTypeKm: string;
+  assetsMetersTypeProduction: string;
+  assetsMetersTypeCustom: string;
+  assetsMetersSourceManual: string;
+  assetsMetersSourceJob: string;
+  assetsMetersSourceImport: string;
+  assetsFleetTitle: string;
+  assetsFleetSubtitle: string;
+  assetsFleetEmpty: string;
+  assetsFleetColCode: string;
+  assetsFleetColCategory: string;
+  assetsFleetColBranch: string;
+  assetsFleetColWarranty: string;
+  assetsFleetColInsurance: string;
+  assetsFleetColLicense: string;
+  assetsFleetColInspection: string;
+  assetsFleetColOdometer: string;
+  assetsFleetDays: string;
+  assetsFleetNone: string;
+  assetsTransfersTitle: string;
+  assetsTransfersSubtitle: string;
+  assetsTransfersEmpty: string;
+  assetsTransfersColAsset: string;
+  assetsTransfersColFrom: string;
+  assetsTransfersColTo: string;
+  assetsTransfersColStatus: string;
+  assetsTransfersColSubmitted: string;
+  assetsTransfersColApproved: string;
+  assetsTransfersColRejected: string;
+  assetsTransfersColJournal: string;
+  assetsTransfersCreate: string;
+  assetsTransfersCreateTitle: string;
+  assetsTransfersReason: string;
+  assetsTransfersReasonAr: string;
+  assetsTransfersToBranch: string;
+  assetsTransfersCreatedToast: string;
+  assetsTransfersOpen: string;
+  assetsTransfersSubmit: string;
+  assetsTransfersSubmittedToast: string;
+  assetsTransfersApprove: string;
+  assetsTransfersApproveTitle: string;
+  assetsTransfersApprovedToast: string;
+  assetsTransfersReject: string;
+  assetsTransfersRejectTitle: string;
+  assetsTransfersRejectReason: string;
+  assetsTransfersRejectedToast: string;
+  assetsTransfersNbv: string;
+  assetsTransfersZeroNbv: string;
+  assetsTransfersStatusDraft: string;
+  assetsTransfersStatusSubmitted: string;
+  assetsTransfersStatusApproved: string;
+  assetsTransfersStatusRejected: string;
+  assetsScanTitle: string;
+  assetsScanSubtitle: string;
+  assetsScanInputLabel: string;
+  assetsScanResolve: string;
+  assetsScanCardTitle: string;
+  assetsScanOpenCard: string;
+  assetsScanOpenWorkOrders: string;
+  assetsScanActivePlans: string;
+  assetsScanOdometer: string;
+  assetsTagsTitle: string;
+  assetsTagsSubtitle: string;
+  assetsTagsEmpty: string;
+  assetsTagsColCode: string;
+  assetsTagsColPrintedAt: string;
+  assetsTagsColStatus: string;
+  assetsTagsCreate: string;
+  assetsTagsCreateTitle: string;
+  assetsTagsQuantity: string;
+  assetsTagsCreatedToast: string;
+  assetsTagsPrintedBadge: string;
+  assetsTagsPendingBadge: string;
+  assetsTagsPrintSheet: string;
+  assetsTagsPrintSheetTitle: string;
+  assetsTagsPrintNow: string;
+  assetsTagsPrintedToast: string;
+  assetsTagsDelete: string;
+  assetsTagsDeleteTitle: string;
+  assetsTagsDeletedToast: string;
+  faExpiryChipsTitle: string;
+  faWarrantyExpiry: string;
+  faInsuranceExpiry: string;
+  faLicenseExpiry: string;
+  faInspectionExpiry: string;
+  faComponentsTitle: string;
+  faComponentsEmpty: string;
+  faParentAsset: string;
+  faCostCenter: string;
+  faServiceHistoryTitle: string;
+  faServiceHistoryEmpty: string;
+  faServiceHistoryWorkOrder: string;
+  faServiceHistoryReading: string;
+  faServiceHistoryTransfer: string;
+  faAssetEdit: string;
+  faAssetEditTitle: string;
+  faWarrantyExpiryLabel: string;
+  faInsuranceExpiryLabel: string;
+  faLicenseExpiryLabel: string;
+  faInspectionExpiryLabel: string;
+  faParentAssetLabel: string;
+  faCostCenterLabel: string;
+  faAssetSavedToast: string;
+  assetsErrMeterRegression: string;
+  assetsErrOdometerNotKm: string;
+  assetsErrOdometerAlready: string;
+  assetsErrReadingJobLink: string;
+  assetsErrTransferState: string;
+  assetsErrTransferStale: string;
+  assetsErrTransferRace: string;
+  assetsErrTransferSelf: string;
+  assetsErrTransferReason: string;
+  assetsErrPurposeMapped: string;
+  assetsErrTagInvalid: string;
+  assetsErrTagNotFound: string;
+  assetsErrTagAlreadyPrinted: string;
+  assetsErrMeterNotFound: string;
+  assetsErrTagNotFoundShort: string;
 }
 
 const ar: Dictionary = {
@@ -14482,6 +14643,166 @@ const ar: Dictionary = {
   assetsErrAssetNotOperable: "الأصل مستبعد أو مشطوب — لا أمر صيانة ولا خطة لأصلٍ مجمّد.",
   assetsErrPlanTriggerShape: "شكل المُطلِق غير مكتمل — خطة التقويم تحمل الفترة، وخطة العدّاد تحمل العدّاد والعتبة.",
   assetsErrPlanWindowOpen: "توجد نافذة توليد مفتوحة لهذا الأصل — أمر واحد مفتوح لكل نافذة (BR-097).",
+
+  // PHASE-049 (W-21 — T-14+T-15): العدادات والنقل والمسح والبطاقات وبطاقة الأصل الموسّعة.
+  assetsMetersTitle: "عدادات الأصول",
+  assetsMetersSubtitle: "عدادات الأصل (ساعات/كم/إنتاج/مخصص) مع سجل القراءات — القراءة تقوّم الخطط فورًا، والقراءات رتيبة القيمة.",
+  assetsMetersEmpty: "لا عدادات بعد.",
+  assetsMetersPaneMeters: "العدادات",
+  assetsMetersPaneFleet: "سجل الأسطول",
+  assetsMetersColAsset: "الأصل",
+  assetsMetersColName: "العداد",
+  assetsMetersColType: "النوع",
+  assetsMetersColUnit: "الوحدة",
+  assetsMetersColOdometer: "عداد المسافة",
+  assetsMetersColLastValue: "آخر قراءة",
+  assetsMetersColLastReading: "تاريخها",
+  assetsMetersCreate: "عداد جديد",
+  assetsMetersCreateTitle: "إنشاء عدّاد",
+  assetsMetersName: "اسم العداد",
+  assetsMetersNameAr: "اسم العداد (عربي)",
+  assetsMetersType: "النوع",
+  assetsMetersUnit: "الوحدة",
+  assetsMetersOdometer: "عداد المسافة (كم فقط)",
+  assetsMetersCreatedToast: "أُنشئ العداد.",
+  assetsMetersOpen: "فتح",
+  assetsMetersReadingsTitle: "سجل القراءات",
+  assetsMetersReadingsEmpty: "لا قراءات بعد.",
+  assetsMetersColValue: "القيمة",
+  assetsMetersColEffectiveDate: "تاريخ السريان",
+  assetsMetersColSource: "المصدر",
+  assetsMetersColWorkOrder: "أمر العمل",
+  assetsMetersRecord: "قراءة جديدة",
+  assetsMetersRecordTitle: "تسجيل قراءة",
+  assetsMetersValue: "القيمة",
+  assetsMetersEffectiveDate: "تاريخ السريان",
+  assetsMetersSource: "المصدر",
+  assetsMetersJobOrder: "أمر العمل (لقراءات الأوامر)",
+  assetsMetersReadingNote: "ملاحظة",
+  assetsMetersRecordedToast: "سُجّلت القراءة.",
+  assetsMetersEvaluations: "تقييم الخطط عند القراءة",
+  assetsMetersDesignate: "تعيين كعداد مسافة",
+  assetsMetersUndesignate: "إلغاء تعيين عداد المسافة",
+  assetsMetersDesignatedToast: "حُدّث تعيين عداد المسافة.",
+  assetsMetersTypeHours: "ساعات",
+  assetsMetersTypeKm: "كيلومتر",
+  assetsMetersTypeProduction: "إنتاج",
+  assetsMetersTypeCustom: "مخصص",
+  assetsMetersSourceManual: "يدوي",
+  assetsMetersSourceJob: "أمر عمل",
+  assetsMetersSourceImport: "استيراد",
+  assetsFleetTitle: "سجل الأسطول",
+  assetsFleetSubtitle: "الأصول النشطة مع حالة الوثائق (ضمان/تأمين/ترخيص/فحص) وعداد المسافة — الأيام محسوبة في قاعدة البيانات نفسها.",
+  assetsFleetEmpty: "لا أصول نشطة.",
+  assetsFleetColCode: "الرمز",
+  assetsFleetColCategory: "الفئة",
+  assetsFleetColBranch: "الفرع",
+  assetsFleetColWarranty: "الضمان",
+  assetsFleetColInsurance: "التأمين",
+  assetsFleetColLicense: "الترخيص",
+  assetsFleetColInspection: "الفحص",
+  assetsFleetColOdometer: "عداد المسافة",
+  assetsFleetDays: "يوم",
+  assetsFleetNone: "—",
+  assetsTransfersTitle: "نقل الأصول",
+  assetsTransfersSubtitle: "نقل الأصل بين الفروع بموافقة — الموافقة تُرحّل إعادة تصنيف القيمة الدفترية بين مراكز تكلفة الفروع مرة واحدة (G-61).",
+  assetsTransfersEmpty: "لا عمليات نقل بعد.",
+  assetsTransfersColAsset: "الأصل",
+  assetsTransfersColFrom: "من فرع",
+  assetsTransfersColTo: "إلى فرع",
+  assetsTransfersColStatus: "الحالة",
+  assetsTransfersColSubmitted: "أُرسل",
+  assetsTransfersColApproved: "أُقر",
+  assetsTransfersColRejected: "رُفض",
+  assetsTransfersColJournal: "القيد",
+  assetsTransfersCreate: "طلب نقل جديد",
+  assetsTransfersCreateTitle: "إنشاء طلب نقل",
+  assetsTransfersReason: "سبب النقل",
+  assetsTransfersReasonAr: "سبب النقل (عربي)",
+  assetsTransfersToBranch: "الفرع المقصود",
+  assetsTransfersCreatedToast: "أُنشئ طلب النقل.",
+  assetsTransfersOpen: "فتح",
+  assetsTransfersSubmit: "إرسال للموافقة",
+  assetsTransfersSubmittedToast: "أُرسل طلب النقل للموافقة.",
+  assetsTransfersApprove: "إقرار",
+  assetsTransfersApproveTitle: "إقرار النقل",
+  assetsTransfersApprovedToast: "أُقر النقل ورُحّل قيد إعادة التصنيف.",
+  assetsTransfersReject: "رفض",
+  assetsTransfersRejectTitle: "رفض النقل",
+  assetsTransfersRejectReason: "سبب الرفض",
+  assetsTransfersRejectedToast: "رُفض طلب النقل.",
+  assetsTransfersNbv: "القيمة الدفترية الصافية المنقولة",
+  assetsTransfersZeroNbv: "قيمة دفترية صفر — لا قيد (يتحول الفرع فقط).",
+  assetsTransfersStatusDraft: "مسودة",
+  assetsTransfersStatusSubmitted: "مُرسل",
+  assetsTransfersStatusApproved: "مُقر",
+  assetsTransfersStatusRejected: "مرفوض",
+  assetsScanTitle: "مسح بطاقة الأصل",
+  assetsScanSubtitle: "امسح رمز QR أو أدخل الرمز الموقّع — يُحل إلى بطاقة الأصل عبر بوابة التوقيع ثم عزل المستأجر.",
+  assetsScanInputLabel: "رمز البطاقة",
+  assetsScanResolve: "تحليل",
+  assetsScanCardTitle: "بطاقة الأصل",
+  assetsScanOpenCard: "فتح البطاقة الكاملة",
+  assetsScanOpenWorkOrders: "أوامر صيانة مفتوحة",
+  assetsScanActivePlans: "خطط وقائية نشطة",
+  assetsScanOdometer: "عداد المسافة",
+  assetsTagsTitle: "بطاقات الأصول",
+  assetsTagsSubtitle: "بطاقات QR موقّعة لكل أصل — الرمز غير قابل للتخمين، والطباعة ختم أحادي الاستخدام.",
+  assetsTagsEmpty: "لا بطاقات بعد.",
+  assetsTagsColCode: "الرمز",
+  assetsTagsColPrintedAt: "طُبعت في",
+  assetsTagsColStatus: "الحالة",
+  assetsTagsCreate: "إصدار بطاقات",
+  assetsTagsCreateTitle: "إصدار بطاقات للأصل",
+  assetsTagsQuantity: "العدد (١-٥٠)",
+  assetsTagsCreatedToast: "أُصدرت البطاقات.",
+  assetsTagsPrintedBadge: "مطبوعة",
+  assetsTagsPendingBadge: "بانتظار الطباعة",
+  assetsTagsPrintSheet: "ورقة الطباعة",
+  assetsTagsPrintSheetTitle: "ورقة طباعة البطاقات",
+  assetsTagsPrintNow: "اطبع الآن",
+  assetsTagsPrintedToast: "خُتمت الطباعة.",
+  assetsTagsDelete: "حذف",
+  assetsTagsDeleteTitle: "حذف البطاقة",
+  assetsTagsDeletedToast: "حُذفت البطاقة — توقف الرمز عن الحل فورًا.",
+  faExpiryChipsTitle: "الوثائق والانتهاء",
+  faWarrantyExpiry: "انتهاء الضمان",
+  faInsuranceExpiry: "انتهاء التأمين",
+  faLicenseExpiry: "انتهاء الترخيص",
+  faInspectionExpiry: "انتهاء الفحص",
+  faComponentsTitle: "المكونات",
+  faComponentsEmpty: "لا مكونات مرتبطة.",
+  faParentAsset: "الأصل الأم",
+  faCostCenter: "مركز التكلفة",
+  faServiceHistoryTitle: "التاريخ الخدمي",
+  faServiceHistoryEmpty: "لا أحداث خدمية بعد.",
+  faServiceHistoryWorkOrder: "أمر صيانة",
+  faServiceHistoryReading: "قراءة عداد",
+  faServiceHistoryTransfer: "نقل",
+  faAssetEdit: "تعديل بيانات الأصل",
+  faAssetEditTitle: "تعديل الوثائق والتبعية",
+  faWarrantyExpiryLabel: "انتهاء الضمان",
+  faInsuranceExpiryLabel: "انتهاء التأمين",
+  faLicenseExpiryLabel: "انتهاء الترخيص",
+  faInspectionExpiryLabel: "انتهاء الفحص",
+  faParentAssetLabel: "الأصل الأم",
+  faCostCenterLabel: "مركز التكلفة",
+  faAssetSavedToast: "حُفظت بيانات الأصل.",
+  assetsErrMeterRegression: "القراءة أقل من آخر لقطة — القيم رتيبة (الرفض يحمل القيمتين).",
+  assetsErrOdometerNotKm: "عداد المسافة من نوع الكيلومتر فقط.",
+  assetsErrOdometerAlready: "للأصل عداد مسافة معيّن بالفعل — ألغِ التعيين أولًا.",
+  assetsErrReadingJobLink: "قراءة أمر العمل تحمل رقم الأمر — والمرتبط يجب أن يكون مكتملًا.",
+  assetsErrTransferState: "حالة النقل لا تسمح بهذه الخطوة.",
+  assetsErrTransferStale: "الأصل لم يعد في الفرع المصدر — تحقق ثم أعد.",
+  assetsErrTransferRace: "حُسم النقل في معاملة متزامنة — أعد التحميل.",
+  assetsErrTransferSelf: "لا يجوز للمُنشئ إقرار طلبه أو رفضه (الفصل).",
+  assetsErrTransferReason: "سبب الرفض مطلوب.",
+  assetsErrPurposeMapped: "الفرع بلا حساب أصل معيّن — عيّن الربط قبل النقل.",
+  assetsErrTagInvalid: "الرمز غير موقّع صالحًا — الرفض عند التوقيع لا عند البحث.",
+  assetsErrTagNotFound: "لا بطاقة بهذا الرمز في هذا المستأجر.",
+  assetsErrTagAlreadyPrinted: "البطاقة مطبوعة — الختم أحادي الاستخدام؛ أصدر بطاقة جديدة.",
+  assetsErrMeterNotFound: "العداد غير موجود.",
+  assetsErrTagNotFoundShort: "رمز غير معروف",
 };
 
 const en: Dictionary = {
@@ -21730,6 +22051,167 @@ const en: Dictionary = {
   assetsErrAssetNotOperable: "The asset is disposed or written off — no work order or plan on a frozen substrate.",
   assetsErrPlanTriggerShape: "The trigger shape is incomplete — a CALENDAR plan carries its interval; a METER plan carries its meter and threshold.",
   assetsErrPlanWindowOpen: "A generation window is open for this asset — at most one open order per window (BR-097).",
+
+  // PHASE-049 (W-21 — T-14+T-15): meters / transfers / scan / tags + the
+  // extended asset card.
+  assetsMetersTitle: "Asset meters",
+  assetsMetersSubtitle: "The asset meters (hours/km/production/custom) with their readings log — a reading evaluates the plans immediately; values are monotonic.",
+  assetsMetersEmpty: "No meters yet.",
+  assetsMetersPaneMeters: "Meters",
+  assetsMetersPaneFleet: "Fleet register",
+  assetsMetersColAsset: "Asset",
+  assetsMetersColName: "Meter",
+  assetsMetersColType: "Type",
+  assetsMetersColUnit: "Unit",
+  assetsMetersColOdometer: "Odometer",
+  assetsMetersColLastValue: "Last value",
+  assetsMetersColLastReading: "Read at",
+  assetsMetersCreate: "New meter",
+  assetsMetersCreateTitle: "Create meter",
+  assetsMetersName: "Meter name",
+  assetsMetersNameAr: "Meter name (Arabic)",
+  assetsMetersType: "Type",
+  assetsMetersUnit: "Unit",
+  assetsMetersOdometer: "Odometer (KM only)",
+  assetsMetersCreatedToast: "Meter created.",
+  assetsMetersOpen: "Open",
+  assetsMetersReadingsTitle: "Readings log",
+  assetsMetersReadingsEmpty: "No readings yet.",
+  assetsMetersColValue: "Value",
+  assetsMetersColEffectiveDate: "Effective date",
+  assetsMetersColSource: "Source",
+  assetsMetersColWorkOrder: "Work order",
+  assetsMetersRecord: "Record reading",
+  assetsMetersRecordTitle: "Record a reading",
+  assetsMetersValue: "Value",
+  assetsMetersEffectiveDate: "Effective date",
+  assetsMetersSource: "Source",
+  assetsMetersJobOrder: "Work order (for JOB readings)",
+  assetsMetersReadingNote: "Note",
+  assetsMetersRecordedToast: "Reading recorded.",
+  assetsMetersEvaluations: "Plan evaluations at the reading",
+  assetsMetersDesignate: "Designate as odometer",
+  assetsMetersUndesignate: "Undesignate odometer",
+  assetsMetersDesignatedToast: "Odometer designation updated.",
+  assetsMetersTypeHours: "Hours",
+  assetsMetersTypeKm: "Kilometers",
+  assetsMetersTypeProduction: "Production",
+  assetsMetersTypeCustom: "Custom",
+  assetsMetersSourceManual: "Manual",
+  assetsMetersSourceJob: "Work order",
+  assetsMetersSourceImport: "Import",
+  assetsFleetTitle: "Fleet register",
+  assetsFleetSubtitle: "ACTIVE assets with their document status (warranty/insurance/license/inspection) and the odometer — the days derive in the database itself.",
+  assetsFleetEmpty: "No active assets.",
+  assetsFleetColCode: "Code",
+  assetsFleetColCategory: "Category",
+  assetsFleetColBranch: "Branch",
+  assetsFleetColWarranty: "Warranty",
+  assetsFleetColInsurance: "Insurance",
+  assetsFleetColLicense: "License",
+  assetsFleetColInspection: "Inspection",
+  assetsFleetColOdometer: "Odometer",
+  assetsFleetDays: "days",
+  assetsFleetNone: "—",
+  assetsTransfersTitle: "Asset transfers",
+  assetsTransfersSubtitle: "Branch-to-branch transfers with approval — the approval posts the NBV reclassification between the branch cost centers exactly once (G-61).",
+  assetsTransfersEmpty: "No transfers yet.",
+  assetsTransfersColAsset: "Asset",
+  assetsTransfersColFrom: "From branch",
+  assetsTransfersColTo: "To branch",
+  assetsTransfersColStatus: "Status",
+  assetsTransfersColSubmitted: "Submitted",
+  assetsTransfersColApproved: "Approved",
+  assetsTransfersColRejected: "Rejected",
+  assetsTransfersColJournal: "Journal",
+  assetsTransfersCreate: "New transfer request",
+  assetsTransfersCreateTitle: "Create transfer request",
+  assetsTransfersReason: "Transfer reason",
+  assetsTransfersReasonAr: "Transfer reason (Arabic)",
+  assetsTransfersToBranch: "Destination branch",
+  assetsTransfersCreatedToast: "Transfer request created.",
+  assetsTransfersOpen: "Open",
+  assetsTransfersSubmit: "Submit for approval",
+  assetsTransfersSubmittedToast: "Transfer submitted for approval.",
+  assetsTransfersApprove: "Approve",
+  assetsTransfersApproveTitle: "Approve transfer",
+  assetsTransfersApprovedToast: "Transfer approved — the reclassification posted.",
+  assetsTransfersReject: "Reject",
+  assetsTransfersRejectTitle: "Reject transfer",
+  assetsTransfersRejectReason: "Rejection reason",
+  assetsTransfersRejectedToast: "Transfer rejected.",
+  assetsTransfersNbv: "Net book value moved",
+  assetsTransfersZeroNbv: "Zero NBV — no entry (the branch flips only).",
+  assetsTransfersStatusDraft: "Draft",
+  assetsTransfersStatusSubmitted: "Submitted",
+  assetsTransfersStatusApproved: "Approved",
+  assetsTransfersStatusRejected: "Rejected",
+  assetsScanTitle: "Scan asset tag",
+  assetsScanSubtitle: "Scan the QR or type the signed code — it resolves to the asset card through the signature gate, then tenant isolation.",
+  assetsScanInputLabel: "Tag code",
+  assetsScanResolve: "Resolve",
+  assetsScanCardTitle: "Asset card",
+  assetsScanOpenCard: "Open the full card",
+  assetsScanOpenWorkOrders: "Open work orders",
+  assetsScanActivePlans: "Active preventive plans",
+  assetsScanOdometer: "Odometer",
+  assetsTagsTitle: "Asset tags",
+  assetsTagsSubtitle: "Signed QR tags per asset — unguessable codes; printing is a single-use stamp.",
+  assetsTagsEmpty: "No tags yet.",
+  assetsTagsColCode: "Code",
+  assetsTagsColPrintedAt: "Printed at",
+  assetsTagsColStatus: "Status",
+  assetsTagsCreate: "Issue tags",
+  assetsTagsCreateTitle: "Issue tags for an asset",
+  assetsTagsQuantity: "Quantity (1-50)",
+  assetsTagsCreatedToast: "Tags issued.",
+  assetsTagsPrintedBadge: "printed",
+  assetsTagsPendingBadge: "pending",
+  assetsTagsPrintSheet: "Print sheet",
+  assetsTagsPrintSheetTitle: "Tag print sheet",
+  assetsTagsPrintNow: "Print now",
+  assetsTagsPrintedToast: "Print stamped.",
+  assetsTagsDelete: "Delete",
+  assetsTagsDeleteTitle: "Delete tag",
+  assetsTagsDeletedToast: "Tag deleted — the code stops resolving immediately.",
+  faExpiryChipsTitle: "Documents & expiry",
+  faWarrantyExpiry: "Warranty expiry",
+  faInsuranceExpiry: "Insurance expiry",
+  faLicenseExpiry: "License expiry",
+  faInspectionExpiry: "Inspection expiry",
+  faComponentsTitle: "Components",
+  faComponentsEmpty: "No linked components.",
+  faParentAsset: "Parent asset",
+  faCostCenter: "Cost center",
+  faServiceHistoryTitle: "Service history",
+  faServiceHistoryEmpty: "No service events yet.",
+  faServiceHistoryWorkOrder: "Work order",
+  faServiceHistoryReading: "Meter reading",
+  faServiceHistoryTransfer: "Transfer",
+  faAssetEdit: "Edit asset data",
+  faAssetEditTitle: "Edit documents & linkage",
+  faWarrantyExpiryLabel: "Warranty expiry",
+  faInsuranceExpiryLabel: "Insurance expiry",
+  faLicenseExpiryLabel: "License expiry",
+  faInspectionExpiryLabel: "Inspection expiry",
+  faParentAssetLabel: "Parent asset",
+  faCostCenterLabel: "Cost center",
+  faAssetSavedToast: "Asset data saved.",
+  assetsErrMeterRegression: "The reading is below the last snapshot — values are monotonic (the refusal carries both).",
+  assetsErrOdometerNotKm: "The odometer is a KM-type meter only.",
+  assetsErrOdometerAlready: "The asset already carries an odometer — undesignate it first.",
+  assetsErrReadingJobLink: "A JOB reading names its work order — and it must be COMPLETED.",
+  assetsErrTransferState: "The transfer's state refuses this move.",
+  assetsErrTransferStale: "The asset no longer sits in the source branch — verify and retry.",
+  assetsErrTransferRace: "The transfer resolved in a concurrent transaction — reload.",
+  assetsErrTransferSelf: "The creator neither approves nor rejects their own request (SoD).",
+  assetsErrTransferReason: "A rejection reason is required.",
+  assetsErrPurposeMapped: "The branch lacks a mapped asset account — map it before transferring.",
+  assetsErrTagInvalid: "The code is not validly signed — refused at the signature, never at a lookup.",
+  assetsErrTagNotFound: "No tag with this code in this tenant.",
+  assetsErrTagAlreadyPrinted: "The tag is already printed — the stamp is single-use; issue a new tag.",
+  assetsErrMeterNotFound: "The meter does not exist.",
+  assetsErrTagNotFoundShort: "Unknown code",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

@@ -3164,3 +3164,83 @@ export function localizedCmmsError(
       return localizedApiError(d, error, retryAfterSeconds);
   }
 }
+
+// -- PHASE-049 (W-21 — T-14): the meters/transfers vocabularies ----------
+
+/** Meter types (HOURS/KM/PRODUCTION/CUSTOM — FA-F-05). */
+export function localizedMeterType(d: Dictionary, type: string): string {
+  const map: Record<string, string> = {
+    HOURS: d.assetsMetersTypeHours,
+    KM: d.assetsMetersTypeKm,
+    PRODUCTION: d.assetsMetersTypeProduction,
+    CUSTOM: d.assetsMetersTypeCustom,
+  };
+  return map[type] ?? type;
+}
+
+/** Reading sources (MANUAL/JOB/IMPORT — the JOB link law). */
+export function localizedReadingSource(d: Dictionary, source: string): string {
+  const map: Record<string, string> = {
+    MANUAL: d.assetsMetersSourceManual,
+    JOB: d.assetsMetersSourceJob,
+    IMPORT: d.assetsMetersSourceImport,
+  };
+  return map[source] ?? source;
+}
+
+/** Transfer statuses (DRAFT → SUBMITTED → APPROVED/REJECTED — the ladder). */
+export function localizedTransferStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    DRAFT: d.assetsTransfersStatusDraft,
+    SUBMITTED: d.assetsTransfersStatusSubmitted,
+    APPROVED: d.assetsTransfersStatusApproved,
+    REJECTED: d.assetsTransfersStatusRejected,
+  };
+  return map[status] ?? status;
+}
+
+/** The W-21 typed-refusal codes (the cmms-errors classes the new surfaces
+ * meet; the one-line localized summary — the engine's own message rides the
+ * TypedRefusalPanel's details). */
+export function localizedCmmsTransferError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "METER_REGRESSION":
+      return d.assetsErrMeterRegression;
+    case "ODOMETER_NOT_KM":
+      return d.assetsErrOdometerNotKm;
+    case "ODOMETER_ALREADY_DESIGNATED":
+      return d.assetsErrOdometerAlready;
+    case "READING_JOB_LINK":
+    case "READING_WORK_ORDER_NOT_FOUND":
+      return d.assetsErrReadingJobLink;
+    case "ASSET_METER_NOT_FOUND":
+      return d.assetsErrMeterNotFound;
+    case "TRANSFER_STATE_ERROR":
+      return d.assetsErrTransferState;
+    case "TRANSFER_STALE":
+      return d.assetsErrTransferStale;
+    case "TRANSFER_RACE":
+      return d.assetsErrTransferRace;
+    case "TRANSFER_SELF_APPROVAL_BLOCKED":
+      return d.assetsErrTransferSelf;
+    case "TRANSFER_REJECT_REASON_REQUIRED":
+      return d.assetsErrTransferReason;
+    case "PURPOSE_NOT_MAPPED":
+      return d.assetsErrPurposeMapped;
+    case "TAG_CODE_INVALID":
+      return d.assetsErrTagInvalid;
+    case "TAG_NOT_FOUND":
+      return d.assetsErrTagNotFound;
+    case "TAG_ALREADY_PRINTED":
+      return d.assetsErrTagAlreadyPrinted;
+    case "INVALID_AMOUNT":
+      // The fixed-assets input law (the 0108 family's write path rides it).
+      return d.assetsErrCmmsInput;
+    default:
+      return localizedCmmsError(d, error, retryAfterSeconds);
+  }
+}

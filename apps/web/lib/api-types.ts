@@ -4826,6 +4826,14 @@ export interface FixedAssetRow {
   status: string;
   sourceType: string | null;
   sourceId: string | null;
+  /** The 0108 column family (PHASE-049): the four expiry chips + the
+   * cost-center grouping + the parent-asset link. */
+  warrantyExpiry: string | null;
+  insuranceExpiry: string | null;
+  licenseExpiry: string | null;
+  inspectionExpiry: string | null;
+  costCenterId: string | null;
+  parentAssetId: string | null;
   note: string | null;
   noteAr: string | null;
   disposedAt: string | null;
@@ -4855,10 +4863,34 @@ export interface FixedAssetHistoryLine {
  * read model (accumulated-to-date + NBV — INV-023 mirror) and the
  * depreciation history over the append-only lines (reversed runs marked).
  */
+/**
+ * GET /fixed-assets/assets/:id → the NESTED detail payload (the API's own
+ * envelope shape since 044). [Dated 2026-11-22 (PHASE-049 W-21 — the honest
+ * repair of the 044 wire drift, the G-48 class: the previous FLAT type
+ * declared fields the nested payload never carried — the asset card read
+ * undefined fields through the unchecked cast since 044; this type now
+ * mirrors the API EXACTLY, and the W-21 card extension consumes it.]
+ */
+export interface FixedAssetDetailPayload {
+  asset: FixedAssetRow;
+  category: FixedAssetCategoryRow | null;
+  accumulated: string;
+  netBookValue: string;
+  depreciationHistory: readonly FixedAssetHistoryLine[];
+  /** The component tree's one level (PHASE-049 W-21 — F-12). */
+  components: readonly FixedAssetRow[];
+}
+
+/**
+ * The asset card's own row (the mapped shape the card component renders):
+ * the nested payload flattened ONCE at the page boundary — one mapping, one
+ * place, the engine's own figures verbatim.
+ */
 export interface FixedAssetDetailRow extends FixedAssetRow {
   accumulatedToDate: string;
   nbv: string;
   history: readonly FixedAssetHistoryLine[];
+  components: readonly FixedAssetRow[];
 }
 
 /** GET /fixed-assets/depreciation-runs → rows (runs list). */
@@ -5142,6 +5174,149 @@ export interface AssetMeterRow {
   createdAt: string;
   updatedAt: string;
 }
+/** GET /assets/meters/:id/readings → rows (the readings log — the W-18
+ * engine's own row, ordered effective_date DESC, created_at DESC). */
+export interface AssetMeterReadingRow {
+  id: string;
+  meterId: string;
+  value: string;
+  effectiveDate: string;
+  source: string;
+  workOrderId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+/** POST /assets/meters/:id/readings → the reading's own report (the event
+ * surface): the reading + the advanced snapshot + the plan evaluations'
+ * NAMED skips (BR-097's vocabulary, never truncated). */
+export interface RecordReadingResult {
+  reading: AssetMeterReadingRow;
+  meter: AssetMeterRow;
+  evaluations: readonly MaintenancePlanEvaluationRow[];
+}
+
+/** GET /assets/transfers → rows (the approval ladder's own stamps). */
+export interface AssetTransferRow {
+  id: string;
+  assetId: string;
+  fromBranchId: string;
+  toBranchId: string;
+  reason: string;
+  reasonAr: string | null;
+  status: string;
+  submittedAt: string | null;
+  submittedBy: string | null;
+  approvedAt: string | null;
+  approvedBy: string | null;
+  rejectedAt: string | null;
+  rejectedBy: string | null;
+  rejectReason: string | null;
+  journalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** POST /assets/transfers/:id/approve → the G-61 verdict's own report: the
+ * transfer + the journal link + the pure fold's NBV + both branch accounts. */
+export interface TransferApprovalResult {
+  transfer: AssetTransferRow;
+  journalEntryId: string | null;
+  nbv: string;
+  fromAccountId: string | null;
+  toAccountId: string | null;
+}
+
+/** GET /assets/tags → rows (the register; the code is the signed token). */
+export interface AssetTagRow {
+  id: string;
+  assetId: string;
+  code: string;
+  printedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+}
+
+/** GET /assets/tags/print-sheet?assetId= → the batch payload (the pending
+ * tags ONLY — zero parallel accounting; each carries its PRE-RENDERED QR
+ * data URI, deterministic for the same code string). */
+export interface TagPrintSheetPayload {
+  asset: { id: string; code: string; name: string; nameAr: string };
+  tags: readonly (AssetTagRow & { qrImageUri: string })[];
+}
+
+/** GET /assets/scan/:code → the resolution payload: the register brief +
+ * the four expiry chips + the maintenance context + the odometer binding. */
+export interface AssetScanPayload {
+  tag: AssetTagRow;
+  asset: {
+    id: string;
+    code: string;
+    name: string;
+    nameAr: string;
+    categoryId: string;
+    categoryCode: string;
+    categoryName: string;
+    branchId: string;
+    branchCode: string;
+    branchName: string;
+    status: string;
+    custodianUserId: string | null;
+    warrantyExpiry: string | null;
+    insuranceExpiry: string | null;
+    licenseExpiry: string | null;
+    inspectionExpiry: string | null;
+    parentAssetId: string | null;
+    costCenterId: string | null;
+  };
+  openWorkOrders: number;
+  activePlans: number;
+  odometer: {
+    meterId: string;
+    name: string;
+    nameAr: string | null;
+    unit: string;
+    lastValue: string;
+  } | null;
+}
+
+/** GET /assets/fleet-light → rows (the R-10 register view: every ACTIVE
+ * asset with the four expiry chips + SQL-derived days + the odometer). */
+export interface FleetLightRow {
+  assetId: string;
+  code: string;
+  name: string;
+  nameAr: string;
+  status: string;
+  categoryId: string;
+  categoryCode: string;
+  categoryName: string;
+  branchCode: string;
+  branchName: string;
+  warrantyExpiry: string | null;
+  warrantyDays: number | null;
+  insuranceExpiry: string | null;
+  insuranceDays: number | null;
+  licenseExpiry: string | null;
+  licenseDays: number | null;
+  inspectionExpiry: string | null;
+  inspectionDays: number | null;
+  odometerMeterId: string | null;
+  odometerName: string | null;
+  odometerUnit: string | null;
+  odometerValue: string | null;
+}
+
 
 // ---------------------------------------------------------------------------
 // PHASE-027 wire types (GET/POST /notes + /installment-plans). Field names
