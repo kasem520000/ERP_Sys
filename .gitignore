@@ -1,5 +1,11 @@
 # dependencies
-node_modules/
+# [Dated 2026-11-22 (PHASE-049 W-20 step 5a): the trailing slash matched
+# directories only — a node_modules SYMLINK (the environmental workaround
+# for running the battery from a clone whose install lives elsewhere)
+# slipped through and was committed at 3f0d166; hardened to the bare
+# pattern so both shapes stay ignored. The removal commit is additive
+# (never a history rewrite).]
+node_modules
 
 # build outputs
 dist/
