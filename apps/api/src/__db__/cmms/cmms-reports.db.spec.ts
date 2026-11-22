@@ -24,6 +24,7 @@ import {
   TENANT_CMMS_RLS,
   ensureCmmsG59World,
   freshAsset,
+  freshPartsWorld,
   type CmmsG59World,
 } from "./fixtures";
 
@@ -59,6 +60,9 @@ const meters = new AssetMetersService(audit, plans);
 const sweep = new AssetExpirySweepService(audit, new InboxService());
 
 let world: CmmsG59World;
+/** The spec's OWN parts world (the per-arm-world law — never the W-17
+ * spec's shared stock). */
+let parts: { itemId: string; warehouseId: string };
 let dbToday = "";
 let costAssetId = "";
 let costOrderId = "";
@@ -104,6 +108,7 @@ async function startOrder(assetId: string, problem: string): Promise<string> {
 
 beforeAll(async () => {
   world = await ensureCmmsG59World();
+  parts = await freshPartsWorld("RP");
   const tx0 = await withTenant(TENANT_CMMS, async () =>
     requireTenantContext().tx!.execute<{ today: string }>(sql`SELECT CURRENT_DATE::text AS today`),
   );
@@ -130,8 +135,8 @@ beforeAll(async () => {
     await orders.addLine({
       workOrderId: costOrderId,
       legType: "PARTS",
-      itemId: world.itemId,
-      warehouseId: world.warehouseId,
+      itemId: parts.itemId,
+      warehouseId: parts.warehouseId,
       qty: "20",
       actorId: CM_ACTOR,
     });

@@ -219,6 +219,46 @@ export async function ensureCmmsG59World(): Promise<CmmsG59World> {
   return g59World;
 }
 
+/**
+ * A FRESH PARTS WORLD per spec (the W-22 extension of the per-arm-world
+ * law: the shared G-59 world's stock position is the W-17 spec's own —
+ * the W-22 specs' parts legs draw from their OWN item + warehouse +
+ * position 100 × 40, so no spec's consumption can ever move another
+ * spec's absolute stock assertions).
+ */
+export async function freshPartsWorld(code: string): Promise<{
+  itemId: string;
+  warehouseId: string;
+}> {
+  const base = await setupCmmsFixture();
+  const su: Client = await superuserClient();
+  const warehouse = await su.query<{ id: string }>(
+    `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS, `WH-${code}`, `The ${code} warehouse`, `مستودع ${code}`, base.branchId],
+  );
+  const item = await su.query<{ id: string }>(
+    `INSERT INTO items (id, tenant_id, sku, name, name_ar, kind, uom_id, costing_method,
+        base_price)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, 'STOCK',
+        (SELECT id FROM uoms WHERE tenant_id = $1 AND code = 'PCS' LIMIT 1), 'WAC', 40)
+     ON CONFLICT (tenant_id, sku) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_CMMS, `CM-PART-${code}`, `The ${code} filter kit`, `طقم فلاتر ${code}`],
+  );
+  await su.query(
+    `INSERT INTO item_stock (id, tenant_id, item_id, warehouse_id, qty, avg_cost)
+     VALUES (gen_random_uuid(), $1, $2, $3, 100, 40)
+     ON CONFLICT (tenant_id, item_id, warehouse_id)
+     DO UPDATE SET qty = EXCLUDED.qty, avg_cost = EXCLUDED.avg_cost`,
+    [TENANT_CMMS, item.rows[0]!.id, warehouse.rows[0]!.id],
+  );
+  await su.end();
+  return { itemId: item.rows[0]!.id, warehouseId: warehouse.rows[0]!.id };
+}
+
 // ── W-18: the G-61 world (the transfers golden's substrate) ─────────────────
 
 /** The second actor (the SoD's approver — the creator never approves). */
