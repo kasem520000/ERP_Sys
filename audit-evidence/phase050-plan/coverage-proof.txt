@@ -1,0 +1,7 @@
+THE COVERAGE PROOF (built BEFORE the first load run — the W-15 law)
+disk inventory: 283 files
+parts union:   283 files (unique 283)
+missing: NONE
+extra:   NONE
+duplicates: NONE
+VERDICT: COVERED

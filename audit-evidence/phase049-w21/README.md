@@ -69,7 +69,7 @@ step (the battery + this envelope + the ledger).
 - **The unit battery: 8/8 packages — 148 files · 1,868 tests** (web **21 · 171** = the
   W-20 17·155 + the four test files' 16 arms; api 68·857 · mobile 27·393 · desktop 16·274 ·
   ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core 5·36) — the ledger arithmetic
-  **1,868 = 857+171+940 EXACT** (940 = 393+274+43+56+38+36).
+  **1,868 = 857+171+840 EXACT** (840 = 393+274+43+56+38+36).
 - **The affected DB folders (the scope-label law — the API delta touched the fixed-assets
   reads)**: fixed-assets-rules 13 GREEN (the three new arms) · spoof 7 GREEN · cmms-tags 7
   GREEN (the QR determinism arm) — over real PG16, this session, at the delta head. The
@@ -158,3 +158,11 @@ immune — the data-slot shape, re-proven on the meters/fleet panes) · RISK-033
 the four report contracts, the registry 114 → 118, and the golden transcripts G-59…G-61
 with the mandatory failure packs + the INV-034 golden + the RLS A1-A10 + the OA-06
 budgets) — proceeds under the owner's standing order.**
+
+
+> **[Dated 2026-11-22 (correction F-2 — the owner's PHASE-050 launch dispatch, at
+> the claim site): the third term above printed 940 where the ledger's own
+> breakdown (393+274+43+56+38+36) sums to 840 — the total reconciles only with 840
+> (1,868 = 857+171+840). Corrected. This is the same defect class at four evidence
+> sites (w19/w20/w21/w22 READMEs); the dispatch counted three positions, the sweep
+> found the fourth — all fixed with this same dated note.]**

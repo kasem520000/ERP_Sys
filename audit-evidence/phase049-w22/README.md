@@ -77,7 +77,7 @@ counts the README as one of the twenty-one (20 logs + 1 README), not 21 logs.
 - **The unit battery: 8/8 packages — 148 files · 1,868 tests — UNCHANGED** (every
   new spec is a DB spec; api 68·857 · web 21·171 · mobile 27·393 · desktop 16·274
   · ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core 5·36) — the ledger
-  arithmetic **1,868 = 857+171+940 EXACT** (940 = 393+274+43+56+38+36).
+  arithmetic **1,868 = 857+171+840 EXACT** (840 = 393+274+43+56+38+36).
 - **THE FULL DB SUITE — THE NINTH ENVELOPE, RE-ANNOUNCED AT THIS WAVE'S OWN HEAD
   (the owner's clause 5 — it does NOT ride `b7ed567`): 283 files · 3,984 tests ·
   0 failed · 0 skipped** — the W-19 standing envelope 279·3,951 + the W-21
@@ -232,3 +232,11 @@ the IMPLEMENTATION_STATUS flip · the archive `ERP_PLATFORM_PHASE049.zip` (OA-07
 excluding every standing platform zip — أرشفة الأرشيف ممنوعة) · the tag `phase/049`
 (DELIVERY, never acceptance) · the full DB suite re-run at the final head) — proceeds
 under the owner's standing order.**
+
+
+> **[Dated 2026-11-22 (correction F-2 — the owner's PHASE-050 launch dispatch, at
+> the claim site): the third term above printed 940 where the ledger's own
+> breakdown (393+274+43+56+38+36) sums to 840 — the total reconciles only with 840
+> (1,868 = 857+171+840). Corrected. This is the same defect class at four evidence
+> sites (w19/w20/w21/w22 READMEs); the dispatch counted three positions, the sweep
+> found the fourth — all fixed with this same dated note.]**

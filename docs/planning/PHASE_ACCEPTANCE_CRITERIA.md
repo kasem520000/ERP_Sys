@@ -792,6 +792,98 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
     `phase/049` (DELIVERY, never acceptance).** — *Waves:* W-23 (closes the
     ledger and the phase; the open-items log transferred explicitly).
 
+### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
+
+1. **Migrations 0113–0116 (the honest slots — the phase doc's 0087…0090 stale
+   by its own note, the 048/049 D-02 precedent) apply cleanly from zero
+   (re-apply no-op); Drizzle mirror parity; the TWELVE new tables
+   (`quality_specifications` · `spc_measurements` · `ncr_records` ·
+   `capa_records` · `complaints` · `calibration_records` ·
+   `supplier_quality_scores` · `coa_documents` · `batch_quality_holds` ·
+   `recall_registry` · `quality_management_reviews` · `hazard_registers`)
+   have ENTITY_CATALOG rows (328 → 340) + the tables doc.** — *Arms:* the
+   chain spec extended to 116 · the from-zero boot in every run · the
+   A-suite's arms over the twelve tables. *Waves:* W-24 (opens) · W-32 (the
+   final sweep closes).
+2. **The NCR → CAPA lifecycle runs end-to-end: NCR closure requires a
+   disposition (BR-102 — the typed refusal naming the record); CAPA closure
+   requires the effectiveness check recorded after the action due date
+   (BR-103 — the refusal carrying the open figures); the golden tests G-62
+   (the scrap write-off) and G-63 (the external quality cost) post balanced
+   entries through the REAL posting engine with the MANDATORY failure packs
+   (the refusals WITH their full payloads · the zero residue · the
+   flip-and-restore with the green re-runs).** — *Arms:* `quality-ncr.db.spec`
+   (BR-102 + G-62's exactly-once + the unmapped-purpose fail-closed) ·
+   `quality-capa.db.spec` (BR-103 + G-63) · `quality-goldens.db.spec` (the
+   transcripts with the failure packs — the JOURNAL_RULES §7 law). *Waves:*
+   W-25/W-26 (the engine arms) · W-31 (the transcripts close).
+3. **INV-035 holds: any issue/ship document line referencing a batch with an
+   active quality hold is rejected SERVER-SIDE on every baseline path (sales
+   delivery, inventory issue, and any 044 picking path when delivered);
+   release requires a disposition-linked record (BR-101).** — *Arms:*
+   `quality-holds.db.spec` (the blocking matrix over every baseline path +
+   the release rule) · the INV-035 invariant test extending the
+   document-validation suite EVERY path must extend · the W-31 golden (the
+   held batch refused everywhere + the offline-rejection shape). *Waves:*
+   W-28 (opens) · W-31 (the golden closes).
+4. **COA generation produces a certificate from inspection results against
+   the item's specification, blocked unless every parameter is within
+   tolerance or carries an accepted-deviation NCR reference (BR-104 — the
+   refusal naming the parameter and both figures); the print renders
+   bilingual AR/EN with RTL correctness, deterministic byte-identical (the
+   W-13/W-21 print laws — `bi()` exclusively, the REAL Chromium test both
+   directions).** — *Arms:* `quality-coa.db.spec` (BR-104's three shapes +
+   the frozen snapshot) · the web COA print spec. *Waves:* W-27 (the
+   service) · W-29 (the print law) · W-31 (the proof).
+5. **SPC charts compute correctly on known datasets (X-bar/R, Cp/Cpk) with
+   out-of-control points flagged; property tests cover the math (the pure
+   module FIRST, the formulas pinned in the phase report).** — *Arms:* the
+   SPC pure module's unit property tests on pinned reference datasets ·
+   `quality-spc.db.spec` (the service vs the pure module's outputs). *Waves:*
+   W-27 (opens and closes).
+6. **Supplier quality scores compute from NCR/rejection/delivery data and
+   expose the documented feed contract consumed by the 038 scorecards (the
+   consumer reads, never re-computes); the specifications' inspection-result
+   mapping contract feeds from the existing inspections module.** — *Arms:*
+   `quality-supplier-scores.db.spec` (the rolling fold + the feed contract) ·
+   `quality-specs.db.spec` (the mapping contract). *Waves:* W-25 (the specs
+   contract) · W-27 (the scores close).
+7. **The recall drill resolves a batch to its where-used chain and the
+   customers who received it within the OA-06 budget (indexed where-used
+   query over the existing batch/serial ledger, EXPLAIN-verified — never a
+   forced plan, never an isolated probe context).** — *Arms:*
+   `quality-recall.db.spec` (the drill + the budget) ·
+   `quality-explain-budgets.db.spec`. *Waves:* W-28 (the drill) · W-31 (the
+   OA-06 arm closes).
+8. **The `quality-calibration-due` sweep fires 30/7/0-day alerts bound to
+   instrument ASSETS (the 049 handoff: the card + the service-history
+   timeline + the expiry-sweep pattern extended); the food-manufacturing
+   template composes `quality` + hazard registers in its manifest
+   (template-composable, never hardcoded — Q-10/Q-11).** — *Arms:*
+   `quality-calibration.db.spec` (the binding + the sweep isolate — it joins
+   the standing isolate set at W-26) · the manifest reconciliation + the
+   template doc. *Waves:* W-26 (the sweep) · W-30 (the review pack + the
+   registers close).
+9. **CR-36 gates: +10 permission keys with zero-drift equality (337 → 347 =
+   347) · i18n parity BY BOTH COUNTS from the first surface wave (W-29:
+   6,955+n = 6,955+n + mobile 371 = 371) · RLS attack tests A1–A10 on all
+   twelve tables (the composite-FK law) · feature-flag/template gating
+   verified (`quality` · `quality.spc`) · `docs:validate` green · manifest
+   reconciliation.** — *Arms:* the drift checker at every wave ·
+   `quality-rls.db.spec` (A1–A10 × 12, the hostile probe worlds) · the
+   flag-gating specs. *Waves:* W-24 (the keys + the flags) · W-29 (the i18n)
+   · W-31 (the RLS closes).
+10. **The completion report `reports/PHASE-050-COMPLETION.md` with the
+    cumulative ledger #1–#10 walked and closed (every wave's evidence
+    pointers) + the IMPLEMENTATION_STATUS flip + **the archive
+    `ERP_PLATFORM_PHASE050.zip` EXACTLY AS DECLARED (F-4: the git-tracked
+    tree at the closure head, the commit-hash first entry, ADDITIVE-ONLY,
+    EXCLUDING every standing platform zip — أرشفة الأرشيف ممنوعة)** + the
+    tag `phase/050` (DELIVERY, never acceptance).** — *Waves:* W-32 (closes
+    the ledger and the phase; the open-items log transferred explicitly; the
+    ID_LEDGER flip — implemented G 63 · INV 35 · BR 104 — atomic with the
+    canon rows).
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

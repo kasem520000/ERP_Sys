@@ -57,7 +57,7 @@ the ledger).
 - **The unit battery: 8/8 packages — 144 files · 1,852 tests** (web **17 · 155** = the
   W-19 16·147 + the board's 8 arms; api 68·857 · mobile 27·393 · desktop 16·274 ·
   ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core 5·36) — the ledger
-  arithmetic **1,852 = 857+155+940 EXACT** (940 = 393+274+43+56+38+36).
+  arithmetic **1,852 = 857+155+840 EXACT** (840 = 393+274+43+56+38+36).
 - **The full DB suite: NOT RE-RUN THIS WAVE — the scope-label law** (red line §6.7:
   the full DB suite re-runs on migration/schema changes — W-16 and W-23 run it; the
   mid waves run their folders — **W-20 is the phase's first PURE web wave: zero
@@ -179,3 +179,11 @@ environmental class above, never a red).
 T-14 + T-15 — `/assets/meters` + `/assets/transfers` + the QR scan surface + the
 extended asset card + the tag print sheet) — proceeds under the owner's standing
 order.**
+
+
+> **[Dated 2026-11-22 (correction F-2 — the owner's PHASE-050 launch dispatch, at
+> the claim site): the third term above printed 940 where the ledger's own
+> breakdown (393+274+43+56+38+36) sums to 840 — the total reconciles only with 840
+> (1,868 = 857+171+840). Corrected. This is the same defect class at four evidence
+> sites (w19/w20/w21/w22 READMEs); the dispatch counted three positions, the sweep
+> found the fourth — all fixed with this same dated note.]**

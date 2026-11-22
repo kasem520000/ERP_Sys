@@ -9,14 +9,27 @@
 
 | Wave | Delivered | Heads (steps) | Scope | The counts at the wave |
 |---|---|---|---|---|
-| W-16 | 2026-11-21 | `0f…`→`cf0248c` (6 steps) | THE FOUNDATION: migrations 0105–0108 (the 8 tables + the assets column family) · the keys (+10, 326 → 336) · the flags · the catalog 318 → 326 · the drift 336 = 336 · the schema-floor spec | chain 108 · catalog 326 · DB suite 271 · 3,743 |
-| W-17 | 2026-11-21 | →`b7ed567`-lineage (5 steps) | THE WORK-ORDER ENGINE + G-59 (T-05/T-06) + the plans API (T-07) + the 0109 D-02 provision (the cost lines + steps — the chain 108 → 110) | chain 110 · catalog 328 · DB 277 · 3,939 |
-| W-18 | 2026-11-22 | `cf0248c` (4 steps) | THE METERS + SPARES + TRANSFERS plane (T-08/T-09/T-10) + G-60/G-61 arms + the 0110 repair + the six standing precedents | DB 277 · 3,939 · routes 1,077 → 1,093 |
-| W-19 | 2026-11-22 | `4544f2a`→`b7ed567` (5 steps) | THE TAGS + THE SWEEP + R-10 fleet light (T-11/T-12) + 0111 (the first 049 settings keys) + 0112 (the union repair) — the envelope-announced fingerprint law's first application | chain 112 · drift 337 · routes 1,102 · DB 279 · 3,951 |
+| W-16 | 2026-11-21 | `20b56d3`→`9e34ddc` (1 step) | THE FOUNDATION: migrations 0105–0108 (the 8 tables + the assets column family) · the keys (+10, 326 → 336) · the flags · the catalog 318 → 326 · the drift 336 = 336 · the schema-floor spec | chain 108 · catalog 326 · DB suite 272 · 3,885 |
+| W-17 | 2026-11-21 | `82b282d`→`adb5644` (6 steps) | THE WORK-ORDER ENGINE + G-59 (T-05/T-06) + the plans API (T-07) + the 0109 D-02 provision (the cost lines + steps — the chain 108 → 110) | chain 110 · catalog 328 · DB 274 · 3,921 |
+| W-18 | 2026-11-22 | `fa24490`→`cf0248c` (6 steps) | THE METERS + SPARES + TRANSFERS plane (T-08/T-09/T-10) + G-60/G-61 arms + the 0110 repair + the six standing precedents | DB 277 · 3,939 · routes 1,077 → 1,093 |
+| W-19 | 2026-11-22 | `4544f2a`→`d5b4caf` (5 steps) | THE TAGS + THE SWEEP + R-10 fleet light (T-11/T-12) + 0111 (the first 049 settings keys) + 0112 (the union repair) — the envelope-announced fingerprint law's first application | chain 112 · drift 337 · routes 1,102 · DB 279 · 3,951 |
 | W-20 | 2026-11-22 | `18a6d16`→`5e7f903` (5+1 steps) | THE WEB PLANE I (T-13): the maintenance board + the plans admin + the checklist entry — i18n 6,620 → 6,797 (the first surface wave, both counts) | unit 144 · 1,852 · depcruise 2,089 · 15,636 |
 | W-21 | 2026-11-22 | `affadd2`→`4f72e27` (4 steps) | THE WEB PLANE II + THE PRINT PACK (T-14/T-15): the meters + fleet board · the transfers board · the scan + tags + the print sheet · the extended asset card — i18n 6,955; the TWO honest catches (the 0108 write path + the 044 drift), both G-48-class, both repaired | unit 148 · 1,868 · depcruise 2,101 · 15,738 |
 | W-22 | 2026-11-22 | `c146ab5`→`8bf1bf4`→`d4ea9db` (3 steps) | THE REPORTS + THE PROOF (T-16/T-17): the four contracts (registry 114 → 118, all pins together) · the golden transcripts with the failure packs · the INV-034 golden (act-one-witness-two) · the RLS A1–A10 (ten tables) · the OA-06 budgets — **the NINTH DB envelope re-announced at its own head** | registry 118 · DB 283 · 3,984 · depcruise 2,110 · 15,821 |
-| W-23 | 2026-11-22 | this delivery | THE CLOSURE (T-18/T-19): the canon rows (G-59…G-61 · INV-034 · BR-097…BR-100) + the ID_LEDGER flip + this report + the triple flip + the archive + the tag + the full gate sweep at the final head | implemented G 61 · INV 34 · BR 100 |
+| W-23 | 2026-11-22 | `b6812a7`+`41c3701` (the closure + the archive) | THE CLOSURE (T-18/T-19): the canon rows (G-59…G-61 · INV-034 · BR-097…BR-100) + the ID_LEDGER flip + this report + the triple flip + the archive + the tag + the full gate sweep at the final head | implemented G 61 · INV 34 · BR 100 |
+
+**[Dated 2026-11-22 (correction F-1 — the owner's PHASE-050 launch dispatch, the F1
+literal-truth law: the corrections land at the claim sites).** The four head cells above
+were verified against the git log this session and corrected: **W-16** is the ONE
+commit `9e34ddc` on the plan head `20b56d3` (the printed `0f…`→`cf0248c` / 6 steps
+was W-18's shape, and the counts cell carried the plan wave's DB figure — the wave's
+own gate record says **272 · 3,885**); **W-17** is six steps ending `adb5644` with
+**DB 274 · 3,921** per its own gate record (the printed `b7ed567`-lineage and
+277 · 3,939 were W-18's envelope figures); **W-18** is six steps `fa24490`→`cf0248c`
+(the cell had named only the final head, four steps short); **W-19**'s delivery head is
+`d5b4caf` — `b7ed567` is its step 4, the eighth envelope's own head, never the wave's
+last commit; **W-23**'s cell made its two commits explicit. The W-20/W-21/W-22 rows
+verified correct and untouched.**]
 
 Every wave's own evidence: `audit-evidence/phase049-w16…w23/` (the gate records — عرف 049
 option (a)); the central ledger `docs/planning/PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-049 is

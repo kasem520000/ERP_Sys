@@ -1,0 +1,6 @@
+
+> erp-platform@0.1.0 check:id-ledger /home/z/my-project/ERP_Sys_050
+> tsx scripts/check-id-ledger.ts
+
+[check-id-ledger] implemented: G 61 · INV 34 · BR 100 | reservations: 15 phases, 37 ids | phase docs scanned: 68 (95 claim ids, 2517 reference ids)
+[check-id-ledger] 0 errors, 0 warning(s) — OK

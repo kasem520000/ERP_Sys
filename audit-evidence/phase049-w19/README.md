@@ -92,7 +92,7 @@ Every member CONFIRMED by its own run THIS session:
 - **The unit battery: 8/8 packages — 143 files · 1,844 tests** (api **68 · 857** = the
   W-18 66·839 + the two pure specs +18 · web 16·147 · mobile 27·393 · desktop 16·274 ·
   ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core 5·36) — the ledger arithmetic
-  **1,844 = 857+147+940 EXACT** (940 = 393+274+43+56+38+36). The two new specs:
+  **1,844 = 857+147+840 EXACT** (840 = 393+274+43+56+38+36). The two new specs:
   `cmms-sweep-math.spec` (9 — the windows/bands/dedupe/severity folds) ·
   `cmms-tag-code.spec` (9 — the entropy/uniqueness folds, the sign/verify round-trip,
   the tampered/wrong-key/malformed refusals).
@@ -274,3 +274,11 @@ law is the class's own prophylaxis).
 COUNTS from the first surface wave) — opens under the owner's standing order of this
 session («طيب واصل العمل لانهاء المرحلة PHASE-049») — delivered as delivery, never
 acceptance-production.
+
+
+> **[Dated 2026-11-22 (correction F-2 — the owner's PHASE-050 launch dispatch, at
+> the claim site): the third term above printed 940 where the ledger's own
+> breakdown (393+274+43+56+38+36) sums to 840 — the total reconciles only with 840
+> (1,868 = 857+171+840). Corrected. This is the same defect class at four evidence
+> sites (w19/w20/w21/w22 READMEs); the dispatch counted three positions, the sweep
+> found the fourth — all fixed with this same dated note.]**
