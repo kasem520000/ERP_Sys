@@ -605,6 +605,25 @@ with the phases whose acceptance needed a coordinated cross-doc flip.)
 
 ### PHASE-049 — CMMS — Asset Maintenance (OPENED AT PLAN 2026-11-21 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-049-MASTER-PLAN.md` §3/§4 is the binding division)
 
+**[Dated 2026-11-22 (W-21 DELIVERED — THE ACCUMULATION PLACE per the ratified
+عرف 049 option (a); the W-16…W-20 records stand ratified, never rewritten).** This wave's
+accumulated deliveries: **T-14 + T-15 DELIVERED** — `/assets/meters` (the meters board +
+THE FLEET REGISTER — R-10's view with the SQL-derived days chips) · `/assets/transfers`
+(the SoD-aware ladder with the G-61 verdict's own figures) · `/assets/scan` (the resolver +
+the tags admin + **THE PRINT SHEET** — the W-13 law: bi() exclusively, determinism, the QR
+pass-through) · **THE EXTENDED ASSET CARD** (the 044 drift honestly repaired + the expiry
+chips + the components + the cost-center row + THE SERVICE-HISTORY TIMELINE). **#7's
+SURFACE ARMS CLOSED** (the scan resolves to the card; the print renders AR/EN
+deterministic — the print-law spec green). **THE WAVE'S TWO HONEST CATCHES** (the G-48
+class, both repaired in-step with spec arms): the 0108 family's MISSING WRITE PATH (the
+columns read everywhere, written nowhere — the asset PATCH now carries them with the
+ancestor-walk cycle law) and the 044 DETAIL DRIFT (the nested payload vs the flat wire
+type + the register's phantom computed columns — now real and reconciled EXACTLY). The
+constants: chain 112 · catalog 328 · drift 337 · routes 1,102 UNCHANGED; i18n 6,797 →
+**6,955** (+158, both counts) · mobile 371 standing; unit 8/8 — **148 · 1,868**; the
+affected DB folders re-run (fixed-assets 13+7 · cmms-tags 7 GREEN). The evidence:
+`audit-evidence/phase049-w21/` (the gate record).**
+
 **[Dated 2026-11-22 (W-20 DELIVERED — THE ACCUMULATION PLACE per the ratified
 عرف 049 option (a); the W-16…W-19 records stand ratified, never rewritten).** This
 wave's accumulated deliveries: **T-13 DELIVERED** — `/assets/maintenance` (the orders
