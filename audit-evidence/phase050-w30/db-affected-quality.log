@@ -1,0 +1,498 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    /home/z/.local/share/erp-env/embedded-pg-linux-x64/native/bin/pg_ctl -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-23 22:46:39.890 UTC [2374] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-23 22:46:39.890 UTC [2374] LOG:  listening on IPv6 address "::1", port 40769
+2026-11-23 22:46:39.890 UTC [2374] LOG:  listening on IPv4 address "127.0.0.1", port 40769
+
+2026-11-23 22:46:39.890 UTC [2374] LOG:  listening on Unix socket "/tmp/.s.PGSQL.40769"
+
+2026-11-23 22:46:39.891 UTC [2377] LOG:  database system was shut down at 2026-11-23 22:46:39 UTC
+
+2026-11-23 22:46:39.893 UTC [2374] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/quality/quality-coa-print-render.db.spec.ts (3 tests) 1239ms
+   ✓ PHASE-050 W-29 — the COA print in the REAL browser (both directions, the frozen snapshot) > DETERMINISM — two builds byte-identical; two renders byte-identical modulo the renderer's own clock stamps (AR + EN)  491ms
+ ✓ src/__db__/quality/quality-holds.db.spec.ts (8 tests) 1110ms
+   ✓ quality holds — the INV-035 blocking matrix (every baseline path) > THE SALES DELIVERY PATH (the baseline ship path): the post refuses, the document stays DRAFT, ZERO residue  453ms
+ ✓ src/__db__/quality/quality-ncr.db.spec.ts (13 tests) 526ms
+2026-11-23 22:46:48.095 UTC [2621] ERROR:  new row for relation "quality_specifications" violates check constraint "ck_quality_specifications_band"
+2026-11-23 22:46:48.095 UTC [2621] DETAIL:  Failing row contains (3feb3884-6ffe-4fb1-b8a4-1846eb44bfa6, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.095734+00, 2026-11-23 22:46:48.095734+00, 1, null, null, c0f0d5c5-bc12-46dd-8b9a-a658906e6de1, pH, null, null, 7.000000, 7.500000, 7.500000, t, null, null).
+2026-11-23 22:46:48.095 UTC [2621] STATEMENT:  INSERT INTO quality_specifications (id, tenant_id, item_id, parameter, target_value, ucl, lcl)
+	           VALUES (gen_random_uuid(), $1, $2, 'pH', 7, 7.5, 7.5)
+
+2026-11-23 22:46:48.106 UTC [2621] ERROR:  new row for relation "quality_specifications" violates check constraint "ck_quality_specifications_band"
+2026-11-23 22:46:48.106 UTC [2621] DETAIL:  Failing row contains (090ce3a0-5d2a-49af-9657-9ab2fd3b3d87, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.106287+00, 2026-11-23 22:46:48.106287+00, 1, null, null, 8ea2b4fc-fece-4c80-ac78-af0bd1656f7e, pH, null, null, 7.000000, 6.500000, 7.500000, t, null, null).
+2026-11-23 22:46:48.106 UTC [2621] STATEMENT:  INSERT INTO quality_specifications (id, tenant_id, item_id, parameter, target_value, ucl, lcl)
+	           VALUES (gen_random_uuid(), $1, $2, 'pH', 7, 6.5, 7.5)
+
+2026-11-23 22:46:48.116 UTC [2621] ERROR:  duplicate key value violates unique constraint "uq_quality_specifications_tenant_item_parameter"
+2026-11-23 22:46:48.116 UTC [2621] DETAIL:  Key (tenant_id, item_id, parameter)=(5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, a5e0715a-1949-430e-877e-b6faee57d205, Viscosity) already exists.
+2026-11-23 22:46:48.116 UTC [2621] STATEMENT:  INSERT INTO quality_specifications (id, tenant_id, item_id, parameter, target_value)
+	           VALUES (gen_random_uuid(), $1, $2, 'Viscosity', 101)
+
+2026-11-23 22:46:48.116 UTC [2621] ERROR:  insert or update on table "quality_specifications" violates foreign key constraint "fk_quality_specifications_item"
+2026-11-23 22:46:48.116 UTC [2621] DETAIL:  Key (item_id, tenant_id)=(00000000-0000-0000-0000-0000000000ff, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a) is not present in table "items".
+2026-11-23 22:46:48.116 UTC [2621] STATEMENT:  INSERT INTO quality_specifications (id, tenant_id, item_id, parameter, target_value)
+	           VALUES (gen_random_uuid(), $1, $2, 'Viscosity', 100)
+
+2026-11-23 22:46:48.146 UTC [2621] ERROR:  new row for relation "spc_measurements" violates check constraint "ck_spc_measurements_source"
+2026-11-23 22:46:48.146 UTC [2621] DETAIL:  Failing row contains (0b1fa096-d891-4797-bcdb-c14c71d42430, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.146337+00, 2026-11-23 22:46:48.146337+00, 1, null, null, c28df182-b032-4fad-a1cd-a83b15f658e6, 100.000000, 2026-02-10 09:00:00+00, TELEPATHY, null, null).
+2026-11-23 22:46:48.146 UTC [2621] STATEMENT:  INSERT INTO spc_measurements (id, tenant_id, spec_id, value, sampled_at, source)
+	           VALUES (gen_random_uuid(), $1, $2, 100, '2026-02-10T09:00:00Z', 'TELEPATHY')
+
+2026-11-23 22:46:48.147 UTC [2621] ERROR:  insert or update on table "spc_measurements" violates foreign key constraint "fk_spc_measurements_spec"
+2026-11-23 22:46:48.147 UTC [2621] DETAIL:  Key (spec_id, tenant_id)=(00000000-0000-0000-0000-0000000000ee, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a) is not present in table "quality_specifications".
+2026-11-23 22:46:48.147 UTC [2621] STATEMENT:  INSERT INTO spc_measurements (id, tenant_id, spec_id, value, sampled_at)
+	           VALUES (gen_random_uuid(), $1, '00000000-0000-0000-0000-0000000000ee', 100,
+	            '2026-02-10T09:00:00Z')
+
+2026-11-23 22:46:48.168 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_disposition_gate"
+2026-11-23 22:46:48.168 UTC [2621] DETAIL:  Failing row contains (6602ca5c-228b-4a9d-9951-0a8ef115d3c3, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.167928+00, 2026-11-23 22:46:48.167928+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-NODISP-1, PRODUCTION, MEDIUM, 02a511a5-835b-4095-a591-97f3d6d6946c, null, null, null, Out of band, null, 5.000000, DISPOSITIONED, null, 2026-02-15 10:00:00+00, null, null, null, null).
+2026-11-23 22:46:48.168 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.178 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_disposition_gate"
+2026-11-23 22:46:48.178 UTC [2621] DETAIL:  Failing row contains (50959229-94a0-4023-bb0a-ed3ed4e0a8e3, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.177834+00, 2026-11-23 22:46:48.177834+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-NOCLOSE-1, PRODUCTION, MEDIUM, 8b258def-b1cc-4202-a24b-d406044f11ec, null, null, null, Out of band, null, 5.000000, CLOSED, SCRAP, 2026-02-15 10:00:00+00, null, null, null, null).
+2026-11-23 22:46:48.178 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.187 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_disposition_gate"
+2026-11-23 22:46:48.187 UTC [2621] DETAIL:  Failing row contains (52385826-350a-4f4f-9c75-2095838fb014, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.187225+00, 2026-11-23 22:46:48.187225+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-EARLY-1, PRODUCTION, MEDIUM, 478fc6f8-967a-4669-a0d4-8863ce045992, null, null, null, Out of band, null, 5.000000, OPEN, REWORK, 2026-02-15 10:00:00+00, null, null, null, null).
+2026-11-23 22:46:48.187 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.197 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_source_shape"
+2026-11-23 22:46:48.197 UTC [2621] DETAIL:  Failing row contains (d397d4d1-68ff-43f0-ad96-5222d472781c, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.197112+00, 2026-11-23 22:46:48.197112+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-SRCINS-1, INSPECTION, MEDIUM, d09a6bdb-fb56-4b91-8ea9-ade411aa44ab, null, null, null, Out of band, null, 5.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.197 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.206 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_source_shape"
+2026-11-23 22:46:48.206 UTC [2621] DETAIL:  Failing row contains (5312e272-43c5-4519-864e-b395563fd85e, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.206187+00, 2026-11-23 22:46:48.206187+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-SRCSUP-1, SUPPLIER, MEDIUM, 53e84aef-7666-41ca-8fb0-ce320a0e9e8f, null, null, null, Out of band, null, 5.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.206 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.216 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_source_shape"
+2026-11-23 22:46:48.216 UTC [2621] DETAIL:  Failing row contains (50b09826-2afb-4750-b781-7b30330b7db5, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.216288+00, 2026-11-23 22:46:48.216288+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-SRCCMP-1, COMPLAINT, MEDIUM, f42cbba4-e070-4d6d-bc93-63ba40e28917, null, null, null, Out of band, null, 5.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.216 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.226 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_affected_qty"
+2026-11-23 22:46:48.226 UTC [2621] DETAIL:  Failing row contains (9974668a-ebcd-476e-9aea-a2b6bdec870f, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.225786+00, 2026-11-23 22:46:48.225786+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-QTY-0, PRODUCTION, MEDIUM, 9a4783e0-a866-45fc-9830-05472fb06c8a, null, null, null, Out of band, null, 0.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.226 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.226 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_affected_qty"
+2026-11-23 22:46:48.226 UTC [2621] DETAIL:  Failing row contains (091a611a-84e3-4091-b4a9-b6062984aa0d, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.226552+00, 2026-11-23 22:46:48.226552+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-QTY-NEG, PRODUCTION, MEDIUM, 9a4783e0-a866-45fc-9830-05472fb06c8a, null, null, null, Out of band, null, -1.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.226 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.236 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_journal_gated"
+2026-11-23 22:46:48.236 UTC [2621] DETAIL:  Failing row contains (6faf04fb-dd79-4765-896b-fc261a3417a4, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.236137+00, 2026-11-23 22:46:48.236137+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-JNLWRONG-1, PRODUCTION, MEDIUM, 58535aad-881c-4ee5-a687-9c8d53978915, null, null, null, Out of band, null, 5.000000, DISPOSITIONED, REWORK, 2026-02-15 10:00:00+00, null, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-23 22:46:48.236 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.245 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_journal_gated"
+2026-11-23 22:46:48.245 UTC [2621] DETAIL:  Failing row contains (9b95fce9-aecc-488a-b5ed-18bb75c68981, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.245409+00, 2026-11-23 22:46:48.245409+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-JNLOPEN-1, PRODUCTION, MEDIUM, cd288579-75fc-42bc-a1ce-c8fdad70720b, null, null, null, Out of band, null, 5.000000, OPEN, null, null, null, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-23 22:46:48.245 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.255 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_severity"
+2026-11-23 22:46:48.255 UTC [2621] DETAIL:  Failing row contains (df4756ce-3127-4bf9-bc4f-2d8f6cf66637, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.254943+00, 2026-11-23 22:46:48.254943+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-VOCAB-SEV, PRODUCTION, CATASTROPHIC, ce520c36-6dbb-49a9-8641-34ef64833d8e, null, null, null, Out of band, null, 5.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.255 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.255 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_source"
+2026-11-23 22:46:48.255 UTC [2621] DETAIL:  Failing row contains (0ae07c03-4849-4108-946f-a7c9434e54c9, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.255638+00, 2026-11-23 22:46:48.255638+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-VOCAB-SRC, AUDIT, MEDIUM, ce520c36-6dbb-49a9-8641-34ef64833d8e, null, null, null, Out of band, null, 5.000000, OPEN, null, null, null, null, null, null).
+2026-11-23 22:46:48.255 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.256 UTC [2621] ERROR:  new row for relation "ncr_records" violates check constraint "ck_ncr_records_disposition"
+2026-11-23 22:46:48.256 UTC [2621] DETAIL:  Failing row contains (8a3539bf-a922-45a6-8512-cfc8665d2990, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.256181+00, 2026-11-23 22:46:48.256181+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, NCR-QL-VOCAB-DISP, PRODUCTION, MEDIUM, ce520c36-6dbb-49a9-8641-34ef64833d8e, null, null, null, Out of band, null, 5.000000, DISPOSITIONED, DESTROY, 2026-02-15 10:00:00+00, null, null, null, null).
+2026-11-23 22:46:48.256 UTC [2621] STATEMENT:  INSERT INTO ncr_records
+	       (id, tenant_id, ncr_no, source, severity, item_id, batch_id, inspection_id,
+	        partner_id, problem, affected_qty, status, disposition, disposition_at, closed_at,
+	        journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+	        $14, $15, $16)
+
+2026-11-23 22:46:48.259 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_close_gate"
+2026-11-23 22:46:48.259 UTC [2621] DETAIL:  Failing row contains (5e682d43-9257-4f57-a824-62936191f40d, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.258934+00, 2026-11-23 22:46:48.258934+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-NOEFF-1, null, Contain the drift, null, null, null, [], null, CLOSED, null, 0.0000, null, 2026-03-11 09:00:00+00, null, null).
+2026-11-23 22:46:48.259 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.259 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_close_gate"
+2026-11-23 22:46:48.259 UTC [2621] DETAIL:  Failing row contains (545d274a-1bfb-4808-b1e2-cde8fd243755, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.25961+00, 2026-11-23 22:46:48.25961+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-NOSTAMP-1, null, Contain the drift, null, null, null, [], null, CLOSED, {"result": "EFFECTIVE"}, 0.0000, null, null, null, null).
+2026-11-23 22:46:48.259 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.260 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_close_gate"
+2026-11-23 22:46:48.260 UTC [2621] DETAIL:  Failing row contains (da231d99-a623-45e8-9820-455c1aa34cf9, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.26018+00, 2026-11-23 22:46:48.26018+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-EARLYCLOSE-1, null, Contain the drift, null, null, null, [], null, OPEN, null, 0.0000, null, 2026-03-11 09:00:00+00, null, null).
+2026-11-23 22:46:48.260 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.260 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_journal_gated"
+2026-11-23 22:46:48.260 UTC [2621] DETAIL:  Failing row contains (05a73442-0388-445e-a7cc-05e7fb63b81e, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.260783+00, 2026-11-23 22:46:48.260783+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-JNLZERO-1, null, Contain the drift, null, null, null, [], null, IN_PROGRESS, null, 0.0000, 00000000-0000-0000-0000-0000000000dd, null, null, null).
+2026-11-23 22:46:48.260 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.261 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_external_cost"
+2026-11-23 22:46:48.261 UTC [2621] DETAIL:  Failing row contains (ba54ebb4-49e8-4865-8f8d-c5db81cc10f2, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.261344+00, 2026-11-23 22:46:48.261344+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-NEGCOST-1, null, Contain the drift, null, null, null, [], null, OPEN, null, -1.0000, null, null, null, null).
+2026-11-23 22:46:48.261 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.261 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_actions_shape"
+2026-11-23 22:46:48.261 UTC [2621] DETAIL:  Failing row contains (a0b86125-ca54-4ad8-a573-fa5ca49a6a3f, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.261892+00, 2026-11-23 22:46:48.261892+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-ACTIONS-1, null, Contain the drift, null, null, null, {"title": "not an array"}, null, OPEN, null, 0.0000, null, null, null, null).
+2026-11-23 22:46:48.261 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.263 UTC [2621] ERROR:  new row for relation "capa_records" violates check constraint "ck_capa_records_effectiveness_shape"
+2026-11-23 22:46:48.263 UTC [2621] DETAIL:  Failing row contains (084c601a-d1a5-4cfc-94ed-10cb479db9ec, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.263012+00, 2026-11-23 22:46:48.263012+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAPA-QL-EFFSHAPE-1, null, Contain the drift, null, null, null, [], null, CLOSED, ["not an object"], 0.0000, null, 2026-03-11 09:00:00+00, null, null).
+2026-11-23 22:46:48.263 UTC [2621] STATEMENT:  INSERT INTO capa_records
+	         (id, tenant_id, capa_no, ncr_id, title, owner_employee_id, root_cause,
+	          root_cause_at, actions, due_date, status, effectiveness, external_cost,
+	          journal_entry_id, closed_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11::jsonb,
+	          $12, $13, $14, $15)
+
+2026-11-23 22:46:48.286 UTC [2621] ERROR:  new row for relation "complaints" violates check constraint "ck_complaints_resolved_shape"
+2026-11-23 22:46:48.286 UTC [2621] DETAIL:  Failing row contains (de030080-556e-4273-9274-32d3a1a01756, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.286521+00, 2026-11-23 22:46:48.286521+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CMP-QL-NORES-1, PHONE, MEDIUM, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, 2beead70-d7d4-4922-906b-f73540a989d0, null, null, Lumpy syrup, null, null, RESOLVED, null, 2026-02-22 10:00:00+00, null, null).
+2026-11-23 22:46:48.286 UTC [2621] STATEMENT:  INSERT INTO complaints
+	         (id, tenant_id, complaint_no, channel, severity, customer_id, item_id, batch_id,
+	          ncr_id, subject, details, status, resolution, resolved_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 22:46:48.296 UTC [2621] ERROR:  new row for relation "complaints" violates check constraint "ck_complaints_resolved_shape"
+2026-11-23 22:46:48.296 UTC [2621] DETAIL:  Failing row contains (193101fb-53e9-47d0-8cca-f8fbdca6791a, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.296575+00, 2026-11-23 22:46:48.296575+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CMP-QL-EARLY-1, PHONE, MEDIUM, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, fd514221-0680-4bcf-8662-af4b2ba67ef6, null, null, Lumpy syrup, null, null, NEW, Replaced the batch, 2026-02-22 10:00:00+00, null, null).
+2026-11-23 22:46:48.296 UTC [2621] STATEMENT:  INSERT INTO complaints
+	         (id, tenant_id, complaint_no, channel, severity, customer_id, item_id, batch_id,
+	          ncr_id, subject, details, status, resolution, resolved_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 22:46:48.306 UTC [2621] ERROR:  new row for relation "complaints" violates check constraint "ck_complaints_channel"
+2026-11-23 22:46:48.306 UTC [2621] DETAIL:  Failing row contains (8d4625ad-c8a1-4e58-8e11-67a521702f0e, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.305963+00, 2026-11-23 22:46:48.305963+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CMP-QL-CHAN-1, FAX, MEDIUM, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, 2ddcc502-6352-4b46-8b91-49a30fb18efa, null, null, Lumpy syrup, null, null, NEW, null, null, null, null).
+2026-11-23 22:46:48.306 UTC [2621] STATEMENT:  INSERT INTO complaints
+	         (id, tenant_id, complaint_no, channel, severity, customer_id, item_id, batch_id,
+	          ncr_id, subject, details, status, resolution, resolved_at, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 22:46:48.309 UTC [2621] ERROR:  new row for relation "calibration_records" violates check constraint "ck_calibration_records_due_after"
+2026-11-23 22:46:48.309 UTC [2621] DETAIL:  Failing row contains (cfbfb47a-47df-44e6-8380-789f9dbc6f18, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.309186+00, 2026-11-23 22:46:48.309186+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAL-QL-DUEBEFORE-1, 68563872-34ab-4f68-9296-e0c5070e4e27, ISO 17025 reference, PASS, 2026-01-15 09:00:00+00, 2026-01-15, null, null, 0.0000, null, null, null).
+2026-11-23 22:46:48.309 UTC [2621] STATEMENT:  INSERT INTO calibration_records
+	         (id, tenant_id, calibration_no, asset_id, standard_used, result, calibrated_at,
+	          due_date, provider_id, certificate_ref, external_cost, journal_entry_id, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+
+2026-11-23 22:46:48.310 UTC [2621] ERROR:  new row for relation "calibration_records" violates check constraint "ck_calibration_records_journal_gated"
+2026-11-23 22:46:48.310 UTC [2621] DETAIL:  Failing row contains (f9316ccf-bb88-4280-b0af-3a8633e3ab79, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.310106+00, 2026-11-23 22:46:48.310106+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAL-QL-JNLZERO-1, 68563872-34ab-4f68-9296-e0c5070e4e27, ISO 17025 reference, PASS, 2026-01-15 09:00:00+00, 2027-01-15, null, null, 0.0000, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-23 22:46:48.310 UTC [2621] STATEMENT:  INSERT INTO calibration_records
+	         (id, tenant_id, calibration_no, asset_id, standard_used, result, calibrated_at,
+	          due_date, provider_id, certificate_ref, external_cost, journal_entry_id, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+
+2026-11-23 22:46:48.311 UTC [2621] ERROR:  new row for relation "calibration_records" violates check constraint "ck_calibration_records_result"
+2026-11-23 22:46:48.311 UTC [2621] DETAIL:  Failing row contains (8f42d9f2-3909-4896-ad3f-70261e6238bd, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.310985+00, 2026-11-23 22:46:48.310985+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, CAL-QL-RESULT-1, 68563872-34ab-4f68-9296-e0c5070e4e27, ISO 17025 reference, MAYBE, 2026-01-15 09:00:00+00, 2027-01-15, null, null, 0.0000, null, null, null).
+2026-11-23 22:46:48.311 UTC [2621] STATEMENT:  INSERT INTO calibration_records
+	         (id, tenant_id, calibration_no, asset_id, standard_used, result, calibrated_at,
+	          due_date, provider_id, certificate_ref, external_cost, journal_entry_id, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+
+2026-11-23 22:46:48.312 UTC [2621] ERROR:  insert or update on table "calibration_records" violates foreign key constraint "fk_calibration_records_asset"
+2026-11-23 22:46:48.312 UTC [2621] DETAIL:  Key (asset_id, tenant_id)=(00000000-0000-0000-0000-0000000000ea, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a) is not present in table "assets".
+2026-11-23 22:46:48.312 UTC [2621] STATEMENT:  INSERT INTO calibration_records
+	         (id, tenant_id, calibration_no, asset_id, standard_used, result, calibrated_at,
+	          due_date, provider_id, certificate_ref, external_cost, journal_entry_id, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+
+2026-11-23 22:46:48.313 UTC [2621] ERROR:  duplicate key value violates unique constraint "uq_supplier_quality_scores_tenant_partner_period"
+2026-11-23 22:46:48.313 UTC [2621] DETAIL:  Key (tenant_id, partner_id, period_start)=(5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, 2026-01-01) already exists.
+2026-11-23 22:46:48.313 UTC [2621] STATEMENT:  INSERT INTO supplier_quality_scores
+	             (id, tenant_id, partner_id, period_start, score, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, '2026-01-01', 90, $3)
+
+2026-11-23 22:46:48.314 UTC [2621] ERROR:  new row for relation "supplier_quality_scores" violates check constraint "ck_supplier_quality_scores_counts"
+2026-11-23 22:46:48.314 UTC [2621] DETAIL:  Failing row contains (5ad3917e-f609-4d2e-bfcb-822dac6f1001, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.31435+00, 2026-11-23 22:46:48.31435+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, 2026-02-01, 0, 0, 11, 10, 90.00, 2026-11-23 22:46:48.31435+00).
+2026-11-23 22:46:48.314 UTC [2621] STATEMENT:  INSERT INTO supplier_quality_scores
+	             (id, tenant_id, partner_id, period_start, on_time_deliveries, total_deliveries,
+	              score, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, '2026-02-01', 11, 10, 90, $3)
+
+2026-11-23 22:46:48.314 UTC [2621] ERROR:  new row for relation "supplier_quality_scores" violates check constraint "ck_supplier_quality_scores_score"
+2026-11-23 22:46:48.314 UTC [2621] DETAIL:  Failing row contains (7af53d6a-e6f4-4f8d-b34f-550180d5ddce, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.314834+00, 2026-11-23 22:46:48.314834+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, 2026-03-01, 0, 0, 0, 0, 100.01, 2026-11-23 22:46:48.314834+00).
+2026-11-23 22:46:48.314 UTC [2621] STATEMENT:  INSERT INTO supplier_quality_scores
+	               (id, tenant_id, partner_id, period_start, score, created_by)
+	             VALUES (gen_random_uuid(), $1, $2, '2026-03-01', $3, $4)
+
+2026-11-23 22:46:48.315 UTC [2621] ERROR:  new row for relation "supplier_quality_scores" violates check constraint "ck_supplier_quality_scores_score"
+2026-11-23 22:46:48.315 UTC [2621] DETAIL:  Failing row contains (cd082064-c27e-41d6-96f5-e58d67b6d456, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.315155+00, 2026-11-23 22:46:48.315155+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, bf725cc9-ef05-4382-b3f9-4023bfa5ee51, 2026-03-01, 0, 0, 0, 0, -1.00, 2026-11-23 22:46:48.315155+00).
+2026-11-23 22:46:48.315 UTC [2621] STATEMENT:  INSERT INTO supplier_quality_scores
+	               (id, tenant_id, partner_id, period_start, score, created_by)
+	             VALUES (gen_random_uuid(), $1, $2, '2026-03-01', $3, $4)
+
+2026-11-23 22:46:48.334 UTC [2621] ERROR:  new row for relation "coa_documents" violates check constraint "ck_coa_documents_parameters_shape"
+2026-11-23 22:46:48.334 UTC [2621] DETAIL:  Failing row contains (e3638707-c4c9-4b31-b01a-fc714a8349f3, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.334452+00, 2026-11-23 22:46:48.334452+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, COA-QL-SHAPE-1, COA, 6ff4e4b9-603b-4bc8-8708-9981bc4e3b58, null, null, {"parameter": "Viscosity"}, 2026-02-11 10:00:00+00, 5a5a5a5a-0000-4000-8000-0000000005a1, null, null).
+2026-11-23 22:46:48.334 UTC [2621] STATEMENT:  INSERT INTO coa_documents
+	         (id, tenant_id, doc_no, doc_type, item_id, batch_id, inspection_id, parameters,
+	          issued_at, issued_by, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10)
+
+2026-11-23 22:46:48.343 UTC [2621] ERROR:  new row for relation "coa_documents" violates check constraint "ck_coa_documents_type"
+2026-11-23 22:46:48.343 UTC [2621] DETAIL:  Failing row contains (e5498b6b-1020-400f-966a-6cb61ab79b5f, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.343808+00, 2026-11-23 22:46:48.343808+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, COA-QL-TYPE-1, COf, b150ab05-74de-4f36-a76f-915701b0bb41, null, null, [{"lcl": 90, "ucl": 110, "target": 100, "within": true, "measure..., 2026-02-11 10:00:00+00, 5a5a5a5a-0000-4000-8000-0000000005a1, null, null).
+2026-11-23 22:46:48.343 UTC [2621] STATEMENT:  INSERT INTO coa_documents
+	         (id, tenant_id, doc_no, doc_type, item_id, batch_id, inspection_id, parameters,
+	          issued_at, issued_by, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10)
+
+2026-11-23 22:46:48.391 UTC [2621] ERROR:  duplicate key value violates unique constraint "uq_batch_quality_holds_tenant_batch_active"
+2026-11-23 22:46:48.391 UTC [2621] DETAIL:  Key (tenant_id, batch_id)=(5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, ade479af-d0bf-4fc0-a206-3e9d3cb519d3) already exists.
+2026-11-23 22:46:48.391 UTC [2621] STATEMENT:  INSERT INTO batch_quality_holds
+	         (id, tenant_id, batch_id, reason, ncr_id, status, held_at, released_at,
+	          release_note, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9)
+
+2026-11-23 22:46:48.409 UTC [2621] ERROR:  new row for relation "batch_quality_holds" violates check constraint "ck_batch_quality_holds_release_shape"
+2026-11-23 22:46:48.409 UTC [2621] DETAIL:  Failing row contains (18afd432-ab61-4304-b599-77b51d7bf70b, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.408765+00, 2026-11-23 22:46:48.408765+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, be2bb215-60c9-448b-abe1-dcc1d1601fd8, Foreign matter suspected, null, RELEASED, 2026-02-20 08:00:00+00, 2026-02-21 10:00:00+00, null, null, null).
+2026-11-23 22:46:48.409 UTC [2621] STATEMENT:  UPDATE batch_quality_holds SET status = 'RELEASED', released_at = '2026-02-21T10:00:00Z'
+	           WHERE tenant_id = $1 AND batch_id = $2 AND status = 'ACTIVE'
+
+2026-11-23 22:46:48.427 UTC [2621] ERROR:  new row for relation "batch_quality_holds" violates check constraint "ck_batch_quality_holds_release_shape"
+2026-11-23 22:46:48.427 UTC [2621] DETAIL:  Failing row contains (d599662c-81e3-4e09-9b26-56b8038db833, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.427243+00, 2026-11-23 22:46:48.427243+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, 67c88a7f-4504-4a9e-9eb9-534241b95686, Foreign matter suspected, null, RELEASED, 2026-02-20 08:00:00+00, 2026-02-21 10:00:00+00, Accepted, null, null).
+2026-11-23 22:46:48.427 UTC [2621] STATEMENT:  UPDATE batch_quality_holds SET status = 'RELEASED', released_at = '2026-02-21T10:00:00Z',
+	              release_note = 'Accepted'
+	           WHERE tenant_id = $1 AND batch_id = $2 AND status = 'ACTIVE'
+
+2026-11-23 22:46:48.445 UTC [2621] ERROR:  new row for relation "batch_quality_holds" violates check constraint "ck_batch_quality_holds_release_shape"
+2026-11-23 22:46:48.445 UTC [2621] DETAIL:  Failing row contains (2ad3dc06-2784-4a3c-bb37-2daafed02ddc, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.44575+00, 2026-11-23 22:46:48.44575+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, cf7e63c2-abc5-46ce-9134-c58aca084731, Foreign matter suspected, null, ACTIVE, 2026-02-20 08:00:00+00, 2026-02-21 10:00:00+00, Premature, null, null).
+2026-11-23 22:46:48.445 UTC [2621] STATEMENT:  INSERT INTO batch_quality_holds
+	         (id, tenant_id, batch_id, reason, ncr_id, status, held_at, released_at,
+	          release_note, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9)
+
+2026-11-23 22:46:48.483 UTC [2621] ERROR:  new row for relation "recall_registry" violates check constraint "ck_recall_registry_stamps"
+2026-11-23 22:46:48.483 UTC [2621] DETAIL:  Failing row contains (54838002-6216-43b7-b59a-c947b0b54750, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.483505+00, 2026-11-23 22:46:48.483505+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, RCL-QL-NOSTAMP-1, b8e2e731-0fc3-43dd-8443-1143743de315, Precautionary drill, EXECUTED, 2026-02-23 08:00:00+00, null, null, null, null, null, null).
+2026-11-23 22:46:48.483 UTC [2621] STATEMENT:  INSERT INTO recall_registry
+	         (id, tenant_id, recall_no, batch_id, reason, status, initiated_at, executed_at,
+	          closed_at, scope, affected_customers, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11)
+
+2026-11-23 22:46:48.503 UTC [2621] ERROR:  new row for relation "recall_registry" violates check constraint "ck_recall_registry_stamps"
+2026-11-23 22:46:48.503 UTC [2621] DETAIL:  Failing row contains (f7a59620-82b5-471c-a49b-61f717a9e19c, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.503465+00, 2026-11-23 22:46:48.503465+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, RCL-QL-NOFULL-1, af766f04-b210-4433-9c04-95ea5de75d7b, Precautionary drill, CLOSED, 2026-02-23 08:00:00+00, null, 2026-03-01 10:00:00+00, null, null, null, null).
+2026-11-23 22:46:48.503 UTC [2621] STATEMENT:  INSERT INTO recall_registry
+	         (id, tenant_id, recall_no, batch_id, reason, status, initiated_at, executed_at,
+	          closed_at, scope, affected_customers, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11)
+
+2026-11-23 22:46:48.521 UTC [2621] ERROR:  new row for relation "recall_registry" violates check constraint "ck_recall_registry_scope_shape"
+2026-11-23 22:46:48.521 UTC [2621] DETAIL:  Failing row contains (4a59a19b-8249-4d82-909f-882a2d85a662, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.521421+00, 2026-11-23 22:46:48.521421+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, RCL-QL-SCOPE-1, 0af5d4db-23a2-48a8-b6dd-9acf77375587, Precautionary drill, EXECUTED, 2026-02-23 08:00:00+00, 2026-02-23 10:00:00+00, null, {"chain": "not an array"}, null, null, null).
+2026-11-23 22:46:48.521 UTC [2621] STATEMENT:  INSERT INTO recall_registry
+	         (id, tenant_id, recall_no, batch_id, reason, status, initiated_at, executed_at,
+	          closed_at, scope, affected_customers, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11)
+
+2026-11-23 22:46:48.523 UTC [2621] ERROR:  new row for relation "quality_management_reviews" violates check constraint "ck_quality_management_reviews_indicators_shape"
+2026-11-23 22:46:48.523 UTC [2621] DETAIL:  Failing row contains (6b21b3a5-80b1-4b1c-88b1-49749ff7747c, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.523071+00, 2026-11-23 22:46:48.523071+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, QMR-QL-PACK-1, Bad pack, 2026-03-31 13:00:00+00, [], ["not an object"], [], null, null).
+2026-11-23 22:46:48.523 UTC [2621] STATEMENT:  INSERT INTO quality_management_reviews
+	             (id, tenant_id, review_no, title, held_at, indicator_pack, created_by)
+	           VALUES (gen_random_uuid(), $1, 'QMR-QL-PACK-1', 'Bad pack', '2026-03-31T13:00:00Z',
+	            '["not an object"]'::jsonb, $2)
+
+2026-11-23 22:46:48.523 UTC [2621] ERROR:  new row for relation "quality_management_reviews" violates check constraint "ck_quality_management_reviews_attendees_shape"
+2026-11-23 22:46:48.523 UTC [2621] DETAIL:  Failing row contains (5a1f6bd4-9116-49cd-b101-1e8a55949d76, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.523704+00, 2026-11-23 22:46:48.523704+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, QMR-QL-ATT-1, Bad attendees, 2026-03-31 13:00:00+00, {"name": "not an array"}, {}, [], null, null).
+2026-11-23 22:46:48.523 UTC [2621] STATEMENT:  INSERT INTO quality_management_reviews
+	             (id, tenant_id, review_no, title, held_at, attendees, indicator_pack, created_by)
+	           VALUES (gen_random_uuid(), $1, 'QMR-QL-ATT-1', 'Bad attendees',
+	            '2026-03-31T13:00:00Z', '{"name":"not an array"}'::jsonb, '{}'::jsonb, $2)
+
+2026-11-23 22:46:48.524 UTC [2621] ERROR:  new row for relation "quality_management_reviews" violates check constraint "ck_quality_management_reviews_decisions_shape"
+2026-11-23 22:46:48.524 UTC [2621] DETAIL:  Failing row contains (d3b47295-c001-468d-9883-361d62889e43, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.52416+00, 2026-11-23 22:46:48.52416+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, QMR-QL-DEC-1, Bad decisions, 2026-03-31 13:00:00+00, [], {}, {"title": "not an array"}, null, null).
+2026-11-23 22:46:48.524 UTC [2621] STATEMENT:  INSERT INTO quality_management_reviews
+	             (id, tenant_id, review_no, title, held_at, decisions, indicator_pack, created_by)
+	           VALUES (gen_random_uuid(), $1, 'QMR-QL-DEC-1', 'Bad decisions',
+	            '2026-03-31T13:00:00Z', '{"title":"not an array"}'::jsonb, '{}'::jsonb, $2)
+
+2026-11-23 22:46:48.535 UTC [2621] ERROR:  new row for relation "hazard_registers" violates check constraint "ck_hazard_registers_ccp_limit"
+2026-11-23 22:46:48.535 UTC [2621] DETAIL:  Failing row contains (3123bd91-6664-495e-8137-d9781f3bf5a2, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.535426+00, 2026-11-23 22:46:48.535426+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, QL CCP no limit, null, Pathogen growth, null, BIOLOGICAL, null, null, t, null, null, null, null, t, null, null).
+2026-11-23 22:46:48.535 UTC [2621] STATEMENT:  INSERT INTO hazard_registers
+	         (id, tenant_id, name, name_ar, hazard, hazard_ar, category, process_step, item_id,
+	          is_ccp, critical_limit, critical_limit_ar, monitoring_procedure, corrective_action,
+	          is_active, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 22:46:48.536 UTC [2621] ERROR:  new row for relation "hazard_registers" violates check constraint "ck_hazard_registers_category"
+2026-11-23 22:46:48.536 UTC [2621] DETAIL:  Failing row contains (a056365f-d736-4022-91e0-6e9592798b80, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 22:46:48.536148+00, 2026-11-23 22:46:48.536148+00, 1, 5a5a5a5a-0000-4000-8000-0000000005a1, null, QL Bad category, null, Pathogen growth, null, RADIATION, null, null, f, null, null, null, null, t, null, null).
+2026-11-23 22:46:48.536 UTC [2621] STATEMENT:  INSERT INTO hazard_registers
+	         (id, tenant_id, name, name_ar, hazard, hazard_ar, category, process_step, item_id,
+	          is_ccp, critical_limit, critical_limit_ar, monitoring_procedure, corrective_action,
+	          is_active, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 22:46:48.537 UTC [2621] ERROR:  duplicate key value violates unique constraint "uq_hazard_registers_tenant_name"
+2026-11-23 22:46:48.537 UTC [2621] DETAIL:  Key (tenant_id, name)=(5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, QL UNIQUE HAZARD) already exists.
+2026-11-23 22:46:48.537 UTC [2621] STATEMENT:  INSERT INTO hazard_registers
+	         (id, tenant_id, name, name_ar, hazard, hazard_ar, category, process_step, item_id,
+	          is_ccp, critical_limit, critical_limit_ar, monitoring_procedure, corrective_action,
+	          is_active, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+ ✓ src/__db__/quality/quality-schema.db.spec.ts (59 tests) 470ms
+ ✓ src/__db__/quality/quality-reviews-hazards.db.spec.ts (8 tests) 192ms
+ ✓ src/__db__/quality/quality-supplier-scores.db.spec.ts (8 tests) 325ms
+ ✓ src/__db__/quality/quality-coa.db.spec.ts (9 tests) 268ms
+ ✓ src/__db__/quality/quality-recall.db.spec.ts (4 tests) 240ms
+ ✓ src/__db__/quality/quality-calibration-sweep.db.spec.ts (4 tests) 317ms
+ ✓ src/__db__/quality/quality-spc.db.spec.ts (8 tests) 218ms
+ ✓ src/__db__/quality/quality-capa.db.spec.ts (17 tests) 135ms
+ ✓ src/__db__/quality/quality-complaints.db.spec.ts (5 tests) 122ms
+ ✓ src/__db__/quality/quality-calibration.db.spec.ts (10 tests) 156ms
+2026-11-23 22:46:52.500 UTC [2588] ERROR:  update or delete on table "quality_specifications" violates foreign key constraint "fk_spc_measurements_spec" on table "spc_measurements"
+2026-11-23 22:46:52.500 UTC [2588] DETAIL:  Key is still referenced from table "spc_measurements".
+2026-11-23 22:46:52.500 UTC [2588] STATEMENT:  
+	    DELETE FROM quality_specifications WHERE id = $1 RETURNING id
+
+ ✓ src/__db__/quality/quality-specs.db.spec.ts (11 tests) 123ms
+
+ Test Files  14 passed (14)
+      Tests  167 passed (167)
+   Start at  22:46:39
+   Duration  13.44s (transform 2.42s, setup 0ms, collect 3.79s, tests 5.44s, environment 0ms, prepare 56ms)
+
+2026-11-23 22:46:52.546 UTC [2374] LOG:  received fast shutdown request
+
+2026-11-23 22:46:52.546 UTC [2374] LOG:  aborting any active transactions
+2026-11-23 22:46:52.546 UTC [2621] FATAL:  terminating connection due to administrator command
+2026-11-23 22:46:52.546 UTC [2589] FATAL:  terminating connection due to administrator command
+2026-11-23 22:46:52.548 UTC [2374] LOG:  background worker "logical replication launcher" (PID 2380) exited with exit code 1
+
+2026-11-23 22:46:52.550 UTC [2588] FATAL:  terminating connection due to administrator command
+
+(node:2433) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:2433) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-23 22:46:52.558 UTC [2755] FATAL:  terminating connection due to administrator command
+
+2026-11-23 22:46:52.561 UTC [2375] LOG:  shutting down
+
+2026-11-23 22:46:52.561 UTC [2375] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-23 22:46:52.587 UTC [2375] LOG:  checkpoint complete: wrote 3538 buffers (21.6%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.018 s, sync=0.008 s, total=0.026 s; sync files=2800, longest=0.001 s, average=0.001 s; distance=29814 kB, estimate=29814 kB; lsn=0/31FC170, redo lsn=0/31FC170
+
+2026-11-23 22:46:52.595 UTC [2374] LOG:  database system is shut down
+
+VITEST_EXIT=0
