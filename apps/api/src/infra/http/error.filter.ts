@@ -88,6 +88,16 @@ import {
   // COA planes' statuses (see domainStatus).
   SupplierQualityPartnerNotFoundError,
   CoaDocumentNotFoundError,
+  // PHASE-050 (W-28 — T-12 + T-13 + T-14): the complaints · holds ·
+  // recall planes' statuses (see domainStatus).
+  BatchQualityHoldNotFoundError,
+  ComplaintNotFoundError,
+  RecallRecordNotFoundError,
+  BatchQualityHoldError,
+  BatchHoldAlreadyActiveError,
+  BatchQualityHoldStateError,
+  ComplaintStateError,
+  RecallStateError,
 } from "../../modules/quality/domain/quality-errors";
 import {
   AttachmentNotFoundError,
@@ -1343,7 +1353,12 @@ function domainStatus(error: DomainError): number {
     // PHASE-050 (W-27 — T-10 + T-11): the supplier-score recompute
     // target + the certificate reads' not-founds (A7 parity).
     error instanceof SupplierQualityPartnerNotFoundError ||
-    error instanceof CoaDocumentNotFoundError
+    error instanceof CoaDocumentNotFoundError ||
+    // PHASE-050 (W-28 — T-12 + T-13 + T-14): the hold + complaint +
+    // recall registers' not-founds (A7 parity).
+    error instanceof BatchQualityHoldNotFoundError ||
+    error instanceof ComplaintNotFoundError ||
+    error instanceof RecallRecordNotFoundError
   ) {
     return HttpStatus.NOT_FOUND;
   }
@@ -1351,7 +1366,17 @@ function domainStatus(error: DomainError): number {
     error instanceof QualitySpecificationDuplicateError ||
     error instanceof NcrStateError ||
     error instanceof CapaStateError ||
-    error instanceof CapaCostAlreadyRecordedError
+    error instanceof CapaCostAlreadyRecordedError ||
+    // PHASE-050 (W-28 — T-13): INV-035's own blocking refusal surfaces
+    // as the 409 conflict — the caller's document keeps its state, ZERO
+    // residue (the gate fires inside planIssue BEFORE any slice is
+    // valued or applied); the one-active-per-batch law and the register
+    // ladders' conflicts ride the same status.
+    error instanceof BatchQualityHoldError ||
+    error instanceof BatchHoldAlreadyActiveError ||
+    error instanceof BatchQualityHoldStateError ||
+    error instanceof ComplaintStateError ||
+    error instanceof RecallStateError
   ) {
     return HttpStatus.CONFLICT;
   }

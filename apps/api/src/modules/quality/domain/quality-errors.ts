@@ -388,3 +388,116 @@ export class CoaNoSpecificationsError extends DomainError {
     );
   }
 }
+
+// ── the holds plane (T-13 — INV-035 + BR-101, the D-07 gate) ─────────────────
+
+/** INV-035's own refusal — THE SHARED BLOCKING VALIDATION SERVICE's typed
+ * gate (D-07: one service, the only gate). The refusal names the batch,
+ * the hold's reason and the figures (heldAt) so the operator sees the
+ * exact freeze they hit; every baseline issue/ship path surfaces it
+ * (the 409 conflict face — the document stays where it was, ZERO
+ * residue: the gate fires inside planIssue BEFORE any slice is valued
+ * or applied). */
+export class BatchQualityHoldError extends DomainError {
+  constructor(details: {
+    batchId: string;
+    holdId: string;
+    reason: string;
+    heldAt: string;
+  }) {
+    super(
+      "BATCH_QUALITY_HELD",
+      `batch ${details.batchId} is under an ACTIVE quality hold (${details.reason}, held at ${details.heldAt}) — INV-035: the batch cannot be issued or shipped until the hold is released (BR-101: release requires the disposition-linked record)`,
+      details,
+    );
+  }
+}
+
+export class BatchQualityHoldNotFoundError extends DomainError {
+  constructor(details: { holdId: string }) {
+    super(
+      "BATCH_QUALITY_HOLD_NOT_FOUND",
+      `batch quality hold ${details.holdId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The one-active-per-batch law (0116's partial unique) refused at the
+ * service floor — the typed pre-check law; the 23505 never surfaces
+ * raw. */
+export class BatchHoldAlreadyActiveError extends DomainError {
+  constructor(details: { batchId: string; holdId: string }) {
+    super(
+      "BATCH_HOLD_ALREADY_ACTIVE",
+      `batch ${details.batchId} already carries an ACTIVE hold (${details.holdId}) — the one-active-per-batch law (uq_batch_quality_holds_tenant_batch_active); release it before holding the batch again`,
+      details,
+    );
+  }
+}
+
+export class BatchQualityHoldStateError extends DomainError {
+  constructor(details: { holdId: string; status: string }) {
+    super(
+      "BATCH_QUALITY_HOLD_STATE",
+      `hold ${details.holdId} is ${details.status} — the register is evidence, no move reopens it`,
+      details,
+    );
+  }
+}
+
+/** BR-101's own policy refusal: release requires the disposition-linked
+ * record (the ncr link + the release note — the justification pair). */
+export class HoldReleaseDispositionRequiredError extends DomainError {
+  constructor(details: { holdId: string; missing: string }) {
+    super(
+      "HOLD_RELEASE_DISPOSITION_REQUIRED",
+      `BR-101 — hold ${details.holdId} cannot release: ${details.missing} (release requires the disposition-linked record: the ncr whose disposition justifies the release, and the release note)`,
+      details,
+    );
+  }
+}
+
+// ── the complaints plane (T-12 — Q-08, the NCR link + the intake) ────────────
+
+export class ComplaintNotFoundError extends DomainError {
+  constructor(details: { complaintId: string }) {
+    super(
+      "COMPLAINT_NOT_FOUND",
+      `complaint ${details.complaintId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+export class ComplaintStateError extends DomainError {
+  constructor(details: { complaintId: string; status: string; reason: string }) {
+    super(
+      "COMPLAINT_STATE",
+      `complaint ${details.complaintId} is ${details.status} — ${details.reason}`,
+      details,
+    );
+  }
+}
+
+// ── the recall plane (T-14 — Q-09/Q-12, the drill + the record) ──────────────
+
+export class RecallRecordNotFoundError extends DomainError {
+  constructor(details: { recallId: string }) {
+    super(
+      "RECALL_RECORD_NOT_FOUND",
+      `recall record ${details.recallId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+export class RecallStateError extends DomainError {
+  constructor(details: { recallId: string; status: string; reason: string }) {
+    super(
+      "RECALL_STATE",
+      `recall ${details.recallId} is ${details.status} — ${details.reason}`,
+      details,
+    );
+  }
+}

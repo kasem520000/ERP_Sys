@@ -5650,6 +5650,109 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/quality/coa/:id",
     permission: "quality.view",
   },
+  // PHASE-050 (W-28 — T-12 + T-13 + T-14, dated 2026-11-23; matrix §3.28):
+  // the keys-seed-first FOURTH binding wave (1,134 + 18 = 1,152 — the
+  // discipline standing: the TEN keys landed at W-24, the routes bind as
+  // the service waves ship, every change dated at the block — the 1,102
+  // baseline anchor). The complaints plane binds quality.complaints.manage
+  // over the lifecycle acts (the intake + the triage/link/progress/resolve/
+  // close — the 0116 key's own description) with quality.view over the
+  // reads; the holds plane binds quality.hold.manage over the register's
+  // create/release acts with quality.view over the reads (the BLOCKING side
+  // of INV-035 is NOT a route — it is the shared gate wired into the
+  // movement core, server-side on every issue/ship path); the recall plane
+  // binds quality.recall.manage over the drill + the initiate/execute/close
+  // acts with quality.view over the register reads.
+  {
+    method: "POST",
+    path: "/api/v1/quality/complaints",
+    permission: "quality.complaints.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/complaints",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/complaints/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/complaints/:id/triage",
+    permission: "quality.complaints.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/complaints/:id/link-ncr",
+    permission: "quality.complaints.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/complaints/:id/progress",
+    permission: "quality.complaints.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/complaints/:id/resolve",
+    permission: "quality.complaints.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/complaints/:id/close",
+    permission: "quality.complaints.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/holds",
+    permission: "quality.hold.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/holds",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/holds/batch/:batchId",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/holds/:id/release",
+    permission: "quality.hold.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/recall",
+    permission: "quality.recall.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/recall",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/recall/drill/:batchId",
+    permission: "quality.recall.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/recall/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/recall/:id/execute",
+    permission: "quality.recall.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/recall/:id/close",
+    permission: "quality.recall.manage",
+  },
 ];
 
 /**

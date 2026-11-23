@@ -758,3 +758,318 @@ export class QualityCoaController {
     return envelope(await this.coa.find(id));
   }
 }
+
+// ── PHASE-050 (W-28 — T-12 + T-13 + T-14): the complaints · holds · recall
+// planes (the keys-seed-first FOURTH binding wave — the 0116-seeded keys
+// quality.complaints.manage · quality.hold.manage · quality.recall.manage
+// bind here; INV-035's gate is server-side in the movement core, the
+// routes are the register's own management surface) ──────────────────────────
+
+// PHASE-050 (W-28 — T-12): the complaints plane.
+import { ComplaintService } from "../application/complaint-service";
+// PHASE-050 (W-28 — T-13): the holds plane (the register's management
+// surface — the BLOCKING side is the shared gate in the movement core).
+import { HoldService } from "../application/hold-service";
+// PHASE-050 (W-28 — T-14): the recall plane (the drill + the record).
+import { RecallService } from "../application/recall-service";
+
+const COMPLAINT_CHANNELS = ["PHONE", "EMAIL", "WALK_IN", "PORTAL", "SOCIAL", "OTHER"] as const;
+const COMPLAINT_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"] as const;
+
+const createComplaintSchema = z.object({
+  channel: z.enum(COMPLAINT_CHANNELS),
+  severity: z.enum(COMPLAINT_SEVERITIES).default("MEDIUM"),
+  customerId: UUID,
+  itemId: UUID.nullish(),
+  batchId: UUID.nullish(),
+  subject: z.string().min(1).max(500),
+  details: NOTE,
+  detailsAr: NOTE,
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const complaintTriageSchema = z.object({
+  ncrId: UUID.nullish(),
+});
+
+const complaintLinkNcrSchema = z.object({
+  ncrId: UUID,
+});
+
+const complaintResolveSchema = z.object({
+  resolution: TEXT,
+});
+
+const createHoldSchema = z.object({
+  batchId: UUID,
+  reason: TEXT,
+  ncrId: UUID.nullish(),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const holdReleaseSchema = z.object({
+  releaseNote: TEXT,
+});
+
+const createRecallSchema = z.object({
+  batchId: UUID,
+  reason: TEXT,
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+@Controller("/api/v1/quality")
+export class QualityComplaintsController {
+  constructor(@Inject(ComplaintService) private readonly complaints: ComplaintService) {}
+
+  @Post("complaints")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.complaints.manage")
+  @RequireFeature("quality")
+  async createComplaint(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createComplaintSchema.parse(body);
+    return envelope(
+      await this.complaints.create({
+        channel: input.channel,
+        severity: input.severity,
+        customerId: input.customerId,
+        itemId: input.itemId ?? null,
+        batchId: input.batchId ?? null,
+        subject: input.subject,
+        details: input.details ?? null,
+        detailsAr: input.detailsAr ?? null,
+        note: input.note ?? null,
+        noteAr: input.noteAr ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("complaints")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async listComplaints(
+    @Query("status") status?: string,
+    @Query("customerId") customerId?: string,
+    @Query("ncrId") ncrId?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      await this.complaints.list({
+        status,
+        customerId,
+        ncrId,
+        limit: limit === undefined ? undefined : Number(limit),
+      }),
+    );
+  }
+
+  @Get("complaints/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findComplaint(@Param("id") id: string) {
+    return envelope(await this.complaints.find(id));
+  }
+
+  @Post("complaints/:id/triage")
+  @RequirePermissions("quality.complaints.manage")
+  @RequireFeature("quality")
+  async triageComplaint(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = complaintTriageSchema.parse(body ?? {});
+    return envelope(
+      await this.complaints.triage({
+        complaintId: id,
+        ncrId: input.ncrId ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Post("complaints/:id/link-ncr")
+  @RequirePermissions("quality.complaints.manage")
+  @RequireFeature("quality")
+  async linkComplaintNcr(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = complaintLinkNcrSchema.parse(body);
+    return envelope(
+      await this.complaints.linkNcr({
+        complaintId: id,
+        ncrId: input.ncrId,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Post("complaints/:id/progress")
+  @RequirePermissions("quality.complaints.manage")
+  @RequireFeature("quality")
+  async progressComplaint(@Req() request: Request, @Param("id") id: string) {
+    const identity = requireIdentity(request);
+    return envelope(
+      await this.complaints.progress({ complaintId: id, actorId: identity.userId }),
+    );
+  }
+
+  @Post("complaints/:id/resolve")
+  @RequirePermissions("quality.complaints.manage")
+  @RequireFeature("quality")
+  async resolveComplaint(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = complaintResolveSchema.parse(body);
+    return envelope(
+      await this.complaints.resolve({
+        complaintId: id,
+        resolution: input.resolution,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Post("complaints/:id/close")
+  @RequirePermissions("quality.complaints.manage")
+  @RequireFeature("quality")
+  async closeComplaint(@Req() request: Request, @Param("id") id: string) {
+    const identity = requireIdentity(request);
+    return envelope(await this.complaints.close({ complaintId: id, actorId: identity.userId }));
+  }
+}
+
+@Controller("/api/v1/quality")
+export class QualityHoldsController {
+  constructor(@Inject(HoldService) private readonly holds: HoldService) {}
+
+  @Post("holds")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.hold.manage")
+  @RequireFeature("quality")
+  async createHold(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createHoldSchema.parse(body);
+    return envelope(
+      await this.holds.create({
+        batchId: input.batchId,
+        reason: input.reason,
+        ncrId: input.ncrId ?? null,
+        note: input.note ?? null,
+        noteAr: input.noteAr ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("holds")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async listHolds(
+    @Query("batchId") batchId?: string,
+    @Query("status") status?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      await this.holds.list({
+        batchId,
+        status: status === "ACTIVE" || status === "RELEASED" ? status : undefined,
+        limit: limit === undefined ? undefined : Number(limit),
+      }),
+    );
+  }
+
+  /** The batch's ACTIVE hold — the web banners' own read (W-29). */
+  @Get("holds/batch/:batchId")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findActiveHold(@Param("batchId") batchId: string) {
+    return envelope(await this.holds.findActiveByBatch(batchId));
+  }
+
+  @Post("holds/:id/release")
+  @RequirePermissions("quality.hold.manage")
+  @RequireFeature("quality")
+  async releaseHold(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = holdReleaseSchema.parse(body);
+    return envelope(
+      await this.holds.release({
+        holdId: id,
+        releaseNote: input.releaseNote,
+        actorId: identity.userId,
+      }),
+    );
+  }
+}
+
+@Controller("/api/v1/quality")
+export class QualityRecallController {
+  constructor(@Inject(RecallService) private readonly recalls: RecallService) {}
+
+  @Post("recall")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.recall.manage")
+  @RequireFeature("quality")
+  async initiateRecall(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createRecallSchema.parse(body);
+    return envelope(
+      await this.recalls.initiate({
+        batchId: input.batchId,
+        reason: input.reason,
+        note: input.note ?? null,
+        noteAr: input.noteAr ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("recall")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async listRecalls(
+    @Query("status") status?: string,
+    @Query("batchId") batchId?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      await this.recalls.list({
+        status,
+        batchId,
+        limit: limit === undefined ? undefined : Number(limit),
+      }),
+    );
+  }
+
+  /** THE DRILL QUERY (D-14 — the live read; declared BEFORE the :id
+   * route so "drill" never captures an id). */
+  @Get("recall/drill/:batchId")
+  @RequirePermissions("quality.recall.manage")
+  @RequireFeature("quality")
+  async drillBatch(@Param("batchId") batchId: string) {
+    return envelope(await this.recalls.drill(batchId));
+  }
+
+  @Get("recall/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findRecall(@Param("id") id: string) {
+    return envelope(await this.recalls.find(id));
+  }
+
+  @Post("recall/:id/execute")
+  @RequirePermissions("quality.recall.manage")
+  @RequireFeature("quality")
+  async executeRecall(@Req() request: Request, @Param("id") id: string) {
+    const identity = requireIdentity(request);
+    return envelope(await this.recalls.execute({ recallId: id, actorId: identity.userId }));
+  }
+
+  @Post("recall/:id/close")
+  @RequirePermissions("quality.recall.manage")
+  @RequireFeature("quality")
+  async closeRecall(@Req() request: Request, @Param("id") id: string) {
+    const identity = requireIdentity(request);
+    return envelope(await this.recalls.close({ recallId: id, actorId: identity.userId }));
+  }
+}

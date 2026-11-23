@@ -1039,3 +1039,416 @@ export async function listCoaDocuments(filter: {
     LIMIT ${Math.min(filter.limit, 500)}`);
   return rows;
 }
+
+// ── PHASE-050 (W-28 — T-13) the batch quality holds (INV-035 + BR-101 —
+// D-07: the shared blocking validation service is the ONLY gate; this
+// store's read feeds it, and every write is the register's own CAS) ──────────
+
+export interface BatchQualityHoldRow {
+  id: string;
+  batchId: string;
+  reason: string;
+  ncrId: string | null;
+  status: "ACTIVE" | "RELEASED";
+  heldAt: string;
+  releasedAt: string | null;
+  releaseNote: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+const HOLD_COLUMNS = sql`id, batch_id AS "batchId", reason, ncr_id AS "ncrId",
+  status, held_at AS "heldAt", released_at AS "releasedAt",
+  release_note AS "releaseNote", note, note_ar AS "noteAr",
+  created_by AS "createdBy", created_at AS "createdAt"`;
+
+export interface InsertBatchQualityHoldInput {
+  batchId: string;
+  reason: string;
+  ncrId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}
+
+export async function insertBatchQualityHold(
+  input: InsertBatchQualityHoldInput,
+): Promise<BatchQualityHoldRow> {
+  const rows = await query<BatchQualityHoldRow>(sql`
+    INSERT INTO batch_quality_holds
+      (id, tenant_id, created_by, batch_id, reason, ncr_id, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.createdBy},
+            ${input.batchId}, ${input.reason}, ${input.ncrId}, ${input.note}, ${input.noteAr})
+    RETURNING ${HOLD_COLUMNS}`);
+  return rows[0]!;
+}
+
+/** The one-active-per-batch read (the partial unique's own single row —
+ * the gate's read stays single-row by construction). */
+export async function findActiveHoldByBatch(
+  batchId: string,
+): Promise<BatchQualityHoldRow | undefined> {
+  const rows = await query<BatchQualityHoldRow>(sql`
+    SELECT ${HOLD_COLUMNS} FROM batch_quality_holds
+    WHERE batch_id = ${batchId} AND status = 'ACTIVE'
+    LIMIT 1`);
+  return rows[0];
+}
+
+/** THE GATE READ (D-07): every ACTIVE hold over the plan's resolved
+ * batches — ONE statement, the partial unique index's own access path
+ * (uq_batch_quality_holds_tenant_batch_active). */
+export async function findActiveHoldsByBatches(
+  batchIds: readonly string[],
+): Promise<BatchQualityHoldRow[]> {
+  if (batchIds.length === 0) return [];
+  const list = sql.join(
+    batchIds.map((batchId) => sql`${batchId}`),
+    sql`, `,
+  );
+  return query<BatchQualityHoldRow>(sql`
+    SELECT ${HOLD_COLUMNS} FROM batch_quality_holds
+    WHERE status = 'ACTIVE' AND batch_id IN (${list})`);
+}
+
+export async function findBatchQualityHoldById(
+  id: string,
+): Promise<BatchQualityHoldRow | undefined> {
+  const rows = await query<BatchQualityHoldRow>(sql`
+    SELECT ${HOLD_COLUMNS} FROM batch_quality_holds WHERE id = ${id}`);
+  return rows[0];
+}
+
+export async function listBatchQualityHolds(filter: {
+  batchId?: string;
+  status?: "ACTIVE" | "RELEASED";
+  limit: number;
+}): Promise<BatchQualityHoldRow[]> {
+  return query<BatchQualityHoldRow>(sql`
+    SELECT ${HOLD_COLUMNS} FROM batch_quality_holds
+    WHERE (${filter.batchId ?? null}::uuid IS NULL OR batch_id = ${filter.batchId ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY held_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+}
+
+/** BR-101's release CAS: the status pins ACTIVE, the release pair lands
+ * in the SAME statement (the ck_release_shape floor satisfied by the
+ * same statement that consumes the stamp); zero rows = the raced/stale
+ * move. */
+export async function releaseBatchQualityHold(input: {
+  id: string;
+  releaseNote: string;
+  updatedBy: string | null;
+}): Promise<BatchQualityHoldRow | undefined> {
+  const rows = await query<BatchQualityHoldRow>(sql`
+    UPDATE batch_quality_holds
+    SET status = 'RELEASED', released_at = now(), release_note = ${input.releaseNote},
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'ACTIVE'
+    RETURNING ${HOLD_COLUMNS}`);
+  return rows[0];
+}
+
+// ── PHASE-050 (W-28 — T-12) the complaints (Q-08 — the intake, the NCR
+// link, the resolution pair; 0114's own table) ────────────────────────────────
+
+export interface ComplaintRow {
+  id: string;
+  complaintNo: string;
+  channel: string;
+  severity: string;
+  customerId: string;
+  itemId: string | null;
+  batchId: string | null;
+  ncrId: string | null;
+  subject: string;
+  details: string | null;
+  detailsAr: string | null;
+  status: string;
+  resolution: string | null;
+  resolvedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+const COMPLAINT_COLUMNS = sql`id, complaint_no AS "complaintNo", channel, severity,
+  customer_id AS "customerId", item_id AS "itemId", batch_id AS "batchId",
+  ncr_id AS "ncrId", subject, details, details_ar AS "detailsAr", status,
+  resolution, resolved_at AS "resolvedAt", note, note_ar AS "noteAr",
+  created_by AS "createdBy", created_at AS "createdAt"`;
+
+export interface InsertComplaintInput {
+  complaintNo: string;
+  channel: string;
+  severity: string;
+  customerId: string;
+  itemId: string | null;
+  batchId: string | null;
+  subject: string;
+  details: string | null;
+  detailsAr: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}
+
+export async function insertComplaint(input: InsertComplaintInput): Promise<ComplaintRow> {
+  const rows = await query<ComplaintRow>(sql`
+    INSERT INTO complaints
+      (id, tenant_id, created_by, complaint_no, channel, severity, customer_id,
+       item_id, batch_id, subject, details, details_ar, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.createdBy},
+            ${input.complaintNo}, ${input.channel}, ${input.severity}, ${input.customerId},
+            ${input.itemId}, ${input.batchId}, ${input.subject}, ${input.details},
+            ${input.detailsAr}, ${input.note}, ${input.noteAr})
+    RETURNING ${COMPLAINT_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findComplaintById(id: string): Promise<ComplaintRow | undefined> {
+  const rows = await query<ComplaintRow>(sql`
+    SELECT ${COMPLAINT_COLUMNS} FROM complaints WHERE id = ${id}`);
+  return rows[0];
+}
+
+export async function listComplaints(filter: {
+  status?: string;
+  customerId?: string;
+  ncrId?: string;
+  limit: number;
+}): Promise<ComplaintRow[]> {
+  return query<ComplaintRow>(sql`
+    SELECT ${COMPLAINT_COLUMNS} FROM complaints
+    WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+      AND (${filter.customerId ?? null}::uuid IS NULL OR customer_id = ${filter.customerId ?? null})
+      AND (${filter.ncrId ?? null}::uuid IS NULL OR ncr_id = ${filter.ncrId ?? null})
+    ORDER BY created_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+}
+
+/** The triage CAS: NEW pins the from-state; the NCR link may land in the
+ * SAME statement (the triage act carries the first link — the fold's
+ * own window). */
+export async function stampComplaintTriage(input: {
+  id: string;
+  ncrId: string | null;
+  updatedBy: string | null;
+}): Promise<ComplaintRow | undefined> {
+  const rows = await query<ComplaintRow>(sql`
+    UPDATE complaints
+    SET status = 'TRIAGED', ncr_id = ${input.ncrId},
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'NEW'
+    RETURNING ${COMPLAINT_COLUMNS}`);
+  return rows[0];
+}
+
+/** The link CAS: the window pins TRIAGED/IN_PROGRESS; the link is the
+ * triage's own correction while the window stands. */
+export async function linkComplaintNcr(input: {
+  id: string;
+  ncrId: string;
+  updatedBy: string | null;
+}): Promise<ComplaintRow | undefined> {
+  const rows = await query<ComplaintRow>(sql`
+    UPDATE complaints
+    SET ncr_id = ${input.ncrId},
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status IN ('TRIAGED', 'IN_PROGRESS') AND ncr_id IS NULL
+    RETURNING ${COMPLAINT_COLUMNS}`);
+  return rows[0];
+}
+
+export async function stampComplaintProgress(input: {
+  id: string;
+  updatedBy: string | null;
+}): Promise<ComplaintRow | undefined> {
+  const rows = await query<ComplaintRow>(sql`
+    UPDATE complaints
+    SET status = 'IN_PROGRESS',
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'TRIAGED'
+    RETURNING ${COMPLAINT_COLUMNS}`);
+  return rows[0];
+}
+
+/** The resolution CAS: the pair lands together (ck_complaints_resolved_
+ * shape satisfied by the same statement). */
+export async function stampComplaintResolution(input: {
+  id: string;
+  resolution: string;
+  updatedBy: string | null;
+}): Promise<ComplaintRow | undefined> {
+  const rows = await query<ComplaintRow>(sql`
+    UPDATE complaints
+    SET status = 'RESOLVED', resolution = ${input.resolution}, resolved_at = now(),
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'IN_PROGRESS'
+    RETURNING ${COMPLAINT_COLUMNS}`);
+  return rows[0];
+}
+
+export async function stampComplaintClosed(input: {
+  id: string;
+  updatedBy: string | null;
+}): Promise<ComplaintRow | undefined> {
+  const rows = await query<ComplaintRow>(sql`
+    UPDATE complaints
+    SET status = 'CLOSED',
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'RESOLVED'
+    RETURNING ${COMPLAINT_COLUMNS}`);
+  return rows[0];
+}
+
+// ── PHASE-050 (W-28 — T-14) the recall registry (Q-09/Q-12 — the drill's
+// RECORD; the drill's live query is the service over the EXISTING
+// genealogy + sales-edge reads, D-14) ─────────────────────────────────────────
+
+export interface RecallRegistryRow {
+  id: string;
+  recallNo: string;
+  batchId: string;
+  reason: string;
+  status: "INITIATED" | "EXECUTED" | "CLOSED";
+  initiatedAt: string;
+  executedAt: string | null;
+  closedAt: string | null;
+  scope: unknown;
+  affectedCustomers: unknown;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+const RECALL_COLUMNS = sql`id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"`;
+
+export interface InsertRecallInput {
+  recallNo: string;
+  batchId: string;
+  reason: string;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}
+
+export async function insertRecall(input: InsertRecallInput): Promise<RecallRegistryRow> {
+  const rows = await query<RecallRegistryRow>(sql`
+    INSERT INTO recall_registry
+      (id, tenant_id, created_by, recall_no, batch_id, reason, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.createdBy},
+            ${input.recallNo}, ${input.batchId}, ${input.reason}, ${input.note}, ${input.noteAr})
+    RETURNING ${RECALL_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findRecallById(id: string): Promise<RecallRegistryRow | undefined> {
+  const rows = await query<RecallRegistryRow>(sql`
+    SELECT ${RECALL_COLUMNS} FROM recall_registry WHERE id = ${id}`);
+  return rows[0];
+}
+
+export async function listRecalls(filter: {
+  status?: string;
+  batchId?: string;
+  limit: number;
+}): Promise<RecallRegistryRow[]> {
+  return query<RecallRegistryRow>(sql`
+    SELECT ${RECALL_COLUMNS} FROM recall_registry
+    WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+      AND (${filter.batchId ?? null}::uuid IS NULL OR batch_id = ${filter.batchId ?? null})
+    ORDER BY initiated_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+}
+
+/** The execute CAS: INITIATED pins the from-state; the frozen snapshots
+ * (scope + affected_customers) land in the SAME statement (the executed
+ * paths' own record — single-use, never re-frozen). */
+export async function stampRecallExecuted(input: {
+  id: string;
+  scope: unknown;
+  affectedCustomers: unknown;
+  updatedBy: string | null;
+}): Promise<RecallRegistryRow | undefined> {
+  const rows = await query<RecallRegistryRow>(sql`
+    UPDATE recall_registry
+    SET status = 'EXECUTED', executed_at = now(),
+        scope = ${JSON.stringify(input.scope)}::jsonb,
+        affected_customers = ${JSON.stringify(input.affectedCustomers)}::jsonb,
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'INITIATED'
+    RETURNING ${RECALL_COLUMNS}`);
+  return rows[0];
+}
+
+export async function stampRecallClosed(input: {
+  id: string;
+  updatedBy: string | null;
+}): Promise<RecallRegistryRow | undefined> {
+  const rows = await query<RecallRegistryRow>(sql`
+    UPDATE recall_registry
+    SET status = 'CLOSED', closed_at = now(),
+        updated_by = ${input.updatedBy}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND status = 'EXECUTED'
+    RETURNING ${RECALL_COLUMNS}`);
+  return rows[0];
+}
+
+/** The drill's doc→customer lookup (the §10 boundary's own consumer —
+ * the genealogy returns DOC IDS ONLY by design; the recall drill is the
+ * consumer that resolves them): one statement over the two sales doc
+ * tables joined to the partner register. */
+export interface RecallDocCustomerRow {
+  docType: "sales_invoice" | "delivery_note";
+  docId: string;
+  docNo: string | null;
+  customerId: string;
+  customerName: string;
+  customerNameAr: string | null;
+}
+
+export async function listRecallDocCustomers(
+  docs: readonly { docType: "sales_invoice" | "delivery_note"; docId: string }[],
+): Promise<RecallDocCustomerRow[]> {
+  const deliveryIds = docs.filter((doc) => doc.docType === "delivery_note").map((doc) => doc.docId);
+  const invoiceIds = docs.filter((doc) => doc.docType === "sales_invoice").map((doc) => doc.docId);
+  if (deliveryIds.length === 0 && invoiceIds.length === 0) return [];
+  const deliveryArm =
+    deliveryIds.length === 0
+      ? sql``
+      : sql`
+    SELECT 'delivery_note' AS "docType", dn.id AS "docId", dn.delivery_no AS "docNo",
+           dn.customer_id AS "customerId", p.name AS "customerName", p.name_ar AS "customerNameAr"
+      FROM delivery_notes dn JOIN partners p ON p.id = dn.customer_id AND p.tenant_id = dn.tenant_id
+     WHERE dn.id IN (${sql.join(
+       deliveryIds.map((id) => sql`${id}`),
+       sql`, `,
+     )})`;
+  const invoiceArm =
+    invoiceIds.length === 0
+      ? sql``
+      : sql`
+    SELECT 'sales_invoice' AS "docType", si.id AS "docId", si.invoice_no AS "docNo",
+           si.customer_id AS "customerId", p.name AS "customerName", p.name_ar AS "customerNameAr"
+      FROM sales_invoices si JOIN partners p ON p.id = si.customer_id AND p.tenant_id = si.tenant_id
+     WHERE si.id IN (${sql.join(
+       invoiceIds.map((id) => sql`${id}`),
+       sql`, `,
+     )})`;
+  const statement =
+    deliveryIds.length > 0 && invoiceIds.length > 0
+      ? sql`${deliveryArm} UNION ALL ${invoiceArm}`
+      : deliveryIds.length > 0
+        ? deliveryArm
+        : invoiceArm;
+  return query<RecallDocCustomerRow>(statement);
+}

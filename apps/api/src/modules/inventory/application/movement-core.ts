@@ -33,6 +33,11 @@ import {
 import { requireTenantContext } from "../../../infra/db/tenant-context";
 import { fifoConsume } from "../domain/valuation/fifo";
 import { wacIssue, wacReceive } from "../domain/valuation/wac";
+// PHASE-050 (W-28 — INV-035 + BR-101, D-07): the shared blocking
+// validation service — the ONLY gate (the reservation-hard-protection
+// precedent's own choke-point wiring; the quality module's read of its
+// own register, no cycle — the store is a leaf).
+import { assertNoActiveBatchHolds } from "../../quality/application/hold-gate";
 
 /**
  * Movement core (PHASE-010 T5; INV-010/INV-017/INV-018): the ONLY writer
@@ -690,6 +695,16 @@ export async function planIssue(input: {
    * other explicit-batch issue on a QUARANTINED batch still throws
    * BATCH_QUARANTINED (the default below stays undefined → the guard fires). */
   allowQuarantinedBatch?: boolean;
+  /** PHASE-050 (W-28 — INV-035 + BR-101, D-07): the quality module's own
+   * G-62 write-off (the NCR disposition act — sourceType `ncr_record`) is
+   * the SOLE caller allowed to bypass the batch quality-hold gate. The
+   * 0116 flow's own demand: the SCRAP write-off lands AT the disposition,
+   * while the investigating hold may still be ACTIVE (the hold's release
+   * comes after, justified by this very disposition — BR-101's own
+   * ordering). Every other path — explicit batch or FEFO-resolved — is
+   * gated with NO exception (the shared blocking validation service is
+   * the ONLY gate; see quality/application/hold-gate.ts). */
+  allowHeldBatch?: boolean;
   memo?: string | null;
   memoAr?: string | null;
   /** PHASE-044 (INV-029, directed picking §2.4): restrict the bin
@@ -814,6 +829,32 @@ export async function planIssue(input: {
   // every batch decision on the ISSUING warehouse's own stock (the
   // warehouse-scope law, resolveIssueSlices).
   const rawSlices = await resolveIssueSlices(item, input, qty, input.warehouseId);
+
+  // PHASE-050 (W-28 — INV-035 + BR-101, D-07): THE SHARED BLOCKING
+  // VALIDATION SERVICE — one gate, the ONLY gate, wired HERE so every
+  // issue/ship path passes it by construction (the reserved-pool hard
+  // protection's own choke-point precedent; the enforcement-drift risk
+  // closed structurally). The gate judges the RESOLVED plan — the line's
+  // explicit batch AND the FEFO auto-pick alike (a held batch is never
+  // silently issued): any slice referencing a batch with an ACTIVE
+  // quality hold throws BATCH_QUALITY_HELD (the typed 409 naming the
+  // batch, the reason and the figures) BEFORE any slice is valued or
+  // applied — the caller's document keeps its state, ZERO residue. The
+  // server-side-only law (D-20/OA-02): an offline document carrying a
+  // held batch is rejected at sync reconciliation when its POST runs
+  // this same plan. The sole bypass: the quality module's own G-62
+  // write-off (allowHeldBatch — see the input's dated comment).
+  if (input.allowHeldBatch !== true) {
+    const gateBatchIds = [
+      ...new Set(
+        rawSlices
+          .map((slice) => slice.batchId)
+          .filter((batchId): batchId is string => batchId !== null),
+      ),
+    ];
+    await assertNoActiveBatchHolds(gateBatchIds);
+  }
+
   const slices: IssuePlan["slices"] = [];
   let totalValue = new Decimal(0);
   for (const raw of rawSlices) {

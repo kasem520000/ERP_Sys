@@ -18,13 +18,27 @@ import { QualityCalibrationSweepService } from "./application/quality-calibratio
 import { SpcService } from "./application/spc-service";
 import { SupplierScoreService } from "./application/supplier-score-service";
 import { CoaService } from "./application/coa-service";
+// PHASE-050 (W-28 — T-12 + T-13 + T-14): the complaints · holds · recall
+// planes (the shared blocking validation service — hold-gate.ts — is wired
+// into the inventory movement core, not a provider here; this module's
+// own planes are the register surfaces).
+import { ComplaintService } from "./application/complaint-service";
+import { HoldService } from "./application/hold-service";
+import { RecallService } from "./application/recall-service";
 import { registerQualityCalibrationJob } from "./infrastructure/calibration-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
+// PHASE-050 (W-28 — T-14, D-14): the recall drill consumes the
+// manufacturing genealogy walk VERBATIM (zero parallel computation) — the
+// documented contract, the module import that carries it.
+import { ManufacturingModule } from "../manufacturing/manufacturing.module";
 import {
   QualityCalibrationController,
   QualityCapaController,
   QualityCoaController,
+  QualityComplaintsController,
+  QualityHoldsController,
   QualityNcrController,
+  QualityRecallController,
   QualitySpecificationsController,
   QualitySpcController,
   QualitySupplierScoresController,
@@ -53,7 +67,7 @@ import {
  * with their own services and stores on the same keys.
  */
 @Module({
-  imports: [AccountingModule, AuditModule, NotificationsModule],
+  imports: [AccountingModule, AuditModule, NotificationsModule, ManufacturingModule],
   controllers: [
     QualitySpecificationsController,
     QualityNcrController,
@@ -63,6 +77,11 @@ import {
     QualitySpcController,
     QualitySupplierScoresController,
     QualityCoaController,
+    // PHASE-050 (W-28 — T-12 + T-13 + T-14): the complaints · holds ·
+    // recall planes (the keys-seed-first FOURTH binding wave).
+    QualityComplaintsController,
+    QualityHoldsController,
+    QualityRecallController,
   ],
   providers: [
     SpecificationService,
@@ -76,8 +95,13 @@ import {
     SpcService,
     SupplierScoreService,
     CoaService,
+    // PHASE-050 (W-28 — T-12 + T-13 + T-14): the complaints · holds ·
+    // recall planes.
+    ComplaintService,
+    HoldService,
+    RecallService,
   ],
-  exports: [SpecificationService, NcrService, CapaService, CalibrationService],
+  exports: [SpecificationService, NcrService, CapaService, CalibrationService, HoldService],
 })
 export class QualityModule implements OnModuleInit {
   constructor(private readonly calibrationSweep: QualityCalibrationSweepService) {}

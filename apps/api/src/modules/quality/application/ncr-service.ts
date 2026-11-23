@@ -349,6 +349,12 @@ export class NcrService {
           sourceId: row.id,
           reason: "QUALITY_SCRAP",
           batchId: row.batchId,
+          // PHASE-050 (W-28 — INV-035/BR-101, D-07): the G-62 write-off is
+          // the SOLE held-batch bypass — the SCRAP write-off lands AT the
+          // disposition act, while the investigating hold may still be
+          // ACTIVE (the hold's release comes after, justified by this very
+          // disposition — BR-101's own ordering).
+          allowHeldBatch: true,
           memo: `NCR ${row.ncrNo} — quality scrap write-off (G-62)`,
           memoAr: `سجل عدم مطابقة ${row.ncrNo} — إعدام الجودة G-62`,
         });

@@ -142,6 +142,12 @@ import { StandardCostsController } from "./presentation/standard-costs.controlle
     ReworkService,
     DowntimeService,
     StandardCostService,
+    // PHASE-050 (W-28 — T-14, D-14): the recall drill consumes the
+    // genealogy walk VERBATIM (the documented contract — the quality
+    // module's recall service reads this service, zero parallel
+    // computation; the read stays read-only and tenant-scoped as
+    // designed).
+    GenealogyService,
   ],
 })
 export class ManufacturingModule {}
