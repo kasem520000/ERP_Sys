@@ -13,9 +13,9 @@ duplicates their rows, only counts them for the operator:
 
 | Family | Canon document | Row shape | Implemented through |
 |---|---|---|---|
-| Goldens `G-xx` | [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md) §7 | `\| G-xx \| … \| PHASE-0yy \|` | G-01…G-58 (through PHASE-048) |
-| Invariants `INV-xxx` | [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md) | `\| INV-xxx \| … \|` | INV-001…INV-033 (through PHASE-048) |
-| Business rules `BR-xxx` | [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §"the register" | `\| BR-xxx \| … \|` | BR-001…BR-096 (through PHASE-048) |
+| Goldens `G-xx` | [../accounting/JOURNAL_RULES.md](../accounting/JOURNAL_RULES.md) §7 | `\| G-xx \| … \| PHASE-0yy \|` | G-01…G-63 (through PHASE-050) |
+| Invariants `INV-xxx` | [../accounting/ACCOUNTING_INVARIANTS.md](../accounting/ACCOUNTING_INVARIANTS.md) | `\| INV-xxx \| … \|` | INV-001…INV-035 (through PHASE-050) |
+| Business rules `BR-xxx` | [../product/BUSINESS_RULES.md](../product/BUSINESS_RULES.md) §"the register" | `\| BR-xxx \| … \|` | BR-001…BR-104 (through PHASE-050) |
 
 ## 2. Reservations (the coordinated ladder — 2026-11-13)
 
@@ -44,7 +44,7 @@ corrections never move a slot.)*
 | ~~PHASE-047 (HR Growth)~~ **DELIVERED 2026-11-19** — its slots are now IMPLEMENTED (BR-088…091; see §1 — the phase is LEDGER-FREE by design: no G/INV reservations, the four BR laws are the phase doc's own + amendment A-2's confirmed BR-091 wording) and no longer reservations | — | — | — | BR-057…060 (consumed by 036/037); ~~BR-087…090~~ shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | ~~PHASE-048 (Projects & Contracting)~~ **DELIVERED 2026-11-21** — its slots are now IMPLEMENTED (G-55…G-58 · INV-033 · BR-092…096; see §1 — the D-18 wordings binding at approval, carried into the canon at the W-15 closure) and no longer reservations | — | — | — | G-56…G-59 · INV-032 · BR-061…065 (consumed by 037–040); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | ~~PHASE-049 (CMMS)~~ **DELIVERED 2026-11-22** — its slots are now IMPLEMENTED (G-59…G-61 · INV-034 · BR-097…BR-100; see §1 — the W-23 canon rows binding at the closure: JOURNAL_RULES notes 19 · ACCOUNTING_INVARIANTS INV-034 · BUSINESS_RULES the BR-097…BR-100 section) and no longer reservations | — | — | — | G-60…G-62 · INV-033 · BR-066…069 (consumed by 040/042); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
-| PHASE-050 (QMS) | G-62…G-63 | INV-035 | BR-101…BR-104 | G-63…G-64 · INV-034 · BR-070…073 (consumed by 042/044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
+| ~~PHASE-050 (QMS)~~ **DELIVERED 2026-11-23** — its slots are now IMPLEMENTED (G-62…G-63 · INV-035 · BR-101…BR-104; see §1 — the W-32 canon rows binding at the closure: JOURNAL_RULES notes 20 · ACCOUNTING_INVARIANTS INV-035 · BUSINESS_RULES the BR-101…BR-104 section) and no longer reservations | — | — | — | G-63…G-64 · INV-034 · BR-070…073 (consumed by 042/044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | PHASE-051 (FTL) | G-64…G-66 | INV-036 | BR-105…BR-108 | G-65…G-67 · INV-035 · BR-074…077 (consumed by 044); shifted +1 by the 043-completion round's BR-081 (re-coordinated 2026-11-14) |
 | PHASE-052 (Workflow) | G-67 | INV-037 | — | G-68 · INV-036 |
 | PHASE-053 (Accounting Depth & Treasury) | G-68…G-70 | INV-038 | — | G-69…G-71 · INV-037 |
@@ -62,14 +62,14 @@ corrections never move a slot.)*
 | PHASE-065…068 | — | — | — | none claimed |
 
 **Coordination arithmetic** (the checker re-derives it): goldens — implemented
-ends at G-58 (PHASE-048 delivered 2026-11-21); 049 59–61,
-050 62–63, 051 64–66, 052 67, 053 68–70, 054 71–72,
+ends at G-63 (PHASE-050 delivered 2026-11-23); 049 59–61,
+051 64–66, 052 67, 053 68–70, 054 71–72,
 056 73–74, 060 75–76, 061 77–78, 063 79 — contiguous, no overlap. Invariants —
-implemented ends at INV-033 (PHASE-048 delivered); 049 034,
-050 035, 051 036, 052 037, 053 038, 054 039, 055 040, 056 041, 058 042,
+implemented ends at INV-035 (PHASE-050 delivered); 049 034,
+051 036, 052 037, 053 038, 054 039, 055 040, 056 041, 058 042,
 060 043, 061 044, 064 045 — contiguous. Business rules — implemented ends at
-BR-096 (PHASE-048 delivered 2026-11-21); 049 097–100,
-050 101–104, 051 105–108 — contiguous (every phase after 043
+BR-104 (PHASE-050 delivered 2026-11-23); 049 097–100,
+051 105–108 — contiguous (every phase after 043
 shifted +1 by the completion round's BR-081, re-coordinated 2026-11-14).
 
 ## 3. Cross-references (forward references between future phases)

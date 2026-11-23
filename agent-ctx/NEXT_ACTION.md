@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-050 (Quality Management System) — **W-31 THE PROOF PACK DELIVERED (2026-11-23, this session — #1…#9 ALL GREEN) — W-32 (DOCS + GATES + CLOSURE) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-050 (Quality Management System) — **CLOSED AS DELIVERY 2026-11-23** (W-24…W-32 · the tag `phase/050` — DELIVERY, never acceptance · the report `docs/implementation/phases/reports/PHASE-050-COMPLETION.md`) — **PHASE-051 (Foreign Trade & Logistics) IS THE NEXT ELIGIBLE PHASE** — the owner continues with «ابدأ تنفيذ المرحلة PHASE-051» — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
 F-050a commit `de05cfd`):** W-0 ACCEPTED AS DELIVERY at `7054520` after the
@@ -237,23 +237,57 @@ sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS **1,125**
 agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO
 new this wave.
 
-**NEXT: W-32 — DOCS + GATES + CLOSURE (T-19 + T-20)** under the owner's
-standing order: the canon docs in the ID_LEDGER's reserved wordings
-(JOURNAL_RULES G-62/G-63 + note 20 · ACCOUNTING_INVARIANTS INV-035 ·
-BUSINESS_RULES BR-101…BR-104 — **لا كتابة خارجها**) + **THE ID_LEDGER
-FLIP** (atomic with the canon rows — implemented G 63 · INV 35 · BR
-104; the checker's self-test probe (7) moves to G-64/PHASE-051, claimant
-PHASE-052) + the full sweep at the final head (the isolates first; the
-amended ceiling law; the FULL ten-part envelope at 300 · the full
-counts) + the completion report (the cumulative ledger #1–#10 walked
-and closed + the battery scope map + the FULL unit-package table + the
-open-items log transferred explicitly) + the triple flip (the phase doc
-· IMPLEMENTATION_STATUS · NEXT_ACTION → PHASE-051) + **THE ARCHIVE
-ERP_PLATFORM_PHASE050.zip EXACTLY AS DECLARED (F-4/§5 — the physical
-shape of 049: FLAT, the commit-hash as the FIRST ENTRY, ADDITIVE-ONLY,
-EXCLUDING every standing platform zip — أرشفة الأرشيف ممنوعة — the
-members byte-verified, the standing zips verified untouched)** + **the
-tag `phase/050`** (DELIVERY, never acceptance — the §1a (a) ruling).
+**W-32 — THE CLOSURE (T-19 + T-20, delivered 2026-11-23 on the W-31 delivery
+head `df2fe1e`):** THE CANON ROWS in the ID_LEDGER's reserved wordings —
+JOURNAL_RULES **G-62** (the NCR scrap write-off: DR the purpose-mapped
+INVENTORY_SHRINKAGE · CR the per-warehouse INVENTORY at the affected quantity's
+own value, through the REAL engine and the REAL WMS path, INV-013 single-use on
+(ncr_record, disposition), fail-closed, the honest no-GL shapes, the sole
+INV-035 bypass, note 20) · **G-63** (the external quality costs: DR
+QUALITY_EXPENSE 5320 · CR the EXISTING EXTERNAL_ACCRUAL 2137 — the CAPA leg +
+the calibration create act, the cost + the journal link in ONE guarded CAS) ·
+ACCOUNTING_INVARIANTS **INV-035** (the batch quality-hold blocking on every
+baseline issue/ship path — ONE shared gate inside planIssue, the sole bypass
+the G-62 write-off, the offline leg the same plan) · BUSINESS_RULES
+**BR-101…BR-104** (the disposition-linked release · the NCR closure gate · the
+CAPA effectiveness gate · the COA tolerance gate) + **THE ID_LEDGER FLIP atomic
+with the canon rows** (implemented **G 63 · INV 35 · BR 104**; reservations 14
+phases · 30 ids; 0 errors + the self-test all-probes-OK — the probe-7 fixture
+moved to G-64/PHASE-051, claimant PHASE-052, the W-15 precedent's sixth move)
++ **THE COMPLETION REPORT** (the cumulative wave table W-24…W-32 · the ledger
+#1–#10 CLOSED with every wave's evidence pointers · the battery scope map · the
+FULL unit-package table 167 · 2,020 = 976+204+840 EXACT · ROUTE_PERMISSIONS
+1,159 with the five binding waves · the honest catches' log — TWELVE across the
+phase, every one RED-proven then repaired · the open-items log transferred
+explicitly: the 049 report §4's standing recalls verbatim + RISK-033 at EIGHT
+with ZERO new across W-24…W-32 · the PHASE-051 handoff) + **THE TRIPLE FLIP**
+(the phase doc header → COMPLETE · the IMPLEMENTATION_STATUS row → COMPLETE ·
+this file → PHASE-051) + **THE STEP-2 FULL SWEEP AT THE FINAL HEAD** (the
+isolates first · the FULL ten-part envelope at 300 · the standing battery every
+check green · the gate record `audit-evidence/phase050-w32/`) + **THE ARCHIVE
+`ERP_PLATFORM_PHASE050.zip` EXACTLY AS DECLARED (F-4/§5 — the archive-form
+acknowledgment executed: FLAT, the commit-hash as the FIRST ENTRY — the physical
+shape of 049, ADDITIVE-ONLY, EXCLUDING every standing platform zip: أرشفة
+الأرشيف ممنوعة — the members byte-verified, the standing zips verified
+untouched)** + **THE TAG `phase/050`** (DELIVERY, never acceptance — the §1a (a)
+ruling; the tag lands at the archive head).
+
+**The phase's final state:** the chain **118** · ENTITY_CATALOG **340** · the
+drift **347 = 347** · the registry **315 tenant-owned tables** ·
+ROUTE_PERMISSIONS **1,159** · **the report registry 122** · i18n **7,253 =
+7,253 + mobile 371** · the unit battery **167 · 2,020** (api 78·976 · web
+30·204 · mobile 27·393 · desktop 16·274 · ui 3·43 · contracts 2·56 ·
+domain-core 6·38 · sync-core 5·36) · **the DB roster 300** (the quality family
+17 · 188; the full ten-part envelope at the closure's final head) · depcruise
+**2,195 · 16,411** · docs:validate 33/33 · id-ledger 0 errors + self-test OK
+(implemented **G 63 · INV 35 · BR 104**) · history-secrets 0 violations.
+
+**PHASE-051 (Foreign Trade & Logistics):** the COA print patterns and the
+bilingual print pipeline shipped here are reused for trade certificates
+(certificate of origin/analysis); the batch-hold blocking service — the ONE
+shared gate inside the movement core — is the precedent for bonded-warehouse
+movement restrictions on stock. The owner continues with «ابدأ تنفيذ المرحلة
+PHASE-051». **Delivered as delivery — NOT production approval.**
 
 ---
 

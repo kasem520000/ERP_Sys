@@ -1,6 +1,6 @@
 # PHASE-050 — Quality Management System
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-20](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** **COMPLETE — DELIVERED 2026-11-23** (W-24 through W-32; the tag `phase/050` — DELIVERY, never acceptance; the [completion report](reports/PHASE-050-COMPLETION.md)) — was NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-20](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §7 (M-23) · §8 (Q-01…Q-12) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.2
 
 ## 1. Phase Overview
