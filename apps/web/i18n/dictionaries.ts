@@ -7410,6 +7410,310 @@ export interface Dictionary {
   assetsErrTagAlreadyPrinted: string;
   assetsErrMeterNotFound: string;
   assetsErrTagNotFoundShort: string;
+
+  // PHASE-050 (W-29 — T-15, dated 2026-11-23): the QMS screens' cluster —
+  // the five boards (NCR / CAPA / calibration / SPC / complaints) + the COA
+  // print surface + the shared batch-hold banner + the quality typed-error
+  // templates. Every enum value the boards render carries a key (the
+  // Arabic-first law — real Arabic on the ar side).
+  qualityRefusalTitle: string;
+  qualityRefusalDetails: string;
+  qualityRefresh: string;
+  qualityJournal: string;
+  qualitySeverityLow: string;
+  qualitySeverityMedium: string;
+  qualitySeverityHigh: string;
+  qualitySeverityCritical: string;
+  qualityNcrTitle: string;
+  qualityNcrSubtitle: string;
+  qualityNcrEmpty: string;
+  qualityNcrPaneRegister: string;
+  qualityNcrPaneIntake: string;
+  qualityNcrColNo: string;
+  qualityNcrColItem: string;
+  qualityNcrColStatus: string;
+  qualityNcrColSeverity: string;
+  qualityNcrColSource: string;
+  qualityNcrColQty: string;
+  qualityNcrColProblem: string;
+  qualityNcrColDisposition: string;
+  qualityNcrColCreated: string;
+  qualityNcrStatusOpen: string;
+  qualityNcrStatusDispositioned: string;
+  qualityNcrStatusClosed: string;
+  qualityNcrSourceInspection: string;
+  qualityNcrSourceProduction: string;
+  qualityNcrSourceComplaint: string;
+  qualityNcrSourceSupplier: string;
+  qualityNcrDispositionTitle: string;
+  qualityNcrDispositionRework: string;
+  qualityNcrDispositionScrap: string;
+  qualityNcrDispositionAccept: string;
+  qualityNcrDispositionReturnToSupplier: string;
+  qualityNcrDispositionedToast: string;
+  qualityNcrCloseAct: string;
+  qualityNcrClosedToast: string;
+  qualityNcrOpen: string;
+  qualityNcrIntakeTitle: string;
+  qualityNcrIntakeBatch: string;
+  qualityNcrIntakeInspection: string;
+  qualityNcrIntakePartner: string;
+  qualityNcrIntakeProblem: string;
+  qualityNcrIntakeProblemAr: string;
+  qualityNcrIntakeQty: string;
+  qualityNcrIntakeNote: string;
+  qualityNcrIntakeNoteAr: string;
+  qualityNcrCreate: string;
+  qualityNcrCreatedToast: string;
+  qualityCapaTitle: string;
+  qualityCapaSubtitle: string;
+  qualityCapaEmpty: string;
+  qualityCapaPaneRegister: string;
+  qualityCapaPaneIntake: string;
+  qualityCapaColNo: string;
+  qualityCapaColTitle: string;
+  qualityCapaColStatus: string;
+  qualityCapaColNcr: string;
+  qualityCapaColOwner: string;
+  qualityCapaColDue: string;
+  qualityCapaColRootCause: string;
+  qualityCapaColCost: string;
+  qualityCapaColCreated: string;
+  qualityCapaStatusOpen: string;
+  qualityCapaStatusInProgress: string;
+  qualityCapaStatusClosed: string;
+  qualityCapaIntakeTitle: string;
+  qualityCapaIntakeTitleField: string;
+  qualityCapaIntakeNcr: string;
+  qualityCapaIntakeOwner: string;
+  qualityCapaIntakeDue: string;
+  qualityCapaIntakeNote: string;
+  qualityCapaIntakeNoteAr: string;
+  qualityCapaCreate: string;
+  qualityCapaCreatedToast: string;
+  qualityCapaOpen: string;
+  qualityCapaRootCauseAct: string;
+  qualityCapaRootCauseTitle: string;
+  qualityCapaRootCauseText: string;
+  qualityCapaRootCauseToast: string;
+  qualityCapaCostAct: string;
+  qualityCapaCostTitle: string;
+  qualityCapaCostAmount: string;
+  qualityCapaCostToast: string;
+  qualityCapaCloseAct: string;
+  qualityCapaCloseTitle: string;
+  qualityCapaCloseSummary: string;
+  qualityCapaCloseEffective: string;
+  qualityCapaCloseEffectiveYes: string;
+  qualityCapaCloseEffectiveNo: string;
+  qualityCapaCloseCheckedAt: string;
+  qualityCapaCloseToast: string;
+  qualityCapaActionsTitle: string;
+  qualityCapaActionsEmpty: string;
+  qualityCapaActionDue: string;
+  qualityCapaActionCompletedAt: string;
+  qualityCapaEffectivenessTitle: string;
+  qualityCapaEffectivenessSummary: string;
+  qualityCapaEffectivenessEffective: string;
+  qualityCapaEffectivenessCheckedAt: string;
+  qualityCalibrationTitle: string;
+  qualityCalibrationSubtitle: string;
+  qualityCalibrationEmpty: string;
+  qualityCalibrationPaneRegister: string;
+  qualityCalibrationPaneRecord: string;
+  qualityCalibrationColNo: string;
+  qualityCalibrationColAsset: string;
+  qualityCalibrationColStandard: string;
+  qualityCalibrationColResult: string;
+  qualityCalibrationColCalibratedAt: string;
+  qualityCalibrationColDue: string;
+  qualityCalibrationColCertificate: string;
+  qualityCalibrationColCost: string;
+  qualityCalibrationColCreated: string;
+  qualityCalibrationResultPass: string;
+  qualityCalibrationResultFail: string;
+  qualityCalibrationResultAdjusted: string;
+  qualityCalibrationRecordTitle: string;
+  qualityCalibrationRecordProvider: string;
+  qualityCalibrationRecordCost: string;
+  qualityCalibrationRecordNote: string;
+  qualityCalibrationRecordNoteAr: string;
+  qualityCalibrationCreate: string;
+  qualityCalibrationCreatedToast: string;
+  qualityCalibrationSweepTitle: string;
+  qualityCalibrationSweepThresholds: string;
+  qualityCalibrationSweepDefault: string;
+  qualityCalibrationSweepStored: string;
+  qualityCalibrationSweepLastRun: string;
+  qualityCalibrationSweepNeverRun: string;
+  qualityCalibrationSweepSave: string;
+  qualityCalibrationSweepSavedToast: string;
+  qualityCalibrationSweepHint: string;
+  qualitySpcTitle: string;
+  qualitySpcSubtitle: string;
+  qualitySpcEmpty: string;
+  qualitySpcPaneMeasurements: string;
+  qualitySpcPaneChart: string;
+  qualitySpcSpec: string;
+  qualitySpcSpecHint: string;
+  qualitySpcColSampledAt: string;
+  qualitySpcColValue: string;
+  qualitySpcColSource: string;
+  qualitySpcColBatch: string;
+  qualitySpcColNote: string;
+  qualitySpcSourceManual: string;
+  qualitySpcSourceProduction: string;
+  qualitySpcSourceInspection: string;
+  qualitySpcIngestTitle: string;
+  qualitySpcIngestAct: string;
+  qualitySpcIngestedToast: string;
+  qualitySpcChartTitle: string;
+  qualitySpcChartLoad: string;
+  qualitySpcChartSubgroupSize: string;
+  qualitySpcChartSampleCount: string;
+  qualitySpcGrandMean: string;
+  qualitySpcRBar: string;
+  qualitySpcXUcl: string;
+  qualitySpcXLcl: string;
+  qualitySpcRUcl: string;
+  qualitySpcRLcl: string;
+  qualitySpcSigmaHat: string;
+  qualitySpcCp: string;
+  qualitySpcCpk: string;
+  qualitySpcExcluded: string;
+  qualitySpcOutOfControl: string;
+  qualitySpcInControl: string;
+  qualitySpcSubgroupsTitle: string;
+  qualitySpcSubgroupColValues: string;
+  qualitySpcSubgroupColMean: string;
+  qualitySpcSubgroupColRange: string;
+  qualitySpcSubgroupColX: string;
+  qualitySpcSubgroupColR: string;
+  qualitySpcSpecParameter: string;
+  qualitySpcSpecUnit: string;
+  qualitySpcSpecTarget: string;
+  qualitySpcSpecUcl: string;
+  qualitySpcSpecLcl: string;
+  qualityComplaintsTitle: string;
+  qualityComplaintsSubtitle: string;
+  qualityComplaintsEmpty: string;
+  qualityComplaintsPaneRegister: string;
+  qualityComplaintsPaneIntake: string;
+  qualityComplaintsColNo: string;
+  qualityComplaintsColCustomer: string;
+  qualityComplaintsColChannel: string;
+  qualityComplaintsColSeverity: string;
+  qualityComplaintsColSubject: string;
+  qualityComplaintsColStatus: string;
+  qualityComplaintsColNcr: string;
+  qualityComplaintsColCreated: string;
+  qualityComplaintsStatusNew: string;
+  qualityComplaintsStatusTriaged: string;
+  qualityComplaintsStatusInProgress: string;
+  qualityComplaintsStatusResolved: string;
+  qualityComplaintsStatusClosed: string;
+  qualityComplaintsChannelPhone: string;
+  qualityComplaintsChannelEmail: string;
+  qualityComplaintsChannelWalkIn: string;
+  qualityComplaintsChannelPortal: string;
+  qualityComplaintsChannelSocial: string;
+  qualityComplaintsChannelOther: string;
+  qualityComplaintsIntakeTitle: string;
+  qualityComplaintsIntakeCustomer: string;
+  qualityComplaintsIntakeItem: string;
+  qualityComplaintsIntakeBatch: string;
+  qualityComplaintsIntakeSubject: string;
+  qualityComplaintsIntakeDetails: string;
+  qualityComplaintsIntakeDetailsAr: string;
+  qualityComplaintsIntakeNote: string;
+  qualityComplaintsIntakeNoteAr: string;
+  qualityComplaintsCreate: string;
+  qualityComplaintsCreatedToast: string;
+  qualityComplaintsOpen: string;
+  qualityComplaintsTriageAct: string;
+  qualityComplaintsTriageTitle: string;
+  qualityComplaintsTriageNcr: string;
+  qualityComplaintsTriageToast: string;
+  qualityComplaintsProgressAct: string;
+  qualityComplaintsProgressToast: string;
+  qualityComplaintsResolveAct: string;
+  qualityComplaintsResolveTitle: string;
+  qualityComplaintsResolution: string;
+  qualityComplaintsResolveToast: string;
+  qualityComplaintsCloseAct: string;
+  qualityComplaintsCloseToast: string;
+  qualityComplaintsResolvedAt: string;
+  qualityCoaTitle: string;
+  qualityCoaSubtitle: string;
+  qualityCoaEmpty: string;
+  qualityCoaPaneCertificates: string;
+  qualityCoaPaneGenerate: string;
+  qualityCoaColNo: string;
+  qualityCoaColType: string;
+  qualityCoaColItem: string;
+  qualityCoaColBatch: string;
+  qualityCoaColIssuedAt: string;
+  qualityCoaDocTypeCoa: string;
+  qualityCoaDocTypeCoc: string;
+  qualityCoaGenerateTitle: string;
+  qualityCoaGenerateDocType: string;
+  qualityCoaGenerateInspection: string;
+  qualityCoaGenerateParameters: string;
+  qualityCoaGenerateValue: string;
+  qualityCoaGenerateAct: string;
+  qualityCoaGeneratedToast: string;
+  qualityCoaGenerateNoSpecs: string;
+  qualityCoaPrintAct: string;
+  qualityCoaPrintTitle: string;
+  qualityCoaPrintNow: string;
+  qualityCoaVerdictPass: string;
+  qualityCoaVerdictPassUnbanded: string;
+  qualityCoaVerdictPassDeviation: string;
+  qualityCoaVerdictFailOutside: string;
+  qualityCoaToleranceUnbanded: string;
+  qualityCoaToleranceWithin: string;
+  qualityCoaToleranceAboveUcl: string;
+  qualityCoaToleranceBelowLcl: string;
+  qualityCoaPrintParam: string;
+  qualityCoaPrintValue: string;
+  qualityCoaPrintVerdict: string;
+  qualityCoaPrintUnit: string;
+  qualityHoldBannerTitle: string;
+  qualityHoldHeldAt: string;
+  qualityHoldNcr: string;
+  qualityHoldChip: string;
+  qualityErrBatchHeld: string;
+  qualityErrHoldReleaseDisposition: string;
+  qualityErrHoldState: string;
+  qualityErrHoldNotFound: string;
+  qualityErrHoldAlreadyActive: string;
+  qualityErrNcrNotFound: string;
+  qualityErrNcrState: string;
+  qualityErrNcrDispositionRequired: string;
+  qualityErrNcrQtyAboveOnHand: string;
+  qualityErrCapaNotFound: string;
+  qualityErrCapaState: string;
+  qualityErrCapaCostAlready: string;
+  qualityErrCapaActionsPending: string;
+  qualityErrCapaEffectiveness: string;
+  qualityErrCalibrationNotFound: string;
+  qualityErrCalibrationDueDate: string;
+  qualityErrInstrumentNotFound: string;
+  qualityErrSpecNotFound: string;
+  qualityErrSpecDuplicate: string;
+  qualityErrSpecBand: string;
+  qualityErrInspectionNotFound: string;
+  qualityErrInputInvalid: string;
+  qualityErrSpcSubgroupSize: string;
+  qualityErrSpcInsufficient: string;
+  qualityErrSupplierPartner: string;
+  qualityErrCoaNotFound: string;
+  qualityErrCoaGateBlocked: string;
+  qualityErrCoaNoSpecs: string;
+  qualityErrComplaintNotFound: string;
+  qualityErrComplaintState: string;
+  qualityErrRecallNotFound: string;
+  qualityErrRecallState: string;
 }
 
 const ar: Dictionary = {
@@ -14803,6 +15107,308 @@ const ar: Dictionary = {
   assetsErrTagAlreadyPrinted: "البطاقة مطبوعة — الختم أحادي الاستخدام؛ أصدر بطاقة جديدة.",
   assetsErrMeterNotFound: "العداد غير موجود.",
   assetsErrTagNotFoundShort: "رمز غير معروف",
+
+  // PHASE-050 (W-29 — T-15): شاشات إدارة الجودة — حالات عدم المطابقة
+  // والإجراءات التصحيحية والمعايرة وخرائط المراقبة وشكاوى العملاء
+  // وشهادات التحليل ولافتة حجز المجموعات وقوالب الرفض المُوثَّق.
+  qualityRefusalTitle: "رفض مُوثَّق",
+  qualityRefusalDetails: "التفاصيل الكاملة",
+  qualityRefresh: "تحديث",
+  qualityJournal: "القيد المحاسبي",
+  qualitySeverityLow: "منخفضة",
+  qualitySeverityMedium: "متوسطة",
+  qualitySeverityHigh: "عالية",
+  qualitySeverityCritical: "حرجة",
+  qualityNcrTitle: "حالات عدم المطابقة",
+  qualityNcrSubtitle: "سجل حالات عدم المطابقة — كل رقم وكمية وحالة خرج من المحرك كما هو، والتصرُّف يفتح باب الشطب G-62 عبر المحرك الحقيقي.",
+  qualityNcrEmpty: "لا حالات بعد.",
+  qualityNcrPaneRegister: "السجل",
+  qualityNcrPaneIntake: "تسجيل حالة",
+  qualityNcrColNo: "الرقم",
+  qualityNcrColItem: "الصنف",
+  qualityNcrColStatus: "الحالة",
+  qualityNcrColSeverity: "الخطورة",
+  qualityNcrColSource: "المصدر",
+  qualityNcrColQty: "الكمية المتأثرة",
+  qualityNcrColProblem: "المشكلة",
+  qualityNcrColDisposition: "التصرُّف",
+  qualityNcrColCreated: "أُنشئ في",
+  qualityNcrStatusOpen: "مفتوحة",
+  qualityNcrStatusDispositioned: "مُصرَّفة",
+  qualityNcrStatusClosed: "مغلقة",
+  qualityNcrSourceInspection: "فحص",
+  qualityNcrSourceProduction: "إنتاج",
+  qualityNcrSourceComplaint: "شكوى",
+  qualityNcrSourceSupplier: "مورّد",
+  qualityNcrDispositionTitle: "تسجيل التصرُّف",
+  qualityNcrDispositionRework: "إعادة عمل",
+  qualityNcrDispositionScrap: "إتلاف",
+  qualityNcrDispositionAccept: "قبول بالانحراف",
+  qualityNcrDispositionReturnToSupplier: "إرجاع للمورّد",
+  qualityNcrDispositionedToast: "سُجِّل التصرُّف.",
+  qualityNcrCloseAct: "إغلاق",
+  qualityNcrClosedToast: "أُغلقت الحالة.",
+  qualityNcrOpen: "فتح",
+  qualityNcrIntakeTitle: "تسجيل حالة عدم مطابقة",
+  qualityNcrIntakeBatch: "المجموعة (اختياري)",
+  qualityNcrIntakeInspection: "الفحص (اختياري)",
+  qualityNcrIntakePartner: "الجهة (اختياري)",
+  qualityNcrIntakeProblem: "المشكلة",
+  qualityNcrIntakeProblemAr: "المشكلة (بالعربية)",
+  qualityNcrIntakeQty: "الكمية المتأثرة",
+  qualityNcrIntakeNote: "ملاحظة",
+  qualityNcrIntakeNoteAr: "ملاحظة (بالعربية)",
+  qualityNcrCreate: "تسجيل",
+  qualityNcrCreatedToast: "سُجِّلت حالة عدم المطابقة.",
+  qualityCapaTitle: "الإجراءات التصحيحية",
+  qualityCapaSubtitle: "سجل الإجراءات التصحيحية والوقائية — تحليل السبب الجذري ثم التحقق من الفعالية عند الإغلاق، والتكلفة الخارجية تُقيَّد مرة واحدة بالضبط (G-63).",
+  qualityCapaEmpty: "لا إجراءات بعد.",
+  qualityCapaPaneRegister: "السجل",
+  qualityCapaPaneIntake: "إجراء جديد",
+  qualityCapaColNo: "الرقم",
+  qualityCapaColTitle: "العنوان",
+  qualityCapaColStatus: "الحالة",
+  qualityCapaColNcr: "حالة عدم المطابقة",
+  qualityCapaColOwner: "المسؤول",
+  qualityCapaColDue: "الاستحقاق",
+  qualityCapaColRootCause: "السبب الجذري",
+  qualityCapaColCost: "التكلفة الخارجية",
+  qualityCapaColCreated: "أُنشئ في",
+  qualityCapaStatusOpen: "مفتوح",
+  qualityCapaStatusInProgress: "قيد التنفيذ",
+  qualityCapaStatusClosed: "مغلق",
+  qualityCapaIntakeTitle: "فتح إجراء تصحيحي",
+  qualityCapaIntakeTitleField: "العنوان",
+  qualityCapaIntakeNcr: "حالة عدم المطابقة (اختياري)",
+  qualityCapaIntakeOwner: "الموظف المسؤول (اختياري)",
+  qualityCapaIntakeDue: "تاريخ الاستحقاق (اختياري)",
+  qualityCapaIntakeNote: "ملاحظة",
+  qualityCapaIntakeNoteAr: "ملاحظة (بالعربية)",
+  qualityCapaCreate: "فتح",
+  qualityCapaCreatedToast: "فُتح الإجراء.",
+  qualityCapaOpen: "فتح",
+  qualityCapaRootCauseAct: "تسجيل السبب الجذري",
+  qualityCapaRootCauseTitle: "تحليل السبب الجذري",
+  qualityCapaRootCauseText: "السبب الجذري",
+  qualityCapaRootCauseToast: "سُجِّل السبب الجذري وبدأ التنفيذ.",
+  qualityCapaCostAct: "تسجيل التكلفة الخارجية",
+  qualityCapaCostTitle: "التكلفة الخارجية (G-63)",
+  qualityCapaCostAmount: "المبلغ",
+  qualityCapaCostToast: "قُيِّدت التكلفة الخارجية.",
+  qualityCapaCloseAct: "الإغلاق مع التحقق",
+  qualityCapaCloseTitle: "إغلاق الإجراء",
+  qualityCapaCloseSummary: "خلاصة التحقق",
+  qualityCapaCloseEffective: "النتيجة فعّالة؟",
+  qualityCapaCloseEffectiveYes: "فعّالة",
+  qualityCapaCloseEffectiveNo: "غير فعّالة",
+  qualityCapaCloseCheckedAt: "تاريخ التحقق",
+  qualityCapaCloseToast: "أُغلق الإجراء.",
+  qualityCapaActionsTitle: "الإجراءات",
+  qualityCapaActionsEmpty: "لا إجراءات مسجلة.",
+  qualityCapaActionDue: "الاستحقاق",
+  qualityCapaActionCompletedAt: "أُنجز في",
+  qualityCapaEffectivenessTitle: "سجل التحقق من الفعالية",
+  qualityCapaEffectivenessSummary: "الخلاصة",
+  qualityCapaEffectivenessEffective: "الفعالية",
+  qualityCapaEffectivenessCheckedAt: "تاريخ التحقق",
+  qualityCalibrationTitle: "معايرة الأجهزة",
+  qualityCalibrationSubtitle: "سجل معايرة الأجهزة (سجل الخدمة نفسه للجهاز) وسلالم عتبات المسح كما خرجت من المحرك — لا احتساب في الواجهة.",
+  qualityCalibrationEmpty: "لا سجلات معايرة بعد.",
+  qualityCalibrationPaneRegister: "السجل",
+  qualityCalibrationPaneRecord: "تسجيل معايرة",
+  qualityCalibrationColNo: "الرقم",
+  qualityCalibrationColAsset: "الجهاز",
+  qualityCalibrationColStandard: "المعيار المستخدم",
+  qualityCalibrationColResult: "النتيجة",
+  qualityCalibrationColCalibratedAt: "تاريخ المعايرة",
+  qualityCalibrationColDue: "تاريخ الاستحقاق",
+  qualityCalibrationColCertificate: "مرجع الشهادة",
+  qualityCalibrationColCost: "التكلفة الخارجية",
+  qualityCalibrationColCreated: "أُنشئ في",
+  qualityCalibrationResultPass: "اجتاز",
+  qualityCalibrationResultFail: "لم يجتز",
+  qualityCalibrationResultAdjusted: "ضُبِّط",
+  qualityCalibrationRecordTitle: "تسجيل معايرة",
+  qualityCalibrationRecordProvider: "الجهة المزوِّدة (اختياري)",
+  qualityCalibrationRecordCost: "التكلفة الخارجية (اختياري)",
+  qualityCalibrationRecordNote: "ملاحظة",
+  qualityCalibrationRecordNoteAr: "ملاحظة (بالعربية)",
+  qualityCalibrationCreate: "تسجيل",
+  qualityCalibrationCreatedToast: "سُجِّلت المعايرة.",
+  qualityCalibrationSweepTitle: "إعدادات مسح المعايرة",
+  qualityCalibrationSweepThresholds: "العتبات (بالأيام، تنازليًا)",
+  qualityCalibrationSweepDefault: "الافتراضي",
+  qualityCalibrationSweepStored: "محفوظ للمستأجر",
+  qualityCalibrationSweepLastRun: "آخر تشغيل",
+  qualityCalibrationSweepNeverRun: "لم يُشغَّل بعد",
+  qualityCalibrationSweepSave: "حفظ العتبات",
+  qualityCalibrationSweepSavedToast: "حُفظت العتبات.",
+  qualityCalibrationSweepHint: "سلم تنازلي صارم — كل عتبة أصغر مما قبلها، والقيم كما هي من المحرك.",
+  qualitySpcTitle: "خرائط المراقبة",
+  qualitySpcSubtitle: "مخزن عينات المعايير وخرائط X-bar/R — كل رقم (المتوسط العام والحدود وσ̂ وCp وCpk) خرج من الوحدة الصرفة كما هو.",
+  qualitySpcEmpty: "لا عينات لهذا المعيار.",
+  qualitySpcPaneMeasurements: "العينات",
+  qualitySpcPaneChart: "الخريطة",
+  qualitySpcSpec: "المعيار",
+  qualitySpcSpecHint: "المعرّف (UUID) إن لم يظهر المعيار في القائمة",
+  qualitySpcColSampledAt: "تاريخ الأخذ",
+  qualitySpcColValue: "القيمة",
+  qualitySpcColSource: "المصدر",
+  qualitySpcColBatch: "المجموعة",
+  qualitySpcColNote: "ملاحظة",
+  qualitySpcSourceManual: "يدوي",
+  qualitySpcSourceProduction: "إنتاج",
+  qualitySpcSourceInspection: "فحص",
+  qualitySpcIngestTitle: "تسجيل عينة",
+  qualitySpcIngestAct: "تسجيل",
+  qualitySpcIngestedToast: "سُجِّلت العينة.",
+  qualitySpcChartTitle: "خريطة X-bar/R",
+  qualitySpcChartLoad: "احتساب الخريطة",
+  qualitySpcChartSubgroupSize: "حجم المجموعة الفرعية",
+  qualitySpcChartSampleCount: "عدد العينات",
+  qualitySpcGrandMean: "المتوسط العام (X̄̄)",
+  qualitySpcRBar: "متوسط المدى (R̄)",
+  qualitySpcXUcl: "الحد الأعلى لخريطة X",
+  qualitySpcXLcl: "الحد الأدنى لخريطة X",
+  qualitySpcRUcl: "الحد الأعلى لخريطة R",
+  qualitySpcRLcl: "الحد الأدنى لخريطة R",
+  qualitySpcSigmaHat: "الانحراف التقديري (σ̂)",
+  qualitySpcCp: "دليل القدرة (Cp)",
+  qualitySpcCpk: "دليل القدرة المُعدَّل (Cpk)",
+  qualitySpcExcluded: "عينات مستبعدة",
+  qualitySpcOutOfControl: "خارج السيطرة",
+  qualitySpcInControl: "ضمن السيطرة",
+  qualitySpcSubgroupsTitle: "المجموعات الفرعية",
+  qualitySpcSubgroupColValues: "القيم",
+  qualitySpcSubgroupColMean: "المتوسط",
+  qualitySpcSubgroupColRange: "المدى",
+  qualitySpcSubgroupColX: "خريطة X",
+  qualitySpcSubgroupColR: "خريطة R",
+  qualitySpcSpecParameter: "المعامل",
+  qualitySpcSpecUnit: "الوحدة",
+  qualitySpcSpecTarget: "القيمة المستهدفة",
+  qualitySpcSpecUcl: "الحد الأعلى",
+  qualitySpcSpecLcl: "الحد الأدنى",
+  qualityComplaintsTitle: "شكاوى العملاء",
+  qualityComplaintsSubtitle: "سجل شكاوى العملاء — الترقيم الرسمي والسُلَّم (جديدة ← مُفرزة ← قيد التنفيذ ← مُعالجة ← مغلقة) عبر المحرك، وربط حالة عدم المطابقة في نافذة الفرز.",
+  qualityComplaintsEmpty: "لا شكاوى بعد.",
+  qualityComplaintsPaneRegister: "السجل",
+  qualityComplaintsPaneIntake: "تسجيل شكوى",
+  qualityComplaintsColNo: "الرقم",
+  qualityComplaintsColCustomer: "العميل",
+  qualityComplaintsColChannel: "القناة",
+  qualityComplaintsColSeverity: "الخطورة",
+  qualityComplaintsColSubject: "الموضوع",
+  qualityComplaintsColStatus: "الحالة",
+  qualityComplaintsColNcr: "حالة عدم المطابقة",
+  qualityComplaintsColCreated: "أُنشئ في",
+  qualityComplaintsStatusNew: "جديدة",
+  qualityComplaintsStatusTriaged: "مُفرزة",
+  qualityComplaintsStatusInProgress: "قيد التنفيذ",
+  qualityComplaintsStatusResolved: "مُعالجة",
+  qualityComplaintsStatusClosed: "مغلقة",
+  qualityComplaintsChannelPhone: "هاتف",
+  qualityComplaintsChannelEmail: "بريد إلكتروني",
+  qualityComplaintsChannelWalkIn: "حضوري",
+  qualityComplaintsChannelPortal: "البوابة",
+  qualityComplaintsChannelSocial: "شبكات اجتماعية",
+  qualityComplaintsChannelOther: "أخرى",
+  qualityComplaintsIntakeTitle: "تسجيل شكوى",
+  qualityComplaintsIntakeCustomer: "العميل",
+  qualityComplaintsIntakeItem: "الصنف (اختياري)",
+  qualityComplaintsIntakeBatch: "المجموعة (اختياري)",
+  qualityComplaintsIntakeSubject: "الموضوع",
+  qualityComplaintsIntakeDetails: "التفاصيل",
+  qualityComplaintsIntakeDetailsAr: "التفاصيل (بالعربية)",
+  qualityComplaintsIntakeNote: "ملاحظة",
+  qualityComplaintsIntakeNoteAr: "ملاحظة (بالعربية)",
+  qualityComplaintsCreate: "تسجيل",
+  qualityComplaintsCreatedToast: "سُجِّلت الشكوى.",
+  qualityComplaintsOpen: "فتح",
+  qualityComplaintsTriageAct: "الفرز",
+  qualityComplaintsTriageTitle: "فرز الشكوى",
+  qualityComplaintsTriageNcr: "ربط حالة عدم مطابقة (اختياري)",
+  qualityComplaintsTriageToast: "فُرزت الشكوى.",
+  qualityComplaintsProgressAct: "بدء التنفيذ",
+  qualityComplaintsProgressToast: "بدأ تنفيذ الشكوى.",
+  qualityComplaintsResolveAct: "المعالجة",
+  qualityComplaintsResolveTitle: "معالجة الشكوى",
+  qualityComplaintsResolution: "نص المعالجة",
+  qualityComplaintsResolveToast: "عُولجت الشكوى.",
+  qualityComplaintsCloseAct: "الإغلاق",
+  qualityComplaintsCloseToast: "أُغلقت الشكوى.",
+  qualityComplaintsResolvedAt: "عولجت في",
+  qualityCoaTitle: "شهادات التحليل",
+  qualityCoaSubtitle: "سجل الشهادات المُصدرة — لقطة المعاملات مجمّدة كما خرجت من البوابة، والطباعة تقرأ اللقطة نفسها حرفيًا.",
+  qualityCoaEmpty: "لا شهادات بعد.",
+  qualityCoaPaneCertificates: "السجل",
+  qualityCoaPaneGenerate: "إصدار شهادة",
+  qualityCoaColNo: "الرقم",
+  qualityCoaColType: "النوع",
+  qualityCoaColItem: "الصنف",
+  qualityCoaColBatch: "المجموعة",
+  qualityCoaColIssuedAt: "أُصدرت في",
+  qualityCoaDocTypeCoa: "شهادة تحليل (COA)",
+  qualityCoaDocTypeCoc: "شهادة مطابقة (COC)",
+  qualityCoaGenerateTitle: "إصدار شهادة",
+  qualityCoaGenerateDocType: "نوع المستند",
+  qualityCoaGenerateInspection: "الفحص (اختياري)",
+  qualityCoaGenerateParameters: "المعاملات (تغطية كاملة)",
+  qualityCoaGenerateValue: "القيمة المقيسة",
+  qualityCoaGenerateAct: "إصدار",
+  qualityCoaGeneratedToast: "أُصدرت الشهادة.",
+  qualityCoaGenerateNoSpecs: "اختر صنفًا لتحميل معاملاته النشطة.",
+  qualityCoaPrintAct: "معاينة الطباعة",
+  qualityCoaPrintTitle: "معاينة الشهادة",
+  qualityCoaPrintNow: "اطبع الآن",
+  qualityCoaVerdictPass: "مطابق",
+  qualityCoaVerdictPassUnbanded: "بلا حدود",
+  qualityCoaVerdictPassDeviation: "انحراف مقبول",
+  qualityCoaVerdictFailOutside: "خارج الحدود",
+  qualityCoaToleranceUnbanded: "غير محدد بحدود",
+  qualityCoaToleranceWithin: "ضمن الحدود",
+  qualityCoaToleranceAboveUcl: "فوق الحد الأعلى",
+  qualityCoaToleranceBelowLcl: "دون الحد الأدنى",
+  qualityCoaPrintParam: "المعامل",
+  qualityCoaPrintValue: "القيمة",
+  qualityCoaPrintVerdict: "الحكم",
+  qualityCoaPrintUnit: "الوحدة",
+  qualityHoldBannerTitle: "حجز جودة ساري على هذه المجموعة",
+  qualityHoldHeldAt: "حُجزت في",
+  qualityHoldNcr: "حالة عدم المطابقة المرتبطة",
+  qualityHoldChip: "حجز جودة",
+  qualityErrBatchHeld: "المجموعة محجوزة بقرار جودة — لا إصدار حتى يُرفع الحجز.",
+  qualityErrHoldReleaseDisposition: "لا يُرفع الحجز إلا بتصرُّف مُسند — سجِّل التصرُّف أولًا.",
+  qualityErrHoldState: "حالة الحجز لا تسمح بهذه الخطوة.",
+  qualityErrHoldNotFound: "الحجز غير موجود في هذا المستأجر.",
+  qualityErrHoldAlreadyActive: "لهذه المجموعة حجز ساري بالفعل — حجز واحد ساري لكل مجموعة.",
+  qualityErrNcrNotFound: "حالة عدم المطابقة غير موجودة.",
+  qualityErrNcrState: "حالة الحالة لا تسمح بهذه الخطوة — السُلَّم: مفتوحة ← مُصرَّفة ← مغلقة.",
+  qualityErrNcrDispositionRequired: "التصرُّف مطلوب قبل هذه الخطوة.",
+  qualityErrNcrQtyAboveOnHand: "الكمية المتأثرة فوق الرصيد المتاح — راجع الأرقام في تفاصيل الرفض.",
+  qualityErrCapaNotFound: "الإجراء التصحيحي غير موجود.",
+  qualityErrCapaState: "حالة الإجراء لا تسمح بهذه الخطوة.",
+  qualityErrCapaCostAlready: "التكلفة الخارجية قُيِّدت سابقًا — مرة واحدة بالضبط.",
+  qualityErrCapaActionsPending: "لا إغلاق وبقية إجراءات مفتوحة — أكمل النوافذ أولًا.",
+  qualityErrCapaEffectiveness: "التحقق من الفعالية مطلوب عند الإغلاق.",
+  qualityErrCalibrationNotFound: "سجل المعايرة غير موجود.",
+  qualityErrCalibrationDueDate: "تاريخ الاستحقاق غير صالح — لا يستحق قبل المعايرة نفسها.",
+  qualityErrInstrumentNotFound: "الجهاز غير موجود في هذا المستأجر.",
+  qualityErrSpecNotFound: "مواصفة المعامل غير موجودة.",
+  qualityErrSpecDuplicate: "الصنف يحمل معاملًا بهذا الاسم بالفعل.",
+  qualityErrSpecBand: "نطاق السماحية غير صالح — الحد الأعلى أكبر من الأدنى.",
+  qualityErrInspectionNotFound: "الفحص غير موجود.",
+  qualityErrInputInvalid: "قيمة إدخال غير صالحة — راجع الحقول وأعد المحاولة.",
+  qualityErrSpcSubgroupSize: "حجم المجموعة الفرعية خارج النطاق (2-10).",
+  qualityErrSpcInsufficient: "لا تكفي العينات لتكوين مجموعة فرعية كاملة.",
+  qualityErrSupplierPartner: "الجهة غير موجودة في سجل الموردين.",
+  qualityErrCoaNotFound: "الشهادة غير موجودة.",
+  qualityErrCoaGateBlocked: "بوابة الشهادة تمنع الإصدار — معامل خارج الحدود بلا انحراف مقبول (التفاصيل تذكر المعامل والقيمة والحد).",
+  qualityErrCoaNoSpecs: "لا مواصفات نشطة لهذا الصنف — لا شهادة بلا تغطية كاملة.",
+  qualityErrComplaintNotFound: "الشكوى غير موجودة.",
+  qualityErrComplaintState: "حالة الشكوى لا تسمح بهذه الخطوة.",
+  qualityErrRecallNotFound: "سجل الاستدعاء غير موجود.",
+  qualityErrRecallState: "حالة الاستدعاء لا تسمح بهذه الخطوة.",
 };
 
 const en: Dictionary = {
@@ -22212,6 +22818,308 @@ const en: Dictionary = {
   assetsErrTagAlreadyPrinted: "The tag is already printed — the stamp is single-use; issue a new tag.",
   assetsErrMeterNotFound: "The meter does not exist.",
   assetsErrTagNotFoundShort: "Unknown code",
+
+  // PHASE-050 (W-29 — T-15): the QMS screens — nonconformities, corrective
+  // actions, calibration, control charts, customer complaints, the COA print
+  // surface, the batch-hold banner and the typed-refusal templates.
+  qualityRefusalTitle: "Typed refusal",
+  qualityRefusalDetails: "Full details",
+  qualityRefresh: "Refresh",
+  qualityJournal: "Journal entry",
+  qualitySeverityLow: "Low",
+  qualitySeverityMedium: "Medium",
+  qualitySeverityHigh: "High",
+  qualitySeverityCritical: "Critical",
+  qualityNcrTitle: "Nonconformities",
+  qualityNcrSubtitle: "The nonconformity register — every number, quantity and state is the engine's own, verbatim; the disposition act opens the G-62 write-off door through the REAL engine.",
+  qualityNcrEmpty: "No nonconformities yet.",
+  qualityNcrPaneRegister: "Register",
+  qualityNcrPaneIntake: "Intake",
+  qualityNcrColNo: "NCR no.",
+  qualityNcrColItem: "Item",
+  qualityNcrColStatus: "Status",
+  qualityNcrColSeverity: "Severity",
+  qualityNcrColSource: "Source",
+  qualityNcrColQty: "Affected qty",
+  qualityNcrColProblem: "Problem",
+  qualityNcrColDisposition: "Disposition",
+  qualityNcrColCreated: "Created at",
+  qualityNcrStatusOpen: "Open",
+  qualityNcrStatusDispositioned: "Dispositioned",
+  qualityNcrStatusClosed: "Closed",
+  qualityNcrSourceInspection: "Inspection",
+  qualityNcrSourceProduction: "Production",
+  qualityNcrSourceComplaint: "Complaint",
+  qualityNcrSourceSupplier: "Supplier",
+  qualityNcrDispositionTitle: "Record the disposition",
+  qualityNcrDispositionRework: "Rework",
+  qualityNcrDispositionScrap: "Scrap",
+  qualityNcrDispositionAccept: "Accept deviation",
+  qualityNcrDispositionReturnToSupplier: "Return to supplier",
+  qualityNcrDispositionedToast: "Disposition recorded.",
+  qualityNcrCloseAct: "Close",
+  qualityNcrClosedToast: "The record is closed.",
+  qualityNcrOpen: "Open",
+  qualityNcrIntakeTitle: "Record a nonconformity",
+  qualityNcrIntakeBatch: "Batch (optional)",
+  qualityNcrIntakeInspection: "Inspection (optional)",
+  qualityNcrIntakePartner: "Partner (optional)",
+  qualityNcrIntakeProblem: "Problem",
+  qualityNcrIntakeProblemAr: "Problem (Arabic)",
+  qualityNcrIntakeQty: "Affected qty",
+  qualityNcrIntakeNote: "Note",
+  qualityNcrIntakeNoteAr: "Note (Arabic)",
+  qualityNcrCreate: "Record",
+  qualityNcrCreatedToast: "Nonconformity recorded.",
+  qualityCapaTitle: "Corrective actions",
+  qualityCapaSubtitle: "The corrective/preventive register — the root-cause analysis, the effectiveness check at close, and the external cost posted exactly once (G-63).",
+  qualityCapaEmpty: "No corrective actions yet.",
+  qualityCapaPaneRegister: "Register",
+  qualityCapaPaneIntake: "New action",
+  qualityCapaColNo: "CAPA no.",
+  qualityCapaColTitle: "Title",
+  qualityCapaColStatus: "Status",
+  qualityCapaColNcr: "Nonconformity",
+  qualityCapaColOwner: "Owner",
+  qualityCapaColDue: "Due",
+  qualityCapaColRootCause: "Root cause",
+  qualityCapaColCost: "External cost",
+  qualityCapaColCreated: "Created at",
+  qualityCapaStatusOpen: "Open",
+  qualityCapaStatusInProgress: "In progress",
+  qualityCapaStatusClosed: "Closed",
+  qualityCapaIntakeTitle: "Open a corrective action",
+  qualityCapaIntakeTitleField: "Title",
+  qualityCapaIntakeNcr: "Nonconformity (optional)",
+  qualityCapaIntakeOwner: "Owner employee (optional)",
+  qualityCapaIntakeDue: "Due date (optional)",
+  qualityCapaIntakeNote: "Note",
+  qualityCapaIntakeNoteAr: "Note (Arabic)",
+  qualityCapaCreate: "Open",
+  qualityCapaCreatedToast: "Corrective action opened.",
+  qualityCapaOpen: "Open",
+  qualityCapaRootCauseAct: "Record the root cause",
+  qualityCapaRootCauseTitle: "Root-cause analysis",
+  qualityCapaRootCauseText: "Root cause",
+  qualityCapaRootCauseToast: "Root cause recorded — the action is in progress.",
+  qualityCapaCostAct: "Record the external cost",
+  qualityCapaCostTitle: "External cost (G-63)",
+  qualityCapaCostAmount: "Amount",
+  qualityCapaCostToast: "External cost posted.",
+  qualityCapaCloseAct: "Close with the effectiveness check",
+  qualityCapaCloseTitle: "Close the action",
+  qualityCapaCloseSummary: "Effectiveness summary",
+  qualityCapaCloseEffective: "Effective?",
+  qualityCapaCloseEffectiveYes: "Effective",
+  qualityCapaCloseEffectiveNo: "Not effective",
+  qualityCapaCloseCheckedAt: "Checked at",
+  qualityCapaCloseToast: "The action is closed.",
+  qualityCapaActionsTitle: "Actions",
+  qualityCapaActionsEmpty: "No actions recorded.",
+  qualityCapaActionDue: "Due",
+  qualityCapaActionCompletedAt: "Completed at",
+  qualityCapaEffectivenessTitle: "The effectiveness record",
+  qualityCapaEffectivenessSummary: "Summary",
+  qualityCapaEffectivenessEffective: "Effective",
+  qualityCapaEffectivenessCheckedAt: "Checked at",
+  qualityCalibrationTitle: "Instrument calibration",
+  qualityCalibrationSubtitle: "The instrument-calibration register (the asset's own service history) + the sweep's thresholds ladder as the engine returns it — no client arithmetic.",
+  qualityCalibrationEmpty: "No calibration records yet.",
+  qualityCalibrationPaneRegister: "Register",
+  qualityCalibrationPaneRecord: "Record calibration",
+  qualityCalibrationColNo: "Calibration no.",
+  qualityCalibrationColAsset: "Instrument",
+  qualityCalibrationColStandard: "Standard used",
+  qualityCalibrationColResult: "Result",
+  qualityCalibrationColCalibratedAt: "Calibrated at",
+  qualityCalibrationColDue: "Due date",
+  qualityCalibrationColCertificate: "Certificate ref",
+  qualityCalibrationColCost: "External cost",
+  qualityCalibrationColCreated: "Created at",
+  qualityCalibrationResultPass: "Pass",
+  qualityCalibrationResultFail: "Fail",
+  qualityCalibrationResultAdjusted: "Adjusted",
+  qualityCalibrationRecordTitle: "Record a calibration",
+  qualityCalibrationRecordProvider: "Provider (optional)",
+  qualityCalibrationRecordCost: "External cost (optional)",
+  qualityCalibrationRecordNote: "Note",
+  qualityCalibrationRecordNoteAr: "Note (Arabic)",
+  qualityCalibrationCreate: "Record",
+  qualityCalibrationCreatedToast: "Calibration recorded.",
+  qualityCalibrationSweepTitle: "Calibration sweep settings",
+  qualityCalibrationSweepThresholds: "Thresholds (days, descending)",
+  qualityCalibrationSweepDefault: "Default",
+  qualityCalibrationSweepStored: "Stored for this tenant",
+  qualityCalibrationSweepLastRun: "Last run",
+  qualityCalibrationSweepNeverRun: "never run",
+  qualityCalibrationSweepSave: "Save thresholds",
+  qualityCalibrationSweepSavedToast: "Thresholds saved.",
+  qualityCalibrationSweepHint: "A strict descending ladder — each threshold below the one before it; the values are the engine's own.",
+  qualitySpcTitle: "Control charts",
+  qualitySpcSubtitle: "The specification sample store and the X-bar/R charts — every figure (the grand mean, the limits, σ̂, Cp, Cpk) is the pure module's own output, verbatim.",
+  qualitySpcEmpty: "No samples for this specification.",
+  qualitySpcPaneMeasurements: "Measurements",
+  qualitySpcPaneChart: "Chart",
+  qualitySpcSpec: "Specification",
+  qualitySpcSpecHint: "The id (UUID) when the specification is not in the list",
+  qualitySpcColSampledAt: "Sampled at",
+  qualitySpcColValue: "Value",
+  qualitySpcColSource: "Source",
+  qualitySpcColBatch: "Batch",
+  qualitySpcColNote: "Note",
+  qualitySpcSourceManual: "Manual",
+  qualitySpcSourceProduction: "Production",
+  qualitySpcSourceInspection: "Inspection",
+  qualitySpcIngestTitle: "Record a sample",
+  qualitySpcIngestAct: "Record",
+  qualitySpcIngestedToast: "Sample recorded.",
+  qualitySpcChartTitle: "The X-bar/R chart",
+  qualitySpcChartLoad: "Compute the chart",
+  qualitySpcChartSubgroupSize: "Subgroup size",
+  qualitySpcChartSampleCount: "Sample count",
+  qualitySpcGrandMean: "Grand mean (X̄̄)",
+  qualitySpcRBar: "Mean range (R̄)",
+  qualitySpcXUcl: "X-chart UCL",
+  qualitySpcXLcl: "X-chart LCL",
+  qualitySpcRUcl: "R-chart UCL",
+  qualitySpcRLcl: "R-chart LCL",
+  qualitySpcSigmaHat: "Estimated sigma (σ̂)",
+  qualitySpcCp: "Capability index (Cp)",
+  qualitySpcCpk: "Adjusted capability (Cpk)",
+  qualitySpcExcluded: "Excluded samples",
+  qualitySpcOutOfControl: "Out of control",
+  qualitySpcInControl: "In control",
+  qualitySpcSubgroupsTitle: "Subgroups",
+  qualitySpcSubgroupColValues: "Values",
+  qualitySpcSubgroupColMean: "Mean",
+  qualitySpcSubgroupColRange: "Range",
+  qualitySpcSubgroupColX: "X chart",
+  qualitySpcSubgroupColR: "R chart",
+  qualitySpcSpecParameter: "Parameter",
+  qualitySpcSpecUnit: "Unit",
+  qualitySpcSpecTarget: "Target value",
+  qualitySpcSpecUcl: "Upper limit",
+  qualitySpcSpecLcl: "Lower limit",
+  qualityComplaintsTitle: "Customer complaints",
+  qualityComplaintsSubtitle: "The complaints register — the official numbering and the ladder (new → triaged → in progress → resolved → closed) through the engine, the NCR link landing in the triage window.",
+  qualityComplaintsEmpty: "No complaints yet.",
+  qualityComplaintsPaneRegister: "Register",
+  qualityComplaintsPaneIntake: "Intake",
+  qualityComplaintsColNo: "Complaint no.",
+  qualityComplaintsColCustomer: "Customer",
+  qualityComplaintsColChannel: "Channel",
+  qualityComplaintsColSeverity: "Severity",
+  qualityComplaintsColSubject: "Subject",
+  qualityComplaintsColStatus: "Status",
+  qualityComplaintsColNcr: "Nonconformity",
+  qualityComplaintsColCreated: "Created at",
+  qualityComplaintsStatusNew: "New",
+  qualityComplaintsStatusTriaged: "Triaged",
+  qualityComplaintsStatusInProgress: "In progress",
+  qualityComplaintsStatusResolved: "Resolved",
+  qualityComplaintsStatusClosed: "Closed",
+  qualityComplaintsChannelPhone: "Phone",
+  qualityComplaintsChannelEmail: "Email",
+  qualityComplaintsChannelWalkIn: "Walk-in",
+  qualityComplaintsChannelPortal: "Portal",
+  qualityComplaintsChannelSocial: "Social",
+  qualityComplaintsChannelOther: "Other",
+  qualityComplaintsIntakeTitle: "Record a complaint",
+  qualityComplaintsIntakeCustomer: "Customer",
+  qualityComplaintsIntakeItem: "Item (optional)",
+  qualityComplaintsIntakeBatch: "Batch (optional)",
+  qualityComplaintsIntakeSubject: "Subject",
+  qualityComplaintsIntakeDetails: "Details",
+  qualityComplaintsIntakeDetailsAr: "Details (Arabic)",
+  qualityComplaintsIntakeNote: "Note",
+  qualityComplaintsIntakeNoteAr: "Note (Arabic)",
+  qualityComplaintsCreate: "Record",
+  qualityComplaintsCreatedToast: "Complaint recorded.",
+  qualityComplaintsOpen: "Open",
+  qualityComplaintsTriageAct: "Triage",
+  qualityComplaintsTriageTitle: "Triage the complaint",
+  qualityComplaintsTriageNcr: "Link a nonconformity (optional)",
+  qualityComplaintsTriageToast: "Complaint triaged.",
+  qualityComplaintsProgressAct: "Start progress",
+  qualityComplaintsProgressToast: "Complaint in progress.",
+  qualityComplaintsResolveAct: "Resolve",
+  qualityComplaintsResolveTitle: "Resolve the complaint",
+  qualityComplaintsResolution: "Resolution text",
+  qualityComplaintsResolveToast: "Complaint resolved.",
+  qualityComplaintsCloseAct: "Close",
+  qualityComplaintsCloseToast: "Complaint closed.",
+  qualityComplaintsResolvedAt: "Resolved at",
+  qualityCoaTitle: "Certificates of analysis",
+  qualityCoaSubtitle: "The issued certificates — the parameters snapshot frozen by the gate exactly as it returned, and the print reads that very snapshot verbatim.",
+  qualityCoaEmpty: "No certificates yet.",
+  qualityCoaPaneCertificates: "Register",
+  qualityCoaPaneGenerate: "Generate certificate",
+  qualityCoaColNo: "Certificate no.",
+  qualityCoaColType: "Type",
+  qualityCoaColItem: "Item",
+  qualityCoaColBatch: "Batch",
+  qualityCoaColIssuedAt: "Issued at",
+  qualityCoaDocTypeCoa: "Certificate of analysis (COA)",
+  qualityCoaDocTypeCoc: "Certificate of conformity (COC)",
+  qualityCoaGenerateTitle: "Generate a certificate",
+  qualityCoaGenerateDocType: "Document type",
+  qualityCoaGenerateInspection: "Inspection (optional)",
+  qualityCoaGenerateParameters: "Parameters (full coverage)",
+  qualityCoaGenerateValue: "Measured value",
+  qualityCoaGenerateAct: "Generate",
+  qualityCoaGeneratedToast: "Certificate generated.",
+  qualityCoaGenerateNoSpecs: "Pick an item to load its active parameters.",
+  qualityCoaPrintAct: "Print preview",
+  qualityCoaPrintTitle: "Certificate preview",
+  qualityCoaPrintNow: "Print now",
+  qualityCoaVerdictPass: "Conforms",
+  qualityCoaVerdictPassUnbanded: "Unbanded",
+  qualityCoaVerdictPassDeviation: "Deviation accepted",
+  qualityCoaVerdictFailOutside: "Outside the limits",
+  qualityCoaToleranceUnbanded: "Unbanded",
+  qualityCoaToleranceWithin: "Within",
+  qualityCoaToleranceAboveUcl: "Above the upper limit",
+  qualityCoaToleranceBelowLcl: "Below the lower limit",
+  qualityCoaPrintParam: "Parameter",
+  qualityCoaPrintValue: "Value",
+  qualityCoaPrintVerdict: "Verdict",
+  qualityCoaPrintUnit: "Unit",
+  qualityHoldBannerTitle: "An active quality hold sits on this batch",
+  qualityHoldHeldAt: "Held at",
+  qualityHoldNcr: "Linked nonconformity",
+  qualityHoldChip: "Quality hold",
+  qualityErrBatchHeld: "The batch is held by a quality decision — no issue until the hold is released.",
+  qualityErrHoldReleaseDisposition: "A hold releases only with a linked disposition — record the disposition first.",
+  qualityErrHoldState: "The hold's state refuses this move.",
+  qualityErrHoldNotFound: "The hold does not exist in this tenant.",
+  qualityErrHoldAlreadyActive: "This batch already carries an active hold — one active hold per batch.",
+  qualityErrNcrNotFound: "The nonconformity does not exist.",
+  qualityErrNcrState: "The record's state refuses this move — the ladder is open → dispositioned → closed.",
+  qualityErrNcrDispositionRequired: "A disposition is required before this move.",
+  qualityErrNcrQtyAboveOnHand: "The affected quantity is above the on-hand — see the figures in the refusal's details.",
+  qualityErrCapaNotFound: "The corrective action does not exist.",
+  qualityErrCapaState: "The action's state refuses this move.",
+  qualityErrCapaCostAlready: "The external cost is already recorded — exactly once.",
+  qualityErrCapaActionsPending: "No close with open actions — complete their windows first.",
+  qualityErrCapaEffectiveness: "The effectiveness check is required at close.",
+  qualityErrCalibrationNotFound: "The calibration record does not exist.",
+  qualityErrCalibrationDueDate: "The due date is invalid — it never falls before the calibration itself.",
+  qualityErrInstrumentNotFound: "The instrument does not exist in this tenant.",
+  qualityErrSpecNotFound: "The parameter specification does not exist.",
+  qualityErrSpecDuplicate: "The item already carries a parameter with this name.",
+  qualityErrSpecBand: "The tolerance band is invalid — the upper limit must be above the lower.",
+  qualityErrInspectionNotFound: "The inspection does not exist.",
+  qualityErrInputInvalid: "An input value is invalid — check the fields and retry.",
+  qualityErrSpcSubgroupSize: "The subgroup size is outside the domain (2-10).",
+  qualityErrSpcInsufficient: "Not enough samples to form one complete subgroup.",
+  qualityErrSupplierPartner: "The partner does not exist in the supplier register.",
+  qualityErrCoaNotFound: "The certificate does not exist.",
+  qualityErrCoaGateBlocked: "The certificate gate blocks generation — a parameter is outside without an accepted deviation (the details name the parameter, the value and the limit).",
+  qualityErrCoaNoSpecs: "No active specifications for this item — no certificate without full coverage.",
+  qualityErrComplaintNotFound: "The complaint does not exist.",
+  qualityErrComplaintState: "The complaint's state refuses this move.",
+  qualityErrRecallNotFound: "The recall record does not exist.",
+  qualityErrRecallState: "The recall's state refuses this move.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

@@ -25,6 +25,7 @@ import { Badge, Button, Input, Select } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
 import type {
+  BatchQualityHoldRow,
   BatchRow,
   GenealogyBatchRef,
   GenealogyBatchSummary,
@@ -40,6 +41,7 @@ import {
   localizedProductionOrderStatus,
   localizedSaleDocType,
 } from "../lib/messages";
+import { BatchHoldBanner } from "./batch-hold-banner";
 import { Card } from "./card";
 import { ErrorNotice } from "./notices";
 
@@ -63,10 +65,14 @@ export function ManufacturingGenealogy({
   locale,
   items,
   initialBatches,
+  holdsByBatch = new Map(),
 }: {
   locale: Locale;
   items: readonly ItemRow[];
   initialBatches: readonly BatchRow[];
+  /** PHASE-050 (W-29): the ACTIVE quality holds (the page's single read);
+  * additive — an empty map simply renders no banner. */
+  holdsByBatch?: ReadonlyMap<string, BatchQualityHoldRow>;
 }): JSX.Element {
   const d = getDictionary(locale);
   const [error, setError] = useState<string | null>(null);
@@ -152,9 +158,18 @@ export function ManufacturingGenealogy({
   const batchCard: GenealogyBatchRef | null =
     upstream?.batch ?? downstream?.batch ?? summary?.batch ?? null;
 
+  // PHASE-050 (W-29): the selected batch's own hold banner (additive — the
+  // hold renders only when the picked batch carries an ACTIVE one).
+  const activeHold =
+    activeBatchId === "" ? undefined : holdsByBatch.get(activeBatchId);
+
   return (
     <div className="flex flex-col gap-4">
       {error !== null && <ErrorNotice>{error}</ErrorNotice>}
+
+      {activeHold !== undefined ? (
+        <BatchHoldBanner hold={activeHold} locale={locale} d={d} />
+      ) : null}
 
       <Card title={d.mfgGenealogyTitle} description={d.mfgGenealogyBatchHint}>
         <div className="flex flex-wrap items-end gap-3">

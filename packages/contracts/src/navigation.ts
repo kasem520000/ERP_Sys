@@ -1106,6 +1106,91 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 70,
   },
+  // PHASE-050 (W-29 — T-15, dated 2026-11-23): the QMS screens — the six
+  // quality surfaces (NCR / CAPA / calibration / SPC / complaints + the COA
+  // register & print), the manufacturing-adjacent family (production
+  // consumes what quality releases). Feature keys are the exact D-04 module
+  // keys (`quality` for the five register screens; the SPC screen rides the
+  // `quality.spc` composable unit); permissions mirror the
+  // route-permissions rows the quality controllers enforce verbatim
+  // (quality.view / quality.spc.view). Icons come from the CLOSED Lucide
+  // registry set only (the suggested shield-alert/ruler/line-chart/
+  // message-square-warning are NOT in the registry — the closest registry
+  // names used instead, non-directional one-line review entries: a warning
+  // triangle, a settings gear, a clock, a column chart, an inbox, a checked
+  // document).
+  {
+    id: "quality.ncr",
+    parentGroup: "manufacturing",
+    label: { ar: "حالات عدم المطابقة", en: "Nonconformities" },
+    icon: "warning",
+    route: "/quality/ncr",
+    featureKey: "quality",
+    permission: "quality.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 75,
+  },
+  {
+    id: "quality.capa",
+    parentGroup: "manufacturing",
+    label: { ar: "الإجراءات التصحيحية", en: "Corrective actions" },
+    icon: "settings",
+    route: "/quality/capa",
+    featureKey: "quality",
+    permission: "quality.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 76,
+  },
+  {
+    id: "quality.calibration",
+    parentGroup: "manufacturing",
+    label: { ar: "معايرة الأجهزة", en: "Instrument calibration" },
+    icon: "clock",
+    route: "/quality/calibration",
+    featureKey: "quality",
+    permission: "quality.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 77,
+  },
+  {
+    id: "quality.spc",
+    parentGroup: "manufacturing",
+    label: { ar: "خرائط المراقبة", en: "Control charts" },
+    icon: "bar-chart",
+    route: "/quality/spc",
+    featureKey: "quality.spc",
+    permission: "quality.spc.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 78,
+  },
+  {
+    id: "quality.complaints",
+    parentGroup: "manufacturing",
+    label: { ar: "شكاوى العملاء", en: "Customer complaints" },
+    icon: "inbox",
+    route: "/quality/complaints",
+    featureKey: "quality",
+    permission: "quality.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 79,
+  },
+  {
+    id: "quality.coa",
+    parentGroup: "manufacturing",
+    label: { ar: "شهادات التحليل", en: "Certificates of analysis" },
+    icon: "file-check",
+    route: "/quality/coa",
+    featureKey: "quality",
+    permission: "quality.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 80,
+  },
   {
     id: "purchasing.supplier_scorecards",
     parentGroup: "purchasing",

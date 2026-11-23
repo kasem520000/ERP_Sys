@@ -7936,3 +7936,292 @@ export interface HrAlertJobRow {
   createdAt: string;
   updatedAt: string;
 }
+
+// PHASE-050 (W-29 — T-15) wire types (GET/POST /quality/* — the QMS board
+// family). Field names mirror the quality.store rows EXACTLY (camelCase as
+// the API returns); every decimal value is the engine's canonical string
+// (ADR-0009 — the engine-output law: the boards render the engine's own
+// figures verbatim, zero client recomputation).
+
+/** GET /quality/specifications → one per-item parameter row (the spec band
+ * that feeds SPC's charts and COA's coverage law). */
+export interface QualitySpecRow {
+  id: string;
+  itemId: string;
+  parameter: string;
+  parameterAr: string | null;
+  unit: string | null;
+  targetValue: string;
+  ucl: string | null;
+  lcl: string | null;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /quality/ncr → the nonconformity register rows. */
+export interface NcrRow {
+  id: string;
+  ncrNo: string;
+  source: string;
+  severity: string;
+  itemId: string;
+  batchId: string | null;
+  inspectionId: string | null;
+  partnerId: string | null;
+  problem: string;
+  problemAr: string | null;
+  affectedQty: string;
+  status: string;
+  disposition: string | null;
+  dispositionAt: string | null;
+  closedAt: string | null;
+  journalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** POST /quality/ncr/:id/disposition → the record + the G-62 write-off's
+ * OWN figures (the moves' per-warehouse quantities and values — the
+ * engine's numbers verbatim, never a client sum). */
+export interface NcrDispositionResult {
+  ncr: NcrRow;
+  journalEntryId: string | null;
+  writeOff: {
+    totalValue: string;
+    perWarehouse: { warehouseId: string; qty: string; valueAmount: string }[];
+  } | null;
+}
+
+/** The actions array's canonical cell (the jsonb stored verbatim). */
+export interface CapaActionRow {
+  title: string;
+  ownerEmployeeId: string | null;
+  dueDate: string | null;
+  completedAt: string | null;
+}
+
+/** GET /quality/capa → the corrective/preventive action register rows. */
+export interface CapaRow {
+  id: string;
+  capaNo: string;
+  ncrId: string | null;
+  title: string;
+  ownerEmployeeId: string | null;
+  rootCause: string | null;
+  rootCauseAt: string | null;
+  actions: readonly CapaActionRow[];
+  dueDate: string | null;
+  status: string;
+  effectiveness: Record<string, unknown> | null;
+  externalCost: string;
+  journalEntryId: string | null;
+  closedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /quality/calibration → the instrument-calibration register rows. */
+export interface CalibrationRow {
+  id: string;
+  calibrationNo: string;
+  assetId: string;
+  standardUsed: string;
+  result: string;
+  calibratedAt: string;
+  dueDate: string;
+  providerId: string | null;
+  certificateRef: string | null;
+  externalCost: string;
+  journalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /quality/calibration/sweep-config → the sweep's effective ladder
+ * (stored ∪ the documented default [30,7,0], normalized by the pure fold)
+ * + the last run's seal (the audit plane IS the job log). */
+export interface CalibrationSweepConfigRow {
+  key: string;
+  thresholds: number[];
+  default: number[];
+  stored: boolean;
+  lastRun: {
+    at: string;
+    outcome: { windows: number[]; flagged: number; notified: number };
+  } | null;
+}
+
+/** GET /quality/spc/measurements → the per-parameter sample rows (the
+ * chart's own history — no DELETE, corrections are new samples). */
+export interface SpcMeasurementRow {
+  id: string;
+  specId: string;
+  value: string;
+  sampledAt: string;
+  source: string;
+  batchId: string | null;
+  note: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** One computed subgroup of the X-bar/R chart — the PURE module's own
+ * figures (values verbatim + the folded mean/range + the flags). */
+export interface SpcSubgroupRow {
+  values: string[];
+  mean: string;
+  range: string;
+  xOutOfControl: boolean;
+  rOutOfControl: boolean;
+}
+
+/** The published X-bar/R chart (every figure at 6dp, ROUND_HALF_UP — the
+ * pure module's output; null σ̂/Cp/Cpk are the no-fabrication law). */
+export interface SpcXbarRChart {
+  subgroupSize: number;
+  subgroups: readonly SpcSubgroupRow[];
+  excludedCount: number;
+  grandMean: string;
+  rBar: string;
+  xChart: { ucl: string; lcl: string };
+  rChart: { ucl: string; lcl: string };
+  sigmaHat: string | null;
+  cp: string | null;
+  cpk: string | null;
+  outOfControl: boolean;
+}
+
+/** GET /quality/spc/charts/:specId → the spec row (the band's own home) +
+ * the chart (the pure module's output VERBATIM) + the sample count. */
+export interface SpcChartRow {
+  spec: QualitySpecRow;
+  chart: SpcXbarRChart;
+  sampleCount: number;
+}
+
+/** GET /quality/supplier-scores → the rolling fold's period rows. */
+export interface SupplierQualityScoreRow {
+  id: string;
+  partnerId: string;
+  periodStart: string;
+  ncrCount: number;
+  rejectionCount: number;
+  onTimeDeliveries: number;
+  totalDeliveries: number;
+  score: string;
+  computedAt: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** One frozen-snapshot entry of a certificate (the pure gate fold's
+ * CoaGateEntry serialized verbatim — camelCase keys, nulls explicit). */
+export interface CoaParameterEntry {
+  specId: string;
+  parameter: string;
+  parameterAr: string | null;
+  unit: string | null;
+  targetValue: string;
+  ucl: string | null;
+  lcl: string | null;
+  value: string;
+  toleranceVerdict: string;
+  gate: string;
+  breachedLimit: string | null;
+  ncrId: string | null;
+}
+
+/** GET /quality/coa → the generated certificates (the frozen parameters
+ * snapshot stored verbatim; an issued certificate is immutable history). */
+export interface CoaDocumentRow {
+  id: string;
+  docNo: string;
+  docType: string;
+  itemId: string;
+  batchId: string | null;
+  inspectionId: string | null;
+  parameters: readonly Record<string, unknown>[];
+  issuedAt: string;
+  issuedBy: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** POST /quality/coa → the generate act's result (the engine returns the
+ * stored row — the frozen snapshot IS the certificate). */
+export type CoaGenerateResult = CoaDocumentRow;
+
+/** GET /quality/holds → the batch quality holds (INV-035's register; the
+ * ACTIVE rows feed the web banners). */
+export interface BatchQualityHoldRow {
+  id: string;
+  batchId: string;
+  reason: string;
+  ncrId: string | null;
+  status: "ACTIVE" | "RELEASED";
+  heldAt: string;
+  releasedAt: string | null;
+  releaseNote: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+/** GET /quality/complaints → the customer-complaint register rows. */
+export interface ComplaintRow {
+  id: string;
+  complaintNo: string;
+  channel: string;
+  severity: string;
+  customerId: string;
+  itemId: string | null;
+  batchId: string | null;
+  ncrId: string | null;
+  subject: string;
+  details: string | null;
+  detailsAr: string | null;
+  status: string;
+  resolution: string | null;
+  resolvedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+/** GET /quality/recall → the recall registry rows (the drill's RECORD). */
+export interface RecallRegistryRow {
+  id: string;
+  recallNo: string;
+  batchId: string;
+  reason: string;
+  status: "INITIATED" | "EXECUTED" | "CLOSED";
+  initiatedAt: string;
+  executedAt: string | null;
+  closedAt: string | null;
+  scope: unknown;
+  affectedCustomers: unknown;
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}

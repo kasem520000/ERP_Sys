@@ -7,6 +7,11 @@
  * degrade to empty on failure (the screen still works via a pasted batch
  * UUID), and a 401 on any of them redirects to login (a dead session
  * means no search can run). The screen never mutates anything.
+ *
+ * PHASE-050 (W-29 — T-15): the ACTIVE quality holds read ONCE (GET
+ * quality/holds?status=ACTIVE&limit=200) feeds the selected batch's hold
+ * banner — ADDITIVE: a tenant without the quality entitlement (a 403 on
+ * that read) degrades to no banner, never a typed refusal here.
  */
 import { notFound, redirect } from "next/navigation";
 import type { JSX } from "react";
@@ -14,7 +19,7 @@ import type { JSX } from "react";
 import { AppShell } from "../../../../components/app-shell";
 import { ManufacturingGenealogy } from "../../../../components/manufacturing-genealogy";
 import { getDictionary, isLocale, type Locale } from "../../../../i18n/dictionaries";
-import type { BatchRow, ItemRow } from "../../../../lib/api-types";
+import type { BatchRow, BatchQualityHoldRow, ItemRow } from "../../../../lib/api-types";
 import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
 
 export default async function ManufacturingGenealogyPage({
@@ -31,14 +36,24 @@ export default async function ManufacturingGenealogyPage({
 
   await requireSessionToken(localeValue);
 
-  const [items, batches] = await Promise.all([
+  const [items, batches, holds] = await Promise.all([
     fetchApi<readonly ItemRow[]>("items/items?limit=100"),
     // The batch search pool (the select's initial page); the screen works
     // without it — a pasted UUID and the per-item refetch carry the recall.
     fetchApi<readonly BatchRow[]>("inventory/batches?limit=500"),
+    // PHASE-050 (W-29): the selected batch's hold banner's own pool —
+    // additive, degraded on any refusal.
+    fetchApi<readonly BatchQualityHoldRow[]>("quality/holds?status=ACTIVE&limit=200"),
   ]);
   if ((!items.ok && items.status === 401) || (!batches.ok && batches.status === 401)) {
     redirect(`/${locale}/login`);
+  }
+
+  const holdsByBatch = new Map<string, BatchQualityHoldRow>();
+  if (holds.ok) {
+    for (const hold of holds.data) {
+      holdsByBatch.set(hold.batchId, hold);
+    }
   }
 
   const content: JSX.Element = (
@@ -48,6 +63,7 @@ export default async function ManufacturingGenealogyPage({
         (item) => item.kind === "STOCK" && item.trackBatch && item.deletedAt === null,
       )}
       initialBatches={batches.ok ? batches.data : []}
+      holdsByBatch={holdsByBatch}
     />
   );
 

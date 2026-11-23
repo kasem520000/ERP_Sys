@@ -3244,3 +3244,209 @@ export function localizedCmmsTransferError(
       return localizedCmmsError(d, error, retryAfterSeconds);
   }
 }
+
+// -- PHASE-050 (W-29 — T-15): the QMS vocabularies ---------------------------
+
+/**
+ * Quality typed refusals (the quality-errors codes the QMS boards can
+ * meet; the engine's own messages ride the TypedRefusalPanel's details —
+ * this is the one-line localized summary, never a replacement for the
+ * payload). Falls through to the generic API mapping for every code
+ * outside the quality family (the localizedCmmsError precedent).
+ */
+export function localizedQualityError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "BATCH_QUALITY_HELD":
+      return d.qualityErrBatchHeld;
+    case "HOLD_RELEASE_DISPOSITION_REQUIRED":
+      return d.qualityErrHoldReleaseDisposition;
+    case "BATCH_QUALITY_HOLD_STATE":
+      return d.qualityErrHoldState;
+    case "BATCH_QUALITY_HOLD_NOT_FOUND":
+      return d.qualityErrHoldNotFound;
+    case "BATCH_HOLD_ALREADY_ACTIVE":
+      return d.qualityErrHoldAlreadyActive;
+    case "NCR_RECORD_NOT_FOUND":
+      return d.qualityErrNcrNotFound;
+    case "NCR_STATE_ERROR":
+      return d.qualityErrNcrState;
+    case "NCR_DISPOSITION_REQUIRED":
+      return d.qualityErrNcrDispositionRequired;
+    case "NCR_AFFECTED_QTY_ABOVE_ON_HAND":
+      return d.qualityErrNcrQtyAboveOnHand;
+    case "CAPA_RECORD_NOT_FOUND":
+      return d.qualityErrCapaNotFound;
+    case "CAPA_STATE_ERROR":
+      return d.qualityErrCapaState;
+    case "CAPA_COST_ALREADY_RECORDED":
+      return d.qualityErrCapaCostAlready;
+    case "CAPA_ACTIONS_PENDING":
+      return d.qualityErrCapaActionsPending;
+    case "CAPA_EFFECTIVENESS_REQUIRED":
+      return d.qualityErrCapaEffectiveness;
+    case "CALIBRATION_RECORD_NOT_FOUND":
+      return d.qualityErrCalibrationNotFound;
+    case "CALIBRATION_DUE_DATE_INVALID":
+      return d.qualityErrCalibrationDueDate;
+    case "QUALITY_INSTRUMENT_NOT_FOUND":
+      return d.qualityErrInstrumentNotFound;
+    case "QUALITY_SPECIFICATION_NOT_FOUND":
+      return d.qualityErrSpecNotFound;
+    case "QUALITY_SPECIFICATION_DUPLICATE":
+      return d.qualityErrSpecDuplicate;
+    case "QUALITY_SPEC_BAND_INVALID":
+      return d.qualityErrSpecBand;
+    case "QUALITY_INSPECTION_NOT_FOUND":
+      return d.qualityErrInspectionNotFound;
+    case "QUALITY_INPUT_INVALID":
+      return d.qualityErrInputInvalid;
+    case "SPC_SUBGROUP_SIZE_INVALID":
+      return d.qualityErrSpcSubgroupSize;
+    case "SPC_INSUFFICIENT_SAMPLES":
+      return d.qualityErrSpcInsufficient;
+    case "SUPPLIER_QUALITY_PARTNER_NOT_FOUND":
+      return d.qualityErrSupplierPartner;
+    case "COA_DOCUMENT_NOT_FOUND":
+      return d.qualityErrCoaNotFound;
+    case "COA_GATE_BLOCKED":
+      return d.qualityErrCoaGateBlocked;
+    case "COA_NO_SPECIFICATIONS":
+      return d.qualityErrCoaNoSpecs;
+    case "COMPLAINT_NOT_FOUND":
+      return d.qualityErrComplaintNotFound;
+    case "COMPLAINT_STATE":
+      return d.qualityErrComplaintState;
+    case "RECALL_RECORD_NOT_FOUND":
+      return d.qualityErrRecallNotFound;
+    case "RECALL_STATE":
+      return d.qualityErrRecallState;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}
+
+/** The shared severity vocabulary (LOW/MEDIUM/HIGH/CRITICAL — the NCR and
+ * complaints boards' own ladder). */
+export function localizedQualitySeverity(d: Dictionary, severity: string): string {
+  const map: Record<string, string> = {
+    LOW: d.qualitySeverityLow,
+    MEDIUM: d.qualitySeverityMedium,
+    HIGH: d.qualitySeverityHigh,
+    CRITICAL: d.qualitySeverityCritical,
+  };
+  return map[severity] ?? severity;
+}
+
+/** NCR statuses (OPEN/DISPOSITIONED/CLOSED — BR-102's ladder). */
+export function localizedNcrStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    OPEN: d.qualityNcrStatusOpen,
+    DISPOSITIONED: d.qualityNcrStatusDispositioned,
+    CLOSED: d.qualityNcrStatusClosed,
+  };
+  return map[status] ?? status;
+}
+
+/** NCR sources (INSPECTION/PRODUCTION/COMPLAINT/SUPPLIER). */
+export function localizedNcrSource(d: Dictionary, source: string): string {
+  const map: Record<string, string> = {
+    INSPECTION: d.qualityNcrSourceInspection,
+    PRODUCTION: d.qualityNcrSourceProduction,
+    COMPLAINT: d.qualityNcrSourceComplaint,
+    SUPPLIER: d.qualityNcrSourceSupplier,
+  };
+  return map[source] ?? source;
+}
+
+/** NCR dispositions (REWORK/SCRAP/ACCEPT/RETURN_TO_SUPPLIER — G-62's door). */
+export function localizedNcrDisposition(d: Dictionary, disposition: string): string {
+  const map: Record<string, string> = {
+    REWORK: d.qualityNcrDispositionRework,
+    SCRAP: d.qualityNcrDispositionScrap,
+    ACCEPT: d.qualityNcrDispositionAccept,
+    RETURN_TO_SUPPLIER: d.qualityNcrDispositionReturnToSupplier,
+  };
+  return map[disposition] ?? disposition;
+}
+
+/** CAPA statuses (OPEN/IN_PROGRESS/CLOSED). */
+export function localizedCapaStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    OPEN: d.qualityCapaStatusOpen,
+    IN_PROGRESS: d.qualityCapaStatusInProgress,
+    CLOSED: d.qualityCapaStatusClosed,
+  };
+  return map[status] ?? status;
+}
+
+/** Calibration results (PASS/FAIL/ADJUSTED). */
+export function localizedCalibrationResult(d: Dictionary, result: string): string {
+  const map: Record<string, string> = {
+    PASS: d.qualityCalibrationResultPass,
+    FAIL: d.qualityCalibrationResultFail,
+    ADJUSTED: d.qualityCalibrationResultAdjusted,
+  };
+  return map[result] ?? result;
+}
+
+/** SPC sample sources (MANUAL/PRODUCTION/INSPECTION — the 0113 domain). */
+export function localizedSpcSource(d: Dictionary, source: string): string {
+  const map: Record<string, string> = {
+    MANUAL: d.qualitySpcSourceManual,
+    PRODUCTION: d.qualitySpcSourceProduction,
+    INSPECTION: d.qualitySpcSourceInspection,
+  };
+  return map[source] ?? source;
+}
+
+/** Complaint statuses (NEW/TRIAGED/IN_PROGRESS/RESOLVED/CLOSED — Q-08's
+ * ladder). */
+export function localizedComplaintStatus(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    NEW: d.qualityComplaintsStatusNew,
+    TRIAGED: d.qualityComplaintsStatusTriaged,
+    IN_PROGRESS: d.qualityComplaintsStatusInProgress,
+    RESOLVED: d.qualityComplaintsStatusResolved,
+    CLOSED: d.qualityComplaintsStatusClosed,
+  };
+  return map[status] ?? status;
+}
+
+/** Complaint channels (PHONE/EMAIL/WALK_IN/PORTAL/SOCIAL/OTHER). */
+export function localizedComplaintChannel(d: Dictionary, channel: string): string {
+  const map: Record<string, string> = {
+    PHONE: d.qualityComplaintsChannelPhone,
+    EMAIL: d.qualityComplaintsChannelEmail,
+    WALK_IN: d.qualityComplaintsChannelWalkIn,
+    PORTAL: d.qualityComplaintsChannelPortal,
+    SOCIAL: d.qualityComplaintsChannelSocial,
+    OTHER: d.qualityComplaintsChannelOther,
+  };
+  return map[channel] ?? channel;
+}
+
+/** The COA gate verdicts (BR-104's three shapes + the coverage verdicts). */
+export function localizedCoaGateVerdict(d: Dictionary, gate: string): string {
+  const map: Record<string, string> = {
+    PASS: d.qualityCoaVerdictPass,
+    PASS_UNBANDED: d.qualityCoaVerdictPassUnbanded,
+    PASS_DEVIATION_ACCEPTED: d.qualityCoaVerdictPassDeviation,
+    FAIL_OUTSIDE: d.qualityCoaVerdictFailOutside,
+  };
+  return map[gate] ?? gate;
+}
+
+/** The tolerance fold's verdicts (the ONLY evaluator's own vocabulary). */
+export function localizedCoaToleranceVerdict(d: Dictionary, verdict: string): string {
+  const map: Record<string, string> = {
+    UNBANDED: d.qualityCoaToleranceUnbanded,
+    WITHIN: d.qualityCoaToleranceWithin,
+    ABOVE_UCL: d.qualityCoaToleranceAboveUcl,
+    BELOW_LCL: d.qualityCoaToleranceBelowLcl,
+  };
+  return map[verdict] ?? verdict;
+}

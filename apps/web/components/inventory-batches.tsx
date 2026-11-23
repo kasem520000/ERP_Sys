@@ -24,9 +24,15 @@ import {
 } from "@erp/ui";
 
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { BatchRow, ItemRow, WarehouseRow } from "../lib/api-types";
+import type {
+  BatchRow,
+  BatchQualityHoldRow,
+  ItemRow,
+  WarehouseRow,
+} from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedInventoryError, localizedName } from "../lib/messages";
+import { BatchHoldBanner, BatchHoldChip } from "./batch-hold-banner";
 import { Card } from "./card";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
@@ -46,12 +52,16 @@ export function InventoryBatches({
   items,
   warehouses,
   canManage,
+  holdsByBatch = new Map(),
 }: {
   locale: Locale;
   initialRows: readonly BatchRow[];
   items: readonly ItemRow[];
   warehouses: readonly WarehouseRow[];
   canManage: boolean;
+  /** PHASE-050 (W-29): the ACTIVE quality holds (the page's single read);
+  * additive — an empty map simply renders no banners. */
+  holdsByBatch?: ReadonlyMap<string, BatchQualityHoldRow>;
 }): JSX.Element {
   const d = getDictionary(locale);
   const router = useRouter();
@@ -89,6 +99,15 @@ export function InventoryBatches({
   }, [rows, expiredOnly, query]);
 
   const writeOffRow = rows.find((row) => row.id === writeOffId);
+  const writeOffHold =
+    writeOffRow === undefined ? undefined : holdsByBatch.get(writeOffRow.id);
+  // PHASE-050 (W-29): the held batches currently listed in the register —
+  // each carries its own full banner above the table (the register's own
+  // text, one banner per held batch).
+  const heldListed = filtered.flatMap((row) => {
+    const hold = holdsByBatch.get(row.id);
+    return hold === undefined ? [] : [{ row, hold }];
+  });
   const formReady = itemId !== "" && batchNo.trim().length >= 1;
   const writeOffReady =
     writeOffWarehouse !== "" && writeOffDate !== "" && writeOffRow !== undefined;
@@ -172,6 +191,22 @@ export function InventoryBatches({
             className="lg:max-w-xs"
           />
         </div>
+        {/* PHASE-050 (W-29): THE HELD BATCHES' OWN BANNERS — above the table,
+            one full banner per held batch currently listed (the register's
+            own reason + stamps; a tenant without the quality entitlement
+            simply renders none — the additive law). */}
+        {heldListed.length > 0 ? (
+          <div className="mb-3 flex flex-col gap-2">
+            {heldListed.map(({ row, hold }) => (
+              <div key={row.id} className="flex flex-col gap-1">
+                <span className="font-mono text-xs text-gray-600" dir="ltr">
+                  {row.batchNo}
+                </span>
+                <BatchHoldBanner hold={hold} locale={locale} d={d} />
+              </div>
+            ))}
+          </div>
+        ) : null}
         <DataTable
           columns={[
             {
@@ -189,7 +224,16 @@ export function InventoryBatches({
               accessor: (row) => row.batchNo,
               mono: true,
               sortable: true,
-              render: (row) => <span className="font-mono text-sm" dir="ltr">{row.batchNo}</span>,
+              render: (row) => (
+                <span className="flex flex-wrap items-center gap-1">
+                  <span className="font-mono text-sm" dir="ltr">
+                    {row.batchNo}
+                  </span>
+                  {holdsByBatch.get(row.id) !== undefined ? (
+                    <BatchHoldChip label={d.qualityHoldChip} />
+                  ) : null}
+                </span>
+              ),
             },
             {
               id: "expiry",
@@ -299,6 +343,11 @@ export function InventoryBatches({
 
       {canManage && writeOffRow !== undefined && (
         <Card title={`${d.batchesWriteOffTitle} · ${writeOffRow.batchNo}`}>
+          {writeOffHold !== undefined ? (
+            <div className="mb-3">
+              <BatchHoldBanner hold={writeOffHold} locale={locale} d={d} />
+            </div>
+          ) : null}
           <p className="text-xs text-muted-foreground">{d.batchesWriteOffHint}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Select

@@ -178,6 +178,16 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   // sidebar; these fallbacks cover nav-fetch failure (the rule above).
   "manufacturing/mrp": { group: "manufacturingNavSection", label: "mfgMrpTitle" },
   "manufacturing/mps": { group: "manufacturingNavSection", label: "mfgMpsTitle" },
+  // PHASE-050 (W-29 — T-15): the QMS screens' fallback crumbs (the same
+  // rule — the sidebar is registry-driven through the six NAV_ITEMS rows
+  // quality.ncr / quality.capa / quality.calibration / quality.spc /
+  // quality.complaints / quality.coa).
+  "quality/ncr": { group: "manufacturingNavSection", label: "qualityNcrTitle" },
+  "quality/capa": { group: "manufacturingNavSection", label: "qualityCapaTitle" },
+  "quality/calibration": { group: "manufacturingNavSection", label: "qualityCalibrationTitle" },
+  "quality/spc": { group: "manufacturingNavSection", label: "qualitySpcTitle" },
+  "quality/complaints": { group: "manufacturingNavSection", label: "qualityComplaintsTitle" },
+  "quality/coa": { group: "manufacturingNavSection", label: "qualityCoaTitle" },
   // -- PHASE-021 (T2-b): the Offline Console entry — always visible
   // (DR-P21-06; browser opens the honest ONLINE-ONLY console).
   offline: { group: "offlineNavSection", label: "offlineConsoleTitle" },
