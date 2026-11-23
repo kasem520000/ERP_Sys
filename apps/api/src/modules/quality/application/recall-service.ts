@@ -214,11 +214,32 @@ export class RecallService {
       });
     }
     const drillResult = await this.drill(current.batchId);
-    const scope = {
-      batch: drillResult.batch,
-      whereUsed: drillResult.whereUsed,
-      frozenAt: new Date().toISOString(),
-    };
+    // THE SCOPE SNAPSHOT (0116's ck_recall_registry_scope_shape demands a
+    // jsonb ARRAY — the honest shape): one kind-tagged entry per
+    // where-used edge — the productions that consumed the batch and the
+    // sales documents that shipped it — plus the frozenAt witness. The
+    // customer side rides affected_customers (its own array).
+    const scope = [
+      ...drillResult.whereUsed.productions.map((edge) => ({
+        kind: "production" as const,
+        level: edge.level,
+        fromBatchId: edge.fromBatchId,
+        orderId: edge.orderId,
+        orderNo: edge.orderNo,
+        fgBatchId: edge.fgBatchId,
+        qty: edge.qty,
+      })),
+      ...drillResult.whereUsed.sales.map((edge) => ({
+        kind: "sale" as const,
+        level: edge.level,
+        batchId: edge.batchId,
+        docType: edge.docType,
+        docId: edge.docId,
+        docDate: edge.docDate,
+        qty: edge.qty,
+      })),
+      { kind: "witness" as const, frozenAt: new Date().toISOString() },
+    ];
     const row = await store.stampRecallExecuted({
       id: input.recallId,
       scope,

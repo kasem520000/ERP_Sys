@@ -1,0 +1,271 @@
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    /home/z/.local/share/erp-env/embedded-pg-linux-x64/native/bin/pg_ctl -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-23 20:22:12.846 UTC [22277] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-23 20:22:12.846 UTC [22277] LOG:  listening on IPv6 address "::1", port 42149
+2026-11-23 20:22:12.846 UTC [22277] LOG:  listening on IPv4 address "127.0.0.1", port 42149
+
+2026-11-23 20:22:12.846 UTC [22277] LOG:  listening on Unix socket "/tmp/.s.PGSQL.42149"
+
+2026-11-23 20:22:12.848 UTC [22280] LOG:  database system was shut down at 2026-11-23 20:22:12 UTC
+
+2026-11-23 20:22:12.849 UTC [22277] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/quality/quality-holds.db.spec.ts (8 tests) 1190ms
+   ✓ quality holds — the INV-035 blocking matrix (every baseline path) > THE SALES DELIVERY PATH (the baseline ship path): the post refuses, the document stays DRAFT, ZERO residue  517ms
+2026-11-23 20:22:19.302 UTC [22380] ERROR:  new row for relation "warehouses" violates check constraint "ck_warehouses_code_shape"
+2026-11-23 20:22:19.302 UTC [22380] DETAIL:  Failing row contains (3ea0c4cf-d22e-48bf-8601-ecca9146ab76, 5a5a5a5a-5a5a-5a5a-5a5a-5a5a5a5a5a5a, 2026-11-23 20:22:19.30164+00, 2026-11-23 20:22:19.30164+00, 1, null, 634f175d-c6a5-418e-b9d9-10ee5b26f653, QL-WH-HOLD-DRILL-EMPTY, The HOLD-DRILL-EMPTY warehouse, مستودع HOLD-DRILL-EMPTY, null, t, null, null, null, STANDARD, null, null).
+2026-11-23 20:22:19.302 UTC [22380] STATEMENT:  INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4,
+	        (SELECT id FROM branches WHERE tenant_id = $1 AND code = 'BR-QL' LIMIT 1))
+	     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+	     RETURNING id
+
+2026-11-23 20:22:19.381 UTC [22357] ERROR:  new row for relation "recall_registry" violates check constraint "ck_recall_registry_scope_shape"
+2026-11-23 20:22:19.381 UTC [22357] STATEMENT:  
+	    UPDATE recall_registry
+	    SET status = 'EXECUTED', executed_at = now(),
+	        scope = $1::jsonb,
+	        affected_customers = $2::jsonb,
+	        updated_by = $3, updated_at = now(), version = version + 1
+	    WHERE id = $4 AND status = 'INITIATED'
+	    RETURNING id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+	  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+	  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+	  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"
+
+2026-11-23 20:22:19.433 UTC [22357] ERROR:  new row for relation "recall_registry" violates check constraint "ck_recall_registry_scope_shape"
+2026-11-23 20:22:19.433 UTC [22357] STATEMENT:  
+	    UPDATE recall_registry
+	    SET status = 'EXECUTED', executed_at = now(),
+	        scope = $1::jsonb,
+	        affected_customers = $2::jsonb,
+	        updated_by = $3, updated_at = now(), version = version + 1
+	    WHERE id = $4 AND status = 'INITIATED'
+	    RETURNING id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+	  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+	  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+	  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"
+
+ ❯ src/__db__/quality/quality-recall.db.spec.ts (4 tests | 3 failed) 216ms
+   × quality recall — the drill + the record (Q-09/Q-12) > THE DRILL QUERY: batch → where-used → customers (a shipped batch resolves to its customer; nothing shipped resolves to the honest empty scope) 88ms
+     → new row for relation "warehouses" violates check constraint "ck_warehouses_code_shape"
+   × quality recall — the drill + the record (Q-09/Q-12) > THE RECORD: initiate → execute (the FROZEN snapshots) → close — the ladder through the REAL CAS; a later stock move never moves a stored snapshot 78ms
+     → Failed query: 
+    UPDATE recall_registry
+    SET status = 'EXECUTED', executed_at = now(),
+        scope = $1::jsonb,
+        affected_customers = $2::jsonb,
+        updated_by = $3, updated_at = now(), version = version + 1
+    WHERE id = $4 AND status = 'INITIATED'
+    RETURNING id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"
+params: {"batch":{"batchId":"8cf29734-2f58-442a-b4c6-4c44014b9e0d","batchNo":"QL-B-HOLD-REC","itemId":"b4d0c568-4523-478e-8a38-54e8a0d65fba","sku":"QL-SCRAP-HOLD-REC","status":"ACTIVE"},"whereUsed":{"productions":[],"sales":[{"level":1,"batchId":"8cf29734-2f58-442a-b4c6-4c44014b9e0d","docType":"delivery_note","docId":"01a20a12-e1d7-7000-bd12-e349be9cf730","docDate":"2026-11-23","qty":"7.000000"}]},"frozenAt":"2026-11-23T20:22:19.381Z"},[{"customerId":"00478363-ecec-45e1-93a6-d4379c471860","customerName":"QL Customer Co","customerNameAr":"عميل الجودة","documents":[{"docType":"delivery_note","docId":"01a20a12-e1d7-7000-bd12-e349be9cf730","docNo":"DEL-2026-000002","docDate":"2026-11-23","qty":"7.000000"}]}],5a5a5a5a-0000-4000-8000-0000000005a1,01a20a12-e1f0-7000-8777-811736603438
+   × quality recall — the drill + the record (Q-09/Q-12) > THE HELD BATCH'S OWN RECALL: the drill works beside an ACTIVE hold (the record is not the gate — INV-035 blocks issues, never reads) 47ms
+     → Failed query: 
+    UPDATE recall_registry
+    SET status = 'EXECUTED', executed_at = now(),
+        scope = $1::jsonb,
+        affected_customers = $2::jsonb,
+        updated_by = $3, updated_at = now(), version = version + 1
+    WHERE id = $4 AND status = 'INITIATED'
+    RETURNING id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"
+params: {"batch":{"batchId":"628f99a3-7748-498b-9e62-18e5467220e9","batchNo":"QL-B-HOLD-REC-HOLD","itemId":"ac29bffa-f082-4710-8087-d416849bd2e7","sku":"QL-SCRAP-HOLD-REC-HOLD","status":"ACTIVE"},"whereUsed":{"productions":[],"sales":[]},"frozenAt":"2026-11-23T20:22:19.433Z"},[],5a5a5a5a-0000-4000-8000-0000000005a1,01a20a12-e21c-7000-9bc6-af4b6344da2c
+   ✓ quality recall — the drill + the record (Q-09/Q-12) > THE RLS BOUNDARY + the not-found floor: the isolated tenant sees no records; the unknown recall is the typed 404 2ms
+2026-11-23 20:22:19.465 UTC [22386] ERROR:  syntax error at or near ":" at character 134
+2026-11-23 20:22:19.465 UTC [22386] STATEMENT:  SELECT count(*)::int AS n FROM notifications
+	        WHERE tenant_id = $1 AND category = 'quality'
+	          AND dedupe_key = quality:complaint:CMP-2026-000001
+
+ ❯ src/__db__/quality/quality-complaints.db.spec.ts (5 tests | 1 failed) 103ms
+   × quality complaints — the intake + the NCR link (Q-08) > THE INTAKE: the official CMP number, the NEW status, the inbox notification recorded (category 'quality') 17ms
+     → syntax error at or near ":"
+   ✓ quality complaints — the intake + the NCR link (Q-08) > THE LADDER: triage (carrying the first NCR link) → progress → resolve (the pair) → close — every rung through the REAL CAS 48ms
+   ✓ quality complaints — the intake + the NCR link (Q-08) > THE LINK WINDOW: a NEW complaint carries no link; the link lands at TRIAGED through the register's OWN row 19ms
+   ✓ quality complaints — the intake + the NCR link (Q-08) > THE RESOLUTION-PAIR FLOOR: the resolve on a non-IN_PROGRESS rung is the typed refusal; the blank resolution is the input floor 17ms
+   ✓ quality complaints — the intake + the NCR link (Q-08) > THE RLS BOUNDARY: the isolated tenant sees no complaints 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/quality/quality-complaints.db.spec.ts > quality complaints — the intake + the NCR link (Q-08) > THE INTAKE: the official CMP number, the NEW status, the inbox notification recorded (category 'quality')
+error: syntax error at or near ":"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ src/__db__/quality/quality-complaints.db.spec.ts:58:19
+     56|     expect(row.complaintNo).toMatch(/^CMP-\d{4}-\d{6}$/);
+     57|     const su = await superuserClient();
+     58|     const inbox = await su.query<{ n: number }>(
+       |                   ^
+     59|       `SELECT count(*)::int AS n FROM notifications
+     60|         WHERE tenant_id = $1 AND category = 'quality'
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/__db__/quality/quality-recall.db.spec.ts > quality recall — the drill + the record (Q-09/Q-12) > THE DRILL QUERY: batch → where-used → customers (a shipped batch resolves to its customer; nothing shipped resolves to the honest empty scope)
+error: new row for relation "warehouses" violates check constraint "ck_warehouses_code_shape"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ freshQualityScrapWorld src/__db__/quality/fixtures.ts:350:21
+    348|     [TENANT_QUALITY, `QL-SCRAP-${code}`, `The ${code} scrap item`, `صن…
+    349|   );
+    350|   const warehouse = await su.query<{ id: string }>(
+       |                     ^
+    351|     `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branc…
+    352|      VALUES (gen_random_uuid(), $1, $2, $3, $4,
+ ❯ src/__db__/quality/quality-recall.db.spec.ts:99:24
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/__db__/quality/quality-recall.db.spec.ts > quality recall — the drill + the record (Q-09/Q-12) > THE RECORD: initiate → execute (the FROZEN snapshots) → close — the ladder through the REAL CAS; a later stock move never moves a stored snapshot
+Error: Failed query: 
+    UPDATE recall_registry
+    SET status = 'EXECUTED', executed_at = now(),
+        scope = $1::jsonb,
+        affected_customers = $2::jsonb,
+        updated_by = $3, updated_at = now(), version = version + 1
+    WHERE id = $4 AND status = 'INITIATED'
+    RETURNING id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"
+params: {"batch":{"batchId":"8cf29734-2f58-442a-b4c6-4c44014b9e0d","batchNo":"QL-B-HOLD-REC","itemId":"b4d0c568-4523-478e-8a38-54e8a0d65fba","sku":"QL-SCRAP-HOLD-REC","status":"ACTIVE"},"whereUsed":{"productions":[],"sales":[{"level":1,"batchId":"8cf29734-2f58-442a-b4c6-4c44014b9e0d","docType":"delivery_note","docId":"01a20a12-e1d7-7000-bd12-e349be9cf730","docDate":"2026-11-23","qty":"7.000000"}]},"frozenAt":"2026-11-23T20:22:19.381Z"},[{"customerId":"00478363-ecec-45e1-93a6-d4379c471860","customerName":"QL Customer Co","customerNameAr":"عميل الجودة","documents":[{"docType":"delivery_note","docId":"01a20a12-e1d7-7000-bd12-e349be9cf730","docNo":"DEL-2026-000002","docDate":"2026-11-23","qty":"7.000000"}]}],5a5a5a5a-0000-4000-8000-0000000005a1,01a20a12-e1f0-7000-8777-811736603438
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.stampRecallExecuted src/modules/quality/infrastructure/quality.store.ts:1382:16
+ ❯ RecallService.execute src/modules/quality/application/recall-service.ts:222:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-recall.db.spec.ts:166:22
+
+Caused by: error: new row for relation "recall_registry" violates check constraint "ck_recall_registry_scope_shape"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.stampRecallExecuted src/modules/quality/infrastructure/quality.store.ts:1382:16
+ ❯ RecallService.execute src/modules/quality/application/recall-service.ts:222:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-recall.db.spec.ts:166:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 217, severity: 'ERROR', code: '23514', detail: undefined, hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'recall_registry', dataType: undefined, constraint: 'ck_recall_registry_scope_shape', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/__db__/quality/quality-recall.db.spec.ts > quality recall — the drill + the record (Q-09/Q-12) > THE HELD BATCH'S OWN RECALL: the drill works beside an ACTIVE hold (the record is not the gate — INV-035 blocks issues, never reads)
+Error: Failed query: 
+    UPDATE recall_registry
+    SET status = 'EXECUTED', executed_at = now(),
+        scope = $1::jsonb,
+        affected_customers = $2::jsonb,
+        updated_by = $3, updated_at = now(), version = version + 1
+    WHERE id = $4 AND status = 'INITIATED'
+    RETURNING id, recall_no AS "recallNo", batch_id AS "batchId", reason,
+  status, initiated_at AS "initiatedAt", executed_at AS "executedAt",
+  closed_at AS "closedAt", scope, affected_customers AS "affectedCustomers",
+  note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt"
+params: {"batch":{"batchId":"628f99a3-7748-498b-9e62-18e5467220e9","batchNo":"QL-B-HOLD-REC-HOLD","itemId":"ac29bffa-f082-4710-8087-d416849bd2e7","sku":"QL-SCRAP-HOLD-REC-HOLD","status":"ACTIVE"},"whereUsed":{"productions":[],"sales":[]},"frozenAt":"2026-11-23T20:22:19.433Z"},[],5a5a5a5a-0000-4000-8000-0000000005a1,01a20a12-e21c-7000-9bc6-af4b6344da2c
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.stampRecallExecuted src/modules/quality/infrastructure/quality.store.ts:1382:16
+ ❯ RecallService.execute src/modules/quality/application/recall-service.ts:222:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-recall.db.spec.ts:236:22
+
+Caused by: error: new row for relation "recall_registry" violates check constraint "ck_recall_registry_scope_shape"
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.stampRecallExecuted src/modules/quality/infrastructure/quality.store.ts:1382:16
+ ❯ RecallService.execute src/modules/quality/application/recall-service.ts:222:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-recall.db.spec.ts:236:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 217, severity: 'ERROR', code: '23514', detail: undefined, hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'public', table: 'recall_registry', dataType: undefined, constraint: 'ck_recall_registry_scope_shape', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  4 failed | 13 passed (17)
+   Start at  20:22:12
+   Duration  7.48s (transform 1.21s, setup 0ms, collect 1.88s, tests 1.51s, environment 0ms, prepare 58ms)
+
+2026-11-23 20:22:19.575 UTC [22277] LOG:  received fast shutdown request
+2026-11-23 20:22:19.575 UTC [22277] LOG:  aborting any active transactions
+2026-11-23 20:22:19.575 UTC [22380] FATAL:  terminating connection due to administrator command
+2026-11-23 20:22:19.575 UTC [22386] FATAL:  terminating connection due to administrator command
+2026-11-23 20:22:19.577 UTC [22358] FATAL:  terminating connection due to administrator command
+2026-11-23 20:22:19.578 UTC [22277] LOG:  background worker "logical replication launcher" (PID 22283) exited with exit code 1
+2026-11-23 20:22:19.578 UTC [22357] FATAL:  terminating connection due to administrator command
+
+2026-11-23 20:22:19.582 UTC [22278] LOG:  shutting down
+
+2026-11-23 20:22:19.582 UTC [22278] LOG:  checkpoint starting: shutdown immediate
+
+(node:22336) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:22336) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-23 20:22:19.607 UTC [22278] LOG:  checkpoint complete: wrote 3263 buffers (19.9%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.017 s, sync=0.009 s, total=0.026 s; sync files=2792, longest=0.001 s, average=0.001 s; distance=28433 kB, estimate=28433 kB; lsn=0/30A2F28, redo lsn=0/30A2F28
+
+2026-11-23 20:22:19.636 UTC [22277] LOG:  database system is shut down
+
+VITEST_EXIT=1

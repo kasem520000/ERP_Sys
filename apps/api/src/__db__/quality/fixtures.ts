@@ -205,7 +205,7 @@ import { StockService } from "../../modules/inventory/application/stock-service"
 
 /** The service singletons (the cmms fixtures' shape — direct construction,
  * no Nest container; the specs run inside withTenant). */
-const audit = new AuditService(new DrizzleAuditStore());
+export const audit = new AuditService(new DrizzleAuditStore());
 export const posting = new PostingService(audit, new PartnerSubledgerService());
 export const numbering = new NumberingService(audit);
 const periods = new PeriodService(audit);
@@ -555,4 +555,156 @@ export async function seedSupplierDelivery(input: {
     inspectionId = inspection.id;
   }
   return { poId: order.id, grnId: receipt.id, inspectionId };
+}
+
+// ── W-28: the hold-blocking worlds (INV-035's matrix — the batches with
+// REAL stock the gate refuses against; the FEFO pair for the auto-pick
+// arm — both through the REAL receipt path, the scrap world's shape) ────────
+
+/** A single-batch blocking world: a batch-tracked item + its own
+ * warehouse + REAL stock (100 @ 2.500000) — the matrix's default
+ * substrate. */
+export async function freshQualityHoldWorld(code: string): Promise<{
+  itemId: string;
+  batchId: string;
+  warehouseId: string;
+}> {
+  return freshQualityScrapWorld(`HOLD-${code}`);
+}
+
+/** THE FEFO PAIR: a hasExpiry batch-tracked item with TWO batches — the
+ * HELD one expiring FIRST (FEFO's own pick) and the OTHER expiring
+ * later; both with REAL stock through the REAL receipt path. */
+export async function freshQualityFefoWorld(code: string): Promise<{
+  itemId: string;
+  heldBatchId: string;
+  otherBatchId: string;
+  warehouseId: string;
+}> {
+  await ensureQualityPostingWorld();
+  const su: Client = await superuserClient();
+  const item = await su.query<{ id: string }>(
+    `INSERT INTO items (id, tenant_id, sku, name, name_ar, kind, uom_id, costing_method,
+        base_price, track_batch, has_expiry)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, 'STOCK',
+        (SELECT id FROM uoms WHERE tenant_id = $1 AND code = 'PCS' LIMIT 1), 'WAC', 45, true, true)
+     ON CONFLICT (tenant_id, sku) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_QUALITY, `QL-FEFO-${code}`, `The ${code} FEFO item`, `صنف فيفو ${code}`],
+  );
+  const warehouse = await su.query<{ id: string }>(
+    `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4,
+        (SELECT id FROM branches WHERE tenant_id = $1 AND code = 'BR-QL' LIMIT 1))
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_QUALITY, `QL-WH-FEFO-${code}`, `The ${code} FEFO warehouse`, `مستودع فيفو ${code}`],
+  );
+  await su.end();
+  const itemId = item.rows[0]!.id;
+  const warehouseId = warehouse.rows[0]!.id;
+  // The HELD batch expires FIRST (2027-01-01) — FEFO's own pick; the
+  // OTHER expires later (2027-12-31). Both received through the REAL
+  // path (batchNo + batchExpiry — the receipt creates the batch rows).
+  await withTenant(TENANT_QUALITY, async () => {
+    await stock.manualReceipt({
+      itemId,
+      warehouseId,
+      qty: "100",
+      unitCost: "2.500000",
+      reason: "COUNT_GAIN",
+      counterAccountId: null,
+      valueDate: "2026-02-01",
+      batchNo: `QL-FEFO-${code}-HELD`,
+      batchExpiry: "2027-01-01",
+      note: "The FEFO pair's held batch",
+      noteAr: "الدفعة المحجوزة لزوج فيفو",
+      actorId: QL_ACTOR,
+    });
+    await stock.manualReceipt({
+      itemId,
+      warehouseId,
+      qty: "100",
+      unitCost: "2.500000",
+      reason: "COUNT_GAIN",
+      counterAccountId: null,
+      valueDate: "2026-02-01",
+      batchNo: `QL-FEFO-${code}-OTHER`,
+      batchExpiry: "2027-12-31",
+      note: "The FEFO pair's other batch",
+      noteAr: "الدفعة الأخرى لزوج فيفو",
+      actorId: QL_ACTOR,
+    });
+  });
+  const su2: Client = await superuserClient();
+  const batches = await su2.query<{ id: string; batch_no: string }>(
+    `SELECT id, batch_no FROM item_batches
+      WHERE tenant_id = $1 AND item_id = $2 ORDER BY batch_no`,
+    [TENANT_QUALITY, itemId],
+  );
+  await su2.end();
+  const held = batches.rows.find((row) => row.batch_no === `QL-FEFO-${code}-HELD`)!;
+  const other = batches.rows.find((row) => row.batch_no === `QL-FEFO-${code}-OTHER`)!;
+  return { itemId, heldBatchId: held.id, otherBatchId: other.id, warehouseId };
+}
+
+// ── W-28: the delivery path's own singletons (the baseline ship path —
+// the standalone delivery needs no order; the post rides the REAL
+// services and the REAL posting engine) ──────────────────────────────────────
+
+import { DeliveryNoteService } from "../../modules/sales/application/deliveries";
+import { PickingService } from "../../modules/inventory/application/picking-service";
+import { TransferService } from "../../modules/inventory/application/transfer-service";
+import { HoldService } from "../../modules/quality/application/hold-service";
+import { ComplaintService } from "../../modules/quality/application/complaint-service";
+import { RecallService } from "../../modules/quality/application/recall-service";
+import { GenealogyService } from "../../modules/manufacturing/application/genealogy-service";
+import { InboxService } from "../../modules/notifications/application/inbox-service";
+
+const picking = new PickingService(audit, numbering);
+export const deliveries = new DeliveryNoteService(audit, posting, numbering, picking);
+export const transfers = new TransferService(audit, posting, numbering);
+export const holds = new HoldService(audit);
+export const complaints = new ComplaintService(audit, numbering, new InboxService());
+export const recalls = new RecallService(audit, numbering, new GenealogyService());
+
+// ── W-28: the complaints intake's owner target (the QSW recipe verbatim —
+// the QL tenant gets its OWNER membership so ownerTarget() resolves and the
+// intake notification lands; idempotent) ────────────────────────────────────
+
+import { generateUuidV7 } from "@erp/domain-core";
+
+export async function ensureQualityOwnerTarget(): Promise<void> {
+  const su: Client = await superuserClient();
+  const existing = await su.query<{ n: number }>(
+    `SELECT count(*)::int AS n FROM memberships m
+      JOIN roles r ON r.id = m.role_id AND r.tenant_id = m.tenant_id
+     WHERE m.tenant_id = $1 AND r.key = 'owner' AND m.status = 'ACTIVE'`,
+    [TENANT_QUALITY],
+  );
+  if (existing.rows[0]!.n > 0) {
+    await su.end();
+    return;
+  }
+  const ownerTemplate = await su.query<{ id: string }>(
+    `SELECT id FROM roles WHERE tenant_id IS NULL AND key = 'owner'`,
+  );
+  const roleId = generateUuidV7();
+  await su.query(
+    `INSERT INTO roles (id, tenant_id, key, name, name_ar, is_system)
+     VALUES ($1, $2, 'owner', 'Owner', 'المالك', false)`,
+    [roleId, TENANT_QUALITY],
+  );
+  await su.query(
+    `INSERT INTO role_permissions (role_id, tenant_id, permission_id)
+     SELECT $1, $2, rp.permission_id FROM role_permissions rp
+      JOIN roles r ON r.id = rp.role_id WHERE r.id = $3`,
+    [roleId, TENANT_QUALITY, ownerTemplate.rows[0]!.id],
+  );
+  await su.query(
+    `INSERT INTO memberships (id, tenant_id, user_id, role_id)
+     VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`,
+    [generateUuidV7(), TENANT_QUALITY, QL_ACTOR, roleId],
+  );
+  await su.end();
 }
