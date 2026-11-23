@@ -794,6 +794,109 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-26 — T-07 + T-08 delivered, the CAPA +
+> calibration wave under the owner's standing order — «عند الانتهاء من أي
+> خطوة ادفعها إلى المستودع», every step pushed at its own commit; the
+> evidence `audit-evidence/phase050-w26/`, the THIRTY-SEVENTH consecutive
+> same-session wave): #2's CAPA arms DELIVERED — `quality-capa.db.spec` 17
+> arms over real PG16 (BR-103's effectiveness gate as the typed refusals
+> carrying the open action/due-date figures — the undated open action the
+> fail-closed BLOCK, the future-dated one the BLOCK with
+> openActionCount/pendingCount/pendingDueDates, the elapsed-window
+> boundary an open action due TODAY closes · **G-63's exactly-once** —
+> DR 5320 QUALITY_EXPENSE · CR 2137 EXTERNAL_ACCRUAL through the REAL
+> engine, the single-use source key `(capa_record, id, external_cost)`
+> + the single-use cost stamp (journal_entry_id IS NULL + external_cost
+> = 0 pinned), the replay the typed CAPA_COST_ALREADY_RECORDED with one
+> journal standing · **the unmapped-purpose fail-closed** —
+> QUALITY_EXPENSE superseded → the engine's own PURPOSE_NOT_MAPPED with
+> the ZERO residue (the record keeps its pre-act state, zero journals,
+> the cost still 0) + the flip-and-restore re-run GREEN · the root-cause
+> start act (OPEN → IN_PROGRESS in the same CAS, the IN_PROGRESS
+> re-record refreshing the stamp — the declared interpretation) · the
+> actions array's shape law refused cell-by-cell · the zero-cost CAPA
+> closing with NO entry · the future-dated CHECK refused (the
+> fabrication guard) · the honest negative check closing with the
+> record preserved · the CLOSED register refusing every move BY NAME) —
+> the G-62/G-63 golden TRANSCRIPTS with the failure packs remain W-31's.
+> #8's sweep arms DELIVERED — `quality-calibration-sweep.db.spec` 4 arms
+> (**THE FIFTH STANDING ISOLATE** — soak · fcm · email · the cmms sweep
+> · the quality calibration sweep, §0c (2)'s own law that the sweep
+> joins the isolate set the wave it ships): the default ladder firing
+> each band once with the S-15 severities and the dedupe keys asserted
+> EXACT · the structural DEDUPE (the re-run converges — flagged again,
+> notified 0, no accumulation, every pass seals) · **THE PER-CYCLE
+> RE-ALERT** (D-08's «per instrument+window+day» axes — the DAY is the
+> DUE DATE the alert names: a re-calibrated instrument stops, the next
+> near-dated cycle alerts AGAIN through its new due-date key; within a
+> cycle re-runs/the cron/races converge) · the settings surface (the
+> first 050 settings keys — the typed write dedup+descending · the
+> custom ladder governs · the registry refusal re-surfaced as
+> CALIBRATION_SWEEP_THRESHOLDS_INVALID · the garbage row fails-closed
+> to [30,7,0])) + `quality-calibration.db.spec` 10 arms (D-08's
+> instrument-AS-asset binding through the fixed-assets module's OWN
+> findAssetCard with the typed not-found · the official
+> CAL-{YYYY}-{SEQ:6} numbering · the due-after floor's typed pre-check
+> naming BOTH dates · G-63 AT THE CREATE ACT with the PRE-GENERATED
+> record id naming the INV-013 source key before the row exists (ONE
+> ambient transaction — the unmapped EXTERNAL_ACCRUAL leaves NO row and
+> NO journal, the in-house create UNAFFECTED throughout — a tenant
+> without the mapping keeps calibrating, the honest shape) · the
+> zero-cost/absent-cost in-house NO-entry shape · the newest-first
+> per-asset history). THE UNIT FOLDS (the plan §4's own arm): the CAPA
+> lifecycle matrix fold (16 property tests — the total status × move
+> grid, the actions shape law, BR-103's gate arms) + the calibration
+> sweep-math fold (11 property tests — the window coercion class, the
+> disjoint-band totality, D-08's dedupe-key axes, the severity ladder).
+> **THE HONEST CATCHES (two, both RED-proven with the four-quarter
+> logs, no battery red standing): (1) the cmms-schema spec's union arms
+> — 0117 (the W-25 stock-moves source widening) had defined
+> ck_stock_moves_source_shape at a NEW site with the new `ncr_record`
+> member and the W-25 scope-label run left the arm's EXPLICIT
+> bookkeeping stale (the lineage 10 → 11 sites; the members 23 → 24);
+> the arm's own design fired RED naming the drift
+> (`db-cmms-schema-union-RED.log`, VITEST_EXIT=1, 2 failed), repaired
+> with the dated notes at every modified site, GREEN re-run
+> (`db-cmms-schema-union-GREEN.log`, 32/32); the notifications arm's
+> enumeration grew 17 → 18 with `quality` in the same repair —
+> MIGRATION 0118_quality_notifications_category.sql ('quality' joins
+> BOTH notifications CHECK domains, the shared-scope union law's
+> 18-member union, ordered WITH the sweep's inbox writer in the same
+> increment; the journal 117 → 118, the manifest/journal/spec pins
+> moved together, no tables — the count stays 340; both scratch runs
+> CHAIN_118_APPLIED → check:rls OK — 340). (2) the sweep probe's own
+> shape — the per-cycle arm went RED on the first run
+> (`db-sweep-probe-RED.log`, VITEST_EXIT=1 — expected 4 flagged, the
+> band filter sat INSIDE the per-instrument DISTINCT ON collapse so a
+> re-calibrated instrument (+300 due) still flagged on its superseded
+> +15 row); THE REPAIR: the LATEST-FIRST LAW in scanCalibrationDue (the
+> collapse runs BEFORE the band filter — the instrument's CURRENT
+> obligation is its newest due date), the dated comment at the claim
+> site; GREEN 114/114.** ROUTE_PERMISSIONS 1,113 + 12 = 1,125 — the
+> keys-seed-first SECOND binding wave (the CAPA seven + the calibration
+> five incl. the sweep-config pair, dated at the block, the 1,102
+> baseline anchor); the error filter's domainStatus rows in the same
+> increment (the not-founds 404 · the lifecycle/single-use conflicts
+> 409 · BR-103's policy refusals 422). The battery: THE FIVE ISOLATES
+> STANDALONE FIRST (soak 1·1 229.11s · fcm 1·8 · email 1·5 · the cmms
+> sweep 1·4 · **the quality calibration sweep 1·4 — the new fifth**,
+> every VITEST_EXIT=0) · the affected folders re-run at the delta head
+> (the quality family 6 · 114 — the schema 59 + the NCR 13 + the specs
+> 11 + the CAPA 17 + the calibration 10 + the sweep 4 · migrations +
+> identity-flows 2 · 28 over the 1,125 routes · the cmms schema 1 · 32
+> — the repaired union arms) · the coverage roster's declared movement
+> (chunk-a 100 → 102 · **isolate-quality-sweep the new part** · the
+> roster 286 → 289, VERDICT: COVERED; the full ten-part envelope re-runs
+> at W-32) · typecheck 8/8 (0 cached — the force re-run) · lint 8/8 (0
+> cached) · depcruise 2,135 · 15,992 (+11/+86) · unit 152 · 1,921 (the
+> ledger arithmetic **1,921 = 910+171+840 EXACT** — the api 70·883 →
+> 72·910) · i18n 6,955 = 6,955 + mobile 371 (no delta — an API-DB
+> wave) · drift 347 = 347 (zero delta — no new keys) · manifests 13/13
+> · docs:validate 33/33 · id-ledger 0 errors + self-test all-probes-OK
+> (probe 7 stands at G-62/PHASE-050) · history-secrets 0 violations ·
+> 6,624 allowlisted (the window's shift; the FOUR tag anchors untouched)
+> · capabilities agree · shells PASS/PASS · boundary PASS.]**
+
 > **[Dated 2026-11-23 (PHASE-050 W-25 — T-05 + T-06 delivered, the
 > specifications + NCR engines wave under the owner's standing order; the
 > evidence `audit-evidence/phase050-w25/`, the THIRTY-SIXTH consecutive

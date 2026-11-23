@@ -1,0 +1,106 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys_clone/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-23 03:02:48.175 UTC [1380] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-23 03:02:48.176 UTC [1380] LOG:  listening on IPv6 address "::1", port 40745
+2026-11-23 03:02:48.176 UTC [1380] LOG:  listening on IPv4 address "127.0.0.1", port 40745
+
+2026-11-23 03:02:48.176 UTC [1380] LOG:  listening on Unix socket "/tmp/.s.PGSQL.40745"
+
+2026-11-23 03:02:48.177 UTC [1383] LOG:  database system was shut down at 2026-11-23 03:02:48 UTC
+
+2026-11-23 03:02:48.179 UTC [1380] LOG:  database system is ready to accept connections
+
+ ❯ src/__db__/quality/quality-calibration-sweep.db.spec.ts (4 tests | 1 failed) 338ms
+   ✓ PHASE-050 W-26 — the quality-calibration-due sweep (D-08: the disjoint bands, the structural per-cycle dedupe) > the default ladder fires each band once: 30/7/0 with the S-15 severities; outside-the-widest, departed instruments and superseded due dates never alert 102ms
+   ✓ PHASE-050 W-26 — the quality-calibration-due sweep (D-08: the disjoint bands, the structural per-cycle dedupe) > THE DEDUPE (the structural once-per-pass): the re-run converges — flagged counts again, ZERO new notifications, no accumulation 22ms
+   × PHASE-050 W-26 — the quality-calibration-due sweep (D-08: the disjoint bands, the structural per-cycle dedupe) > THE PER-CYCLE RE-ALERT (D-08's day axis): a re-calibration moves the due date far → the instrument stops alerting; a subsequent near-dated cycle alerts AGAIN (the new due date forms NEW keys) 52ms
+     → expected 4 to be 3 // Object.is equality
+   ✓ PHASE-050 W-26 — the quality-calibration-due sweep (D-08: the disjoint bands, the structural per-cycle dedupe) > THE SETTINGS SURFACE (the first 050 settings keys): the typed write lands the SAME row the generic surface writes; the custom ladder governs the next pass; the garbage row fails-closed to the documented default; the refusal is the wave's own name 59ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/quality/quality-calibration-sweep.db.spec.ts > PHASE-050 W-26 — the quality-calibration-due sweep (D-08: the disjoint bands, the structural per-cycle dedupe) > THE PER-CYCLE RE-ALERT (D-08's day axis): a re-calibration moves the due date far → the instrument stops alerting; a subsequent near-dated cycle alerts AGAIN (the new due date forms NEW keys)
+AssertionError: expected 4 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 4
+
+ ❯ src/__db__/quality/quality-calibration-sweep.db.spec.ts:278:34
+    276|     await su.end();
+    277|     const afterRenewal = await withTenant(TENANT_QSW, () => sweep.runS…
+    278|     expect(afterRenewal.flagged).toBe(3); // the standing three — the …
+       |                                  ^
+    279|     expect(afterRenewal.notified).toBe(0);
+    280| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  03:02:47
+   Duration  6.54s (transform 893ms, setup 0ms, collect 1.81s, tests 338ms, environment 0ms, prepare 54ms)
+
+2026-11-23 03:02:53.617 UTC [1380] LOG:  received fast shutdown request
+2026-11-23 03:02:53.617 UTC [1380] LOG:  aborting any active transactions
+
+2026-11-23 03:02:53.617 UTC [1460] FATAL:  terminating connection due to administrator command
+2026-11-23 03:02:53.619 UTC [1380] LOG:  background worker "logical replication launcher" (PID 1386) exited with exit code 1
+2026-11-23 03:02:53.620 UTC [1381] LOG:  shutting down
+2026-11-23 03:02:53.620 UTC [1381] LOG:  checkpoint starting: shutdown immediate
+
+(node:1439) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1439) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-23 03:02:53.645 UTC [1381] LOG:  checkpoint complete: wrote 3010 buffers (18.4%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.017 s, sync=0.008 s, total=0.025 s; sync files=2788, longest=0.001 s, average=0.001 s; distance=28174 kB, estimate=28174 kB; lsn=0/30623A0, redo lsn=0/30623A0
+
+2026-11-23 03:02:53.652 UTC [1380] LOG:  database system is shut down
+
+VITEST_EXIT=1

@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-050 (Quality Management System) — **W-25 THE SPECIFICATIONS + NCR ENGINES DELIVERED (2026-11-23, this session) — W-26 (CAPA + CALIBRATION) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-050 (Quality Management System) — **W-26 THE CAPA + CALIBRATION ENGINES DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-27 (SPC + SUPPLIER SCORES + COA) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
 F-050a commit `de05cfd`):** W-0 ACCEPTED AS DELIVERY at `7054520` after the
@@ -130,3 +130,125 @@ joins the standing isolate set from this wave** (§0c (2)). The standing
 recalls as transferred in the 049 completion report §4; the reservations
 G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT production
 approval.
+
+---
+
+**W-26 — THE CAPA + CALIBRATION ENGINES (T-07 + T-08, delivered on the
+W-25 head `b4cc743` in three commits — `b8333a6` the engines → `041a163`
+the DB specs → this battery/gate/ledger increment, EVERY step pushed at
+its own commit per the owner's «عند الانتهاء من أي خطوة ادفعها إلى
+المستودع»):**
+
+- **THE CAPA ENGINE (T-07 — D-10):** the pure fold FIRST
+  (`capa-lifecycle.ts` — the TOTAL status × move matrix with the
+  root-cause-act-IS-the-start declared interpretation · the actions
+  array's canonical shape law refused cell-by-cell · **BR-103's
+  capaCloseGate: D-10's two conditions EXACTLY** — every OPEN action's
+  window elapsed (undated open = the fail-closed BLOCK, future-dated =
+  the BLOCK with the figures openActionCount/pendingCount/
+  pendingDueDates) AND the effectiveness check RECORDED (the outcome the
+  tenant's honest record, never a forced verdict) — 16 property tests)
+  · the service (the official `CAPA-{YYYY}-{SEQ:6}` numbering · the NCR
+  link's typed pre-check through the module's OWN row · **THE G-63
+  EXTERNAL-COST ACT**: DR QUALITY_EXPENSE (5320, the 0116 marker) · CR
+  EXTERNAL_ACCRUAL (2137, the existing marker) through the REAL engine,
+  fail-closed PURPOSE_NOT_MAPPED, INV-013 exactly-once on the
+  single-use `(capa_record, id, external_cost)` key, the cost + the
+  journal link landing in ONE guarded CAS, ONE ambient transaction
+  all-or-nothing (INV-018) · **THE CLOSE ACT**: BR-103's typed
+  refusals + the checkedAt fabrication guard (a future-dated check
+  refused)).
+- **THE CALIBRATION ENGINE (T-08 — D-08, the 049 handoff verbatim):** the
+  instrument-AS-asset binding through the fixed-assets module's OWN
+  `findAssetCard` (the typed QUALITY_INSTRUMENT_NOT_FOUND) · the official
+  `CAL-{YYYY}-{SEQ:6}` numbering · the due-after floor's typed pre-check
+  naming BOTH dates (the 0115 CHECK's own shape) · **G-63 AT THE CREATE
+  ACT** — the record id PRE-GENERATED (uuidv7) so the INV-013 source key
+  names the row before it exists, the posting + the insert ONE ambient
+  transaction; the zero-cost in-house shape carries NO entry.
+- **THE QUALITY-CALIBRATION SWEEP (T-08 — THE FIFTH STANDING ISOLATE from
+  this wave, §0c (2)):** the pure folds FIRST (`calibration-sweep-math.ts`
+  — the 0111 cmms sibling in this module's own home + **D-08's own dedupe
+  axes `quality:calibration:{assetId}:{threshold}:{dueDate}`** — the DAY
+  axis is the DUE DATE the alert names: the per-cycle re-alert law (a
+  re-calibrated instrument's new cycle alerts again) with the convergence
+  law held within a cycle — 11 property tests) · the sweep service (the
+  clock law — every date derived from the DATABASE'S OWN CURRENT_DATE in
+  the probe's SQL · the structural dedupe via uq_notifications_dedupe ·
+  the owner target + the 'quality' prefs gate · THE SEAL
+  `quality.calibration_sweep_run` in the same ambient transaction) · the
+  pg-boss job (the phase doc's verbatim queue name `quality-calibration-due`,
+  daily 04:45 UTC, the 'quality' entitlement gate, registered on boot) ·
+  **THE SETTINGS SURFACE — the FIRST 050 SETTINGS KEYS**
+  (`quality.calibration_sweep_thresholds` on the typed registry, fail-closed
+  default [30,7,0], the SAME tenant_settings row + the SAME
+  publishTenancyEvent invalidation as the generic surface).
+- **THE WIRING:** ROUTE_PERMISSIONS **1,113 + 12 = 1,125** (the
+  keys-seed-first SECOND binding wave: the CAPA seven + the calibration
+  five incl. the sweep-config pair, dated at the block) · **MIGRATION
+  0118_quality_notifications_category.sql** ('quality' joins BOTH
+  notifications CHECK domains — the 18-member union, the shared-scope
+  union law, ordered WITH the writer in the same increment; the journal
+  117 → 118, no tables — the catalog stays 340; both scratch runs
+  CHAIN_118_APPLIED → [check-rls] OK — 340) · the error filter's
+  domainStatus rows in the same increment.
+- **THE HONEST CATCHES (two, both RED-proven with the four-quarter
+  logs):** (1) the cmms-schema spec's union arms — the W-25 scope-label
+  run had left the stock_moves arm's EXPLICIT bookkeeping stale at
+  0117's new site (the lineage 10 → 11; the members 23 → 24 with
+  `ncr_record`); the arm's own design fired RED naming the drift,
+  repaired with the dated notes at every modified site, GREEN 32/32.
+  (2) the sweep probe's LATEST-FIRST LAW — the per-cycle arm caught the
+  band-inside-the-collapse bug RED (a re-calibrated +300 instrument
+  still flagged on its superseded +15 row); the collapse now runs BEFORE
+  the band filter; GREEN 114/114.
+
+**The wave's battery (every log in `audit-evidence/phase050-w26/`, this
+session — the THIRTY-SEVENTH consecutive same-session wave):** §0a FIRST
+(the remote verified at `b4cc743` = the W-25 delivery head; the FOUR
+tags' six identifiers + the 049 tag intact; the tree clean at HEAD) —
+then **THE FIVE ISOLATES STANDALONE FIRST** (soak 1·1 229.11s · fcm 1·8
+· email 1·5 · the cmms sweep 1·4 · **the quality calibration sweep 1·4
+— the new fifth**, every VITEST_EXIT=0 stamp) · **the affected DB
+folders re-run at the delta head** (the scope-label law): **the quality
+family 6 · 114 GREEN** (the schema 59 + the NCR 13 + the specs 11 + the
+CAPA 17 + the calibration 10 + the sweep 4 — the family 83 → 114) ·
+**migrations + identity-flows 2 · 28 GREEN** (the chain at 118 + the
+ROUTE_PERMISSIONS checklist over the 1,125 routes — the owner template
+grants every quality.* key) · **the cmms schema 1 · 32 GREEN** (the
+repaired union arms) · the coverage roster updated with the declared
+movement (chunk-a 100 → 102 · **isolate-quality-sweep the new part** ·
+the roster 286 → 289; 289 = 289, missing NONE, extra NONE, duplicates
+NONE — VERDICT: COVERED; the full ten-part envelope re-runs at W-32) ·
+typecheck 8/8 (0 cached — the force re-run) · lint 8/8 (0 cached) ·
+depcruise clean **2,135 modules · 15,992 dependencies** (+11/+86 dated) ·
+unit 8/8 — **152 · 1,921** (api 72·910 · web 21·171 · mobile 27·393 ·
+desktop 16·274 · ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core
+5·36 — the ledger arithmetic **1,921 = 910+171+840 EXACT**, the F-2
+third term standing) · i18n 6,955 = 6,955 (no delta, as declared — an
+API-DB wave) + mobile 371 = 371 · tokens 50/50 · **drift 347 = 347**
+(zero delta — no new keys) · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors + self-test all-probes-OK (implemented G 61 · INV 34 ·
+BR 100 standing — the 050 flip is W-32's; probe 7 stands at
+G-62/PHASE-050) · history-secrets 0 violations · 6,624 allowlisted hits
+(the window's shift: the W-26 session commits entering the last-200
+sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS **1,125**
+(the tsx recount) · the registry 315 tenant-owned tables · capabilities
+agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO
+new this wave.
+
+**NEXT: W-27 — SPC + SUPPLIER SCORES + COA (T-09 + T-10 + T-11)** under the
+owner's standing order: **the SPC pure module FIRST with the property
+tests on pinned reference datasets** (D-12 — the unit-first law before
+any consumer: X-bar/R, Cp/Cpk, the out-of-control flags; the surface
+rides the `quality.spc` feature key; the measurements draw from the
+specifications' parameters — no parallel parameter source); the supplier
+quality scores (the rolling fold from NCRs/rejections/deliveries + **the
+documented 038 feed contract** — D-13: the consumer READS, never
+re-computes); the COA generation service (**BR-104** — D-11: blocked
+unless every parameter is within tolerance or carries an
+accepted-deviation NCR reference, the refusal naming the parameter and
+both figures; the frozen snapshot; the bilingual print is W-29's). The
+standing recalls as transferred in the 049 completion report §4; the
+reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT
+production approval.
