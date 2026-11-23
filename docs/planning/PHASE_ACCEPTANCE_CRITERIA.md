@@ -794,6 +794,67 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-29 — T-15 delivered, the web plane under
+> the owner's standing order — «عند الانتهاء من أي خطوة ادفعها إلى
+> المستودع», every step pushed at its own commit: `6171b09` the screens →
+> `f749298` the specs → this battery/gate/ledger increment; the evidence
+> `audit-evidence/phase050-w29/`, the FORTIETH consecutive same-session
+> wave): THE SIX QUALITY SCREENS (D-17 — the data-slot shape, the 048/049
+> board patterns): `/quality/ncr` · `/quality/capa` · `/quality/calibration`
+> · `/quality/spc` (rides the `quality.spc` feature key) ·
+> `/quality/complaints` · `/quality/coa` (the certificates register + the
+> generate act + THE PRINT PREVIEW) — every figure an ENGINE OUTPUT
+> rendered VERBATIM (zero client-side recomputation), the segmented Button
+> switches (never the Tabs primitive), the typed-refusal panels with FULL
+> payloads, the mono cells dir=ltr, the DataTable +
+> activeLocaleHeader columns, the one-line localized refusals through
+> `localizedQualityError` (all 33 quality codes). #4's PRINT ARM
+> DELIVERED — the W-13/W-21 print laws: the COA builder (`lib/coa-print.ts`
+> — bi() EXCLUSIVELY, zero parallel computation, the frozen parameters
+> VERBATIM, .num LTR-mono, a real thead) + **THE REAL CHROMIUM TEST both
+> directions** (`quality-coa-print-render.db.spec` 3 arms: both locales'
+> html carries thead + dir + the numeric class + the embedded woff2; the
+> REAL PDF render (%PDF, pages ≥ 1, byteLength > 10_000) for both; the
+> determinism arm — two builds byte-identical + two renders
+> byte-identical modulo the renderer's own Skia clock stamps, the
+> probe-evidenced finding dated in the spec) + the web print spec
+> (`lib/__tests__/coa-print.test.ts` 3 arms: dictionary-exclusivity both
+> locales · byte-identical determinism · VERBATIM figure pass-through).
+> #9's I18N ARM DELIVERED — **BY BOTH COUNTS (the first-surface-wave
+> law): 6,955 + 298 = 6,955 + 298 — ar=7,253 = en=7,253, 100% parity,
+> no empty values** + mobile 371 = 371 standing. THE HOLD BANNERS (the
+> shared `batch-hold-banner.tsx` — role=status, the warning tokens, the
+> reason + heldAt VERBATIM) wired into the batch-bearing surfaces (the
+> inventory batches registry + the manufacturing genealogy surface — one
+> parallel active-holds read per surface, additive, degrading to no
+> banners on a 403; the banner spec 3 arms). THE FLAG-GATING VERIFIED
+> (the six NAV_ITEMS rows carry the exact featureKeys — `quality` ×5 +
+> `quality.spc` on the SPC row — + the permission keys + both label
+> sides; the ⌘K palette inherits them through resolveNavigation, OA-04;
+> the 403 degradation arms the pages carry). The web suite **21·171 →
+> 30·204** (+9 files, +33 tests). The battery (this gate increment,
+> every log this session): THE FIVE ISOLATES STANDALONE FIRST (soak
+> 1·1 227.96s · fcm 1·8 · email 1·5 · the cmms sweep 1·4 · the quality
+> calibration sweep 1·4 — every VITEST_EXIT=0) · the affected folders
+> re-run at the delta head (the quality family **13 · 159 GREEN** — the
+> family 156 → 159 · migrations + identity-flows 2 · 28 over the 1,152
+> routes) · the coverage roster's declared movement (chunk-a 108 → 109 ·
+> the roster 295 → 296; 296 = 296, missing NONE, extra NONE, duplicates
+> NONE — VERDICT: COVERED) · the 118-chain scratch from zero TWICE (both
+> CHAIN_118_APPLIED → [check-rls] OK — 340) · typecheck 8/8 (0 cached —
+> the force re-run) · lint 8/8 (0 cached — no catch this wave) ·
+> depcruise clean **2,184 modules · 16,312 dependencies** (+24/+174
+> dated) · unit 8/8 — **167 · 2,020** (api 78·976 · web **30·204** ·
+> mobile 27·393 · desktop 16·274 · ui 3·43 · contracts 2·56 ·
+> domain-core 6·38 · sync-core 5·36 — the ledger arithmetic **2,020 =
+> 976+204+840 EXACT**, the F-2 third term standing) · drift 347 = 347 ·
+> manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors + self-test
+> all-probes-OK (probe 7 stands at G-62/PHASE-050) · history-secrets 0
+> violations · 6,723 allowlisted hits (the window's shift; the FOUR tag
+> anchors untouched) · ROUTE_PERMISSIONS **1,152** standing (no new
+> routes — a surface wave) · the registry 315 tenant-owned tables ·
+> capabilities agree · shells PASS/PASS · boundary PASS.]**
+
 > **[Dated 2026-11-23 (PHASE-050 W-28 — T-12 + T-13 + T-14 delivered, the
 > complaints + holds + recall wave under the owner's standing order — «عند
 > الانتهاء من أي خطوة ادفعها إلى المستودع», every step pushed at its own

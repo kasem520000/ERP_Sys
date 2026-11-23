@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-050 (Quality Management System) — **W-28 THE COMPLAINTS + HOLDS + RECALL ENGINES DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-29 (THE WEB PLANE) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-050 (Quality Management System) — **W-29 THE WEB PLANE DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-30 (THE REVIEW PACK + THE REPORTS) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
 F-050a commit `de05cfd`):** W-0 ACCEPTED AS DELIVERY at `7054520` after the
@@ -237,21 +237,96 @@ sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS **1,125**
 agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO
 new this wave.
 
-**NEXT: W-29 — THE WEB PLANE (T-15)** under the owner's standing order:
-the five screens (`/quality/ncr` · `/quality/capa` ·
-`/quality/calibration` · `/quality/spc` · `/quality/complaints`) + the
-COA print surface + **the hold banners on every batch-bearing surface**
-(D-17 — the data-slot shape; the typed-refusal panels with FULL
-payloads); **i18n BY BOTH COUNTS from this wave** (the first surface
-wave — the declared delta 6,955+n = 6,955+n + mobile 371 standing, §5);
-the boards render the engines' figures VERBATIM; the flag-gating
-verified; the COA print law green (the REAL Chromium test both
-directions, deterministic byte-identical — the W-13/W-21 print laws).
-The standing recalls as transferred in the 049 completion report §4; the
-reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT
-production approval.
+**NEXT: W-30 — THE REVIEW PACK + THE REPORTS (T-16 + T-17)** under the
+owner's standing order: the management review pack + the hazard
+registers composed into the food-manufacturing template manifest (D-15);
+**the four report contracts (registry 118 → 122, all pin sites together
+— D-18: quality.ncr-register · quality.capa-status ·
+quality.calibration-due · quality.complaints-summary)**. The standing
+recalls as transferred in the 049 completion report §4; the reservations
+G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT production
+approval.
 
 ---
+
+**W-29 — THE WEB PLANE (T-15, delivered on the W-28 head `f2148e5` in
+three commits — `6171b09` the screens → `f749298` the specs → this
+battery/gate/ledger increment, EVERY step pushed at its own commit per
+the owner's «عند الانتهاء من أي خطوة ادفعها إلى المستودع»):**
+
+- **THE SIX QUALITY SCREENS (D-17):** `/quality/ncr` (the register +
+  intake panes, the disposition + close acts) · `/quality/capa` (the
+  root-cause + external-cost + close acts) · `/quality/calibration`
+  (the register + create + THE SWEEP-CONFIG surface — the thresholds
+  ladder VERBATIM) · `/quality/spc` (the measurements + THE CHART READ
+  rendered VERBATIM — grandMean/rBar/limits/sigmaHat/cp/cpk/
+  excludedCount/outOfControl + the subgroups table; rides the
+  `quality.spc` feature key) · `/quality/complaints` (the ladder acts)
+  · `/quality/coa` (the certificates register + the generate act + THE
+  PRINT PREVIEW) — the 048/049 board patterns' laws: every figure an
+  ENGINE OUTPUT rendered VERBATIM (zero client-side recomputation),
+  the segmented Button switches (never the Tabs primitive), the
+  typed-refusal panels with FULL payloads, the one-line localized
+  refusals (`localizedQualityError` — all 33 codes), the mono cells
+  dir=ltr, the DataTable + activeLocaleHeader columns, the token-class
+  chips.
+- **THE COA PRINT (the W-13/W-21 print laws):** the builder
+  (`lib/coa-print.ts` — bi() EXCLUSIVELY, zero parallel computation,
+  the frozen parameters VERBATIM, .num LTR-mono, a real thead,
+  determinism — no wall-clock) + the preview Dialog + Print-now +
+  **THE REAL CHROMIUM TEST both directions**
+  (`quality-coa-print-render.db.spec` 3 arms — both locales' html
+  assertions (thead + dir + the numeric class + the embedded woff2) +
+  the REAL PDF render (%PDF, pages ≥ 1, byteLength > 10_000) + the
+  determinism arm (two builds byte-identical + two renders
+  byte-identical modulo the renderer's own Skia /CreationDate +
+  /ModDate clock stamps — the probe-evidenced finding, dated in the
+  spec)) + the web print spec (3 arms: dictionary-exclusivity ·
+  determinism · VERBATIM figures).
+- **THE HOLD BANNERS:** the shared `batch-hold-banner.tsx` (role=status,
+  the warning tokens, the reason + heldAt VERBATIM, the NCR link)
+  wired into the inventory batches registry + the manufacturing
+  genealogy surface (one parallel active-holds read per surface,
+  additive, degrading to no banners on a 403; the row chip + the full
+  banners).
+- **THE WIRING:** the six NAV_ITEMS rows (orders 75-80, the closed icon
+  registry; the flag-gating verified — `quality` ×5 + `quality.spc` on
+  the SPC row + the permission keys + both label sides; the ⌘K palette
+  inherits them through resolveNavigation, OA-04) + the six
+  FALLBACK_CRUMBS + **i18n BY BOTH COUNTS (the first-surface-wave
+  law): 6,955 + 298 = 6,955 + 298 — ar=7,253 = en=7,253, 100% parity**
+  + mobile 371 standing + the api-types row mirrors.
+- **THE SPECS (the web suite 21·171 → 30·204):** the six board specs
+  (5/4/4/4/4/3 arms — the listing-verbatim/AR-parity/exact-act-bodies/
+  typed-refusal-full-payload shapes) + the banner spec (3 arms) + the
+  nav-rows flag-gating spec (3 arms) + the print spec (3 arms).
+
+**The wave's battery (every log in `audit-evidence/phase050-w29/`, this
+session — the FORTIETH consecutive same-session wave):** §0a FIRST (the
+remote verified at `f749298` = the W-29 step-2 head; the FOUR tags' six
+identifiers + the 049 tag intact) — then THE FIVE ISOLATES STANDALONE
+FIRST (soak 1·1 227.96s · fcm 1·8 · email 1·5 · the cmms sweep 1·4 ·
+the quality calibration sweep 1·4) · the affected folders (the quality
+family 13 · 159 · migrations + identity-flows 2 · 28 over the 1,152
+routes) · the coverage roster (chunk-a 108 → 109 · the roster 295 →
+296, VERDICT: COVERED) · the 118-chain scratch from zero TWICE ·
+typecheck 8/8 (0 cached) · lint 8/8 (0 cached — no catch this wave) ·
+depcruise clean 2,184 modules · 16,312 dependencies (+24/+174) · unit
+8/8 — 167 · 2,020 (the ledger arithmetic 2,020 = 976+204+840 EXACT) ·
+i18n 7,253 = 7,253 (+298 both sides — the declared delta) + mobile 371
+= 371 · drift 347 = 347 · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors + self-test all-probes-OK · history-secrets 0
+violations · 6,723 allowlisted (the FOUR tag anchors untouched) ·
+ROUTE_PERMISSIONS 1,152 standing (no new routes — a surface wave) · the
+registry 315 tenant-owned tables · capabilities agree · shells PASS/PASS
+· boundary PASS. RISK-033: EIGHT incidents, ZERO new this wave.
+
+**NEXT: W-31 — THE PROOF PACK (T-18)** after W-30: the golden
+transcripts G-62/G-63 with the MANDATORY failure packs + the INV-035
+blocking-matrix golden + the RLS attack matrix A1–A10 over the TWELVE
+tables + the OA-06 EXPLAIN budgets. The standing recalls as transferred
+in the 049 completion report §4; the reservations G-62…G-63 · INV-035 ·
+BR-101…BR-104 — لا كتابة خارجها. NOT production approval.
 
 **W-28 — THE COMPLAINTS + HOLDS + RECALL ENGINES (T-12 + T-13 + T-14,
 delivered on the W-27 head `2f24c95` in three commits — `edc3fe2` the
