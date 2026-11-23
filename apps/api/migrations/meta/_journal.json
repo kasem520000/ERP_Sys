@@ -819,6 +819,13 @@
       "when": 1798776000000,
       "tag": "0117_quality_ncr_source_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 117,
+      "version": "7",
+      "when": 1798862400000,
+      "tag": "0118_quality_notifications_category",
+      "breakpoints": true
     }
   ],
   "version": "7"

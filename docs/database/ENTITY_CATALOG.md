@@ -774,7 +774,7 @@ precedent) + the two partial tenant indexes) is an additive column family on the
 `assets` catalog row — no new entity row (MIGRATION_STRATEGY §6, the 0100 crm_time_entries
 precedent).
 
-## quality — QMS (PHASE-050 — migrations `0113_quality_specifications.sql` … `0116_quality_holds_recall.sql`, schema_version 116; 328 → 340 table rows; the W-24 foundation wave, 2026-11-22; [dated 2026-11-23 — W-25: `0117_quality_ncr_source_shape.sql` extends the journal to schema_version 117 — the stock-moves source widening admitting exactly `ncr_record` for G-62's write-off moves, the 0109/0110 DROP+ADD precedent; NO new tables, the count stays 340])
+## quality — QMS (PHASE-050 — migrations `0113_quality_specifications.sql` … `0116_quality_holds_recall.sql`, schema_version 116; 328 → 340 table rows; the W-24 foundation wave, 2026-11-22; [dated 2026-11-23 — W-25: `0117_quality_ncr_source_shape.sql` extends the journal to schema_version 117 — the stock-moves source widening admitting exactly `ncr_record` for G-62's write-off moves, the 0109/0110 DROP+ADD precedent; NO new tables, the count stays 340]; [dated 2026-11-23 — W-26: `0118_quality_notifications_category.sql` extends the journal to schema_version 118 — the notifications/notification_prefs category widening admitting exactly `quality` for the `quality-calibration-due` sweep's inbox records (the 0111/0112 pattern, the shared-scope union law's 18-member union, ordered with the writer in the same increment); NO new tables, the count stays 340])
 
 The Quality Management System cluster (CR-20, the approved master plan's D-02 four
 slots): the per-item quality specifications with target/UCL/LCL tolerances and the SPC

@@ -72,7 +72,14 @@ export type NotificationCategory =
   // family — the four classes (warranty/insurance/license/inspection —
   // D-10; the inspection class is the R-10 fleet-light fourth), the
   // per-asset-per-class-per-threshold deduped inbox notifications.
-  | "assets";
+  | "assets"
+  // PHASE-050 (W-26 — T-08, 0118 category widening): the QMS family — the
+  // `quality-calibration-due` sweep's deduped inbox notifications (D-08's
+  // own dedupe axes: instrument+window+due-date). The DB domain floor
+  // widened by migration 0118 (the 18-member union, the shared-scope
+  // union law); this type is the writer's actual vocabulary.
+  | "quality";
+
 export type NotificationSeverity = "info" | "warning" | "critical";
 
 export interface BilingualText {

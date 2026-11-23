@@ -831,6 +831,14 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
     }
     expect(union.size).toBeGreaterThan(0);
     // The definitions' lineage is on record (the sites enumerated).
+    // [dated 2026-11-23 — PHASE-050 W-26: the lineage grows 10 → 11 sites —
+    // 0117_quality_ncr_source_shape.sql (the W-25 stock-moves source
+    // widening admitting `ncr_record` for G-62's write-off moves) defines
+    // the constraint at a NEW site; the W-25 scope-label run left this
+    // enumeration stale (an honest catch of W-26's own RED run — the
+    // union LAW's dynamic check stayed green; the drift was in the arm's
+    // explicit bookkeeping only, repaired here with the W-26 dated
+    // note).]
     expect([...constraintSites.keys()].sort()).toEqual([
       "0014_inventory_core.sql",
       "0016_purchasing_core.sql",
@@ -842,6 +850,7 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
       "0077_contract_manufacturing.sql",
       "0109_cmms_cost_lines_steps.sql",
       "0110_cmms_source_shape_repair.sql",
+      "0117_quality_ncr_source_shape.sql",
     ]);
 
     // The LIVE constraint, from the catalog itself.
@@ -854,8 +863,12 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
       [...live.rows[0]!.definition.matchAll(/'([^']+)'/g)].map((hit) => hit[1]!),
     );
 
-    // The members ENUMERATED EXPLICITLY (23 at the 110 chain — every
-    // source family the platform has ever defined):
+    // The members ENUMERATED EXPLICITLY (24 at the 118 chain — every
+    // source family the platform has ever defined; [dated 2026-11-23 —
+    // PHASE-050 W-26: `ncr_record` joins with 0117 — the W-25 G-62
+    // write-off's move source, the honest catch of W-26's own RED run:
+    // the W-25 wave's scope-label run left this enumeration at the 23
+    // of the 110 chain]):
     expect([...liveMembers].sort()).toEqual([
       "consignment_settlement",
       "contract_mfg",
@@ -870,6 +883,7 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
       "manual_issue",
       "manual_receipt",
       "method_switch",
+      "ncr_record",
       "opening_balance_doc",
       "production_order",
       "quarantine_disposition",
@@ -941,7 +955,10 @@ describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-sc
 
     // The members ENUMERATED EXPLICITLY (seventeen at the 112 chain —
     // every category family the platform has ever defined, 'payroll'
-    // among them):
+    // among them; [dated 2026-11-23 — PHASE-050 W-26: the union grows
+    // 17 → 18 members — `quality` joins with 0118 (the
+    // quality-calibration-due sweep's inbox records, D-08's own
+    // dependency), the 0111/0112 widening pattern carried into 050]):
     expect([...union].sort()).toEqual([
       "assets",
       "budgeting",
@@ -955,6 +972,7 @@ describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-sc
       "notes",
       "payroll",
       "purchasing",
+      "quality",
       "reconciliation",
       "stock",
       "subscription",

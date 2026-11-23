@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
 } from "@nestjs/common";
@@ -22,6 +23,10 @@ import { RequireFeature } from "../../../infra/auth/require-feature.decorator";
 import { envelope } from "../../../infra/http/envelope";
 import { NcrService } from "../application/ncr-service";
 import { SpecificationService } from "../application/specification-service";
+// PHASE-050 (W-26 — T-07 + T-08): the CAPA + calibration planes.
+import { CapaService } from "../application/capa-service";
+import { CalibrationService } from "../application/calibration-service";
+import { QualityCalibrationSweepService } from "../application/quality-calibration-sweep-service";
 
 /**
  * PHASE-050 (W-25 — T-05 + T-06, 2026-11-23) the quality routes (matrix
@@ -105,6 +110,65 @@ const createNcrSchema = z.object({
 
 const dispositionSchema = z.object({
   disposition: DISPOSITION,
+});
+
+// PHASE-050 (W-26 — T-07 + T-08, dated 2026-11-23): the CAPA + calibration
+// planes' own shapes (the 4dp money floor on the external cost — ADR-0009's
+// no-binary-float law at the API face; the actions array's canonical cells
+// validated by the domain fold at the service floor).
+const AMOUNT4 = z.string().regex(/^\d+(\.\d{1,4})?$/, "decimal (≤ 4dp)");
+const DAY = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "ISO date (YYYY-MM-DD)");
+const STAMP = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/, "ISO datetime");
+
+const createCapaSchema = z.object({
+  title: TEXT,
+  ncrId: UUID.nullable().optional(),
+  ownerEmployeeId: UUID.nullable().optional(),
+  dueDate: DAY.nullable().optional(),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const capaRootCauseSchema = z.object({
+  rootCause: z.string().min(1).max(4000),
+});
+
+const capaActionCell = z.object({
+  title: z.string().min(1).max(500),
+  ownerEmployeeId: UUID.nullable().optional(),
+  dueDate: DAY.nullable().optional(),
+  completedAt: STAMP.nullable().optional(),
+});
+
+const capaActionsSchema = z.object({
+  actions: z.array(capaActionCell).max(100),
+});
+
+const capaExternalCostSchema = z.object({
+  amount: AMOUNT4,
+});
+
+const capaCloseSchema = z.object({
+  summary: z.string().min(1).max(4000),
+  effective: z.boolean(),
+  checkedAt: STAMP,
+});
+
+const createCalibrationSchema = z.object({
+  assetId: UUID,
+  standardUsed: SHORT,
+  result: z.enum(["PASS", "FAIL", "ADJUSTED"]),
+  calibratedAt: STAMP,
+  dueDate: DAY,
+  providerId: UUID.nullable().optional(),
+  certificateRef: SHORT.nullable().optional(),
+  externalCost: AMOUNT4.nullable().optional(),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const calibrationThresholdsSchema = z.object({
+  thresholds: z.array(z.number().int().min(0)).min(1).max(12),
 });
 
 @Controller("/api/v1/quality")
@@ -278,5 +342,207 @@ export class QualityNcrController {
   async closeNcr(@Req() request: Request, @Param("id") id: string) {
     const identity = requireIdentity(request);
     return envelope(await this.ncr.close(id, identity.userId));
+  }
+}
+
+// ── PHASE-050 (W-26 — T-07): the CAPA plane (BR-103's gate + the G-63 door) ───
+
+@Controller("/api/v1/quality")
+export class QualityCapaController {
+  constructor(@Inject(CapaService) private readonly capa: CapaService) {}
+
+  @Get("capa")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  listCapas(@Query("status") status?: string, @Query("ncrId") ncrId?: string) {
+    return envelope(
+      this.capa.list({
+        status,
+        ncrId: ncrId === undefined || ncrId === "" ? undefined : ncrId,
+        limit: 200,
+      }),
+    );
+  }
+
+  @Post("capa")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.capa.manage")
+  @RequireFeature("quality")
+  async createCapa(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createCapaSchema.parse(body);
+    return envelope(
+      await this.capa.create({
+        title: input.title,
+        ncrId: input.ncrId,
+        ownerEmployeeId: input.ownerEmployeeId,
+        dueDate: input.dueDate,
+        note: input.note,
+        noteAr: input.noteAr,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("capa/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findCapa(@Param("id") id: string) {
+    return envelope(await this.capa.find(id));
+  }
+
+  /** THE START ACT'S DOOR: the root-cause analysis (OPEN → IN_PROGRESS in
+   * the same CAS — the declared W-26 interpretation). */
+  @Post("capa/:id/root-cause")
+  @RequirePermissions("quality.capa.manage")
+  @RequireFeature("quality")
+  async recordCapaRootCause(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = capaRootCauseSchema.parse(body);
+    return envelope(
+      await this.capa.recordRootCause(id, { rootCause: input.rootCause, actorId: identity.userId }),
+    );
+  }
+
+  /** The actions array's door (the canonical cells validated by the
+   * domain fold at the service floor). */
+  @Post("capa/:id/actions")
+  @RequirePermissions("quality.capa.manage")
+  @RequireFeature("quality")
+  async recordCapaActions(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = capaActionsSchema.parse(body);
+    return envelope(
+      await this.capa.recordActions(id, {
+        actions: input.actions.map((cell) => ({
+          title: cell.title,
+          ownerEmployeeId: cell.ownerEmployeeId ?? null,
+          dueDate: cell.dueDate ?? null,
+          completedAt: cell.completedAt ?? null,
+        })),
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  /** THE G-63 ACT'S DOOR: the external service cost (DR QUALITY_EXPENSE ·
+   * CR EXTERNAL_ACCRUAL through the REAL engine, fail-closed, exactly
+   * once). */
+  @Post("capa/:id/external-cost")
+  @RequirePermissions("quality.capa.manage")
+  @RequireFeature("quality")
+  async recordCapaExternalCost(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ) {
+    const identity = requireIdentity(request);
+    const input = capaExternalCostSchema.parse(body);
+    return envelope(
+      await this.capa.recordExternalCost(id, { amount: input.amount, actorId: identity.userId }),
+    );
+  }
+
+  /** BR-103's own door: the close with the effectiveness check (every
+   * open window elapsed — the typed refusals carry the figures). */
+  @Post("capa/:id/close")
+  @RequirePermissions("quality.capa.manage")
+  @RequireFeature("quality")
+  async closeCapa(@Req() request: Request, @Param("id") id: string, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = capaCloseSchema.parse(body);
+    return envelope(
+      await this.capa.close(id, {
+        summary: input.summary,
+        effective: input.effective,
+        checkedAt: input.checkedAt,
+        actorId: identity.userId,
+      }),
+    );
+  }
+}
+
+// ── PHASE-050 (W-26 — T-08): the calibration plane (D-08's binding + the
+// sweep's settings surface) ────────────────────────────────────────────────────
+
+@Controller("/api/v1/quality")
+export class QualityCalibrationController {
+  constructor(
+    @Inject(CalibrationService) private readonly calibration: CalibrationService,
+    @Inject(QualityCalibrationSweepService)
+    private readonly sweep: QualityCalibrationSweepService,
+  ) {}
+
+  @Get("calibration")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  listCalibrations(@Query("assetId") assetId?: string) {
+    return envelope(
+      this.calibration.list({
+        assetId: assetId === undefined || assetId === "" ? undefined : assetId,
+        limit: 200,
+      }),
+    );
+  }
+
+  @Post("calibration")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.calibration.manage")
+  @RequireFeature("quality")
+  async createCalibration(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createCalibrationSchema.parse(body);
+    return envelope(
+      await this.calibration.create({
+        assetId: input.assetId,
+        standardUsed: input.standardUsed,
+        result: input.result,
+        calibratedAt: input.calibratedAt,
+        dueDate: input.dueDate,
+        providerId: input.providerId,
+        certificateRef: input.certificateRef,
+        externalCost: input.externalCost,
+        note: input.note,
+        noteAr: input.noteAr,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  /** The sweep's effective ladder (stored ∪ the documented default
+   * [30,7,0], normalized by the pure fold) + the last run's seal (the
+   * audit plane is the job log). DECLARED BEFORE the :id route so the
+   * path never swallows it as an id. */
+  @Get("calibration/sweep-config")
+  @RequirePermissions("quality.calibration.manage")
+  @RequireFeature("quality")
+  async getSweepConfig() {
+    return envelope(await this.sweep.effectiveConfig());
+  }
+
+  /** The audited thresholds write — the same registry validation, the
+   * same tenant_settings row, the same invalidation event as the
+   * generic settings surface (one data home; the wave's own named
+   * refusal). */
+  @Put("calibration/sweep-config")
+  @HttpCode(HttpStatus.OK)
+  @RequirePermissions("quality.calibration.manage")
+  @RequireFeature("quality")
+  async putSweepConfig(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = calibrationThresholdsSchema.parse(body);
+    return envelope(
+      await this.sweep.writeThresholds({
+        thresholds: input.thresholds,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("calibration/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findCalibration(@Param("id") id: string) {
+    return envelope(await this.calibration.find(id));
   }
 }

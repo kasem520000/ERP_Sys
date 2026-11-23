@@ -1,0 +1,245 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys_clone/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-23 02:29:21.426 UTC [20273] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-23 02:29:21.426 UTC [20273] LOG:  listening on IPv6 address "::1", port 34433
+2026-11-23 02:29:21.426 UTC [20273] LOG:  listening on IPv4 address "127.0.0.1", port 34433
+
+2026-11-23 02:29:21.427 UTC [20273] LOG:  listening on Unix socket "/tmp/.s.PGSQL.34433"
+
+2026-11-23 02:29:21.428 UTC [20276] LOG:  database system was shut down at 2026-11-23 02:29:21 UTC
+
+2026-11-23 02:29:21.429 UTC [20273] LOG:  database system is ready to accept connections
+
+2026-11-23 02:29:26.466 UTC [20354] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-23 02:29:26.466 UTC [20354] DETAIL:  Failing row contains (185fb130-2dd5-4192-859c-9d4cabbc26db, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.466291+00, 2026-11-23 02:29:26.466291+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, a45b519d-a1b0-4aee-836c-bb6bfdb0ca8a, MO-REQ-STAMP, Won't start, null, null, null, MEDIUM, null, REQUESTED, null, 2026-02-01 08:00:00+00, null, null, 0.0000, 0.0000, 0.0000, null, null, null).
+2026-11-23 02:29:26.466 UTC [20354] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 02:29:26.476 UTC [20354] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-23 02:29:26.476 UTC [20354] DETAIL:  Failing row contains (30d02fac-f65e-47f1-b486-5d244eb6e5fb, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.476035+00, 2026-11-23 02:29:26.476035+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, c4b92449-eb4b-480f-b6eb-e4f2f4c753c3, MO-PLN-STAMP, Won't start, null, null, null, MEDIUM, null, PLANNED, null, 2026-02-01 08:00:00+00, 2026-02-01 09:00:00+00, null, 0.0000, 0.0000, 0.0000, null, null, null).
+2026-11-23 02:29:26.476 UTC [20354] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 02:29:26.485 UTC [20354] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-23 02:29:26.485 UTC [20354] DETAIL:  Failing row contains (6096808d-0144-4635-baa3-967a1583e314, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.484908+00, 2026-11-23 02:29:26.484908+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 494b9af7-cf98-4374-b70d-6c4874e8917b, MO-CMP-NOSTAMP, Won't start, null, null, null, MEDIUM, null, COMPLETED, null, 2026-02-01 08:00:00+00, 2026-02-01 09:00:00+00, null, 0.0000, 0.0000, 0.0000, 11111111-1111-4111-8111-111111111111, null, null).
+2026-11-23 02:29:26.485 UTC [20354] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 02:29:26.494 UTC [20354] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_journal_gated"
+2026-11-23 02:29:26.494 UTC [20354] DETAIL:  Failing row contains (3c42f6a8-5b9e-435d-b4ae-b3b4cfb61716, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.494357+00, 2026-11-23 02:29:26.494357+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 5f35dad9-23c3-48b8-ba30-ec3d6e073069, MO-JOURNAL-GATE, Won't start, null, null, null, MEDIUM, null, REQUESTED, null, null, null, null, 0.0000, 0.0000, 0.0000, 11111111-1111-4111-8111-111111111112, null, null).
+2026-11-23 02:29:26.494 UTC [20354] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 02:29:26.503 UTC [20354] ERROR:  new row for relation "maintenance_work_orders" violates check constraint "ck_maintenance_work_orders_stamps"
+2026-11-23 02:29:26.503 UTC [20354] DETAIL:  Failing row contains (0d45c2d9-92e6-449e-a0b0-0e57974c88ff, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.503059+00, 2026-11-23 02:29:26.503059+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 41d18f80-80d9-40ca-8092-a98d4f580436, MO-BAD-STATUS, x, null, null, null, MEDIUM, null, CANCELLED, null, null, null, null, 0.0000, 0.0000, 0.0000, null, null, null).
+2026-11-23 02:29:26.503 UTC [20354] STATEMENT:  INSERT INTO maintenance_work_orders
+	             (id, tenant_id, asset_id, order_no, problem, status, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'MO-BAD-STATUS', 'x', 'CANCELLED', $3)
+
+2026-11-23 02:29:26.514 UTC [20354] ERROR:  duplicate key value violates unique constraint "uq_maintenance_work_orders_tenant_plan_open"
+2026-11-23 02:29:26.514 UTC [20354] DETAIL:  Key (tenant_id, asset_id, plan_id)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, d810a6ae-ce34-42cf-985e-e41ee7d5dbef, c46b2a76-f562-403c-bc05-3e1e2e3d4407) already exists.
+2026-11-23 02:29:26.514 UTC [20354] STATEMENT:  INSERT INTO maintenance_work_orders
+	       (id, tenant_id, asset_id, order_no, problem, priority, status, plan_id,
+	        planned_at, started_at, completed_at, labor_total, parts_total,
+	        external_total, journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+
+2026-11-23 02:29:26.536 UTC [20354] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_trigger_shape"
+2026-11-23 02:29:26.536 UTC [20354] DETAIL:  Failing row contains (1a33062e-a299-47ad-bbd6-c54187b11242, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.536734+00, 2026-11-23 02:29:26.536734+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, d10171c0-b47c-457d-94d8-fec531d836ab, Mixed plan, null, null, null, CALENDAR, 30, 2026-03-01, 1cd8c126-f663-41dc-a113-883505f50700, 100.000000, null, null, t, null, null).
+2026-11-23 02:29:26.536 UTC [20354] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-23 02:29:26.546 UTC [20354] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_trigger_shape"
+2026-11-23 02:29:26.546 UTC [20354] DETAIL:  Failing row contains (693d142d-599d-4d7b-be2e-76d6fbd0f193, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.546116+00, 2026-11-23 02:29:26.546116+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, a65c1b9e-e17a-4eb1-9810-27159f4574dd, Thresholdless plan, null, null, null, METER, null, null, 2c27805d-6f7d-462b-8c54-eefa038cbc9d, null, null, null, t, null, null).
+2026-11-23 02:29:26.546 UTC [20354] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-23 02:29:26.555 UTC [20354] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_trigger_shape"
+2026-11-23 02:29:26.555 UTC [20354] DETAIL:  Failing row contains (f7fd15ef-a4c4-42ae-8409-511833df9d94, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.55534+00, 2026-11-23 02:29:26.55534+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 1ac1a2d9-7ee7-4dbc-b9f1-94cf50ccbbff, Over-carried plan, null, null, null, METER, 30, 2026-03-01, beea741c-73e1-4e52-833e-514b3f23c79e, 250.000000, null, null, t, null, null).
+2026-11-23 02:29:26.555 UTC [20354] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-23 02:29:26.564 UTC [20354] ERROR:  new row for relation "maintenance_plans" violates check constraint "ck_maintenance_plans_anchor_gated"
+2026-11-23 02:29:26.564 UTC [20354] DETAIL:  Failing row contains (efa851cd-3569-4d6d-819a-de3303630a81, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.564504+00, 2026-11-23 02:29:26.564504+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, e86aab12-4180-4020-a298-7959dc059459, Anchored calendar plan, null, null, null, CALENDAR, 30, 2026-03-01, null, null, 1000.000000, null, t, null, null).
+2026-11-23 02:29:26.564 UTC [20354] STATEMENT:  INSERT INTO maintenance_plans
+	         (id, tenant_id, asset_id, name, trigger_type, interval_days, next_due_date,
+	          meter_id, threshold_delta, last_anchor_value, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+
+2026-11-23 02:29:26.573 UTC [20354] ERROR:  new row for relation "asset_meters" violates check constraint "ck_asset_meters_odometer_gated"
+2026-11-23 02:29:26.573 UTC [20354] DETAIL:  Failing row contains (b6bb6715-26e9-4130-a20e-9b82b3bb57f5, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.572977+00, 2026-11-23 02:29:26.572977+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 5ae4aaf2-8b1e-40ff-81c8-d09776af8e8e, Engine hours, null, HOURS, h, t, 0.000000, null, null, null).
+2026-11-23 02:29:26.573 UTC [20354] STATEMENT:  INSERT INTO asset_meters (id, tenant_id, asset_id, name, type, unit, is_odometer, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'Engine hours', 'HOURS', 'h', true, $3)
+
+2026-11-23 02:29:26.583 UTC [20354] ERROR:  duplicate key value violates unique constraint "uq_asset_meters_tenant_asset_odometer"
+2026-11-23 02:29:26.583 UTC [20354] DETAIL:  Key (tenant_id, asset_id)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 83bb0251-6ff3-492e-b832-04cc6958b225) already exists.
+2026-11-23 02:29:26.583 UTC [20354] STATEMENT:  INSERT INTO asset_meters (id, tenant_id, asset_id, name, type, unit, is_odometer, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'Second odometer', 'KM', 'km', true, $3)
+
+2026-11-23 02:29:26.593 UTC [20354] ERROR:  new row for relation "asset_meter_readings" violates check constraint "ck_asset_meter_readings_value"
+2026-11-23 02:29:26.593 UTC [20354] DETAIL:  Failing row contains (820a89af-e828-4af0-ad6c-6cec5739a4fc, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.593308+00, 2026-11-23 02:29:26.593308+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, ae28a90e-39af-4881-8698-c87798cd477e, -5.000000, 2026-02-01, MANUAL, null, null, null).
+2026-11-23 02:29:26.593 UTC [20354] STATEMENT:  INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, -5, '2026-02-01', 'MANUAL', $3)
+
+2026-11-23 02:29:26.603 UTC [20354] ERROR:  new row for relation "asset_meter_readings" violates check constraint "ck_asset_meter_readings_job_link"
+2026-11-23 02:29:26.603 UTC [20354] DETAIL:  Failing row contains (ed7d3647-4ede-431e-9010-72d2d0f099c7, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.60323+00, 2026-11-23 02:29:26.60323+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, b9a2823b-e06a-4562-83dc-8a88cd112606, 100.000000, 2026-02-01, JOB, null, null, null).
+2026-11-23 02:29:26.603 UTC [20354] STATEMENT:  INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 100, '2026-02-01', 'JOB', $3)
+
+2026-11-23 02:29:26.613 UTC [20354] ERROR:  new row for relation "asset_meter_readings" violates check constraint "ck_asset_meter_readings_job_link"
+2026-11-23 02:29:26.613 UTC [20354] DETAIL:  Failing row contains (b71f812c-7d73-4ce2-b8e9-7fdad5f4c233, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.613458+00, 2026-11-23 02:29:26.613458+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 29ce6268-57b5-43b9-9e32-a79c0aa0f114, 100.000000, 2026-02-01, MANUAL, 4e81a0e7-6429-43bc-9d0d-f1a3927493dd, null, null).
+2026-11-23 02:29:26.613 UTC [20354] STATEMENT:  INSERT INTO asset_meter_readings (id, tenant_id, meter_id, value, effective_date, source, work_order_id, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 100, '2026-02-01', 'MANUAL', $3, $4)
+
+2026-11-23 02:29:26.626 UTC [20354] ERROR:  new row for relation "asset_spares" violates check constraint "ck_asset_spares_qty"
+2026-11-23 02:29:26.626 UTC [20354] DETAIL:  Failing row contains (87eab0ca-c124-49cc-87e8-adf364f0cfa9, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.625778+00, 2026-11-23 02:29:26.625778+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, f3234c47-824c-454c-9c40-bd44d2561467, fc66e6f8-c22f-44d7-9d99-ddda62c9acf7, 0.000000, null, null).
+2026-11-23 02:29:26.626 UTC [20354] STATEMENT:  INSERT INTO asset_spares (id, tenant_id, asset_id, item_id, qty, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, $3, 0, $4)
+
+2026-11-23 02:29:26.637 UTC [20354] ERROR:  duplicate key value violates unique constraint "uq_asset_spares_tenant_asset_item"
+2026-11-23 02:29:26.637 UTC [20354] DETAIL:  Key (tenant_id, asset_id, item_id)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, d22847b4-bb79-4255-8a5e-41a02abaa2e4, 624963e1-9bcc-4a41-82f9-99532a5bd678) already exists.
+2026-11-23 02:29:26.637 UTC [20354] STATEMENT:  INSERT INTO asset_spares (id, tenant_id, asset_id, item_id, qty, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, $3, 3, $4)
+
+2026-11-23 02:29:26.646 UTC [20354] ERROR:  new row for relation "asset_tags" violates check constraint "ck_asset_tags_code"
+2026-11-23 02:29:26.646 UTC [20354] DETAIL:  Failing row contains (9991d370-88aa-46c3-8494-9c564756d523, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.646042+00, 2026-11-23 02:29:26.646042+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, d65ef518-9a95-435b-963b-29da4d3dc34e, short, null, null, null).
+2026-11-23 02:29:26.646 UTC [20354] STATEMENT:  INSERT INTO asset_tags (id, tenant_id, asset_id, code, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, 'short', $3)
+
+2026-11-23 02:29:26.663 UTC [20354] ERROR:  duplicate key value violates unique constraint "uq_asset_tags_tenant_code"
+2026-11-23 02:29:26.663 UTC [20354] DETAIL:  Key (tenant_id, code)=(3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, tag-dup-fixed-signed-token-payload-0123456789abcdef) already exists.
+2026-11-23 02:29:26.663 UTC [20354] STATEMENT:  INSERT INTO asset_tags (id, tenant_id, asset_id, code, created_by)
+	           VALUES (gen_random_uuid(), $1, $2, $3, $4)
+
+2026-11-23 02:29:26.683 UTC [20354] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_branches"
+2026-11-23 02:29:26.683 UTC [20354] DETAIL:  Failing row contains (cede5eec-15db-4b5b-a707-c1469bca6569, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.683649+00, 2026-11-23 02:29:26.683649+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, ebe758b7-db4e-481a-94b6-0baba234fe5a, 0a815063-779c-4958-b330-c80f95d6c7ac, 0a815063-779c-4958-b330-c80f95d6c7ac, Relocation, null, DRAFT, null, null, null, null, null, null, null, null, null, null).
+2026-11-23 02:29:26.683 UTC [20354] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 02:29:26.693 UTC [20354] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-23 02:29:26.693 UTC [20354] DETAIL:  Failing row contains (e4571887-d549-4710-b769-2faa4846201c, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.693254+00, 2026-11-23 02:29:26.693254+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, ab09a9bb-e55e-47d3-981a-b73589fa20c8, 0a815063-779c-4958-b330-c80f95d6c7ac, 19456a7c-600b-471d-a28b-f901f8e35eba, Relocation, null, DRAFT, null, null, 2026-02-01 10:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, null, null, null, null, null, null).
+2026-11-23 02:29:26.693 UTC [20354] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 02:29:26.702 UTC [20354] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-23 02:29:26.702 UTC [20354] DETAIL:  Failing row contains (9534c1d8-c144-4def-a805-eeea6b44e982, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.702652+00, 2026-11-23 02:29:26.702652+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, 0e7fc364-a26d-4438-b158-bb7daea40fe5, 0a815063-779c-4958-b330-c80f95d6c7ac, bb1a23a1-b1c6-43d5-a7fb-2c7c4476ca8b, Relocation, null, APPROVED, null, null, null, null, null, null, null, null, null, null).
+2026-11-23 02:29:26.702 UTC [20354] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 02:29:26.711 UTC [20354] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-23 02:29:26.711 UTC [20354] DETAIL:  Failing row contains (13588052-1961-438c-a4ba-c26c5c59efe3, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.7117+00, 2026-11-23 02:29:26.7117+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, ef40740c-ff11-40ad-93ab-c65c0d2da0c9, 0a815063-779c-4958-b330-c80f95d6c7ac, f481c751-b492-4b09-a74b-428d6d5ed5b4, Relocation, null, REJECTED, 2026-02-01 08:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, null, null, 2026-02-01 09:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, null, null, null, null).
+2026-11-23 02:29:26.711 UTC [20354] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 02:29:26.721 UTC [20354] ERROR:  new row for relation "asset_transfers" violates check constraint "ck_asset_transfers_stamps"
+2026-11-23 02:29:26.721 UTC [20354] DETAIL:  Failing row contains (23e62523-6eaa-49b3-a11d-d7861a18b163, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.721031+00, 2026-11-23 02:29:26.721031+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, null, a5a3eb78-e24d-43e7-a26d-b9f190d4e965, 0a815063-779c-4958-b330-c80f95d6c7ac, 2bf85e52-5c10-466c-9cb3-428a87baf277, Relocation, null, APPROVED, 2026-02-01 08:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, 2026-02-01 09:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, 2026-02-01 10:00:00+00, 3c3c3c3c-0000-4000-8000-0000000003c1, both, null, null, null).
+2026-11-23 02:29:26.721 UTC [20354] STATEMENT:  INSERT INTO asset_transfers
+	         (id, tenant_id, asset_id, from_branch_id, to_branch_id, reason, status,
+	          submitted_at, submitted_by, approved_at, approved_by, rejected_at,
+	          rejected_by, reject_reason, created_by)
+	       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+
+2026-11-23 02:29:26.729 UTC [20354] ERROR:  new row for relation "assets" violates check constraint "ck_assets_parent_not_self"
+2026-11-23 02:29:26.729 UTC [20354] DETAIL:  Failing row contains (487ea433-c57c-4203-9348-d326d7d1e764, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c, 2026-11-23 02:29:26.725613+00, 2026-11-23 02:29:26.725613+00, 1, 3c3c3c3c-0000-4000-8000-0000000003c1, EXT-SELF, Asset EXT-SELF, أصل EXT-SELF, bc464966-124a-4132-a3b0-f44d6fe3dcf4, 2026-01-15, 100000.0000, 0.0000, 0.0000, 60, STRAIGHT_LINE, null, 0a815063-779c-4958-b330-c80f95d6c7ac, null, ACTIVE, null, null, null, null, null, null, 2027-01-15, null, null, null, null, 487ea433-c57c-4203-9348-d326d7d1e764).
+2026-11-23 02:29:26.729 UTC [20354] STATEMENT:  UPDATE assets SET parent_asset_id = id WHERE id = $1
+
+2026-11-23 02:29:26.732 UTC [20354] ERROR:  insert or update on table "assets" violates foreign key constraint "fk_assets_cost_center"
+2026-11-23 02:29:26.732 UTC [20354] DETAIL:  Key (cost_center_id, tenant_id)=(00000000-0000-4000-8000-00000000dead, 3c3c3c3c-3c3c-3c3c-3c3c-3c3c3c3c3c3c) is not present in table "cost_centers".
+2026-11-23 02:29:26.732 UTC [20354] STATEMENT:  INSERT INTO assets (id, tenant_id, code, name, name_ar, category_id,
+	              acquisition_date, cost, useful_life_months, branch_id, cost_center_id, created_by)
+	           VALUES (gen_random_uuid(), $1, 'EXT-BADCC', 'x', 'س', $2, '2026-01-15', 100, 60, $3,
+	              '00000000-0000-4000-8000-00000000dead', $4)
+
+ ✓ src/__db__/cmms/cmms-schema.db.spec.ts (32 tests) 358ms
+
+ Test Files  1 passed (1)
+      Tests  32 passed (32)
+   Start at  02:29:20
+   Duration  6.21s (transform 532ms, setup 0ms, collect 1.28s, tests 358ms, environment 0ms, prepare 56ms)
+
+2026-11-23 02:29:26.780 UTC [20273] LOG:  received fast shutdown request
+2026-11-23 02:29:26.780 UTC [20273] LOG:  aborting any active transactions
+2026-11-23 02:29:26.780 UTC [20273] LOG:  background worker "logical replication launcher" (PID 20279) exited with exit code 1
+2026-11-23 02:29:26.782 UTC [20354] FATAL:  terminating connection due to administrator command
+2026-11-23 02:29:26.784 UTC [20274] LOG:  shutting down
+2026-11-23 02:29:26.784 UTC [20274] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-23 02:29:26.808 UTC [20274] LOG:  checkpoint complete: wrote 2998 buffers (18.3%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.016 s, sync=0.009 s, total=0.025 s; sync files=2788, longest=0.001 s, average=0.001 s; distance=28052 kB, estimate=28052 kB; lsn=0/3043A08, redo lsn=0/3043A08
+
+2026-11-23 02:29:26.816 UTC [20273] LOG:  database system is shut down
+
+VITEST_EXIT=0

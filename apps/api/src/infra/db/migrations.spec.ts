@@ -351,7 +351,14 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // 0109/0110 DROP+ADD precedent, the honest catch of the wave's own
     // first DB run; EXACTLY the one new source admitted, the standing
     // twenty-four members untouched). The journal 116 → 117.
-    expect(files.at(-1)?.tag).toBe("0117_quality_ncr_source_shape");
+    //
+    // PHASE-050 (W-26 — T-08, dated 2026-11-23): 0118 = THE NOTIFICATIONS
+    // CATEGORY WIDENING — 'quality' joins BOTH CHECK domains (the
+    // 0111/0112 pattern, the shared-scope union law's 18-member union),
+    // ordered WITH the quality-calibration-due sweep's inbox writer that
+    // ships in the same wave (never after it — the same-increment law);
+    // NO tables (the catalog stays 340). The journal 117 → 118.
+    expect(files.at(-1)?.tag).toBe("0118_quality_notifications_category");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

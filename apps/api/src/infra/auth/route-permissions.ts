@@ -5515,6 +5515,81 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/quality/ncr/:id/close",
     permission: "quality.ncr.manage",
   },
+  // PHASE-050 (W-26 — T-07 + T-08, dated 2026-11-23; matrix §3.28): the
+  // keys-seed-first SECOND binding wave (1,113 + 12 = 1,125 — the
+  // discipline standing: the TEN keys landed at W-24, the routes bind
+  // as the service waves ship, every change dated at the block — the
+  // 1,102 baseline anchor). The CAPA plane binds quality.capa.manage
+  // over the lifecycle acts (the root-cause start act · the actions
+  // array · BR-103's close door · the G-63 external-cost door) with
+  // quality.view over the reads; the calibration plane binds
+  // quality.calibration.manage (the register's create + the due-date
+  // sweep's configuration — the 0116 key's own description) with
+  // quality.view over the reads; the sweep-config read is the manage
+  // plane (the cmms expiry-sweep precedent — the effective ladder + the
+  // last run's seal is operational config, never a finance read). The
+  // SPC (quality.spc.view, W-27) and complaints/holds/recall (W-28)
+  // families bind on their own waves.
+  {
+    method: "GET",
+    path: "/api/v1/quality/capa",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/capa",
+    permission: "quality.capa.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/capa/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/capa/:id/root-cause",
+    permission: "quality.capa.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/capa/:id/actions",
+    permission: "quality.capa.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/capa/:id/external-cost",
+    permission: "quality.capa.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/capa/:id/close",
+    permission: "quality.capa.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/calibration",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/calibration",
+    permission: "quality.calibration.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/calibration/sweep-config",
+    permission: "quality.calibration.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/quality/calibration/sweep-config",
+    permission: "quality.calibration.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/calibration/:id",
+    permission: "quality.view",
+  },
 ];
 
 /**

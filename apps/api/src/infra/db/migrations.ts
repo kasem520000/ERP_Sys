@@ -649,6 +649,15 @@ export const MIGRATIONS: readonly string[] = [
   // source — the standing twenty-four members ride untouched. The
   // journal 116 → 117; the catalog stays 340 (no tables).
   "0117_quality_ncr_source_shape",
+  // PHASE-050 (W-26 — T-08, dated 2026-11-23): 0118 = THE NOTIFICATIONS
+  // CATEGORY WIDENING — 'quality' joins BOTH CHECK domains (the
+  // 0111/0112 pattern, the shared-scope union law's 18-member union),
+  // ordered WITH the quality-calibration-due sweep's inbox writer that
+  // ships in the same wave (never after it — the same-increment law).
+  // NO tables (the catalog stays 340); the drift stays 347 (the
+  // sweep-config surface binds the EXISTING 0116 quality.calibration
+  // key); ROUTE_PERMISSIONS 1,113 + 12 = 1,125 dated at the block.
+  "0118_quality_notifications_category",
 ];
 
 /**

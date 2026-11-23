@@ -77,6 +77,13 @@ import {
   QualityInspectionNotFoundError,
   NcrRecordNotFoundError,
   NcrStateError,
+  // PHASE-050 (W-26 — T-07 + T-08): the CAPA + calibration planes'
+  // statuses (see domainStatus).
+  CapaRecordNotFoundError,
+  CalibrationRecordNotFoundError,
+  QualityInstrumentNotFoundError,
+  CapaStateError,
+  CapaCostAlreadyRecordedError,
 } from "../../modules/quality/domain/quality-errors";
 import {
   AttachmentNotFoundError,
@@ -1319,18 +1326,24 @@ function domainStatus(error: DomainError): number {
   // single-use disposition stamp, the CLOSED register, the duplicate
   // parameter natural key). The policy class — BR-102's own
   // NCR_DISPOSITION_REQUIRED closure gate, the G-62 band/on-hand
-  // floors, the input vocabulary — falls through to the 422 default
-  // exactly as the family law documents it.
+  // floors, BR-103's CAPA_ACTIONS_PENDING/CAPA_EFFECTIVENESS_REQUIRED
+  // closure gates (W-26), the G-63 floors, the input vocabulary — falls
+  // through to the 422 default exactly as the family law documents it.
   if (
     error instanceof QualitySpecificationNotFoundError ||
     error instanceof QualityInspectionNotFoundError ||
-    error instanceof NcrRecordNotFoundError
+    error instanceof NcrRecordNotFoundError ||
+    error instanceof CapaRecordNotFoundError ||
+    error instanceof CalibrationRecordNotFoundError ||
+    error instanceof QualityInstrumentNotFoundError
   ) {
     return HttpStatus.NOT_FOUND;
   }
   if (
     error instanceof QualitySpecificationDuplicateError ||
-    error instanceof NcrStateError
+    error instanceof NcrStateError ||
+    error instanceof CapaStateError ||
+    error instanceof CapaCostAlreadyRecordedError
   ) {
     return HttpStatus.CONFLICT;
   }

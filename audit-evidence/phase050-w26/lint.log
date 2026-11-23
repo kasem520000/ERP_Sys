@@ -1,0 +1,52 @@
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/mobile:lint: cache bypass, force executing d6984b6ea7e8ad20
+@erp/domain-core:lint: cache bypass, force executing 356a22ea030fb73e
+@erp/sync-core:lint: cache bypass, force executing 74727c8d3d5df9ab
+@erp/contracts:lint: cache bypass, force executing 23a2fade14b7e3ae
+@erp/web:lint: cache bypass, force executing 7998c1f83f328db9
+@erp/desktop:lint: cache bypass, force executing f921a41162b33313
+@erp/api:lint: cache bypass, force executing 5a2fde984b26fc62
+@erp/ui:lint: cache bypass, force executing 42485c57ef7c8547
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/my-project/ERP_Sys_clone/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/my-project/ERP_Sys_clone/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/my-project/ERP_Sys_clone/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/my-project/ERP_Sys_clone/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    46.549s 
+
+EXIT=0

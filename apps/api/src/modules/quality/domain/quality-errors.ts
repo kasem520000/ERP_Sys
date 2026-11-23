@@ -129,3 +129,130 @@ export class NcrAffectedQtyAboveOnHandError extends DomainError {
     );
   }
 }
+
+// ── the CAPA plane (T-07 — W-26) ─────────────────────────────────────────────
+
+export class CapaRecordNotFoundError extends DomainError {
+  constructor(details: { capaId: string }) {
+    super(
+      "CAPA_RECORD_NOT_FOUND",
+      `CAPA ${details.capaId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The lifecycle refusals (the ladder OPEN → IN_PROGRESS → CLOSED — the
+ * NcrStateError precedent: the refusal carries the record, its current
+ * state, the refused move, and the fold's own reason line). */
+export class CapaStateError extends DomainError {
+  constructor(details: {
+    capaId: string;
+    capaNo: string;
+    from: string;
+    to: string;
+    reason: string;
+  }) {
+    super(
+      "CAPA_STATE_ERROR",
+      `CAPA ${details.capaNo} is ${details.from} — the move to ${details.to} is illegal (${details.reason}; the ladder is OPEN → IN_PROGRESS → CLOSED)`,
+      details,
+    );
+  }
+}
+
+/** BR-103's due-date half (D-10's own law: the typed refusal carrying
+ * the open action/due-date figures): the close attempt while an open
+ * action's window has not elapsed — an undated open action or a
+ * future-dated one. */
+export class CapaActionsPendingError extends DomainError {
+  constructor(details: {
+    capaId: string;
+    capaNo: string;
+    openActionCount: number;
+    pendingCount: number;
+    pendingDueDates: (string | null)[];
+  }) {
+    super(
+      "CAPA_ACTIONS_PENDING",
+      `CAPA ${details.capaNo} cannot close before its actions' due dates pass (BR-103 — ${details.pendingCount} of ${details.openActionCount} open action(s) carry windows that have not elapsed: ${details.pendingDueDates.map((due) => due ?? "no due date declared").join(", ")})`,
+      details,
+    );
+  }
+}
+
+/** BR-103's effectiveness half (D-10's second condition: the
+ * effectiveness check must be recorded before closure). */
+export class CapaEffectivenessRequiredError extends DomainError {
+  constructor(details: { capaId: string; capaNo: string }) {
+    super(
+      "CAPA_EFFECTIVENESS_REQUIRED",
+      `CAPA ${details.capaNo} cannot close without its effectiveness check recorded (BR-103 — the check lands with the closure; a closed record with no check is the 0114 floor's own refusal)`,
+      details,
+    );
+  }
+}
+
+/** The single-use G-63 stamp (the fold's COST_ALREADY_RECORDED cell —
+ * INV-013's sibling discipline: the external cost posts exactly once). */
+export class CapaCostAlreadyRecordedError extends DomainError {
+  constructor(details: { capaId: string; capaNo: string; journalEntryId: string }) {
+    super(
+      "CAPA_COST_ALREADY_RECORDED",
+      `CAPA ${details.capaNo} already carries its external cost (the G-63 stamp is single-use — journal entry ${details.journalEntryId} owns it)`,
+      details,
+    );
+  }
+}
+
+// ── the calibration plane (T-08) ──────────────────────────────────────────────
+
+/** The instrument-asset binding's typed not-found (D-08: the instrument
+ * IS an asset on the 049 surfaces — the calibration binds the asset card
+ * through the fixed-assets module's own read, the composite FK's service
+ * face). */
+export class QualityInstrumentNotFoundError extends DomainError {
+  constructor(details: { assetId: string }) {
+    super(
+      "QUALITY_INSTRUMENT_NOT_FOUND",
+      `instrument asset ${details.assetId} does not exist in this tenant (the calibration binds the asset card — D-08, the 0115 composite FK's service face)`,
+      details,
+    );
+  }
+}
+
+export class CalibrationRecordNotFoundError extends DomainError {
+  constructor(details: { calibrationId: string }) {
+    super(
+      "CALIBRATION_RECORD_NOT_FOUND",
+      `calibration record ${details.calibrationId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The due-after floor's typed pre-check (0115's own CHECK refused at
+ * the service floor BEFORE the DB constraint fires — the refusal names
+ * BOTH dates). */
+export class CalibrationDueDateInvalidError extends DomainError {
+  constructor(details: { calibratedAt: string; dueDate: string }) {
+    super(
+      "CALIBRATION_DUE_DATE_INVALID",
+      `the due date ${details.dueDate} does not follow the calibration act ${details.calibratedAt} (the due date is strictly after the calibration's own UTC day — the 0115 floor; a due date on or before the act day is refused)`,
+      details,
+    );
+  }
+}
+
+/** The sweep's settings write refusal (the registry's own zod refusal
+ * re-surfaced under the wave's own name — the
+ * CmmsSweepThresholdsInvalidError precedent). */
+export class CalibrationSweepThresholdsInvalidError extends DomainError {
+  constructor(details: { message: string }) {
+    super(
+      "CALIBRATION_SWEEP_THRESHOLDS_INVALID",
+      `the calibration sweep's threshold ladder is invalid: ${details.message} (the registry's own schema refusal re-surfaced — the documented fail-closed default [30,7,0] stands)`,
+      details,
+    );
+  }
+}

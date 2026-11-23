@@ -741,6 +741,28 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-049 (W-19, D-10): the asset-expiry sweep's threshold ladder — the day-values before each expiry date at which the sweep alerts (the documented default [30,7,0]; the dedupe is per asset per class per threshold pass, so an item descends band by band across nights). One ladder governs all four classes: warranty, insurance, license, inspection.",
   }),
+  // PHASE-050 (W-26 — T-08, D-08): THE FIRST 050 SETTINGS KEYS — the
+  // quality-calibration-due sweep's threshold ladder (the 0111
+  // precedent's own settings keys, the owner's standing order that the
+  // expiry-sweep pattern extends to calibration due dates). The
+  // documented fail-closed default [30,7,0] (tenant-configurable DATA,
+  // never hard-coded law); the pure normalize fold lives in the quality
+  // module's own domain (calibration-sweep-math — this module's own
+  // home, no cross-module domain import); the dedupe is per instrument
+  // per window per due-date cycle, so an instrument descends band by
+  // band across nights AND re-alerts in its next calibration cycle
+  // (the day axis is the due date the alert names — never the current
+  // day; the convergence law holds within a cycle).
+  "quality.calibration_sweep_thresholds": Object.freeze({
+    key: "quality.calibration_sweep_thresholds",
+    schema: z
+      .array(z.number().int().min(0))
+      .min(1)
+      .max(12),
+    default: [30, 7, 0],
+    description:
+      "PHASE-050 (W-26, T-08/D-08): the quality-calibration-due sweep's threshold ladder — the day-values before each instrument's calibration due date at which the sweep alerts (the documented default [30,7,0]; the dedupe is per instrument per threshold pass per due-date cycle, so an instrument descends band by band across nights and re-alerts after each re-calibration). One ladder governs every instrument asset.",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);
