@@ -794,6 +794,60 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-25 — T-05 + T-06 delivered, the
+> specifications + NCR engines wave under the owner's standing order; the
+> evidence `audit-evidence/phase050-w25/`, the THIRTY-SIXTH consecutive
+> same-session wave): #2's NCR arms DELIVERED — `quality-ncr.db.spec` 13
+> arms over real PG16 (BR-102's closure gate as the typed refusal NAMING
+> the record · **G-62's exactly-once** — the single-use source key
+> `(ncr_record, disposition)` + the single-use disposition stamp, the
+> replay refused typed with one journal + one move standing · **the
+> unmapped-purpose fail-closed** — INVENTORY_SHRINKAGE superseded → the
+> engine's own PURPOSE_NOT_MAPPED with the ZERO residue (the record stays
+> OPEN, zero journals, zero moves) + the flip-and-restore re-run GREEN ·
+> the affected-quantity floor at create AND at the act (the live stock
+> read, the refusal naming BOTH figures, zero residue) · the write-off's
+> REAL-WMS moves (planIssue/applyIssue, sourced `ncr_record`, the
+> per-warehouse coverage + the 1140/1141 per-account credit split) · the
+> honest no-GL shapes (REWORK/ACCEPT/RETURN_TO_SUPPLIER · the batch-less
+> SCRAP's no-journal declared interpretation) · the golden-class arm
+> 5 × 2.500000 = 12.5000 — DR 5110 · CR 1140) — the CAPA arms (BR-103 +
+> G-63) are W-26's. #6's specification-feed arms DELIVERED —
+> `quality-specs.db.spec` 11 arms (the authoring surface with the
+> no-fabrication band law's typed refusals naming the parameter and BOTH
+> figures · the natural-key duplicate refusal · the PATCH's explicit-null
+> CLEAR · the SPC-FK protection BY NAME · **the inspection-result
+> mapping contract**: the inspections row VERBATIM through the owning
+> store, the item through the engine's own chain (the FG batch · the
+> production order · the GRN-only declared honest NONE shape), the
+> active register alongside — zero parallel computation) — the
+> supplier-score arms are W-27's. THE UNIT FOLDS (the plan §4's own
+> arm): the NCR lifecycle matrix fold (12 property tests — the full
+> status × move walk) + the tolerance fold (14 property tests — the
+> no-fabrication law, the closed interval, the 6-dp exactness). **THE
+> HONEST CATCH (the 0109/0110 precedent, the G-48 class): the
+> stock-moves source domain refused the write-off's `ncr_record` BY
+> NAME at the first DB run — the additive migration 0117 re-adds the
+> constraint with the standing twenty-four members + EXACTLY the one
+> new source (the journal 116 → 117, the manifest/journal/catalog pins
+> moved together, no tables — the count stays 340; both scratch runs
+> CHAIN_117_APPLIED → check:rls OK). ROUTE_PERMISSIONS 1,102 + 11 =
+> 1,113 — the keys-seed-first FIRST binding wave (the eleven W-25
+> routes on quality.view/manage/ncr.manage, dated at the block); the
+> error filter's domainStatus rows landed in the same increment (the
+> T-03 lesson). The battery: the four isolates standalone FIRST · the
+> affected folders re-run at the delta head (the quality family 3 · 83
+> — the schema 59 + the NCR 13 + the specs 11 · migrations +
+> identity-flows 2 · 28) · the coverage roster's declared movement
+> (chunk-a 98 → 100 · the roster 284 → 286) · typecheck 8/8 · lint 8/8
+> · depcruise 2,124 · 15,906 (+12/+77) · unit 150 · 1,894 (the ledger
+> arithmetic 1,894 = 883+171+840 EXACT) · i18n 6,955 = 6,955 + mobile
+> 371 · drift 347 = 347 · manifests 13/13 · docs:validate 33/33 ·
+> id-ledger 0 errors + self-test all-probes-OK · history-secrets 0
+> violations · 6,579 (the slices 67+67+66 + the finalize, coverage
+> EXACT 200/200; the FOUR tag anchors untouched) · capabilities ·
+> shells PASS/PASS · boundary PASS.]**
+
 > **[Dated 2026-11-22 (PHASE-050 W-24 — T-01…T-04 delivered, the foundation
 > wave under the owner's launch authorization; the evidence
 > `audit-evidence/phase050-w24/`, the THIRTY-FIFTH consecutive same-session
