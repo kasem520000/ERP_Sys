@@ -1,0 +1,561 @@
+
+ RUN  v3.2.7 /home/z/erp_check/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/erp_check/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-23 04:46:10.019 UTC [10186] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-23 04:46:10.019 UTC [10186] LOG:  listening on IPv6 address "::1", port 43247
+2026-11-23 04:46:10.019 UTC [10186] LOG:  listening on IPv4 address "127.0.0.1", port 43247
+
+2026-11-23 04:46:10.020 UTC [10186] LOG:  listening on Unix socket "/tmp/.s.PGSQL.43247"
+
+2026-11-23 04:46:10.020 UTC [10189] LOG:  database system was shut down at 2026-11-23 04:46:09 UTC
+
+2026-11-23 04:46:10.022 UTC [10186] LOG:  database system is ready to accept connections
+
+2026-11-23 04:46:15.565 UTC [10287] ERROR:  column "branch_id" does not exist at character 199
+2026-11-23 04:46:15.565 UTC [10287] DETAIL:  There is a column named "branch_id" in table "production_orders", but it cannot be referenced from this part of the query.
+2026-11-23 04:46:15.565 UTC [10287] STATEMENT:  INSERT INTO production_orders (id, tenant_id, branch_id, item_id, uom_id,
+	        planned_qty, materials_warehouse_id, fg_warehouse_id, order_no)
+	     VALUES (gen_random_uuid(), $1,
+	        (SELECT branch_id FROM branches WHERE tenant_id = $1 AND code = 'BR-QL' LIMIT 1),
+	        $2, (SELECT uom_id FROM items WHERE id = $2), 10, $3, $4, $5)
+	     RETURNING id
+
+ ❯ src/__db__/quality/quality-coa.db.spec.ts (9 tests | 1 failed) 555ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > SHAPE 1 — all within (and the unbanded parameter recorded, never judged): the certificate generates with the frozen snapshot verbatim 40ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > SHAPE 2 — a parameter outside without a reference: BR-104's typed refusal names the parameter and BOTH figures 27ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > SHAPE 3 — a parameter outside WITH an accepted-deviation NCR: passes with the provenance on the frozen entry 39ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > the deviation reference's own floors: an OPEN NCR is not an acceptance; another item's NCR is not this item's acceptance 60ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > THE COVERAGE LAW: a missing parameter, a foreign spec, and a duplicate measurement each block, named 25ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > the empty register is the honest refusal (nothing to certify, never an empty certificate) 12ms
+   × PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > the provenance floors: a foreign batch and a foreign inspection are the typed refusals; the GRN per-line resolution passes 223ms
+     → column "branch_id" does not exist
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > THE FROZEN SNAPSHOT: a later spec PATCH never moves a stored certificate 26ms
+   ✓ PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > the reads: the list by item and the 404 shape; THE RLS BOUNDARY keeps the isolated tenant empty 27ms
+2026-11-23 04:46:15.661 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.661 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+2026-11-23 04:46:15.689 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.689 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+2026-11-23 04:46:15.704 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.704 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+2026-11-23 04:46:15.720 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.720 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+2026-11-23 04:46:15.733 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.733 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+2026-11-23 04:46:15.754 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.754 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+2026-11-23 04:46:15.766 UTC [10273] ERROR:  column "note_ar" of relation "spc_measurements" does not exist at character 121
+2026-11-23 04:46:15.766 UTC [10273] STATEMENT:  
+	    INSERT INTO spc_measurements
+	      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+	    VALUES ($1, erp.current_tenant_id(), $2,
+	            $3, $4, $5::timestamptz,
+	            $6, $7, $8, $9)
+	    RETURNING id, spec_id AS "specId", value::text AS "value",
+	  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+	  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+	  updated_at::text AS "updatedAt"
+
+ ❯ src/__db__/quality/quality-spc.db.spec.ts (8 tests | 7 failed) 121ms
+   × PHASE-050 W-27 — the SPC service over real PG16 > the chart read returns the PURE module's outputs VERBATIM on the pinned dataset A 21ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e46d-7000-a033-2a0a05ccb15f,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e46a-7000-820d-5f36a7dca7c9,10.0,2026-06-01T08:00:00.000Z,PRODUCTION,,,
+   × PHASE-050 W-27 — the SPC service over real PG16 > the chart read caps at the NEWEST samples and reverses to time order (the DESC cap law) 22ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e489-7000-a867-8880d43fee63,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e487-7000-82dd-1a18cd593f98,50.0,2026-06-01T08:00:00.000Z,MANUAL,,,
+   × PHASE-050 W-27 — the SPC service over real PG16 > the trailing partial group is excluded and disclosed through the service read 14ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e498-7000-a17b-4c8e1ff3c5c6,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e495-7000-9831-40980adfbfed,10.0,2026-06-01T08:00:00.000Z,MANUAL,,,
+   × PHASE-050 W-27 — the SPC service over real PG16 > the ingestion floors: the unknown spec is the typed 404 shape; the bad source and the unknown batch are the typed input refusals 16ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4a8-7000-9e9f-9347fd9b476f,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4a4-7000-8a91-a194ca938439,-5.250000,2026-06-01T08:00:00Z,MANUAL,,,
+   × PHASE-050 W-27 — the SPC service over real PG16 > the chart's own floors: the subgroup size domain and the complete-subgroup floor (both typed, both carrying the figures) 13ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4b4-7000-a2e3-b775fa3ca1f9,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4b3-7000-a5df-b3d6f2d847bd,10.0,2026-06-01T08:00:00Z,MANUAL,,,
+   × PHASE-050 W-27 — the SPC service over real PG16 > the batch provenance: the batch's own measurements read through the provenance surface 21ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4ca-7000-8f71-2a306a00eaee,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4c8-7000-8df6-9aba96b1a0b7,10.400000,2026-06-02T08:00:00Z,MANUAL,19b5a454-b0b8-4e51-b108-01b88f584bf5,,
+   × PHASE-050 W-27 — the SPC service over real PG16 > THE RLS BOUNDARY: the isolated tenant sees no samples and the chart read is the 404 shape 14ms
+     → Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4d6-7000-92e5-8437c0eb5a1d,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4d5-7000-90d7-408ce03b09a8,10.0,2026-06-01T08:00:00Z,MANUAL,,,
+   ✓ PHASE-050 W-27 — the SPC service over real PG16 > the SpcSubgroupSizeInvalidError class surfaces the pure module's own contract (the shared import shape) 0ms
+ ✓ src/__db__/quality/quality-supplier-scores.db.spec.ts (8 tests) 343ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__db__/quality/quality-coa.db.spec.ts > PHASE-050 W-27 — the COA generation gate (BR-104) over real PG16 > the provenance floors: a foreign batch and a foreign inspection are the typed refusals; the GRN per-line resolution passes
+error: column "branch_id" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ rawProductionOrder src/__db__/quality/quality-coa.db.spec.ts:113:17
+    111|   const postingWorld = await ensureQualityPostingWorld();
+    112|   const su: Client = await superuserClient();
+    113|   const order = await su.query<{ id: string }>(
+       |                 ^
+    114|     `INSERT INTO production_orders (id, tenant_id, branch_id, item_id,…
+    115|         planned_qty, materials_warehouse_id, fg_warehouse_id, order_no)
+ ❯ src/__db__/quality/quality-coa.db.spec.ts:414:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > the chart read returns the PURE module's outputs VERBATIM on the pinned dataset A
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e46d-7000-a033-2a0a05ccb15f,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e46a-7000-820d-5f36a7dca7c9,10.0,2026-06-01T08:00:00.000Z,PRODUCTION,,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:78:7
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:78:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > the chart read caps at the NEWEST samples and reverses to time order (the DESC cap law)
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e489-7000-a867-8880d43fee63,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e487-7000-82dd-1a18cd593f98,50.0,2026-06-01T08:00:00.000Z,MANUAL,,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:132:7
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:132:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > the trailing partial group is excluded and disclosed through the service read
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e498-7000-a17b-4c8e1ff3c5c6,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e495-7000-9831-40980adfbfed,10.0,2026-06-01T08:00:00.000Z,MANUAL,,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:164:7
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:164:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > the ingestion floors: the unknown spec is the typed 404 shape; the bad source and the unknown batch are the typed input refusals
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4a8-7000-9e9f-9347fd9b476f,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4a4-7000-8a91-a194ca938439,-5.250000,2026-06-01T08:00:00Z,MANUAL,,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:233:22
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:233:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > the chart's own floors: the subgroup size domain and the complete-subgroup floor (both typed, both carrying the figures)
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4b4-7000-a2e3-b775fa3ca1f9,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4b3-7000-a5df-b3d6f2d847bd,10.0,2026-06-01T08:00:00Z,MANUAL,,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:254:5
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:254:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > the batch provenance: the batch's own measurements read through the provenance surface
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4ca-7000-8f71-2a306a00eaee,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4c8-7000-8df6-9aba96b1a0b7,10.400000,2026-06-02T08:00:00Z,MANUAL,19b5a454-b0b8-4e51-b108-01b88f584bf5,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:291:22
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:291:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  src/__db__/quality/quality-spc.db.spec.ts > PHASE-050 W-27 — the SPC service over real PG16 > THE RLS BOUNDARY: the isolated tenant sees no samples and the chart read is the 404 shape
+Error: Failed query: 
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES ($1, erp.current_tenant_id(), $2,
+            $3, $4, $5::timestamptz,
+            $6, $7, $8, $9)
+    RETURNING id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"
+params: 01a206b9-e4d6-7000-92e5-8437c0eb5a1d,5a5a5a5a-0000-4000-8000-0000000005a1,01a206b9-e4d5-7000-90d7-408ce03b09a8,10.0,2026-06-01T08:00:00Z,MANUAL,,,
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:73:11
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+     44|  * index signature our row interfaces deliberately lack). */
+     45| async function query<T>(statement: Parameters<TenantDb["execute"]>[0])…
+     46|   const result = await tenantTx().execute(statement);
+       |                  ^
+     47|   return result.rows as unknown as T[];
+     48| }
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:317:5
+
+Caused by: error: column "note_ar" of relation "spc_measurements" does not exist
+ ❯ ../../node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:149:14
+ ❯ NodePgPreparedQuery.queryWithCache ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/pg-core/session.ts:71:12
+ ❯ query src/modules/quality/infrastructure/quality.store.ts:46:18
+ ❯ Module.insertSpcMeasurement src/modules/quality/infrastructure/quality.store.ts:775:16
+ ❯ SpcService.record src/modules/quality/application/spc-service.ts:99:17
+ ❯ NodePgSession.transaction ../../node_modules/.pnpm/drizzle-orm@0.45.4_@opentelemetry+api@1.9.0_@types+better-sqlite3@7.6.13_@types+pg@8.23.1_bet_zt4sqjmo4grxqhme4inmktha7a/node_modules/src/node-postgres/session.ts:259:19
+ ❯ src/__db__/quality/quality-spc.db.spec.ts:317:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 137, severity: 'ERROR', code: '42703', detail: undefined, hint: undefined, position: '121', internalPosition: undefined, internalQuery: undefined, where: undefined, schema: undefined, table: undefined, dataType: undefined, constraint: undefined, file: 'parse_target.c', routine: 'checkInsertTargets' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  8 failed | 17 passed (25)
+   Start at  04:46:08
+   Duration  7.29s (transform 909ms, setup 0ms, collect 1.77s, tests 1.02s, environment 0ms, prepare 58ms)
+
+2026-11-23 04:46:16.197 UTC [10186] LOG:  received fast shutdown request
+2026-11-23 04:46:16.197 UTC [10186] LOG:  aborting any active transactions
+2026-11-23 04:46:16.197 UTC [10287] FATAL:  terminating connection due to administrator command
+2026-11-23 04:46:16.198 UTC [10273] FATAL:  terminating connection due to administrator command
+2026-11-23 04:46:16.200 UTC [10285] FATAL:  terminating connection due to administrator command
+2026-11-23 04:46:16.204 UTC [10186] LOG:  background worker "logical replication launcher" (PID 10192) exited with exit code 1
+2026-11-23 04:46:16.205 UTC [10187] LOG:  shutting down
+2026-11-23 04:46:16.205 UTC [10187] LOG:  checkpoint starting: shutdown immediate
+
+(node:10251) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:10251) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-23 04:46:16.230 UTC [10187] LOG:  checkpoint complete: wrote 3275 buffers (20.0%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.017 s, sync=0.008 s, total=0.025 s; sync files=2790, longest=0.001 s, average=0.001 s; distance=28369 kB, estimate=28369 kB; lsn=0/3093030, redo lsn=0/3093030
+
+2026-11-23 04:46:16.237 UTC [10186] LOG:  database system is shut down
+

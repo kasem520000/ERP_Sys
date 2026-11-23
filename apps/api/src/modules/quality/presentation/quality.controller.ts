@@ -561,7 +561,6 @@ const spcMeasurementSchema = z.object({
   source: z.enum(["MANUAL", "PRODUCTION", "INSPECTION"]).optional(),
   batchId: UUID.nullable().optional(),
   note: NOTE,
-  noteAr: NOTE,
 });
 
 const supplierRecomputeSchema = z.object({
@@ -627,7 +626,6 @@ export class QualitySpcController {
         source: input.source,
         batchId: input.batchId,
         note: input.note,
-        noteAr: input.noteAr,
         actorId: identity.userId,
       }),
     );

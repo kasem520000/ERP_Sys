@@ -40,7 +40,6 @@ export interface RecordSpcMeasurementInput {
   source?: string;
   batchId?: string | null;
   note?: string | null;
-  noteAr?: string | null;
   actorId: string | null;
 }
 
@@ -103,7 +102,6 @@ export class SpcService {
       source,
       batchId,
       note: input.note ?? null,
-      noteAr: input.noteAr ?? null,
       actorId: input.actorId,
     });
     await this.audit.record({

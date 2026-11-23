@@ -383,3 +383,176 @@ export async function freshQualityScrapWorld(code: string): Promise<{
     warehouseId: warehouse.rows[0]!.id,
   };
 }
+
+// ── W-27: the supplier-score world (the delivery evidence through the
+// REAL purchasing services + the REAL posting engine — the 038 window
+// read's own law verbatim) ────────────────────────────────────────────────────
+
+import { PurchaseOrderService } from "../../modules/purchasing/application/orders";
+import { GoodsReceiptService } from "../../modules/purchasing/application/goods-receipts";
+import { PutawayService } from "../../modules/inventory/application/putaway-service";
+import { insertInspection } from "../../modules/manufacturing/infrastructure/manufacturing.store";
+
+/** The service singletons the supplier world drives (the direct-
+ * construction precedent; every journal through the REAL engine). */
+const putaway = new PutawayService(audit);
+export const purchaseOrders = new PurchaseOrderService(audit, numbering);
+export const goodsReceipts = new GoodsReceiptService(audit, posting, numbering, putaway);
+
+export interface SupplierQualityWorld {
+  supplierId: string;
+  itemId: string;
+  warehouseId: string;
+  branchId: string;
+}
+
+let supplierWorldBootstrapped = false;
+
+/**
+ * THE GRNI MAPPING (the purchasing fixtures' own tenant-setup step — the
+ * §2 purpose without a §3 template marker, the PHASE-007 fail-closed gap
+ * recorded): the QL tenant's 2130 (Deferred revenue in the current
+ * template) carries the GRNI purpose for the delivery evidence's own
+ * postings. Idempotent.
+ */
+async function ensureQualityGrniMapping(): Promise<void> {
+  const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+  if ((await tenancy.findActivePurpose("GRNI")) === undefined) {
+    const accrued = await tenancy.findAccountByCode("2130");
+    if (accrued === undefined) {
+      throw new Error("the QL world's 2130 account is missing (the posting world must boot first)");
+    }
+    await tenancy.insertAccountPurpose({
+      purposeKey: "GRNI",
+      accountId: accrued.id,
+      activeFrom: "2025-12-01",
+    });
+  }
+}
+
+/** The current month's first day (the rolling fold's calendar grain —
+ * the seeded evidence lands INSIDE the window the specs recompute). */
+export function currentMonthStart(): string {
+  const now = new Date();
+  return `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-01`;
+}
+
+/**
+ * A FRESH SUPPLIER per arm (the per-arm-world law): a SUPPLIER-kind
+ * partner on the QL tenant + the world's standing ids. The first call
+ * boots the GRNI mapping (idempotent).
+ */
+export async function freshQualitySupplier(code: string): Promise<SupplierQualityWorld> {
+  const base = await setupQualityFixture();
+  const postingWorld = await ensureQualityPostingWorld();
+  if (!supplierWorldBootstrapped) {
+    await withTenant(TENANT_QUALITY, ensureQualityGrniMapping);
+    supplierWorldBootstrapped = true;
+  }
+  const su: Client = await superuserClient();
+  const supplier = await su.query<{ id: string }>(
+    `INSERT INTO partners (id, tenant_id, kind, code, name, name_ar)
+     VALUES (gen_random_uuid(), $1, 'SUPPLIER', $2, $3, $4)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_QUALITY, `QL-SUP-${code}`, `QL Supplier ${code}`, `مورد ${code}`],
+  );
+  await su.end();
+  return {
+    supplierId: supplier.rows[0]!.id,
+    itemId: base.itemId,
+    warehouseId: postingWorld.warehouseId,
+    branchId: base.branchId,
+  };
+}
+
+/**
+ * ONE POSTED DELIVERY: PO (expected date) → issued → GRN (receipt date)
+ * → POSTED — every step through the REAL services, the journal through
+ * the REAL posting engine (G-07's own path). Optionally a FAIL
+ * inspection on the receipt (the incoming-lot rejection — the
+ * manufacturing store's own write surface, the FAIL disposition the
+ * 0026 CHECK's own demand).
+ */
+export async function seedSupplierDelivery(input: {
+  world: SupplierQualityWorld;
+  code: string;
+  orderDate: string;
+  expectedDate: string | null;
+  receiptDate: string;
+  failInspection?: boolean;
+}): Promise<{ poId: string; grnId: string; inspectionId: string | null }> {
+  const { world } = input;
+  const order = await withTenant(TENANT_QUALITY, () =>
+    purchaseOrders.create({
+      branchId: world.branchId,
+      supplierId: world.supplierId,
+      orderDate: input.orderDate,
+      expectedDate: input.expectedDate,
+      currencyCode: "SAR",
+      exchangeRate: null,
+      note: null,
+      noteAr: null,
+      actorId: QL_ACTOR,
+      lines: [
+        {
+          itemId: world.itemId,
+          qty: "10",
+          unitPrice: "10.000000",
+          taxCodeId: null,
+          note: null,
+        },
+      ],
+    }),
+  );
+  await withTenant(TENANT_QUALITY, () => purchaseOrders.issue(order.id, QL_ACTOR));
+  const orderLines = await withTenant(TENANT_QUALITY, () => purchaseOrders.findWithLines(order.id));
+  const receipt = await withTenant(TENANT_QUALITY, () =>
+    goodsReceipts.create({
+      branchId: world.branchId,
+      supplierId: world.supplierId,
+      poId: order.id,
+      warehouseId: world.warehouseId,
+      receiptDate: input.receiptDate,
+      poLessReason: null,
+      note: null,
+      noteAr: null,
+      actorId: QL_ACTOR,
+      lines: [
+        {
+          poLineId: orderLines.lines[0]!.id,
+          itemId: world.itemId,
+          qty: "10",
+          unitCost: "10.000000",
+          accountId: null,
+          batchNo: null,
+          batchExpiry: null,
+          serialIds: null,
+          note: null,
+        },
+      ],
+    }),
+  );
+  await withTenant(TENANT_QUALITY, () => goodsReceipts.post(receipt.id, QL_ACTOR));
+  let inspectionId: string | null = null;
+  if (input.failInspection === true) {
+    const inspection = await withTenant(TENANT_QUALITY, () =>
+      insertInspection({
+        targetType: "goods_receipt",
+        orderId: null,
+        grnId: receipt.id,
+        fgBatchId: null,
+        result: "FAIL",
+        sampled: true,
+        sampleSize: 5,
+        disposition: "RETURN_TO_SUPPLIER",
+        inspectedAt: `${input.receiptDate}T10:00:00.000Z`,
+        note: `Incoming lot rejection ${input.code}`,
+        noteAr: null,
+        actorId: QL_ACTOR,
+      }),
+    );
+    inspectionId = inspection.id;
+  }
+  return { poId: order.id, grnId: receipt.id, inspectionId };
+}

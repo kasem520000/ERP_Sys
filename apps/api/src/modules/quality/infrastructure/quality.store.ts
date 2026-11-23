@@ -744,15 +744,17 @@ export interface SpcMeasurementRow {
   source: string;
   batchId: string | null;
   note: string | null;
-  noteAr: string | null;
   version: number;
   createdAt: string;
   updatedAt: string;
 }
 
+// The 0113 sample store's own shape: a single note column (no note_ar
+// — the measurements are operational rows, not the bilingual master
+// data; the 0113 CHECK's own domain).
 const SPC_COLUMNS = sql`id, spec_id AS "specId", value::text AS "value",
   sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
-  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  note, version, created_at::text AS "createdAt",
   updated_at::text AS "updatedAt"`;
 
 export interface InsertSpcMeasurementInput {
@@ -762,7 +764,6 @@ export interface InsertSpcMeasurementInput {
   source: string;
   batchId: string | null;
   note: string | null;
-  noteAr: string | null;
   actorId: string | null;
 }
 
@@ -774,10 +775,10 @@ export async function insertSpcMeasurement(
 ): Promise<SpcMeasurementRow> {
   const rows = await query<SpcMeasurementRow>(sql`
     INSERT INTO spc_measurements
-      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note)
     VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.actorId},
             ${input.specId}, ${input.value}, ${input.sampledAt}::timestamptz,
-            ${input.source}, ${input.batchId}, ${input.note}, ${input.noteAr})
+            ${input.source}, ${input.batchId}, ${input.note})
     RETURNING ${SPC_COLUMNS}`);
   return rows[0]!;
 }
