@@ -640,6 +640,15 @@ export const MIGRATIONS: readonly string[] = [
   "0114_quality_ncr_capa",
   "0115_quality_calibration_supplier",
   "0116_quality_holds_recall",
+  // PHASE-050 (W-25 — T-06, dated 2026-11-23): 0117 = THE STOCK-MOVES
+  // SOURCE WIDENING FOR G-62's WRITE-OFF — the honest catch of the
+  // wave's own first DB run (the 0109/0110 DROP+ADD precedent, the G-48
+  // class): ck_stock_moves_source_shape is a closed domain and D-05's
+  // write-off sources its moves `ncr_record`; the first insert was
+  // refused BY NAME. The additive slot admits EXACTLY the one new
+  // source — the standing twenty-four members ride untouched. The
+  // journal 116 → 117; the catalog stays 340 (no tables).
+  "0117_quality_ncr_source_shape",
 ];
 
 /**

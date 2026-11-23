@@ -5448,6 +5448,73 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/assets/expiry-sweep",
     permission: "assets.expiry.manage",
   },
+  // PHASE-050 (W-25 — T-05 + T-06, dated 2026-11-23; matrix §3.28): the
+  // 0116-seeded keys' FIRST binding wave (1,102 + 11 = 1,113 — the
+  // keys-seed-first discipline: the TEN keys landed at W-24, the routes
+  // bind as the service waves ship, every change dated at the block —
+  // the 1,102 baseline anchor). The specifications plane binds
+  // quality.view / quality.manage (the master-data register — the
+  // 0113 grants carry DELETE by design); the NCR plane binds
+  // quality.ncr.manage over the lifecycle acts (BR-102's gate + the
+  // G-62 write-off door — the disposition and the close); the
+  // inspection-result mapping contract's read rides quality.view. The
+  // CAPA/calibration (W-26), SPC (quality.spc.view, W-27) and
+  // complaints/holds/recall (W-28) families bind on their own waves.
+  {
+    method: "GET",
+    path: "/api/v1/quality/specifications",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/specifications",
+    permission: "quality.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/specifications/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/quality/specifications/:id",
+    permission: "quality.manage",
+  },
+  {
+    method: "DELETE",
+    path: "/api/v1/quality/specifications/:id",
+    permission: "quality.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/inspections/:inspectionId/map",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/ncr",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/ncr",
+    permission: "quality.ncr.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/ncr/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/ncr/:id/disposition",
+    permission: "quality.ncr.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/ncr/:id/close",
+    permission: "quality.ncr.manage",
+  },
 ];
 
 /**

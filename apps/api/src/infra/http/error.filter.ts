@@ -69,6 +69,15 @@ import {
   PicklistKeyTakenError,
   FormLayoutNotFoundError,
 } from "../../modules/configuration/domain/custom-field-errors";
+// PHASE-050 (W-25, dated 2026-11-23): the quality module's typed
+// refusals (the specifications + NCR planes' statuses — see domainStatus).
+import {
+  QualitySpecificationNotFoundError,
+  QualitySpecificationDuplicateError,
+  QualityInspectionNotFoundError,
+  NcrRecordNotFoundError,
+  NcrStateError,
+} from "../../modules/quality/domain/quality-errors";
 import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
@@ -1300,6 +1309,30 @@ function domainStatus(error: DomainError): number {
     error instanceof CustomFieldRequiredError
   ) {
     return HttpStatus.BAD_REQUEST;
+  }
+  // PHASE-050 (W-25, dated 2026-11-23): the quality module's statuses —
+  // registered in the SAME increment that ships the routes (the
+  // PHASE-045 T-03 lesson: never the 422 fall-through drift for a
+  // not-found). The 404s: the specification + inspection + NCR
+  // not-founds (A7 parity — unknown == foreign, never an existence
+  // disclosure). The 409s: the NCR lifecycle ladder's conflicts (the
+  // single-use disposition stamp, the CLOSED register, the duplicate
+  // parameter natural key). The policy class — BR-102's own
+  // NCR_DISPOSITION_REQUIRED closure gate, the G-62 band/on-hand
+  // floors, the input vocabulary — falls through to the 422 default
+  // exactly as the family law documents it.
+  if (
+    error instanceof QualitySpecificationNotFoundError ||
+    error instanceof QualityInspectionNotFoundError ||
+    error instanceof NcrRecordNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (
+    error instanceof QualitySpecificationDuplicateError ||
+    error instanceof NcrStateError
+  ) {
+    return HttpStatus.CONFLICT;
   }
   return HttpStatus.UNPROCESSABLE_ENTITY;
 }

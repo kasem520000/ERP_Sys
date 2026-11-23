@@ -27,6 +27,9 @@ import { TaxModule } from "./modules/tax/tax.module";
 import { InventoryModule } from "./modules/inventory/inventory.module";
 import { PurchasingModule } from "./modules/purchasing/purchasing.module";
 import { FixedAssetsModule } from "./modules/fixed_assets/fixed_assets.module";
+// PHASE-050 (W-25, dated 2026-11-23): the quality module (QMS, CR-20 — the
+// specifications plane + the NCR engine with G-62's write-off).
+import { QualityModule } from "./modules/quality/quality.module";
 import { NotesModule } from "./modules/notes/notes.module";
 import { InstallmentsModule } from "./modules/installments/installments.module";
 // PHASE-028/029 (restored lineage): the budgeting + payroll modules.
@@ -81,6 +84,7 @@ import { UsageLimitGuard } from "./infra/auth/usage-limit.guard";
     InventoryModule,
     PurchasingModule,
     FixedAssetsModule,
+    QualityModule,
     NotesModule,
     InstallmentsModule,
     BudgetingModule,

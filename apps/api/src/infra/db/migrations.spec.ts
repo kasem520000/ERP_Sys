@@ -345,7 +345,13 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // manifest enablements; the ONE CoA marker QUALITY_EXPENSE 5320 —
     // G-62 rides the EXISTING INVENTORY_SHRINKAGE pair). TWELVE tenant
     // tables; the catalog 328 → 340.
-    expect(files.at(-1)?.tag).toBe("0116_quality_holds_recall");
+    //
+    // PHASE-050 (W-25 — T-06, dated 2026-11-23): 0117 = THE STOCK-MOVES
+    // SOURCE WIDENING for G-62's write-off moves (`ncr_record` — the
+    // 0109/0110 DROP+ADD precedent, the honest catch of the wave's own
+    // first DB run; EXACTLY the one new source admitted, the standing
+    // twenty-four members untouched). The journal 116 → 117.
+    expect(files.at(-1)?.tag).toBe("0117_quality_ncr_source_shape");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {
