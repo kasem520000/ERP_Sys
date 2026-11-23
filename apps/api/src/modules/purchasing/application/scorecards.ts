@@ -26,6 +26,11 @@ import { SupplierRatingNotFoundError } from "../domain/sourcing-errors";
  * ONE row per supplier (recompute overwrites — the window moves). The
  * on-demand recompute runs here; the nightly sweep (pg-boss) calls the
  * same service per ACTIVE tenant for the entitled ones.
+ *
+ * PHASE-050 (W-27 — T-10): the recompute's detail carries the SUPPLIER
+ * QUALITY FEED — the quality module's own rolling-fold rows, read
+ * VERBATIM through its store (D-13's documented contract; see the
+ * recompute body for the contract's own record).
  */
 
 export const SCORECARD_WINDOW_DAYS_DEFAULT = 90;
@@ -89,6 +94,24 @@ export class ScorecardService {
       priceVariancePct: sample.priceVariancePct,
     });
 
+    // PHASE-050 (W-27 — T-10, dated 2026-11-23) THE SUPPLIER QUALITY FEED
+    // CONTRACT (D-13 — recorded in BOTH phase surfaces: HERE the
+    // consumer's record; the provider's is the quality module's own
+    // service + store): the scorecard READS the quality module's
+    // supplier_quality_scores rows through its own store read
+    // (findSupplierQualityFeed) and carries them VERBATIM in the detail —
+    // the consumer reads, NEVER re-computes (zero parallel computation).
+    // The feed is ADDITIVE detail: the debit-note quality leg keeps its
+    // own delivered computation (038's law stands untouched); the
+    // quality module's rolling fold (NCRs · rejections · the delivery
+    // window — the 038 read's own on-time law) rides beside it as the
+    // QMS evidence. Absent rows → the empty array (a tenant that never
+    // ran the fold carries no quality history — the honest shape, never
+    // a fabricated score).
+    const qualityFeed = await import("../../quality/infrastructure/quality.store").then(
+      (qualityStore) => qualityStore.findSupplierQualityFeed(input.supplierId, 12),
+    );
+
     await collab.upsertSupplierRating({
       supplierId: input.supplierId,
       windowStart,
@@ -105,6 +128,8 @@ export class ScorecardService {
         debitNotes: sample.debitNoteCount,
         priceVariancePct: sample.priceVariancePct,
         weights: { delivery: 0.4, quality: 0.4, price: 0.2 },
+        // PHASE-050 (W-27): the documented quality feed — VERBATIM rows.
+        qualityFeed,
       },
       computedBy: input.computedBy,
     });

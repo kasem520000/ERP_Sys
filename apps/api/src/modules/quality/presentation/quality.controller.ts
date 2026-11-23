@@ -27,6 +27,10 @@ import { SpecificationService } from "../application/specification-service";
 import { CapaService } from "../application/capa-service";
 import { CalibrationService } from "../application/calibration-service";
 import { QualityCalibrationSweepService } from "../application/quality-calibration-sweep-service";
+// PHASE-050 (W-27 — T-09 + T-10 + T-11): the SPC + supplier-score + COA planes.
+import { SpcService } from "../application/spc-service";
+import { SupplierScoreService } from "../application/supplier-score-service";
+import { CoaService } from "../application/coa-service";
 
 /**
  * PHASE-050 (W-25 — T-05 + T-06, 2026-11-23) the quality routes (matrix
@@ -544,5 +548,215 @@ export class QualityCalibrationController {
   @RequireFeature("quality")
   async findCalibration(@Param("id") id: string) {
     return envelope(await this.calibration.find(id));
+  }
+}
+
+// ── PHASE-050 (W-27 — T-09 + T-10 + T-11): the SPC + supplier-score +
+// COA planes (the keys-seed-first THIRD binding wave) ────────────────────────
+
+const spcMeasurementSchema = z.object({
+  specId: UUID,
+  value: VALUE,
+  sampledAt: STAMP,
+  source: z.enum(["MANUAL", "PRODUCTION", "INSPECTION"]).optional(),
+  batchId: UUID.nullable().optional(),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const supplierRecomputeSchema = z.object({
+  periodStart: DAY,
+});
+
+const coaGenerateSchema = z.object({
+  docType: z.enum(["COA", "COC"]),
+  itemId: UUID,
+  batchId: UUID.nullable().optional(),
+  inspectionId: UUID.nullable().optional(),
+  parameters: z
+    .array(
+      z.object({
+        specId: UUID,
+        value: VALUE,
+        ncrId: UUID.nullable().optional(),
+      }),
+    )
+    .min(1)
+    .max(200),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+@Controller("/api/v1/quality")
+export class QualitySpcController {
+  constructor(@Inject(SpcService) private readonly spc: SpcService) {}
+
+  /** The sample store's read (the chart's own history — the provenance
+   * read rides the batch filter). */
+  @Get("spc/measurements")
+  @RequirePermissions("quality.spc.view")
+  @RequireFeature("quality.spc")
+  listMeasurements(
+    @Query("specId") specId?: string,
+    @Query("batchId") batchId?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      this.spc.listMeasurements({
+        specId: specId === undefined || specId === "" ? undefined : specId,
+        batchId: batchId === undefined || batchId === "" ? undefined : batchId,
+        limit: limit === undefined ? 200 : Math.min(Number(limit) || 200, 500),
+      }),
+    );
+  }
+
+  /** The sample ingestion (the master-data manage key — the 0116
+   * grants' own S/I/U discipline; the surface rides quality.spc). */
+  @Post("spc/measurements")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.manage")
+  @RequireFeature("quality.spc")
+  async recordMeasurement(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = spcMeasurementSchema.parse(body);
+    return envelope(
+      await this.spc.record({
+        specId: input.specId,
+        value: input.value,
+        sampledAt: input.sampledAt,
+        source: input.source,
+        batchId: input.batchId,
+        note: input.note,
+        noteAr: input.noteAr,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  /** THE CHART READ: the PURE module's output VERBATIM (X-bar/R, Cp/Cpk,
+   * the out-of-control flags — D-12's zero-parallel-computation law). */
+  @Get("spc/charts/:specId")
+  @RequirePermissions("quality.spc.view")
+  @RequireFeature("quality.spc")
+  async chart(
+    @Param("specId") specId: string,
+    @Query("subgroupSize") subgroupSize?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      await this.spc.chart(specId, {
+        subgroupSize:
+          subgroupSize === undefined || subgroupSize === ""
+            ? undefined
+            : Number(subgroupSize),
+        limit: limit === undefined || limit === "" ? undefined : Number(limit),
+      }),
+    );
+  }
+}
+
+@Controller("/api/v1/quality")
+export class QualitySupplierScoresController {
+  constructor(@Inject(SupplierScoreService) private readonly scores: SupplierScoreService) {}
+
+  @Get("supplier-scores")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  listScores(@Query("partnerId") partnerId?: string, @Query("limit") limit?: string) {
+    return envelope(
+      this.scores.list({
+        partnerId: partnerId === undefined || partnerId === "" ? undefined : partnerId,
+        limit: limit === undefined ? 200 : Math.min(Number(limit) || 200, 500),
+      }),
+    );
+  }
+
+  /** THE DOCUMENTED 038 FEED CONTRACT's own door (D-13 — the consumer
+   * reads, never re-computes): the latest periods for one supplier,
+   * VERBATIM. DECLARED BEFORE the recompute route's :partnerId shape
+   * never collides (distinct sub-paths). */
+  @Get("supplier-scores/:partnerId/feed")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async feed(@Param("partnerId") partnerId: string, @Query("limit") limit?: string) {
+    return envelope(
+      await this.scores.feed(
+        partnerId,
+        limit === undefined ? undefined : Math.min(Number(limit) || 12, 24),
+      ),
+    );
+  }
+
+  /** The rolling fold's recompute (the master-data manage key — the
+   * fold is rebuildable derived data, the 0115 grants' own shape). */
+  @Post("supplier-scores/:partnerId/recompute")
+  @RequirePermissions("quality.manage")
+  @RequireFeature("quality")
+  async recompute(
+    @Req() request: Request,
+    @Param("partnerId") partnerId: string,
+    @Body() body: unknown,
+  ) {
+    const identity = requireIdentity(request);
+    const input = supplierRecomputeSchema.parse(body);
+    return envelope(
+      await this.scores.recompute({
+        partnerId,
+        periodStart: input.periodStart,
+        actorId: identity.userId,
+      }),
+    );
+  }
+}
+
+@Controller("/api/v1/quality")
+export class QualityCoaController {
+  constructor(@Inject(CoaService) private readonly coa: CoaService) {}
+
+  @Get("coa")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  listCertificates(
+    @Query("itemId") itemId?: string,
+    @Query("batchId") batchId?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      this.coa.list({
+        itemId: itemId === undefined || itemId === "" ? undefined : itemId,
+        batchId: batchId === undefined || batchId === "" ? undefined : batchId,
+        limit: limit === undefined ? 200 : Math.min(Number(limit) || 200, 500),
+      }),
+    );
+  }
+
+  /** BR-104's own door: the generation gate (the refusal names the
+   * parameter and both figures; the frozen snapshot lands verbatim). */
+  @Post("coa")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.coa.generate")
+  @RequireFeature("quality")
+  async generate(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = coaGenerateSchema.parse(body);
+    return envelope(
+      await this.coa.generate({
+        docType: input.docType,
+        itemId: input.itemId,
+        batchId: input.batchId,
+        inspectionId: input.inspectionId,
+        parameters: input.parameters,
+        note: input.note,
+        noteAr: input.noteAr,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("coa/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findCertificate(@Param("id") id: string) {
+    return envelope(await this.coa.find(id));
   }
 }

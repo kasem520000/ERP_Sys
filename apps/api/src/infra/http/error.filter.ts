@@ -84,6 +84,10 @@ import {
   QualityInstrumentNotFoundError,
   CapaStateError,
   CapaCostAlreadyRecordedError,
+  // PHASE-050 (W-27 — T-09 + T-10 + T-11): the SPC + supplier-score +
+  // COA planes' statuses (see domainStatus).
+  SupplierQualityPartnerNotFoundError,
+  CoaDocumentNotFoundError,
 } from "../../modules/quality/domain/quality-errors";
 import {
   AttachmentNotFoundError,
@@ -1335,7 +1339,11 @@ function domainStatus(error: DomainError): number {
     error instanceof NcrRecordNotFoundError ||
     error instanceof CapaRecordNotFoundError ||
     error instanceof CalibrationRecordNotFoundError ||
-    error instanceof QualityInstrumentNotFoundError
+    error instanceof QualityInstrumentNotFoundError ||
+    // PHASE-050 (W-27 — T-10 + T-11): the supplier-score recompute
+    // target + the certificate reads' not-founds (A7 parity).
+    error instanceof SupplierQualityPartnerNotFoundError ||
+    error instanceof CoaDocumentNotFoundError
   ) {
     return HttpStatus.NOT_FOUND;
   }

@@ -256,3 +256,135 @@ export class CalibrationSweepThresholdsInvalidError extends DomainError {
     );
   }
 }
+
+// ── the SPC plane (T-09 — W-27) ──────────────────────────────────────────────
+// The two input floors live beside the pure fold that throws them
+// (spc-statistics.ts — the fold's own contract); re-exported here so the
+// HTTP face and every consumer imports the taxonomy from one place.
+
+export {
+  SpcSubgroupSizeInvalidError,
+  SpcInsufficientSamplesError,
+} from "./spc-statistics";
+
+// ── the supplier quality score plane (T-10 — W-27) ──────────────────────────
+
+/** The fold's input floor (beside the fold — supplier-score.ts); the
+ * service reads make the shape structurally impossible, the fold
+ * refuses it BY NAME anyway. */
+export { SupplierScoreInputsInvalidError } from "./supplier-score";
+
+/** The recompute target's not-found (the partners module's own row —
+ * the feed contract's supplier). */
+export class SupplierQualityPartnerNotFoundError extends DomainError {
+  constructor(details: { partnerId: string }) {
+    super(
+      "SUPPLIER_QUALITY_PARTNER_NOT_FOUND",
+      `supplier ${details.partnerId} does not exist in this tenant (the quality rolling fold computes one row per supplier per period — the partners module's own row is the target)`,
+      details,
+    );
+  }
+}
+
+/** The period shape floor (the rolling fold's calendar-month law). */
+export class SupplierScorePeriodInvalidError extends DomainError {
+  constructor(details: { periodStart: string }) {
+    super(
+      "SUPPLIER_SCORE_PERIOD_INVALID",
+      `the period start ${details.periodStart} is not a calendar month's first day (the rolling fold computes one row per supplier per calendar month — YYYY-MM-01; the natural key is (tenant, partner, period_start))`,
+      details,
+    );
+  }
+}
+
+// ── the COA plane (T-11 — W-27) ──────────────────────────────────────────────
+
+export class CoaDocumentNotFoundError extends DomainError {
+  constructor(details: { coaId: string }) {
+    super(
+      "COA_DOCUMENT_NOT_FOUND",
+      `certificate ${details.coaId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The batch-item provenance floor: the certificate's batch must belong
+ * to the certificate's item (the 0115 composite FK guarantees the
+ * batch's existence; the cross-field coherence is this typed floor). */
+export class CoaBatchItemMismatchError extends DomainError {
+  constructor(details: { batchId: string; itemId: string; batchItemId: string }) {
+    super(
+      "COA_BATCH_ITEM_MISMATCH",
+      `batch ${details.batchId} belongs to item ${details.batchItemId}, not the certificate's item ${details.itemId} (the certificate's provenance must be coherent — the frozen snapshot certifies ONE item)`,
+      details,
+    );
+  }
+}
+
+/** The inspection-item provenance floor: the linked inspection must
+ * resolve to the certificate's item through the mapping contract's own
+ * chain (the FG batch · the production order · the GRN's own lines for
+ * a per-line resolution — the W-25 declared shape). */
+export class CoaInspectionItemMismatchError extends DomainError {
+  constructor(details: { inspectionId: string; itemId: string }) {
+    super(
+      "COA_INSPECTION_ITEM_MISMATCH",
+      `inspection ${details.inspectionId} does not resolve to the certificate's item ${details.itemId} (the mapping contract's own chain — the FG batch, the production order, or the goods receipt's own lines for a per-line resolution)`,
+      details,
+    );
+  }
+}
+
+/** The accepted-deviation reference's own floor: the referenced NCR
+ * must be this item's and carry the ACCEPT disposition (an open or
+ * differently-dispositioned NCR is not an acceptance). */
+export class CoaDeviationNcrInvalidError extends DomainError {
+  constructor(details: { ncrId: string; ncrNo: string; itemId: string; disposition: string | null }) {
+    super(
+      "COA_DEVIATION_NCR_INVALID",
+      `NCR ${details.ncrNo} is not an accepted deviation for this certificate's item (the reference must carry the ACCEPT disposition on this item — found disposition ${details.disposition ?? "none"} on item ${details.itemId})`,
+      details,
+    );
+  }
+}
+
+/** BR-104's OWN typed refusal (the phase doc's wording: blocked unless
+ * every parameter is within tolerance or carries an accepted-deviation
+ * NCR reference — the refusal naming the parameter and BOTH figures). */
+export class CoaGateBlockedError extends DomainError {
+  constructor(details: {
+    itemId: string;
+    firstFailure: { parameter: string; value: string; breachedLimit: string } | null;
+    missing: string[];
+    foreign: string[];
+    duplicates: string[];
+  }) {
+    const failure =
+      details.firstFailure !== null
+        ? `parameter "${details.firstFailure.parameter}" measured ${details.firstFailure.value} against the limit ${details.firstFailure.breachedLimit}`
+        : details.missing.length > 0
+          ? `the active parameters [${details.missing.join(", ")}] carry no measurement`
+          : details.foreign.length > 0
+            ? `the measured set carries foreign specification ids [${details.foreign.join(", ")}]`
+            : `the measured set carries duplicate measurements [${details.duplicates.join(", ")}]`;
+    super(
+      "COA_GATE_BLOCKED",
+      `the certificate is blocked (BR-104 — ${failure}; every parameter must be within tolerance or carry an accepted-deviation NCR reference, and every active parameter must be measured exactly once)`,
+      details,
+    );
+  }
+}
+
+/** The empty-register floor: an item with no active specifications
+ * carries nothing to certify — the honest refusal, never an empty
+ * certificate. */
+export class CoaNoSpecificationsError extends DomainError {
+  constructor(details: { itemId: string }) {
+    super(
+      "COA_NO_SPECIFICATIONS",
+      `item ${details.itemId} carries no active quality specifications (a certificate certifies the item's parameters — nothing to certify is the honest refusal, never an empty certificate)`,
+      details,
+    );
+  }
+}

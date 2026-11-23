@@ -11,13 +11,23 @@ import { SpecificationService } from "./application/specification-service";
 import { CapaService } from "./application/capa-service";
 import { CalibrationService } from "./application/calibration-service";
 import { QualityCalibrationSweepService } from "./application/quality-calibration-sweep-service";
+// PHASE-050 (W-27 — T-09 + T-10 + T-11): the SPC + supplier-score + COA
+// engines (the pure layers FIRST — the unit-first law — then the services
+// that feed them; the 038 feed contract's consumer side lives in the
+// purchasing scorecards, which read this module's store).
+import { SpcService } from "./application/spc-service";
+import { SupplierScoreService } from "./application/supplier-score-service";
+import { CoaService } from "./application/coa-service";
 import { registerQualityCalibrationJob } from "./infrastructure/calibration-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
 import {
   QualityCalibrationController,
   QualityCapaController,
+  QualityCoaController,
   QualityNcrController,
   QualitySpecificationsController,
+  QualitySpcController,
+  QualitySupplierScoresController,
 } from "./presentation/quality.controller";
 
 /**
@@ -33,10 +43,14 @@ import {
  * AccountingModule import (the G-59/G-61/G-62/G-63 wiring precedent);
  * the asset card read is consumed through the fixed-assets store's own
  * surface (the documented contract — zero parallel computation); the
- * sweep's inbox writer rides the NotificationsModule export. The
- * remaining planes (SPC/supplier/COA W-27 · complaints/holds/recall
- * W-28) extend THIS module with their own services and stores on the
- * same keys.
+ * sweep's inbox writer rides the NotificationsModule export. The SPC
+ * plane (W-27) computes its charts through the PURE module
+ * (spc-statistics — the only SPC arithmetic), the supplier rolling
+ * fold stores its rows for the 038 scorecards' documented feed read
+ * (D-13 — the consumer reads, never re-computes), and the COA gate
+ * composes the tolerance fold (BR-104 — the only evaluator); the
+ * remaining planes (complaints/holds/recall W-28) extend THIS module
+ * with their own services and stores on the same keys.
  */
 @Module({
   imports: [AccountingModule, AuditModule, NotificationsModule],
@@ -45,6 +59,10 @@ import {
     QualityNcrController,
     QualityCapaController,
     QualityCalibrationController,
+    // PHASE-050 (W-27 — T-09 + T-10 + T-11): the three new planes' routes.
+    QualitySpcController,
+    QualitySupplierScoresController,
+    QualityCoaController,
   ],
   providers: [
     SpecificationService,
@@ -53,6 +71,11 @@ import {
     CapaService,
     CalibrationService,
     QualityCalibrationSweepService,
+    // PHASE-050 (W-27 — T-09 + T-10 + T-11): the SPC + supplier-score +
+    // COA planes.
+    SpcService,
+    SupplierScoreService,
+    CoaService,
   ],
   exports: [SpecificationService, NcrService, CapaService, CalibrationService],
 })

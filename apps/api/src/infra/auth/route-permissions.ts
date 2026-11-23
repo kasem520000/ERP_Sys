@@ -5590,6 +5590,66 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/quality/calibration/:id",
     permission: "quality.view",
   },
+  // PHASE-050 (W-27 — T-09 + T-10 + T-11, dated 2026-11-23; matrix §3.28):
+  // the keys-seed-first THIRD binding wave (1,125 + 9 = 1,134 — the
+  // discipline standing: the TEN keys landed at W-24, the routes bind as
+  // the service waves ship, every change dated at the block — the 1,102
+  // baseline anchor). The SPC plane binds quality.spc.view over the
+  // chart + measurement reads (the `quality.spc` feature key at the
+  // controller) with the INGESTION on quality.manage (the master-data
+  // manage key — the 0113 S/I/U evidence discipline; the surface rides
+  // quality.spc, D-12); the supplier-score plane binds quality.view over
+  // the reads + the 038 feed contract's own door and quality.manage over
+  // the rolling recompute (rebuildable derived data — the 0115 grants'
+  // own shape); the COA plane binds quality.coa.generate over BR-104's
+  // generation door (the 0116 key's own description) with quality.view
+  // over the reads. The complaints/holds/recall (W-28) families bind on
+  // their own wave.
+  {
+    method: "GET",
+    path: "/api/v1/quality/spc/measurements",
+    permission: "quality.spc.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/spc/measurements",
+    permission: "quality.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/spc/charts/:specId",
+    permission: "quality.spc.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/supplier-scores",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/supplier-scores/:partnerId/feed",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/supplier-scores/:partnerId/recompute",
+    permission: "quality.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/coa",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/coa",
+    permission: "quality.coa.generate",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/coa/:id",
+    permission: "quality.view",
+  },
 ];
 
 /**

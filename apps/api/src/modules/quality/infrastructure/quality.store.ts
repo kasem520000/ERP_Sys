@@ -733,3 +733,308 @@ export async function lastCalibrationSweepRun(): Promise<
   const row = rows[0];
   return row === undefined ? undefined : { at: row.at, outcome: row.after };
 }
+
+// ── the SPC measurement rows (T-09 — the per-parameter sample store, W-27) ───
+
+export interface SpcMeasurementRow {
+  id: string;
+  specId: string;
+  value: string;
+  sampledAt: string;
+  source: string;
+  batchId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const SPC_COLUMNS = sql`id, spec_id AS "specId", value::text AS "value",
+  sampled_at::text AS "sampledAt", source, batch_id AS "batchId",
+  note, note_ar AS "noteAr", version, created_at::text AS "createdAt",
+  updated_at::text AS "updatedAt"`;
+
+export interface InsertSpcMeasurementInput {
+  specId: string;
+  value: string;
+  sampledAt: string;
+  source: string;
+  batchId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}
+
+/** The sample store's ONLY writer. Evidence discipline: no DELETE (the
+ * 0113 grants) — the measurements are the chart's history; corrections
+ * are new samples, never rewrites. */
+export async function insertSpcMeasurement(
+  input: InsertSpcMeasurementInput,
+): Promise<SpcMeasurementRow> {
+  const rows = await query<SpcMeasurementRow>(sql`
+    INSERT INTO spc_measurements
+      (id, tenant_id, created_by, spec_id, value, sampled_at, source, batch_id, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.actorId},
+            ${input.specId}, ${input.value}, ${input.sampledAt}::timestamptz,
+            ${input.source}, ${input.batchId}, ${input.note}, ${input.noteAr})
+    RETURNING ${SPC_COLUMNS}`);
+  return rows[0]!;
+}
+
+/** The chart read's own cap: the NEWEST `limit` samples (sampled_at DESC,
+ * id DESC — the deterministic tie-break), newest-first; the service
+ * reverses to time order before feeding the PURE module. */
+export async function listSpcMeasurements(filter: {
+  specId: string;
+  limit: number;
+}): Promise<SpcMeasurementRow[]> {
+  const rows = await query<SpcMeasurementRow>(sql`
+    SELECT ${SPC_COLUMNS} FROM spc_measurements
+    WHERE spec_id = ${filter.specId}
+    ORDER BY sampled_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+  return rows;
+}
+
+/** The batch's own provenance read (a W-28/W-29 consumer surface; kept
+ * beside the family it reads). */
+export async function listSpcMeasurementsByBatch(filter: {
+  batchId: string;
+  limit: number;
+}): Promise<SpcMeasurementRow[]> {
+  const rows = await query<SpcMeasurementRow>(sql`
+    SELECT ${SPC_COLUMNS} FROM spc_measurements
+    WHERE batch_id = ${filter.batchId}
+    ORDER BY sampled_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+  return rows;
+}
+
+// ── the supplier quality score rows (T-10 — the rolling fold, W-27) ──────────
+
+export interface SupplierQualityScoreRow {
+  id: string;
+  partnerId: string;
+  periodStart: string;
+  ncrCount: number;
+  rejectionCount: number;
+  onTimeDeliveries: number;
+  totalDeliveries: number;
+  score: string;
+  computedAt: string;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const SQS_COLUMNS = sql`id, partner_id AS "partnerId", period_start::text AS "periodStart",
+  ncr_count AS "ncrCount", rejection_count AS "rejectionCount",
+  on_time_deliveries AS "onTimeDeliveries", total_deliveries AS "totalDeliveries",
+  score::text AS "score", computed_at::text AS "computedAt",
+  version, created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+/** THE ROLLING UPSERT: one row per (tenant, partner, period_start) — the
+ * recompute OVERWRITES in place (the window moves, the fold re-runs; the
+ * natural key's own law, the 038 scorecard's ONE-row-per-supplier
+ * precedent at period grain). Rebuildable derived data: the 0115 grants
+ * carry DELETE by design (this store never exercises it). */
+export async function upsertSupplierQualityScore(input: {
+  partnerId: string;
+  periodStart: string;
+  ncrCount: number;
+  rejectionCount: number;
+  onTimeDeliveries: number;
+  totalDeliveries: number;
+  score: string;
+  actorId: string | null;
+}): Promise<SupplierQualityScoreRow> {
+  const rows = await query<SupplierQualityScoreRow>(sql`
+    INSERT INTO supplier_quality_scores
+      (id, tenant_id, created_by, partner_id, period_start, ncr_count, rejection_count,
+       on_time_deliveries, total_deliveries, score, computed_at)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.actorId},
+            ${input.partnerId}, ${input.periodStart}::date, ${input.ncrCount},
+            ${input.rejectionCount}, ${input.onTimeDeliveries}, ${input.totalDeliveries},
+            ${input.score}, now())
+    ON CONFLICT ("tenant_id", "partner_id", "period_start") DO UPDATE SET
+      ncr_count = EXCLUDED.ncr_count,
+      rejection_count = EXCLUDED.rejection_count,
+      on_time_deliveries = EXCLUDED.on_time_deliveries,
+      total_deliveries = EXCLUDED.total_deliveries,
+      score = EXCLUDED.score,
+      computed_at = now(),
+      updated_by = EXCLUDED.created_by,
+      updated_at = now(),
+      version = supplier_quality_scores.version + 1
+    RETURNING ${SQS_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function listSupplierQualityScores(filter: {
+  partnerId?: string;
+  limit: number;
+}): Promise<SupplierQualityScoreRow[]> {
+  const rows = await query<SupplierQualityScoreRow>(sql`
+    SELECT ${SQS_COLUMNS} FROM supplier_quality_scores
+    WHERE (${filter.partnerId ?? null}::uuid IS NULL OR partner_id = ${filter.partnerId ?? null})
+    ORDER BY period_start DESC, partner_id
+    LIMIT ${Math.min(filter.limit, 500)}`);
+  return rows;
+}
+
+/** THE DOCUMENTED 038 FEED READ (D-13): the consumer's own door — the
+ * latest periods for ONE supplier, read VERBATIM (the consumer reads,
+ * never re-computes). */
+export async function findSupplierQualityFeed(
+  partnerId: string,
+  limit: number,
+): Promise<SupplierQualityScoreRow[]> {
+  const rows = await query<SupplierQualityScoreRow>(sql`
+    SELECT ${SQS_COLUMNS} FROM supplier_quality_scores
+    WHERE partner_id = ${partnerId}
+    ORDER BY period_start DESC
+    LIMIT ${Math.min(limit, 24)}`);
+  return rows;
+}
+
+// ── the supplier fold's evidence reads (the owning engines' rows) ────────────
+
+/** The period's SUPPLIER-source NCR count (the module's OWN register —
+ * the fold's defect input, one of its two legs). */
+export async function countSupplierNcrs(input: {
+  partnerId: string;
+  periodStart: string;
+  periodEndExclusive: string;
+}): Promise<number> {
+  const rows = await query<{ n: number }>(sql`
+    SELECT count(*)::int AS n FROM ncr_records
+    WHERE source = 'SUPPLIER' AND partner_id = ${input.partnerId}
+      AND (created_at AT TIME ZONE 'UTC')::date >= ${input.periodStart}::date
+      AND (created_at AT TIME ZONE 'UTC')::date < ${input.periodEndExclusive}::date`);
+  return rows[0]!.n;
+}
+
+/** The period's incoming-lot rejections: goods-receipt-target inspections
+ * with result FAIL, joined to the receipts' own supplier (the
+ * manufacturing module's inspections + the purchasing module's receipts
+ * — the OWNING engines' rows, read here, never re-computed). */
+export async function countSupplierRejections(input: {
+  partnerId: string;
+  periodStart: string;
+  periodEndExclusive: string;
+}): Promise<number> {
+  const rows = await query<{ n: number }>(sql`
+    SELECT count(*)::int AS n
+    FROM inspections i
+    JOIN goods_receipts g ON g.id = i.grn_id AND g.tenant_id = i.tenant_id
+    WHERE i.target_type = 'goods_receipt' AND i.result = 'FAIL'
+      AND g.supplier_id = ${input.partnerId}
+      AND (i.inspected_at AT TIME ZONE 'UTC')::date >= ${input.periodStart}::date
+      AND (i.inspected_at AT TIME ZONE 'UTC')::date < ${input.periodEndExclusive}::date`);
+  return rows[0]!.n;
+}
+
+/** The period's delivery performance — THE 038 WINDOW READ'S OWN LAW
+ * VERBATIM (collaboration.store readScorecardWindow): the POSTED receipts
+ * joined to their purchase orders, on-time = receipt_date ≤ the PO's
+ * expected date (a receipt with no expected date is on time by
+ * COALESCE's own grace — the delivered law, mirrored not re-derived). */
+export async function readSupplierDeliveryWindow(input: {
+  partnerId: string;
+  periodStart: string;
+  periodEndExclusive: string;
+}): Promise<{ total: number; onTime: number }> {
+  const rows = await query<{ total: number; onTime: number }>(sql`
+    SELECT count(*)::int AS total,
+           count(*) FILTER (
+             WHERE g.receipt_date <= COALESCE(po.expected_date, g.receipt_date))::int AS "onTime"
+    FROM goods_receipts g
+    JOIN purchase_orders po ON po.id = g.po_id AND po.tenant_id = g.tenant_id
+    WHERE g.supplier_id = ${input.partnerId}
+      AND g.status = 'POSTED'
+      AND g.receipt_date >= ${input.periodStart}::date
+      AND g.receipt_date < ${input.periodEndExclusive}::date`);
+  return rows[0]!;
+}
+
+// ── the COA document rows (T-11 — the generated certificate, W-27) ───────────
+
+/** The frozen snapshot entry's stored shape (the pure fold's CoaGateEntry
+ * serialized verbatim — camelCase keys, nulls explicit, the W-25 actions
+ * array's own discipline). */
+export type CoaParameters = ReadonlyArray<Record<string, unknown>>;
+
+export interface CoaDocumentRow {
+  id: string;
+  docNo: string;
+  docType: string;
+  itemId: string;
+  batchId: string | null;
+  inspectionId: string | null;
+  parameters: CoaParameters;
+  issuedAt: string;
+  issuedBy: string | null;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const COA_COLUMNS = sql`id, doc_no AS "docNo", doc_type AS "docType", item_id AS "itemId",
+  batch_id AS "batchId", inspection_id AS "inspectionId", parameters,
+  issued_at::text AS "issuedAt", issued_by AS "issuedBy", note, note_ar AS "noteAr",
+  version, created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export interface InsertCoaDocumentInput {
+  docNo: string;
+  docType: string;
+  itemId: string;
+  batchId: string | null;
+  inspectionId: string | null;
+  parameters: CoaParameters;
+  issuedAt: string;
+  issuedBy: string | null;
+  note: string | null;
+  noteAr: string | null;
+}
+
+/** The certificate's ONLY writer — the frozen snapshot lands verbatim
+ * (BR-104's own record); evidence discipline: S/I/U, NO DELETE (an
+ * issued certificate is immutable history — the print law's own frozen
+ * input). */
+export async function insertCoaDocument(
+  input: InsertCoaDocumentInput,
+): Promise<CoaDocumentRow> {
+  const rows = await query<CoaDocumentRow>(sql`
+    INSERT INTO coa_documents
+      (id, tenant_id, doc_no, doc_type, item_id, batch_id, inspection_id,
+       parameters, issued_at, issued_by, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.docNo}, ${input.docType},
+            ${input.itemId}, ${input.batchId}, ${input.inspectionId},
+            ${JSON.stringify(input.parameters)}::jsonb, ${input.issuedAt}::timestamptz,
+            ${input.issuedBy}, ${input.note}, ${input.noteAr})
+    RETURNING ${COA_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findCoaDocumentById(id: string): Promise<CoaDocumentRow | undefined> {
+  const rows = await query<CoaDocumentRow>(sql`
+    SELECT ${COA_COLUMNS} FROM coa_documents WHERE id = ${id}`);
+  return rows[0];
+}
+
+export async function listCoaDocuments(filter: {
+  itemId?: string;
+  batchId?: string;
+  limit: number;
+}): Promise<CoaDocumentRow[]> {
+  const rows = await query<CoaDocumentRow>(sql`
+    SELECT ${COA_COLUMNS} FROM coa_documents
+    WHERE (${filter.itemId ?? null}::uuid IS NULL OR item_id = ${filter.itemId ?? null})
+      AND (${filter.batchId ?? null}::uuid IS NULL OR batch_id = ${filter.batchId ?? null})
+    ORDER BY issued_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+  return rows;
+}
