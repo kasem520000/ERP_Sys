@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-050 (Quality Management System) — **W-30 THE REVIEW PACK + THE REPORTS DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-31 (THE PROOF PACK) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-050 (Quality Management System) — **W-31 THE PROOF PACK DELIVERED (2026-11-23, this session — #1…#9 ALL GREEN) — W-32 (DOCS + GATES + CLOSURE) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
 F-050a commit `de05cfd`):** W-0 ACCEPTED AS DELIVERY at `7054520` after the
@@ -237,8 +237,47 @@ sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS **1,125**
 agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO
 new this wave.
 
-**NEXT: W-31 — THE PROOF PACK (T-18)** under the owner's standing
-order: **the golden transcripts G-62/G-63 with the MANDATORY failure
+**NEXT: W-32 — DOCS + GATES + CLOSURE (T-19 + T-20)** under the owner's
+standing order: the canon docs in the ID_LEDGER's reserved wordings
+(JOURNAL_RULES G-62/G-63 + note 20 · ACCOUNTING_INVARIANTS INV-035 ·
+BUSINESS_RULES BR-101…BR-104 — **لا كتابة خارجها**) + **THE ID_LEDGER
+FLIP** (atomic with the canon rows — implemented G 63 · INV 35 · BR
+104; the checker's self-test probe (7) moves to G-64/PHASE-051, claimant
+PHASE-052) + the full sweep at the final head (the isolates first; the
+amended ceiling law; the FULL ten-part envelope at 300 · the full
+counts) + the completion report (the cumulative ledger #1–#10 walked
+and closed + the battery scope map + the FULL unit-package table + the
+open-items log transferred explicitly) + the triple flip (the phase doc
+· IMPLEMENTATION_STATUS · NEXT_ACTION → PHASE-051) + **THE ARCHIVE
+ERP_PLATFORM_PHASE050.zip EXACTLY AS DECLARED (F-4/§5 — the physical
+shape of 049: FLAT, the commit-hash as the FIRST ENTRY, ADDITIVE-ONLY,
+EXCLUDING every standing platform zip — أرشفة الأرشيف ممنوعة — the
+members byte-verified, the standing zips verified untouched)** + **the
+tag `phase/050`** (DELIVERY, never acceptance — the §1a (a) ruling).
+
+---
+
+**W-31 — THE PROOF PACK (T-18, delivered on the W-30 head `ab3beda` in
+two commits — `ca52143` the specs + the affected folders → this
+battery/gate/ledger increment, EVERY step pushed at its own commit per
+the owner's «عند الانتهاء من أي خطوة ادفعها إلى المستودع»):** the
+golden transcripts G-62/G-63 with the MANDATORY failure packs (the
+JOURNAL_RULES §7 law) + the INV-035 blocking-matrix golden + the
+offline-rejection shape (D-20/OA-02) + the RLS attack matrix A1–A10 ×
+12 (the composite-FK law) + the OA-06 EXPLAIN budgets — **#1…#9 ALL
+GREEN; only #10 (the W-32 closure) remains.** The family 167 → 188
+(17 files); the roster 297 → 300, VERDICT: COVERED. The battery: the
+five isolates (soak 228.67s) · the affected folders (17·188 · 2·28) ·
+the scratch ×2 · typecheck 8/8 · lint 8/8 (no catch this wave) ·
+depcruise 2,195 · 16,411 (+3/+35) · unit 167 · 2,020 standing · i18n
+7,253 standing + mobile 371 · drift 347 = 347 · manifests 13/13 ·
+docs:validate 33/33 · id-ledger 0 errors + self-test OK ·
+history-secrets 0 violations · 6,790 (the FOUR tag anchors untouched)
+· ROUTE_PERMISSIONS 1,159 · the report registry 122 · capabilities
+agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents,
+ZERO new this wave.
+
+**PREVIOUS WAVE (W-30 — the review pack + the reports):** **the golden transcripts G-62/G-63 with the MANDATORY failure
 packs** (the refusals WITH their full payloads, the zero residue, the
 flip-and-restore with the green re-runs — the JOURNAL_RULES §7 law, the
 048-W14/049-W22 pattern) + **the INV-035 blocking-matrix golden** (the

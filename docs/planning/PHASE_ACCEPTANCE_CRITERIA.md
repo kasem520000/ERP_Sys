@@ -794,6 +794,56 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-31 — T-18 delivered, the proof pack
+> under the owner's standing order — «عند الانتهاء من أي خطوة ادفعها إلى
+> المستودع», pushed at its own commits: `ca52143` the specs + the
+> affected folders → this battery/gate/ledger increment; the evidence
+> `audit-evidence/phase050-w31/`, the FORTY-SECOND consecutive
+> same-session wave): #2's GOLDEN TRANSCRIPTS DELIVERED —
+> `quality-goldens.db.spec` 7 arms (the 049 cmms-goldens precedent's
+> shape — the golden transcript + THE MANDATORY FAILURE PACK per
+> golden, the JOURNAL_RULES §7 law): the G-62 transcript (DR 5110 · CR
+> 1140, 12.5000 balanced to the cent; the write-off move; INV-013
+> single-use; the batch ledger 100 → 95) + its failure pack (the
+> unmapped-purpose refusal WITH the full payload + the ZERO residue +
+> the flip-and-restore GREEN re-run) + the on-hand floor naming BOTH
+> figures · the G-63 transcript (DR 5320 · CR 2137, 480.0000; the cost
+> stamp + the journal link in ONE CAS) + its failure pack · **#3's
+> GOLDEN ARMS DELIVERED** — the INV-035 blocking-matrix golden (the
+> four canonical paths each refused with the FULL payload + the zero
+> residue per path + the release + the green flip-and-restore re-run)
+> + **the offline-rejection shape (D-20/OA-02: the offline leg's POST
+> is the same plan — the same typed BATCH_QUALITY_HELD,
+> payload-for-payload equal)** · **#9's RLS + OA ARMS DELIVERED** —
+> `quality-rls.db.spec` 10 arms (the cmms-rls precedent's exact set:
+> A1/A2/A3/A4/A5/A7/A8/A9/A10 + the census — the twelve tables each
+> covered ≥ 6 times: the forged-tenant INSERTs 42501 · the UPDATE
+> hijacks 0 rows byte-identical · the DELETE grants law (nine evidence
+> tables DENIED) · the composite-FK law (the catalog walk + the live
+> FK-inversion 23503) · the recursive-CTE cycle walk) +
+> `quality-explain-budgets.db.spec` 4 arms (the OA-06 budgets: the
+> where-used leg rides ix_stock_moves_tenant_batch · the doc→customer
+> resolution the planner's own index paths · the SPC chart read
+> ix_spc_measurements_tenant_spec_sampled Index Scan Backward — never a
+> forced plan, never an isolated probe context) — **#1…#9 ALL GREEN;
+> only #10 (the W-32 closure) remains.** The battery (this gate
+> increment, every log this session): THE FIVE ISOLATES STANDALONE
+> FIRST (soak 1·1 228.67s · fcm 1·8 · email 1·5 · the cmms sweep 1·4 ·
+> the quality calibration sweep 1·4) · the affected folders (the
+> quality family **17 · 188 GREEN** — the family 167 → 188 · migrations
+> + identity-flows 2 · 28 over the 1,159 routes) · the coverage roster
+> (chunk-a 110 → 113 · the roster 296 → 297 → **300**; 300 = 300,
+> missing NONE, extra NONE, duplicates NONE — VERDICT: COVERED) · the
+> 118-chain scratch from zero TWICE · typecheck 8/8 (0 cached) · lint
+> 8/8 (0 cached — no catch this wave) · depcruise clean 2,195 modules ·
+> 16,411 dependencies (+3/+35 dated) · unit 8/8 — 167 · 2,020 standing
+> · i18n 7,253 = 7,253 standing + mobile 371 = 371 · drift 347 = 347 ·
+> manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors + self-test
+> all-probes-OK · history-secrets 0 violations · 6,790 allowlisted hits
+> (the FOUR tag anchors untouched) · ROUTE_PERMISSIONS 1,159 standing ·
+> the registry 315 tenant-owned tables · the report registry 122 ·
+> capabilities agree · shells PASS/PASS · boundary PASS.]**
+
 > **[Dated 2026-11-23 (PHASE-050 W-30 — T-16 + T-17 delivered under the
 > owner's standing order — «عند الانتهاء من أي خطوة ادفعها إلى
 > المستودع», every step pushed at its own commit: `dd08585` the engines
