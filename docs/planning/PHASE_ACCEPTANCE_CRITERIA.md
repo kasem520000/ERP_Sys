@@ -794,6 +794,33 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-22 (PHASE-050 W-24 — T-01…T-04 delivered, the foundation
+> wave under the owner's launch authorization; the evidence
+> `audit-evidence/phase050-w24/`, the THIRTY-FIFTH consecutive same-session
+> wave): #1 OPENED — the migrations 0113–0116 applied from zero (the chain
+> 112 → 116, both scratch runs CHAIN_116_APPLIED → [check-rls] OK — 340) ·
+> the Drizzle mirrors +12 (parity with the migrations' shapes) · the twelve
+> tables have ENTITY_CATALOG rows (328 → 340) + the tables.registry entries
+> (303 → 315, the A-suite +72 → 1,896 green) · the chain spec extended to
+> 116 (the manifest/journal/pins moved together) · the quality schema spec
+> 59 arms GREEN (every structural law refused BY NAME, every rejection arm
+> on its own world). #9's keys + flags arms DELIVERED — the +10 keys
+> 337 → 347 = 347 (zero-drift at the wave head, seed = mirror, both drift
+> lists + the identity-flows pin) · the two feature flags `quality` ·
+> `quality.spc` on business + enterprise with STARTER AT THE DECLARED
+> NEUTRAL ZERO (verified live from the from-zero boot) + the four
+> quality-carrying templates' manifest enablements + the manifest schema's
+> dated whole-module-key amendment + FEATURE_CATALOG §30. #1's "tables doc"
+> arm: the twelve ENTITY_CATALOG rows carry the column-level truth (the
+> full TABLES/ doc is W-32's canon wave with T-19). THE HONEST CATCHES
+> (three, all RED-proven then repaired — the wave's README carries them
+> whole): the entitlements substrate refused the whole-module key (the
+> provisioning path 23514'd — 0116 §7's additive one-key widening); the
+> tenancy CoA pins (79 → 80 · 56 → 57 — the one 5320 marker); the
+> tenancy-http journey pin (the same marker, caught by the envelope's
+> first chunk-c run — the RED log kept). ROUTE_PERMISSIONS 1,102 unchanged
+> (keys-seed-first).]**
+
 1. **Migrations 0113–0116 (the honest slots — the phase doc's 0087…0090 stale
    by its own note, the 048/049 D-02 precedent) apply cleanly from zero
    (re-apply no-op); Drizzle mirror parity; the TWELVE new tables

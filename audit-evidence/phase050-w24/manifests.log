@@ -1,0 +1,21 @@
+
+> erp-platform@0.1.0 validate:manifests /home/z/my-project/ERP_Sys_w24
+> tsx scripts/validate-manifests.ts
+
+== industry manifests validation (industries/README §3): 13 shipped template(s) ==
+OK   industry.retail@1.0.0 — schema valid (content hash sha256:ac0a93342ae85cd9b870c96b2bf63cb13e5e815477ebd9d9679f08700080cbba)
+OK   industry.grocery@1.0.0 — schema valid (content hash sha256:c6ef7c8a82bdc3817e46e9068892e550ea2bbacb1583d0954f5c86704e29525e)
+OK   industry.restaurant@1.0.0 — schema valid (content hash sha256:894b764f81702ff27a2f877d61915e3a56cd2abeddb2a4e4fbb2b546f84a025d)
+OK   industry.automotive@1.0.0 — schema valid (content hash sha256:2f847473908d59276ec5bd4338016ecb0612fb40b0fe3d66d93f5ffdc3dc4d88)
+OK   industry.distribution@1.0.0 — schema valid (content hash sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d)
+OK   industry.food_manufacturing@1.0.0 — schema valid (content hash sha256:a6f8a37ef24aba9549de0ea3aad4045b4c691f0f1d0ae66c626cf55519c3dc23)
+OK   industry.professional_services@1.0.0 — schema valid (content hash sha256:dd08b957aab40af33829ff4605dc883b1c0a01b8c84a3270f19e183643917728)
+OK   industry.education@1.0.0 — schema valid (content hash sha256:8f11c6435cead4da4336d3ebbb9aef6cb1cc1e05290e877b66e7f6fa5a4bf623)
+OK   industry.agriculture@1.0.0 — schema valid (content hash sha256:2cb978d0eeb84657c8f90088ff91db111caed4e0071ee52fdc45107eb6c60d33)
+OK   industry.wholesale@1.0.0 — schema valid (content hash sha256:013c35ad9626cb58e1acb4d9115eebae47880badd36f10e4da82d0abfaa28f1f)
+OK   industry.electronics@1.0.0 — schema valid (content hash sha256:67aff4f368e04bda2650596fc3f4105d0bae43e2edf61535a0ebffa34d1637f0)
+OK   industry.healthcare@1.0.0 — schema valid (content hash sha256:391edb9971ea13efd68af15cada39efb08dd797112f18c096d2aa2dee928f84d)
+OK   industry.rental_logistics@1.0.0 — schema valid (content hash sha256:bd6dceac7d47c24563ad0c3af26b79dcec0ac15715bab11b3935abb3591ea98d)
+
+OK — 13 manifest(s) valid against §3; ids unique; versions semver; required_feature_keys non-empty.
+EXIT=0

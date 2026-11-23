@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/my-project/ERP_Sys_w24
+> turbo run lint --force
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/ui:lint: cache bypass, force executing 42485c57ef7c8547
+@erp/sync-core:lint: cache bypass, force executing 74727c8d3d5df9ab
+@erp/domain-core:lint: cache bypass, force executing 356a22ea030fb73e
+@erp/contracts:lint: cache bypass, force executing 23a2fade14b7e3ae
+@erp/web:lint: cache bypass, force executing 7998c1f83f328db9
+@erp/mobile:lint: cache bypass, force executing d6984b6ea7e8ad20
+@erp/desktop:lint: cache bypass, force executing f921a41162b33313
+@erp/api:lint: cache bypass, force executing 5aa712acbf414687
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/my-project/ERP_Sys_w24/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/my-project/ERP_Sys_w24/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/my-project/ERP_Sys_w24/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/my-project/ERP_Sys_w24/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/my-project/ERP_Sys_w24/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/my-project/ERP_Sys_w24/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/my-project/ERP_Sys_w24/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/my-project/ERP_Sys_w24/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    48.249s 
+
+EXIT=0
