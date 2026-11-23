@@ -1,0 +1,63 @@
+
+> erp-platform@0.1.0 typecheck /home/z/ERP_Sys
+> turbo run typecheck --force
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running typecheck in 9 packages
+   • Remote caching disabled
+
+@erp/sync-core:typecheck: cache bypass, force executing f7cc668c43104048
+@erp/api:typecheck: cache bypass, force executing 5a5aa996d9d7ffa1
+@erp/desktop:typecheck: cache bypass, force executing 1e2b7a5c27647947
+@erp/domain-core:typecheck: cache bypass, force executing abdef343ff8e11d2
+@erp/web:typecheck: cache bypass, force executing ef1f1c5e656d3530
+@erp/mobile:typecheck: cache bypass, force executing f17fda02599184df
+@erp/contracts:typecheck: cache bypass, force executing 953720667f1b812e
+@erp/ui:typecheck: cache bypass, force executing 66d5bc8793dda12e
+@erp/api:typecheck: 
+@erp/api:typecheck: > @erp/api@0.1.0 typecheck /home/z/ERP_Sys/apps/api
+@erp/api:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/api:typecheck: 
+@erp/domain-core:typecheck: 
+@erp/domain-core:typecheck: > @erp/domain-core@0.1.0 typecheck /home/z/ERP_Sys/packages/domain-core
+@erp/domain-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/domain-core:typecheck: 
+@erp/ui:typecheck: 
+@erp/ui:typecheck: > @erp/ui@1.0.0 typecheck /home/z/ERP_Sys/packages/ui
+@erp/ui:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/ui:typecheck: 
+@erp/desktop:typecheck: 
+@erp/desktop:typecheck: > @erp/desktop@0.1.0 typecheck /home/z/ERP_Sys/apps/desktop
+@erp/desktop:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/desktop:typecheck: 
+@erp/contracts:typecheck: 
+@erp/contracts:typecheck: > @erp/contracts@0.1.0 typecheck /home/z/ERP_Sys/packages/contracts
+@erp/contracts:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/contracts:typecheck: 
+@erp/web:typecheck: 
+@erp/web:typecheck: > @erp/web@0.1.0 typecheck /home/z/ERP_Sys/apps/web
+@erp/web:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/web:typecheck: 
+@erp/mobile:typecheck: 
+@erp/mobile:typecheck: > @erp/mobile@0.1.0 typecheck /home/z/ERP_Sys/apps/mobile
+@erp/mobile:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/mobile:typecheck: 
+@erp/sync-core:typecheck: 
+@erp/sync-core:typecheck: > @erp/sync-core@0.1.0 typecheck /home/z/ERP_Sys/packages/sync-core
+@erp/sync-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/sync-core:typecheck: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    1m9.079s 
+
+EXIT=0

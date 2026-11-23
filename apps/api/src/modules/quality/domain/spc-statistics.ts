@@ -128,7 +128,12 @@ export function computeXbarRChart(input: SpcChartInput): XbarRChart {
   const d4 = new Decimal(constants.d4);
   const d2 = new Decimal(constants.d2);
 
-  const complete = Math.floor(input.values.length / n);
+  // Integer floor division via the house bitwise pattern (ADR-0009 bans
+  // Math.floor; the operands are the ingested sample count — bounded by
+  // the DESC-cap ingestion law (the newest 20 charted) — and the subgroup
+  // size 2…10: the quotient is a pure subgroup COUNT, never a rounded
+  // measurement, far inside the 2^31 safe range).
+  const complete = (input.values.length / n) | 0;
   const excludedCount = input.values.length - complete * n;
 
   const subgroups: SpcSubgroup[] = [];

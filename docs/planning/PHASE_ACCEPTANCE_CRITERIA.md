@@ -794,6 +794,122 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-27 — T-09 + T-10 + T-11 delivered, the
+> SPC + supplier-scores + COA wave under the owner's standing order — «عند
+> الانتهاء من أي خطوة ادفعها إلى المستودع», every step pushed at its own
+> commit: `20255ac` the engines → `fa71b27` the DB specs → this
+> battery/gate/ledger increment; the evidence `audit-evidence/phase050-w27/`,
+> the THIRTY-EIGHTH consecutive same-session wave): #5 CLOSED — the SPC
+> pure module FIRST (D-12, the unit-first law): `spc-statistics.ts` THE
+> ONLY SPC ARITHMETIC IN THE MODULE — the pinned Shewhart constants table
+> n=2…10 (A₂/D₃/D₄/d₂ at 3dp) · the subgroups chunk with the trailing
+> partial group EXCLUDED and disclosed (`excludedCount` — a partial group
+> is not evidence) · X̄ᵢ/rᵢ at 6dp · X̄̄±A₂R̄ / D₃R̄/D₄R̄ · σ̂=R̄/d₂ ·
+> Cp=(USL−LSL)/6σ̂ and Cpk=min(USL−X̄̄, X̄̄−LSL)/3σ̂ against the
+> SPECIFICATION band (one-sided/unset → NULL, the no-fabrication law) ·
+> the out-of-control flags judging the PUBLISHED figures (the
+> closed-interval law — ON a limit is within) · the degenerate R̄=0
+> collapse (null σ̂/Cp/Cpk, never a fabricated infinity) — with its **13
+> property tests on THREE PINNED REFERENCE DATASETS** (A stable: **Cp
+> 1.163000 EXACT · Cpk 1.114542 · UCLx 10.255800**; B the X-chart mean
+> shift — the fifth subgroup flagged ABOVE; C the R-chart range spike —
+> flagged on R only) + the constants-table shape walk + the order-freedom
+> ×50 + the independent JS-oracle ×100; `quality-spc.db.spec` 8 arms over
+> real PG16 (THE CHART READ vs THE PURE MODULE VERBATIM on the pinned
+> dataset A — the DB's own numeric(19,6) canonical strings feeding the
+> independent fold; the DESC-cap law — the newest 20 samples charted, the
+> wild older pair excluded; the trailing partial group excluded and
+> disclosed; the ingestion floors — the unknown spec the 404 shape, the
+> source vocabulary and the unknown batch the typed refusals, the
+> NEGATIVE VALUE LEGAL arm (a temperature can be −5); the batch provenance
+> read; the RLS boundary — the isolated tenant sees no samples and the
+> chart is the 404 shape). #6's score arms CLOSED —
+> `quality-supplier-scores.db.spec` 8 arms (THE PINNED WORLD through the
+> REAL purchasing services: one on-time + one late POSTED delivery (PO →
+> issued → GRN → posted through the REAL engine, G-07's own path) + one
+> FAIL goods-receipt inspection + one SUPPLIER-source NCR → ncrCount 1 ·
+> rejectionCount 1 · total 2 · onTime 1 → **the pinned blend defectLeg 0 ·
+> deliveryLeg 50 · score 20.00**; the idempotent upsert — ONE row per
+> period, the version advances; THE UNMEASURED ZERO — no deliveries →
+> 0.00, evidence never decoration; the calendar-month + kind + not-found
+> floors, all typed; **THE DOCUMENTED 038 FEED CONTRACT (D-13)** — the
+> scorecard recompute's detail carries the quality rows VERBATIM (the
+> consumer READS, never re-computes) + the feed door's own read + the
+> honest empty shape; the RLS boundary; the window law — an outside-month
+> delivery never counts) + the supplier-score pure fold (the pinned
+> 0.60/0.40 blend · the drag cap · monotonicity · convexity bounds ×200 ·
+> the weights pin — 10 property tests) — the specs mapping contract arm
+> stood DELIVERED at W-25 (`quality-specs.db.spec`). #4's SERVICE ARM
+> DELIVERED (the print is W-29's): `coa-gate.ts` BR-104's pure three-shape
+> fold (WITHIN/UNBANDED pass · OUTSIDE fails naming the parameter + BOTH
+> figures · OUTSIDE+accepted-NCR passes as DEVIATION_ACCEPTED with the
+> tolerance verdict kept honest (ABOVE_UCL, never re-judged) · the
+> coverage law: missing/foreign/duplicate each block, named — 11 tests;
+> the fold COMPOSES the tolerance fold, the module's ONLY evaluator,
+> W-25's law) + `quality-coa.db.spec` 9 arms (BR-104's three shapes over
+> the real register incl. the Arabic parameter names in the frozen
+> snapshot; OUTSIDE blocked with the ZERO RESIDUE — the refusal rolls the
+> number reserve back; the deviation floors — an OPEN NCR is not an
+> acceptance, another item's NCR is not this item's; the provenance floors
+> — the foreign batch, the foreign FG-batch inspection, the GRN per-line
+> resolution through the purchasing store's own line read; THE FROZEN
+> SNAPSHOT — a later spec PATCH never moves a stored certificate; the
+> reads + the RLS boundary) + the CoaService (the official
+> COA-{YYYY}-{SEQ:6} numbering, both certificate types one sequence).
+> **THE HONEST CATCH OF THE WAVE (the 0109/0110 precedent, caught RED at
+> the FIRST DB run, before any push of the spec increment):** the step-1
+> store's `spc_measurements` INSERT carried `note_ar` — a column the 0113
+> table does NOT have (the samples are operational rows, a single note
+> column; the bilingual note_ar is the master-data registers' shape) — the
+> first run's 42703 refused the INSERT BY NAME
+> (`db-first-run-RED.log`, 8 failed); the repair removes note_ar from the
+> store row, the service input, and the controller schema, with the dated
+> comment at the store's column block; GREEN 9·139.** ROUTE_PERMISSIONS
+> **1,125 + 9 = 1,134** — the keys-seed-first THIRD binding wave (the SPC
+> chart/measurement reads on quality.spc.view + the ingestion on
+> quality.manage · the supplier reads + the feed door on quality.view +
+> the recompute on quality.manage · the COA generation on
+> quality.coa.generate + reads on quality.view, dated at the block); the
+> error filter's domainStatus rows in the same increment. The battery
+> (this gate increment, every log this session — the environment reset
+> recovered FIRST: the EIGHTH — the fresh clone, pnpm 9.15.9, the
+> workspace install, the persistent-store embedded-PG16 binaries re-linked
+> and the chromium 1200/1248 shells provisioned BEFORE the runs): **THE
+> FIVE ISOLATES STANDALONE FIRST** (soak 1·1 229.30s · fcm 1·8 15.65s ·
+> email 1·5 · the cmms sweep 1·4 · the quality calibration sweep 1·4,
+> every VITEST_EXIT=0) · the affected folders re-run at the delta head
+> (the quality family **9 · 139 GREEN** — the schema 59 + the specs 11 +
+> the NCR 13 + the CAPA 17 + the calibration 10 + the sweep 4 + the SPC 8
+> + the supplier scores 8 + the COA 9 · migrations + identity-flows 2 · 28
+> over the **1,134** routes) · the coverage roster's declared movement
+> (chunk-a 102 → 105 · the roster 289 → 292; 292 = 292, missing NONE,
+> extra NONE, duplicates NONE — VERDICT: COVERED; the full ten-part
+> envelope re-runs at W-32) · the 118-chain scratch from zero TWICE (both
+> runs CHAIN_118_APPLIED → [check-rls] OK — 340 catalog tables →
+> SCRATCH_STOPPED, EXIT=0) · typecheck 8/8 (0 cached — the force re-run) ·
+> lint 8/8 (0 cached) **with the honest catch of this increment — the
+> step-1 `spc-statistics.ts:131` `Math.floor` caught RED by the standing
+> battery (`lint-RED.log`, 7/8, the ADR-0009 rule naming the file/line);
+> the repair is the house bitwise integer-floor pattern with the dated
+> comment (a pure subgroup COUNT, never a rounded measurement; the
+> operands bounded by the DESC-cap law), GREEN re-run 8/8, the affected
+> folders re-run at the final head (the quality family 9·139 · the api
+> unit 75·944)** · depcruise clean **2,147 modules · 16,074
+> dependencies** (+12/+82 dated) · unit 8/8 — **155 · 1,955** (api
+> **75·944** · web 21·171 · mobile 27·393 · desktop 16·274 · ui 3·43 ·
+> contracts 2·56 · domain-core 6·38 · sync-core 5·36 — the ledger
+> arithmetic **1,955 = 944+171+840 EXACT**, the F-2 third term standing)
+> · i18n 6,955 = 6,955 (no delta, as declared — an API-DB wave) + mobile
+> 371 = 371 · tokens 50/50 · drift **347 = 347** (zero delta — no new
+> keys) · manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors +
+> self-test all-probes-OK (probe 7 stands at G-62/PHASE-050 — the 050
+> flip is W-32's) · history-secrets 0 violations · 6,654 allowlisted hits
+> (the W-26 6,624 +30 — the window's shift: the W-27 session commits
+> entering the last-200 sample; the FOUR tag anchors untouched) ·
+> ROUTE_PERMISSIONS **1,134** (the tsx recount) · the registry 315
+> tenant-owned tables · capabilities agree · shells PASS/PASS · boundary
+> PASS.]**
+
 > **[Dated 2026-11-23 (PHASE-050 W-26 — T-07 + T-08 delivered, the CAPA +
 > calibration wave under the owner's standing order — «عند الانتهاء من أي
 > خطوة ادفعها إلى المستودع», every step pushed at its own commit; the
