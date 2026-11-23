@@ -14,7 +14,9 @@
     "pos.receipts",
     "crm.service_orders",
     "sales.invoices",
-    "treasury.cashier_shifts"
+    "treasury.cashier_shifts",
+    "quality",
+    "quality.spc"
   ],
   "default_modules_enabled": [
     "accounting",

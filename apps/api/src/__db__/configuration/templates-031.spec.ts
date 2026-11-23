@@ -111,7 +111,13 @@ const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   // required_feature_keys gains the TWO CMMS FLAGS (the CMMS-plane
   // enablement, D-11/D-16 / 0108 §3; canonical + stored + docs mirror +
   // pins moved together, the 0098 §3 procedure).
-  "industry.healthcare": "sha256:1feda082097b49038bc3d053b444ea9b37368c4293b26f613e29ac5441709bef",
+  // PHASE-050 (W-24, 2026-11-22): re-pinned — the healthcare manifest's
+  // required_feature_keys gains the ONE QMS FLAG (the QMS-plane
+  // enablement, D-04 / 0116 §5c: `quality` the whole-module composable
+  // unit — healthcare composes `quality` alone, the SPC plane's own
+  // `quality.spc` NOT, the phase doc's own division; canonical + stored +
+  // docs mirror + pins moved together, the 0108 §3 procedure).
+  "industry.healthcare": "sha256:391edb9971ea13efd68af15cada39efb08dd797112f18c096d2aa2dee928f84d",
 });
 
 // -- tenant A: the healthcare apply + the claim-capture legs ------------------

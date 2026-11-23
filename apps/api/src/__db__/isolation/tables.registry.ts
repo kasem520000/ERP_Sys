@@ -596,6 +596,34 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   // completion). The auto-generated A-suite extends by +12.
   { table: "maintenance_cost_lines", deleteGranted: true },
   { table: "maintenance_work_order_steps" },
+  // PHASE-050 (CR-20 — QMS, Quality Management System; migrations
+  // 0113–0116; the W-24 foundation wave, 2026-11-22): the quality
+  // cluster — TWELVE tables. Master data (DELETE granted — the typed
+  // service guards own the lifecycles): quality_specifications (the
+  // per-item parameter register), hazard_registers (the tenant-owned
+  // HACCP structure, D-15). Rebuildable derived data (DELETE granted —
+  // the fold recomputes): supplier_quality_scores (the 038 feed
+  // contract's own rows, D-13). The evidence discipline (SELECT/INSERT/
+  // UPDATE only — the audited history): spc_measurements (the chart's
+  // own samples), ncr_records (BR-102's spine + the G-62 stamp),
+  // capa_records (BR-103 + the G-63 stamp), complaints (the NCR link),
+  // calibration_records (the instrument-asset history, D-08),
+  // coa_documents (the frozen certificate snapshot),
+  // batch_quality_holds (the INV-035 audit trail), recall_registry
+  // (the drill's record), quality_management_reviews (the indicator
+  // pack). The auto-generated A-suite extends by +72.
+  { table: "quality_specifications", deleteGranted: true },
+  { table: "spc_measurements" },
+  { table: "ncr_records" },
+  { table: "capa_records" },
+  { table: "complaints" },
+  { table: "calibration_records" },
+  { table: "supplier_quality_scores", deleteGranted: true },
+  { table: "coa_documents" },
+  { table: "batch_quality_holds" },
+  { table: "recall_registry" },
+  { table: "quality_management_reviews" },
+  { table: "hazard_registers", deleteGranted: true },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

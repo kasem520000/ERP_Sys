@@ -221,6 +221,16 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // sweep's configuration is an operational act; the accountant's
   // finance-read plane stays at assets.expiry.view).
   "apps/api/migrations/0111_cmms_sweep_settings.sql",
+  // PHASE-050 (CR-20 — QMS, the W-24 foundation wave, 2026-11-22):
+  // 0116 §5a seeds the TEN quality keys (matrix §3.28; 337 → 347) —
+  // quality.view/manage · quality.ncr.manage · quality.capa.manage ·
+  // quality.calibration.manage · quality.spc.view ·
+  // quality.complaints.manage · quality.coa.generate ·
+  // quality.hold.manage · quality.recall.manage. Role grants: the owner
+  // template holds all ten; the accountant the ONE finance-read key
+  // (quality.view — the G-62/G-63 GL reconciliation's read plane); the
+  // operational keys stay owner-only.
+  "apps/api/migrations/0116_quality_holds_recall.sql",
 ];
 
 export async function main(): Promise<void> {

@@ -28,7 +28,9 @@
     "hr.training",
     "hr.org",
     "assets.maintenance",
-    "assets.transfer"
+    "assets.transfer",
+    "quality",
+    "quality.spc"
   ],
   "default_modules_enabled": [
     "accounting",

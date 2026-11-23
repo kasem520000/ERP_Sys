@@ -326,7 +326,26 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // live constraints equal the all-migrations union — a future
     // partial DROP+ADD goes RED naming the missing member). No tables;
     // the catalog stays 328.
-    expect(files.at(-1)?.tag).toBe("0112_cmms_notifications_category_repair");
+    // PHASE-050 (CR-20 — QMS, the approved master plan's D-01/D-02
+    // honest slots — the phase doc's "0087…0090" are stale blueprint
+    // slots, its own §4 note defers to the journal, the 047 D-03/048
+    // D-02/049 D-01 precedent; delivered 2026-11-22 at W-24, the
+    // foundation wave, under the owner's launch authorization): 0113
+    // the specifications cluster (quality_specifications +
+    // spc_measurements — the no-fabrication floor), 0114 the
+    // NCR/CAPA/complaints cluster (BR-102's disposition gate + the
+    // G-62 SCRAP-only stamp · BR-103's effectiveness floor + the G-63
+    // cost stamp · the complaints NCR link), 0115 the
+    // calibration/supplier/COA cluster (the instrument-asset binding
+    // D-08 · the rolling fold · the frozen COA snapshot), 0116 the
+    // holds/recall/review/hazard cluster + THE DATA-ONLY grants block
+    // (the TEN quality.* keys — matrix §3.28, 337 → 347; the TWO flags
+    // quality · quality.spc on business+enterprise with STARTER AT THE
+    // DECLARED NEUTRAL ZERO; the FOUR quality-carrying templates'
+    // manifest enablements; the ONE CoA marker QUALITY_EXPENSE 5320 —
+    // G-62 rides the EXISTING INVENTORY_SHRINKAGE pair). TWELVE tenant
+    // tables; the catalog 328 → 340.
+    expect(files.at(-1)?.tag).toBe("0116_quality_holds_recall");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

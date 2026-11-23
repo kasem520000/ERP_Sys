@@ -84,8 +84,17 @@ import {
  *  required_feature_keys gains the TWO CMMS FLAGS (the CMMS-plane
  *  enablement, D-11/D-16 / 0108 §3; canonical + stored + docs mirror +
  *  pins moved together, the 0098 §3 procedure).
+ *
+ *  PHASE-050 (W-24, 2026-11-22): re-pinned — the manifest's
+ *  required_feature_keys gains the TWO QMS FLAGS (the QMS-plane
+ *  enablement, D-04 / 0116 §5c: `quality` the whole-module composable
+ *  unit + `quality.spc` the SPC plane's own — food_manufacturing
+ *  composes BOTH; canonical + stored + docs mirror + pins moved
+ *  together, the 0108 §3 procedure). The starter degradation chain
+ *  below gains the two keys (starter carries NEITHER — the declared
+ *  neutral zero).
  */
-const KNOWN_HASH = "sha256:1e4995ddc0f6054454f00ce8cc549e7b647f80c287625afbbaececa8d7248010";
+const KNOWN_HASH = "sha256:a6f8a37ef24aba9549de0ea3aad4045b4c691f0f1d0ae66c626cf55519c3dc23";
 
 /** The 0026 plan-grant manufacturing set (the "manufacturing add-on"). */
 const MANUFACTURING_KEYS: readonly string[] = [
@@ -706,6 +715,12 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
     // granted by 0037 to business + enterprise — starter gets NEITHER
     // flag NOR the substrate: the DECLARED NEUTRAL ZERO, the tier-4
     // posture; the 048 W-8 three-flags extension's exact shape).
+    // PHASE-050 (W-24, 2026-11-22 — the QMS-plane enablement, 0116 §5c):
+    // the backstop now also carries the TWO QMS FLAGS (quality +
+    // quality.spc — the closure substrate items.item_master is in every
+    // plan including starter, so NO closure gap joins them: exactly the
+    // two keys, sorted after purchasing; starter carries NEITHER — the
+    // DECLARED NEUTRAL ZERO again).
     await expect(
       withTenant(starterTenant, () =>
         applyService.apply(starterOwner, {
@@ -742,6 +757,8 @@ describe("templates-018 — food_manufacturing through the PHASE-015 engine", ()
         "manufacturing.work_centers",
         "payroll.employees",
         "purchasing.landed_costs",
+        "quality",
+        "quality.spc",
       ],
       guidance: {
         ar: expect.stringContaining("manufacturing.qc"),

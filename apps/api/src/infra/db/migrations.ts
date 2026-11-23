@@ -606,6 +606,40 @@ export const MIGRATIONS: readonly string[] = [
   // restores the complete SEVENTEEN-member union. The journal 111 → 112;
   // the catalog stays 328 (no tables).
   "0112_cmms_notifications_category_repair",
+  // PHASE-050 (Blueprint v3.0 · CR-20 — QMS, Quality Management System;
+  // the approved master plan's D-01/D-02 honest slots — the journal's
+  // actual 0112 end respected, the 047 D-03/048 D-02/049 D-01 precedent;
+  // delivered 2026-11-22 at W-24, the foundation wave, under the owner's
+  // launch authorization — NEVER production approval): 0113 the
+  // specifications cluster (quality_specifications per item + parameter
+  // with target/UCL/LCL — the no-fabrication floor: an unset tolerance
+  // is UNTOLERATED; spc_measurements the per-parameter samples — D-12:
+  // no parallel parameter source), 0114 the NCR/CAPA/complaints cluster
+  // (ncr_records with BR-102's disposition-gate floor + the G-62
+  // SCRAP-only journal stamp · capa_records with BR-103's effectiveness
+  // floor + the G-63 external-cost stamp · complaints with the NCR link
+  // and the resolution pair), 0115 the calibration/supplier/COA cluster
+  // (calibration_records — the instrument AS an asset, D-08, the due
+  // date the W-26 sweep's anchor · supplier_quality_scores the rolling
+  // fold over the 038 feed contract · coa_documents with the frozen
+  // parameter snapshot), 0116 the holds/recall/review/hazard cluster
+  // (batch_quality_holds with the one-active-per-batch partial unique +
+  // BR-101's release floor · recall_registry the drill's record ·
+  // quality_management_reviews with the indicator pack ·
+  // hazard_registers the HACCP-style tenant-owned structure) + THE
+  // DATA-ONLY GRANTS BLOCK (the 0098/0103/0108 pattern): the TEN
+  // quality.* permission keys (matrix §3.28, 337 → 347), the TWO FEATURE
+  // FLAGS (quality · quality.spc) on business+enterprise with STARTER
+  // AT THE DECLARED NEUTRAL ZERO, the FOUR quality-carrying templates'
+  // manifest enablements (food_manufacturing + electronics additionally
+  // compose quality.spc), and the ONE CoA template marker QUALITY_EXPENSE
+  // (5320 — D-06's own dependency; G-62 rides the EXISTING
+  // INVENTORY_SHRINKAGE + INVENTORY pair, G-63's credit leg the EXISTING
+  // EXTERNAL_ACCRUAL). Twelve tenant tables; the catalog 328 → 340.
+  "0113_quality_specifications",
+  "0114_quality_ncr_capa",
+  "0115_quality_calibration_supplier",
+  "0116_quality_holds_recall",
 ];
 
 /**

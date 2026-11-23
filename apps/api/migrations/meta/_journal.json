@@ -784,6 +784,34 @@
       "when": 1798344000000,
       "tag": "0112_cmms_notifications_category_repair",
       "breakpoints": true
+    },
+    {
+      "idx": 112,
+      "version": "7",
+      "when": 1798430400000,
+      "tag": "0113_quality_specifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 113,
+      "version": "7",
+      "when": 1798516800000,
+      "tag": "0114_quality_ncr_capa",
+      "breakpoints": true
+    },
+    {
+      "idx": 114,
+      "version": "7",
+      "when": 1798603200000,
+      "tag": "0115_quality_calibration_supplier",
+      "breakpoints": true
+    },
+    {
+      "idx": 115,
+      "version": "7",
+      "when": 1798689600000,
+      "tag": "0116_quality_holds_recall",
+      "breakpoints": true
     }
   ],
   "version": "7"

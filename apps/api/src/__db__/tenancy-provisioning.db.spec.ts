@@ -252,9 +252,9 @@ describe("provisionWorkspace (acceptance 2)", () => {
     const first = await withTenant(created.tenantId, async () =>
       onboarding.provision(created.ownerUserId, { fiscalCalendarStartMonth: 4 }),
     );
-    expect(first.accounts.created).toBe(79); // 65 + the four PHASE-042 markers (0065/0066: 5125/5430/5990/5995) + the four PHASE-044 markers (0067 §10: 4895 · 0070 §8: 1290/2135/4990) + the three PHASE-043 tolling markers (0077 §6: 1420/2136/5126) + the three PHASE-049 CMMS markers (0108 §4: 5310 MAINTENANCE_EXPENSE · 2138 LABOR_CLEARING · 2137 EXTERNAL_ACCRUAL)
+    expect(first.accounts.created).toBe(80); // 65 + the four PHASE-042 markers (0065/0066: 5125/5430/5990/5995) + the four PHASE-044 markers (0067 §10: 4895 · 0070 §8: 1290/2135/4990) + the three PHASE-043 tolling markers (0077 §6: 1420/2136/5126) + the three PHASE-049 CMMS markers (0108 §4: 5310 MAINTENANCE_EXPENSE · 2138 LABOR_CLEARING · 2137 EXTERNAL_ACCRUAL) + the one PHASE-050 QMS marker (0116 §11: 5320 QUALITY_EXPENSE — D-06's own dependency; G-62 rides the EXISTING INVENTORY_SHRINKAGE pair and G-63's credit leg the EXISTING EXTERNAL_ACCRUAL, no new markers for either)
     expect(first.accounts.existing).toBe(0);
-    expect(first.purposes.created).toBe(56); // 41 + CONSOLIDATION_ADJUSTMENT (0041) + the four PHASE-042 purposes + the four PHASE-044 purposes (DEPOSIT_FORFEITURE · QUARANTINE_INVENTORY · CONSIGNATION_PAYABLE · TRANSFER_PRICING_ADJUSTMENT) + the three PHASE-043 tolling purposes (0077 §6: TOLLING_MATERIALS · TOLLING_CONVERSION_PAYABLE · TOLLING_YIELD_LOSS) + the three PHASE-049 CMMS purposes (0108 §4: MAINTENANCE_EXPENSE · LABOR_CLEARING · EXTERNAL_ACCRUAL)
+    expect(first.purposes.created).toBe(57); // 41 + CONSOLIDATION_ADJUSTMENT (0041) + the four PHASE-042 purposes + the four PHASE-044 purposes (DEPOSIT_FORFEITURE · QUARANTINE_INVENTORY · CONSIGNATION_PAYABLE · TRANSFER_PRICING_ADJUSTMENT) + the three PHASE-043 tolling purposes (0077 §6: TOLLING_MATERIALS · TOLLING_CONVERSION_PAYABLE · TOLLING_YIELD_LOSS) + the three PHASE-049 CMMS purposes (0108 §4: MAINTENANCE_EXPENSE · LABOR_CLEARING · EXTERNAL_ACCRUAL) + the one PHASE-050 QMS purpose (0116 §11: QUALITY_EXPENSE)
     // owner was cloned at registration → 8 system-role clones here (owner
     // already exists: created 7, existing 1? — the registration clones
     // 'owner'; provision clones the remaining 8 keys incl. owner as skip).
@@ -277,7 +277,7 @@ describe("provisionWorkspace (acceptance 2)", () => {
       [created.tenantId],
     );
     await su.end();
-    expect(accounts.rows).toHaveLength(79); // 42 + 1151 + 2150/5250 (0024/0025) + 1160/5120/5400/5410/5420 (0026; 0027 adds no account row — the 2130 template row is UPDATED in place) + 1220/3210/4910/5910 (0037 fixed assets; the 1210/5300 template rows are UPDATED in place) + 1170/2160/4920/5260 (0038 notes/installments — 1160/2150 were TAKEN by 0026 WIP + 0025 COMMISSION_ACCRUAL; the first draft collided and this counter caught it) + 2170/2180/2190/5270/5280/5295 (0040 payroll — 2160/5260/5250/5290 all TAKEN, hence the 5295 half-step; verified free across the chain) + 3220 (0041 consolidation — the CONSOLIDATION_ADJUSTMENT equity leaf; a PRE-EXISTING 034-tree drift: the restored-lineage migration added the account but this pin stayed 64, and the PHASE-035 evidence run covered only its spec subset — repaired in PHASE-036 as a recorded gate repair) + 5125/5430/5990/5995 (0065/0066 PHASE-042: REWORK_EXPENSE + DOWNTIME_EXPENSE + PURCHASE_PRICE_VARIANCE + STANDARD_REVALUATION — the 0026 additive-marker pattern) + 4895/1290/2135/4990 (0067 §10 + 0070 §8 PHASE-044: DEPOSIT_FORFEITURE + QUARANTINE_INVENTORY + CONSIGNATION_PAYABLE + TRANSFER_PRICING_ADJUSTMENT) + 1420/2136/5126 (0077 §6 PHASE-043: TOLLING_MATERIALS + TOLLING_CONVERSION_PAYABLE + TOLLING_YIELD_LOSS) + 5310/2138/2137 (0108 §4 PHASE-049: MAINTENANCE_EXPENSE + LABOR_CLEARING + EXTERNAL_ACCRUAL — the CMMS G-59/G-61 purposes; 2135/2136 were TAKEN by consignment/tolling, hence the 2137/2138 pair — verified free across the chain)
+    expect(accounts.rows).toHaveLength(80); // 42 + 1151 + 2150/5250 (0024/0025) + 1160/5120/5400/5410/5420 (0026; 0027 adds no account row — the 2130 template row is UPDATED in place) + 1220/3210/4910/5910 (0037 fixed assets; the 1210/5300 template rows are UPDATED in place) + 1170/2160/4920/5260 (0038 notes/installments — 1160/2150 were TAKEN by 0026 WIP + 0025 COMMISSION_ACCRUAL; the first draft collided and this counter caught it) + 2170/2180/2190/5270/5280/5295 (0040 payroll — 2160/5260/5250/5290 all TAKEN, hence the 5295 half-step; verified free across the chain) + 3220 (0041 consolidation — the CONSOLIDATION_ADJUSTMENT equity leaf; a PRE-EXISTING 034-tree drift: the restored-lineage migration added the account but this pin stayed 64, and the PHASE-035 evidence run covered only its spec subset — repaired in PHASE-036 as a recorded gate repair) + 5125/5430/5990/5995 (0065/0066 PHASE-042: REWORK_EXPENSE + DOWNTIME_EXPENSE + PURCHASE_PRICE_VARIANCE + STANDARD_REVALUATION — the 0026 additive-marker pattern) + 4895/1290/2135/4990 (0067 §10 + 0070 §8 PHASE-044: DEPOSIT_FORFEITURE + QUARANTINE_INVENTORY + CONSIGNATION_PAYABLE + TRANSFER_PRICING_ADJUSTMENT) + 1420/2136/5126 (0077 §6 PHASE-043: TOLLING_MATERIALS + TOLLING_CONVERSION_PAYABLE + TOLLING_YIELD_LOSS) + 5310/2138/2137 (0108 §4 PHASE-049: MAINTENANCE_EXPENSE + LABOR_CLEARING + EXTERNAL_ACCRUAL — the CMMS G-59/G-61 purposes; 2135/2136 were TAKEN by consignment/tolling, hence the 2137/2138 pair — verified free across the chain) + 5320 (0116 §11 PHASE-050: QUALITY_EXPENSE — the QMS G-63 purpose; verified free across the chain)
     expect(accounts.rows.find((row) => row.code === "1000")?.name_ar).toBe("الأصول");
     expect(accounts.rows.find((row) => row.code === "1111")?.is_postable).toBe(true);
     expect(accounts.rows.find((row) => row.code === "1000")?.is_postable).toBe(false);
@@ -287,9 +287,9 @@ describe("provisionWorkspace (acceptance 2)", () => {
       onboarding.provision(created.ownerUserId, {}),
     );
     expect(second.accounts.created).toBe(0);
-    expect(second.accounts.existing).toBe(79); // the PHASE-042/043/044/049 markers above — idempotent re-run
+    expect(second.accounts.existing).toBe(80); // the PHASE-042/043/044/049/050 markers above — idempotent re-run
     expect(second.purposes.created).toBe(0);
-    expect(second.purposes.existing).toBe(56);
+    expect(second.purposes.existing).toBe(57);
     expect(second.roles.created).toEqual([]);
 
     // still exactly 64 accounts / 41 active purposes / 9 roles after 0040
@@ -316,7 +316,7 @@ describe("provisionWorkspace (acceptance 2)", () => {
     await after.end();
     // 8 tenant roles: owner (registration) + the 7 business templates —
     // platform_admin is platform staff only, never a tenant role (§2).
-    expect(counts.rows[0]).toEqual({ accounts: 79, purposes: 56, roles: 8 }); // 64/41 + the 0041 consolidation pair + the four PHASE-042 markers (0065/0066) + the four PHASE-044 markers (0067 §10: 4895 · 0070 §8: 1290/2135/4990) + the three PHASE-043 tolling markers (0077 §6: 1420/2136/5126) + the three PHASE-049 CMMS markers (0108 §4: 5310 · 2138 · 2137)
+    expect(counts.rows[0]).toEqual({ accounts: 80, purposes: 57, roles: 8 }); // 64/41 + the 0041 consolidation pair + the four PHASE-042 markers (0065/0066) + the four PHASE-044 markers (0067 §10: 4895 · 0070 §8: 1290/2135/4990) + the three PHASE-043 tolling markers (0077 §6: 1420/2136/5126) + the three PHASE-049 CMMS markers (0108 §4: 5310 · 2138 · 2137) + the one PHASE-050 QMS marker (0116 §11: 5320 QUALITY_EXPENSE)
 
     // numbering + fiscal + jurisdiction settings written (policy rows only)
     const settings = await superuserClient();

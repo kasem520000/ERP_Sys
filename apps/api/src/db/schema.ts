@@ -11091,3 +11091,465 @@ export const maintenanceWorkOrderSteps = pgTable(
     ),
   ],
 );
+
+// ---------------------------------------------------------------------------
+// PHASE-050 quality cluster (migrations 0113–0116; CR-20, the approved
+// master plan's D-02 four slots — QMS: specifications + SPC samples,
+// NCR/CAPA/complaints, calibration/supplier scores/COA, holds/recall/
+// reviews/hazards). Evidence discipline declared per table in the
+// migrations' grants: the histories (NCR/CAPA/complaints/calibration/
+// COA/holds/recalls/reviews/measurements) carry NO DELETE; the master
+// data (specifications, hazard registers) and the rebuildable fold
+// (supplier scores) carry the full S/I/U/D.
+
+/** PHASE-050 (T-01, migration 0113 — Q-05, the no-fabrication law):
+ * per-item quality specifications — one row per (tenant, item,
+ * parameter) with the target value and the UCL/LCL tolerance band; an
+ * unset tolerance end is UNTOLERATED, never a fabricated limit; a
+ * one-sided band is legal; a both-ends band is real (UCL > LCL). They
+ * feed the inspection mapping (W-25), the SPC charts (W-27) and the
+ * COA generation (W-27). Master data (DELETE granted — the typed
+ * service guards own the lifecycle). */
+export const qualitySpecifications = pgTable(
+  "quality_specifications",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    itemId: uuid("item_id").notNull(),
+    parameter: text("parameter").notNull(),
+    parameterAr: text("parameter_ar"),
+    unit: text("unit"),
+    targetValue: numeric("target_value", { precision: 19, scale: 6 }).notNull(),
+    ucl: numeric("ucl", { precision: 19, scale: 6 }),
+    lcl: numeric("lcl", { precision: 19, scale: 6 }),
+    isActive: boolean("is_active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_quality_specifications_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_quality_specifications_tenant_item_parameter").on(
+      table.tenantId,
+      table.itemId,
+      table.parameter,
+    ),
+    index("ix_quality_specifications_tenant_item").on(
+      table.tenantId,
+      table.itemId,
+      table.isActive,
+    ),
+  ],
+);
+
+/** PHASE-050 (T-01, migration 0113 — Q-04, D-12): the per-parameter SPC
+ * samples — the PURE module's X-bar/R, Cp/Cpk and out-of-control flags
+ * (W-27, the unit-first law) draw from these rows; the parameters come
+ * from the specifications (no parallel parameter source). Evidence
+ * discipline: no DELETE (the measurements are the chart's history). */
+export const spcMeasurements = pgTable(
+  "spc_measurements",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    specId: uuid("spec_id").notNull(),
+    value: numeric("value", { precision: 19, scale: 6 }).notNull(),
+    sampledAt: timestamp("sampled_at", { withTimezone: true, mode: "string" }).notNull(),
+    source: text("source").notNull().default("MANUAL"),
+    batchId: uuid("batch_id"),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_spc_measurements_id_tenant").on(table.id, table.tenantId),
+    index("ix_spc_measurements_tenant_spec_sampled").on(
+      table.tenantId,
+      table.specId,
+      table.sampledAt,
+    ),
+    index("ix_spc_measurements_tenant_batch")
+      .on(table.tenantId, table.batchId)
+      .where(sql`${table.batchId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-050 (T-02, migration 0114 — Q-01, BR-102's floor): the
+ * non-conformance register — source INSPECTION/PRODUCTION/COMPLAINT/
+ * SUPPLIER, severity, affected quantity, disposition; no closure
+ * without a disposition (the status/disposition XOR law); the G-62
+ * SCRAP write-off stamp (journal_entry_id) exists only on the SCRAP
+ * disposition path — the posting itself is W-25's through the REAL
+ * engine on the INVENTORY_SHRINKAGE purpose pair (D-05, the 044
+ * valuation-ledger precedent). Evidence discipline: no DELETE. */
+export const ncrRecords = pgTable(
+  "ncr_records",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    ncrNo: text("ncr_no").notNull(),
+    source: text("source").notNull(),
+    severity: text("severity").notNull().default("MEDIUM"),
+    itemId: uuid("item_id").notNull(),
+    batchId: uuid("batch_id"),
+    inspectionId: uuid("inspection_id"),
+    partnerId: uuid("partner_id"),
+    problem: text("problem").notNull(),
+    problemAr: text("problem_ar"),
+    affectedQty: numeric("affected_qty", { precision: 19, scale: 6 }).notNull(),
+    status: text("status").notNull().default("OPEN"),
+    disposition: text("disposition"),
+    dispositionAt: timestamp("disposition_at", { withTimezone: true, mode: "string" }),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    journalEntryId: uuid("journal_entry_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_ncr_records_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_ncr_records_tenant_no").on(table.tenantId, table.ncrNo),
+    index("ix_ncr_records_tenant_status").on(table.tenantId, table.status),
+    index("ix_ncr_records_tenant_item").on(table.tenantId, table.itemId),
+    index("ix_ncr_records_tenant_batch")
+      .on(table.tenantId, table.batchId)
+      .where(sql`${table.batchId} IS NOT NULL`),
+    index("ix_ncr_records_tenant_partner")
+      .on(table.tenantId, table.partnerId)
+      .where(sql`${table.partnerId} IS NOT NULL`),
+    index("ix_ncr_records_tenant_source").on(table.tenantId, table.source),
+  ],
+);
+
+/** PHASE-050 (T-02, migration 0114 — Q-02, BR-103's floor): the CAPA
+ * register — root cause, the actions array with owners and dates, and
+ * the effectiveness record required before closure (the due-date half
+ * of the gate is the W-26 service's typed refusal); the external
+ * service cost carries the G-63 stamp (only with a cost — DR
+ * QUALITY_EXPENSE · CR EXTERNAL_ACCRUAL, D-06). Evidence discipline:
+ * no DELETE. */
+export const capaRecords = pgTable(
+  "capa_records",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    capaNo: text("capa_no").notNull(),
+    ncrId: uuid("ncr_id"),
+    title: text("title").notNull(),
+    ownerEmployeeId: uuid("owner_employee_id"),
+    rootCause: text("root_cause"),
+    rootCauseAt: timestamp("root_cause_at", { withTimezone: true, mode: "string" }),
+    actions: jsonb("actions").notNull().default([]),
+    dueDate: date("due_date"),
+    status: text("status").notNull().default("OPEN"),
+    effectiveness: jsonb("effectiveness"),
+    externalCost: numeric("external_cost", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    journalEntryId: uuid("journal_entry_id"),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_capa_records_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_capa_records_tenant_no").on(table.tenantId, table.capaNo),
+    index("ix_capa_records_tenant_status").on(table.tenantId, table.status),
+    index("ix_capa_records_tenant_ncr")
+      .on(table.tenantId, table.ncrId)
+      .where(sql`${table.ncrId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-050 (T-02, migration 0114 — Q-08): the customer-complaint
+ * intake — channel, severity, item/batch reference, the NCR link, and
+ * the resolution pair stamped together on the resolved paths. Evidence
+ * discipline: no DELETE. */
+export const complaints = pgTable(
+  "complaints",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    complaintNo: text("complaint_no").notNull(),
+    channel: text("channel").notNull(),
+    severity: text("severity").notNull().default("MEDIUM"),
+    customerId: uuid("customer_id").notNull(),
+    itemId: uuid("item_id"),
+    batchId: uuid("batch_id"),
+    ncrId: uuid("ncr_id"),
+    subject: text("subject").notNull(),
+    details: text("details"),
+    detailsAr: text("details_ar"),
+    status: text("status").notNull().default("NEW"),
+    resolution: text("resolution"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_complaints_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_complaints_tenant_no").on(table.tenantId, table.complaintNo),
+    index("ix_complaints_tenant_status").on(table.tenantId, table.status),
+    index("ix_complaints_tenant_customer").on(table.tenantId, table.customerId),
+    index("ix_complaints_tenant_ncr")
+      .on(table.tenantId, table.ncrId)
+      .where(sql`${table.ncrId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-050 (T-03, migration 0115 — Q-03, the 049 handoff verbatim):
+ * calibration records — the instrument IS an asset (the composite FK
+ * binds the asset card and the service-history timeline); the due date
+ * is the quality-calibration-due sweep's own anchor (W-26); the
+ * external cost carries the G-63 stamp. Evidence discipline: no
+ * DELETE (the calibration history is the instrument's own record). */
+export const calibrationRecords = pgTable(
+  "calibration_records",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    calibrationNo: text("calibration_no").notNull(),
+    assetId: uuid("asset_id").notNull(),
+    standardUsed: text("standard_used").notNull(),
+    result: text("result").notNull(),
+    calibratedAt: timestamp("calibrated_at", { withTimezone: true, mode: "string" }).notNull(),
+    dueDate: date("due_date").notNull(),
+    providerId: uuid("provider_id"),
+    certificateRef: text("certificate_ref"),
+    externalCost: numeric("external_cost", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    journalEntryId: uuid("journal_entry_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_calibration_records_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_calibration_records_tenant_no").on(table.tenantId, table.calibrationNo),
+    index("ix_calibration_records_tenant_asset").on(
+      table.tenantId,
+      table.assetId,
+      table.calibratedAt,
+    ),
+    index("ix_calibration_records_tenant_due").on(table.tenantId, table.dueDate),
+  ],
+);
+
+/** PHASE-050 (T-03, migration 0115 — Q-06, D-13): the supplier quality
+ * rolling fold — one row per (tenant, supplier, period start) built
+ * from NCRs (SUPPLIER source), rejections and delivery performance;
+ * the 038 scorecards READ these rows through the documented feed
+ * contract, never re-compute. Rebuildable derived data (full grants). */
+export const supplierQualityScores = pgTable(
+  "supplier_quality_scores",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    partnerId: uuid("partner_id").notNull(),
+    periodStart: date("period_start").notNull(),
+    ncrCount: integer("ncr_count").notNull().default(0),
+    rejectionCount: integer("rejection_count").notNull().default(0),
+    onTimeDeliveries: integer("on_time_deliveries").notNull().default(0),
+    totalDeliveries: integer("total_deliveries").notNull().default(0),
+    score: numeric("score", { precision: 5, scale: 2 }).notNull(),
+    computedAt: timestamp("computed_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_supplier_quality_scores_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_supplier_quality_scores_tenant_partner_period").on(
+      table.tenantId,
+      table.partnerId,
+      table.periodStart,
+    ),
+    index("ix_supplier_quality_scores_tenant_period").on(table.tenantId, table.periodStart),
+    index("ix_supplier_quality_scores_tenant_partner").on(table.tenantId, table.partnerId),
+  ],
+);
+
+/** PHASE-050 (T-03, migration 0115 — Q-07, BR-104): the generated
+ * certificate of analysis (COA) or conformity (COC) — the frozen
+ * parameter snapshot array (the gate at generation: every parameter
+ * within tolerance or carrying an accepted-deviation NCR reference);
+ * the bilingual print (W-29) reads this array VERBATIM — never
+ * recomputed. Evidence discipline: no DELETE. */
+export const coaDocuments = pgTable(
+  "coa_documents",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    docNo: text("doc_no").notNull(),
+    docType: text("doc_type").notNull(),
+    itemId: uuid("item_id").notNull(),
+    batchId: uuid("batch_id"),
+    inspectionId: uuid("inspection_id"),
+    parameters: jsonb("parameters").notNull(),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" }).notNull(),
+    issuedBy: uuid("issued_by"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_coa_documents_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_coa_documents_tenant_no").on(table.tenantId, table.docNo),
+    index("ix_coa_documents_tenant_item").on(table.tenantId, table.itemId, table.issuedAt),
+    index("ix_coa_documents_tenant_batch")
+      .on(table.tenantId, table.batchId)
+      .where(sql`${table.batchId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-050 (T-04, migration 0116 — Q-09, INV-035/BR-101): the batch
+ * quality holds — one ACTIVE hold per batch (the partial unique); the
+ * shared blocking validation service (W-28) is the ONLY gate reading it
+ * on every issue/ship path, server-side only; release requires the
+ * disposition-linked record (the NCR link + the note). Evidence
+ * discipline: no DELETE (the hold history is the INV-035 audit
+ * trail). */
+export const batchQualityHolds = pgTable(
+  "batch_quality_holds",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    batchId: uuid("batch_id").notNull(),
+    reason: text("reason").notNull(),
+    ncrId: uuid("ncr_id"),
+    status: text("status").notNull().default("ACTIVE"),
+    heldAt: timestamp("held_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    releasedAt: timestamp("released_at", { withTimezone: true, mode: "string" }),
+    releaseNote: text("release_note"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_batch_quality_holds_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_batch_quality_holds_tenant_batch_active")
+      .on(table.tenantId, table.batchId)
+      .where(sql`${table.status} = 'ACTIVE'`),
+    index("ix_batch_quality_holds_tenant_batch").on(
+      table.tenantId,
+      table.batchId,
+      table.status,
+    ),
+  ],
+);
+
+/** PHASE-050 (T-04, migration 0116 — Q-09/Q-12, D-14): the recall
+ * drill's RECORD (distinct from the drill's live query on the
+ * batch/serial ledger) — the initiated/executed/closed ladder with the
+ * frozen scope + affected-customers snapshots at execution. Evidence
+ * discipline: no DELETE. */
+export const recallRegistry = pgTable(
+  "recall_registry",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    recallNo: text("recall_no").notNull(),
+    batchId: uuid("batch_id").notNull(),
+    reason: text("reason").notNull(),
+    status: text("status").notNull().default("INITIATED"),
+    initiatedAt: timestamp("initiated_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    executedAt: timestamp("executed_at", { withTimezone: true, mode: "string" }),
+    closedAt: timestamp("closed_at", { withTimezone: true, mode: "string" }),
+    scope: jsonb("scope"),
+    affectedCustomers: jsonb("affected_customers"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_recall_registry_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_recall_registry_tenant_no").on(table.tenantId, table.recallNo),
+    index("ix_recall_registry_tenant_status").on(table.tenantId, table.status),
+    index("ix_recall_registry_tenant_batch").on(table.tenantId, table.batchId),
+  ],
+);
+
+/** PHASE-050 (T-04, migration 0116 — Q-10, D-15): the quality
+ * management review record — the meeting with the indicator pack (the
+ * engines' own reads frozen at the meeting, zero recomputation) and
+ * the decisions. Evidence discipline: no DELETE. */
+export const qualityManagementReviews = pgTable(
+  "quality_management_reviews",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    reviewNo: text("review_no").notNull(),
+    title: text("title").notNull(),
+    heldAt: timestamp("held_at", { withTimezone: true, mode: "string" }).notNull(),
+    attendees: jsonb("attendees").notNull().default([]),
+    indicatorPack: jsonb("indicator_pack").notNull(),
+    decisions: jsonb("decisions").notNull().default([]),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_quality_management_reviews_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_quality_management_reviews_tenant_no").on(
+      table.tenantId,
+      table.reviewNo,
+    ),
+    index("ix_quality_management_reviews_tenant_held").on(table.tenantId, table.heldAt),
+  ],
+);
+
+/** PHASE-050 (T-04, migration 0116 — Q-11, D-15): the HACCP-style
+ * hazard register — hazards/CCPs/critical limits/monitoring per
+ * process step or item; the food-manufacturing template composes the
+ * surface and the tenant owns the critical-limits structure (never
+ * hardcoded checklists). Master data (DELETE granted — the tenant's
+ * own structure). */
+export const hazardRegisters = pgTable(
+  "hazard_registers",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    name: text("name").notNull(),
+    nameAr: text("name_ar"),
+    hazard: text("hazard").notNull(),
+    hazardAr: text("hazard_ar"),
+    category: text("category").notNull(),
+    processStep: text("process_step"),
+    itemId: uuid("item_id"),
+    isCcp: boolean("is_ccp").notNull().default(false),
+    criticalLimit: text("critical_limit"),
+    criticalLimitAr: text("critical_limit_ar"),
+    monitoringProcedure: text("monitoring_procedure"),
+    correctiveAction: text("corrective_action"),
+    isActive: boolean("is_active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_hazard_registers_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_hazard_registers_tenant_name").on(table.tenantId, table.name),
+    index("ix_hazard_registers_tenant_item")
+      .on(table.tenantId, table.itemId)
+      .where(sql`${table.itemId} IS NOT NULL`),
+    index("ix_hazard_registers_tenant_active").on(table.tenantId, table.isActive),
+  ],
+);

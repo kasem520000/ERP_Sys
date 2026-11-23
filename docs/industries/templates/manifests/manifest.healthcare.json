@@ -20,7 +20,8 @@
     "hr.training",
     "hr.org",
     "assets.maintenance",
-    "assets.transfer"
+    "assets.transfer",
+    "quality"
   ],
   "default_modules_enabled": [
     "accounting",

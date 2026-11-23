@@ -207,7 +207,11 @@ describe("seeds (acceptance 9)", () => {
     // (assets.expiry.manage — the sweep's threshold settings surface over
     // the first 049 settings keys; matrix §3.27's W-19 dated note; the
     // drift CLI agrees: matrix 337 = seed 337).
-    expect(result.rows[0]?.n).toBe(337);
+    // + 10 = 347 after 0116 — the TEN PHASE-050 QMS quality keys (matrix
+    // §3.28, the W-24 foundation wave 2026-11-22 — quality.view/manage ·
+    // ncr/capa/calibration/spc/complaints/coa/hold/recall; the drift CLI
+    // agrees: matrix 347 = seed 347).
+    expect(result.rows[0]?.n).toBe(347);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

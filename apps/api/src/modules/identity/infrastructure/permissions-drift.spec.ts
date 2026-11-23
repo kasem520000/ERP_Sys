@@ -77,6 +77,11 @@ const SEED_PATHS = [
   // still read the 336-era union — the RED log kept,
   // unit-api-first-RED.log).
   join(process.cwd(), "migrations", "0111_cmms_sweep_settings.sql"), // PHASE-049 the sweep threshold key (336 → 337)
+  // PHASE-050 (CR-20 — QMS, W-24, 2026-11-22): 0116 §5a seeds the TEN
+  // quality keys and joins both lists together (matrix §3.28,
+  // 337 → 347) — the same lesson carried forward (the spec's copy
+  // extends in the SAME change).
+  join(process.cwd(), "migrations", "0116_quality_holds_recall.sql"), // PHASE-050 the ten quality keys (337 → 347)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

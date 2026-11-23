@@ -1417,6 +1417,15 @@ export const FOOD_MANUFACTURING_TEMPLATE_MANIFEST: IndustryTemplateManifest = de
     // carries NEITHER flag — the declared neutral zero).
     "assets.maintenance",
     "assets.transfer",
+    // PHASE-050 (W-24 — D-04, the QMS-plane enablement, CR-36f,
+    // 2026-11-22): the TWO FEATURE FLAGS ride the quality-carrying
+    // templates by default (0116 §5c — the stored registry's guarded
+    // append; `quality` the WHOLE-MODULE composable unit + `quality.spc`
+    // the SPC plane's own; the ten PERMISSION keys ride ROLES,
+    // matrix §3.28; starter carries NEITHER flag — the declared
+    // neutral zero).
+    "quality",
+    "quality.spc",
   ],
   default_modules_enabled: [
     "accounting",
@@ -2232,6 +2241,14 @@ export const AGRICULTURE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreez
     "sales.invoices",
     "accounting.projects",
     "accounting.cost_centers",
+    // PHASE-050 (W-24 — D-04, the QMS-plane enablement, CR-36f,
+    // 2026-11-22): `quality` (the WHOLE-MODULE composable unit) rides
+    // the quality-carrying templates by default (0116 §5c — the stored
+    // registry's guarded append; this template composes the SPC plane's
+    // own `quality.spc` NOT — the phase doc's own division; the ten
+    // PERMISSION keys ride ROLES, matrix §3.28; starter carries NEITHER
+    // flag — the declared neutral zero).
+    "quality",
   ],
   default_modules_enabled: [
     "accounting",
@@ -2851,6 +2868,15 @@ export const ELECTRONICS_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreez
     "crm.service_orders",
     "sales.invoices",
     "treasury.cashier_shifts",
+    // PHASE-050 (W-24 — D-04, the QMS-plane enablement, CR-36f,
+    // 2026-11-22): the TWO FEATURE FLAGS ride the quality-carrying
+    // templates by default (0116 §5c — the stored registry's guarded
+    // append; `quality` the WHOLE-MODULE composable unit + `quality.spc`
+    // the SPC plane's own; the ten PERMISSION keys ride ROLES,
+    // matrix §3.28; starter carries NEITHER flag — the declared
+    // neutral zero).
+    "quality",
+    "quality.spc",
   ],
   default_modules_enabled: [
     "accounting",
@@ -3174,6 +3200,14 @@ export const HEALTHCARE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze
     // carries NEITHER flag — the declared neutral zero).
     "assets.maintenance",
     "assets.transfer",
+    // PHASE-050 (W-24 — D-04, the QMS-plane enablement, CR-36f,
+    // 2026-11-22): `quality` (the WHOLE-MODULE composable unit) rides
+    // the quality-carrying templates by default (0116 §5c — the stored
+    // registry's guarded append; this template composes the SPC plane's
+    // own `quality.spc` NOT — the phase doc's own division; the ten
+    // PERMISSION keys ride ROLES, matrix §3.28; starter carries NEITHER
+    // flag — the declared neutral zero).
+    "quality",
   ],
   default_modules_enabled: [
     "accounting",

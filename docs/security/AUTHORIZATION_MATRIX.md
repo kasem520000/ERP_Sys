@@ -980,6 +980,67 @@ permission plane — no new key.
 > The three G-59/G-61 CoA template markers (MAINTENANCE_EXPENSE 5310 · LABOR_CLEARING
 > 2138 · EXTERNAL_ACCRUAL 2137) are account-template rows, never permission keys.
 
+### §3.28 QMS — quality management (PHASE-050; catalog 337 → 347 at W-24)
+
+The QMS cluster (CR-20, the approved master plan's D-03 — NCR/CAPA, specifications,
+calibration, SPC, supplier scores, COA, complaints, holds/recall, reviews, hazard
+registers). **The ten keys seed in migration `0116` §5a (the W-24 foundation wave,
+2026-11-22 — the permission catalog extends 337 → 347; seed = mirror, zero drift).**
+The entitlement/authorization divergence (the §3.25/§3.26/§3.27 precedent, deliberate):
+the TWO FEATURE FLAGS — `quality` (the whole-module composable unit, the plan's D-04
+binding shape) · `quality.spc` (the SPC plane's own unit) — are the ENTITLEMENT keys:
+business + enterprise carry them (0116 §5b) and the FOUR quality-carrying industry
+templates (food_manufacturing · agriculture · healthcare · electronics) compose
+`quality` by default, with food_manufacturing + electronics additionally composing
+`quality.spc` (0116 §5c). **STARTER GETS NEITHER FLAG — the declared neutral zero (the
+tier-4 posture verbatim: the QMS plane is not a starter feature; zero starter keys
+move).** The ten keys below are the AUTHORIZATION surface and ride ROLES (0116 §5a) —
+never the plans. **NOT ledger-free**: `quality.ncr.manage` gates the G-62 scrap
+write-off act (the SCRAP disposition posts the inventory write-off through the engine on
+the INVENTORY_SHRINKAGE pair — INV-013 single-use) and `quality.capa.manage` +
+`quality.calibration.manage` gate the G-63 external-cost postings (DR QUALITY_EXPENSE ·
+CR EXTERNAL_ACCRUAL); `quality.hold.manage` is the INV-035 blocking gate's operational
+surface (the shared validation service is the only gate — D-07). The ONE 050 CoA
+template marker (QUALITY_EXPENSE 5320) is an account-template row, never a permission
+key.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `quality.view` | View the quality plane: specifications, NCR/CAPA registers, calibration, complaints, COA (the finance-read plane) / عرض مستوى الجودة: المواصفات وسجلات عدم المطابقة والمعايرة والشكاوى والشهادات | owner, accountant | tenant | no (read-only over the quality plane; the G-62/G-63 GL reconciliation reads these registers) |
+| `quality.manage` | Manage the quality plane's operational configuration (specifications authoring and the module's settings) / إدارة التشغيل لمستوى الجودة: تأليف المواصفات وإعدادات الوحدة | owner | tenant | no (a configuration act, never a ledger write — the specifications feed the BR-104 gate read-only) |
+| `quality.ncr.manage` | Manage NCR records, drive the disposition/closure lifecycle (BR-102) and fire the G-62 scrap write-off / إدارة سجلات عدم المطابقة وقرارات التصرف والإغلاق وتشغيل شطب الإتلاف G-62 | owner | tenant | **yes** (the SCRAP disposition posts the inventory write-off (G-62) through the engine — DR INVENTORY_SHRINKAGE · CR the per-warehouse INVENTORY at the affected quantity's own value, exactly once, fail-closed until mapped; the SoD surface over the posting) |
+| `quality.capa.manage` | Manage CAPA records: root cause, actions, the effectiveness gate (BR-103) and the G-63 external cost / إدارة سجلات CAPA: الجذر والإجراءات وبوابة الفعالية والتكلفة الخارجية G-63 | owner | tenant | **yes** (the external service cost posts the quality expense (G-63) — DR QUALITY_EXPENSE · CR EXTERNAL_ACCRUAL exactly once; BR-103's closure gate refuses with the open action/due-date figures) |
+| `quality.calibration.manage` | Manage calibration records for instrument assets and the due-date sweep's configuration / إدارة سجلات معايرة أجهزة الأصول وإعدادات كنس تواريخ الاستحقاق | owner | tenant | **yes** (the external calibration cost posts the G-63 leg; the due-date sweep (W-26) drives the 30/7/0 alerts bound to instrument ASSETS — the 049 handoff) |
+| `quality.spc.view` | View the SPC charts (X-bar/R, Cp/Cpk, out-of-control flags — the quality.spc feature plane) / عرض خرائط الضبط الإحصائي ومؤشراتها | owner | tenant | no (read-only over the SPC plane — the pure module's own outputs) |
+| `quality.complaints.manage` | Manage the customer-complaint intake, triage and the NCR link / إدارة استقبال الشكاوى وفرزها وربطها بسجلات عدم المطابقة | owner | tenant | no (an intake/triage act — the NCR link routes to quality.ncr.manage's own gates) |
+| `quality.coa.generate` | Generate certificates of analysis/conformity (BR-104's tolerance gate at generation) / توليد شهادات التحليل أو المطابقة عبر بوابة التحمل | owner | tenant | **yes** (the certificate is a regulatory document: generation is blocked unless every parameter is within tolerance or carries an accepted-deviation NCR reference — BR-104's typed refusal naming the parameter and both figures; the frozen snapshot is immutable once issued) |
+| `quality.hold.manage` | Place and release batch quality holds (INV-035/BR-101 — release requires the disposition-linked record) / وضع حجز الدفعات ورفعه بموجب سجل التصرف المرتبط | owner | tenant | **yes** (the hold BLOCKS every issue/ship path server-side (INV-035); release requires the disposition-linked record (BR-101) — the blocking matrix is the W-28 invariant test's own surface) |
+| `quality.recall.manage` | Manage the recall registry and execute the traceability drill (batch → where-used → customers) / إدارة سجل الاستدعاء وتنفيذ تمرين التتبع | owner | tenant | **yes** (the drill reads the batch/serial ledger live and freezes the scope + affected customers into the record — the OA-06 budget is the acceptance criterion; a recall is a high-consequence act) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — the keys-seed-first discipline, the §3.23–§3.27
+precedent): the `/api/v1/quality/*` families land with the W-25…W-28 service waves, each
+route on the exact keys above, and the web plane (W-29) on the same keys; the reports
+(W-30) ride the module's own read keys per the §12 module-register reuse convention. Role
+grants per 0116 §5a: the owner template holds all ten; the accountant the ONE
+finance-read key (quality.view — the G-62/G-63 GL reconciliation's read plane; the
+operational keys stay owner-only — quality operations are tenant-granted beyond the
+baseline). The alert surfaces ride the notifications' own permission plane — no new key.
+
+> **[Dated 2026-11-22 (PHASE-050 W-24 — T-01…T-04, the foundation wave): the ten
+> keys seeded; ROUTE_PERMISSIONS stays 1,102 = 1,102.]** Migration 0116 §5a seeds the
+> catalog 337 → 347 with ZERO route rows added — the keys land first and the
+> `/api/v1/quality/*` families bind them as the W-25…W-28 service waves ship (the
+> §3.23–§3.27 keys-seed-first precedent; every future route-row addition carries its
+> own dated note here, the 1,102 ledger discipline — W-19's nine-row block remains the
+> last route delta). The TWO FEATURE FLAGS (`quality` · `quality.spc`) grant to
+> business + enterprise (0116 §5b — starter at the DECLARED NEUTRAL ZERO) and the four
+> quality-carrying templates compose them by default (0116 §5c — food_manufacturing +
+> electronics carry both; agriculture + healthcare carry `quality` alone) — the
+> entitlement/authorization divergence above, the §3.26/§3.27 precedent. The ONE CoA
+> template marker (QUALITY_EXPENSE 5320) is an account-template row, never a
+> permission key; G-62 rides the EXISTING INVENTORY_SHRINKAGE pair and G-63's credit
+> leg the EXISTING EXTERNAL_ACCRUAL — no new markers for either.
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

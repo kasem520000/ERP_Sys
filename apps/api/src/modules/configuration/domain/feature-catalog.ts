@@ -338,6 +338,21 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   // engine are platform baseline.
   "assets.maintenance": ["fixed_assets.register"],
   "assets.transfer": ["fixed_assets.register"],
+  // PHASE-050 (CR-20 — QMS, Quality Management System, the W-24
+  // foundation wave, 2026-11-22): the TWO FEATURE FLAGS ride the
+  // EXISTING delivered baseline (the approved master plan's D-04 — the
+  // binding shape: `quality` the WHOLE-MODULE composable unit +
+  // `quality.spc` the SPC plane's own unit; the ten permission keys are
+  // the separate authorization surface, matrix §3.28). The quality
+  // plane stands on the item master (the specifications are per item —
+  // D-02's own substrate law; the NCR/CAPA/complaint/calibration/
+  // recall surfaces reference items, batches, partners, assets and
+  // inspections through documented contracts, never parallel sources);
+  // the SPC plane stands on the quality module itself (D-12: the
+  // measurements draw from the specifications' parameters — no
+  // parallel parameter source).
+  "quality": ["items.item_master"],
+  "quality.spc": ["quality"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

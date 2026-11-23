@@ -93,10 +93,18 @@ import {
  *  required_feature_keys gains the eight WMS keys (the distribution-bearing
  *  manifest enablement, CR-36 (f)); the migration seed, the docs mirror,
  *  and the contracts verbatim copy moved together (the 039 re-pin
- *  procedure). */
+ *  procedure).
+ *
+ *  PHASE-050 (W-24, 2026-11-22): the electronics pin re-pinned — the
+ *  manifest's required_feature_keys gains the TWO QMS FLAGS (the
+ *  QMS-plane enablement, D-04 / 0116 §5c: `quality` the whole-module
+ *  composable unit + `quality.spc` the SPC plane's own — electronics
+ *  composes BOTH; canonical + stored + docs mirror + pins moved together,
+ *  the 0108 §3 procedure). The wholesale manifest is untouched (wholesale
+ *  is not a quality-carrying template). */
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   "industry.wholesale": "sha256:013c35ad9626cb58e1acb4d9115eebae47880badd36f10e4da82d0abfaa28f1f",
-  "industry.electronics": "sha256:216f1e981ae4c457173c18ead7c1263780f8082c6d18807fb9308a507e6f51a9",
+  "industry.electronics": "sha256:67aff4f368e04bda2650596fc3f4105d0bae43e2edf61535a0ebffa34d1637f0",
 });
 
 // -- tenant A: wholesale apply ------------------------------------------------

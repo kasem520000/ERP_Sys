@@ -397,6 +397,11 @@ describe("capability classification (industries/README §4)", () => {
     // alone, so its missing keys join the chain like any hard block).
     // None of the blocked keys is phase-gated, so starter is a hard block
     // with bilingual guidance naming the exact keys.
+    // PHASE-050 (W-24, 2026-11-22): the chain gains `quality` (the
+    // whole-module flag joins agriculture's required_feature_keys —
+    // 0116 §5c; the closure substrate items.item_master is in starter,
+    // so exactly ONE key joins; the SPC plane's own `quality.spc` NOT —
+    // agriculture composes `quality` alone).
     expect(check.missingChain).toEqual([
       "accounting.cost_centers",
       "accounting.projects",
@@ -405,6 +410,7 @@ describe("capability classification (industries/README §4)", () => {
       "manufacturing.batch_genealogy",
       "manufacturing.bom",
       "manufacturing.production_orders",
+      "quality",
     ]);
     expect(stateOf(check, "harvest_batches")).toMatchObject({
       status: "blocked",

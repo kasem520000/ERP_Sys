@@ -37,15 +37,27 @@ export const INDUSTRY_SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
  * PHASE-048 projects & contracting module's composable flags: WBS,
  * contracting, and field service, matrix §3.26's entitlement plane +
  * `assets` — the PHASE-049 CMMS module's composable flags: maintenance
- * and transfer, matrix §3.27's entitlement plane).
+ * and transfer, matrix §3.27's entitlement plane + `quality` — the
+ * PHASE-050 QMS module's composable flags, matrix §3.28's entitlement
+ * plane).
+ *
+ * PHASE-050 (W-24, 2026-11-22) — THE WHOLE-MODULE FLAG, a declared
+ * interpretation: the approved master plan's D-04 binding shape gives
+ * the QMS module a WHOLE-MODULE composable unit — the bare `quality`
+ * key — beside the SPC plane's own `quality.spc`. The pattern below is
+ * extended MINIMALLY: every cataloged module keeps the standing
+ * `module.feature` shape, and exactly ONE additional string matches —
+ * `quality` alone (the whole-module flag). No other bare module key is
+ * grantable (the alternation admits `quality` only as a two-segment
+ * prefix, the dated amendment below carries the one-key exception).
  */
 const FEATURE_KEY_MODULE_SEGMENT =
   "platform|accounting|partners|items|inventory|sales|purchasing|treasury|tax|reporting|" +
   "crm|manufacturing|distribution|pos|offline|industry|fixed_assets|notes|installments|" +
-  "budgeting|payroll|consolidation|hr|projects|assets";
+  "budgeting|payroll|consolidation|hr|projects|assets|quality";
 
 export const INDUSTRY_FEATURE_KEY_PATTERN = new RegExp(
-  `^(${FEATURE_KEY_MODULE_SEGMENT})\\.[a-z0-9_]+$`,
+  `^((${FEATURE_KEY_MODULE_SEGMENT})\\.[a-z0-9_]+|quality)$`,
 );
 
 /** §3 $defs.moduleName — runtime modules per MODULE_BOUNDARIES. */

@@ -321,6 +321,23 @@ const BUSINESS_KEYS: readonly string[] = [
   // entitlement/authorization divergence note.)
   "fixed_assets.register",
   "assets.maintenance", "assets.transfer",
+  // PHASE-050 (W-24, 2026-11-22) transcription of the 0116 §5b plan
+  // grants (the TWO FEATURE FLAGS → business + enterprise, the tier-4
+  // precedent; STARTER GETS NEITHER — the declared neutral zero: the
+  // QMS plane is not a starter feature): quality (the WHOLE-MODULE
+  // composable unit — the approved master plan's D-04 binding shape,
+  // the declared interpretation in the manifest schema) · quality.spc
+  // (the SPC plane's own unit). The four quality-carrying templates'
+  // (0116 §5c: food_manufacturing + electronics carrying BOTH ·
+  // agriculture + healthcare carrying `quality` alone) REQUIRED chains
+  // resolve through exactly these grants — the quality manifest
+  // enablement. The dependency substrate (items.item_master granted by
+  // 0008 to every plan including starter — transcribed at the top of
+  // this list) needs no new rows: the quality keys' BR-040 closures
+  // resolve through it. (The ten PERMISSION keys ride ROLES per 0116
+  // §5a, never the plans — matrix §3.28's entitlement/authorization
+  // divergence note.)
+  "quality", "quality.spc",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

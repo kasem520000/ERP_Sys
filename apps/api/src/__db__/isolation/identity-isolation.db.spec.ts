@@ -3659,6 +3659,143 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-050 (CR-20 — QMS, migrations 0113–0116; the W-24 foundation
+  // wave, 2026-11-22): the quality cluster's OWN rows per tenant — the fd
+  // family continues the fc sequence. FK-chained to the standing fixtures:
+  // items babababa · item_batches f2f2f2f2 · partners b5b5b5b5 · assets
+  // fa1a1a1a (the NCR rides the PRODUCTION source — no inspection fixture
+  // needed; the CAPA stands alone with ncr_id NULL).
+  await superuser.query(
+    `INSERT INTO quality_specifications (id, tenant_id, item_id, parameter, target_value, ucl, lcl)
+     VALUES
+       ('fd0d0d0d-0000-4000-8000-000000000001', $1, 'babababa-0000-4000-8000-000000000001',
+        'Viscosity', 100, 110, 90),
+       ('fd0d0d0d-0000-4000-8000-000000000002', $2, 'babababa-0000-4000-8000-000000000002',
+        'Viscosity', 100, 110, 90)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO spc_measurements (id, tenant_id, spec_id, value, sampled_at, source, batch_id)
+     VALUES
+       ('fd1d1d1d-0000-4000-8000-000000000001', $1, 'fd0d0d0d-0000-4000-8000-000000000001',
+        100, '2026-02-10T09:00:00Z', 'PRODUCTION', 'f2f2f2f2-0000-4000-8000-000000000001'),
+       ('fd1d1d1d-0000-4000-8000-000000000002', $2, 'fd0d0d0d-0000-4000-8000-000000000002',
+        100, '2026-02-10T09:00:00Z', 'PRODUCTION', 'f2f2f2f2-0000-4000-8000-000000000002')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO ncr_records (id, tenant_id, ncr_no, source, item_id, batch_id, problem, affected_qty, status)
+     VALUES
+       ('fd2d2d2d-0000-4000-8000-000000000001', $1, 'NCR-ISO-1', 'PRODUCTION',
+        'babababa-0000-4000-8000-000000000001', 'f2f2f2f2-0000-4000-8000-000000000001',
+        'Viscosity out of band', 5, 'OPEN'),
+       ('fd2d2d2d-0000-4000-8000-000000000002', $2, 'NCR-ISO-1', 'PRODUCTION',
+        'babababa-0000-4000-8000-000000000002', 'f2f2f2f2-0000-4000-8000-000000000002',
+        'Viscosity out of band', 5, 'OPEN')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO capa_records (id, tenant_id, capa_no, title, status)
+     VALUES
+       ('fd3d3d3d-0000-4000-8000-000000000001', $1, 'CAPA-ISO-1', 'Viscosity drift containment', 'OPEN'),
+       ('fd3d3d3d-0000-4000-8000-000000000002', $2, 'CAPA-ISO-1', 'Viscosity drift containment', 'OPEN')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO complaints (id, tenant_id, complaint_no, channel, customer_id, item_id, batch_id, subject, status)
+     VALUES
+       ('fd4d4d4d-0000-4000-8000-000000000001', $1, 'CMP-ISO-1', 'PHONE',
+        'b5b5b5b5-0000-4000-8000-000000000001', 'babababa-0000-4000-8000-000000000001',
+        'f2f2f2f2-0000-4000-8000-000000000001', 'Lumpy batch', 'NEW'),
+       ('fd4d4d4d-0000-4000-8000-000000000002', $2, 'CMP-ISO-1', 'PHONE',
+        'b5b5b5b5-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+        'f2f2f2f2-0000-4000-8000-000000000002', 'Lumpy batch', 'NEW')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO calibration_records (id, tenant_id, calibration_no, asset_id, standard_used,
+                                      result, calibrated_at, due_date)
+     VALUES
+       ('fd5d5d5d-0000-4000-8000-000000000001', $1, 'CAL-ISO-1',
+        'fa1a1a1a-0000-4000-8000-000000000001', 'ISO 17025 reference', 'PASS',
+        '2026-01-15T09:00:00Z', '2027-01-15'),
+       ('fd5d5d5d-0000-4000-8000-000000000002', $2, 'CAL-ISO-1',
+        'fa1a1a1a-0000-4000-8000-000000000002', 'ISO 17025 reference', 'PASS',
+        '2026-01-15T09:00:00Z', '2027-01-15')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO supplier_quality_scores (id, tenant_id, partner_id, period_start,
+                                          on_time_deliveries, total_deliveries, score)
+     VALUES
+       ('fd6d6d6d-0000-4000-8000-000000000001', $1, 'b5b5b5b5-0000-4000-8000-000000000001',
+        '2026-01-01', 10, 10, 95),
+       ('fd6d6d6d-0000-4000-8000-000000000002', $2, 'b5b5b5b5-0000-4000-8000-000000000002',
+        '2026-01-01', 10, 10, 95)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO coa_documents (id, tenant_id, doc_no, doc_type, item_id, batch_id, parameters, issued_at)
+     VALUES
+       ('fd7d7d7d-0000-4000-8000-000000000001', $1, 'COA-ISO-1', 'COA',
+        'babababa-0000-4000-8000-000000000001', 'f2f2f2f2-0000-4000-8000-000000000001',
+        '[{"parameter":"Viscosity","target":100,"ucl":110,"lcl":90,"measured":100,"within":true}]'::jsonb,
+        '2026-02-11T10:00:00Z'),
+       ('fd7d7d7d-0000-4000-8000-000000000002', $2, 'COA-ISO-1', 'COA',
+        'babababa-0000-4000-8000-000000000002', 'f2f2f2f2-0000-4000-8000-000000000002',
+        '[{"parameter":"Viscosity","target":100,"ucl":110,"lcl":90,"measured":100,"within":true}]'::jsonb,
+        '2026-02-11T10:00:00Z')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO batch_quality_holds (id, tenant_id, batch_id, reason, status)
+     VALUES
+       ('fd8d8d8d-0000-4000-8000-000000000001', $1, 'f2f2f2f2-0000-4000-8000-000000000001',
+        'Foreign matter suspected', 'ACTIVE'),
+       ('fd8d8d8d-0000-4000-8000-000000000002', $2, 'f2f2f2f2-0000-4000-8000-000000000002',
+        'Foreign matter suspected', 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO recall_registry (id, tenant_id, recall_no, batch_id, reason, status)
+     VALUES
+       ('fd9d9d9d-0000-4000-8000-000000000001', $1, 'RCL-ISO-1',
+        'f2f2f2f2-0000-4000-8000-000000000001', 'Precautionary drill', 'INITIATED'),
+       ('fd9d9d9d-0000-4000-8000-000000000002', $2, 'RCL-ISO-1',
+        'f2f2f2f2-0000-4000-8000-000000000002', 'Precautionary drill', 'INITIATED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO quality_management_reviews (id, tenant_id, review_no, title, held_at, indicator_pack)
+     VALUES
+       ('fdadadad-0000-4000-8000-000000000001', $1, 'QMR-ISO-1', 'Quarterly quality review',
+        '2026-03-31T13:00:00Z', '{"ncr":{"open":1}}'::jsonb),
+       ('fdadadad-0000-4000-8000-000000000002', $2, 'QMR-ISO-1', 'Quarterly quality review',
+        '2026-03-31T13:00:00Z', '{"ncr":{"open":1}}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO hazard_registers (id, tenant_id, name, hazard, category, is_ccp, critical_limit)
+     VALUES
+       ('fdbdbdbd-0000-4000-8000-000000000001', $1, 'ISO Cold chain', 'Pathogen growth',
+        'BIOLOGICAL', true, '≤ 4°C'),
+       ('fdbdbdbd-0000-4000-8000-000000000002', $2, 'ISO Cold chain', 'Pathogen growth',
+        'BIOLOGICAL', true, '≤ 4°C')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -4257,6 +4394,35 @@ const OWN_ROW: Record<string, [string, string]> = {
     "fc9c9c9c-0000-4000-8000-000000000001",
     "fc9c9c9c-0000-4000-8000-000000000002",
   ],
+  // PHASE-050 (CR-20 — QMS): the fd family (one OWN row per tenant per
+  // table — the default EXPECTED_ROWS_PER_TENANT of 1 each).
+  quality_specifications: [
+    "fd0d0d0d-0000-4000-8000-000000000001",
+    "fd0d0d0d-0000-4000-8000-000000000002",
+  ],
+  spc_measurements: ["fd1d1d1d-0000-4000-8000-000000000001", "fd1d1d1d-0000-4000-8000-000000000002"],
+  ncr_records: ["fd2d2d2d-0000-4000-8000-000000000001", "fd2d2d2d-0000-4000-8000-000000000002"],
+  capa_records: ["fd3d3d3d-0000-4000-8000-000000000001", "fd3d3d3d-0000-4000-8000-000000000002"],
+  complaints: ["fd4d4d4d-0000-4000-8000-000000000001", "fd4d4d4d-0000-4000-8000-000000000002"],
+  calibration_records: [
+    "fd5d5d5d-0000-4000-8000-000000000001",
+    "fd5d5d5d-0000-4000-8000-000000000002",
+  ],
+  supplier_quality_scores: [
+    "fd6d6d6d-0000-4000-8000-000000000001",
+    "fd6d6d6d-0000-4000-8000-000000000002",
+  ],
+  coa_documents: ["fd7d7d7d-0000-4000-8000-000000000001", "fd7d7d7d-0000-4000-8000-000000000002"],
+  batch_quality_holds: [
+    "fd8d8d8d-0000-4000-8000-000000000001",
+    "fd8d8d8d-0000-4000-8000-000000000002",
+  ],
+  recall_registry: ["fd9d9d9d-0000-4000-8000-000000000001", "fd9d9d9d-0000-4000-8000-000000000002"],
+  quality_management_reviews: [
+    "fdadadad-0000-4000-8000-000000000001",
+    "fdadadad-0000-4000-8000-000000000002",
+  ],
+  hazard_registers: ["fdbdbdbd-0000-4000-8000-000000000001", "fdbdbdbd-0000-4000-8000-000000000002"],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -5336,6 +5502,57 @@ const MISMATCHED_INSERT: Record<string, string> = {
       work_order_id, source_task_id, seq, title)
      VALUES ('fc9c9c9c-3000-4000-8000-000000000003', $1, 'fc2c2c2c-0000-4000-8000-000000000002',
       'fc1c1c1c-0000-4000-8000-000000000002', 2, 'Attack step')`,
+  // PHASE-050 (CR-20 — QMS, migrations 0113–0116): the mismatched-tenant
+  // attack rows (FK-consistent against tenant B's own fixtures; the RLS
+  // WITH CHECK is what must refuse — never an FK accident).
+  quality_specifications: `INSERT INTO quality_specifications (id, tenant_id, item_id,
+      parameter, target_value, ucl, lcl)
+     VALUES ('fd0d0d0d-3000-4000-8000-000000000003', $1, 'babababa-0000-4000-8000-000000000002',
+      'pH', 7, 7.5, 6.5)`,
+  spc_measurements: `INSERT INTO spc_measurements (id, tenant_id, spec_id, value, sampled_at, source)
+     VALUES ('fd1d1d1d-3000-4000-8000-000000000003', $1, 'fd0d0d0d-0000-4000-8000-000000000002',
+      7.2, '2026-02-12T09:00:00Z', 'MANUAL')`,
+  ncr_records: `INSERT INTO ncr_records (id, tenant_id, ncr_no, source, item_id, batch_id,
+      problem, affected_qty, status)
+     VALUES ('fd2d2d2d-3000-4000-8000-000000000003', $1, 'NCR-ATK', 'PRODUCTION',
+      'babababa-0000-4000-8000-000000000002', 'f2f2f2f2-0000-4000-8000-000000000002',
+      'Attack NCR', 1, 'OPEN')`,
+  capa_records: `INSERT INTO capa_records (id, tenant_id, capa_no, title, status)
+     VALUES ('fd3d3d3d-3000-4000-8000-000000000003', $1, 'CAPA-ATK', 'Attack CAPA', 'OPEN')`,
+  complaints: `INSERT INTO complaints (id, tenant_id, complaint_no, channel, customer_id,
+      item_id, batch_id, subject, status)
+     VALUES ('fd4d4d4d-3000-4000-8000-000000000003', $1, 'CMP-ATK', 'EMAIL',
+      'b5b5b5b5-0000-4000-8000-000000000002', 'babababa-0000-4000-8000-000000000002',
+      'f2f2f2f2-0000-4000-8000-000000000002', 'Attack complaint', 'NEW')`,
+  calibration_records: `INSERT INTO calibration_records (id, tenant_id, calibration_no, asset_id,
+      standard_used, result, calibrated_at, due_date)
+     VALUES ('fd5d5d5d-3000-4000-8000-000000000003', $1, 'CAL-ATK',
+      'fa1a1a1a-0000-4000-8000-000000000002', 'Attack standard', 'PASS',
+      '2026-02-01T09:00:00Z', '2027-02-01')`,
+  supplier_quality_scores: `INSERT INTO supplier_quality_scores (id, tenant_id, partner_id,
+      period_start, on_time_deliveries, total_deliveries, score)
+     VALUES ('fd6d6d6d-3000-4000-8000-000000000003', $1, 'b5b5b5b5-0000-4000-8000-000000000002',
+      '2026-02-01', 5, 5, 90)`,
+  coa_documents: `INSERT INTO coa_documents (id, tenant_id, doc_no, doc_type, item_id, batch_id,
+      parameters, issued_at)
+     VALUES ('fd7d7d7d-3000-4000-8000-000000000003', $1, 'COA-ATK', 'COC',
+      'babababa-0000-4000-8000-000000000002', 'f2f2f2f2-0000-4000-8000-000000000002',
+      '[]'::jsonb, '2026-02-12T10:00:00Z')`,
+  batch_quality_holds: `INSERT INTO batch_quality_holds (id, tenant_id, batch_id, reason, ncr_id,
+      status, released_at, release_note)
+     VALUES ('fd8d8d8d-3000-4000-8000-000000000003', $1, 'f2f2f2f2-0000-4000-8000-000000000002',
+      'Attack hold', 'fd2d2d2d-0000-4000-8000-000000000002', 'RELEASED',
+      '2026-02-13T08:00:00Z', 'Attack release')`,
+  recall_registry: `INSERT INTO recall_registry (id, tenant_id, recall_no, batch_id, reason, status)
+     VALUES ('fd9d9d9d-3000-4000-8000-000000000003', $1, 'RCL-ATK',
+      'f2f2f2f2-0000-4000-8000-000000000002', 'Attack recall', 'INITIATED')`,
+  quality_management_reviews: `INSERT INTO quality_management_reviews (id, tenant_id, review_no,
+      title, held_at, indicator_pack)
+     VALUES ('fdadadad-3000-4000-8000-000000000003', $1, 'QMR-ATK', 'Attack review',
+      '2026-04-30T13:00:00Z', '{}'::jsonb)`,
+  hazard_registers: `INSERT INTO hazard_registers (id, tenant_id, name, hazard, category, is_ccp, critical_limit)
+     VALUES ('fdbdbdbd-3000-4000-8000-000000000003', $1, 'Attack hazard', 'Attack pathogen',
+      'BIOLOGICAL', false, NULL)`,
 };
 
 beforeAll(async () => {

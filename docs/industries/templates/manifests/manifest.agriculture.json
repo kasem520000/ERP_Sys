@@ -12,7 +12,8 @@
     "purchasing.goods_receipts",
     "sales.invoices",
     "accounting.projects",
-    "accounting.cost_centers"
+    "accounting.cost_centers",
+    "quality"
   ],
   "default_modules_enabled": [
     "accounting",
