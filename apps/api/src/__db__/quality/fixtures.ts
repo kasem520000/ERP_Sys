@@ -159,3 +159,194 @@ export async function freshQualityBatch(code: string): Promise<{
   await su.end();
   return { itemId, batchId: batch.rows[0]!.id };
 }
+
+// ── W-25: the posting world (the G-62 substrate + the service singletons) ───
+
+import { AuditService } from "../../modules/audit/api/audit";
+import { DrizzleAuditStore } from "../../modules/audit/infrastructure/drizzle-audit.store";
+import { PeriodService } from "../../modules/accounting/application/period-service";
+import { PostingService } from "../../modules/accounting/application/posting-service";
+import { PartnerSubledgerService } from "../../modules/partners/application/subledger-service";
+import { NumberingService } from "../../modules/accounting/application/numbering-service";
+import { StockService } from "../../modules/inventory/application/stock-service";
+
+/** The service singletons (the cmms fixtures' shape — direct construction,
+ * no Nest container; the specs run inside withTenant). */
+const audit = new AuditService(new DrizzleAuditStore());
+export const posting = new PostingService(audit, new PartnerSubledgerService());
+export const numbering = new NumberingService(audit);
+const periods = new PeriodService(audit);
+export { periods };
+export const stock = new StockService(audit, posting);
+
+export interface QualityPostingWorld {
+  /** QL-WH — the default warehouse (the INVENTORY purpose's own account,
+   * the provisioned CoA's 1140). */
+  warehouseId: string;
+  /** QL-WH-B — the override warehouse (its OWN inventory account 1141 —
+   * the per-warehouse credit split's own subject). */
+  warehouseBId: string;
+  warehouseBAccountId: string;
+  /** The provisioned CoA's INVENTORY account (1140) — the default leg. */
+  inventoryAccountId: string;
+}
+
+let postingWorld: QualityPostingWorld | undefined;
+
+/**
+ * THE G-62 POSTING WORLD (idempotent — the cmms G-59 world's shape): the
+ * QL tenant gets the FULL CoA template instantiation (provisionCoaTemplate
+ * — every standing purpose mapping included: INVENTORY 1140 ·
+ * INVENTORY_SHRINKAGE 5110 · INVENTORY_APPRECIATION …) + FY2026-QL's OPEN
+ * periods (today's postings resolve) + the two warehouses: QL-WH on the
+ * INVENTORY purpose's default resolution and QL-WH-B carrying the EXPLICIT
+ * per-warehouse inventory_account_id override (a second account 1141
+ * created through the tenancy surface) — G-62's per-account credit split
+ * has its own substrate.
+ */
+export async function ensureQualityPostingWorld(): Promise<QualityPostingWorld> {
+  if (postingWorld !== undefined) return postingWorld;
+  await setupQualityFixture();
+  await withTenant(TENANT_QUALITY, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    await tenancy.seedMasterDataBasics();
+    await tenancy.provisionCoaTemplate();
+    await periods.createYear(QL_ACTOR, {
+      name: "FY2026-QL",
+      startDate: "2026-01-01",
+      endDate: "2026-12-31",
+    });
+    // The second inventory account (the per-warehouse override's own —
+    // created through the tenant's own runtime surface, never a raw poke).
+    const inventory = await tenancy.findAccountByCode("1140");
+    if ((await tenancy.findAccountByCode("1141")) === undefined) {
+      await tenancy.insertAccount({
+        code: "1141",
+        name: "Inventory — Secondary warehouse",
+        nameAr: "المخزون — المستودع الثانوي",
+        type: "ASSET",
+        parentId: inventory === undefined ? null : inventory.parentId,
+        isPostable: true,
+      });
+    }
+    // THE 0008 FAIL-CLOSED GAP the template leaves unmarked (the inventory
+    // fixtures' own tenant-setup step): INVENTORY_APPRECIATION → the 4920
+    // REVENUE host under 4000 — the world's COUNT_GAIN receipts post
+    // through the REAL engine (the receipt's own counter purpose).
+    if ((await tenancy.findActivePurpose("INVENTORY_APPRECIATION")) === undefined) {
+      let appreciation = await tenancy.findAccountByCode("4920");
+      if (appreciation === undefined) {
+        const parent = await tenancy.findAccountByCode("4000");
+        appreciation = await tenancy.insertAccount({
+          code: "4920",
+          name: "Inventory appreciation",
+          nameAr: "زيادة قيمة المخزون",
+          type: "REVENUE",
+          parentId: parent === undefined ? null : parent.id,
+          isPostable: true,
+        });
+      }
+      await tenancy.insertAccountPurpose({
+        purposeKey: "INVENTORY_APPRECIATION",
+        accountId: appreciation.id,
+        activeFrom: "2025-12-01",
+      });
+    }
+  });
+  const base = await setupQualityFixture();
+  const su: Client = await superuserClient();
+  const inventoryAccount = await su.query<{ id: string }>(
+    `SELECT id FROM accounts WHERE tenant_id = $1 AND code = '1140' LIMIT 1`,
+    [TENANT_QUALITY],
+  );
+  const secondAccount = await su.query<{ id: string }>(
+    `SELECT id FROM accounts WHERE tenant_id = $1 AND code = '1141' LIMIT 1`,
+    [TENANT_QUALITY],
+  );
+  const warehouseA = await su.query<{ id: string }>(
+    `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id)
+     VALUES (gen_random_uuid(), $1, 'QL-WH', 'Quality Main Warehouse', 'مستودع الجودة الرئيسي', $2)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_QUALITY, base.branchId],
+  );
+  const warehouseB = await su.query<{ id: string }>(
+    `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id, inventory_account_id)
+     VALUES (gen_random_uuid(), $1, 'QL-WH-B', 'Quality Second Warehouse', 'مستودع الجودة الثانوي', $2, $3)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name,
+       inventory_account_id = EXCLUDED.inventory_account_id
+     RETURNING id`,
+    [TENANT_QUALITY, base.branchId, secondAccount.rows[0]!.id],
+  );
+  await su.end();
+  postingWorld = {
+    warehouseId: warehouseA.rows[0]!.id,
+    warehouseBId: warehouseB.rows[0]!.id,
+    warehouseBAccountId: secondAccount.rows[0]!.id,
+    inventoryAccountId: inventoryAccount.rows[0]!.id,
+  };
+  return postingWorld;
+}
+
+/**
+ * A FRESH SCRAP WORLD per arm (the per-arm-world law, the cmms
+ * freshPartsWorld precedent): a BATCH-TRACKED item + its own batch + its
+ * own warehouse + REAL stock on the batch — the receipt through the
+ * inventory module's OWN manualReceipt (the engine's receipt: the
+ * stock_moves rows + the item_stock position + the WAC valuation all
+ * land through the REAL path, so G-62's on-hand floor and the write-off
+ * valuation read the ledger's own rows). The pinned figures ride the
+ * G-13 golden's own: 100 × 2.500000 (the write-off of 5 = 12.5000).
+ */
+export async function freshQualityScrapWorld(code: string): Promise<{
+  itemId: string;
+  batchId: string;
+  warehouseId: string;
+}> {
+  await ensureQualityPostingWorld();
+  const su: Client = await superuserClient();
+  const item = await su.query<{ id: string }>(
+    `INSERT INTO items (id, tenant_id, sku, name, name_ar, kind, uom_id, costing_method,
+        base_price, track_batch)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, 'STOCK',
+        (SELECT id FROM uoms WHERE tenant_id = $1 AND code = 'PCS' LIMIT 1), 'WAC', 45, true)
+     ON CONFLICT (tenant_id, sku) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_QUALITY, `QL-SCRAP-${code}`, `The ${code} scrap item`, `صنف الإعدام ${code}`],
+  );
+  const warehouse = await su.query<{ id: string }>(
+    `INSERT INTO warehouses (id, tenant_id, code, name, name_ar, branch_id)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4,
+        (SELECT id FROM branches WHERE tenant_id = $1 AND code = 'BR-QL' LIMIT 1))
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [TENANT_QUALITY, `QL-WH-${code}`, `The ${code} warehouse`, `مستودع ${code}`],
+  );
+  const batch = await su.query<{ id: string }>(
+    `INSERT INTO item_batches (id, tenant_id, item_id, batch_no, expiry_date)
+     VALUES (gen_random_uuid(), $1, $2, $3, '2027-06-30')
+     RETURNING id`,
+    [TENANT_QUALITY, item.rows[0]!.id, `QL-B-${code}`],
+  );
+  await su.end();
+  await withTenant(TENANT_QUALITY, () =>
+    stock.manualReceipt({
+      itemId: item.rows[0]!.id,
+      warehouseId: warehouse.rows[0]!.id,
+      qty: "100",
+      unitCost: "2.500000",
+      reason: "COUNT_GAIN",
+      counterAccountId: null,
+      valueDate: "2026-02-01",
+      batchId: batch.rows[0]!.id,
+      note: `The ${code} scrap world's opening stock`,
+      noteAr: `مخزون عالم الإعدام ${code} الافتتاحي`,
+      actorId: QL_ACTOR,
+    }),
+  );
+  return {
+    itemId: item.rows[0]!.id,
+    batchId: batch.rows[0]!.id,
+    warehouseId: warehouse.rows[0]!.id,
+  };
+}

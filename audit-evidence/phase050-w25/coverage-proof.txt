@@ -1,0 +1,12 @@
+THE COVERAGE PROOF (the W-25 roster — built for the wave's declared
+movement; the affected-folder runs verified the delta this wave, the
+FULL envelope re-runs at the W-32 final sweep per the scope-label law)
+disk inventory: 286 files
+parts union:   286 files (unique 286)
+missing: NONE
+extra:   NONE
+duplicates: NONE
+THE DECLARED MOVEMENT: the two W-25 specs join chunk-a at their
+alphabetical position (quality-ncr before quality-schema, quality-specs
+after it) — chunk-a 98 → 100 · the roster 284 → 286.
+VERDICT: COVERED
