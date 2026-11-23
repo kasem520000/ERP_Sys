@@ -42,15 +42,17 @@ describe("heldBatchTarget — the refusal-target fold", () => {
       seed = (seed * 1103515245 + 12345) % 2147483648;
       return seed / 2147483648;
     };
+    // The house bitwise truncation (ADR-0009 bans Math.floor; the index
+    // math is a pure array position, far inside the 2^31 safe range).
     for (let attempt = 0; attempt < 50; attempt += 1) {
       const shuffled = [...batchIds];
       for (let i = shuffled.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(random() * (i + 1));
+        const j = (random() * (i + 1)) | 0;
         [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
       }
       const shuffledHolds = [...holds];
       for (let i = shuffledHolds.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(random() * (i + 1));
+        const j = (random() * (i + 1)) | 0;
         [shuffledHolds[i], shuffledHolds[j]] = [shuffledHolds[j]!, shuffledHolds[i]!];
       }
       expect(heldBatchTarget(shuffled, shuffledHolds)?.id).toBe(baseline);

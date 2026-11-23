@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-050 (Quality Management System) — **W-27 THE SPC + SUPPLIER SCORES + COA ENGINES DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-28 (COMPLAINTS + HOLDS + RECALL) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-050 (Quality Management System) — **W-28 THE COMPLAINTS + HOLDS + RECALL ENGINES DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-29 (THE WEB PLANE) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
 F-050a commit `de05cfd`):** W-0 ACCEPTED AS DELIVERY at `7054520` after the
@@ -237,17 +237,163 @@ sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS **1,125**
 agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO
 new this wave.
 
-**NEXT: W-28 — COMPLAINTS + HOLDS + RECALL (T-12 + T-13 + T-14)** under the
-owner's standing order: the complaints API (intake, triage, the NCR link,
-notifications) · **THE SHARED BLOCKING VALIDATION SERVICE wired into every
-baseline issue/ship path (INV-035 + BR-101 — D-07: ONE service, the only
-gate, the invariant test extending the document-validation suite every
-path must extend)** · the recall drill on the batch/serial ledger (D-14 —
-batch → where-used → customers). The standing recalls as transferred in
-the 049 completion report §4; the reservations G-62…G-63 · INV-035 ·
-BR-101…BR-104 — لا كتابة خارجها. NOT production approval.
+**NEXT: W-29 — THE WEB PLANE (T-15)** under the owner's standing order:
+the five screens (`/quality/ncr` · `/quality/capa` ·
+`/quality/calibration` · `/quality/spc` · `/quality/complaints`) + the
+COA print surface + **the hold banners on every batch-bearing surface**
+(D-17 — the data-slot shape; the typed-refusal panels with FULL
+payloads); **i18n BY BOTH COUNTS from this wave** (the first surface
+wave — the declared delta 6,955+n = 6,955+n + mobile 371 standing, §5);
+the boards render the engines' figures VERBATIM; the flag-gating
+verified; the COA print law green (the REAL Chromium test both
+directions, deterministic byte-identical — the W-13/W-21 print laws).
+The standing recalls as transferred in the 049 completion report §4; the
+reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT
+production approval.
 
 ---
+
+**W-28 — THE COMPLAINTS + HOLDS + RECALL ENGINES (T-12 + T-13 + T-14,
+delivered on the W-27 head `2f24c95` in three commits — `edc3fe2` the
+engines → `a6d4685` the DB specs → this battery/gate/ledger increment,
+EVERY step pushed at its own commit per the owner's «عند الانتهاء من أي
+خطوة ادفعها إلى المستودع»):**
+
+- **THE SHARED BLOCKING VALIDATION SERVICE (T-13 — INV-035 + BR-101,
+  D-07: ONE service, the ONLY gate):** the pure fold FIRST
+  (`hold-blocking.ts` — the deterministic refusal-target selection
+  (batchId ASC; the caller's slice order is NEVER evidence, invariance
+  under permutation ×50) + BR-101's release gate (NOT_ACTIVE /
+  DISPOSITION_LINK_REQUIRED naming what is missing) — 10 property
+  tests); **the gate wired INSIDE the movement core's planIssue** (the
+  reserved-pool hard-protection precedent's own choke point — every
+  issue/ship path passes it BY CONSTRUCTION, the enforcement-drift risk
+  closed structurally): fired after resolveIssueSlices so it judges the
+  RESOLVED plan (the line's explicit batch AND the FEFO auto-pick
+  alike — a held batch is never silently issued), BEFORE any slice is
+  valued or applied (the caller's document keeps its state, ZERO
+  residue), one read over the partial unique
+  uq_batch_quality_holds_tenant_batch_active; the typed 409
+  BATCH_QUALITY_HELD naming the batch + the reason + the figures;
+  **THE SOLE BYPASS** — `allowHeldBatch` carried by EXACTLY ONE path,
+  the G-62 write-off (the NCR disposition act: the SCRAP write-off
+  lands AT the disposition while the investigating hold may still be
+  ACTIVE — BR-101's own ordering); **THE SERVER-SIDE-ONLY LAW
+  (D-20/OA-02)** — an offline document carrying a held batch is
+  rejected at sync reconciliation when its POST runs this same plan; the
+  register's own surface (`HoldService`: the create with the
+  one-active-per-batch typed pre-check · the active-hold read the W-29
+  banners consume · BR-101's release with the disposition-link refusal
+  at the service floor above the ck_release_shape DB floor).
+- **THE COMPLAINTS ENGINE (T-12 — Q-08):** the pure fold FIRST
+  (`complaint-lifecycle.ts` — the total status × move matrix
+  NEW→TRIAGED→IN_PROGRESS→RESOLVED→CLOSED, every illegal cell refused BY
+  NAME · the NCR-link window (TRIAGED/IN_PROGRESS only) · the
+  resolution-pair law — 12 property tests); the service (the official
+  CMP-{YYYY}-{SEQ:6} numbering · the triage act carrying the first NCR
+  link · the link through the register's OWN row · the resolve pair
+  landing together · every transition ONE guarded CAS) + THE INTAKE
+  NOTIFICATION (category 'quality' — the calibration sweep's own
+  channel, 0118's widening; the structural dedupe on the complaint's
+  own number).
+- **THE RECALL ENGINE (T-14 — Q-09/Q-12, D-14: the drill RECORD is
+  distinct from the drill QUERY):** the pure fold FIRST
+  (`recall-scope.ts` — the registry ladder + THE CUSTOMER FOLD (dedupe
+  across every sale edge, deterministic sorts, the missing-lookup drop
+  honestly disclosed) — 10 property tests); the service (THE DRILL
+  QUERY: the genealogy walk consumed VERBATIM through
+  ManufacturingModule's exported GenealogyService (the documented D-14
+  contract — zero parallel computation) + the doc→customer lookup (the
+  §10 boundary's designated consumer, one UNION read over the sales doc
+  tables joined to the partner register) · THE RECORD: the official
+  REC-{YYYY}-{SEQ:6} numbering, the execute act freezing the
+  kind-tagged where-used array + the affected-customers array (0116's
+  own jsonb-array law), the close sealing the ladder).
+- **THE DB SPECS (the family 139 → 156):** `quality-holds.db.spec` 8
+  arms (THE INV-035 BLOCKING MATRIX: the raw choke point · the manual
+  issue path with ZERO residue · the sales delivery path (the document
+  stays DRAFT) · the transfer path (the FEFO-resolved pick) · the FEFO
+  arm itself · the sole bypass (the G-62 write-off on the HELD batch) ·
+  the release rule with the flip-and-restore (the previously refused
+  issue posts GREEN after the linked release) · the register's floors +
+  the RLS boundary) · `quality-complaints.db.spec` 5 arms (the intake +
+  the notification · the ladder · the link window · the
+  resolution-pair floor · the RLS boundary) · `quality-recall.db.spec` 4
+  arms (the drill query · the record with the frozen snapshots + the
+  frozen-snapshot law (a later delivery never moves a stored scope) ·
+  the held batch's own recall (the record is not the gate) · the RLS
+  boundary + the not-found floor) + the fixtures' blocking worlds (the
+  hold world + the FEFO pair through the REAL receipt path + the
+  delivery/transfer singletons + the ownerTarget substrate per the QSW
+  recipe).
+- **THE HONEST CATCHES (three, all RED-proven, no battery red
+  standing):** (1) the execute act's scope snapshot was a jsonb OBJECT —
+  0116's ck_recall_registry_scope_shape demands an ARRAY (caught at the
+  FIRST DB run, `db-first-run-RED.log`, 4 failed; the repair is the
+  kind-tagged where-used entries array); (2) the intake arm's unquoted
+  dedupe-key interpolation (the syntax error at ':') + the fixture
+  codes' length (the warehouses' 20-char shape) + the missing
+  ownerTarget substrate — all caught by the same first run;
+  parameterized, the codes shortened, the QSW-recipe OWNER membership
+  seeded idempotently; (3) the step-1 hold-blocking spec's shuffle
+  helpers carried Math.floor — caught RED by this gate increment's
+  standing lint (`lint-RED.log`, 7/8, the ADR-0009 rule), repaired with
+  the house bitwise truncation (the W-27 catch's own precedent), GREEN
+  8/8. A fourth family-run catch: the manual-issue arm's zero-residue
+  journal read was tenant-wide (the family's other worlds legitimately
+  carry their own) — the read is now world-scoped to the arm's own
+  item.
+- **THE WIRING:** ROUTE_PERMISSIONS **1,134 + 18 = 1,152** (the
+  keys-seed-first FOURTH binding wave, dated at the block: the
+  complaints eight on quality.complaints.manage/quality.view · the holds
+  four on quality.hold.manage/quality.view — the BLOCKING side of
+  INV-035 is NOT a route · the recall six on quality.recall.manage/
+  quality.view, the drill route declared BEFORE :id) · the error
+  filter's domainStatus rows in the same increment (the three 404s; the
+  409s incl. BATCH_QUALITY_HELD; the policy classes fall through to
+  422) · GenealogyService exported from ManufacturingModule (the D-14
+  documented contract, dated at the export).
+
+**The wave's battery (every log in `audit-evidence/phase050-w28/`, this
+session — the THIRTY-NINTH consecutive same-session wave):** §0a FIRST
+(the remote verified at `a6d4685` = the W-28 step-2 head; the FOUR tags'
+six identifiers + the 049 tag intact; the tree clean at HEAD) — then
+**THE FIVE ISOLATES STANDALONE FIRST** (soak 1·1 229.01s · fcm 1·8 ·
+email 1·5 · the cmms sweep 1·4 · the quality calibration sweep 1·4 —
+every VITEST_EXIT=0 stamp) · **the affected DB folders re-run at the
+delta head** (the scope-label law): **the quality family 12 · 156
+GREEN** (the family 139 → 156) · **migrations + identity-flows 2 · 28
+GREEN** (the chain at 118 + the ROUTE_PERMISSIONS checklist over the
+1,152 routes) · the coverage roster verified (chunk-a 105 → 108 · the
+roster 292 → 295; 295 = 295, missing NONE, extra NONE, duplicates NONE —
+VERDICT: COVERED; the full ten-part envelope re-runs at W-32) · **the
+118-chain scratch from zero TWICE** (both runs CHAIN_118_APPLIED →
+[check-rls] OK — **340 catalog tables** → SCRATCH_STOPPED, EXIT=0, both
+logs kept) · typecheck 8/8 (0 cached — the force re-run) · lint 8/8 (0
+cached — the RED/repair disclosed above) · depcruise clean **2,160
+modules · 16,138 dependencies** (+13/+64 dated) · unit 8/8 — **158 ·
+1,987** (api **78·976** · web 21·171 · mobile 27·393 · desktop 16·274 ·
+ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core 5·36 — the
+ledger arithmetic **1,987 = 976+171+840 EXACT**, the F-2 third term
+standing) · i18n 6,955 = 6,955 (no delta, as declared — an API-DB wave)
++ mobile 371 = 371 · tokens 50/50 · **drift 347 = 347** (zero delta — no
+new keys) · manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors +
+self-test all-probes-OK (implemented G 61 · INV 34 · BR 100 standing —
+the 050 flip is W-32's; probe 7 stands at G-62/PHASE-050) ·
+history-secrets 0 violations · 6,687 allowlisted hits (the window's
+shift: the W-28 session commits entering the last-200 sample; the FOUR
+tag anchors untouched) · ROUTE_PERMISSIONS **1,152** (the tsx recount) ·
+the registry 315 tenant-owned tables · capabilities agree · shells
+PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO new this
+wave.
+
+**NEXT: W-30 — THE REVIEW PACK + THE REPORTS (T-16 + T-17)** after
+W-29: the management review pack + the hazard registers composed into
+the food-manufacturing template manifest (D-15); **the four report
+contracts (registry 118 → 122, all pin sites together — D-18)**. The
+standing recalls as transferred in the 049 completion report §4; the
+reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT
+production approval.
 
 **W-27 — THE SPC + SUPPLIER SCORES + COA ENGINES (T-09 + T-10 + T-11,
 delivered on the W-26 head `94c4dc6` in three commits — `20255ac` the

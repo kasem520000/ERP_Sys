@@ -794,6 +794,102 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-28 — T-12 + T-13 + T-14 delivered, the
+> complaints + holds + recall wave under the owner's standing order — «عند
+> الانتهاء من أي خطوة ادفعها إلى المستودع», every step pushed at its own
+> commit: `edc3fe2` the engines → `a6d4685` the DB specs → this
+> battery/gate/ledger increment; the evidence `audit-evidence/phase050-w28/`,
+> the THIRTY-NINTH consecutive same-session wave): #3's blocking arms
+> DELIVERED — **THE SHARED BLOCKING VALIDATION SERVICE (D-07: ONE service,
+> the ONLY gate) wired INSIDE the inventory movement core's planIssue**
+> (the reserved-pool hard-protection precedent's own choke point — every
+> issue/ship path passes it BY CONSTRUCTION, the enforcement-drift risk
+> closed structurally; the gate judges the RESOLVED plan — the line's
+> explicit batch AND the FEFO auto-pick alike): `quality-holds.db.spec` 8
+> arms over real PG16 — THE RAW CHOKE POINT (the typed BATCH_QUALITY_HELD
+> naming the batch + the reason + the figures) · THE INVENTORY ISSUE PATH
+> (the manualIssue refused with ZERO residue — no moves added, no journal,
+> the read world-scoped) · THE SALES DELIVERY PATH (the post refused, the
+> document stays DRAFT, zero moves) · THE TRANSFER PATH (the dispatch
+> refused on the FEFO-resolved held batch) · THE FEFO ARM (a held batch
+> expiring first is never silently issued — the strict reject, never a
+> silent skip) · THE SOLE BYPASS (the G-62 write-off issues the HELD
+> batch at the NCR's SCRAP disposition — the sole allowHeldBatch caller,
+> BR-101's own ordering: the release comes after, justified by this very
+> disposition) · THE RELEASE RULE (BR-101's floor — a bare hold's release
+> refused HOLD_RELEASE_DISPOSITION_REQUIRED; the one-active-per-batch law
+> refused BY NAME; THE FLIP-AND-RESTORE — the linked hold releases with
+> the justification note and the previously refused manualIssue posts
+> GREEN through the REAL engine; the RELEASED register refuses every
+> move) · the register's floors (the 404 shape, the active read, the RLS
+> boundary) — the INV-035 invariant test extending the document-validation
+> matrix's own shape (the reservation-hard-protection precedent); the
+> W-31 golden (the offline-rejection shape) remains W-31's. #7's drill
+> arms DELIVERED — `quality-recall.db.spec` 4 arms (THE DRILL QUERY: a
+> shipped batch resolves through the REAL delivery path to its customer
+> — the genealogy walk's sales edge VERBATIM (D-14: consumed through
+> ManufacturingModule's exported GenealogyService, zero parallel
+> computation) + the customer fold deduped; the nothing-shipped batch the
+> honest empty scope · THE RECORD: initiate → execute — **THE FROZEN
+> SNAPSHOTS (the kind-tagged where-used array per 0116's own jsonb-array
+> law + the affected-customers array)** → close; the close-before-execute
+> refused; the FROZEN SNAPSHOT LAW — a later delivery never moves a
+> stored scope; the re-execute refused (the single-use stamp) · the held
+> batch's own recall — the drill works beside an ACTIVE hold (the record
+> is not the gate: INV-035 blocks issues, never reads) · the RLS boundary
+> + the not-found floor) — the OA-06 EXPLAIN budget is W-31's arm. #2's
+> complaints arms DELIVERED — `quality-complaints.db.spec` 5 arms (the
+> intake with the official CMP-{YYYY}-{SEQ:6} number + THE INTAKE
+> NOTIFICATION (category 'quality', the structural dedupe) · the ladder
+> triage→progress→resolve→close through the REAL CAS, the triage carrying
+> the first NCR link · the link window's refusals · the resolution-pair
+> floor · the RLS boundary). **THE HONEST CATCHES (three, all RED-proven
+> with the logs, no battery red standing): (1) the execute act's scope
+> snapshot was a jsonb OBJECT — 0116's ck_recall_registry_scope_shape
+> demands an ARRAY (caught at the FIRST DB run,
+> `db-first-run-RED.log`, 4 failed); the repair is the kind-tagged
+> where-used entries array (the honest shape within the constraint); (2)
+> the intake arm's dedupe-key lookup interpolated the key UNQUOTED into
+> the raw SQL — parameterized; the same first run caught the fixture
+> codes' length (the warehouses' 20-char shape) and the missing
+> ownerTarget substrate (the QL tenant's OWNER membership seeded per the
+> QSW recipe); (3) the step-1 hold-blocking spec's shuffle helpers
+> carried Math.floor — caught RED by this gate increment's standing lint
+> (`lint-RED.log`, 7/8, the ADR-0009 rule), repaired with the house
+> bitwise truncation (the W-27 catch's own precedent), GREEN 8/8.**
+> ROUTE_PERMISSIONS **1,134 + 18 = 1,152** — the keys-seed-first FOURTH
+> binding wave (the complaints eight + the holds four + the recall six,
+> dated at the block — the BLOCKING side of INV-035 is NOT a route: it is
+> the gate in the movement core); the error filter's domainStatus rows in
+> the same increment (the three 404s; the 409s incl. BATCH_QUALITY_HELD;
+> the policy classes fall through to 422). The battery (this gate
+> increment, every log this session): THE FIVE ISOLATES STANDALONE FIRST
+> (soak 1·1 229.01s · fcm 1·8 · email 1·5 · the cmms sweep 1·4 · the
+> quality calibration sweep 1·4 — every VITEST_EXIT=0) · the affected
+> folders re-run at the delta head (the quality family **12 · 156
+> GREEN** — the family 139 → 156 · migrations + identity-flows 2 · 28
+> over the **1,152** routes) · the coverage roster's declared movement
+> (chunk-a 105 → 108 · the roster 292 → 295; 295 = 295, missing NONE,
+> extra NONE, duplicates NONE — VERDICT: COVERED; the full ten-part
+> envelope re-runs at W-32) · the 118-chain scratch from zero TWICE (both
+> runs CHAIN_118_APPLIED → [check-rls] OK — 340 catalog tables →
+> SCRATCH_STOPPED, EXIT=0) · typecheck 8/8 (0 cached — the force re-run)
+> · lint 8/8 (0 cached — the RED/repair disclosed above) · depcruise
+> clean **2,160 modules · 16,138 dependencies** (+13/+64 dated) · unit
+> 8/8 — **158 · 1,987** (api **78·976** · web 21·171 · mobile 27·393 ·
+> desktop 16·274 · ui 3·43 · contracts 2·56 · domain-core 6·38 ·
+> sync-core 5·36 — the ledger arithmetic **1,987 = 976+171+840 EXACT**,
+> the F-2 third term standing) · i18n 6,955 = 6,955 (no delta, as
+> declared — an API-DB wave) + mobile 371 = 371 · tokens 50/50 · drift
+> **347 = 347** (zero delta — no new keys) · manifests 13/13 ·
+> docs:validate 33/33 · id-ledger 0 errors + self-test all-probes-OK
+> (probe 7 stands at G-62/PHASE-050 — the 050 flip is W-32's) ·
+> history-secrets 0 violations · **6,687 allowlisted hits** (the W-27
+> 6,654 +33 — the window's shift: the W-28 session commits entering the
+> last-200 sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS
+> **1,152** (the tsx recount) · the registry 315 tenant-owned tables ·
+> capabilities agree · shells PASS/PASS · boundary PASS.]**
+
 > **[Dated 2026-11-23 (PHASE-050 W-27 — T-09 + T-10 + T-11 delivered, the
 > SPC + supplier-scores + COA wave under the owner's standing order — «عند
 > الانتهاء من أي خطوة ادفعها إلى المستودع», every step pushed at its own

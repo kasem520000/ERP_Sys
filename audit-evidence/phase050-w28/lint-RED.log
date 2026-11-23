@@ -1,0 +1,71 @@
+
+> erp-platform@0.1.0 lint /home/z/ERP_Sys
+> turbo run lint --force
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/desktop:lint: cache bypass, force executing f921a41162b33313
+@erp/sync-core:lint: cache bypass, force executing 74727c8d3d5df9ab
+@erp/web:lint: cache bypass, force executing 7998c1f83f328db9
+@erp/api:lint: cache bypass, force executing de9682ac4da22d0b
+@erp/mobile:lint: cache bypass, force executing d6984b6ea7e8ad20
+@erp/contracts:lint: cache bypass, force executing 23a2fade14b7e3ae
+@erp/domain-core:lint: cache bypass, force executing 356a22ea030fb73e
+@erp/ui:lint: cache bypass, force executing 42485c57ef7c8547
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/ERP_Sys/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/ERP_Sys/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/ERP_Sys/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/ERP_Sys/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/ERP_Sys/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/ERP_Sys/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/ERP_Sys/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/ERP_Sys/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/api:lint: 
+@erp/api:lint: /home/z/ERP_Sys/apps/api/src/modules/quality/domain/hold-blocking.spec.ts
+@erp/api:lint:   48:19  error  'Math.floor' is restricted from being used. Floating-point rounding is forbidden: use @erp/domain-core decimal helpers (ADR-0009)  no-restricted-properties
+@erp/api:lint:   53:19  error  'Math.floor' is restricted from being used. Floating-point rounding is forbidden: use @erp/domain-core decimal helpers (ADR-0009)  no-restricted-properties
+@erp/api:lint: 
+@erp/api:lint: /home/z/ERP_Sys/apps/api/src/modules/quality/domain/recall-scope.spec.ts
+@erp/api:lint:   90:19  error  'Math.floor' is restricted from being used. Floating-point rounding is forbidden: use @erp/domain-core decimal helpers (ADR-0009)  no-restricted-properties
+@erp/api:lint: 
+@erp/api:lint: ✖ 3 problems (3 errors, 0 warnings)
+@erp/api:lint: 
+@erp/api:lint:  ELIFECYCLE  Command failed with exit code 1.
+@erp/api#lint:  ERROR  command (/home/z/ERP_Sys/apps/api) /home/z/.npm-global/bin/pnpm run lint exited (1)
+
+ Tasks:    7 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    48.389s 
+Failed:    @erp/api#lint
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
+EXIT=1
