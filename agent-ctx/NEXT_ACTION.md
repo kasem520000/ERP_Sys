@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-050 (Quality Management System) — **W-29 THE WEB PLANE DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-30 (THE REVIEW PACK + THE REPORTS) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-050 (Quality Management System) — **W-30 THE REVIEW PACK + THE REPORTS DELIVERED (2026-11-23, this session — every step pushed at its own commit per the owner's standing order) — W-31 (THE PROOF PACK) WAITS ON THE OWNER'S DISPATCH** — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
 F-050a commit `de05cfd`):** W-0 ACCEPTED AS DELIVERY at `7054520` after the
@@ -237,17 +237,82 @@ sample; the FOUR tag anchors untouched) · ROUTE_PERMISSIONS **1,125**
 agree · shells PASS/PASS · boundary PASS. RISK-033: EIGHT incidents, ZERO
 new this wave.
 
-**NEXT: W-30 — THE REVIEW PACK + THE REPORTS (T-16 + T-17)** under the
-owner's standing order: the management review pack + the hazard
-registers composed into the food-manufacturing template manifest (D-15);
-**the four report contracts (registry 118 → 122, all pin sites together
-— D-18: quality.ncr-register · quality.capa-status ·
-quality.calibration-due · quality.complaints-summary)**. The standing
-recalls as transferred in the 049 completion report §4; the reservations
-G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها. NOT production
-approval.
+**NEXT: W-31 — THE PROOF PACK (T-18)** under the owner's standing
+order: **the golden transcripts G-62/G-63 with the MANDATORY failure
+packs** (the refusals WITH their full payloads, the zero residue, the
+flip-and-restore with the green re-runs — the JOURNAL_RULES §7 law, the
+048-W14/049-W22 pattern) + **the INV-035 blocking-matrix golden** (the
+held batch refused on EVERY baseline path + the offline-rejection
+shape) + **the RLS attack matrix A1–A10 over the TWELVE tables** (D-19)
++ **the OA-06 EXPLAIN budgets** (the SPC chart reads + the recall drill
+— the W-9 assertion law: never a forced plan, never an isolated probe
+context). The standing recalls as transferred in the 049 completion
+report §4; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا
+كتابة خارجها. NOT production approval.
 
 ---
+
+**W-30 — THE REVIEW PACK + THE REPORTS (T-16 + T-17, delivered on the
+W-29 head `87153f8` in three commits — `dd08585` the engines →
+`0de7ebe` the DB specs → this battery/gate/ledger increment, EVERY step
+pushed at its own commit per the owner's «عند الانتهاء من أي خطوة
+ادفعها إلى المستودع»):**
+
+- **THE MANAGEMENT REVIEW PACK (T-16 — D-15):** the official
+  MRV-{YYYY}-{SEQ:6} numbering + **THE FROZEN INDICATOR PACK** (at
+  create the service reads the NCR/CAPA/complaint/SPC status counts
+  through the engines' OWN store reads and freezes the pack into the
+  row's jsonb — the frozen-snapshot law: a later state never moves a
+  stored pack, proven by the spec) + the decisions array.
+- **THE HAZARD REGISTERS (T-16 — Q-11):** the HACCP register CRUD per
+  the 0116 table's own shape (the hazard, the CCP flag, the critical
+  limits, the monitoring, the corrective actions) — the food-
+  manufacturing template composes the quality plane (the template doc's
+  QMS section; template-composable, never hardcoded; manifests 13/13).
+- **THE FOUR REPORT CONTRACTS (T-17 — D-18, registry 118 → 122, ALL
+  PIN SITES TOGETHER):** quality.ncr-register (the ncr-status-vocabulary
+  check — no quantity totals across unlike units) · quality.capa-status
+  (BR-103's gate figures through the same capaCloseGate fold the close
+  act rides) · quality.calibration-due (the sweep's own probe shape —
+  the thresholds ladder ∪ [30,7,0], disjoint bands, the LATEST due
+  dates — never running the sweep) · quality.complaints-summary (the
+  grouped counts + the count-tie check) — the pin moves verified green
+  in their own suites (4 · 36).
+- **THE DB SPECS (the family 159 → 167):** quality-reviews-hazards 8
+  arms (the frozen pack VERBATIM against the world's counts · the
+  frozen-snapshot law · the hazard constraint law · the RLS boundary).
+- **THE WIRING:** ROUTE_PERMISSIONS **1,152 + 7 = 1,159** (the FIFTH
+  binding wave — the reviews three + the hazards four on the standing
+  keys) · the error filter's rows in the same increment · the module
+  wiring.
+
+**The wave's battery (every log in `audit-evidence/phase050-w30/`, this
+session — the FORTY-FIRST consecutive same-session wave):** §0a FIRST
+(the remote verified at `0de7ebe` = the W-30 step-2 head; the FOUR
+tags' six identifiers + the 049 tag intact) — then THE FIVE ISOLATES
+STANDALONE FIRST (soak 1·1 228.09s · fcm 1·8 · email 1·5 · the cmms
+sweep 1·4 · the quality calibration sweep 1·4) · the affected folders
+(the quality family 14 · 167 · migrations + identity-flows 2 · 28 over
+the 1,159 routes · the reporting family 4 · 36) · the coverage roster
+(chunk-a 109 → 110 · the roster 296 → 297, VERDICT: COVERED) · the
+118-chain scratch from zero TWICE · typecheck 8/8 (0 cached) · lint 8/8
+(0 cached — no catch this wave) · depcruise clean 2,192 modules ·
+16,376 dependencies (+8/+64) · unit 8/8 — 167 · 2,020 standing · i18n
+7,253 = 7,253 standing (no delta — an API-DB wave) + mobile 371 = 371 ·
+drift 347 = 347 · manifests 13/13 · docs:validate 33/33 · id-ledger 0
+errors + self-test all-probes-OK · history-secrets 0 violations · 6,762
+allowlisted (the FOUR tag anchors untouched) · ROUTE_PERMISSIONS 1,159
+(the tsx recount) · the registry 315 tenant-owned tables · the report
+registry **122** · capabilities agree · shells PASS/PASS · boundary
+PASS. RISK-033: EIGHT incidents, ZERO new this wave.
+
+**NEXT: W-32 — DOCS + GATES + CLOSURE (T-19 + T-20)** after W-31: the
+canon docs in the ID_LEDGER's reserved wordings (JOURNAL_RULES G-62/G-63
++ note 20 · ACCOUNTING_INVARIANTS INV-035 · BUSINESS_RULES
+BR-101…BR-104 — لا كتابة خارجها) + THE ID_LEDGER FLIP + the full sweep
+at the final head + the completion report + the triple flip + **THE
+ARCHIVE ERP_PLATFORM_PHASE050.zip EXACTLY AS DECLARED (F-4/§5)** + the
+tag `phase/050` (DELIVERY, never acceptance). NOT production approval.
 
 **W-29 — THE WEB PLANE (T-15, delivered on the W-28 head `f2148e5` in
 three commits — `6171b09` the screens → `f749298` the specs → this

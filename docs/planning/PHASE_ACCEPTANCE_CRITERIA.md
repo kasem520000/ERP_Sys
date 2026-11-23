@@ -794,6 +794,58 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
 
 ### PHASE-050 — Quality Management System (OPENED AT PLAN 2026-11-22 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-050-MASTER-PLAN.md` §3/§4 is the binding division; the five dated corrections F-1…F-4 + the archive-form acknowledgment landed with the plan wave; the reservations G-62…G-63 · INV-035 · BR-101…BR-104 — لا كتابة خارجها)
 
+> **[Dated 2026-11-23 (PHASE-050 W-30 — T-16 + T-17 delivered under the
+> owner's standing order — «عند الانتهاء من أي خطوة ادفعها إلى
+> المستودع», every step pushed at its own commit: `dd08585` the engines
+> → `0de7ebe` the DB specs → this battery/gate/ledger increment; the
+> evidence `audit-evidence/phase050-w30/`, the FORTY-FIRST consecutive
+> same-session wave): #8's TEMPLATE ARM DELIVERED — the management
+> review pack (the official MRV-{YYYY}-{SEQ:6} numbering + **THE FROZEN
+> INDICATOR PACK** — the NCR/CAPA/complaint/SPC status counts read
+> through the engines' OWN reads and frozen at create; a later state
+> never moves a stored pack, proven by the spec) + the HACCP hazard
+> registers (the 0116 table's own shape: the hazard, the CCP flag, the
+> critical limits, the monitoring, the corrective actions) + **the
+> food-manufacturing template composes the quality plane** (the template
+> doc's QMS section — the hazard registers + the review pack + the six
+> quality surfaces; template-composable, never hardcoded; manifests
+> 13/13 standing) · `quality-reviews-hazards.db.spec` 8 arms (the frozen
+> pack asserted VERBATIM against the world's actual counts · the
+> frozen-snapshot law · the hazard constraint law · the RLS boundary).
+> #9's REPORT ARMS DELIVERED — **the four report contracts (registry
+> 118 → 122, ALL PIN SITES TOGETHER — D-18)**: quality.ncr-register (the
+> register's own rows + the item/partner briefs + the
+> ncr-status-vocabulary check — no quantity totals across unlike units)
+> · quality.capa-status (BR-103's gate verdict figures through the same
+> capaCloseGate fold the close act rides + the capa-closure-shape check)
+> · quality.calibration-due (the sweep's own probe shape — the effective
+> thresholds ladder ∪ the documented [30,7,0] default, disjoint bands,
+> the instruments' LATEST due dates — never running the sweep) ·
+> quality.complaints-summary (the grouped counts by status/channel/
+> severity + the complaints-count-tie check) — the pin moves verified
+> green in their own suites (golden + industry-018 + industry-019 +
+> cmms-reports 4 · 36). The battery (this gate increment, every log
+> this session): THE FIVE ISOLATES STANDALONE FIRST (soak 1·1 228.09s ·
+> fcm 1·8 · email 1·5 · the cmms sweep 1·4 · the quality calibration
+> sweep 1·4) · the affected folders re-run at the delta head (the
+> quality family **14 · 167 GREEN** — the family 159 → 167 · migrations
+> + identity-flows 2 · 28 over the **1,159** routes · the reporting
+> family 4 · 36) · the coverage roster's declared movement (chunk-a 109
+> → 110 · the roster 296 → 297; 297 = 297, missing NONE, extra NONE,
+> duplicates NONE — VERDICT: COVERED) · the 118-chain scratch from zero
+> TWICE (both CHAIN_118_APPLIED → [check-rls] OK — 340) · typecheck 8/8
+> (0 cached) · lint 8/8 (0 cached — no catch this wave) · depcruise
+> clean **2,192 modules · 16,376 dependencies** (+8/+64 dated) · unit
+> 8/8 — **167 · 2,020 standing** (no unit delta — an API-DB wave) ·
+> i18n 7,253 = 7,253 standing (no delta) + mobile 371 = 371 · drift
+> **347 = 347** (zero delta — the seven W-30 routes bind the standing
+> keys) · manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors +
+> self-test all-probes-OK · history-secrets 0 violations · 6,762
+> allowlisted hits (the window's shift; the FOUR tag anchors untouched)
+> · ROUTE_PERMISSIONS **1,159** (the tsx recount — 1,152 + 7) · the
+> registry 315 tenant-owned tables · the report registry **122** ·
+> capabilities agree · shells PASS/PASS · boundary PASS.]**
+
 > **[Dated 2026-11-23 (PHASE-050 W-29 — T-15 delivered, the web plane under
 > the owner's standing order — «عند الانتهاء من أي خطوة ادفعها إلى
 > المستودع», every step pushed at its own commit: `6171b09` the screens →
