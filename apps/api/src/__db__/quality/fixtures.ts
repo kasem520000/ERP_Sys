@@ -160,6 +160,39 @@ export async function freshQualityBatch(code: string): Promise<{
   return { itemId, batchId: batch.rows[0]!.id };
 }
 
+// ── W-26: the calibration worlds (the per-arm instrument fixtures) ─────────────
+
+/**
+ * A FRESH INSTRUMENT ASSET per arm (the per-arm-world law — the CAPA G-63
+ * arms and the calibration register's arms never share a mutable
+ * instrument): a fresh asset on the QL tenant through the same category +
+ * branch the base fixture seeds (D-08: the instrument IS an asset — the
+ * binding target).
+ */
+export async function freshQualityInstrument(code: string): Promise<string> {
+  const base = await setupQualityFixture();
+  const su: Client = await superuserClient();
+  const asset = await su.query<{ id: string }>(
+    `INSERT INTO assets (id, tenant_id, code, name, name_ar, category_id, branch_id,
+        acquisition_date, cost, useful_life_months, status, created_by)
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6,
+        '2025-06-01', 9000, 60, 'ACTIVE', $7)
+     ON CONFLICT (tenant_id, code) DO UPDATE SET name = EXCLUDED.name
+     RETURNING id`,
+    [
+      TENANT_QUALITY,
+      `QL-INST-${code}`,
+      `The ${code} instrument`,
+      `جهاز ${code}`,
+      base.categoryId,
+      base.branchId,
+      QL_ACTOR,
+    ],
+  );
+  await su.end();
+  return asset.rows[0]!.id;
+}
+
 // ── W-25: the posting world (the G-62 substrate + the service singletons) ───
 
 import { AuditService } from "../../modules/audit/api/audit";

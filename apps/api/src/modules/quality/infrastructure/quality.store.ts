@@ -648,32 +648,37 @@ export interface CalibrationDueRow {
 /**
  * ONE banded probe (the scanExpiringAssets sibling): every ACTIVE
  * instrument whose LATEST calibration record's due date falls in the
- * band — the LATEST record wins (a re-calibrated instrument's CURRENT
- * obligation is its newest due date; the superseded history never
- * alerts). THE DERIVED STEP (the clock law): the band edges resolve
- * against the database's own CURRENT_DATE inside the statement — the
- * same clock the fold's day-values mirror; no Date.now()+delta anywhere
- * in JS. The outer ORDER BY re-establishes the deterministic read order
- * after DISTINCT ON collapses the per-instrument rows.
+ * band. THE LATEST-FIRST LAW (the honest shape the W-26 sweep spec's
+ * per-cycle arm caught RED before any push): the per-instrument
+ * DISTINCT ON collapse happens BEFORE the band filter — the re-calibrated
+ * instrument's CURRENT obligation is its newest due date (a +300
+ * re-calibration never lets the superseded +15 row alert); the band then
+ * applies to the LATEST due date alone. THE DERIVED STEP (the clock
+ * law): the band edges resolve against the database's own CURRENT_DATE
+ * inside the statement — the same clock the fold's day-values mirror;
+ * no Date.now()+delta anywhere in JS. The outer ORDER BY keeps the
+ * deterministic read order.
  */
 export async function scanCalibrationDue(input: {
   band: { threshold: number; fromDays: number | null; toDays: number };
   limit: number;
 }): Promise<CalibrationDueRow[]> {
   return query<CalibrationDueRow>(sql`
-    SELECT * FROM (
+    SELECT latest."assetId" AS "assetId", latest.code, latest.name,
+      latest."nameAr" AS "nameAr", latest."dueDateValue"::text AS "dueDate"
+    FROM (
       SELECT DISTINCT ON (a.id)
         a.id AS "assetId", a.code, a.name, a.name_ar AS "nameAr",
-        cr.due_date::text AS "dueDate"
+        cr.due_date AS "dueDateValue"
       FROM calibration_records cr
       JOIN assets a ON a.id = cr.asset_id AND a.tenant_id = cr.tenant_id
       WHERE a.status = 'ACTIVE'
-        AND cr.due_date <= (CURRENT_DATE + ${input.band.toDays}::int)
-        AND (${input.band.fromDays ?? null}::int IS NULL
-          OR cr.due_date > (CURRENT_DATE + ${input.band.fromDays ?? null}::int))
       ORDER BY a.id, cr.calibrated_at DESC, cr.created_at DESC, cr.id DESC
     ) latest
-    ORDER BY latest."dueDate", latest."assetId"
+    WHERE latest."dueDateValue" <= (CURRENT_DATE + ${input.band.toDays}::int)
+      AND (${input.band.fromDays ?? null}::int IS NULL
+        OR latest."dueDateValue" > (CURRENT_DATE + ${input.band.fromDays ?? null}::int))
+    ORDER BY latest."dueDateValue", latest."assetId"
     LIMIT ${input.limit}`);
 }
 
