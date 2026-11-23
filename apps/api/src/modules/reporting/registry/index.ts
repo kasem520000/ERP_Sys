@@ -200,6 +200,17 @@ import { projectsEvmSummaryContract } from "./projects/evm-summary.contract";
 import { projectsContractProgressContract } from "./projects/contract-progress.contract";
 import { projectsRetentionStatementContract } from "./projects/retention-statement.contract";
 import { projectFieldserviceSlaContract } from "./projects/fieldservice-sla.contract";
+// PHASE-050 (W-30 — T-17, dated 2026-11-23) · the quality set
+// (REPORT_CATALOG §9's PHASE-050 rows — the four report contracts,
+// registry 118 → 122): every contract reads the quality module's own
+// registers VERBATIM (zero parallel computation — D-18's law; the BR-103
+// gate fold and the sweep's own probe shape compose the engines' own
+// reads) and rides the module's own read key (the §12 convention,
+// matrix §3.28 — quality.view).
+import { qualityNcrRegisterContract } from "./quality/ncr-register.contract";
+import { qualityCapaStatusContract } from "./quality/capa-status.contract";
+import { qualityCalibrationDueContract } from "./quality/calibration-due.contract";
+import { qualityComplaintsSummaryContract } from "./quality/complaints-summary.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -427,6 +438,19 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   projectsContractProgressContract,
   projectsRetentionStatementContract,
   projectFieldserviceSlaContract,
+  // §9 quality — PHASE-050 rows (REPORT_CATALOG §9's PHASE-050 additions;
+  // W-30, T-17, dated 2026-11-23): the QMS set — the NCR register (the
+  // module's own rows with the item/partner briefs; quantities never
+  // summed across unlike units), the CAPA status (the BR-103 gate's own
+  // verdict figures through the same fold the close act rides), the
+  // calibration due window (the sweep's own probe shape — the effective
+  // thresholds ladder folded into disjoint bands), and the complaints
+  // summary (the register's own grouped counts, counts only) — every
+  // figure the quality module's own, zero parallel computation.
+  qualityNcrRegisterContract,
+  qualityCapaStatusContract,
+  qualityCalibrationDueContract,
+  qualityComplaintsSummaryContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

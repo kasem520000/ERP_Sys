@@ -1,6 +1,6 @@
 # Report Catalog
 
-> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-22 (PHASE-049 — assets.maintenance-costs + assets.maintenance-backlog + assets.meter-readings + assets.expiry-register; registry 114 → 118. Earlier: PHASE-048 — projects.evm-summary + projects.contract-progress + projects.retention-statement + projects.fieldservice-sla; registry 110 → 114. Earlier: PHASE-047 — hr.performance-cycle-results + hr.recruitment-pipeline + hr.training-completions + hr.document-expiry; registry 106 → 110. Earlier: PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
+> **Status:** STABLE · **Owner:** Reporting Architecture · **Updated:** 2026-11-23 (PHASE-050 W-30 — quality.ncr-register + quality.capa-status + quality.calibration-due + quality.complaints-summary; registry 118 → 122. Earlier: PHASE-049 — assets.maintenance-costs + assets.maintenance-backlog + assets.meter-readings + assets.expiry-register; registry 114 → 118. Earlier: PHASE-048 — projects.evm-summary + projects.contract-progress + projects.retention-statement + projects.fieldservice-sla; registry 110 → 114. Earlier: PHASE-047 — hr.performance-cycle-results + hr.recruitment-pipeline + hr.training-completions + hr.document-expiry; registry 106 → 110. Earlier: PHASE-046 — payroll.statutory-summary + payroll.eosb-liability; registry 104 → 106. PHASE-038 — purchasing.rfq-award-matrix + purchasing.supplier-scorecard; registry 86 → 88 · PHASE-039 — sales.rma_register + sales.dunning_status; registry 88 → 90 · PHASE-041 — communication.outbound_delivery_log; registry 90 → 91 · PHASE-042 — manufacturing.work-center-utilization + downtime-analysis + rework-cost + cost-variance; registry 91 → 95 · PHASE-044 — inventory.bin-contents + cycle-count-variance + abc-classification + slow-movement; registry 95 → 99 · PHASE-043 — manufacturing.mrp-exceptions + manufacturing.atp-position; registry 99 → 101 · PHASE-045 — hr.attendance-register + hr.leave-balances + hr.overtime-summary; registry 101 → 104)
 
 Inventory of every core report, grouped by domain, with **provenance** (source of truth:
 module service + owned tables), key parameters, required permission, export formats, and
@@ -458,6 +458,38 @@ configured thresholds or the honest BEYOND label) and the document NUMBER never
 ships (amendment A-4 — the payslips precedent; employee code + name + kind + dates
 + band only). Employee rows carry code + display names only.
 
+**Shipped (PHASE-050 W-30, category `quality`)** — the four QMS contracts over the
+PHASE-013 engine (registry 118 → 122; permissions reuse the 0116-seeded module keys
+— the §12 module-register convention, matrix §3.28): every contract reads the
+quality module's own registers VERBATIM (zero parallel computation — D-18's law);
+the `quality` data-source module registers at phase 50 (the window widened 48 → 50,
+declared at the runtime):
+
+| Report key | Title (EN / AR) | Source of truth | Key parameters | Perm | Exports | Phase |
+|------------|------------------|-----------------|----------------|------|---------|-------|
+| `quality.ncr-register` | NCR Register / سجل عدم المطابقات | quality · `QualityReportQueriesService.ncrRegister` · ncr_records (+ items/partners briefs; the register's own status/severity/source vocabularies and the disposition pair) | dateFrom/To, status? (OPEN/DISPOSITIONED/CLOSED) | `quality.view` | PDF · XLSX · CSV | PHASE-050 |
+| `quality.capa-status` | CAPA Status / حالة سجلات CAPA | quality · `QualityReportQueriesService.capaStatus` · capa_records (+ the NCR link; the BR-103 gate's own verdict figures through the capaCloseGate fold, derived against the database's CURRENT_DATE) | dateFrom/To, status? (OPEN/IN_PROGRESS/CLOSED) | `quality.view` | PDF · XLSX · CSV | PHASE-050 |
+| `quality.calibration-due` | Calibration Due / استحقاقات المعايرة | quality · `QualityReportQueriesService.calibrationDue` (the sweep engine's effective thresholds ladder — stored ∪ the documented [30,7,0] default — folded into disjoint bands + the scanCalibrationDue probe per band: the ACTIVE instruments' LATEST due dates) | locale | `quality.view` | PDF · XLSX · CSV | PHASE-050 |
+| `quality.complaints-summary` | Complaints Summary / ملخص الشكاوى | quality · `QualityReportQueriesService.complaintsSummary` · complaints (the register's own grouped counts — one GROUP BY per axis) | dateFrom/To | `quality.view` | PDF · XLSX · CSV | PHASE-050 |
+
+Notes: `quality.ncr-register` carries the `ncr-status-vocabulary` block-on-fail
+assertion (every row's status/severity/source sits in the 0114 CHECK's own domain)
+and renders NO quantity totals by design (different items carry different units —
+the retention-statement law; the row count is the register's own total);
+`quality.capa-status` carries `capa-closure-shape` (every CLOSED row carries its
+recorded effectiveness check and its close stamp — BR-103's own floor re-checked by
+the reader) and its pending-action figures are the BR-103 gate fold's own outputs
+(the same fold the close act rides, derived against the same database date — zero
+parallel computation); `quality.calibration-due` carries
+`calibration-band-vocabulary` (every rendered row's band is one of the effective
+thresholds ladder's own windows — the sweep's disjoint-band fold, every instrument
+in exactly one band) and never runs the sweep (a report is never the alerting act —
+it renders the same window the alerts name, the days derived from the database's
+CURRENT_DATE inside the probe's SQL); `quality.complaints-summary` carries
+`complaints-count-tie` (each axis's counts sum to the period total — every
+complaint counted exactly once per axis) and is COUNTS ONLY (no complaint body or
+customer data crosses into the summary).
+
 ## 10. Consolidation (v2.0 — multi-entity)
 
 Delivered by PHASE-034 (**COMPLETE 2026-11-09** — registry rows 76 → 80; the four
@@ -557,6 +589,7 @@ A report cannot be registered before its data phase — the registry cross-check
 | PHASE-047 | the four talent contracts added (§9's hr workforce additions: the appraisal cycle results — one row per (cycle × reviewee) MANAGER review in SUBMITTED/CALIBRATED with BR-090's manager-outcomes-only posture structural (the `performance-manager-only-source` block-on-fail check; the 360 inputs never ship); the recruitment funnel — BR-088's FIXED ladder as count columns with the `pipeline-stage-total-tie` check, counts only (the applicants' personal data never crosses into exports — amendment A-4); the training completions — the once-stamped completed_at + the result vocabulary with the `training-completion-shape` check; and the document expiry register — the band folded from the tenant's configured sweep thresholds with the `document-band-vocabulary` check, the document number never ships (amendment A-4)); registry 106 → 110 |
 | PHASE-048 | the four projects contracts added (§9's PHASE-048 rows: the EVM summary — the W-10 engine's own snapshot with the `evm-ac-gl-tie` INV-033 block-on-fail check and the snapshot's own figures as the totals (zero parallel computation); the contract progress — the W-11 certificates register + the BR-093 ceiling card's own read with the `br-092-pair-integrity` re-check; the retention statement — the whole ledger verbatim with the `retention-ledger-shape` check and NO amount totals by design (the W-13 print law); and the field-service SLA posture — the W-12 single clock's PURE readout (`slaReadout`, nothing recorded: a report is never the evaluation act) with the `sla-no-fabricated-target` fail-closed check); registry 110 → 114 (the `projects` data-source module registered at phase 48 — the window widened 45 → 48, declared) |
 | PHASE-049 | the four CMMS contracts added (§9's PHASE-049 rows — the fixed-assets data-source module's CMMS extension, no window change): the maintenance-costs register — the work-order engine's own three legs with the LIVE `inv034-expense-tie` block-on-fail check (the GL maintenance-expense debit vs the order's own source lines to the cent, plus the no-posting-before-completion arm); the maintenance backlog — the overdue ACTIVE plans by their OWN next-due date + the open orders, the days derived from the database's CURRENT_DATE (the sweep's derived-step clock law) with the `backlog-honest-shape` check; the meter-readings log — the engine's own rows with the `readings-log-shape` vocabulary check; and the fleet expiry register — R-10's engine read verbatim (the four expiry chips + the single designated KM odometer binding) with the `fleet-odometer-single-binding` check; registry 114 → 118 (the `fixed_assets` data-source module's own phase — no window change; the §12 module-register key reuse: `assets.maintenance.view` ×2 · `assets.meters.view` · `assets.expiry.view`) |
+| PHASE-050 | the four quality contracts added (§9's PHASE-050 rows, W-30 — D-18; the `quality` data-source module registered at phase 50, the window widened 48 → 50, declared): the NCR register — the register's own rows with the item/partner briefs and the `ncr-status-vocabulary` check (NO quantity totals across unlike units — the retention-statement law); the CAPA status — the register's own figures + the BR-103 gate's own verdict figures through the same capaCloseGate fold the close act rides, with the `capa-closure-shape` check; the calibration due window — the sweep's own probe shape (the effective thresholds ladder stored ∪ the documented [30,7,0] default, folded into disjoint bands, the instruments' LATEST due dates) with the `calibration-band-vocabulary` check, never running the sweep; and the complaints summary — the register's own grouped counts by status/channel/severity with the `complaints-count-tie` check, counts only; registry 118 → 122 (the §12 module-register key reuse: `quality.view` ×4) |
 
 ## 14. Saved views, dashboard widgets, and subscriptions
 
@@ -651,3 +684,15 @@ A report cannot be registered before its data phase — the registry cross-check
    boot list, the db fixtures, the unit spec, the consolidation spec's own
    catalog — the three §3.27 keys with the dated notes) — no partial
    anchoring).
+9. PHASE-050 (2026-11-23, W-30 T-17) catalog↔registry reconciliation extended:
+   every one of the 122 registry keys has exactly one catalog row (122/122) —
+   the four quality contracts added above (§9's PHASE-050 rows); the
+   reconciliation was re-walked at delivery (each of `quality.ncr-register`,
+   `quality.capa-status`, `quality.calibration-due`,
+   `quality.complaints-summary` appears exactly once in §9 and once in the
+   live registry — the four rows' pins re-pinned together at ALL sites per
+   the 048-W14 law: the eight count pins (report-pack-wiring · reporting-unit
+   ×2 · consolidation-contracts ×2 · golden ×2 · industry-018 · industry-019
+   + the cmms spec's own pin) + the four known-permission catalogs (the boot
+   list, the db fixtures, the unit spec, the consolidation spec's own catalog
+   — the one §3.28 key with the dated note) — no partial anchoring).

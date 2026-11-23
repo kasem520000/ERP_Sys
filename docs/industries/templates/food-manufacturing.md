@@ -1,6 +1,6 @@
 # Template: Food Manufacturing — `food_manufacturing`
 
-> **Status:** STABLE · SHIPPED (PHASE-018, 2026-11-03) · **Owner:** Industry Solutions Architecture · **Updated:** 2026-11-03
+> **Status:** STABLE · SHIPPED (PHASE-018, 2026-11-03) · **Owner:** Industry Solutions Architecture · **Updated:** 2026-11-23 (PHASE-050 W-30 — the QMS composition section: the hazard registers + the management review pack + the quality screens, composed on the `quality`/`quality.spc` feature keys the manifest has carried since W-24; earlier: 2026-11-03)
 
 Production with a conscience: recipes (**BOM قائمة المواد**), batch-tracked materials, a
 **QC gate فحص الجودة** before finished goods may sell, and shelf-life batches with
@@ -19,6 +19,13 @@ next-day markdown discipline. Delivered with PHASE-018 — seeded at v1.0.0 by m
 ## Manifest
 
 > **PHASE-045 (0088):** the workforce enablement — `required_feature_keys` gains `hr.attendance` · `hr.leave` · `hr.shifts`; the excerpt also catches up with the 0066 manufacturing-execution keys (the byte-true mirror is [manifests/manifest.food_manufacturing.json](manifests/manifest.food_manufacturing.json)).
+>
+> **PHASE-050 (W-24 — 0116 §5c, and W-30's composition section below):** the QMS enablement —
+> `required_feature_keys` additionally gains `quality` (the WHOLE-MODULE composable unit) ·
+> `quality.spc` (the SPC plane's own flag), plus the 0108 CMMS pair (`assets.maintenance` ·
+> `assets.transfer`) and the 0098 talent quartet. Starter carries NEITHER quality flag (the
+> declared neutral zero); the ten `quality.*` PERMISSION keys ride ROLES (matrix §3.28),
+> never a template's required chain.
 
 ```json
 {
@@ -36,7 +43,10 @@ next-day markdown discipline. Delivered with PHASE-018 — seeded at v1.0.0 by m
     "inventory.multi_warehouse",
     "inventory.batch_tracking" , "inventory.stock_counts",
     "items.price_lists", "purchasing.landed_costs",
-    "hr.attendance", "hr.leave", "hr.shifts"
+    "hr.attendance", "hr.leave", "hr.shifts",
+    "hr.performance", "hr.recruitment", "hr.training", "hr.org",
+    "assets.maintenance", "assets.transfer",
+    "quality", "quality.spc"
   ],
   "default_modules_enabled": ["accounting", "partners", "items", "inventory", "sales",
     "purchasing", "treasury", "tax", "reporting", "manufacturing", "configuration"],
@@ -123,6 +133,8 @@ next-day markdown discipline. Delivered with PHASE-018 — seeded at v1.0.0 by m
 | `purchasing.landed_costs` | Required | PHASE-011 | Imported ingredients (flour, cocoa, packaging) |
 | `pos.sales`, `treasury.cashier_shifts` | Optional | PHASE-016 | Factory-outlet counter |
 | `distribution.customer_tiers` | Optional | PHASE-017 | Wholesale vs retail pricing |
+| `quality` | Required | PHASE-050 | The QMS composable unit: specifications, NCR/CAPA, calibration, complaints, COA, holds, recall, the hazard registers, the management review pack — composed here for food-safety operations (the section below) |
+| `quality.spc` | Required | PHASE-050 | The SPC plane's own flag (X-bar/R charts, Cp/Cpk, out-of-control flags) — composed with `quality` |
 
 ## Terminology overrides (sample)
 
@@ -146,6 +158,36 @@ next-day markdown discipline. Delivered with PHASE-018 — seeded at v1.0.0 by m
 | QC inspections | فحوصات الجودة | `manufacturing.qc` |
 | Batch genealogy | شجرة الدفعات | `manufacturing.genealogy` |
 | Expiry control | الرقابة على الصلاحية | `inventory.expiry_list` |
+
+## Quality management surfaces (PHASE-050, composed — never hardcoded)
+
+The template composes the QMS plane through the `quality` + `quality.spc` feature keys its
+manifest has carried since W-24 (0116 §5c — CR-36f template-composable grants): the
+surfaces arrive **composed**, and the tenant owns the content. Nothing below is a seeded
+checklist — Q-10/Q-11's own law (D-15).
+
+- **The HACCP hazard registers** (Q-11, W-30): `hazard_registers` — one register row per
+  hazard, the tenant's own structure: the hazard description (bilingual), the category
+  vocabulary (`BIOLOGICAL`/`CHEMICAL`/`PHYSICAL`/`ALLERGEN`), the process step, the optional
+  item binding, the **CCP flag with its critical limit** (the HACCP floor: a critical
+  control point carries its critical limit — refused typed otherwise), the monitoring
+  procedure and the corrective action. Routes: `POST/GET /api/v1/quality/hazards`,
+  `GET/PATCH /api/v1/quality/hazards/:id` (`quality.manage` / `quality.view`).
+- **The management review pack** (Q-10, W-30): `quality_management_reviews` — the meeting
+  record with its **frozen indicator pack** (the NCR/CAPA/complaint status counts + the
+  SPC out-of-control chart count + the samples volume — the engines' own reads at the
+  meeting, frozen verbatim: a later state never moves a stored pack) and the decisions
+  array. The official `MRV-{YYYY}-{SEQ:6}` numbers. Routes: `POST/GET
+  /api/v1/quality/reviews`, `GET /api/v1/quality/reviews/:id` (`quality.manage` /
+  `quality.view`) — the record is evidence, no lifecycle acts exist by design.
+- **The five quality screens** riding the `quality` feature key (W-29, the web plane):
+  NCR register · CAPA register · calibration register + sweep config · complaints ladder ·
+  COA certificates — plus the SPC charts screen on `quality.spc`. The batch-hold banners
+  (INV-035) ride the inventory batch surfaces.
+- **The four quality report contracts** (W-30, registry 118 → 122): `quality.ncr-register`,
+  `quality.capa-status`, `quality.calibration-due` (the sweep's own 30/7/0 due-window
+  probe), `quality.complaints-summary` — every figure the quality module's own rows, zero
+  parallel computation (see [../../reporting/REPORT_CATALOG.md](../../reporting/REPORT_CATALOG.md) §9).
 
 ## Signature workflow — bakery production (compact)
 
@@ -196,8 +238,10 @@ Numbered steps and per-step journals:
 
 - MES/shop-floor IoT (machine telemetry, OEE dashboards).
 - Allergen/nutrition labeling and regulatory specification management.
-- HACCP document management (QC here is pass/fail/sampled inspection, not a documentation
-  system).
+- Full HACCP document management (PHASE-050 W-30 delivers the composed hazard/CCP register
+  with the tenant-owned critical limits — the section above; the register is not a
+  documentation system: monitoring calendars, verification records and the audit-program
+  paperwork stay out of scope).
 - Capacity planning / finite scheduling (production orders carry dates, not a scheduler).
 
 ## Known limitations

@@ -501,3 +501,64 @@ export class RecallStateError extends DomainError {
     );
   }
 }
+
+// ── the management review plane (T-16 — Q-10, the frozen indicator pack) ────
+
+export class ManagementReviewNotFoundError extends DomainError {
+  constructor(details: { reviewId: string }) {
+    super(
+      "MANAGEMENT_REVIEW_NOT_FOUND",
+      `management review ${details.reviewId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+// ── the hazard register plane (T-16 — Q-11, the HACCP register) ─────────────
+
+export class HazardRegisterNotFoundError extends DomainError {
+  constructor(details: { hazardId: string }) {
+    super(
+      "HAZARD_REGISTER_NOT_FOUND",
+      `hazard register row ${details.hazardId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, name) natural key is unique (the 0116 uq) — the typed
+ * pre-check law; the 23505 never surfaces raw. */
+export class HazardRegisterDuplicateError extends DomainError {
+  constructor(details: { name: string }) {
+    super(
+      "HAZARD_REGISTER_DUPLICATE",
+      `a hazard register row already carries the name "${details.name}" (the (tenant, name) key is unique — uq_hazard_registers_tenant_name)`,
+      details,
+    );
+  }
+}
+
+/** The register's own state law: a RETIRED (inactive) row is frozen
+ * evidence — retiring is the last write it accepts. */
+export class HazardRegisterStateError extends DomainError {
+  constructor(details: { hazardId: string; name: string }) {
+    super(
+      "HAZARD_REGISTER_STATE",
+      `hazard register row ${details.name} is retired (is_active = false) — the register is evidence, no move rewrites a retired row`,
+      details,
+    );
+  }
+}
+
+/** THE HACCP FLOOR (the 0116 ck_hazard_registers_ccp_limit's service
+ * face): a critical control point carries its critical limit — the typed
+ * pre-check names the missing pair before the DB CHECK fires. */
+export class HazardCcpLimitRequiredError extends DomainError {
+  constructor(details: { name: string }) {
+    super(
+      "HAZARD_CCP_LIMIT_REQUIRED",
+      `the hazard "${details.name}" is a critical control point (CCP) but carries no critical limit (the HACCP floor — ck_hazard_registers_ccp_limit: a CCP row must carry its critical limit)`,
+      details,
+    );
+  }
+}

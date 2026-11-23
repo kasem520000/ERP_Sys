@@ -202,6 +202,11 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "assets.maintenance.view",
   "assets.meters.view",
   "assets.expiry.view",
+  // PHASE-050 (0116 §5a seed, matrix §3.28 — W-30, T-17, dated
+  // 2026-11-23): the quality report key (the same §12 convention — the
+  // four contracts ride the module's own finance-read key the /quality
+  // routes ride; the grant the fullContext actor needs to run them).
+  "quality.view",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

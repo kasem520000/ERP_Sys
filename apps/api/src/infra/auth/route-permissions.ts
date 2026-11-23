@@ -5753,6 +5753,53 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/quality/recall/:id/close",
     permission: "quality.recall.manage",
   },
+  // PHASE-050 (W-30 — T-16, dated 2026-11-23; matrix §3.28): the
+  // keys-seed-first FIFTH binding wave (1,152 + 7 = 1,159 — the
+  // discipline standing: the TEN keys landed at W-24, the routes bind as
+  // the service waves ship, every change dated at the block — the 1,102
+  // baseline anchor). The management review plane binds quality.manage
+  // over the create (the meeting record with the FROZEN indicator pack —
+  // the register is evidence, NO lifecycle acts exist by design) with
+  // quality.view over the reads; the hazard register plane binds
+  // quality.manage over the create + the patch (the HACCP master data —
+  // the tenant owns the critical-limits structure, the
+  // food-manufacturing template composes the surface) with quality.view
+  // over the reads.
+  {
+    method: "POST",
+    path: "/api/v1/quality/reviews",
+    permission: "quality.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/reviews",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/reviews/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/quality/hazards",
+    permission: "quality.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/hazards",
+    permission: "quality.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/quality/hazards/:id",
+    permission: "quality.view",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/quality/hazards/:id",
+    permission: "quality.manage",
+  },
 ];
 
 /**

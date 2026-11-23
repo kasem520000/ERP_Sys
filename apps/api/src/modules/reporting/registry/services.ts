@@ -42,6 +42,7 @@ import { PartnerSubledgerService } from "../../partners/application/subledger-se
 import { ManufacturingExecutionQueriesService } from "./manufacturing/queries";
 import { PlanningQueriesService } from "./manufacturing/planning-queries";
 import { WmsQueriesService } from "./operational/wms-queries";
+import { QualityReportQueriesService } from "./quality/quality-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -134,6 +135,14 @@ export interface ReportingServices {
   projectsRetention: RetentionService;
   projectsBilling: ProgressBillingService;
   projectsFieldservice: FieldserviceService;
+  /** PHASE-050 (W-30 — T-17, dated 2026-11-23) · the quality query
+   * surface — the quality module's own registers (NCR/CAPA/complaints/
+   * calibration) the four quality contracts read VERBATIM (zero parallel
+   * computation: the BR-103 gate fold + the sweep's own probe shape are
+   * the engines' own reads; stateless reader over the ambient tenant
+   * transaction, the same direct-construction graph the 049 CMMS
+   * surface builds). */
+  qualityQueries: QualityReportQueriesService;
 }
 
 let bundle: ReportingServices | undefined;
@@ -208,6 +217,10 @@ export function reportingServices(): ReportingServices {
         const postings = new ServiceOrderPosting(posting, invoices, new ReservationService(audit));
         return new FieldserviceService(audit, new InboxService(), postings);
       })(),
+      // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality registers'
+      // own reader (the same direct-construction graph the __db__/quality
+      // fixtures build — the sweep engine's read surfaces only).
+      qualityQueries: new QualityReportQueriesService(),
     };
   }
   return bundle;

@@ -25,6 +25,12 @@ import { CoaService } from "./application/coa-service";
 import { ComplaintService } from "./application/complaint-service";
 import { HoldService } from "./application/hold-service";
 import { RecallService } from "./application/recall-service";
+// PHASE-050 (W-30 — T-16, D-15): the management review pack (the frozen
+// indicator pack — the engines' own reads) + the HACCP hazard registers
+// (the tenant owns the critical-limits structure; the food-manufacturing
+// template composes the surface).
+import { ManagementReviewsService } from "./application/reviews-service";
+import { HazardRegistersService } from "./application/hazards-service";
 import { registerQualityCalibrationJob } from "./infrastructure/calibration-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
 // PHASE-050 (W-28 — T-14, D-14): the recall drill consumes the
@@ -36,9 +42,11 @@ import {
   QualityCapaController,
   QualityCoaController,
   QualityComplaintsController,
+  QualityHazardsController,
   QualityHoldsController,
   QualityNcrController,
   QualityRecallController,
+  QualityReviewsController,
   QualitySpecificationsController,
   QualitySpcController,
   QualitySupplierScoresController,
@@ -82,6 +90,10 @@ import {
     QualityComplaintsController,
     QualityHoldsController,
     QualityRecallController,
+    // PHASE-050 (W-30 — T-16): the management review pack + the hazard
+    // registers (the keys-seed-first FIFTH binding wave).
+    QualityReviewsController,
+    QualityHazardsController,
   ],
   providers: [
     SpecificationService,
@@ -100,6 +112,12 @@ import {
     ComplaintService,
     HoldService,
     RecallService,
+    // PHASE-050 (W-30 — T-16): the management review pack + the hazard
+    // registers (the reviews service rides the SPC engine's own chart
+    // read for the pack's out-of-control count — the declared consumer
+    // surface, zero parallel computation).
+    ManagementReviewsService,
+    HazardRegistersService,
   ],
   exports: [SpecificationService, NcrService, CapaService, CalibrationService, HoldService],
 })

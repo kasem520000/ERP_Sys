@@ -98,6 +98,12 @@ import {
   BatchQualityHoldStateError,
   ComplaintStateError,
   RecallStateError,
+  // PHASE-050 (W-30 — T-16): the reviews + hazards planes' statuses
+  // (see domainStatus).
+  ManagementReviewNotFoundError,
+  HazardRegisterNotFoundError,
+  HazardRegisterDuplicateError,
+  HazardRegisterStateError,
 } from "../../modules/quality/domain/quality-errors";
 import {
   AttachmentNotFoundError,
@@ -1358,7 +1364,11 @@ function domainStatus(error: DomainError): number {
     // recall registers' not-founds (A7 parity).
     error instanceof BatchQualityHoldNotFoundError ||
     error instanceof ComplaintNotFoundError ||
-    error instanceof RecallRecordNotFoundError
+    error instanceof RecallRecordNotFoundError ||
+    // PHASE-050 (W-30 — T-16, dated 2026-11-23): the management review +
+    // hazard register reads' not-founds (A7 parity — unknown == foreign).
+    error instanceof ManagementReviewNotFoundError ||
+    error instanceof HazardRegisterNotFoundError
   ) {
     return HttpStatus.NOT_FOUND;
   }
@@ -1376,7 +1386,15 @@ function domainStatus(error: DomainError): number {
     error instanceof BatchHoldAlreadyActiveError ||
     error instanceof BatchQualityHoldStateError ||
     error instanceof ComplaintStateError ||
-    error instanceof RecallStateError
+    error instanceof RecallStateError ||
+    // PHASE-050 (W-30 — T-16, dated 2026-11-23): the hazard register's
+    // natural-key conflict (the (tenant, name) unique, refused at the
+    // service floor) and the register's own state law (a retired row is
+    // frozen evidence). The HACCP CCP floor
+    // (HAZARD_CCP_LIMIT_REQUIRED) is the policy class — it falls through
+    // to the 422 default exactly as the family law documents it.
+    error instanceof HazardRegisterDuplicateError ||
+    error instanceof HazardRegisterStateError
   ) {
     return HttpStatus.CONFLICT;
   }

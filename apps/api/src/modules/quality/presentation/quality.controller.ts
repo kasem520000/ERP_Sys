@@ -1073,3 +1073,196 @@ export class QualityRecallController {
     return envelope(await this.recalls.close({ recallId: id, actorId: identity.userId }));
   }
 }
+
+// ── PHASE-050 (W-30 — T-16): the management review pack + the hazard
+// registers (the keys-seed-first FIFTH binding wave — D-15: the meeting
+// record with the FROZEN indicator pack + the HACCP register; the
+// reviews bind quality.manage over the create with quality.view over the
+// reads — the record is evidence, no lifecycle acts exist by design; the
+// hazards bind quality.manage over the create/patch with quality.view
+// over the reads — the tenant owns the critical-limits structure, the
+// food-manufacturing template composes the surface, never a hardcoded
+// checklist) ───────────────────────────────────────────────────────────────────
+
+// PHASE-050 (W-30 — T-16): the reviews + hazards planes.
+import { ManagementReviewsService } from "../application/reviews-service";
+import { HazardRegistersService } from "../application/hazards-service";
+
+const createReviewSchema = z.object({
+  meetingDate: STAMP,
+  title: z.string().min(1).max(500).optional(),
+  attendees: z.array(z.string().min(1).max(200)).max(100).optional(),
+  decisions: z.array(z.string().min(1).max(2000)).min(1).max(100),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const HAZARD_CATEGORIES = ["BIOLOGICAL", "CHEMICAL", "PHYSICAL", "ALLERGEN"] as const;
+
+const createHazardSchema = z.object({
+  name: z.string().min(1).max(200),
+  nameAr: NOTE,
+  hazard: TEXT,
+  hazardAr: NOTE,
+  category: z.enum(HAZARD_CATEGORIES),
+  processStep: z.string().max(200).nullable().optional(),
+  itemId: UUID.nullish(),
+  isCcp: z.boolean().optional(),
+  criticalLimit: z.string().min(1).max(2000).nullable().optional(),
+  criticalLimitAr: NOTE,
+  monitoringProcedure: z.string().max(4000).nullable().optional(),
+  correctiveAction: z.string().max(4000).nullable().optional(),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+const updateHazardSchema = z.object({
+  hazard: TEXT.optional(),
+  hazardAr: NOTE,
+  processStep: z.string().max(200).nullable().optional(),
+  itemId: UUID.nullish(),
+  isCcp: z.boolean().optional(),
+  criticalLimit: z.string().min(1).max(2000).nullable().optional(),
+  criticalLimitAr: NOTE,
+  monitoringProcedure: z.string().max(4000).nullable().optional(),
+  correctiveAction: z.string().max(4000).nullable().optional(),
+  isActive: z.boolean().optional(),
+  note: NOTE,
+  noteAr: NOTE,
+});
+
+@Controller("/api/v1/quality")
+export class QualityReviewsController {
+  constructor(
+    @Inject(ManagementReviewsService) private readonly reviews: ManagementReviewsService,
+  ) {}
+
+  @Post("reviews")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.manage")
+  @RequireFeature("quality")
+  async createReview(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createReviewSchema.parse(body);
+    return envelope(
+      await this.reviews.create({
+        meetingDate: input.meetingDate,
+        title: input.title,
+        attendees: input.attendees,
+        decisions: input.decisions,
+        note: input.note ?? null,
+        noteAr: input.noteAr ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("reviews")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async listReviews(@Query("limit") limit?: string) {
+    return envelope(
+      await this.reviews.list({
+        limit: limit === undefined ? undefined : Number(limit),
+      }),
+    );
+  }
+
+  @Get("reviews/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findReview(@Param("id") id: string) {
+    return envelope(await this.reviews.find(id));
+  }
+}
+
+@Controller("/api/v1/quality")
+export class QualityHazardsController {
+  constructor(
+    @Inject(HazardRegistersService) private readonly hazards: HazardRegistersService,
+  ) {}
+
+  @Post("hazards")
+  @HttpCode(HttpStatus.CREATED)
+  @RequirePermissions("quality.manage")
+  @RequireFeature("quality")
+  async createHazard(@Req() request: Request, @Body() body: unknown) {
+    const identity = requireIdentity(request);
+    const input = createHazardSchema.parse(body);
+    return envelope(
+      await this.hazards.create({
+        name: input.name,
+        nameAr: input.nameAr ?? null,
+        hazard: input.hazard,
+        hazardAr: input.hazardAr ?? null,
+        category: input.category,
+        processStep: input.processStep ?? null,
+        itemId: input.itemId ?? null,
+        isCcp: input.isCcp,
+        criticalLimit: input.criticalLimit ?? null,
+        criticalLimitAr: input.criticalLimitAr ?? null,
+        monitoringProcedure: input.monitoringProcedure ?? null,
+        correctiveAction: input.correctiveAction ?? null,
+        note: input.note ?? null,
+        noteAr: input.noteAr ?? null,
+        actorId: identity.userId,
+      }),
+    );
+  }
+
+  @Get("hazards")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async listHazards(
+    @Query("itemId") itemId?: string,
+    @Query("category") category?: string,
+    @Query("activeOnly") activeOnly?: string,
+    @Query("limit") limit?: string,
+  ) {
+    return envelope(
+      await this.hazards.list({
+        itemId: itemId === undefined || itemId === "" ? undefined : itemId,
+        category,
+        activeOnly: activeOnly === "true",
+        limit: limit === undefined ? undefined : Number(limit),
+      }),
+    );
+  }
+
+  @Get("hazards/:id")
+  @RequirePermissions("quality.view")
+  @RequireFeature("quality")
+  async findHazard(@Param("id") id: string) {
+    return envelope(await this.hazards.find(id));
+  }
+
+  @Patch("hazards/:id")
+  @RequirePermissions("quality.manage")
+  @RequireFeature("quality")
+  async updateHazard(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ) {
+    const identity = requireIdentity(request);
+    const patch = updateHazardSchema.parse(body);
+    return envelope(
+      await this.hazards.update({
+        hazardId: id,
+        hazard: patch.hazard,
+        hazardAr: patch.hazardAr,
+        processStep: patch.processStep,
+        itemId: patch.itemId === undefined ? undefined : patch.itemId === null ? null : patch.itemId,
+        isCcp: patch.isCcp,
+        criticalLimit: patch.criticalLimit,
+        criticalLimitAr: patch.criticalLimitAr,
+        monitoringProcedure: patch.monitoringProcedure,
+        correctiveAction: patch.correctiveAction,
+        isActive: patch.isActive,
+        note: patch.note,
+        noteAr: patch.noteAr,
+        actorId: identity.userId,
+      }),
+    );
+  }
+}

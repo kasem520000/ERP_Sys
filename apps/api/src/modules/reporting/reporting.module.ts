@@ -125,6 +125,11 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   "assets.maintenance.view",
   "assets.meters.view",
   "assets.expiry.view",
+  // PHASE-050 (0116 §5a seed, matrix §3.28 — W-30, T-17, dated
+  // 2026-11-23): the quality report key (the same §12 module-register
+  // convention — the four contracts ride the module's own finance-read
+  // key the /quality routes ride).
+  "quality.view",
   // PHASE-027 (0038 seed): the notes/installments report keys
   "notes.notes.view",
   "installments.plans.view",

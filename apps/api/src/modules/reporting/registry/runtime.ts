@@ -42,6 +42,7 @@ const CATEGORIES: readonly ReportCategory[] = [
   "industry",
   "hr", // PHASE-045: the workforce registers (attendance / leave balances / overtime)
   "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects plane (WBS/EVM/contracting/field service)
+  "quality", // PHASE-050 (W-30 — T-17, dated 2026-11-23): the QMS registers (NCR/CAPA/calibration/complaints)
 ];
 
 const SOURCE_MODULES: readonly DataSourceModule[] = [
@@ -69,6 +70,7 @@ const SOURCE_MODULES: readonly DataSourceModule[] = [
   "communication", // PHASE-041: the communication query surface (the outbound delivery log)
   "hr", // PHASE-045: the hr query surface (attendance register / leave balances / overtime summary)
   "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects query surface (the W-9…W-12 engines the four projects contracts read verbatim — WBS rollup · budgets/actuals · EVM · change orders · contracting · field service)
+  "quality", // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality query surface (the quality module's own registers the four quality contracts read verbatim — NCR · CAPA · calibration due · complaints)
 ];
 
 const dataSourceSchema = z.object({
@@ -204,9 +206,10 @@ const MODULE_DATA_PHASE: Readonly<Record<DataSourceModule, number>> = Object.fre
   communication: 41, // PHASE-041: the outbound delivery log over the send ledger
   hr: 45, // PHASE-045: attendance register / leave balances / overtime summary query surfaces
   projects: 48, // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects engines (WBS rollup · budgets/actuals + INV-033 · EVM · change orders · contracting registers · field service — the query surfaces the four projects contracts read)
+  quality: 50, // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality module's own registers (NCR/CAPA/complaints/calibration — the query surfaces the four quality contracts read verbatim)
 });
 
-const REGISTERED_PHASE_WINDOW = 48; // PHASE-013 window, widened by the
+const REGISTERED_PHASE_WINDOW = 50; // PHASE-013 window, widened by the
 // delivering phases that registered contracts over real query surfaces:
 // 15 (industry reports) + 16 (the POS set) + 17 (distribution) + 18
 // (manufacturing) + 19 (CRM) + 26 (fixed assets) + 27 (notes/installments) +
@@ -215,7 +218,10 @@ const REGISTERED_PHASE_WINDOW = 48; // PHASE-013 window, widened by the
 // (communication — see MODULE_DATA_PHASE) + 45 (hr — see
 // MODULE_DATA_PHASE) + 48 (projects — see MODULE_DATA_PHASE; the W-14
 // widening, dated 2026-11-22: the four projects contracts register over
-// the PHASE-048 engine surfaces — declared, never silent).
+// the PHASE-048 engine surfaces — declared, never silent) + 50 (quality
+// — see MODULE_DATA_PHASE; the W-30 widening, dated 2026-11-23: the four
+// quality contracts register over the PHASE-050 QMS registers —
+// declared, never silent).
 
 /** Financial reports must carry the §11 minimum assertion set (§16 checklist). */
 const FINANCIAL_MINIMUM_ASSERTIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({

@@ -1452,3 +1452,316 @@ export async function listRecallDocCustomers(
         : invoiceArm;
   return query<RecallDocCustomerRow>(statement);
 }
+
+// ── PHASE-050 (W-30 — T-16) the management review indicator-pack reads
+// (D-15: the engines' own status counts, one GROUP BY each — the pack
+// reads the OWNING registers, zero recomputation, and FREEZES the answer
+// into the meeting row; a later state never moves a stored pack) ──────────
+
+/** The grouped count row (the pack's own atom — status → n). */
+export interface StatusCountRow {
+  status: string;
+  n: number;
+}
+
+/** The NCR register's own status counts (the 0114 ladder's own domain). */
+export async function countNcrsByStatus(): Promise<Record<string, number>> {
+  const rows = await query<StatusCountRow>(sql`
+    SELECT status, count(*)::int AS n FROM ncr_records GROUP BY status ORDER BY status`);
+  return Object.fromEntries(rows.map((row) => [row.status, row.n]));
+}
+
+/** The CAPA register's own status counts. */
+export async function countCapasByStatus(): Promise<Record<string, number>> {
+  const rows = await query<StatusCountRow>(sql`
+    SELECT status, count(*)::int AS n FROM capa_records GROUP BY status ORDER BY status`);
+  return Object.fromEntries(rows.map((row) => [row.status, row.n]));
+}
+
+/** The complaints register's own status counts (the 0114 ladder). */
+export async function countComplaintsByStatus(): Promise<Record<string, number>> {
+  const rows = await query<StatusCountRow>(sql`
+    SELECT status, count(*)::int AS n FROM complaints GROUP BY status ORDER BY status`);
+  return Object.fromEntries(rows.map((row) => [row.status, row.n]));
+}
+
+/**
+ * The sample store's own volume (the HONEST CHEAP READ — declared W-30):
+ * the SPC chart (X-bar/R, the out-of-control flags) is the PURE module's
+ * computed output, never a stored column — a SQL count of "out-of-control
+ * charts" would RECOMPUTE the fold inside the database (the D-12
+ * parallel-computation ban). The pack therefore carries the samples count
+ * here (the chart's own input volume, a stock simple count), while the
+ * out-of-control chart count lands through the ENGINE'S OWN chart read at
+ * the service floor (SpcService.chart — the spc-service docblock's own
+ * "report pack W-30" consumer surface).
+ */
+export async function countSpcMeasurements(): Promise<number> {
+  const rows = await query<{ n: number }>(sql`
+    SELECT count(*)::int AS n FROM spc_measurements`);
+  return rows[0]!.n;
+}
+
+// ── PHASE-050 (W-30 — T-16) the management review rows (Q-10 — the
+// meeting RECORD: the frozen indicator pack + the decisions; evidence
+// discipline: S/I/U, NO DELETE — the register is the review's own
+// evidence, no move rewrites a held meeting) ────────────────────────────────
+
+/** The frozen indicator pack's stored shape (the engines' own counts at
+ * the meeting — camelCase keys, frozen verbatim, never recomputed). */
+export interface ReviewIndicatorPack {
+  ncrsByStatus: Record<string, number>;
+  capasByStatus: Record<string, number>;
+  complaintsByStatus: Record<string, number>;
+  spc: {
+    activeSpecs: number;
+    outOfControlCharts: number;
+    measurements: number;
+  };
+}
+
+export interface ManagementReviewRow {
+  id: string;
+  reviewNo: string;
+  title: string;
+  heldAt: string;
+  attendees: string[];
+  indicatorPack: ReviewIndicatorPack;
+  decisions: string[];
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+const REVIEW_COLUMNS = sql`id, review_no AS "reviewNo", title, held_at AS "heldAt",
+  attendees, indicator_pack AS "indicatorPack", decisions, note, note_ar AS "noteAr",
+  created_by AS "createdBy", created_at AS "createdAt"`;
+
+export interface InsertManagementReviewInput {
+  reviewNo: string;
+  title: string;
+  heldAt: string;
+  attendees: string[];
+  indicatorPack: ReviewIndicatorPack;
+  decisions: string[];
+  note: string | null;
+  noteAr: string | null;
+  createdBy: string | null;
+}
+
+/** The meeting record's ONLY writer — the indicator pack lands FROZEN
+ * (the 0116 frozen-snapshot law: a later engine state never moves a
+ * stored pack; the jsonb CHECKs' object/array shapes satisfied by the
+ * same statement that lands them). */
+export async function insertManagementReview(
+  input: InsertManagementReviewInput,
+): Promise<ManagementReviewRow> {
+  const rows = await query<ManagementReviewRow>(sql`
+    INSERT INTO quality_management_reviews
+      (id, tenant_id, created_by, review_no, title, held_at, attendees,
+       indicator_pack, decisions, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.createdBy},
+            ${input.reviewNo}, ${input.title}, ${input.heldAt}::timestamptz,
+            ${JSON.stringify(input.attendees)}::jsonb,
+            ${JSON.stringify(input.indicatorPack)}::jsonb,
+            ${JSON.stringify(input.decisions)}::jsonb, ${input.note}, ${input.noteAr})
+    RETURNING ${REVIEW_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findManagementReviewById(
+  id: string,
+): Promise<ManagementReviewRow | undefined> {
+  const rows = await query<ManagementReviewRow>(sql`
+    SELECT ${REVIEW_COLUMNS} FROM quality_management_reviews WHERE id = ${id}`);
+  return rows[0];
+}
+
+export async function listManagementReviews(filter: {
+  limit: number;
+}): Promise<ManagementReviewRow[]> {
+  return query<ManagementReviewRow>(sql`
+    SELECT ${REVIEW_COLUMNS} FROM quality_management_reviews
+    ORDER BY held_at DESC, id DESC
+    LIMIT ${Math.min(filter.limit, 500)}`);
+}
+
+// ── PHASE-050 (W-30 — T-16) the hazard register rows (Q-11 — the HACCP
+// register; the tenant owns the critical-limits structure, the
+// food-manufacturing template composes the surface — D-15; master data:
+// the 0116 grants carry S/I/U/D by design, this store exercises S/I/U) ──────
+
+export interface HazardRegisterRow {
+  id: string;
+  name: string;
+  nameAr: string | null;
+  hazard: string;
+  hazardAr: string | null;
+  category: string;
+  processStep: string | null;
+  itemId: string | null;
+  isCcp: boolean;
+  criticalLimit: string | null;
+  criticalLimitAr: string | null;
+  monitoringProcedure: string | null;
+  correctiveAction: string | null;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const HAZARD_COLUMNS = sql`id, name, name_ar AS "nameAr", hazard, hazard_ar AS "hazardAr",
+  category, process_step AS "processStep", item_id AS "itemId", is_ccp AS "isCcp",
+  critical_limit AS "criticalLimit", critical_limit_ar AS "criticalLimitAr",
+  monitoring_procedure AS "monitoringProcedure", corrective_action AS "correctiveAction",
+  is_active AS "isActive", note, note_ar AS "noteAr", version,
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export interface InsertHazardRegisterInput {
+  name: string;
+  nameAr: string | null;
+  hazard: string;
+  hazardAr: string | null;
+  category: string;
+  processStep: string | null;
+  itemId: string | null;
+  isCcp: boolean;
+  criticalLimit: string | null;
+  criticalLimitAr: string | null;
+  monitoringProcedure: string | null;
+  correctiveAction: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}
+
+export async function insertHazardRegister(
+  input: InsertHazardRegisterInput,
+): Promise<HazardRegisterRow> {
+  const rows = await query<HazardRegisterRow>(sql`
+    INSERT INTO hazard_registers
+      (id, tenant_id, created_by, name, name_ar, hazard, hazard_ar, category,
+       process_step, item_id, is_ccp, critical_limit, critical_limit_ar,
+       monitoring_procedure, corrective_action, note, note_ar)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.actorId},
+            ${input.name}, ${input.nameAr}, ${input.hazard}, ${input.hazardAr},
+            ${input.category}, ${input.processStep}, ${input.itemId}, ${input.isCcp},
+            ${input.criticalLimit}, ${input.criticalLimitAr},
+            ${input.monitoringProcedure}, ${input.correctiveAction},
+            ${input.note}, ${input.noteAr})
+    RETURNING ${HAZARD_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findHazardRegisterById(
+  id: string,
+): Promise<HazardRegisterRow | undefined> {
+  const rows = await query<HazardRegisterRow>(sql`
+    SELECT ${HAZARD_COLUMNS} FROM hazard_registers WHERE id = ${id}`);
+  return rows[0];
+}
+
+/** The natural-key read (the (tenant, name) unique's typed pre-check). */
+export async function findHazardRegisterByName(
+  name: string,
+): Promise<HazardRegisterRow | undefined> {
+  const rows = await query<HazardRegisterRow>(sql`
+    SELECT ${HAZARD_COLUMNS} FROM hazard_registers WHERE name = ${name}`);
+  return rows[0];
+}
+
+export async function listHazardRegisters(filter: {
+  itemId?: string;
+  category?: string;
+  activeOnly?: boolean;
+  limit: number;
+}): Promise<HazardRegisterRow[]> {
+  return query<HazardRegisterRow>(sql`
+    SELECT ${HAZARD_COLUMNS} FROM hazard_registers
+    WHERE (${filter.itemId ?? null}::uuid IS NULL OR item_id = ${filter.itemId ?? null})
+      AND (${filter.category ?? null}::text IS NULL OR category = ${filter.category ?? null})
+      AND (${filter.activeOnly ?? false} = false OR is_active = true)
+    ORDER BY name
+    LIMIT ${Math.min(filter.limit, 500)}`);
+}
+
+export interface UpdateHazardRegisterInput {
+  id: string;
+  hazard?: string;
+  hazardAr?: string | null;
+  processStep?: string | null;
+  itemId?: string | null;
+  isCcp?: boolean;
+  criticalLimit?: string | null;
+  criticalLimitAr?: string | null;
+  monitoringProcedure?: string | null;
+  correctiveAction?: string | null;
+  isActive?: boolean;
+  note?: string | null;
+  noteAr?: string | null;
+  actorId: string | null;
+}
+
+/**
+ * THE PATCH + STATE CAS (the updateQualitySpec idiom + the register's own
+ * state law): the nullable columns merge with `!== undefined` so an
+ * explicit null CLEARS; the WHERE pins `is_active = true` — the row's own
+ * state law (a RETIRED register row is frozen evidence: retiring is the
+ * last write it accepts, the transition itself landing through this same
+ * CAS as SET is_active = false). The name and the category are IMMUTABLE
+ * (the register row's own identity — the natural key and the 0116
+ * vocabulary's domain, the updateQualitySpec precedent's parameter law).
+ * Zero rows = the retired row or the raced move (the service re-reads and
+ * refuses with the row's own state).
+ */
+export async function updateHazardRegister(
+  input: UpdateHazardRegisterInput,
+): Promise<HazardRegisterRow | undefined> {
+  const current = await findHazardRegisterById(input.id);
+  if (current === undefined) return undefined;
+  const next = {
+    hazard: input.hazard ?? current.hazard,
+    hazardAr: input.hazardAr !== undefined ? input.hazardAr : current.hazardAr,
+    processStep: input.processStep !== undefined ? input.processStep : current.processStep,
+    itemId: input.itemId !== undefined ? input.itemId : current.itemId,
+    isCcp: input.isCcp ?? current.isCcp,
+    criticalLimit:
+      input.criticalLimit !== undefined ? input.criticalLimit : current.criticalLimit,
+    criticalLimitAr:
+      input.criticalLimitAr !== undefined ? input.criticalLimitAr : current.criticalLimitAr,
+    monitoringProcedure:
+      input.monitoringProcedure !== undefined
+        ? input.monitoringProcedure
+        : current.monitoringProcedure,
+    correctiveAction:
+      input.correctiveAction !== undefined ? input.correctiveAction : current.correctiveAction,
+    isActive: input.isActive ?? current.isActive,
+    note: input.note !== undefined ? input.note : current.note,
+    noteAr: input.noteAr !== undefined ? input.noteAr : current.noteAr,
+  };
+  const rows = await query<HazardRegisterRow>(sql`
+    UPDATE hazard_registers SET
+      hazard = ${next.hazard},
+      hazard_ar = ${next.hazardAr},
+      process_step = ${next.processStep},
+      item_id = ${next.itemId},
+      is_ccp = ${next.isCcp},
+      critical_limit = ${next.criticalLimit},
+      critical_limit_ar = ${next.criticalLimitAr},
+      monitoring_procedure = ${next.monitoringProcedure},
+      corrective_action = ${next.correctiveAction},
+      is_active = ${next.isActive},
+      note = ${next.note},
+      note_ar = ${next.noteAr},
+      updated_by = ${input.actorId},
+      updated_at = now(),
+      version = version + 1
+    WHERE id = ${input.id}
+      AND is_active = true
+    RETURNING ${HAZARD_COLUMNS}`);
+  return rows[0];
+}

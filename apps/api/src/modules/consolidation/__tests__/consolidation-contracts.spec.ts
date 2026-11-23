@@ -114,6 +114,10 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "assets.maintenance.view",
   "assets.meters.view",
   "assets.expiry.view",
+  // PHASE-050 (0116 §5a seed, matrix §3.28 — W-30, T-17, dated
+  // 2026-11-23): the quality report key (the same §12 convention —
+  // the four contracts ride the module's own finance-read key).
+  "quality.view",
   "notes.notes.view",
   "installments.plans.view",
   // PHASE-028/029 (restored lineage, migrations 0042/0043 seeds): the
@@ -143,12 +147,12 @@ describe("PHASE-034 · the consolidation report contracts (REPORT_CATALOG §10)"
   it("the 86-contract registry validates against the known-permission catalog", () => {
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(118); // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects)
+    expect(result.count).toBe(122); // PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects)
   });
 
   it("the four §10 keys are registered verbatim with consolidation.reports.view", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(118); // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
+    expect(snapshot).toHaveLength(122); // PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
     for (const id of CONSOLIDATION_IDS) {
       const row = snapshot.find((entry) => entry.id === id);
       expect(row, `${id} must be registered`).toBeDefined();
