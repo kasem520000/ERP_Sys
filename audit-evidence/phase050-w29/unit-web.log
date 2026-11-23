@@ -1,0 +1,45 @@
+
+> @erp/web@0.1.0 test /home/z/ERP_Sys/apps/web
+> vitest run
+
+
+ RUN  v3.2.7 /home/z/ERP_Sys/apps/web
+
+ ✓ components/__tests__/hr-performance-board.test.tsx (8 tests) 839ms
+ ✓ components/__tests__/hr-recruitment-board.test.tsx (7 tests) 788ms
+ ✓ components/__tests__/hr-org-board.test.tsx (8 tests) 720ms
+ ✓ components/__tests__/hr-training-board.test.tsx (5 tests) 619ms
+   ✓ PHASE-047 W-5 T-13 — the training board > the completion patch posts the exact shape (status + attendance + completion + result)  346ms
+ ✓ components/__tests__/projects-contracting-board.test.tsx (11 tests) 579ms
+ ✓ components/__tests__/assets-maintenance-board.test.tsx (8 tests) 537ms
+ ✓ components/__tests__/quality-ncr-board.test.tsx (5 tests) 546ms
+ ✓ components/__tests__/quality-complaints-board.test.tsx (4 tests) 482ms
+ ✓ components/__tests__/assets-meters-board.test.tsx (5 tests) 410ms
+ ✓ components/__tests__/statutory-profiles-board.test.tsx (5 tests) 416ms
+ ✓ components/__tests__/eosb-board.test.tsx (5 tests) 413ms
+ ✓ components/__tests__/assets-transfers-board.test.tsx (5 tests) 369ms
+ ✓ components/__tests__/quality-calibration-board.test.tsx (4 tests) 370ms
+ ✓ components/__tests__/quality-coa-board.test.tsx (3 tests) 352ms
+ ✓ components/__tests__/quality-spc-board.test.tsx (4 tests) 410ms
+ ✓ components/__tests__/quality-capa-board.test.tsx (4 tests) 306ms
+ ✓ components/__tests__/projects-wbs-board.test.tsx (7 tests) 268ms
+ ✓ components/__tests__/projects-fieldservice-board.test.tsx (7 tests) 222ms
+ ✓ components/__tests__/atp-promise-point.test.tsx (4 tests) 205ms
+ ✓ components/__tests__/assets-scan-surface.test.tsx (3 tests) 162ms
+ ✓ components/offline/__tests__/offline-components.test.tsx (19 tests) 138ms
+ ✓ components/__tests__/employee-talent-360.test.tsx (7 tests) 119ms
+ ✓ components/__tests__/batch-hold-banner.test.tsx (3 tests) 57ms
+ ✓ lib/shell/__tests__/sync-mirror.test.ts (14 tests) 43ms
+ ✓ lib/shell/__tests__/bridge.test.tsx (13 tests) 42ms
+ ✓ lib/shell/__tests__/store-client.test.ts (20 tests) 28ms
+ ✓ lib/__tests__/assets-print.test.ts (3 tests) 19ms
+ ✓ lib/__tests__/coa-print.test.ts (3 tests) 16ms
+ ✓ __tests__/local-schema-parity.test.ts (7 tests) 5ms
+ ✓ components/__tests__/quality-nav-rows.test.tsx (3 tests) 4ms
+
+ Test Files  30 passed (30)
+      Tests  204 passed (204)
+   Start at  21:58:28
+   Duration  34.40s (transform 1.80s, setup 0ms, collect 11.07s, tests 9.48s, environment 8.54s, prepare 1.64s)
+
+EXIT=0
