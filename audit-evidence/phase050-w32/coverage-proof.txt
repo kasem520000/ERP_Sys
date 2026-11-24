@@ -1,0 +1,11 @@
+THE COVERAGE PROOF (the W-32 FULL SWEEP — the final head's own envelope)
+disk inventory: 300 files
+parts union:   300 files (unique 300)
+missing: NONE
+extra:   NONE
+duplicates: NONE
+THE FULL TEN-PART ENVELOPE AT THE CLOSURE HEAD (the coverage verified
+BEFORE the first run — the W-15 law): 300 files · 4,244 tests · 0 failed
+· 0 skipped — the arithmetic 300 = 1+1+1+1+1+3+5+113+86+88 EXACT ·
+4,244 = 1+8+5+4+4+1,915+23+948+625+711 EXACT; every part inside the
+amended 570s ceiling; VERDICT: COVERED — THE PHASE'S FINAL HEAD

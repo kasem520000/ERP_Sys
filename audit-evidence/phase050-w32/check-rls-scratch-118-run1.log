@@ -1,0 +1,79 @@
+SCRATCH_INITDB
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-scratch-rls-5499 ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    /home/z/.local/share/erp-env/embedded-pg-linux-x64/native/bin/pg_ctl -D /tmp/erp-api-scratch-rls-5499 -l logfile start
+
+
+SCRATCH_READY
+2026-11-24 00:11:02.179 UTC [31505] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-24 00:11:02.180 UTC [31505] LOG:  listening on IPv6 address "::1", port 5499
+2026-11-24 00:11:02.180 UTC [31505] LOG:  listening on IPv4 address "127.0.0.1", port 5499
+
+2026-11-24 00:11:02.180 UTC [31505] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5499"
+
+2026-11-24 00:11:02.181 UTC [31508] LOG:  database system was shut down at 2026-11-24 00:11:02 UTC
+
+2026-11-24 00:11:02.182 UTC [31505] LOG:  database system is ready to accept connections
+
+CHAIN_APPLYING
+CHAIN_118_APPLIED
+RLS_CHECK
+[check-rls] OK — 340 catalog tables
+
+
+SCRATCH_STOPPING
+2026-11-24 00:11:05.315 UTC [31505] LOG:  received fast shutdown request
+
+2026-11-24 00:11:05.315 UTC [31505] LOG:  aborting any active transactions
+
+2026-11-24 00:11:05.317 UTC [31505] LOG:  background worker "logical replication launcher" (PID 31511) exited with exit code 1
+
+2026-11-24 00:11:05.317 UTC [31506] LOG:  shutting down
+
+2026-11-24 00:11:05.317 UTC [31506] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-24 00:11:05.338 UTC [31506] LOG:  checkpoint complete: wrote 2876 buffers (17.6%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.013 s, sync=0.008 s, total=0.021 s; sync files=2788, longest=0.001 s, average=0.001 s; distance=28013 kB, estimate=28013 kB; lsn=0/3039F68, redo lsn=0/3039F68
+
+2026-11-24 00:11:05.345 UTC [31505] LOG:  database system is shut down
+
+SCRATCH_STOPPED
+EXIT=0
