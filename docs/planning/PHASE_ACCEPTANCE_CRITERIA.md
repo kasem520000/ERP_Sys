@@ -1443,6 +1443,117 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
     ID_LEDGER flip — implemented G 63 · INV 35 · BR 104 — atomic with the
     canon rows).
 
+### PHASE-051 — Foreign Trade & Logistics (OPENED AT PLAN 2026-11-24 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-051-MASTER-PLAN.md` §3/§4 is the binding division; the launch dispatch's §5 declared base — the COA print patterns → the trade certificates · the planIssue unified gate → the bonded restrictions · the documented-contract precedents — carried into every wave; the reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة خارجها)
+
+1. **Migrations 0119–0122 (the honest slots — the phase doc's 0091…0094 stale
+   by its own note, the 048/049/050 D-02 precedent) apply cleanly from zero
+   (re-apply no-op); Drizzle mirror parity; the FOURTEEN new tables
+   (`letters_of_credit` · `lc_amendments` · `lc_documents` ·
+   `documentary_collections` · `incoterms` · `bills_of_lading` ·
+   `packing_lists` · `certificates_of_origin` · `customs_declarations` ·
+   `customs_declaration_lines` · `hs_code_registry` ·
+   `bonded_warehouse_moves` · `duty_drawback_claims` ·
+   `shipment_tracking_events`) have ENTITY_CATALOG rows (340 → 354) + the
+   tables doc; the Incoterms and HS seeds load and are tenant-extensible.** —
+   *Arms:* the chain spec extended to 122 · the from-zero boot in every run ·
+   the A-suite's arms over the fourteen tables · the seeds' disclaimer
+   (D-16). *Waves:* W-33 (opens) · W-42 (the final sweep closes).
+2. **The LC lifecycle runs end-to-end — issue, amend, track the documents
+   checklist with discrepancies, retire — with G-64 posting balanced
+   margin/retirement entries and LC fees posting to financial charges;
+   expiry alerts fire at 30/14/7/1 days (BR-105).** — *Arms:*
+   `trade-lc.db.spec` (the ladder · the amendments' typed windows · the
+   checklist states + the discrepancy notes · G-64's exactly-once + the
+   unmapped-purpose refusal + zero residue) · `trade-lc-sweep.db.spec`
+   (**the SIXTH standing isolate** — the ladder, the dedupe axes, the
+   settings surface, the DB's-own-clock law) · the pure folds FIRST
+   (property tests). *Waves:* W-34 (opens) · W-41 (the golden closes).
+3. **Customs declarations compute duties and import VAT per line and flow
+   into the existing landed-cost allocation (G-65); INV-036 holds — no
+   landed-cost allocation on an import receipt without a completed
+   declaration reference, and every allocated duty ties to a declaration
+   line.** — *Arms:* `trade-customs.db.spec` (the line math on Decimal
+   (ADR-0009) · the allocation through the REAL LandedCostsService VERBATIM
+   — zero parallel computation · the INV-036 typed refusals (D-07's honest
+   interpretation: the customs-duty allocation on an import receipt
+   requires the COMPLETED declaration; ordinary non-duty landed costs
+   untouched) + the zero residue + the line-level tie) · the duty/VAT pure
+   fold. *Waves:* W-37 (opens) · W-41 (the golden closes).
+4. **Bonded moves post no duty on movement (G-66); release into free
+   circulation recognizes duty exactly once (BR-107); duty-suspended stock
+   is visibly flagged and blocked from customer issue while suspended.** —
+   *Arms:* `trade-bonded.db.spec` (the in-bond transfer with NO duty entry
+   through the REAL movement core · **THE SHARED GATE'S BLOCKING MATRIX over
+   every baseline issue path — the 050 hold-gate's own evidence shape: the
+   raw `planIssue` · the manualIssue · the sales-delivery post · the
+   transfer dispatch, the typed `BONDED_STOCK_SUSPENDED` naming the stock +
+   the bond, zero residue** · the release's duty recognition (the
+   G-65-shaped pair at the released quantity) + the single-use stamp + the
+   typed replay refusal + the flip-and-restore) · the suspended banner spec
+   (W-39) · **the block is G-66's own structural face — NO new invariant
+   identifier (the reservations law; the launch dispatch's declared base:
+   the planIssue unified gate as the precedent)**. *Waves:* W-38 (opens) ·
+   W-41 (the golden closes).
+5. **Duty drawback claims cannot submit without linked export evidence
+   (BR-108); the claim workflow records claimed amounts and status
+   transitions.** — *Arms:* `trade-drawback.db.spec` (the export-evidence
+   gate's typed refusal naming the claim + the missing evidence · the
+   ladder · **the honest no-GL shape — the non-ledger-document law: the
+   claim is a registry record; the refund lands when treasury records
+   it**). *Waves:* W-38 (opens).
+6. **Incoterm selection is mandatory on trade-flagged purchase/sales orders
+   and renders the carriage/insurance/duty risk-hint matrix (BR-106); the
+   registry page lists the seeded set and accepts tenant additions.** —
+   *Arms:* `trade-incoterms.db.spec` (the registry + the mandate's typed
+   refusal at the order's own posting — **D-10's proposed trigger: with the
+   `trade` flag enabled, an order whose currency ≠ the base OR carrying the
+   import/export marker** + the ownership matrix as registry data) · the web
+   selector spec on the PO/SO forms + the reference page spec (W-39).
+   *Waves:* W-35 (the engine) · W-39 (the surface).
+7. **Shipment tracking events drive document status transitions (booked →
+   departed → arrived → cleared → delivered) on the linked bills of lading,
+   packing lists and declarations; the tracking board renders AR/EN parity
+   with RTL and loading/empty states.** — *Arms:* the tracking PURE fold
+   (D-14 — the total status × event matrix, the monotone ladder, the typed
+   refusals — property tests FIRST) · `trade-tracking.db.spec` (the fold's
+   output rendered VERBATIM) · the web board spec (W-39). *Waves:* W-36 (the
+   engine) · W-39 (the board).
+8. **Certificates of origin print in bilingual chamber format; the PO →
+   LC/collection → transport documents → declaration → receipt →
+   landed-cost chain is navigable end-to-end.** — *Arms:* the certificate
+   print spec (D-13 — the 050 print laws carried verbatim: `bi()`
+   EXCLUSIVELY · the frozen snapshots VERBATIM · the REAL Chromium test both
+   directions, deterministic byte-identical with the renderer's own clock
+   stamps normalized) · the chain-navigation spec (the linked reads through
+   each module's OWN rows — D-15's documented contracts). *Waves:* W-39 (the
+   print) · the chain arms W-34…W-37 as each link lands.
+9. **CR-36 gates: +10 permission keys with zero-drift equality (347 → 357 =
+   357) · i18n parity BY BOTH COUNTS from the first surface wave (W-39:
+   7,253+n = 7,253+n + mobile 371 = 371 standing) · RLS attack tests A1–A10
+   on all fourteen tables (the composite-FK law) · feature-flag/template
+   gating verified (`trade` · `trade.lc` · `trade.customs` — wholesale ·
+   distribution-field-sales · electronics compose by default) ·
+   `docs:validate` green · OA-06 budgets (indexes + EXPLAIN on declaration
+   lines and tracking events).** — *Arms:* the drift checker at every wave ·
+   `trade-rls.db.spec` (A1–A10 × 14, the hostile probe worlds — the
+   cmms/quality precedent's exact set) · `trade-explain-budgets.db.spec`
+   (OA-06 — never a forced plan, never an isolated probe context) · the
+   flag-gating specs. *Waves:* W-33 (the keys + the flags) · W-39 (the
+   i18n) · W-41 (the RLS closes).
+10. **The completion report `reports/PHASE-051-COMPLETION.md` with the
+    cumulative ledger #1–#10 walked and closed (every wave's evidence
+    pointers) + the IMPLEMENTATION_STATUS flip + **the archive
+    `ERP_PLATFORM_PHASE051.zip` EXACTLY AS DECLARED (§5 of the master plan:
+    the git-tracked tree at the closure head, FLAT — the physical shape of
+    049/050, the commit-hash as the FIRST entry, ADDITIVE-ONLY, EXCLUDING
+    every standing platform zip — أرشفة الأرشيف ممنوعة; the SEVENTEEN
+    standing zips 034_FINAL…050 verified untouched)** + the tag `phase/051`
+    (DELIVERY, never acceptance) + the Stage-13 release gate checked per
+    CR-38 and recorded before Wave 3 starts.** — *Waves:* W-42 (closes the
+    ledger and the phase; the open-items log transferred explicitly; the
+    ID_LEDGER flip — implemented G 66 · INV 36 · BR 108 — atomic with the
+    canon rows).
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

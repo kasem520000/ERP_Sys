@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/my-project/ERP_Sys_051
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/contracts:lint: cache miss, executing 3fdb7241f054e8c3
+@erp/domain-core:lint: cache miss, executing 6100448496824f0c
+@erp/api:lint: cache miss, executing 3006057246b25317
+@erp/ui:lint: cache miss, executing 97cf1d26708e37b0
+@erp/web:lint: cache miss, executing a9c147d729575f8c
+@erp/mobile:lint: cache miss, executing edf799d5d1e2253d
+@erp/sync-core:lint: cache miss, executing 9e9191fd5f1c8ac2
+@erp/desktop:lint: cache miss, executing 7b4c5fca61bf5b93
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/my-project/ERP_Sys_051/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/my-project/ERP_Sys_051/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/my-project/ERP_Sys_051/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/my-project/ERP_Sys_051/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    47.456s 
+
+EXIT=0

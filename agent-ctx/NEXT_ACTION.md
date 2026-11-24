@@ -1,3 +1,39 @@
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-0 THE MASTER PLAN WAVE DELIVERED FOR REVIEW (2026-11-24, this session)** — the plan `agent-ctx/PHASE-051-MASTER-PLAN.md` PROPOSED, the implementation waves **W-33…W-42 BLOCKED until the owner's approval dispatch** (إذن إطلاق فقط — NOT production approval) — تسليم لا قبول
+
+**The launch dispatch (the owner's, recorded in full in the plan §0b):**
+PHASE-050 CLOSED AS DELIVERY at the tag `phase/050` (`01f61a7` — W-31 + W-32
+accepted, ZERO deviations — «لا تصحيحات مطلوبة», the first no-correction
+closure in the record) · PHASE-051 LAUNCHED with the master-plan-first law
+(سابقة 049-W0/050-W0) and the §5 declared base BINDING: the COA dual-print
+patterns → the trade certificates (D-13) · the planIssue unified gate → the
+bonded-warehouse movement restrictions (D-08) · the D-13/D-14
+documented-contract precedents → the 051 contracts (D-15) · **the standing
+order: «عند الانتهاء من أي خطوة ادفعها إلى المستودع»** · the open-items log
+transferred VERBATIM (§0c (6)) · the reservations **G-64…G-66 · INV-036 ·
+BR-105…BR-108 — لا كتابة خارجها**.
+
+**W-0 — THE MASTER PLAN WAVE (T-00, delivered on the closure head `01f61a7`
+in ONE docs-only increment, this session):** the plan PROPOSED for review
+before launch (W-33…W-42 over T-01…T-18 — the foundation 0119–0122 · the LC
+engine + the SIXTH isolate (the `trade-expiry-sweep`) · collections +
+Incoterms · transport + tracking · the customs engine (G-65/INV-036) ·
+bonded + drawback (G-66/BR-107/BR-108) · the web plane (the print laws) ·
+the reports (registry 122 → 126) · the proof pack · the closure + the tag
+`phase/051`) · the acceptance ledger OPENED
+(`docs/planning/PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-051 — the ten criteria
+with their ARMS and WAVES) · the IMPLEMENTATION_STATUS dated header line
+prepended · the evidence envelope `audit-evidence/phase051-plan/` (the
+FORTY-FOURTH consecutive same-session wave — the §0a fresh-clone record +
+the full battery at the 050 closure's own constants re-proven). **The
+implementation waves are BLOCKED until the owner's approval dispatch — the
+open inputs: (a) the wave numbering W-33…W-42 · (b) the G-64/G-65/G-66
+account shapes (D-05/D-06/D-08) · (c) the BR-106 trigger rule (D-10) —
+تسليم لا قبول — NOT production approval.**
+
+---
+
+# PHASE-050 — CLOSED AS DELIVERY 2026-11-23 (the historical record below)
+
 # NEXT ACTION — PHASE-050 (Quality Management System) — **CLOSED AS DELIVERY 2026-11-23** (W-24…W-32 · the tag `phase/050` — DELIVERY, never acceptance · the report `docs/implementation/phases/reports/PHASE-050-COMPLETION.md`) — **PHASE-051 (Foreign Trade & Logistics) IS THE NEXT ELIGIBLE PHASE** — the owner continues with «ابدأ تنفيذ المرحلة PHASE-051» — تسليم لا قبول — NOT production approval
 
 **The approval dispatch (the owner's W-0 acceptance, recorded in full at the
