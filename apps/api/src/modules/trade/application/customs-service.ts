@@ -390,6 +390,20 @@ export class CustomsService {
     if (reason.trim().length === 0 || reason.length > 2000) {
       throw new TradeInputInvalidError({ field: "reason", reason: "1…2000 chars are required (the cancellation's own record)" });
     }
+    if (declaration.status !== "DRAFT") {
+      // THE STAMP-SHAPE FLOOR's own wording (the 0121
+      // ck_customs_declarations_submitted_shape law: CANCELLED carries
+      // submitted_at NULL — the submission stamp is monotone evidence
+      // that never un-stamps; once submitted, the declaration completes
+      // or stands).
+      throw new DeclarationStateError({
+        declarationId: declaration.id,
+        declarationNo: declaration.declarationNo,
+        from: declaration.status,
+        to: "CANCELLED",
+        reason: "the cancellation exits the DRAFT rung only — the submission stamp is monotone evidence that never un-stamps (the 0121 stamp-shape floor)",
+      });
+    }
     const stamped = await store.stampDeclarationCancelled(id);
     if (stamped === undefined) {
       throw racedMove(declaration, "CANCELLED");
