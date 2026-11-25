@@ -620,6 +620,18 @@ export async function stampCollectionAccepted(input: {
  * + the settled pair in the SAME statement from the window the fold
  * allowed (PRESENTED on D/P at sight · ACCEPTED on D/A), the 0119
  * XOR floors satisfied by the same write that consumes the stamp).
+ *
+ * THE AT-SIGHT ACCEPTANCE (the 0119 accepted_shape floor's own
+ * reading, recorded at the claim site): a PAID row carries the FULL
+ * ceremony — presented_at AND accepted_at AND paid_at (the 0119
+ * author's "ACCEPTED+ the acceptance" ladder wording: every rung
+ * carries the stamps below it). For a D/P collection settling at
+ * sight, the drawee's acceptance of the documents and the payment are
+ * ONE banking event — the acceptance stamp lands TOGETHER with the
+ * payment (COALESCE preserves a D/A's earlier explicit acceptance
+ * rung, the usance gap: accepted_at < paid_at; a D/P's at-sight
+ * record shows accepted_at = paid_at — the register's own evidence
+ * tells the terms apart).
  */
 export async function stampCollectionSettled(input: {
   id: string;
@@ -629,6 +641,7 @@ export async function stampCollectionSettled(input: {
   const rows = await query<CollectionRow>(sql`
     UPDATE documentary_collections
     SET status = 'PAID', paid_at = now(), settled_at = now(),
+        accepted_at = COALESCE(accepted_at, now()),
         settlement_ref = ${input.settlementRef},
         updated_at = now(), updated_by = ${input.actorId}, version = version + 1
     WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()

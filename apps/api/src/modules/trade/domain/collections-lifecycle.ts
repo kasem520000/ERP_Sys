@@ -14,17 +14,20 @@
  *
  *   THE TERMS GATE (the D/P vs D/A settlement windows — the phase doc's
  *   own pair): a DOCUMENTS-AGAINST-PAYMENT collection pays AT SIGHT —
- *   the presentation leads DIRECTLY to the settlement (it never
- *   accepts; there is no draft to accept); a DOCUMENTS-AGAINST-
- *   ACCEPTANCE collection is a USANCE instrument — the acceptance
- *   PRECEDES the settlement (the drawee's undertaking to pay at
- *   maturity), and the register carries its maturity date from birth
- *   (the 0119 usance floor: a D/A row with a NULL due_date never
- *   inserts). The settlement itself is the bank's own fact — the fold
- *   records no maturity gate on the settle act (an early settlement is
- *   a real banking event: the drawee may pay before maturity; the
- *   register records the fact with its reference — the declared
- *   interpretation, recorded here at the claim site).
+ *   the presentation leads DIRECTLY to the settlement (the ACCEPT ACT
+ *   never exists on D/P — there is no draft to accept; the register's
+ *   at-sight acceptance stamp lands together with the payment, the
+ *   0119 accepted_shape floor's own reading — the STORE's settle
+ *   stamp, declared interpretation #4 at the service's claim site); a
+ *   DOCUMENTS-AGAINST-ACCEPTANCE collection is a USANCE instrument —
+ *   the acceptance PRECEDES the settlement (the drawee's undertaking
+ *   to pay at maturity), and the register carries its maturity date
+ *   from birth (the 0119 usance floor: a D/A row with a NULL due_date
+ *   never inserts). The settlement itself is the bank's own fact — the
+ *   fold records no maturity gate on the settle act (an early
+ *   settlement is a real banking event: the drawee may pay before
+ *   maturity; the register records the fact with its reference — the
+ *   declared interpretation, recorded here at the claim site).
  *
  *   THE STAMP LAW'S EXIT (the 0119 XOR floors' own reading — the
  *   margin-exit law's sibling derivation): the presentation stamp

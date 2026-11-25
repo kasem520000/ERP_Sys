@@ -48,7 +48,7 @@ describe("the move matrix", () => {
     }
   });
 
-  it("THE D/P WINDOW (at sight): present → settle; the acceptance never exists", () => {
+  it("THE D/P WINDOW (at sight): present → settle; the ACCEPT ACT never exists (there is no draft to accept)", () => {
     expect(nextCollectionMove("OPEN", "present", "D/P")).toEqual({
       allowed: true,
       to: "PRESENTED",

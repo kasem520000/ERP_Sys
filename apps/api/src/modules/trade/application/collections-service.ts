@@ -49,7 +49,7 @@ import {
  *   is minted for a collection, G-64…G-66/INV-036/BR-105…BR-108
  *   untouched).
  *
- *   THE DECLARED INTERPRETATIONS (three, recorded at the claim sites):
+ *   THE DECLARED INTERPRETATIONS (four, recorded at the claim sites):
  *   (1) THE REGISTER'S OFFICIAL NUMBER `COLL-{YYYY}-{SEQ:6}` IS
  *   RESERVED AT CREATE (the LC/NCR/INV-021 precedent — the register
  *   row is the audit trail from its first write); (2) THE MATURITY IS
@@ -59,7 +59,13 @@ import {
  *   maturity, the W-40 contracts among them); (3) THE DOCUMENTS SET
  *   IS FROZEN AT CREATE (documents are lifecycle state machines — no
  *   PATCH surface, values ride create; the presented set is the
- *   created set).
+ *   created set); (4) THE AT-SIGHT ACCEPTANCE — a D/P collection
+ *   settling from PRESENTED stamps its acceptance TOGETHER with the
+ *   payment (the 0119 accepted_shape floor's own reading: a PAID row
+ *   carries the full ceremony; the drawee's acceptance of the
+ *   documents and the payment are one banking event at sight — the
+ *   explicit ACCEPT ACT stays the D/A-only usance ceremony, the
+ *   fold's own terms gate).
  *
  *   ONE ambient transaction per act (INV-018): the stamp and the audit
  *   record commit together or not at all — there is no journal to
