@@ -1980,6 +1980,113 @@ ONCE (BR-107) + the drawback claims' export-evidence gate (BR-108))
 under the owner's standing order. NOT production approval — تسليم لا
 قبول.]**
 
+**[Dated 2026-11-25 (PHASE-051 W-38 DELIVERED at the engine head
+`e01dbab` + the spec head `22836be` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERIA #4 + #5 GREEN — THE ENGINE ARMS
+(the blocking matrix + the release + the export-evidence gate; the
+golden transcripts + the failure packs are W-41's; the suspended
+banner spec is W-39's).** BONDED MOVES POST NO DUTY ON MOVEMENT
+(G-66 — D-08 VERBATIM): `trade-bonded.db.spec` (14 arms over real
+PG16, every arm on its OWN world — a fresh item per arm) proves THE
+IN-BOND TRANSFER through the REAL movement core (the OUT leg at WAC
+with the movement core's own `allowBondedStock` bypass — the
+beneficiary discipline; the IN leg at the carried cost — value
+conservation, G-15's own law), the G-15 policy journal on distinct
+accounts asserted as the VALUE-NEUTRAL pair (DR 1141 · CR 1140 at
+the carried value — NEVER a duty line; zero journals at the
+'release' operation), and the from-NULL INITIAL DEPOSIT (the
+custodial entry — the declared interpretation #10: NO journal while
+suspended, the INV-010 trail exact). **THE SHARED GATE'S BLOCKING
+MATRIX OVER EVERY BASELINE ISSUE PATH** (the 050 hold-gate's own
+evidence shape): the raw `planIssue` (the typed 409
+BONDED_STOCK_SUSPENDED naming the stock + the bond + the figures —
+the exact pool/on-hand payload, ZERO residue), the `manualIssue`
+(zero moves beyond the deposit's receipt, zero journals), the
+sales-delivery post (the note stays DRAFT, zero moves), the transfer
+dispatch — **the bond FOLLOWS THE GOODS** (the destination's pool
+grows, the gate blocks the destination alike), and the flag-off
+boundary (a tenant without the trade entitlement: a positive-pool
+position issues GREEN exactly as before — the gate silent, never
+restated narrower). THE BLOCK IS G-66'S OWN STRUCTURAL FACE — NO NEW
+INVARIANT IDENTIFIER (the reservations law §6.16; the launch
+dispatch's declared base: the planIssue unified gate as the
+precedent). RELEASE INTO FREE CIRCULATION RECOGNIZES DUTY EXACTLY
+ONCE (BR-107 — D-11): the release golden arm asserts the G-65-shaped
+pair at the released quantity (the journal **DR INVENTORY 1140 (the
+released stock's value uplift) · CR the purpose-mapped
+CUSTOMS_DUTY_PAYABLE 2145**, INV-013 single-use on
+(bonded_warehouse_moves, id, release) — the journal source's own
+anchor), the revaluation uplift through the REAL RevaluationService
+(WAC 2 → 2.1 — the WAC/layers math at the released quantity, the
+adjust move with the journal link), the ATOMIC recognition pair on
+the register's row (the 0121 ck_release_shape floor), THE
+FLIP-AND-RESTORE at release (the pool drops to zero — the manual
+issue passes; the physical-move shape carries the destination's WAC
+with the duty), THE SINGLE-USE STAMP (the replay refused — the row
+and the journal stand), the partial releases partitioning the
+declared duty + THE OVER-RELEASE GUARD (40 + 60 = the declared 100;
+61 refused BY NAME), the declaration-state refusals (SUBMITTED ·
+EXPORT-type · **COMPLETED through the REAL G-65 flow — the
+double-recognition refusal, the honest bifurcation**), the zero-duty
+release (the declared interpretation #6 extended: the EMPTY
+recognition pair — nothing posts, the pool still releases), and the
+FX ride + the fail-closed purpose (the superseded→refused→
+restored→GREEN flip-and-restore — the W-37 arm's own shape).
+DUTY-SUSPENDED STOCK IS VISIBLY FLAGGED AND BLOCKED FROM CUSTOMER
+ISSUE WHILE SUSPENDED (the gate's structural block — the suspended
+banner on the bonded-bearing surfaces is W-39's own arm, declared).
+DUTY DRAWBACK CLAIMS CANNOT SUBMIT WITHOUT LINKED EXPORT EVIDENCE
+(BR-108 — D-12's own wording): `trade-drawback.db.spec` (7 arms over
+real PG16) proves the gate's typed refusal (DRAWBACK_EVIDENCE_
+REQUIRED naming the claim + the missing evidence, the claim stays
+DRAFT — ZERO residue), the OR branches (the EXPORT declaration — the
+export-type law refuses an IMPORT declaration as evidence; the
+export bill of lading), the DRAFT-only link window, THE WORKFLOW
+RECORDS THE CLAIMED AMOUNTS AND STATUS TRANSITIONS (the ladder DRAFT
+→ SUBMITTED → UNDER_REVIEW → APPROVED | REJECTED; APPROVED → PAID —
+the stamps' shapes: submitted_at monotone, decided_at only at the
+verdicts; REJECTED and PAID terminal, every later move refused), and
+**THE HONEST NO-GL SHAPE — ZERO journals and ZERO cash movements
+across the whole workflow** (the non-ledger-document law's trade
+face: the claim is a registry record, the refund money lands when
+treasury records it — 053's surface). MIGRATION **0126** (the honest
+catch, disclosed at the claim sites: the closed
+ck_stock_moves_source_shape refused the bonded engine's first
+stock_moves insert BY NAME — the step-1 «NO migration» declaration
+corrected; the 0117/0123 additive-slot precedent's own class, the
+chain 125 → 126, the shared-scope union 24 + 1 = 25 — the cmms-schema
+spec's standing scope arm updated in the same increment). The
+battery: the six isolates standalone first, the ELEVEN-PART ENVELOPE
+**310 · 4,453 · 0 failed · 0 skipped** (the coverage verified before
+the first load run; the one declared roster movement: the
+trade-bonded + trade-drawback specs join chunk-a 120 → 122), the
+126-chain scratch from zero TWICE (check-rls OK — 354 catalog
+tables), the standing battery green at the final code state
+(typecheck 8/8 · lint 8/8 · depcruise 2,244 · 16,752 · unit 175 ·
+2,125 (api 86·1,081 — the two folds' property tests) · ROUTE_
+PERMISSIONS 1,199 + 13 = 1,212 (the keys-seed-first FIFTH trade
+binding wave, dated at the block; drift 357 = 357, zero delta) ·
+docs 33/33 · id-ledger 0 errors + the self-test all-probes-OK ·
+history-secrets 0 violations (7,220 allowlisted hits — the window's
+shift) · the shells and the boundary PASS —
+`audit-evidence/phase051-w38/`). THE WAVE'S HONEST CATCH (one,
+first-RED-proven then repaired, disclosed at the claim sites — no
+battery red standing): the closed source vocabulary's refusal (the
+0126 story above) + the two spec first-reds repaired in the same
+session (the per-arm-world law's fresh-item discipline — the shared
+fixture item accumulated two arms' positions; the empty-ledger pool
+read's numeric-literal "0" shape; the 0121 stamp floors on the raw
+export-declaration fixture insert) — all disclosed, all repaired, the
+re-runs GREEN. **RISK-033: EIGHT incidents, ZERO new this wave — the
+row stays OPEN, closing only by the owner's order.** The reservations
+G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة خارجها. NEXT: W-39
+(the web plane — T-14: the three screens + the Incoterms reference
+page + the incoterm selector in the PO/SO forms + the certificate
+print surface (D-13 — the 050 print laws) + the duty-suspended
+banners (D-17) + i18n BY BOTH COUNTS from this wave) under the
+owner's standing order. NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

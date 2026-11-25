@@ -1,0 +1,12 @@
+# PHASE-051 W-38 — BATTERY mobile tokens
+# started: 2026-11-25T21:23:43Z
+
+
+> erp-platform@0.1.0 check:mobile-tokens /home/z/ERP_Sys_work
+> tsx scripts/check-mobile-tokens.ts
+
+== mobile token parity: 130/130 ==
+== mobile token derivations: 50/50 ==
+canonical ⊆ mobile on every token family; RN adaptations derive from the canonical values.
+
+BATTERY_EXIT=0

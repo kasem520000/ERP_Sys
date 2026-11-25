@@ -1,4 +1,81 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-37 THE CUSTOMS ENGINE DELIVERED (2026-11-25, this session — the engines `af76c7b` → the DB specs `bb3a3fb` → the gate increment, every step pushed at its own commit)** — W-38 NEXT (the bonded warehouse + duty drawback — T-11 + T-12: the in-bond transfer with NO duty entry through the REAL movement core (G-66 — D-08) + THE SHARED GATE at planIssue blocking the duty-suspended stock from customer issue + the release recognizing the duty EXACTLY ONCE (BR-107) + the drawback claims' export-evidence gate (BR-108 — D-12)) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-38 THE BONDED + DRAWBACK ENGINES DELIVERED (2026-11-25, this session — the engines `e01dbab` → the DB specs `22836be` → the gate increment, every step pushed at its own commit)** — W-39 NEXT (the web plane — T-14: the three screens + the Incoterms reference page + the incoterm selector embedded in the PO/SO forms + the certificate print surface (D-13 — the 050 print laws: `bi()` EXCLUSIVELY, the frozen snapshots VERBATIM, the REAL Chromium both directions, deterministic byte-identical) + the duty-suspended banners (D-17) + i18n BY BOTH COUNTS from this wave (the declared delta 7,253+n = 7,253+n + mobile 371 standing)) under the standing order — تسليم لا قبول
+
+**W-38 — THE BONDED + DRAWBACK ENGINES (T-11 + T-12, delivered on the
+W-37 gate head `33aaff5` in two increments + this gate):** THE TWO PURE
+FOLDS FIRST (the unit-first law): `bonded-fold.ts` — the ladder (DRAFT →
+EXECUTED, terminal), the kind shapes (IN_BOND requires to; RELEASE
+requires from), the no-duty/duty matrix (an IN_BOND move NEVER carries
+duty — the 0121 floor's caller-side face; a RELEASE carries the
+recognition pair ATOMICALLY or NOT AT ALL — the empty pair is the
+zero-duty release's own shape, the G-65 interpretation #6 extended), THE
+RELEASE DUTY (BR-107 — the declaration's OWN figure at the released
+quantity: per-line duty_amount × the released share on Decimal 4dp, the
+tie a FUNCTION never a relation, the over-release guard over the
+register's own Σ) + THE BASE ALLOCATION (the exact-Σ law — the remainder
+absorbed so Σ ≡ the converted total EXACTLY) with 21 property tests;
+`drawback-fold.ts` — the ladder (DRAFT → SUBMITTED → UNDER_REVIEW →
+APPROVED | REJECTED; APPROVED → PAID), the evidence gate, the DRAFT-only
+link window, the export-type law with 11 property tests → **THE SHARED
+BONDED GATE** (`bonded-gate.ts` — G-66's own structural face, D-08
+VERBATIM: the SECOND blocking validation wired INSIDE the movement
+core's planIssue at the INV-035 gate's own choke point — the hold-gate
+precedent's exact shape; every issue/ship path passes it BY
+CONSTRUCTION; the typed 409 BONDED_STOCK_SUSPENDED naming the stock +
+the bond + the figures, ZERO residue; the bond ledger = the register
+itself (interpretation #7); the flag OFF = the gate silent; the sole
+bypass `allowBondedStock` — the beneficiary discipline; NO new invariant
+identifier — the reservations law §6.16) → THE BONDED ENGINE
+(BND-{YYYY}-{SEQ:6}): create → execute — THE IN-BOND TRANSFER (G-66: NO
+duty entry, the REAL movement core VERBATIM — the OUT leg at WAC with
+the bypass, the IN leg at the carried cost, the G-15 policy journal the
+value-neutral pair; the INITIAL DEPOSIT from NULL: the custodial entry,
+NO journal — interpretation #10) / THE RELEASE (BR-107: the declaration
+link — IMPORT-type ACCEPTED only (a COMPLETED declaration's duties
+already flowed through G-65 — the double-recognition refusal); the
+fold's duty at the released quantity; the FX ride; the fail-closed
+CUSTOMS_DUTY_PAYABLE; THE RECOGNITION JOURNAL — Dr the released stock's
+value · Cr the purpose-mapped liability, INV-013 single-use on
+(bonded_warehouse_moves, id, release); THE REVALUATION through the REAL
+RevaluationService VERBATIM (the WAC/layers uplift at the released
+quantity); THE EXECUTION CAS — the stamp + the recognition pair ATOMIC;
+the zero-duty release: the EMPTY pair) → THE DRAWBACK ENGINE
+(DBK-{YYYY}-{SEQ:6}): create → link (DRAFT-only, the EXPORT-type
+verification) → submit (BR-108'S EXPORT-EVIDENCE GATE) → review →
+approve | reject → pay — THE HONEST NO-GL SHAPE (D-12: the claim is a
+registry record, the refund lands when treasury records it, 053's
+surface) → THE THIRTEEN-ROUTE CONTROLLER (trade.view over the reads +
+trade.bonded.manage / trade.drawback.manage over the acts — the 0122 §5
+keys) + the error filter's W-38 codes → **MIGRATION 0126** (the honest
+catch: the closed ck_stock_moves_source_shape refused the first
+bonded_move insert BY NAME — the 0117/0123 additive-slot precedent's
+own class, the chain 125 → 126, the union 24 + 1 = 25, the cmms-schema
+scope arm updated in the same increment) → **THE DB SPECS**
+(`trade-bonded.db.spec` 14 arms — the blocking matrix over every
+baseline issue path + the release golden + the flip-and-restore + the
+single-use stamp + the over-release guard + the declaration-state
+refusals + the zero-duty release + the FX + the fail-closed purpose +
+the flag-off boundary; `trade-drawback.db.spec` 7 arms — the evidence
+gate + the ladder + the honest no-GL). ROUTE_PERMISSIONS 1,199 + 13 =
+**1,212** (the keys-seed-first FIFTH trade binding wave, dated at the
+block; drift 357 = 357, zero delta). The battery: the six isolates
+standalone first, the ELEVEN-PART ENVELOPE **310 · 4,453 · 0 failed · 0
+skipped** (the coverage verified before the first load run; the one
+declared roster movement: the two new specs join chunk-a 120 → 122),
+the 126-chain scratch from zero TWICE (check-rls OK — 354 catalog
+tables), the standing battery green at the final code state (typecheck
+8/8 · lint 8/8 · depcruise 2,244 · 16,752 · unit 175 · 2,125 (api
+86·1,081) · ROUTE_PERMISSIONS 1,212 (the tsx recount) · i18n 7,253
+standing (no delta — an API-DB wave) + mobile 371 = 371 · tokens 130/130
++ derivations 50/50 · manifests 13/13 · docs 33/33 · id-ledger 0 errors
++ all-probes-OK · history-secrets 0 violations (7,220 allowlisted hits —
+the window's shift) · capabilities agree · shells PASS/PASS · boundary
+PASS). **W-39 (the web plane) waits on the owner's dispatch under the
+standing order. RISK-033: EIGHT incidents, ZERO new — the row stays
+OPEN. NOT production approval — تسليم لا قبول.**
+
+---
+
+# The W-37 customs-engine record (the historical context below)
 
 **W-37 — THE CUSTOMS ENGINE (T-10, delivered on the W-36 gate head
 `5270b93` in two increments + this gate):** THE PURE FOLD FIRST (D-06 —

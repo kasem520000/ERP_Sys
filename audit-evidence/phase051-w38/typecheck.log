@@ -1,0 +1,60 @@
+# PHASE-051 W-38 — BATTERY typecheck (turbo 8 packages)
+# started: 2026-11-25T21:21:32Z
+
+
+> erp-platform@0.1.0 typecheck /home/z/ERP_Sys_work
+> turbo run typecheck
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running typecheck in 9 packages
+   • Remote caching disabled
+
+@erp/web:typecheck: cache hit, replaying logs 921789f9abe4dbd3
+@erp/contracts:typecheck: cache hit, replaying logs 711bbe75aff6cd17
+@erp/web:typecheck: 
+@erp/web:typecheck: > @erp/web@0.1.0 typecheck /home/z/ERP_Sys_work/apps/web
+@erp/web:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/web:typecheck: 
+@erp/contracts:typecheck: 
+@erp/contracts:typecheck: > @erp/contracts@0.1.0 typecheck /home/z/ERP_Sys_work/packages/contracts
+@erp/contracts:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/contracts:typecheck: 
+@erp/mobile:typecheck: cache hit, replaying logs e10752064be5c410
+@erp/domain-core:typecheck: cache hit, replaying logs 19d5b62eb3ba7f06
+@erp/mobile:typecheck: 
+@erp/mobile:typecheck: > @erp/mobile@0.1.0 typecheck /home/z/ERP_Sys_work/apps/mobile
+@erp/mobile:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/mobile:typecheck: 
+@erp/domain-core:typecheck: 
+@erp/domain-core:typecheck: > @erp/domain-core@0.1.0 typecheck /home/z/ERP_Sys_work/packages/domain-core
+@erp/domain-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/domain-core:typecheck: 
+@erp/ui:typecheck: cache hit, replaying logs 530e58e7ab7e0ed5
+@erp/ui:typecheck: 
+@erp/ui:typecheck: > @erp/ui@1.0.0 typecheck /home/z/ERP_Sys_work/packages/ui
+@erp/ui:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/ui:typecheck: 
+@erp/desktop:typecheck: cache hit, replaying logs fab03e10c9aad92e
+@erp/desktop:typecheck: 
+@erp/desktop:typecheck: > @erp/desktop@0.1.0 typecheck /home/z/ERP_Sys_work/apps/desktop
+@erp/desktop:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/desktop:typecheck: 
+@erp/sync-core:typecheck: cache hit, replaying logs 901d4541086a711d
+@erp/sync-core:typecheck: 
+@erp/sync-core:typecheck: > @erp/sync-core@0.1.0 typecheck /home/z/ERP_Sys_work/packages/sync-core
+@erp/sync-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/sync-core:typecheck: 
+@erp/api:typecheck: cache miss, executing dc72483fb21d8d85
+@erp/api:typecheck: 
+@erp/api:typecheck: > @erp/api@0.1.0 typecheck /home/z/ERP_Sys_work/apps/api
+@erp/api:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/api:typecheck: 
+
+ Tasks:    8 successful, 8 total
+Cached:    7 cached, 8 total
+  Time:    28.789s 
+
+
+BATTERY_EXIT=0
