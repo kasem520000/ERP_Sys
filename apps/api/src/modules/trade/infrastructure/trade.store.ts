@@ -795,7 +795,8 @@ export interface BillOfLadingRow {
 }
 
 const BL_COLUMNS = sql`id, bl_no AS "blNo", doc_type AS "docType", carrier_name AS "carrierName",
-  port_of_loading AS "portOfLoading", port_of_discharge AS "portOfDischarge", container_refs,
+  port_of_loading AS "portOfLoading", port_of_discharge AS "portOfDischarge",
+  container_refs AS "containerRefs",
   purchase_order_id AS "purchaseOrderId", delivery_note_id AS "deliveryNoteId",
   shipment_status AS "shipmentStatus", issued_at::text AS "issuedAt", note, note_ar AS "noteAr",
   created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
