@@ -1,0 +1,10 @@
+# PHASE-051 W-36 — permissions drift (seed ↔ AUTHORIZATION_MATRIX — zero-drift standing, no key this wave)
+# started: 2026-11-25T20:04:05Z
+
+
+> erp-platform@0.1.0 check:permissions-drift /home/z/ERP_Sys_work
+> tsx scripts/check-permissions-drift.ts
+
+[permissions-drift] OK — matrix 357 keys, seed 357 keys
+
+BATTERY_EXIT=0

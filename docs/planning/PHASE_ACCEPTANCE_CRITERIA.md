@@ -1877,6 +1877,109 @@ the HS registry extension, the duty computation into the landed costs
 line fold a PURE module FIRST) under the owner's standing order. NOT
 production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-25 (PHASE-051 W-37 DELIVERED at the engine head
+`af76c7b` + the spec head `bb3a3fb` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERION #3 GREEN — THE ENGINE ARMS (the
+declaration → allocation flow + the INV-036 refusals; the golden
+transcripts + the failure packs are W-41's).** THE DUTY/VAT LINE FOLD
+(D-06 — the unit-first law) CAME FIRST: `duty-vat-fold.ts` — the line
+math (duty_amount = customs_value × duty_rate on Decimal, ADR-0009,
+4dp ROUND_HALF_UP) with the NO-HARDCODED-RATES LAW (the rates are the
+tenant's own data; a zero rate the explicit EXW/free statement) and
+the totals (the G-65 amount's own source: Σ (duty + import VAT) from
+the declaration's OWN lines — never a stored parallel figure) with 11
+property tests. CUSTOMS DECLARATIONS COMPUTE DUTIES AND IMPORT VAT PER
+LINE: `trade-customs.db.spec` (10 arms over real PG16, every arm on
+its OWN world) proves the line math on every row (the find's own
+chain renders the fold's output — 10.0000/5.0000 on the golden
+world's lines). THE DUTIES FLOW INTO THE EXISTING LANDED-COST
+ALLOCATION (G-65 — D-06/D-15(a) VERBATIM): the completion act creates
++ posts THE LANDED-COST DOCUMENT OF KIND `customs` THROUGH THE REAL
+LandedCostService (the ONLY allocator — zero parallel computation):
+the journal asserted line-by-line — **DR INVENTORY 1140 (the on-hand
+allocation) · DR COGS (the issued portion — fully-on-hand → 0) · CR
+the purpose-mapped CUSTOMS_DUTY_PAYABLE 2145** (the 0122 §8 marker,
+fail-closed until mapped: the superseded→refused→restored→GREEN
+flip-and-restore arm), allocated by VALUE per the existing engine,
+the FX ride at the contract rate (D-21's own shape — the landed
+amount the BASE figure, the missing rate refused at the act). INV-036
+HOLDS — NO LANDED-COST ALLOCATION ON AN IMPORT RECEIPT WITHOUT A
+COMPLETED DECLARATION REFERENCE (D-07's honest interpretation): the
+typed DECLARATION_REQUIRED (no declaration references the receipt) /
+DECLARATION_INCOMPLETE (the resolved declaration's own state —
+ACCEPTED, not COMPLETED) refusals fire at the purchasing POST act
+itself (the shared customs landed-cost floor — the documented
+contract consumed through the plain-function shape, the W-35 order
+gate's precedent) with ZERO residue (the refused allocation stays a
+draft — status DRAFT, posted_journal_id NULL, zero journal entries,
+zero allocation rows); ordinary NON-DUTY landed costs stand untouched
+(a freight cost posts GREEN with no declaration near the receipt, its
+ordinary rows carrying NO tie — never restated narrower); the flag
+OFF = the floor silent (the boundary tenant's own full substrate
+proves the pre-051 behavior). EVERY ALLOCATED DUTY TIES TO A
+DECLARATION LINE (the line-level linkage recorded on the allocation —
+INV-036's own demand): the 0125 additive column
+`landed_cost_allocations.declaration_line_id` + the tie map resolved
+by the trade gate (the one-line-per-item exactness laws — the declared
+interpretation #5: every declaration line item-bearing, every item
+declared exactly once, every GRN stock line's item declared; the three
+refusal arms — the item-less line, the doubled item, the undeclared
+GRN item — each refuse DECLARATION_LINE_TIE_INVALID at the post with
+THE WHOLE COMPLETION ROLLING BACK (INV-018: the declaration stays
+ACCEPTED, zero landed-cost documents, zero journals). THE
+EXACTLY-ONCE: the completion CAS (the stamp law — the second complete
+refused from the COMPLETED rung) + the 0125 partial unique
+uq_landed_costs_tenant_declaration (one customs landed-cost document
+per declaration, ever — the INV-013-equivalent single-use, D-06's own
+wording) + the declaration's own linkage pair (landed_cost_id +
+landed_cost_no, landing in the SAME ambient transaction). THE
+LADDER'S OWN ARMS: the DRAFT-only lines window · the DRAFT-only
+cancellation (the 0121 stamp-shape floor — «the submission stamp is
+monotone evidence that never un-stamps», the specific refusal wired
+BEFORE the CAS) · the typed 404 · THE HS REGISTRY's arms (the tenant
+addition, the duplicate refused BY NAME, the frozen code, the
+retirement's snapshot semantics) · THE ZERO-DUTY COMPLETION (the
+declared interpretation #6: an all-EXW/free set completes without a
+landed-cost document — nothing to allocate, the linkage pair NULL).
+MIGRATION **0125** (the 0123/0124 additive-slot precedent's own
+class, ordered WITH the writers — the chain 124 → 125; the manifest +
+journal + the spec's dated chain note together). ROUTE_PERMISSIONS
+1,188 + 11 = **1,199** (the keys-seed-first FOURTH trade binding
+wave, dated at the block — the customs family binds the EXISTING
+0122-seeded trade.customs.* keys; drift 357 = 357, zero delta). The
+battery: the six isolates standalone first, the ELEVEN-PART ENVELOPE
+**308 · 4,432 · 0 failed · 0 skipped** (the coverage verified before
+the first load run; the one declared roster movement: the
+trade-customs spec joins chunk-a 119 → 120), the 125-chain scratch
+from zero TWICE (check-rls OK — 354 catalog tables), the standing
+battery green at the final code state (typecheck 8/8 · lint 8/8 ·
+depcruise 2,234 · 16,668 · unit 173 · 2,093 (api 84·1,049 — the
+fold's property tests) · drift 357 = 357 · docs 33/33 · id-ledger 0
+errors + the self-test all-probes-OK · history-secrets 0 violations
+(7,154 allowlisted hits — the window's shift) · the shells and the
+boundary PASS — `audit-evidence/phase051-w37/`). THE WAVE'S HONEST
+CATCH (one, first-RED-proven then repaired, disclosed at the claim
+sites — no battery red standing): the customs spec's FIRST run had
+the completion-refusal catches INSIDE the withTenant callbacks —
+swallowing the refusal within the transaction and COMMITTING the
+completion stamp (the tie-law arms found the declarations COMPLETED
+instead of rolled back); the repair moves the catch OUTSIDE the
+withTenant so the refusal propagates through the transaction (the
+INV-018 rollback actually proven — the honest shape); the
+`invocation-slip` class of the prior waves does not recur (the
+scratch proof invoked through the filter's apps/api cwd from the
+first try). **RISK-033: EIGHT incidents, ZERO new this wave — the row
+stays OPEN, closing only by the owner's order.** The reservations
+G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة خارجها. NEXT: W-38
+(the bonded warehouse + duty drawback — T-11 + T-12: the in-bond
+transfer with NO duty entry through the REAL movement core (G-66 —
+D-08) + THE SHARED GATE at planIssue blocking the duty-suspended
+stock from customer issue + the release recognizing the duty EXACTLY
+ONCE (BR-107) + the drawback claims' export-evidence gate (BR-108))
+under the owner's standing order. NOT production approval — تسليم لا
+قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

@@ -1,0 +1,11 @@
+# PHASE-051 W-36 — mobile i18n parity
+# started: 2026-11-25T20:04:06Z
+
+
+> erp-platform@0.1.0 check:mobile-i18n /home/z/ERP_Sys_work
+> tsx scripts/check-mobile-i18n-parity.ts
+
+== mobile i18n parity: ar=371 keys, en=371 keys ==
+ar/en mobile catalogs at 100% key parity; no empty values.
+
+BATTERY_EXIT=0

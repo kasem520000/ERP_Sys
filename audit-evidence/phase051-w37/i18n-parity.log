@@ -1,0 +1,11 @@
+# PHASE-051 W-36 — i18n key parity (ar/en — no delta, as declared — an API-DB wave)
+# started: 2026-11-25T20:04:05Z
+
+
+> erp-platform@0.1.0 check:i18n-parity /home/z/ERP_Sys_work
+> tsx scripts/check-i18n-parity.ts
+
+== i18n key parity: ar=7253 keys, en=7253 keys ==
+ar/en catalogs at 100% key parity; no empty values.
+
+BATTERY_EXIT=0

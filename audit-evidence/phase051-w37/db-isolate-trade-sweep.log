@@ -1,0 +1,90 @@
+# PHASE-051 W-36 — db-isolate-trade-sweep (standalone FIRST, the owner's عزل مسبق order — the sixth standing isolate since W-34)
+# started: 2026-11-25T19:51:35Z
+
+
+ RUN  v3.2.7 /home/z/ERP_Sys_work/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_Sys_work/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-25 19:51:37.093 UTC [1095] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-25 19:51:37.093 UTC [1095] LOG:  listening on IPv6 address "::1", port 41649
+
+2026-11-25 19:51:37.093 UTC [1095] LOG:  listening on IPv4 address "127.0.0.1", port 41649
+
+2026-11-25 19:51:37.093 UTC [1095] LOG:  listening on Unix socket "/tmp/.s.PGSQL.41649"
+
+2026-11-25 19:51:37.095 UTC [1098] LOG:  database system was shut down at 2026-11-25 19:51:37 UTC
+
+2026-11-25 19:51:37.096 UTC [1095] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/trade/trade-lc-sweep.db.spec.ts (6 tests) 508ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  19:51:36
+   Duration  7.36s (transform 782ms, setup 0ms, collect 1.61s, tests 508ms, environment 0ms, prepare 58ms)
+
+2026-11-25 19:51:43.652 UTC [1095] LOG:  received fast shutdown request
+2026-11-25 19:51:43.652 UTC [1095] LOG:  aborting any active transactions
+2026-11-25 19:51:43.652 UTC [1176] FATAL:  terminating connection due to administrator command
+
+2026-11-25 19:51:43.655 UTC [1095] LOG:  background worker "logical replication launcher" (PID 1101) exited with exit code 1
+
+2026-11-25 19:51:43.655 UTC [1096] LOG:  shutting down
+2026-11-25 19:51:43.655 UTC [1096] LOG:  checkpoint starting: shutdown immediate
+
+(node:1154) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1154) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-25 19:51:43.679 UTC [1096] LOG:  checkpoint complete: wrote 3114 buffers (19.0%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.015 s, sync=0.009 s, total=0.024 s; sync files=2903, longest=0.001 s, average=0.001 s; distance=29244 kB, estimate=29244 kB; lsn=0/316DBE8, redo lsn=0/316DBE8
+
+2026-11-25 19:51:43.687 UTC [1095] LOG:  database system is shut down
+
+VITEST_EXIT=0
+
+SUMMARY_VERIFY: files_line=" Test Files  1 passed (1)" tests_line="      Tests  6 passed (6)"
+GUARDED_VERDICT: files_failed=0 tests_failed=0 => GREEN

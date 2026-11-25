@@ -1,4 +1,80 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-36 TRANSPORT DOCUMENTS + SHIPMENT TRACKING DELIVERED (2026-11-25, this session — the engines `258c49a` → the DB specs `5653574` → the gate increment, every step pushed at its own commit)** — W-37 NEXT (the customs engine — T-10: the declarations + lines API, the HS registry extension, the duty computation into the landed costs (G-65 — D-06) with INV-036's completeness gate (D-07); the duty/VAT line fold a PURE module FIRST) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-37 THE CUSTOMS ENGINE DELIVERED (2026-11-25, this session — the engines `af76c7b` → the DB specs `bb3a3fb` → the gate increment, every step pushed at its own commit)** — W-38 NEXT (the bonded warehouse + duty drawback — T-11 + T-12: the in-bond transfer with NO duty entry through the REAL movement core (G-66 — D-08) + THE SHARED GATE at planIssue blocking the duty-suspended stock from customer issue + the release recognizing the duty EXACTLY ONCE (BR-107) + the drawback claims' export-evidence gate (BR-108 — D-12)) under the standing order — تسليم لا قبول
+
+**W-37 — THE CUSTOMS ENGINE (T-10, delivered on the W-36 gate head
+`5270b93` in two increments + this gate):** THE PURE FOLD FIRST (D-06 —
+the unit-first law): `duty-vat-fold.ts` — THE DUTY/VAT LINE MATH
+(duty_amount = customs_value × duty_rate on Decimal, ADR-0009, 4dp
+ROUND_HALF_UP; the import VAT the tenant's own figure — REQUIRES_VERIFICATION,
+never invented; THE NO-HARDCODED-RATES LAW: the rates are the tenant's own
+data, a zero rate the explicit EXW/free statement) · THE TOTALS (the
+G-65 amount's own source: Σ (duty + import VAT) from the declaration's OWN
+lines — never a stored parallel figure) with 11 property tests → THE
+CUSTOMS DECLARATIONS API (create with the official CUS-{YYYY}-{SEQ:6} +
+the lines computed THROUGH THE FOLD VERBATIM → the DRAFT-only add-line →
+submit (≥1 line) → accept → **complete — THE G-65 FLOW (D-06 VERBATIM)**:
+the fold's totals → the FX ride at the contract rate (D-21's own shape —
+the landed amount the BASE figure) → the exactly-once pre-check (the
+duplicate refused BY NAME) → the purpose-mapped CUSTOMS_DUTY_PAYABLE
+(the 0122 §8 marker 2145, fail-closed until mapped) → THE COMPLETION CAS
+(ACCEPTED → COMPLETED, the stamp law's exactly-once) → **THE LANDED-COST
+DOCUMENT OF KIND customs THROUGH THE REAL LandedCostService VERBATIM
+(D-15(a)'s documented contract — the PurchasingModule import
+one-directional: the REAL service the ONLY allocator, DR INVENTORY · DR
+COGS · CR the purpose-mapped CUSTOMS_DUTY_PAYABLE, allocated by VALUE,
+the line-level tie riding the allocation rows) → the declaration's
+linkage pair in the SAME ambient transaction (INV-018)** — THE ZERO-DUTY
+COMPLETION (the declared interpretation #6: an all-EXW/free set completes
+without a landed-cost document — nothing to allocate) → cancel (the
+DRAFT-only exit — the 0121 stamp-shape floor's specific refusal) · THE HS
+REGISTRY (D-16: the reads, the tenant additions, the frozen code, the
+retirement's snapshot semantics) → **THE SHARED CUSTOMS LANDED-COST FLOOR**
+(`trade-customs-gate.ts` — INV-036/D-07's honest interpretation, the
+trade-order-gate's plain-function shape consumed by the purchasing
+LandedCostService's POST act: DECLARATION_REQUIRED/DECLARATION_INCOMPLETE
+with ZERO residue; the non-duty landed costs untouched; the flag OFF =
+the floor silent; **THE LINE-LEVEL TIE** — the declaration's own lines
+joined to the GRN's stock lines by ITEM, the one-line-per-item exactness
+laws (the declared interpretation #5), the tie map riding the allocation
+rows) → **MIGRATION 0125_trade_customs_landed_cost_source** (the
+0123/0124 additive-slot precedent's own class, ordered WITH the writers:
+landed_costs.declaration_id + THE PARTIAL UNIQUE
+uq_landed_costs_tenant_declaration (the INV-013-equivalent exactly-once
+— one customs landed-cost document per declaration, ever) +
+customs_declarations.landed_cost_id/landed_cost_no (the linkage pair) +
+landed_cost_allocations.declaration_line_id (the line-level tie —
+INV-036's own demand); the chain 124 → 125; the manifest + journal +
+the spec's dated chain note together) → THE ELEVEN-ROUTE CONTROLLER
+(trade.customs.view over the reads + trade.customs.manage over the
+register acts) — **ROUTE_PERMISSIONS 1,188 + 11 = 1,199** (the
+keys-seed-first FOURTH trade binding wave, dated at the block) · the
+error filter's domainStatus chain registered the W-37 codes in the SAME
+increment that ships the routes. **THE WAVE'S HONEST CATCH (one,
+first-RED-proven then repaired, disclosed at the claim sites — no battery
+red standing): the customs spec's FIRST run had the completion-refusal
+catches INSIDE the withTenant callbacks — swallowing the refusal within
+the transaction and COMMITTING the completion stamp (the tie-law arms
+found the declarations COMPLETED instead of rolled back); the repair
+moves the catch OUTSIDE the withTenant so the refusal propagates through
+the transaction (the INV-018 rollback actually proven — the honest
+shape).** The evidence envelope `audit-evidence/phase051-w37/` (the
+FORTY-NINTH consecutive same-session wave): the SIX isolates standalone
+FIRST + the eleven-part envelope **308 · 4,432 · 0 failed · 0 skipped**
+(the coverage verified before the first load run; the one declared
+roster movement: the trade-customs spec joins chunk-a 119 → 120) + the
+125-chain scratch from zero TWICE (check-rls OK — 354 catalog tables) +
+the standing battery (typecheck 8/8 · lint 8/8 · depcruise 2,234/16,668 ·
+unit 173 · 2,093 (api 84·1,049 — the fold's property tests) · drift 357
+= 357 · ROUTE_PERMISSIONS 1,199 · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors + all-probes-OK · history-secrets 0 violations (7,154
+allowlisted hits — the window's shift) · capabilities agree · shells
+PASS/PASS · boundary PASS). **W-38 (the bonded warehouse + the duty
+drawback) waits on the owner's dispatch under the standing order.
+RISK-033: EIGHT incidents, ZERO new — the row stays OPEN. NOT production
+approval — تسليم لا قبول.**
+
+---
+
+# The W-36 transport + tracking record (the historical context below)
 
 **W-36 — TRANSPORT DOCUMENTS + SHIPMENT TRACKING (T-09 + T-13, delivered
 on the W-35 gate head `0fc3d4c` in two increments + this gate):** THE PURE
