@@ -6005,6 +6005,76 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/trade/shipments/events",
     permission: "trade.shipments.manage",
   },
+  // PHASE-051 (W-37 — T-10, dated 2026-11-25; matrix §3.29): the
+  // keys-seed-first FOURTH trade binding wave (1,188 + 11 = 1,199 — the
+  // discipline standing: the TEN trade.* keys landed at W-33 (0122 §5),
+  // the routes bind as the service waves ship, every change dated at
+  // the block — the 1,159 baseline anchor). THE CUSTOMS FAMILY binds
+  // trade.customs.view over the reads (the declarations register + the
+  // find's own chain — the declaration + its lines + the fold's
+  // totals — and the HS registry) and trade.customs.manage over the
+  // register acts (create with the lines · the DRAFT-only add-line ·
+  // submit · accept · THE G-65 COMPLETION · cancel · the HS tenant
+  // additions + the retirement). The bonded/drawback (W-38) family
+  // binds on its own wave; the routes are feature-gated at the
+  // controller on the whole-module unit trade (D-04 — the customs
+  // family carries no own flag; the phase doc's trade.customs flag is
+  // the screen-plane composable unit, W-39's own wiring).
+  {
+    method: "GET",
+    path: "/api/v1/trade/customs/declarations",
+    permission: "trade.customs.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/customs/declarations/:id",
+    permission: "trade.customs.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/declarations",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/declarations/:id/lines",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/declarations/:id/submit",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/declarations/:id/accept",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/declarations/:id/complete",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/declarations/:id/cancel",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/customs/hs",
+    permission: "trade.customs.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/customs/hs",
+    permission: "trade.customs.manage",
+  },
+  {
+    method: "PATCH",
+    path: "/api/v1/trade/customs/hs/:code",
+    permission: "trade.customs.manage",
+  },
 ];
 
 /**

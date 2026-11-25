@@ -747,6 +747,21 @@ export const MIGRATIONS: readonly string[] = [
   // starter sets landed at 0122 §6; the new-tenant materialization is
   // the W-35 onboarding hook — one source, both paths).
   "0124_trade_order_incoterms",
+  // PHASE-051 (W-37 — T-10, dated 2026-11-25): the landed-cost
+  // declaration source — landed_costs.declaration_id + the partial
+  // unique uq_landed_costs_tenant_declaration (the INV-013-equivalent
+  // exactly-once: one customs landed-cost document per declaration,
+  // ever) + customs_declarations.landed_cost_id/landed_cost_no (the
+  // completion act's linkage pair, D-06/D-15(a)) +
+  // landed_cost_allocations.declaration_line_id (the line-level tie —
+  // «every allocated duty tied to its declaration line», INV-036's
+  // own demand). The 0123/0124 additive-slot precedent's own class —
+  // ordered WITH the writers under the same-increment law. NO tables
+  // (the catalog stays 354); the drift stays 357 (the W-37 routes bind
+  // the EXISTING 0122-seeded keys); ROUTE_PERMISSIONS 1,188 + 11 =
+  // 1,199 dated at the block (the customs family — the keys-seed-first
+  // discipline's FOURTH trade binding wave).
+  "0125_trade_customs_landed_cost_source",
 ];
 
 /**

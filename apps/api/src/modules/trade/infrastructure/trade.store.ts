@@ -1010,3 +1010,339 @@ export async function findDeclarationShipmentStatus(id: string): Promise<{ id: s
     WHERE id = ${id} LIMIT 1`);
   return rows[0];
 }
+
+// ── the customs declarations register (T-10 — W-37, the 0121 plane) ─────────
+
+export interface DeclarationRow {
+  id: string;
+  declarationNo: string;
+  declarationType: string;
+  customsOffice: string;
+  status: string;
+  submittedAt: string | null;
+  acceptedAt: string | null;
+  completedAt: string | null;
+  receiptId: string | null;
+  purchaseOrderId: string | null;
+  billOfLadingId: string | null;
+  shipmentStatus: string;
+  currency: string;
+  landedCostId: string | null;
+  landedCostNo: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const DECLARATION_COLUMNS = sql`id, declaration_no AS "declarationNo", declaration_type AS "declarationType",
+  customs_office AS "customsOffice", status, submitted_at::text AS "submittedAt",
+  accepted_at::text AS "acceptedAt", completed_at::text AS "completedAt",
+  receipt_id AS "receiptId", purchase_order_id AS "purchaseOrderId",
+  bill_of_lading_id AS "billOfLadingId", shipment_status AS "shipmentStatus",
+  currency, landed_cost_id AS "landedCostId", landed_cost_no AS "landedCostNo",
+  note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+/** The declaration + its own lines (the find's own chain — D-06's
+ * source-of-truth read; the totals render from the LINES, never a
+ * stored parallel figure). */
+export interface DeclarationLineRow {
+  id: string;
+  declarationId: string;
+  lineNo: number;
+  hsCode: string;
+  originCountry: string | null;
+  itemId: string | null;
+  description: string | null;
+  quantity: string | null;
+  uom: string | null;
+  customsValue: string;
+  dutyRate: string;
+  dutyAmount: string;
+  importVat: string;
+  note: string | null;
+  noteAr: string | null;
+}
+
+const DECLARATION_LINE_COLUMNS = sql`id, declaration_id AS "declarationId", line_no AS "lineNo",
+  hs_code AS "hsCode", origin_country AS "originCountry", item_id AS "itemId",
+  description, quantity::text AS "quantity", uom, customs_value::text AS "customsValue",
+  duty_rate::text AS "dutyRate", duty_amount::text AS "dutyAmount",
+  import_vat::text AS "importVat", note, note_ar AS "noteAr"`;
+
+export async function insertDeclaration(input: {
+  declarationNo: string;
+  declarationType: string;
+  customsOffice: string;
+  currency: string;
+  receiptId: string | null;
+  purchaseOrderId: string | null;
+  billOfLadingId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<DeclarationRow> {
+  const rows = await query<DeclarationRow>(sql`
+    INSERT INTO customs_declarations
+      (id, tenant_id, declaration_no, declaration_type, customs_office, status,
+       currency, receipt_id, purchase_order_id, bill_of_lading_id, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.declarationNo},
+            ${input.declarationType}, ${input.customsOffice}, 'DRAFT',
+            ${input.currency}, ${input.receiptId}, ${input.purchaseOrderId},
+            ${input.billOfLadingId}, ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${DECLARATION_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findDeclarationById(id: string): Promise<DeclarationRow | undefined> {
+  const rows = await query<DeclarationRow>(sql`
+    SELECT ${DECLARATION_COLUMNS} FROM customs_declarations WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function findDeclarationByNo(declarationNo: string): Promise<DeclarationRow | undefined> {
+  const rows = await query<DeclarationRow>(sql`
+    SELECT ${DECLARATION_COLUMNS} FROM customs_declarations WHERE declaration_no = ${declarationNo} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listDeclarations(filter: {
+  status?: string;
+  declarationType?: string;
+  receiptId?: string;
+  limit?: number;
+}): Promise<DeclarationRow[]> {
+  const status = filter.status ?? null;
+  const type = filter.declarationType ?? null;
+  const receipt = filter.receiptId ?? null;
+  return query<DeclarationRow>(sql`
+    SELECT ${DECLARATION_COLUMNS} FROM customs_declarations
+    WHERE (${status}::text IS NULL OR status = ${status})
+      AND (${type}::text IS NULL OR declaration_type = ${type})
+      AND (${receipt}::uuid IS NULL OR receipt_id = ${receipt})
+    ORDER BY created_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+/** The find's own chain: the declaration + its own lines (the G-65
+ * amount's source read — the totals render from the lines, never a
+ * stored parallel figure — D-06's zero-parallel-computation law). */
+export async function findDeclarationWithLines(id: string): Promise<{
+  declaration: DeclarationRow;
+  lines: DeclarationLineRow[];
+} | undefined> {
+  const declaration = await findDeclarationById(id);
+  if (declaration === undefined) return undefined;
+  const lines = await listDeclarationLines(id);
+  return { declaration, lines };
+}
+
+export async function listDeclarationLines(declarationId: string): Promise<DeclarationLineRow[]> {
+  return query<DeclarationLineRow>(sql`
+    SELECT ${DECLARATION_LINE_COLUMNS} FROM customs_declaration_lines
+    WHERE declaration_id = ${declarationId}
+    ORDER BY line_no, id`);
+}
+
+/** The line-number sequence within one declaration (the 0121
+ * uq (tenant, declaration, line_no)'s own allocator — the service
+ * stamps the line_no at the write, the next free number per
+ * declaration). */
+export async function nextDeclarationLineNo(declarationId: string): Promise<number> {
+  const rows = await query<{ next: number }>(sql`
+    SELECT COALESCE(MAX(line_no), 0) + 1 AS next FROM customs_declaration_lines
+    WHERE declaration_id = ${declarationId}`);
+  return rows[0]!.next;
+}
+
+export async function insertDeclarationLine(input: {
+  declarationId: string;
+  lineNo: number;
+  hsCode: string;
+  originCountry: string | null;
+  itemId: string | null;
+  description: string | null;
+  quantity: string | null;
+  uom: string | null;
+  customsValue: string;
+  dutyRate: string;
+  dutyAmount: string;
+  importVat: string;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<DeclarationLineRow> {
+  const rows = await query<DeclarationLineRow>(sql`
+    INSERT INTO customs_declaration_lines
+      (id, tenant_id, declaration_id, line_no, hs_code, origin_country, item_id,
+       description, quantity, uom, customs_value, duty_rate, duty_amount, import_vat,
+       note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.declarationId}, ${input.lineNo},
+            ${input.hsCode}, ${input.originCountry}, ${input.itemId}, ${input.description},
+            ${input.quantity}, ${input.uom}, ${input.customsValue}, ${input.dutyRate},
+            ${input.dutyAmount}, ${input.importVat}, ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${DECLARATION_LINE_COLUMNS}`);
+  return rows[0]!;
+}
+
+/** THE LADDER'S CAS (the 0121 stamp law — the machine's own shape):
+ * every transition is ONE guarded UPDATE — the status pins the
+ * from-state, the stamps land in the SAME statement, and zero rows
+ * means the raced/stale move. The completion additionally carries the
+ * landed-cost linkage pair (the G-65 flow's own stamps landing
+ * TOGETHER with the rung — INV-018's all-or-nothing law). */
+async function stampDeclaration(input: {
+  id: string;
+  from: string;
+  to: string;
+  stamps: string;
+  landedCostId?: string | null;
+  landedCostNo?: string | null;
+}): Promise<DeclarationRow | undefined> {
+  void input.stamps;
+  const rows = await query<DeclarationRow>(sql`
+    UPDATE customs_declarations
+    SET status = ${input.to},
+        submitted_at = CASE WHEN ${input.to} IN ('SUBMITTED', 'ACCEPTED', 'COMPLETED') THEN now() ELSE submitted_at END,
+        accepted_at = CASE WHEN ${input.to} IN ('ACCEPTED', 'COMPLETED') THEN now() ELSE accepted_at END,
+        completed_at = CASE WHEN ${input.to} = 'COMPLETED' THEN now() ELSE completed_at END,
+        landed_cost_id = COALESCE(${input.landedCostId ?? null}, landed_cost_id),
+        landed_cost_no = COALESCE(${input.landedCostNo ?? null}, landed_cost_no),
+        updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id() AND status = ${input.from}
+    RETURNING ${DECLARATION_COLUMNS}`);
+  return rows[0];
+}
+
+export async function stampDeclarationSubmitted(id: string): Promise<DeclarationRow | undefined> {
+  return stampDeclaration({ id, from: "DRAFT", to: "SUBMITTED", stamps: "submitted_at" });
+}
+
+export async function stampDeclarationAccepted(id: string): Promise<DeclarationRow | undefined> {
+  return stampDeclaration({ id, from: "SUBMITTED", to: "ACCEPTED", stamps: "accepted_at" });
+}
+
+/** THE COMPLETION STAMP (the G-65 flow's own CAS): ACCEPTED → COMPLETED
+ * with the landed-cost linkage pair landing TOGETHER (the stamp, the
+ * document id + its official number — the completion act's
+ * all-or-nothing law; a raced or repeated completion finds the rung
+ * already COMPLETED and returns undefined — the exactly-once). */
+export async function stampDeclarationCompleted(input: {
+  id: string;
+  landedCostId: string | null;
+  landedCostNo: string | null;
+}): Promise<DeclarationRow | undefined> {
+  return stampDeclaration({
+    id: input.id,
+    from: "ACCEPTED",
+    to: "COMPLETED",
+    stamps: "completed_at + landed_cost pair",
+    landedCostId: input.landedCostId,
+    landedCostNo: input.landedCostNo,
+  });
+}
+
+export async function stampDeclarationCancelled(id: string): Promise<DeclarationRow | undefined> {
+  // CANCELLED exits the DRAFT rung ONLY — the 0121 stamp-shape floors'
+  // own law (ck_customs_declarations_submitted_shape: CANCELLED carries
+  // submitted_at NULL; the submission stamp is monotone evidence that
+  // never un-stamps — once submitted, the declaration completes or
+  // stands; the service's typed refusal names the floor).
+  return stampDeclaration({ id, from: "DRAFT", to: "CANCELLED", stamps: "cancelled" });
+}
+
+/** THE G-65 LINKAGE WRITE (the completion act's own tail — the 0125
+ * pair): the declaration's landed-cost document id + official number,
+ * landing in the SAME ambient transaction as the completion stamp, the
+ * landed-cost document, the journal and the revaluation (INV-018's
+ * all-or-nothing law; the navigable chain's declaration-side link —
+ * acceptance #8's own read). */
+export async function linkDeclarationLandedCost(input: {
+  id: string;
+  landedCostId: string;
+  landedCostNo: string | null;
+}): Promise<DeclarationRow | undefined> {
+  const rows = await query<DeclarationRow>(sql`
+    UPDATE customs_declarations
+    SET landed_cost_id = ${input.landedCostId},
+        landed_cost_no = ${input.landedCostNo},
+        updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'COMPLETED' AND landed_cost_id IS NULL
+    RETURNING ${DECLARATION_COLUMNS}`);
+  return rows[0];
+}
+
+// ── the HS registry (T-10 — the tenant-extensible starter set) ─────────────
+
+export interface HsCodeRow {
+  id: string;
+  hsCode: string;
+  name: string;
+  nameAr: string;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+}
+
+const HS_COLUMNS = sql`id, hs_code AS "hsCode", name, name_ar AS "nameAr", is_active AS "isActive",
+  note, note_ar AS "noteAr", created_at::text AS "createdAt"`;
+
+export async function insertHsCode(input: {
+  hsCode: string;
+  name: string;
+  nameAr: string;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<HsCodeRow> {
+  const rows = await query<HsCodeRow>(sql`
+    INSERT INTO hs_code_registry
+      (id, tenant_id, hs_code, name, name_ar, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.hsCode}, ${input.name},
+            ${input.nameAr}, ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${HS_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findHsCodeByCode(hsCode: string): Promise<HsCodeRow | undefined> {
+  const rows = await query<HsCodeRow>(sql`
+    SELECT ${HS_COLUMNS} FROM hs_code_registry WHERE hs_code = ${hsCode} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listHsCodes(filter: { activeOnly?: boolean; limit?: number }): Promise<HsCodeRow[]> {
+  const activeOnly = filter.activeOnly ?? false;
+  return query<HsCodeRow>(sql`
+    SELECT ${HS_COLUMNS} FROM hs_code_registry
+    WHERE (${activeOnly}::boolean IS FALSE OR is_active = TRUE)
+    ORDER BY hs_code, id
+    LIMIT ${filter.limit ?? 500}`);
+}
+
+/** The registry update (the retirement + the notes — the code itself
+ * NEVER rewrites: the frozen-identity law, the service's typed
+ * refusal; this statement carries no hs_code SET clause by
+ * construction). */
+export async function updateHsCode(input: {
+  hsCode: string;
+  name?: string | null;
+  nameAr?: string | null;
+  isActive?: boolean;
+  note?: string | null;
+  noteAr?: string | null;
+}): Promise<HsCodeRow | undefined> {
+  const rows = await query<HsCodeRow>(sql`
+    UPDATE hs_code_registry
+    SET name = COALESCE(${input.name ?? null}, name),
+        name_ar = COALESCE(${input.nameAr ?? null}, name_ar),
+        is_active = COALESCE(${input.isActive ?? null}, is_active),
+        note = COALESCE(${input.note ?? null}, note),
+        note_ar = COALESCE(${input.noteAr ?? null}, note_ar),
+        updated_at = now(), version = version + 1
+    WHERE hs_code = ${input.hsCode}
+    RETURNING ${HS_COLUMNS}`);
+  return rows[0];
+}

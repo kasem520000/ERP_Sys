@@ -408,7 +408,18 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // extensible DATA with a DELETE grant, the snapshot semantics ride
     // the service's typed gates; the 0123 additive-slot precedent's
     // own class under the same-increment law)]
-    expect(files.at(-1)?.tag).toBe("0124_trade_order_incoterms");
+    // [dated 2026-11-25 — PHASE-051 W-37: the chain grows 124 → 125 —
+    // 0125_trade_customs_landed_cost_source lands WITH this wave's
+    // writers (the landed-cost declaration source: landed_costs.
+    // declaration_id + the partial unique uq_landed_costs_tenant_
+    // declaration — the INV-013-equivalent exactly-once, one customs
+    // landed-cost document per declaration ever; customs_declarations.
+    // landed_cost_id/landed_cost_no — the completion act's linkage
+    // pair; landed_cost_allocations.declaration_line_id — the
+    // line-level tie, «every allocated duty tied to its declaration
+    // line» (INV-036's own demand); the 0123/0124 additive-slot
+    // precedent's own class under the same-increment law)]
+    expect(files.at(-1)?.tag).toBe("0125_trade_customs_landed_cost_source");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

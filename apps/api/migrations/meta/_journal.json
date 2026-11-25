@@ -868,6 +868,13 @@
       "when": 1799380800000,
       "tag": "0124_trade_order_incoterms",
       "breakpoints": true
+    },
+    {
+      "idx": 124,
+      "version": "7",
+      "when": 1799467200000,
+      "tag": "0125_trade_customs_landed_cost_source",
+      "breakpoints": true
     }
   ],
   "version": "7"

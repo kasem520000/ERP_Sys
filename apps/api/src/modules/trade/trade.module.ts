@@ -3,11 +3,13 @@ import { Module, type OnModuleInit } from "@nestjs/common";
 import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
 import { NotificationsModule } from "../notifications/notifications.module";
+import { PurchasingModule } from "../purchasing/purchasing.module";
 import { LcService } from "./application/lc-service";
 import { CollectionsService } from "./application/collections-service";
 import { IncotermsService } from "./application/incoterms-service";
 import { TransportService } from "./application/transport-service";
 import { TrackingService } from "./application/tracking-service";
+import { CustomsService } from "./application/customs-service";
 import { TradeExpirySweepService } from "./application/trade-expiry-sweep-service";
 import { registerTradeExpiryJob } from "./infrastructure/trade-expiry-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
@@ -20,13 +22,14 @@ import {
   TradeTrackingController,
   TradeTransportController,
 } from "./presentation/trade-transport.controller";
+import { TradeCustomsController } from "./presentation/trade-customs.controller";
 
 /**
  * PHASE-051 (W-34 — T-05 + T-06, 2026-11-25; W-35 — T-07 + T-08,
- * 2026-11-25; W-36 — T-09 + T-13, 2026-11-25) THE TRADE MODULE (FTL,
- * CR-21 — the LC engine + the expiry sweep + the collections + the
- * Incoterms registry + the transport documents + the shipment
- * tracking): the LC
+ * 2026-11-25; W-36 — T-09 + T-13, 2026-11-25; W-37 — T-10, 2026-11-25)
+ * THE TRADE MODULE (FTL, CR-21 — the LC engine + the expiry sweep + the
+ * collections + the Incoterms registry + the transport documents + the
+ * shipment tracking + THE CUSTOMS ENGINE): the LC
  * lifecycle (issue → the typed amendments with the G-64 margin
  * adjustments → the documents checklist with the discrepancy notes →
  * retire) with G-64's postings through the REAL posting engine (D-05)
@@ -49,18 +52,26 @@ import {
  * sweep's inbox writer rides the NotificationsModule export (the
  * asset-expiry-sweep wiring precedent); the tenant's chosen bank
  * accounts are consumed through the treasury store's own surface
- * (the documented contract — zero parallel computation). The
- * remaining planes (customs W-37 · bonded/drawback W-38) extend
- * THIS module with their own services and stores on the same keys.
+ * (the documented contract — zero parallel computation) + the customs
+ * engine (T-10 — the declarations ladder with the D-06 duty/VAT line
+ * fold and THE G-65 COMPLETION through the REAL LandedCostService
+ * VERBATIM — D-15(a)'s documented contract: the PurchasingModule
+ * import is one-directional (purchasing consumes the trade gates
+ * through PLAIN FUNCTIONS — the order gate + the customs landed-cost
+ * floor; the trade module consumes the landed-cost SERVICE through
+ * the module import — never a cycle)). The remaining plane
+ * (bonded/drawback W-38) extends THIS module with its own services
+ * and stores on the same keys.
  */
 @Module({
-  imports: [AccountingModule, AuditModule, NotificationsModule],
+  imports: [AccountingModule, AuditModule, NotificationsModule, PurchasingModule],
   controllers: [
     TradeLcController,
     TradeCollectionsController,
     TradeIncotermsController,
     TradeTransportController,
     TradeTrackingController,
+    TradeCustomsController,
   ],
   providers: [
     LcService,
@@ -68,6 +79,7 @@ import {
     IncotermsService,
     TransportService,
     TrackingService,
+    CustomsService,
     TradeExpirySweepService,
   ],
   exports: [
@@ -76,6 +88,7 @@ import {
     IncotermsService,
     TransportService,
     TrackingService,
+    CustomsService,
     TradeExpirySweepService,
   ],
 })

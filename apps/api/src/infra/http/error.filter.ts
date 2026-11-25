@@ -133,6 +133,19 @@ import {
   PackingListDuplicateError,
   DeclarationLinkNotFoundError,
 } from "../../modules/trade/domain/trade-errors";
+// PHASE-051 (W-37 — T-10, dated 2026-11-25): the trade module's typed
+// refusals (the customs plane's statuses — see domainStatus).
+import {
+  DeclarationRecordNotFoundError,
+  DeclarationDuplicateError,
+  DeclarationStateError,
+  DeclarationLandedCostDuplicateError,
+  DeclarationRequiredError,
+  DeclarationIncompleteError,
+  HsCodeRecordNotFoundError,
+  HsCodeDuplicateError,
+  HsCodeFrozenError,
+} from "../../modules/trade/domain/trade-errors";
 import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
@@ -1509,6 +1522,39 @@ function domainStatus(error: DomainError): number {
     error instanceof IncotermCodeFrozenError ||
     error instanceof BlDuplicateError ||
     error instanceof PackingListDuplicateError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-051 (W-37 — T-10, dated 2026-11-25): the trade customs plane's
+  // statuses — registered in the SAME increment that ships the routes
+  // (the PHASE-045 T-03 lesson). The 404s: the declaration register's
+  // and the HS registry's not-founds (A7 parity). The 409s: the ladder's
+  // conflicts (the stamp law's raced/terminal moves, the empty-lines
+  // floor, the import-receipt law, the exactly-once completion) + the
+  // two natural keys ((tenant, declaration_no) and (tenant, hs_code))
+  // + the exactly-once landed-cost duplicate (the 0125 unique index's
+  // caller-side face) + INV-036's completeness refusals
+  // (DECLARATION_REQUIRED/DECLARATION_INCOMPLETE — the allocation's own
+  // floor, D-07's wordings). The policy class — the line shapes
+  // (DECLARATION_LINE_INVALID: the fold's verdicts, the HS pattern), the
+  // tie's exactness laws (DECLARATION_LINE_TIE_INVALID), the
+  // fail-closed purpose mapping (CUSTOMS_PURPOSE_NOT_MAPPED), the
+  // registry write floors (HS_CODE_INVALID) — falls through to the 422
+  // default exactly as the family law documents it.
+  if (
+    error instanceof DeclarationRecordNotFoundError ||
+    error instanceof HsCodeRecordNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (
+    error instanceof DeclarationDuplicateError ||
+    error instanceof DeclarationStateError ||
+    error instanceof DeclarationLandedCostDuplicateError ||
+    error instanceof DeclarationRequiredError ||
+    error instanceof DeclarationIncompleteError ||
+    error instanceof HsCodeDuplicateError ||
+    error instanceof HsCodeFrozenError
   ) {
     return HttpStatus.CONFLICT;
   }

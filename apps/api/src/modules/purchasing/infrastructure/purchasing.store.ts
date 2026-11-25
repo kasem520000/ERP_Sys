@@ -1012,6 +1012,10 @@ export interface LandedCostRow {
   status: string;
   allocatedToStock: string;
   allocatedToCogs: string;
+  /** PHASE-051 (W-37 — T-10, D-06/D-15(a)): the customs landed-cost
+   * document's declaration source (null on the ordinary rows — the
+   * 0125 additive column). */
+  declarationId: string | null;
   note: string | null;
   createdBy: string | null;
   createdAt: string;
@@ -1028,15 +1032,19 @@ export async function insertLandedCost(input: {
   chargeAccountId: string;
   note: string | null;
   actorId: string | null;
+  /** PHASE-051 (W-37 — T-10, D-06/D-15(a)): the declaration source —
+   * null on the ordinary rows (the 0125 additive column; the customs
+   * completion act's linkage). */
+  declarationId?: string | null;
 }): Promise<LandedCostRow> {
   const tx = tenantTx();
   const id = generateUuidV7();
   await tx.execute(sql`
     INSERT INTO landed_costs (id, tenant_id, grn_id, cost_type, vendor_id, amount, allocation_method,
-                              charge_account_id, note, created_by)
+                              charge_account_id, note, created_by, declaration_id)
     VALUES (${id}, erp.current_tenant_id(), ${input.grnId}, ${input.costType}, ${input.vendorId},
             ${input.amount}, ${input.allocationMethod}, ${input.chargeAccountId}, ${input.note},
-            ${input.actorId})
+            ${input.actorId}, ${input.declarationId ?? null})
   `);
   return findLandedCostById(id) as Promise<LandedCostRow>;
 }
@@ -1047,7 +1055,7 @@ export async function findLandedCostById(id: string): Promise<LandedCostRow | un
            amount::text AS amount, allocation_method AS "allocationMethod",
            charge_account_id AS "chargeAccountId", status,
            allocated_to_stock::text AS "allocatedToStock", allocated_to_cogs::text AS "allocatedToCogs",
-           note, created_by AS "createdBy", created_at AS "createdAt",
+           declaration_id AS "declarationId", note, created_by AS "createdBy", created_at AS "createdAt",
            posting_date AS "postingDate", posted_journal_id AS "postedJournalId"
     FROM landed_costs WHERE id = ${id} LIMIT 1
   `);
@@ -1060,13 +1068,30 @@ export async function listLandedCosts(filter: { grnId?: string; limit: number })
            amount::text AS amount, allocation_method AS "allocationMethod",
            charge_account_id AS "chargeAccountId", status,
            allocated_to_stock::text AS "allocatedToStock", allocated_to_cogs::text AS "allocatedToCogs",
-           note, created_by AS "createdBy", created_at AS "createdAt",
+           declaration_id AS "declarationId", note, created_by AS "createdBy", created_at AS "createdAt",
            posting_date AS "postingDate", posted_journal_id AS "postedJournalId"
     FROM landed_costs
     WHERE (${filter.grnId ?? null}::uuid IS NULL OR grn_id = ${filter.grnId ?? null})
     ORDER BY created_at DESC LIMIT ${filter.limit}
   `);
   return rows.rows as unknown as LandedCostRow[];
+}
+
+/** PHASE-051 (W-37 — T-10, D-06/D-15(a)): the customs landed-cost
+ * document's declaration source read — the exactly-once pre-check's own
+ * probe (the trade completion act's duplicate refusal; the 0125 unique
+ * index is the DB floor of the same law). */
+export async function findLandedCostByDeclaration(declarationId: string): Promise<LandedCostRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, grn_id AS "grnId", cost_no AS "costNo", cost_type AS "costType", vendor_id AS "vendorId",
+           amount::text AS amount, allocation_method AS "allocationMethod",
+           charge_account_id AS "chargeAccountId", status,
+           allocated_to_stock::text AS "allocatedToStock", allocated_to_cogs::text AS "allocatedToCogs",
+           declaration_id AS "declarationId", note, created_by AS "createdBy", created_at AS "createdAt",
+           posting_date AS "postingDate", posted_journal_id AS "postedJournalId"
+    FROM landed_costs WHERE declaration_id = ${declarationId} LIMIT 1
+  `);
+  return (rows.rows as unknown as LandedCostRow[])[0];
 }
 
 export async function updateLandedCostStatus(input: {
@@ -1087,6 +1112,11 @@ export async function updateLandedCostStatus(input: {
     remainingQty: string;
     allocatedAmount: string;
     cogsAdjustmentAmount: string;
+    /** PHASE-051 (W-37 — T-10, D-06/INV-036): the line-level tie — the
+     * allocation row's declaration line (null on the ordinary rows;
+     * the trade gate's tie map, passed through the documented
+     * contract). */
+    declarationLineId?: string | null;
   }[];
 }): Promise<void> {
   const tx = tenantTx();
@@ -1111,11 +1141,13 @@ export async function updateLandedCostStatus(input: {
       await tx.execute(sql`
         INSERT INTO landed_cost_allocations (id, tenant_id, landed_cost_id, grn_line_id, item_id,
                                              warehouse_id, qty_at_allocation, remaining_qty,
-                                             allocated_amount, cogs_adjustment_amount, revalue_applied_at)
+                                             allocated_amount, cogs_adjustment_amount,
+                                             declaration_line_id, revalue_applied_at)
         VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.id}, ${allocation.grnLineId},
                 ${allocation.itemId}, ${allocation.warehouseId}, ${allocation.qtyAtAllocation},
                 ${allocation.remainingQty}, ${allocation.allocatedAmount},
-                ${allocation.cogsAdjustmentAmount}, now())
+                ${allocation.cogsAdjustmentAmount},
+                ${allocation.declarationLineId ?? null}, now())
       `);
     }
   }
@@ -1131,13 +1163,15 @@ export async function listLandedCostAllocations(landedCostId: string): Promise<
     remainingQty: string;
     allocatedAmount: string;
     cogsAdjustmentAmount: string;
+    declarationLineId: string | null;
   }[]
 > {
   const rows = await tenantTx().execute(sql`
     SELECT id, grn_line_id AS "grnLineId", item_id AS "itemId", warehouse_id AS "warehouseId",
            qty_at_allocation::text AS "qtyAtAllocation", remaining_qty::text AS "remainingQty",
            allocated_amount::text AS "allocatedAmount",
-           cogs_adjustment_amount::text AS "cogsAdjustmentAmount"
+           cogs_adjustment_amount::text AS "cogsAdjustmentAmount",
+           declaration_line_id AS "declarationLineId"
     FROM landed_cost_allocations WHERE landed_cost_id = ${landedCostId} ORDER BY grn_line_id
   `);
   return rows.rows as unknown as {
@@ -1149,6 +1183,7 @@ export async function listLandedCostAllocations(landedCostId: string): Promise<
     remainingQty: string;
     allocatedAmount: string;
     cogsAdjustmentAmount: string;
+    declarationLineId: string | null;
   }[];
 }
 

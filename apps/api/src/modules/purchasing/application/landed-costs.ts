@@ -7,6 +7,7 @@ import { PostingService } from "../../accounting/application/posting-service";
 import type { JournalLineSpec, JournalSpec } from "../../accounting/domain/posting-engine/journal-spec";
 import { ownTenantBaseCurrency } from "../../../infra/settings/setting-reader";
 import { RevaluationService } from "../../inventory/application/revaluation-service";
+import { resolveCustomsLandedCostFloor } from "../../trade/infrastructure/trade-customs-gate";
 import * as store from "../infrastructure/purchasing.store";
 import {
   LandedCostAmountInvalidError,
@@ -233,6 +234,10 @@ export class LandedCostService {
     chargeAccountId: string;
     note: string | null;
     actorId: string | null;
+    /** PHASE-051 (W-37 — T-10, D-06/D-15(a)): the declaration source —
+     * the customs completion act's linkage (the 0125 additive column;
+     * null on the ordinary rows). */
+    declarationId?: string | null;
   }): Promise<store.LandedCostRow> {
     const base = await this.resolveAllocationBase(input);
     const created = await store.insertLandedCost({
@@ -244,13 +249,14 @@ export class LandedCostService {
       chargeAccountId: input.chargeAccountId,
       note: input.note,
       actorId: input.actorId,
+      declarationId: input.declarationId ?? null,
     });
     await this.audit.record({
       action: "purchasing.landed_cost_created",
       entityType: "landed_cost",
       entityId: created.id,
       actorId: input.actorId ?? undefined,
-      after: { grnId: input.grnId, costType: input.costType, amount: created.amount, allocationMethod: input.allocationMethod },
+      after: { grnId: input.grnId, costType: input.costType, amount: created.amount, allocationMethod: input.allocationMethod, declarationId: created.declarationId },
     });
     return created;
   }
@@ -281,6 +287,24 @@ export class LandedCostService {
     const stockLines = lines.filter((line) => line.accountId === null);
     const base = await ownTenantBaseCurrency();
     const amount = new Decimal(cost.amount);
+
+    // PHASE-051 (W-37 — T-10, INV-036/D-07 — the shared customs floor, the
+    // documented contract): a customs-duty landed-cost allocation on an
+    // import receipt REQUIRES a COMPLETED declaration reference — the
+    // typed DECLARATION_REQUIRED/DECLARATION_INCOMPLETE refusals fire HERE
+    // (the allocation act), with ZERO residue (the refused draft stays a
+    // draft, nothing posts — D-07's own wording); ordinary non-duty landed
+    // costs stand untouched (the gate returns null and the allocation
+    // proceeds exactly as before — the existing behavior, never restated
+    // narrower). The floor's tie map (the declaration's own lines joined
+    // to these stock lines by item) rides the allocation rows below —
+    // every allocated duty tied to its declaration line (D-06/INV-036).
+    const customsFloor = await resolveCustomsLandedCostFloor({
+      grnId: cost.grnId,
+      declarationId: cost.declarationId,
+      costType: cost.costType,
+      grnStockLines: stockLines.map((line) => ({ grnLineId: line.id, itemId: line.itemId })),
+    });
 
     const { allocations, allocatedToStock, allocatedToCogs } = await this.computeAllocation({
       grn,
@@ -376,7 +400,13 @@ export class LandedCostService {
       postedJournalId: result.journalEntryId,
       allocatedToStock,
       allocatedToCogs,
-      allocations,
+      // PHASE-051 (W-37 — T-10, D-06/INV-036): the allocation rows carry
+      // the line-level tie — the customs floor's map, rendered VERBATIM
+      // (null on the ordinary rows).
+      allocations: allocations.map((allocation) => ({
+        ...allocation,
+        declarationLineId: customsFloor === null ? null : (customsFloor.declarationLineByGrnLine.get(allocation.grnLineId) ?? null),
+      })),
     });
     await this.numbering.bind(LDC_FORMAT.docType, acquired.number, id);
     await this.audit.record({

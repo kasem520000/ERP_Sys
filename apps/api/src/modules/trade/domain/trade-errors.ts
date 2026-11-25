@@ -370,3 +370,174 @@ export class DeclarationLinkNotFoundError extends DomainError {
     );
   }
 }
+
+// ── the customs plane (T-10 — the declarations + lines + the G-65 flow) ─────
+
+export class DeclarationRecordNotFoundError extends DomainError {
+  constructor(details: { declarationId: string }) {
+    super(
+      "DECLARATION_RECORD_NOT_FOUND",
+      `customs declaration ${details.declarationId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, declaration_no) natural key is unique (the 0121 uq) —
+ * the service refuses BY NAME before the DB floor. */
+export class DeclarationDuplicateError extends DomainError {
+  constructor(details: { declarationNo: string }) {
+    super(
+      "DECLARATION_DUPLICATE",
+      `a declaration numbered ${details.declarationNo} already exists in this tenant (the (tenant, declaration_no) key is unique — uq_customs_declarations_tenant_no)`,
+      details,
+    );
+  }
+}
+
+/** THE LADDER'S OWN REFUSAL (the 0121 stamp law's fold — DRAFT →
+ * SUBMITTED → ACCEPTED → COMPLETED | CANCELLED; the typed refusal
+ * names the register and the illegal move's reason: the empty-lines
+ * floor at submission, the stamp law's monotone evidence). */
+export class DeclarationStateError extends DomainError {
+  constructor(details: {
+    declarationId: string;
+    declarationNo: string;
+    from: string;
+    to: string;
+    reason: string;
+  }) {
+    super(
+      "DECLARATION_STATE",
+      `declaration ${details.declarationNo} is ${details.from} — ${details.reason} (the move to ${details.to} is refused)`,
+      details,
+    );
+  }
+}
+
+/** The declaration's line-shape floor (the 0121 CHECKs' caller-side
+ * face: the HS code pattern, the amounts' non-negativity — the FOLD's
+ * verdict rendered VERBATIM, D-06's own demand). */
+export class DeclarationLineInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super(
+      "DECLARATION_LINE_INVALID",
+      `the declaration line is refused at ${details.field}: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+/**
+ * INV-036'S COMPLETENESS REFUSALS (D-07's own wordings — the honest
+ * interpretation: a customs-duty landed-cost allocation on an import
+ * receipt REQUIRES a COMPLETED declaration reference): the typed
+ * refusal names the receipt and the declaration's own state, with
+ * ZERO residue (the refused allocation stays a draft, nothing posts).
+ * The reservation law rides the wording: INV-036 exactly, no invented
+ * identifier.
+ */
+export class DeclarationRequiredError extends DomainError {
+  constructor(details: { grnId: string; costType: string }) {
+    super(
+      "DECLARATION_REQUIRED",
+      `the ${details.costType} landed-cost allocation on goods receipt ${details.grnId} requires a COMPLETED customs declaration reference (INV-036 — declaration completeness): no declaration references this receipt`,
+      details,
+    );
+  }
+}
+
+export class DeclarationIncompleteError extends DomainError {
+  constructor(details: { grnId: string; declarationId: string; declarationNo: string; status: string }) {
+    super(
+      "DECLARATION_INCOMPLETE",
+      `the customs landed-cost allocation on goods receipt ${details.grnId} requires a COMPLETED customs declaration reference (INV-036 — declaration completeness): declaration ${details.declarationNo} is ${details.status}`,
+      details,
+    );
+  }
+}
+
+/** The line-level tie's exactness laws (D-06 — «every allocated duty
+ * tied to its declaration line»; the tie map's resolution demands:
+ * every declaration line item-bearing, one line per item, the GRN's
+ * stock lines covered). The declared interpretation #5, recorded at
+ * the claim sites. */
+export class DeclarationLineTieInvalidError extends DomainError {
+  constructor(details: { declarationNo: string; reason: string }) {
+    super(
+      "DECLARATION_LINE_TIE_INVALID",
+      `the declaration ${details.declarationNo}'s line-level tie is refused: ${details.reason} (INV-036's own demand — every allocated duty tied to its declaration line)`,
+      details,
+    );
+  }
+}
+
+/** G-65's own shape at the completion act: the landed-cost charge
+ * account is the purpose-mapped CUSTOMS_DUTY_PAYABLE — fail-closed
+ * until mapped (the 0122 §8 marker standing; the D-06 wording). */
+export class CustomsPurposeNotMappedError extends DomainError {
+  constructor(details: { declarationNo: string }) {
+    super(
+      "CUSTOMS_PURPOSE_NOT_MAPPED",
+      `the customs duty payable account is not mapped for this tenant (declaration ${details.declarationNo}) — G-65's CR leg resolves the purpose-mapped CUSTOMS_DUTY_PAYABLE, fail-closed until mapped (map the 0122 §8 marker 2145 to an account)`,
+      details,
+    );
+  }
+}
+
+/** The exactly-once source law (the 0125 partial unique's caller-side
+ * face — ONE customs landed-cost document per declaration, ever:
+ * INV-036's single-use at the relational floor). */
+export class DeclarationLandedCostDuplicateError extends DomainError {
+  constructor(details: { declarationNo: string; landedCostId: string }) {
+    super(
+      "DECLARATION_LANDED_COST_DUPLICATE",
+      `declaration ${details.declarationNo} already sources customs landed-cost document ${details.landedCostId} (one customs landed cost per declaration, ever — uq_landed_costs_tenant_declaration, the INV-013-equivalent exactly-once)`,
+      details,
+    );
+  }
+}
+
+// ── the HS registry plane (T-10 — the tenant-extensible starter set) ────────
+
+export class HsCodeRecordNotFoundError extends DomainError {
+  constructor(details: { hsCode: string }) {
+    super(
+      "HS_CODE_RECORD_NOT_FOUND",
+      `HS code ${details.hsCode} does not exist in this tenant's registry`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, hs_code) natural key is unique (the 0121 uq) — the
+ * tenant-addition write refuses BY NAME before the DB floor. */
+export class HsCodeDuplicateError extends DomainError {
+  constructor(details: { hsCode: string }) {
+    super(
+      "HS_CODE_DUPLICATE",
+      `an HS code ${details.hsCode} already exists in this tenant's registry (the (tenant, hs_code) key is unique — uq_hs_code_registry_tenant_code)`,
+      details,
+    );
+  }
+}
+
+/** The registry write's own floor (the 0121 CHECK shapes — the code
+ * pattern and the bilingual name floors, re-surfaced typed). */
+export class HsCodeInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super("HS_CODE_INVALID", `the HS registry write is refused at ${details.field}: ${details.reason}`, details);
+  }
+}
+
+/** The code is the row's identity — a PATCH never rewrites it (the
+ * register's audit-trail law, the 0121 uq's own reading). */
+export class HsCodeFrozenError extends DomainError {
+  constructor(details: { hsCode: string; attempted: string }) {
+    super(
+      "HS_CODE_FROZEN",
+      `an HS code is its identity — ${details.hsCode} cannot become ${details.attempted} (create a new row and retire the old one)`,
+      details,
+    );
+  }
+}
