@@ -1,4 +1,60 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-33 THE FOUNDATION DELIVERED (2026-11-24, this session — the plan APPROVED as the binding phase program, W-33 released by the owner's dispatch; F-051a `b67afc7` → the foundation `ff2b0df` → the schema spec `ab1fd30`, every step pushed at its own commit)** — W-34 NEXT (the LC engine + G-64's postings + the BR-105 `trade-expiry-sweep` — the SIXTH standing isolate) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-34 THE LC ENGINE + THE EXPIRY SWEEP DELIVERED (2026-11-25, this session — the engine `7291513` → the DB specs `3f98aa7`, every step pushed at its own commit)** — W-35 NEXT (the documentary collections API (D/P + D/A, the settlement linkage) + the Incoterms registry + the PO/SO selector with BR-106's risk-hint matrix) under the standing order — تسليم لا قبول
+
+**W-34 — THE LC ENGINE + THE EXPIRY SWEEP (T-05 + T-06, delivered on the
+W-33 gate head `4368187` in two increments + this gate):** THE TRADE MODULE
+OPENS (`modules/trade/` — the domain folds FIRST (lc-lifecycle's total
+status × move matrix + lc-sweep-math's BR-105 arithmetic, 31 property
+tests) → the services → the store → the controller → the wiring): the LC
+lifecycle API (create with the official `LC-{YYYY}-{SEQ:6}` reserved at
+create → **issue — G-64's margin deposit through the REAL posting engine:
+DR the purpose-mapped LC_MARGIN_DEPOSIT (the 0122 §8 marker 1180) · CR the
+tenant's chosen bank account** (an explicit ACTIVE in-currency cash account
+at the act, the landed-cost charge-account discipline's own shape; INV-013
+single-use on (lc, issue); the FX ride at the contract rate (D-21); the
+INV-019-exact treasury movement) → **amend** — the dated typed changes
+(VALUE/VALIDITY/DOCUMENTS/OTHER, the typed-change + freshness laws) with
+the margin adjustment through THE SAME G-64 pair on (lc_amendment, id) →
+**the documents checklist** — the monotone stamps (the 0119 floors' fold
+VERBATIM) + the discrepancy notes (BR-105's own anchor) → **fee** — THE
+FINANCIAL-CHARGES DISCIPLINE (the bank-charge pattern, zero new machinery:
+DR BANK_CHARGES · CR the bank, on the `fee_{seq}` INV-028-precedent
+single-use keys) → **retire** — the G-64 reversal (DR the bank · CR
+LC_MARGIN_DEPOSIT on (lc, retirement); the settled pair + the journal link
+land TOGETHER in the CAS) → **cancel** (the margin exit law: the margined
+instrument cancels never)) + **BR-105's `trade-expiry-sweep`** (D-09 — the
+0111/calibration pattern verbatim, **THE SIXTH STANDING ISOLATE**: the
+30/14/7/1 ladder + the discrepancy family on the same bands, the structural
+dedupe on D-09's own axes, the clock law (the DB's OWN CURRENT_DATE), the
+ISSUED → EXPIRED transition (the ladder's own terminus, CAS-stamped +
+audited, idempotent), the 'trade' prefs gate, the
+trade.lc_expiry_sweep_run seal, the typed settings key
+trade.lc_expiry_sweep_thresholds) + the pg-boss job (queue
+`trade-expiry-sweep`, daily 05:00 UTC — the nightly ladder's free window)
++ THE ELEVEN-ROUTE CONTROLLER binding trade.lc.view / trade.lc.manage,
+feature-gated on trade.lc — **ROUTE_PERMISSIONS 1,159 + 11 = 1,170** (the
+keys-seed-first FIRST trade binding wave). **THE HONEST CATCH (the
+0117/0118 additive-slot precedent's own class, disclosed at the claim
+sites): the TWO closed-domain widenings land WITH the writers through the
+additive slot 0123 (the chain 122 → 123): 'trade' joins the notifications
+categories (the 19-member union) + 'letters_of_credit'/'lc_amendment'/
+'lc_fee' join ck_cash_movements_source_shape (the fee EVENT its own source
+identity — the one-movement-per-source-side law's own demand).** The
+evidence envelope `audit-evidence/phase051-w34/` (the FORTY-SIXTH
+consecutive same-session wave): the SIX isolates standalone FIRST (the
+trade sweep the sixth) + the eleven-part envelope **303 · 4,385 · 0 failed
+· 0 skipped** + the 123-chain scratch from zero TWICE (check-rls OK — 354
+catalog tables) + the standing battery (typecheck 8/8 · lint 8/8 ·
+depcruise 2,210/16,500 · unit 169 · 2,051 (api 80·1,007) · drift 357 = 357
+· ROUTE_PERMISSIONS 1,170 · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors + all-probes-OK · history-secrets 0 violations ·
+capabilities agree · shells PASS/PASS · boundary PASS). **W-35 (the
+collections + Incoterms) waits on the owner's dispatch under the standing
+order. RISK-033: EIGHT incidents, ZERO new — the row stays OPEN. NOT
+production approval — تسليم لا قبول.**
+
+---
+
+# The W-33 foundation record (the historical context below)
 
 **The W-0 approval dispatch (the owner's, recorded in full in the plan §0b
 and the F-051a note):** the plan ACCEPTED AS DELIVERY at `2449233` after the

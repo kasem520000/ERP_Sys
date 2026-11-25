@@ -1624,6 +1624,110 @@ order.** The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا
 BR-105 expiry sweep — the SIXTH standing isolate) under the owner's
 standing order. NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-25 (PHASE-051 W-34 DELIVERED at the engine head
+`7291513` + the spec head `3f98aa7` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERION #2'S LC ARMS GREEN + THE SWEEP
+ISOLATE GREEN STANDALONE.** THE LIFECYCLE RUNS END-TO-END — issue,
+amend, track the documents checklist with discrepancies, retire: the
+GOLDEN-CLASS ARM of `trade-lc.db.spec` walks the whole journey over
+real PG16 with every G-64 posting proven AT THE JOURNAL-LINE LEVEL
+(the deposit DR LC_MARGIN_DEPOSIT (1180) · CR the tenant's chosen
+bank at the contract rate (the FX ride, INV-008 capture) with the
+INV-019-exact treasury movement; the amendment's margin adjustment
+through the SAME pair on (lc_amendment, id); the retirement reversal
+of the CURRENT margin with the settled pair + the journal stamps
+landing TOGETHER in the CAS stamp — the 0119 retirement-shape floor
+satisfied by the same statement) + THE LEDGER ARITHMETIC (the margin
+asset's net over the lifecycle EXACTLY ZERO; the movement bases tie
+the line bases by construction) + G-64's exactly-once (the ladder's
+typed refusals naming the record; the duplicate delivery returns the
+STORED result — idempotentReplay, INV-013's own surface; the entry
+count stays ONE) + the unmapped-purpose fail-closed with ZERO residue
++ the flip-and-restore re-run GREEN + the amendment windows (the
+typed-change law + the freshness law + the validity floor + the
+decrease's REVERSED pair with the IN movement) + the checklist
+monotone law (the 0119 floors' fold VERBATIM — the unpresented
+verification refused, the regressing stamps refused) + the margin
+exit law (the margined cancellation refused — the deposit's exit is
+the retirement pair; the margin-free retirement refused — the
+declared shapes at the claim sites) + the terminal register + the
+bank-account floor (the wrong-currency and unknown accounts refused
+with the typed name). THE LC FEES POST TO FINANCIAL CHARGES: the
+bank-charge pattern (DR the purpose-mapped BANK_CHARGES · CR the
+bank) on the `fee_{seq}` single-use keys — the INV-028 `op_<seq>`
+precedent (two fees, two keys, two treasury movements, proven) + the
+cash-moves source widening (the honest catch disclosed below). THE
+EXPIRY ALERTS FIRE AT 30/14/7/1 DAYS (BR-105) + THE SIXTH STANDING
+ISOLATE GREEN STANDALONE: `trade-lc-sweep.db.spec` — the default
+ladder fires each band once with the S-15 severities; the discrepancy
+family rides the same bands (`trade:lc:{lcId}:disc:{threshold}:
+{expiryDate}`); the dedupe is STRUCTURAL (the re-run converges —
+flagged counts again, ZERO new notifications, every pass seals); the
+per-cycle re-alert (the validity amendment moves the expiry — the new
+date forms NEW keys); the settings surface (the typed write · the
+custom ladder governs · the garbage row fails-closed to [30,14,7,1] ·
+the zod refusal under LC_SWEEP_THRESHOLDS_INVALID); the prefs gate
+(in-app off skips the records, the flags still count, the run still
+seals; the prefs removed → a NEW instrument records again); the seal
+`trade.lc_expiry_sweep_run` carries {windows, flagged, notified,
+expired}; THE EXPIRY TRANSITION (the declared interpretation's own
+arm): the ISSUED instrument past its date CAS-stamps EXPIRED from the
+DB'S OWN CURRENT_DATE (the clock law — no Date.now()+delta anywhere
+in the sweep's path), audited `trade.lc_expired`, idempotent (the
+re-run finds no ISSUED row), a DRAFT row past its date never touched.
+THE ENVELOPE AT THE NEW COUNT: **303 files · 4,385 tests · 0 failed ·
+0 skipped** (the SIX isolates standalone FIRST — soak 1·1 · fcm 1·8 ·
+email 1·5 · the cmms sweep 1·4 · the quality calibration sweep 1·4 ·
+THE TRADE SWEEP 1·6 — the sixth, joining the standing set this wave;
+the load parts: smoke 3·1,999 20.2s · perf-rest 5·23 95.0s · chunk-a
+115·999 146.6s · b-rest 86·625 63.8s · c 88·711 75.1s; the arithmetic
+303 = 1+1+1+1+1+1+3+5+115+86+88 EXACT · 4,385 = 28 + 4,357 EXACT; the
+provenance 4,385 = 4,369 (the W-33 envelope) + 16 (the two trade
+specs: trade-lc 10 + the trade sweep 6); every part inside the 570s
+ceiling; the coverage verified BEFORE the first load run — 303 = 303,
+missing NONE, extra NONE, duplicates NONE, VERDICT: COVERED). THE
+123-CHAIN SCRATCH FROM ZERO TWICE: both runs CHAIN_123_APPLIED →
+[check-rls] OK — 354 catalog tables → SCRATCH_STOPPED, EXIT=0, both
+logs kept. THE STANDING BATTERY at the final code state: typecheck
+8/8 (0 cached) · lint 8/8 (0 cached) · depcruise clean 2,210 modules ·
+16,500 dependencies (+13/+81 dated) · unit 8/8 — 169 files · 2,051
+tests (api 80·1,007 · web 30·204 · mobile 27·393 · desktop 16·274 ·
+ui 3·43 · contracts 2·56 · domain-core 6·38 · sync-core 5·36; the
+ledger arithmetic 2,051 = 1,007+204+840 EXACT) · permissions drift
+**347 → 357 = 357** (unchanged — no key this wave; the sweep-config
+binds the EXISTING 0122-seeded trade.lc.manage key) · ROUTE_PERMISSIONS
+**1,159 + 11 = 1,170** (the keys-seed-first FIRST trade binding wave,
+dated at the block — the LC plane's eleven routes) · i18n 7,253
+standing (no delta — an API-DB wave) + mobile 371 · tokens 50/50 ·
+manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors (implemented
+G 63 · INV 35 · BR 104 standing — the 051 flip is W-42's) + the
+self-test all-probes-OK (probe 7 stands at G-64/PHASE-051) ·
+history-secrets 0 violations · 6,974 allowlisted hits (the FIVE tag
+anchors walked, untouched) · capabilities agree · shells PASS/PASS ·
+boundary PASS. THE HONEST CATCH (one, first-RED-proven then repaired —
+the 0117/0118 additive-slot precedent's own class, disclosed at the
+claim sites): the TWO closed-domain widenings this wave's writers
+demand land WITH the writers through the additive slot 0123 (the chain
+122 → 123): (a) 'trade' joins the notifications/notification_prefs
+CHECK domains (the sweep's inbox records — the 19-member union, the
+shared-scope union law; the cmms-schema spec's standing arm updated in
+the same increment); (b) ck_cash_movements_source_shape is a closed
+domain AND uq_cash_movements_source_side is one movement per
+source-side — the repair gives the FEE EVENT its own source identity
+('lc_fee' keyed by its single-use journal entry; the margin pair
+keeps (letters_of_credit, lc.id) one row per side; the amendments
+keep (lc_amendment, id)) — EXACTLY the three new members, no wider,
+the standing twelve of 0056 + three = fifteen. The master plan's four
+declared slots 0119–0122 are consumed at W-33 and PUBLISHED (the
+constants law); the additive slot is the 050 0117/0118 precedent's
+own class, dated at every claim site. **RISK-033: EIGHT incidents,
+ZERO new this wave — the row stays OPEN, closing only by the owner's
+order.** The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا
+كتابة خارجها. NEXT: W-35 (the documentary collections API (D/P + D/A)
++ the Incoterms registry with BR-106's selector mandate) under the
+owner's standing order. NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

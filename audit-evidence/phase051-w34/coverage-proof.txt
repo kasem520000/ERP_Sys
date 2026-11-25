@@ -1,0 +1,11 @@
+W-34 coverage proof (the W-15 law — verified BEFORE the first load run):
+disk inventory: 303 files
+parts union:    303 files
+missing: NONE
+extra:   NONE
+duplicates: NONE
+VERDICT: COVERED
+The eleven parts (the five standing isolates + THE SIXTH (trade-expiry-sweep) + the five load parts):
+  isolate-soak 1 · isolate-fcm 1 · isolate-email 1 · isolate-sweep 1 · isolate-quality-sweep 1 · isolate-trade-sweep 1 · chunk-smoke 3 · chunk-perf-rest 5 · chunk-a 115 · chunk-b-rest 86 · chunk-c 88
+arithmetic: 303 = 1+1+1+1+1+1+3+5+115+86+88 EXACT
+The declared movements from the W-33 roster: trade-lc.db.spec joins chunk-a at its alphabetical position (114 → 115, the W-24 quality-schema precedent's own move) · trade-lc-sweep.db.spec is THE SIXTH standing isolate (its own part, the plan's D-09 — the owner's عزل مسبق order).

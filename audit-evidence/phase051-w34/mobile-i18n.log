@@ -1,0 +1,7 @@
+
+> erp-platform@0.1.0 check:mobile-i18n /home/z/my-project/ERP_Sys_051
+> tsx scripts/check-mobile-i18n-parity.ts
+
+== mobile i18n parity: ar=371 keys, en=371 keys ==
+ar/en mobile catalogs at 100% key parity; no empty values.
+EXIT=0
