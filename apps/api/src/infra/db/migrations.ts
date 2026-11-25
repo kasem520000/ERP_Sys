@@ -762,6 +762,20 @@ export const MIGRATIONS: readonly string[] = [
   // 1,199 dated at the block (the customs family — the keys-seed-first
   // discipline's FOURTH trade binding wave).
   "0125_trade_customs_landed_cost_source",
+  // PHASE-051 (W-38 — T-11, dated 2026-11-25): the bonded engine's
+  // stock-moves source widening — the REAL movement core's bonded legs
+  // (the in-bond transfer's two legs + the deposit's custodial receipt
+  // + the release's physical legs, ALL sourced 'bonded_move') refused
+  // by the closed ck_stock_moves_source_shape's standing twenty-four
+  // members (the 0117/0123 additive-slot precedent's own class, the
+  // same-increment law; the DB spec's first RED disclosed at the claim
+  // sites — the step-1 «NO migration» declaration corrected here, the
+  // dated honest catch). The union 24 + 1 = TWENTY-FIVE, no wider; the
+  // drift stays 357 (the W-38 routes bind the EXISTING 0122-seeded
+  // keys); ROUTE_PERMISSIONS 1,199 + 13 = 1,212 dated at the block
+  // (the bonded/drawback families — the keys-seed-first FIFTH trade
+  // binding wave).
+  "0126_bonded_stock_moves_source",
 ];
 
 /**

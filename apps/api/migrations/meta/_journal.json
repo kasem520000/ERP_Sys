@@ -875,6 +875,13 @@
       "when": 1799467200000,
       "tag": "0125_trade_customs_landed_cost_source",
       "breakpoints": true
+    },
+    {
+      "idx": 125,
+      "version": "7",
+      "when": 1799553600000,
+      "tag": "0126_bonded_stock_moves_source",
+      "breakpoints": true
     }
   ],
   "version": "7"

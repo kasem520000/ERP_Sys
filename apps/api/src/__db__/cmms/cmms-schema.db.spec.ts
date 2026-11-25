@@ -851,6 +851,7 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
       "0109_cmms_cost_lines_steps.sql",
       "0110_cmms_source_shape_repair.sql",
       "0117_quality_ncr_source_shape.sql",
+      "0126_bonded_stock_moves_source.sql",
     ]);
 
     // The LIVE constraint, from the catalog itself.
@@ -863,13 +864,18 @@ describe("PHASE-049 W-18 — THE stock_moves SCOPE ARM (the shared-scope union l
       [...live.rows[0]!.definition.matchAll(/'([^']+)'/g)].map((hit) => hit[1]!),
     );
 
-    // The members ENUMERATED EXPLICITLY (24 at the 118 chain — every
+    // The members ENUMERATED EXPLICITLY (25 at the 126 chain — every
     // source family the platform has ever defined; [dated 2026-11-23 —
     // PHASE-050 W-26: `ncr_record` joins with 0117 — the W-25 G-62
     // write-off's move source, the honest catch of W-26's own RED run:
     // the W-25 wave's scope-label run left this enumeration at the 23
-    // of the 110 chain]):
+    // of the 110 chain; dated 2026-11-25 — PHASE-051 W-38:
+    // `bonded_move` joins with 0126 — the bonded engine's REAL-
+    // movement-core legs (the in-bond transfer's two legs + the
+    // deposit's custodial receipt + the release's physical legs), the
+    // 0117/0123 additive-slot precedent's own class])
     expect([...liveMembers].sort()).toEqual([
+      "bonded_move",
       "consignment_settlement",
       "contract_mfg",
       "credit_note",

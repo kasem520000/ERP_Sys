@@ -419,7 +419,17 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // line-level tie, «every allocated duty tied to its declaration
     // line» (INV-036's own demand); the 0123/0124 additive-slot
     // precedent's own class under the same-increment law)]
-    expect(files.at(-1)?.tag).toBe("0125_trade_customs_landed_cost_source");
+    // [dated 2026-11-25 — PHASE-051 W-38: the chain grows 125 → 126 —
+    // 0126_bonded_stock_moves_source lands WITH this wave's writers
+    // (the bonded engine's REAL-movement-core legs ALL sourced
+    // 'bonded_move': the in-bond transfer's two legs + the deposit's
+    // custodial receipt + the release's physical legs — the closed
+    // twenty-four-member source vocabulary refused the first insert BY
+    // NAME, the 0117/0123 additive-slot precedent's own class under
+    // the same-increment law; the union 24 + 1 = 25, no wider; the DB
+    // spec's first RED disclosed at the claim sites — the honest
+    // catch, the step-1 «NO migration» declaration corrected here)]
+    expect(files.at(-1)?.tag).toBe("0126_bonded_stock_moves_source");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {
