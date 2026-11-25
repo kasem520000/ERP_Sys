@@ -13,6 +13,7 @@ import { TrackingService } from "./application/tracking-service";
 import { CustomsService } from "./application/customs-service";
 import { BondedService } from "./application/bonded-service";
 import { DrawbackService } from "./application/drawback-service";
+import { CertificateService } from "./application/certificate-service";
 import { TradeExpirySweepService } from "./application/trade-expiry-sweep-service";
 import { registerTradeExpiryJob } from "./infrastructure/trade-expiry-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
@@ -27,6 +28,7 @@ import {
 } from "./presentation/trade-transport.controller";
 import { TradeCustomsController } from "./presentation/trade-customs.controller";
 import { TradeBondedController } from "./presentation/trade-bonded.controller";
+import { TradeCertificatesController } from "./presentation/trade-certificates.controller";
 
 /**
  * PHASE-051 (W-34 — T-05 + T-06, 2026-11-25; W-35 — T-07 + T-08,
@@ -89,6 +91,7 @@ import { TradeBondedController } from "./presentation/trade-bonded.controller";
     TradeTrackingController,
     TradeCustomsController,
     TradeBondedController,
+    TradeCertificatesController,
   ],
   providers: [
     LcService,
@@ -99,6 +102,7 @@ import { TradeBondedController } from "./presentation/trade-bonded.controller";
     CustomsService,
     BondedService,
     DrawbackService,
+    CertificateService,
     TradeExpirySweepService,
   ],
   exports: [
@@ -110,6 +114,7 @@ import { TradeBondedController } from "./presentation/trade-bonded.controller";
     CustomsService,
     BondedService,
     DrawbackService,
+    CertificateService,
     TradeExpirySweepService,
   ],
 })

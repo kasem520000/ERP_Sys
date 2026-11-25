@@ -23,11 +23,13 @@ import type {
   PartnerRow,
   QuotationRow,
   SalesOrderRow,
+  TradeIncotermRow,
   WarehouseRow,
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedName, localizedSalesError, salesStatusLabel } from "../lib/messages";
 import { AtpPromisePoint } from "./atp-promise-point";
+import { IncotermSelector } from "./incoterm-selector";
 import { Card } from "./card";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
@@ -65,6 +67,7 @@ export function SalesQuotes({
   warehouses,
   branches,
   baseCurrency,
+  incoterms,
   canCreateQuotes,
   canSendQuotes,
   canConvertQuotes,
@@ -80,6 +83,7 @@ export function SalesQuotes({
   warehouses: readonly WarehouseRow[];
   branches: readonly BranchRow[];
   baseCurrency: string;
+  incoterms: readonly TradeIncotermRow[];
   canCreateQuotes: boolean;
   canSendQuotes: boolean;
   canConvertQuotes: boolean;
@@ -106,6 +110,11 @@ export function SalesQuotes({
   const [expectedDate, setExpectedDate] = useState("");
   const [currencyCode, setCurrencyCode] = useState(baseCurrency === "" ? "SAR" : baseCurrency);
   const [exchangeRate, setExchangeRate] = useState("");
+  // PHASE-051 (W-39 — T-14, D-17): the incoterm selection rides the ORDER
+  // create form (BR-106's mandate is enforced at the order's own posting —
+  // the server-side gate; the selector renders the risk-hint matrix at
+  // selection time VERBATIM, the API's own output).
+  const [incotermCode, setIncotermCode] = useState("");
   const [reserve, setReserve] = useState(false);
   const [lines, setLines] = useState<DraftLine[]>([{ ...EMPTY_LINE }]);
 
@@ -219,6 +228,11 @@ export function SalesQuotes({
           currencyCode: effectiveCurrency,
           exchangeRate: exchangeRate === "" ? null : exchangeRate,
           reserve,
+          // PHASE-051 (W-39 — T-14): the incoterm rides the create body when
+          // picked (BR-106's gate reads it at the posting — the typed
+          // ORDER_INCOTERM_REQUIRED refusal names the order when the trade
+          // flag demands it and the selection is absent).
+          ...(incotermCode !== "" ? { incotermCode } : {}),
           lines: lines.map((l) => ({
             itemId: l.itemId,
             qty: l.qty,
@@ -376,6 +390,14 @@ export function SalesQuotes({
               mono
               bidiIsolate
             />
+            {mode === "order" ? (
+              <IncotermSelector
+                locale={locale}
+                incoterms={incoterms}
+                value={incotermCode}
+                onValueChange={setIncotermCode}
+              />
+            ) : null}
             {effectiveCurrency !== baseCurrency && (
               <Input
                 label={d.salesExchangeRate}

@@ -694,3 +694,72 @@ export class DrawbackEvidenceRequiredError extends DomainError {
     );
   }
 }
+
+// ── the certificates (W-39 — T-14, the 0120 §4 plane's print anchor) ────────
+
+/**
+ * THE INPUT FLOOR (the issue act's own zod-side typed refusal — the
+ * TRADE_INPUT_INVALID shape on the certificates plane: the field and
+ * the reason, the caller's own wording).
+ */
+export class CertificateInputInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super(
+      "CERTIFICATE_INPUT_INVALID",
+      `the certificate issue's ${details.field}: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, certificate_no) natural key is unique (the 0120 uq) —
+ * the service refuses BY NAME before the DB floor (the typed pre-check
+ * law; the 23505 never surfaces raw). */
+export class CertificateDuplicateError extends DomainError {
+  constructor(details: { certificateNo: string }) {
+    super(
+      "CERTIFICATE_DUPLICATE",
+      `a certificate numbered ${details.certificateNo} already exists in this tenant (the (tenant, certificate_no) key is unique — uq_certificates_of_origin_tenant_no)`,
+      details,
+    );
+  }
+}
+
+/** The unknown certificate's typed 404 (the find's own refusal — A7's
+ * shape: foreign/unknown ids indistinguishable). */
+export class CertificateRecordNotFoundError extends DomainError {
+  constructor(details: { certificateId: string }) {
+    super(
+      "CERTIFICATE_RECORD_NOT_FOUND",
+      `certificate ${details.certificateId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The issue's own link floor (D-13's chain law): the certificate rides
+ * the transport documents — a billOfLadingId that resolves to nothing is
+ * the typed refusal naming the link (the 404-shape, never a silent
+ * null). */
+export class CertificateLinkNotFoundError extends DomainError {
+  constructor(details: { link: string; id: string }) {
+    super(
+      "CERTIFICATE_LINK_NOT_FOUND",
+      `the certificate's ${details.link} ${details.id} does not exist in this tenant (the chain's own link — PO → LC/collection → transport documents → declaration, acceptance #8)`,
+      details,
+    );
+  }
+}
+
+/** The goods lines' own floor (the chamber format's line grammar — the
+ * 050 COA coverage law's trade face: every line carries its description
+ * and its origin; a blank line never rides the frozen snapshot). */
+export class CertificateLineInvalidError extends DomainError {
+  constructor(details: { index: number; field: string; reason: string }) {
+    super(
+      "CERTIFICATE_LINE_INVALID",
+      `the certificate's goods line ${details.index} ${details.field}: ${details.reason}`,
+      details,
+    );
+  }
+}

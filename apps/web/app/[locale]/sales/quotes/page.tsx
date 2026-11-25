@@ -21,6 +21,7 @@ import type {
   QuotationRow,
   SalesOrderRow,
   TenantProfile,
+  TradeIncotermRow,
   WarehouseRow,
 } from "../../../../lib/api-types";
 import { localizedApiError } from "../../../../lib/messages";
@@ -40,16 +41,21 @@ export default async function SalesQuotesPage({
 
   await requireSessionToken(localeValue);
 
-  const [quotes, orders, customers, items, warehouses, branches, profile, session] = await Promise.all([
-    fetchApi<readonly QuotationRow[]>("sales/quotations?limit=200"),
-    fetchApi<readonly SalesOrderRow[]>("sales/sales-orders?limit=200"),
-    fetchApi<readonly PartnerRow[]>("partners?limit=500"),
-    fetchApi<readonly ItemRow[]>("inventory/items?limit=500"),
-    fetchApi<readonly WarehouseRow[]>("inventory/warehouses"),
-    fetchApi<readonly BranchRow[]>("tenancy/branches"),
-    fetchApi<TenantProfile>("tenancy/profile"),
-    fetchApi<CurrentSession>("identity/sessions/current"),
-  ]);
+  const [quotes, orders, customers, items, warehouses, branches, profile, incoterms, session] =
+    await Promise.all([
+      fetchApi<readonly QuotationRow[]>("sales/quotations?limit=200"),
+      fetchApi<readonly SalesOrderRow[]>("sales/sales-orders?limit=200"),
+      fetchApi<readonly PartnerRow[]>("partners?limit=500"),
+      fetchApi<readonly ItemRow[]>("inventory/items?limit=500"),
+      fetchApi<readonly WarehouseRow[]>("inventory/warehouses"),
+      fetchApi<readonly BranchRow[]>("tenancy/branches"),
+      fetchApi<TenantProfile>("tenancy/profile"),
+      // PHASE-051 (W-39 — T-14, D-17): the Incoterms registry read feeds the
+      // selector embedded in the SO create form (BR-106's mandate is
+      // server-side; the selector degrades to [] on its own 403 — additive).
+      fetchApi<readonly TradeIncotermRow[]>("trade/incoterms"),
+      fetchApi<CurrentSession>("identity/sessions/current"),
+    ]);
   if ((!quotes.ok && quotes.status === 401) || (!session.ok && session.status === 401)) {
     redirect(`/${locale}/login`);
   }
@@ -78,6 +84,7 @@ export default async function SalesQuotesPage({
         items={items.ok ? items.data : []}
         warehouses={warehouses.ok ? warehouses.data : []}
         branches={branches.ok ? branches.data : []}
+        incoterms={incoterms.ok ? incoterms.data : []}
         baseCurrency={profile.ok ? profile.data.baseCurrency : ""}
         canCreateQuotes={permissions.includes("sales.quotations.create")}
         canSendQuotes={permissions.includes("sales.quotations.approve")}

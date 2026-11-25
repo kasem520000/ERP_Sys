@@ -18,6 +18,7 @@ import type {
   PartnerRow,
   PurchaseOrderRow,
   PurchaseRequestRow,
+  TradeIncotermRow,
 } from "../../../../lib/api-types";
 import { localizedApiError } from "../../../../lib/messages";
 import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
@@ -36,11 +37,15 @@ export default async function PurchasingOrdersPage({
 
   await requireSessionToken(localeValue);
 
-  const [orders, requests, suppliers, items, session] = await Promise.all([
+  const [orders, requests, suppliers, items, incoterms, session] = await Promise.all([
     fetchApi<readonly PurchaseOrderRow[]>("purchasing/purchase-orders?limit=200"),
     fetchApi<readonly PurchaseRequestRow[]>("purchasing/purchase-requests?limit=200"),
     fetchApi<readonly PartnerRow[]>("partners?limit=500"),
     fetchApi<readonly ItemRow[]>("inventory/items?limit=500"),
+    // PHASE-051 (W-39 — T-14, D-17): the Incoterms registry read feeds the
+    // selector embedded in the PO create form (BR-106's mandate is
+    // server-side; the selector degrades to [] on its own 403 — additive).
+    fetchApi<readonly TradeIncotermRow[]>("trade/incoterms"),
     fetchApi<CurrentSession>("identity/sessions/current"),
   ]);
   if ((!orders.ok && orders.status === 401) || (!session.ok && session.status === 401)) {
@@ -69,6 +74,7 @@ export default async function PurchasingOrdersPage({
         initialOrders={orders.data}
         suppliers={suppliers.ok ? suppliers.data : []}
         items={items.ok ? items.data : []}
+        incoterms={incoterms.ok ? incoterms.data : []}
         canCreate={permissions.includes("purchasing.purchase_orders.create")}
         canApprove={permissions.includes("purchasing.purchase_orders.approve")}
       />

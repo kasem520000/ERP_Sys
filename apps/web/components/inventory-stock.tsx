@@ -12,9 +12,15 @@ import type { JSX } from "react";
 
 import { Badge, Button, DataTable, SearchInput, Select, formatMoneyDisplay } from "@erp/ui";
 import { getDictionary, type Locale } from "../i18n/dictionaries";
-import type { StockAvailabilityRow, StockOnHandRow, WarehouseRow } from "../lib/api-types";
+import type {
+  StockAvailabilityRow,
+  StockOnHandRow,
+  TradeBondedMoveRow,
+  WarehouseRow,
+} from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedInventoryError } from "../lib/messages";
+import { DutySuspendedBanner, DutySuspendedChip } from "./duty-suspended-banner";
 import { Card } from "./card";
 import { ErrorNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
@@ -23,10 +29,16 @@ export function InventoryStock({
   locale,
   initialRows,
   warehouses,
+  suspendedMoves,
 }: {
   locale: Locale;
   initialRows: readonly StockOnHandRow[];
   warehouses: readonly WarehouseRow[];
+  /** PHASE-051 (W-39 — T-14, D-17): the bonded register's EXECUTED
+   * IN_BOND moves (the host page's one read; the item-keyed map feeds
+   * the chips + the banner — the move's own figures VERBATIM, never a
+   * recomputed suspended balance). */
+  suspendedMoves: readonly TradeBondedMoveRow[];
 }): JSX.Element {
   const d = getDictionary(locale);
   const [rows] = useState<readonly StockOnHandRow[]>(initialRows);
@@ -48,7 +60,35 @@ export function InventoryStock({
     });
   }, [rows, warehouseId, query]);
 
+  // The item-keyed suspension map (the register's own rows — one move
+  // per item at the map's floor; the chip + the banner render the move's
+  // own figures VERBATIM).
+  const suspendedByItem = useMemo(() => {
+    const map = new Map<string, TradeBondedMoveRow>();
+    for (const move of suspendedMoves) {
+      for (const line of move.lines) {
+        if (!map.has(line.itemId)) {
+          map.set(line.itemId, move);
+        }
+      }
+    }
+    return map;
+  }, [suspendedMoves]);
+  const suspendedQtyByItem = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const move of suspendedMoves) {
+      for (const line of move.lines) {
+        if (!map.has(line.itemId)) {
+          map.set(line.itemId, line.qty);
+        }
+      }
+    }
+    return map;
+  }, [suspendedMoves]);
+  const [suspendedBannerItem, setSuspendedBannerItem] = useState<StockOnHandRow | null>(null);
+
   async function openAvailability(row: StockOnHandRow): Promise<void> {
+    setSuspendedBannerItem(suspendedByItem.has(row.itemId) ? row : null);
     setAvailabilityError(null);
     const result = await bffFetch<StockAvailabilityRow>(
       `inventory/availability?itemId=${encodeURIComponent(row.itemId)}&warehouseId=${encodeURIComponent(row.warehouseId)}`,
@@ -124,6 +164,9 @@ export function InventoryStock({
                       {d.stockNegativeBadge}
                     </Badge>
                   )}
+                  {suspendedByItem.has(row.itemId) && (
+                    <DutySuspendedChip label={d.tradeDutySuspendedChip} />
+                  )}
                 </span>
               ),
             },
@@ -152,6 +195,15 @@ export function InventoryStock({
           empty={{ title: d.stockEmpty }}
         />
       </Card>
+
+      {suspendedBannerItem !== null ? (
+        <DutySuspendedBanner
+          move={suspendedByItem.get(suspendedBannerItem.itemId) ?? null}
+          qty={suspendedQtyByItem.get(suspendedBannerItem.itemId) ?? null}
+          locale={locale}
+          d={d}
+        />
+      ) : null}
 
       {availability !== null && (
         <Card title={d.navInventoryStock}>

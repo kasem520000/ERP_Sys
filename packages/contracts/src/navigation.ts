@@ -1251,6 +1251,76 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "transaction-entry",
     order: 40,
   },
+  // PHASE-051 (W-39 — T-14, D-17, 2026-11-25): the foreign-trade family's
+  // five rows ride the PURCHASING group (the trade module composes on
+  // purchasing.landed_costs — D-04's own dependency; the import leg is
+  // procurement's own foreign-trade face). THE FLAG-GATING: trade.lc on
+  // the LC row + trade.customs on the customs row (the two composable
+  // plane units) + the whole-module `trade` key on the shipments board,
+  // the Incoterms reference page and the certificates print surface.
+  // THE PERMISSION KEYS mirror the route-permissions rows verbatim (the
+  // 0122 §5 ten-key seed — no new key minted). The ⌘K palette inherits
+  // the rows through resolveNavigation (OA-04).
+  {
+    id: "trade.lc",
+    parentGroup: "purchasing",
+    label: { ar: "الاعتمادات المستندية", en: "Letters of credit" },
+    icon: "landmark",
+    route: "/trade/lc",
+    featureKey: "trade.lc",
+    permission: "trade.lc.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 21,
+  },
+  {
+    id: "trade.customs",
+    parentGroup: "purchasing",
+    label: { ar: "التصريحات الجمركية", en: "Customs declarations" },
+    icon: "shield",
+    route: "/trade/customs",
+    featureKey: "trade.customs",
+    permission: "trade.customs.view",
+    branchScoped: false,
+    archetype: "transaction-entry",
+    order: 22,
+  },
+  {
+    id: "trade.shipments",
+    parentGroup: "purchasing",
+    label: { ar: "تتبع الشحنات", en: "Shipment tracking" },
+    icon: "route",
+    route: "/trade/shipments",
+    featureKey: "trade",
+    permission: "trade.shipments.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 23,
+  },
+  {
+    id: "trade.incoterms",
+    parentGroup: "purchasing",
+    label: { ar: "مصطلحات التجارة", en: "Incoterms" },
+    icon: "book-check",
+    route: "/trade/incoterms",
+    featureKey: "trade",
+    permission: "trade.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 24,
+  },
+  {
+    id: "trade.certificates",
+    parentGroup: "purchasing",
+    label: { ar: "شهادات المنشأ والمطابقة", en: "Certificates of origin" },
+    icon: "file-check",
+    route: "/trade/certificates",
+    featureKey: "trade",
+    permission: "trade.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 25,
+  },
   // PHASE-039 supplier returns (matrix §3.3; the seeded 0059 keys): the RTV
   // authorizations REQUESTED → approve → ship → credit (G-38).
   {

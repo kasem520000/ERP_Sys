@@ -6154,6 +6154,34 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/trade/drawback/claims/:id/pay",
     permission: "trade.drawback.manage",
   },
+  // PHASE-051 (W-39 — T-14, dated 2026-11-25; matrix §3.29): the
+  // keys-seed-first SIXTH trade binding wave (1,212 + 3 = 1,215 — the
+  // discipline standing: the TEN trade.* keys landed at W-33 (0122 §5),
+  // the routes bind as the service waves ship, every change dated at
+  // the block). THE CERTIFICATES (the 0120 §4 plane — D-13's print
+  // anchor): the register reads bind trade.view (the whole-module
+  // viewer key, the incoterms/bonded reads' own shape) and THE ISSUE
+  // binds trade.shipments.manage — the transport-documents cluster's
+  // own manage key (the 0120 family: the B/L, the packing lists and
+  // the certificates are one cluster, the BL/PL precedent's own key;
+  // NO new key minted, the 357 discipline standing). The routes are
+  // feature-gated at the controller on the whole-module unit `trade`
+  // (D-04 — the certificates carry no own flag).
+  {
+    method: "GET",
+    path: "/api/v1/trade/certificates",
+    permission: "trade.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/certificates/:id",
+    permission: "trade.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/certificates",
+    permission: "trade.shipments.manage",
+  },
 ];
 
 /**

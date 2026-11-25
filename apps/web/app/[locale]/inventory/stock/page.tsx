@@ -13,7 +13,7 @@ import { AppShell } from "../../../../components/app-shell";
 import { RetryButton } from "../../../../components/retry-button";
 import { InventoryStock } from "../../../../components/inventory-stock";
 import { getDictionary, isLocale, type Locale } from "../../../../i18n/dictionaries";
-import type { StockOnHandRow, WarehouseRow } from "../../../../lib/api-types";
+import type { StockOnHandRow, TradeBondedMoveRow, WarehouseRow } from "../../../../lib/api-types";
 import { localizedApiError } from "../../../../lib/messages";
 import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
 
@@ -31,9 +31,16 @@ export default async function InventoryStockPage({
 
   await requireSessionToken(localeValue);
 
-  const [stock, warehouses] = await Promise.all([
+  const [stock, warehouses, bondedMoves] = await Promise.all([
     fetchApi<readonly StockOnHandRow[]>("inventory/stock?limit=300"),
     fetchApi<readonly WarehouseRow[]>("inventory/warehouses"),
+    // PHASE-051 (W-39 — T-14, D-17): the bonded register's EXECUTED
+    // IN_BOND moves feed the duty-suspended banners (the 050 hold-banner
+    // pattern: additive, degrading to no banners on its own 403 — a
+    // tenant without the trade entitlement sees the plain stock board).
+    fetchApi<readonly TradeBondedMoveRow[]>(
+      "trade/bonded/moves?moveKind=IN_BOND&status=EXECUTED&limit=200",
+    ),
   ]);
   if (!stock.ok && stock.status === 401) {
     redirect(`/${locale}/login`);
@@ -58,6 +65,7 @@ export default async function InventoryStockPage({
         locale={localeValue}
         initialRows={stock.data}
         warehouses={warehouses.ok ? warehouses.data : []}
+        suspendedMoves={bondedMoves.ok ? bondedMoves.data : []}
       />
     );
   }

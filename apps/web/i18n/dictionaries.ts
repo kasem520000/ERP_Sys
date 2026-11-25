@@ -7714,6 +7714,338 @@ export interface Dictionary {
   qualityErrComplaintState: string;
   qualityErrRecallNotFound: string;
   qualityErrRecallState: string;
+
+// ── PHASE-051 (W-39 — T-14, the trade plane's keys: i18n BY BOTH
+// COUNTS — the first-surface-wave law; ar +n = en +n on this block) ────────
+  tradeLcTitle: string;
+  tradeLcSubtitle: string;
+  tradeCustomsTitle: string;
+  tradeCustomsSubtitle: string;
+  tradeShipmentsTitle: string;
+  tradeShipmentsSubtitle: string;
+  tradeIncotermsTitle: string;
+  tradeIncotermsSubtitle: string;
+  tradeCertificatesTitle: string;
+  tradeCertificatesSubtitle: string;
+  tradePaneRegister: string;
+  tradePaneCreate: string;
+  tradePaneDetail: string;
+  tradePaneIssue: string;
+  tradeRefresh: string;
+  tradeEmpty: string;
+  tradeRefusalTitle: string;
+  tradeRefusalDetails: string;
+  tradeLcColNo: string;
+  tradeLcColStatus: string;
+  tradeLcColCurrency: string;
+  tradeLcColAmount: string;
+  tradeLcColMargin: string;
+  tradeLcColBank: string;
+  tradeLcColBeneficiary: string;
+  tradeLcColApplicant: string;
+  tradeLcColIssuedAt: string;
+  tradeLcColExpiry: string;
+  tradeLcCreateTitle: string;
+  tradeLcCreateCurrency: string;
+  tradeLcCreateAmount: string;
+  tradeLcCreateMargin: string;
+  tradeLcCreateBank: string;
+  tradeLcCreateBeneficiary: string;
+  tradeLcCreateApplicant: string;
+  tradeLcCreateExpiry: string;
+  tradeLcCreatePo: string;
+  tradeLcCreateNote: string;
+  tradeLcCreatedToast: string;
+  tradeLcActIssue: string;
+  tradeLcActAmend: string;
+  tradeLcActDocuments: string;
+  tradeLcActFees: string;
+  tradeLcActRetire: string;
+  tradeLcActCancel: string;
+  tradeLcIssueMargin: string;
+  tradeLcIssueBankAccount: string;
+  tradeLcAmendTitle: string;
+  tradeLcAmendType: string;
+  tradeLcAmendValueFrom: string;
+  tradeLcAmendValueTo: string;
+  tradeLcAmendExpiryFrom: string;
+  tradeLcAmendExpiryTo: string;
+  tradeLcAmendDocumentsNote: string;
+  tradeLcAmendSummary: string;
+  tradeLcAmendmentColNo: string;
+  tradeLcAmendmentColType: string;
+  tradeLcAmendmentColEffective: string;
+  tradeLcDocumentsTitle: string;
+  tradeLcDocColType: string;
+  tradeLcDocColPresented: string;
+  tradeLcDocColVerified: string;
+  tradeLcDocColDiscrepancy: string;
+  tradeLcDocDocType: string;
+  tradeLcDocPresented: string;
+  tradeLcDocVerified: string;
+  tradeLcDocDiscrepancy: string;
+  tradeLcFeeAmount: string;
+  tradeLcFeeBankAccount: string;
+  tradeLcFeeMemo: string;
+  tradeLcDetailAmendments: string;
+  tradeLcDetailDocuments: string;
+  tradeLcYes: string;
+  tradeLcNo: string;
+  tradeLcStatusDraft: string;
+  tradeLcStatusIssued: string;
+  tradeLcStatusSettled: string;
+  tradeLcStatusRetired: string;
+  tradeLcStatusCancelled: string;
+  tradeLcStatusExpired: string;
+  tradeCustomsPaneRegister: string;
+  tradeCustomsPaneCreate: string;
+  tradeCustomsPaneDetail: string;
+  tradeCustomsPaneHs: string;
+  tradeCustomsColNo: string;
+  tradeCustomsColType: string;
+  tradeCustomsColOffice: string;
+  tradeCustomsColStatus: string;
+  tradeCustomsColCurrency: string;
+  tradeCustomsColSubmitted: string;
+  tradeCustomsColCompleted: string;
+  tradeCustomsColLandedCost: string;
+  tradeCustomsCreateTitle: string;
+  tradeCustomsCreateType: string;
+  tradeCustomsCreateOffice: string;
+  tradeCustomsCreateCurrency: string;
+  tradeCustomsCreateReceipt: string;
+  tradeCustomsCreatePo: string;
+  tradeCustomsCreateBl: string;
+  tradeCustomsLinesTitle: string;
+  tradeCustomsLineHs: string;
+  tradeCustomsLineOrigin: string;
+  tradeCustomsLineItem: string;
+  tradeCustomsLineDesc: string;
+  tradeCustomsLineQty: string;
+  tradeCustomsLineUom: string;
+  tradeCustomsLineValue: string;
+  tradeCustomsLineDutyRate: string;
+  tradeCustomsLineVat: string;
+  tradeCustomsAddLine: string;
+  tradeCustomsActSubmit: string;
+  tradeCustomsActAccept: string;
+  tradeCustomsActComplete: string;
+  tradeCustomsActCancel: string;
+  tradeCustomsTotalsTitle: string;
+  tradeCustomsTotalValue: string;
+  tradeCustomsTotalDuty: string;
+  tradeCustomsTotalVat: string;
+  tradeCustomsTotalLanded: string;
+  tradeCustomsActAddLine: string;
+  tradeHsColCode: string;
+  tradeHsColName: string;
+  tradeHsColActive: string;
+  tradeHsCreateCode: string;
+  tradeHsCreateName: string;
+  tradeHsCreateNameAr: string;
+  tradeHsCreatedToast: string;
+  tradeHsDisclaimer: string;
+  tradeCustomsCreatedToast: string;
+  tradeDeclarationStatusDraft: string;
+  tradeDeclarationStatusSubmitted: string;
+  tradeDeclarationStatusAccepted: string;
+  tradeDeclarationStatusCompleted: string;
+  tradeDeclarationStatusCancelled: string;
+  tradeDeclarationTypeImport: string;
+  tradeDeclarationTypeExport: string;
+  tradeDeclarationTypeTransit: string;
+  tradeShipmentsPaneBl: string;
+  tradeShipmentsPanePl: string;
+  tradeShipmentsPaneEvents: string;
+  tradeBlColNo: string;
+  tradeBlColType: string;
+  tradeBlColCarrier: string;
+  tradeBlColLoading: string;
+  tradeBlColDischarge: string;
+  tradeBlColStatus: string;
+  tradeBlColIssuedAt: string;
+  tradeBlCreateTitle: string;
+  tradeBlCreateType: string;
+  tradeBlCreateCarrier: string;
+  tradeBlCreateLoading: string;
+  tradeBlCreateDischarge: string;
+  tradeBlCreateContainers: string;
+  tradeBlCreatePo: string;
+  tradeBlCreateDn: string;
+  tradeBlCreatedToast: string;
+  tradePlColNo: string;
+  tradePlColBl: string;
+  tradePlColStatus: string;
+  tradePlColIssuedAt: string;
+  tradePlColLines: string;
+  tradePlCreateTitle: string;
+  tradePlCreateBl: string;
+  tradePlLineDesc: string;
+  tradePlLinePackages: string;
+  tradePlLineGross: string;
+  tradePlLineNet: string;
+  tradePlAddLine: string;
+  tradePlCreatedToast: string;
+  tradeEventsTitle: string;
+  tradeEventColMilestone: string;
+  tradeEventColAt: string;
+  tradeEventColCarrierRef: string;
+  tradeEventColLocation: string;
+  tradeEventColBl: string;
+  tradeEventAppendTitle: string;
+  tradeEventAppendBl: string;
+  tradeEventAppendMilestone: string;
+  tradeEventAppendAt: string;
+  tradeEventAppendCarrierRef: string;
+  tradeEventAppendLocation: string;
+  tradeEventAppendDeclaration: string;
+  tradeEventAppendedToast: string;
+  tradeShipmentStatusBooked: string;
+  tradeShipmentStatusDeparted: string;
+  tradeShipmentStatusArrived: string;
+  tradeShipmentStatusCleared: string;
+  tradeShipmentStatusDelivered: string;
+  tradeBlDocTypeSea: string;
+  tradeBlDocTypeAir: string;
+  tradeBlDocTypeRoad: string;
+  tradeBlDocTypeRail: string;
+  tradeBlDocTypeMultimodal: string;
+  tradeIncotermColCode: string;
+  tradeIncotermColName: string;
+  tradeIncotermColCarriage: string;
+  tradeIncotermColInsurance: string;
+  tradeIncotermColExportClearance: string;
+  tradeIncotermColImportClearance: string;
+  tradeIncotermColImportDuty: string;
+  tradeIncotermColActive: string;
+  tradeIncotermSeller: string;
+  tradeIncotermBuyer: string;
+  tradeIncotermMatrixTitle: string;
+  tradeIncotermCreateTitle: string;
+  tradeIncotermCreateCode: string;
+  tradeIncotermCreateName: string;
+  tradeIncotermCreateNameAr: string;
+  tradeIncotermCreateCarriage: string;
+  tradeIncotermCreateInsurance: string;
+  tradeIncotermCreateExportClearance: string;
+  tradeIncotermCreateImportClearance: string;
+  tradeIncotermCreateImportDuty: string;
+  tradeIncotermCreatedToast: string;
+  tradeIncotermsDisclaimer: string;
+  tradeCertificatesPaneRegister: string;
+  tradeCertificatesPaneIssue: string;
+  tradeCertificateColNo: string;
+  tradeCertificateColType: string;
+  tradeCertificateColIssuedAt: string;
+  tradeCertificateColBl: string;
+  tradeCertificateColDeclaration: string;
+  tradeCertificateIssueTitle: string;
+  tradeCertificateIssueType: string;
+  tradeCertificateIssueExporter: string;
+  tradeCertificateIssueConsignee: string;
+  tradeCertificateIssueBl: string;
+  tradeCertificateIssueDeclaration: string;
+  tradeCertificateGoodsTitle: string;
+  tradeCertificateGoodsDesc: string;
+  tradeCertificateGoodsOrigin: string;
+  tradeCertificateGoodsHs: string;
+  tradeCertificateGoodsQty: string;
+  tradeCertificateGoodsUom: string;
+  tradeCertificateAddGood: string;
+  tradeCertificateIssuedToast: string;
+  tradeCertificateTypeOrigin: string;
+  tradeCertificateTypeConformity: string;
+  tradeCertificatePrintAct: string;
+  tradeCertificatePrintTitle: string;
+  tradeCertificatePrintNow: string;
+  tradeCertificatePrintExporter: string;
+  tradeCertificatePrintConsignee: string;
+  tradeCertificatePrintGood: string;
+  tradeCertificatePrintOrigin: string;
+  tradeCertificatePrintHs: string;
+  tradeCertificatePrintQty: string;
+  tradeCertificatePrintBl: string;
+  tradeCertificatePrintDeclaration: string;
+  tradeIncotermSelectorLabel: string;
+  tradeIncotermSelectorPlaceholder: string;
+  tradeIncotermSelectorMatrixTitle: string;
+  tradeIncotermSelectorHint: string;
+  tradeDutySuspendedBannerTitle: string;
+  tradeDutySuspendedChip: string;
+  tradeDutySuspendedMove: string;
+  tradeDutySuspendedQty: string;
+  tradeDutySuspendedExecutedAt: string;
+  tradeErrInputInvalid: string;
+  tradeErrLcNotFound: string;
+  tradeErrLcDuplicate: string;
+  tradeErrLcState: string;
+  tradeErrLcMarginShape: string;
+  tradeErrLcBankAccount: string;
+  tradeErrLcAmendment: string;
+  tradeErrLcDocumentDuplicate: string;
+  tradeErrLcChecklistState: string;
+  tradeErrLcSweepThresholds: string;
+  tradeErrCollectionNotFound: string;
+  tradeErrCollectionDuplicate: string;
+  tradeErrCollectionState: string;
+  tradeErrCollectionUsance: string;
+  tradeErrCollectionSettlement: string;
+  tradeErrIncotermNotFound: string;
+  tradeErrIncotermDuplicate: string;
+  tradeErrIncotermInvalid: string;
+  tradeErrIncotermCodeFrozen: string;
+  tradeErrIncotermInactive: string;
+  tradeErrOrderIncotermRequired: string;
+  tradeErrBlNotFound: string;
+  tradeErrBlDuplicate: string;
+  tradeErrPlNotFound: string;
+  tradeErrPlDuplicate: string;
+  tradeErrTransportInput: string;
+  tradeErrTrackingEvent: string;
+  tradeErrDeclarationNotFound: string;
+  tradeErrDeclarationDuplicate: string;
+  tradeErrDeclarationState: string;
+  tradeErrDeclarationLine: string;
+  tradeErrDeclarationIncomplete: string;
+  tradeErrDeclarationRequired: string;
+  tradeErrDeclarationLink: string;
+  tradeErrDeclarationLandedCostDuplicate: string;
+  tradeErrDeclarationLineTie: string;
+  tradeErrCustomsPurpose: string;
+  tradeErrHsNotFound: string;
+  tradeErrHsDuplicate: string;
+  tradeErrHsInvalid: string;
+  tradeErrHsFrozen: string;
+  tradeErrBondedNotFound: string;
+  tradeErrBondedDuplicate: string;
+  tradeErrBondedState: string;
+  tradeErrBondedLine: string;
+  tradeErrBondedReleaseShape: string;
+  tradeErrBondedStockSuspended: string;
+  tradeErrDrawbackNotFound: string;
+  tradeErrDrawbackDuplicate: string;
+  tradeErrDrawbackState: string;
+  tradeErrDrawbackEvidence: string;
+  tradeErrCertificateNotFound: string;
+  tradeErrCertificateDuplicate: string;
+  tradeErrCertificateInput: string;
+  tradeErrCertificateLink: string;
+  tradeErrCertificateLine: string;
+  tradeDrawbackStatusDraft: string;
+  tradeDrawbackStatusSubmitted: string;
+  tradeDrawbackStatusUnderReview: string;
+  tradeDrawbackStatusApproved: string;
+  tradeDrawbackStatusRejected: string;
+  tradeDrawbackStatusPaid: string;
+  tradeBondedKindInBond: string;
+  tradeBondedKindRelease: string;
+  tradeBondedStatusDraft: string;
+  tradeBondedStatusExecuted: string;
+  tradeCollectionStatusDraft: string;
+  tradeCollectionStatusPresented: string;
+  tradeCollectionStatusAccepted: string;
+  tradeCollectionStatusSettled: string;
+  tradeCollectionStatusCancelled: string;
 }
 
 const ar: Dictionary = {
@@ -15409,6 +15741,338 @@ const ar: Dictionary = {
   qualityErrComplaintState: "حالة الشكوى لا تسمح بهذه الخطوة.",
   qualityErrRecallNotFound: "سجل الاستدعاء غير موجود.",
   qualityErrRecallState: "حالة الاستدعاء لا تسمح بهذه الخطوة.",
+
+// ── PHASE-051 (W-39 — T-14, the trade plane's keys: i18n BY BOTH
+// COUNTS — the first-surface-wave law; ar +n = en +n on this block) ────────
+  tradeLcTitle: "الاعتمادات المستندية",
+  tradeLcSubtitle: "سجل الاعتمادات — السلم الكامل مع هوامش G-64 ورسوم التمويل عبر بوابات الرسوم القائمة",
+  tradeCustomsTitle: "التصريحات الجمركية",
+  tradeCustomsSubtitle: "سجل التصريحات مع بنود الرسوم وضريبة الاستيراد والتكلفة المرسلة عبر الخدمة الحقيقية",
+  tradeShipmentsTitle: "تتبع الشحنات",
+  tradeShipmentsSubtitle: "مجلس التتبع — سندات الشحن وقوائم التعبئة وسجل أحداث الناقل، الحالة يقودها الطيّ",
+  tradeIncotermsTitle: "مصطلحات التجارة — إنكوترمز",
+  tradeIncotermsSubtitle: "السجل المرجعي مع مصفوفة مخاطر الملكية — بيانات قابلة لتوسيع المستأجر",
+  tradeCertificatesTitle: "شهادات المنشأ والمطابقة",
+  tradeCertificatesSubtitle: "سجل الشهادات بصيغة الغرفة ثنائية اللغة — اللقطة المجمدة تُطبع كما خُزِّنت",
+  tradePaneRegister: "السجل",
+  tradePaneCreate: "إنشاء",
+  tradePaneDetail: "التفاصيل",
+  tradePaneIssue: "الإصدار",
+  tradeRefresh: "تحديث",
+  tradeEmpty: "لا سجلات بعد.",
+  tradeRefusalTitle: "رفض مُوثَّق",
+  tradeRefusalDetails: "التفاصيل الكاملة",
+  tradeLcColNo: "رقم الاعتماد",
+  tradeLcColStatus: "الحالة",
+  tradeLcColCurrency: "العملة",
+  tradeLcColAmount: "المبلغ",
+  tradeLcColMargin: "الهامش",
+  tradeLcColBank: "المصدر",
+  tradeLcColBeneficiary: "المستفيد",
+  tradeLcColApplicant: "مقدم الطلب",
+  tradeLcColIssuedAt: "تاريخ الإصدار",
+  tradeLcColExpiry: "تاريخ الانتهاء",
+  tradeLcCreateTitle: "اعتماد مستندي جديد",
+  tradeLcCreateCurrency: "العملة (ISO-4217)",
+  tradeLcCreateAmount: "المبلغ (≤ 4 منازل)",
+  tradeLcCreateMargin: "هامش الضمان (اختياري)",
+  tradeLcCreateBank: "المصدر",
+  tradeLcCreateBeneficiary: "المستفيد",
+  tradeLcCreateApplicant: "مقدم الطلب",
+  tradeLcCreateExpiry: "تاريخ الانتهاء (yyyy-mm-dd)",
+  tradeLcCreatePo: "أمر الشراء المرتبط (UUID اختياري)",
+  tradeLcCreateNote: "ملاحظة",
+  tradeLcCreatedToast: "أُنشئ الاعتماد — رقمه الرسمي في السجل.",
+  tradeLcActIssue: "الإصدار",
+  tradeLcActAmend: "تعديل",
+  tradeLcActDocuments: "مستند",
+  tradeLcActFees: "رسوم",
+  tradeLcActRetire: "السحب",
+  tradeLcActCancel: "إلغاء",
+  tradeLcIssueMargin: "الهامش عند الإصدار (اختياري)",
+  tradeLcIssueBankAccount: "حساب البنك (UUID)",
+  tradeLcAmendTitle: "تعديل جديد",
+  tradeLcAmendType: "نوع التعديل",
+  tradeLcAmendValueFrom: "من مبلغ",
+  tradeLcAmendValueTo: "إلى مبلغ",
+  tradeLcAmendExpiryFrom: "من تاريخ",
+  tradeLcAmendExpiryTo: "إلى تاريخ",
+  tradeLcAmendDocumentsNote: "ملاحظة المستندات",
+  tradeLcAmendSummary: "الملخص",
+  tradeLcAmendmentColNo: "رقم التعديل",
+  tradeLcAmendmentColType: "النوع",
+  tradeLcAmendmentColEffective: "ساري من",
+  tradeLcDocumentsTitle: "قائمة تحقق المستندات",
+  tradeLcDocColType: "المستند",
+  tradeLcDocColPresented: "مقدَّم",
+  tradeLcDocColVerified: "موثَّق",
+  tradeLcDocColDiscrepancy: "ملاحظة عدم المطابقة",
+  tradeLcDocDocType: "نوع المستند (أحرف كبيرة/أرقام)",
+  tradeLcDocPresented: "مقدَّم",
+  tradeLcDocVerified: "موثَّق",
+  tradeLcDocDiscrepancy: "ملاحظة عدم المطابقة (اختياري)",
+  tradeLcFeeAmount: "مبلغ الرسوم",
+  tradeLcFeeBankAccount: "حساب البنك (UUID)",
+  tradeLcFeeMemo: "مذكرة",
+  tradeLcDetailAmendments: "سجل التعديلات",
+  tradeLcDetailDocuments: "قائمة المستندات",
+  tradeLcYes: "نعم",
+  tradeLcNo: "لا",
+  tradeLcStatusDraft: "مسودة",
+  tradeLcStatusIssued: "مُصدَر",
+  tradeLcStatusSettled: "مُسوّى",
+  tradeLcStatusRetired: "مسحوب",
+  tradeLcStatusCancelled: "ملغى",
+  tradeLcStatusExpired: "منتهٍ",
+  tradeCustomsPaneRegister: "سجل التصريحات",
+  tradeCustomsPaneCreate: "تصريح جديد",
+  tradeCustomsPaneDetail: "بنود التصريح",
+  tradeCustomsPaneHs: "سجل رموز النظام المنسق",
+  tradeCustomsColNo: "رقم التصريح",
+  tradeCustomsColType: "النوع",
+  tradeCustomsColOffice: "المكتب الجمركي",
+  tradeCustomsColStatus: "الحالة",
+  tradeCustomsColCurrency: "العملة",
+  tradeCustomsColSubmitted: "تاريخ التقديم",
+  tradeCustomsColCompleted: "تاريخ الإتمام",
+  tradeCustomsColLandedCost: "التكلفة المرسلة",
+  tradeCustomsCreateTitle: "تصريح جمركي جديد",
+  tradeCustomsCreateType: "نوع التصريح",
+  tradeCustomsCreateOffice: "المكتب الجمركي",
+  tradeCustomsCreateCurrency: "العملة (ISO-4217)",
+  tradeCustomsCreateReceipt: "الاستلام المرتبط (UUID اختياري)",
+  tradeCustomsCreatePo: "أمر الشراء المرتبط (UUID اختياري)",
+  tradeCustomsCreateBl: "سند الشحن المرتبط (UUID اختياري)",
+  tradeCustomsLinesTitle: "بنود الرسوم وضريبة الاستيراد",
+  tradeCustomsLineHs: "رمز النظام المنسق (2…10 أرقام)",
+  tradeCustomsLineOrigin: "بلد المنشأ (ISO-3166)",
+  tradeCustomsLineItem: "الصنف (UUID اختياري)",
+  tradeCustomsLineDesc: "الوصف",
+  tradeCustomsLineQty: "الكمية (≤ 6 منازل)",
+  tradeCustomsLineUom: "وحدة القياس",
+  tradeCustomsLineValue: "القيمة الجمركية",
+  tradeCustomsLineDutyRate: "نسبة الرسوم",
+  tradeCustomsLineVat: "ضريبة الاستيراد",
+  tradeCustomsAddLine: "إضافة بند",
+  tradeCustomsActSubmit: "تقديم",
+  tradeCustomsActAccept: "قبول",
+  tradeCustomsActComplete: "إتمام (G-65)",
+  tradeCustomsActCancel: "إلغاء",
+  tradeCustomsTotalsTitle: "الإجماليات — من البنود عند كل قراءة",
+  tradeCustomsTotalValue: "إجمالي القيمة الجمركية",
+  tradeCustomsTotalDuty: "إجمالي الرسوم",
+  tradeCustomsTotalVat: "إجمالي ضريبة الاستيراد",
+  tradeCustomsTotalLanded: "المبلغ المُرسل (رسوم + ضريبة)",
+  tradeCustomsActAddLine: "إضافة بند (مسودة فقط)",
+  tradeHsColCode: "الرمز",
+  tradeHsColName: "الاسم",
+  tradeHsColActive: "نشط",
+  tradeHsCreateCode: "الرمز (2…10 أرقام)",
+  tradeHsCreateName: "الاسم (إنجليزي)",
+  tradeHsCreateNameAr: "الاسم (عربي)",
+  tradeHsCreatedToast: "أُضيف رمز النظام المنسق إلى سجل المستأجر.",
+  tradeHsDisclaimer: "الطقم المبدئي بيانات قابلة للتوسيع — المستأجر يملك التصنيف النهائي؛ الرمز الناقص ناقص، لا يُخترع (قانون عدم الاختلاق).",
+  tradeCustomsCreatedToast: "أُنشئ التصريح — رقمه الرسمي في السجل.",
+  tradeDeclarationStatusDraft: "مسودة",
+  tradeDeclarationStatusSubmitted: "مقدَّم",
+  tradeDeclarationStatusAccepted: "مقبول",
+  tradeDeclarationStatusCompleted: "مكتمل",
+  tradeDeclarationStatusCancelled: "ملغى",
+  tradeDeclarationTypeImport: "استيراد",
+  tradeDeclarationTypeExport: "تصدير",
+  tradeDeclarationTypeTransit: "عبور",
+  tradeShipmentsPaneBl: "سندات الشحن",
+  tradeShipmentsPanePl: "قوائم التعبئة",
+  tradeShipmentsPaneEvents: "سجل الأحداث",
+  tradeBlColNo: "رقم السند",
+  tradeBlColType: "النوع",
+  tradeBlColCarrier: "الناقل",
+  tradeBlColLoading: "ميناء الشحن",
+  tradeBlColDischarge: "ميناء التفريغ",
+  tradeBlColStatus: "حالة الشحنة",
+  tradeBlColIssuedAt: "تاريخ الإصدار",
+  tradeBlCreateTitle: "سند شحن جديد",
+  tradeBlCreateType: "نوع المستند",
+  tradeBlCreateCarrier: "الناقل",
+  tradeBlCreateLoading: "ميناء الشحن (اختياري)",
+  tradeBlCreateDischarge: "ميناء التفريغ (اختياري)",
+  tradeBlCreateContainers: "مراجع الحاويات (مفصولة بفواصل)",
+  tradeBlCreatePo: "أمر الشراء المرتبط (UUID اختياري)",
+  tradeBlCreateDn: "إشعار التسليم المرتبط (UUID اختياري)",
+  tradeBlCreatedToast: "أُنشئ سند الشحن — رقمه الرسمي في السجل.",
+  tradePlColNo: "رقم القائمة",
+  tradePlColBl: "سند الشحن",
+  tradePlColStatus: "حالة الشحنة",
+  tradePlColIssuedAt: "تاريخ الإصدار",
+  tradePlColLines: "البنود",
+  tradePlCreateTitle: "قائمة تعبئة جديدة",
+  tradePlCreateBl: "سند الشحن (UUID)",
+  tradePlLineDesc: "الوصف",
+  tradePlLinePackages: "عدد العبوات",
+  tradePlLineGross: "الوزن القائم (كجم)",
+  tradePlLineNet: "الوزن الصافي (كجم)",
+  tradePlAddLine: "إضافة بند",
+  tradePlCreatedToast: "أُنشئت قائمة التعبئة — رقمها الرسمي في السجل.",
+  tradeEventsTitle: "سجل أحداث الناقل — الحقيقة الملحقة فقط",
+  tradeEventColMilestone: "المرحلة",
+  tradeEventColAt: "التاريخ",
+  tradeEventColCarrierRef: "مرجع الناقل",
+  tradeEventColLocation: "الموقع",
+  tradeEventColBl: "سند الشحن",
+  tradeEventAppendTitle: "إضافة حدث",
+  tradeEventAppendBl: "سند الشحن (UUID)",
+  tradeEventAppendMilestone: "المرحلة",
+  tradeEventAppendAt: "التاريخ (ISO)",
+  tradeEventAppendCarrierRef: "مرجع الناقل (اختياري)",
+  tradeEventAppendLocation: "الموقع (اختياري)",
+  tradeEventAppendDeclaration: "التصريح المرتبط (UUID اختياري)",
+  tradeEventAppendedToast: "سُجل الحدث — طيّ الحالة يقود حالة المستندات.",
+  tradeShipmentStatusBooked: "محجوز",
+  tradeShipmentStatusDeparted: "مغادر",
+  tradeShipmentStatusArrived: "واصل",
+  tradeShipmentStatusCleared: "مخلَّص",
+  tradeShipmentStatusDelivered: "مسلَّم",
+  tradeBlDocTypeSea: "بحري",
+  tradeBlDocTypeAir: "جوي",
+  tradeBlDocTypeRoad: "بري",
+  tradeBlDocTypeRail: "سكك حديدية",
+  tradeBlDocTypeMultimodal: "نقل متعدد الوسائط",
+  tradeIncotermColCode: "الرمز",
+  tradeIncotermColName: "الاسم",
+  tradeIncotermColCarriage: "النقل الرئيسي",
+  tradeIncotermColInsurance: "التأمين",
+  tradeIncotermColExportClearance: "تخليص التصدير",
+  tradeIncotermColImportClearance: "تخليص الاستيراد",
+  tradeIncotermColImportDuty: "رسوم الاستيراد",
+  tradeIncotermColActive: "نشط",
+  tradeIncotermSeller: "البائع",
+  tradeIncotermBuyer: "المشتري",
+  tradeIncotermMatrixTitle: "مصفوفة مخاطر الملكية — من بيانات الصف نفسه",
+  tradeIncotermCreateTitle: "مصطلح جديد (إضافة المستأجر)",
+  tradeIncotermCreateCode: "الرمز (2…8 أحرف كبيرة/أرقام)",
+  tradeIncotermCreateName: "الاسم (إنجليزي)",
+  tradeIncotermCreateNameAr: "الاسم (عربي)",
+  tradeIncotermCreateCarriage: "النقل على البائع؟",
+  tradeIncotermCreateInsurance: "التأمين على البائع؟",
+  tradeIncotermCreateExportClearance: "تخليص التصدير على البائع؟",
+  tradeIncotermCreateImportClearance: "تخليص الاستيراد على البائع؟",
+  tradeIncotermCreateImportDuty: "رسوم الاستيراد على البائع؟",
+  tradeIncotermCreatedToast: "أُضيف المصطلح إلى سجل المستأجر.",
+  tradeIncotermsDisclaimer: "مجموعة 2020 بيانات بذرة قابلة للتوسيع — دقة التصنيف النهائية على المستأجر (عائلة BR-055).",
+  tradeCertificatesPaneRegister: "سجل الشهادات",
+  tradeCertificatesPaneIssue: "إصدار شهادة",
+  tradeCertificateColNo: "رقم الشهادة",
+  tradeCertificateColType: "النوع",
+  tradeCertificateColIssuedAt: "تاريخ الإصدار",
+  tradeCertificateColBl: "سند الشحن",
+  tradeCertificateColDeclaration: "التصريح",
+  tradeCertificateIssueTitle: "إصدار شهادة منشأ/مطابقة — اللقطة تتجمد الآن",
+  tradeCertificateIssueType: "نوع الشهادة",
+  tradeCertificateIssueExporter: "المصدِّر",
+  tradeCertificateIssueConsignee: "المرسَل إليه",
+  tradeCertificateIssueBl: "سند الشحن المرتبط (UUID اختياري)",
+  tradeCertificateIssueDeclaration: "التصريح المرتبط (UUID اختياري)",
+  tradeCertificateGoodsTitle: "بنود البضائع — منشأ كل بند يُصرَّح به هنا",
+  tradeCertificateGoodsDesc: "الوصف",
+  tradeCertificateGoodsOrigin: "المنشأ (ISO-3166)",
+  tradeCertificateGoodsHs: "رمز النظام المنسق (اختياري)",
+  tradeCertificateGoodsQty: "الكمية (اختياري)",
+  tradeCertificateGoodsUom: "وحدة القياس (اختياري)",
+  tradeCertificateAddGood: "إضافة بند",
+  tradeCertificateIssuedToast: "صُدرت الشهادة — اللقطة المجمدة هي الشهادة.",
+  tradeCertificateTypeOrigin: "شهادة منشأ",
+  tradeCertificateTypeConformity: "شهادة مطابقة",
+  tradeCertificatePrintAct: "معاينة الطباعة",
+  tradeCertificatePrintTitle: "الشهادة — معاينة الطباعة",
+  tradeCertificatePrintNow: "اطبع الآن",
+  tradeCertificatePrintExporter: "المصدِّر",
+  tradeCertificatePrintConsignee: "المرسَل إليه",
+  tradeCertificatePrintGood: "البضاعة",
+  tradeCertificatePrintOrigin: "المنشأ",
+  tradeCertificatePrintHs: "رمز النظام المنسق",
+  tradeCertificatePrintQty: "الكمية",
+  tradeCertificatePrintBl: "سند الشحن",
+  tradeCertificatePrintDeclaration: "التصريح الجمركي",
+  tradeIncotermSelectorLabel: "مصطلح التجارة",
+  tradeIncotermSelectorPlaceholder: "— اختر عند الحاجة —",
+  tradeIncotermSelectorMatrixTitle: "مصفوفة الملكية",
+  tradeIncotermSelectorHint: "الأوامر ذات عملة غير العملة الأساسية أو علامة الاستيراد/التصدير توجب اختيار مصطلح عند الترحيل (BR-106).",
+  tradeDutySuspendedBannerTitle: "مخزون معلَّق تحت السند — يُمنع الصرف للعملاء ما دام معلَّقًا (G-66)",
+  tradeDutySuspendedChip: "معلَّق جمركيًا",
+  tradeDutySuspendedMove: "حركة السند",
+  tradeDutySuspendedQty: "الكمية تحت السند",
+  tradeDutySuspendedExecutedAt: "نُفِّذت",
+  tradeErrInputInvalid: "قيمة إدخال غير صالحة — راجع الحقول وأعد المحاولة.",
+  tradeErrLcNotFound: "الاعتماد غير موجود لدى هذا المستأجر.",
+  tradeErrLcDuplicate: "رقم الاعتماد مستخدم مسبقًا في هذا المستأجر.",
+  tradeErrLcState: "حالة الاعتماد لا تسمح بهذه الخطوة.",
+  tradeErrLcMarginShape: "شكل الهامش يخالف G-64 — راجع شروط الإيداع أو السحب.",
+  tradeErrLcBankAccount: "حساب البنك غير صالح لهذه الخطوة.",
+  tradeErrLcAmendment: "التعديل غير صالح — راجع أزواج المبالغ أو التواريخ.",
+  tradeErrLcDocumentDuplicate: "نوع المستند مسجل مسبقًا في قائمة هذا الاعتماد.",
+  tradeErrLcChecklistState: "حالة قائمة المستندات لا تسمح بهذه الخطوة.",
+  tradeErrLcSweepThresholds: "عتبات الجرد غير صالحة.",
+  tradeErrCollectionNotFound: "التحصيل المستندي غير موجود.",
+  tradeErrCollectionDuplicate: "رقم التحصيل مستخدم مسبقًا.",
+  tradeErrCollectionState: "حالة التحصيل لا تسمح بهذه الخطوة.",
+  tradeErrCollectionUsance: "شروط الأجل (D/A) غير صالحة.",
+  tradeErrCollectionSettlement: "شكل التسوية غير صالح — راجع المرجع والطوابع.",
+  tradeErrIncotermNotFound: "المصطلح غير موجود في سجل هذا المستأجر.",
+  tradeErrIncotermDuplicate: "الرمز مستخدم مسبقًا في سجل المستأجر.",
+  tradeErrIncotermInvalid: "شكل المصطلح غير صالح.",
+  tradeErrIncotermCodeFrozen: "الرمز هو هوية الصف — لا يُعاد كتابته.",
+  tradeErrIncotermInactive: "المصطلح مُوقَف — اختر مصطلحًا نشطًا.",
+  tradeErrOrderIncotermRequired: "الأمر يحمل علم التجارة (العملة أو علامة الاستيراد/التصدير) — اختر مصطلحًا قبل الترحيل (BR-106).",
+  tradeErrBlNotFound: "سند الشحن غير موجود.",
+  tradeErrBlDuplicate: "رقم سند الشحن مستخدم مسبقًا.",
+  tradeErrPlNotFound: "قائمة التعبئة غير موجودة.",
+  tradeErrPlDuplicate: "رقم قائمة التعبئة مستخدم مسبقًا.",
+  tradeErrTransportInput: "إدخال مستندات النقل غير صالح — راجع الحقول.",
+  tradeErrTrackingEvent: "الحدث غير صالح — السلم رتيب والحقيقة الملحقة للناقل.",
+  tradeErrDeclarationNotFound: "التصريح غير موجود.",
+  tradeErrDeclarationDuplicate: "رقم التصريح مستخدم مسبقًا.",
+  tradeErrDeclarationState: "حالة التصريح لا تسمح بهذه الخطوة.",
+  tradeErrDeclarationLine: "بند التصريح غير صالح — راجع الرمز والقيم.",
+  tradeErrDeclarationIncomplete: "التصريح غير مكتمل — الإتمام (G-65) يستلزم سلمًا مكتملًا.",
+  tradeErrDeclarationRequired: "التخصيص الجمركي يستلزم تصريحًا مكتملًا (INV-036).",
+  tradeErrDeclarationLink: "الرابط غير موجود — سلسلة القبول #8 تنكسر.",
+  tradeErrDeclarationLandedCostDuplicate: "التكلفة المرسلة مرتبطة مسبقًا بهذا التصريح.",
+  tradeErrDeclarationLineTie: "تثبيت البند غير صالح — القيمة المخصصة تتجاوز بند التصريح.",
+  tradeErrCustomsPurpose: "الغرض غير مخطط على حساب غرض موجود — يرفض حتى التعيين.",
+  tradeErrHsNotFound: "رمز النظام المنسق غير موجود في سجل المستأجر.",
+  tradeErrHsDuplicate: "الرمز مستخدم مسبقًا.",
+  tradeErrHsInvalid: "شكل الرمز غير صالح (2…10 أرقام).",
+  tradeErrHsFrozen: "الرمز هو هوية الصف — لا يُعاد كتابته.",
+  tradeErrBondedNotFound: "حركة السند غير موجودة.",
+  tradeErrBondedDuplicate: "رقم الحركة مستخدم مسبقًا.",
+  tradeErrBondedState: "حالة الحركة لا تسمح بهذه الخطوة.",
+  tradeErrBondedLine: "بند الحركة غير صالح — راجع الكميات.",
+  tradeErrBondedReleaseShape: "شكل الإفراج يخالف BR-107 — التعرف الفردي مرة واحدة بالضبط.",
+  tradeErrBondedStockSuspended: "المخزون معلَّق تحت السند (G-66) — الصرف ممنوع حتى الإفراج.",
+  tradeErrDrawbackNotFound: "طلب استرداد الرسوم غير موجود.",
+  tradeErrDrawbackDuplicate: "رقم الطلب مستخدم مسبقًا.",
+  tradeErrDrawbackState: "حالة الطلب لا تسمح بهذه الخطوة.",
+  tradeErrDrawbackEvidence: "لا تقديم بلا دليل تصدير مرتبط (BR-108).",
+  tradeErrCertificateNotFound: "الشهادة غير موجودة.",
+  tradeErrCertificateDuplicate: "رقم الشهادة مستخدم مسبقًا.",
+  tradeErrCertificateInput: "إدخال الشهادة غير صالح — راجع الحقول.",
+  tradeErrCertificateLink: "رابط الشهادة غير موجود — سلسلة القبول #8 تنكسر.",
+  tradeErrCertificateLine: "بند البضائع غير صالح — راجع الوصف والمنشأ.",
+  tradeDrawbackStatusDraft: "مسودة",
+  tradeDrawbackStatusSubmitted: "مقدَّم",
+  tradeDrawbackStatusUnderReview: "قيد المراجعة",
+  tradeDrawbackStatusApproved: "معتمد",
+  tradeDrawbackStatusRejected: "مرفوض",
+  tradeDrawbackStatusPaid: "مدفوع",
+  tradeBondedKindInBond: "إدخال تحت السند",
+  tradeBondedKindRelease: "إفراج",
+  tradeBondedStatusDraft: "مسودة",
+  tradeBondedStatusExecuted: "منفَّذ",
+  tradeCollectionStatusDraft: "مسودة",
+  tradeCollectionStatusPresented: "مقدَّم",
+  tradeCollectionStatusAccepted: "مقبول",
+  tradeCollectionStatusSettled: "مُسوّى",
+  tradeCollectionStatusCancelled: "ملغى",
 };
 
 const en: Dictionary = {
@@ -23120,6 +23784,338 @@ const en: Dictionary = {
   qualityErrComplaintState: "The complaint's state refuses this move.",
   qualityErrRecallNotFound: "The recall record does not exist.",
   qualityErrRecallState: "The recall's state refuses this move.",
+
+// ── PHASE-051 (W-39 — T-14, the trade plane's keys: i18n BY BOTH
+// COUNTS — the first-surface-wave law; ar +n = en +n on this block) ────────
+  tradeLcTitle: "Letters of credit",
+  tradeLcSubtitle: "The LC register — the full ladder with G-64's margins and the fees through the existing charges discipline",
+  tradeCustomsTitle: "Customs declarations",
+  tradeCustomsSubtitle: "The declarations register with the duty/VAT lines and the landed cost through the real service",
+  tradeShipmentsTitle: "Shipment tracking",
+  tradeShipmentsSubtitle: "The tracking board — the bills of lading, the packing lists and the carrier event log; the fold drives the status",
+  tradeIncotermsTitle: "Incoterms",
+  tradeIncotermsSubtitle: "The reference registry with the ownership risk-hint matrix — tenant-extensible data",
+  tradeCertificatesTitle: "Certificates of origin/conformity",
+  tradeCertificatesSubtitle: "The chamber-format bilingual register — the frozen snapshot prints as stored",
+  tradePaneRegister: "Register",
+  tradePaneCreate: "Create",
+  tradePaneDetail: "Details",
+  tradePaneIssue: "Issue",
+  tradeRefresh: "Refresh",
+  tradeEmpty: "No records yet.",
+  tradeRefusalTitle: "Typed refusal",
+  tradeRefusalDetails: "Full details",
+  tradeLcColNo: "LC no.",
+  tradeLcColStatus: "Status",
+  tradeLcColCurrency: "Currency",
+  tradeLcColAmount: "Amount",
+  tradeLcColMargin: "Margin",
+  tradeLcColBank: "Issuing bank",
+  tradeLcColBeneficiary: "Beneficiary",
+  tradeLcColApplicant: "Applicant",
+  tradeLcColIssuedAt: "Issued at",
+  tradeLcColExpiry: "Expiry date",
+  tradeLcCreateTitle: "New letter of credit",
+  tradeLcCreateCurrency: "Currency (ISO-4217)",
+  tradeLcCreateAmount: "Amount (≤ 4dp)",
+  tradeLcCreateMargin: "Margin amount (optional)",
+  tradeLcCreateBank: "Issuing bank",
+  tradeLcCreateBeneficiary: "Beneficiary name",
+  tradeLcCreateApplicant: "Applicant name",
+  tradeLcCreateExpiry: "Expiry date (yyyy-mm-dd)",
+  tradeLcCreatePo: "Linked purchase order (optional UUID)",
+  tradeLcCreateNote: "Note",
+  tradeLcCreatedToast: "The LC is created — its official number is in the register.",
+  tradeLcActIssue: "Issue",
+  tradeLcActAmend: "Amend",
+  tradeLcActDocuments: "Document",
+  tradeLcActFees: "Fee",
+  tradeLcActRetire: "Retire",
+  tradeLcActCancel: "Cancel",
+  tradeLcIssueMargin: "Margin at issue (optional)",
+  tradeLcIssueBankAccount: "Bank account (UUID)",
+  tradeLcAmendTitle: "New amendment",
+  tradeLcAmendType: "Change type",
+  tradeLcAmendValueFrom: "Amount from",
+  tradeLcAmendValueTo: "Amount to",
+  tradeLcAmendExpiryFrom: "Expiry from",
+  tradeLcAmendExpiryTo: "Expiry to",
+  tradeLcAmendDocumentsNote: "Documents note",
+  tradeLcAmendSummary: "Summary",
+  tradeLcAmendmentColNo: "Amendment no.",
+  tradeLcAmendmentColType: "Type",
+  tradeLcAmendmentColEffective: "Effective at",
+  tradeLcDocumentsTitle: "The documents checklist",
+  tradeLcDocColType: "Document",
+  tradeLcDocColPresented: "Presented",
+  tradeLcDocColVerified: "Verified",
+  tradeLcDocColDiscrepancy: "Discrepancy note",
+  tradeLcDocDocType: "Document type (uppercase/digits)",
+  tradeLcDocPresented: "Presented",
+  tradeLcDocVerified: "Verified",
+  tradeLcDocDiscrepancy: "Discrepancy note (optional)",
+  tradeLcFeeAmount: "Fee amount",
+  tradeLcFeeBankAccount: "Bank account (UUID)",
+  tradeLcFeeMemo: "Memo",
+  tradeLcDetailAmendments: "The amendments register",
+  tradeLcDetailDocuments: "The documents checklist",
+  tradeLcYes: "Yes",
+  tradeLcNo: "No",
+  tradeLcStatusDraft: "Draft",
+  tradeLcStatusIssued: "Issued",
+  tradeLcStatusSettled: "Settled",
+  tradeLcStatusRetired: "Retired",
+  tradeLcStatusCancelled: "Cancelled",
+  tradeLcStatusExpired: "Expired",
+  tradeCustomsPaneRegister: "Declarations register",
+  tradeCustomsPaneCreate: "New declaration",
+  tradeCustomsPaneDetail: "Declaration lines",
+  tradeCustomsPaneHs: "HS code registry",
+  tradeCustomsColNo: "Declaration no.",
+  tradeCustomsColType: "Type",
+  tradeCustomsColOffice: "Customs office",
+  tradeCustomsColStatus: "Status",
+  tradeCustomsColCurrency: "Currency",
+  tradeCustomsColSubmitted: "Submitted at",
+  tradeCustomsColCompleted: "Completed at",
+  tradeCustomsColLandedCost: "Landed cost",
+  tradeCustomsCreateTitle: "New customs declaration",
+  tradeCustomsCreateType: "Declaration type",
+  tradeCustomsCreateOffice: "Customs office",
+  tradeCustomsCreateCurrency: "Currency (ISO-4217)",
+  tradeCustomsCreateReceipt: "Linked receipt (optional UUID)",
+  tradeCustomsCreatePo: "Linked purchase order (optional UUID)",
+  tradeCustomsCreateBl: "Linked bill of lading (optional UUID)",
+  tradeCustomsLinesTitle: "The duty/VAT lines",
+  tradeCustomsLineHs: "HS code (2…10 digits)",
+  tradeCustomsLineOrigin: "Origin country (ISO-3166)",
+  tradeCustomsLineItem: "Item (optional UUID)",
+  tradeCustomsLineDesc: "Description",
+  tradeCustomsLineQty: "Quantity (≤ 6dp)",
+  tradeCustomsLineUom: "UoM",
+  tradeCustomsLineValue: "Customs value",
+  tradeCustomsLineDutyRate: "Duty rate",
+  tradeCustomsLineVat: "Import VAT",
+  tradeCustomsAddLine: "Add line",
+  tradeCustomsActSubmit: "Submit",
+  tradeCustomsActAccept: "Accept",
+  tradeCustomsActComplete: "Complete (G-65)",
+  tradeCustomsActCancel: "Cancel",
+  tradeCustomsTotalsTitle: "Totals — from the lines at every read",
+  tradeCustomsTotalValue: "Total customs value",
+  tradeCustomsTotalDuty: "Total duty",
+  tradeCustomsTotalVat: "Total import VAT",
+  tradeCustomsTotalLanded: "Landed amount (duty + VAT)",
+  tradeCustomsActAddLine: "Add line (draft only)",
+  tradeHsColCode: "Code",
+  tradeHsColName: "Name",
+  tradeHsColActive: "Active",
+  tradeHsCreateCode: "Code (2…10 digits)",
+  tradeHsCreateName: "Name (English)",
+  tradeHsCreateNameAr: "Name (Arabic)",
+  tradeHsCreatedToast: "The HS code joined the tenant registry.",
+  tradeHsDisclaimer: "The starter set is tenant-extensible data — the tenant owns the final classification; a missing code is MISSING, never invented (the no-fabrication law).",
+  tradeCustomsCreatedToast: "The declaration is created — its official number is in the register.",
+  tradeDeclarationStatusDraft: "Draft",
+  tradeDeclarationStatusSubmitted: "Submitted",
+  tradeDeclarationStatusAccepted: "Accepted",
+  tradeDeclarationStatusCompleted: "Completed",
+  tradeDeclarationStatusCancelled: "Cancelled",
+  tradeDeclarationTypeImport: "Import",
+  tradeDeclarationTypeExport: "Export",
+  tradeDeclarationTypeTransit: "Transit",
+  tradeShipmentsPaneBl: "Bills of lading",
+  tradeShipmentsPanePl: "Packing lists",
+  tradeShipmentsPaneEvents: "Event log",
+  tradeBlColNo: "B/L no.",
+  tradeBlColType: "Type",
+  tradeBlColCarrier: "Carrier",
+  tradeBlColLoading: "Port of loading",
+  tradeBlColDischarge: "Port of discharge",
+  tradeBlColStatus: "Shipment status",
+  tradeBlColIssuedAt: "Issued at",
+  tradeBlCreateTitle: "New bill of lading",
+  tradeBlCreateType: "Document type",
+  tradeBlCreateCarrier: "Carrier name",
+  tradeBlCreateLoading: "Port of loading (optional)",
+  tradeBlCreateDischarge: "Port of discharge (optional)",
+  tradeBlCreateContainers: "Container refs (comma-separated)",
+  tradeBlCreatePo: "Linked purchase order (optional UUID)",
+  tradeBlCreateDn: "Linked delivery note (optional UUID)",
+  tradeBlCreatedToast: "The B/L is created — its official number is in the register.",
+  tradePlColNo: "P/L no.",
+  tradePlColBl: "B/L",
+  tradePlColStatus: "Shipment status",
+  tradePlColIssuedAt: "Issued at",
+  tradePlColLines: "Lines",
+  tradePlCreateTitle: "New packing list",
+  tradePlCreateBl: "Bill of lading (UUID)",
+  tradePlLineDesc: "Description",
+  tradePlLinePackages: "Packages",
+  tradePlLineGross: "Gross (kg)",
+  tradePlLineNet: "Net (kg)",
+  tradePlAddLine: "Add line",
+  tradePlCreatedToast: "The packing list is created — its official number is in the register.",
+  tradeEventsTitle: "The carrier event log — append-only truth",
+  tradeEventColMilestone: "Milestone",
+  tradeEventColAt: "Event at",
+  tradeEventColCarrierRef: "Carrier ref",
+  tradeEventColLocation: "Location",
+  tradeEventColBl: "B/L",
+  tradeEventAppendTitle: "Append event",
+  tradeEventAppendBl: "Bill of lading (UUID)",
+  tradeEventAppendMilestone: "Milestone",
+  tradeEventAppendAt: "Event at (ISO)",
+  tradeEventAppendCarrierRef: "Carrier ref (optional)",
+  tradeEventAppendLocation: "Location (optional)",
+  tradeEventAppendDeclaration: "Linked declaration (optional UUID)",
+  tradeEventAppendedToast: "The event is recorded — the fold drives the documents' status.",
+  tradeShipmentStatusBooked: "Booked",
+  tradeShipmentStatusDeparted: "Departed",
+  tradeShipmentStatusArrived: "Arrived",
+  tradeShipmentStatusCleared: "Cleared",
+  tradeShipmentStatusDelivered: "Delivered",
+  tradeBlDocTypeSea: "Sea",
+  tradeBlDocTypeAir: "Air",
+  tradeBlDocTypeRoad: "Road",
+  tradeBlDocTypeRail: "Rail",
+  tradeBlDocTypeMultimodal: "Multimodal",
+  tradeIncotermColCode: "Code",
+  tradeIncotermColName: "Name",
+  tradeIncotermColCarriage: "Main carriage",
+  tradeIncotermColInsurance: "Insurance",
+  tradeIncotermColExportClearance: "Export clearance",
+  tradeIncotermColImportClearance: "Import clearance",
+  tradeIncotermColImportDuty: "Import duty",
+  tradeIncotermColActive: "Active",
+  tradeIncotermSeller: "Seller",
+  tradeIncotermBuyer: "Buyer",
+  tradeIncotermMatrixTitle: "The ownership risk-hint matrix — from the row's own data",
+  tradeIncotermCreateTitle: "New incoterm (tenant addition)",
+  tradeIncotermCreateCode: "Code (2…8 uppercase/digits)",
+  tradeIncotermCreateName: "Name (English)",
+  tradeIncotermCreateNameAr: "Name (Arabic)",
+  tradeIncotermCreateCarriage: "Carriage by seller?",
+  tradeIncotermCreateInsurance: "Insurance by seller?",
+  tradeIncotermCreateExportClearance: "Export clearance by seller?",
+  tradeIncotermCreateImportClearance: "Import clearance by seller?",
+  tradeIncotermCreateImportDuty: "Import duty by seller?",
+  tradeIncotermCreatedToast: "The incoterm joined the tenant registry.",
+  tradeIncotermsDisclaimer: "The 2020 set ships as tenant-extensible seed data — the final classification's accuracy is the tenant's (the BR-055 family).",
+  tradeCertificatesPaneRegister: "Certificates register",
+  tradeCertificatesPaneIssue: "Issue a certificate",
+  tradeCertificateColNo: "Certificate no.",
+  tradeCertificateColType: "Type",
+  tradeCertificateColIssuedAt: "Issued at",
+  tradeCertificateColBl: "B/L",
+  tradeCertificateColDeclaration: "Declaration",
+  tradeCertificateIssueTitle: "Issue a certificate of origin/conformity — the snapshot freezes now",
+  tradeCertificateIssueType: "Certificate type",
+  tradeCertificateIssueExporter: "Exporter",
+  tradeCertificateIssueConsignee: "Consignee",
+  tradeCertificateIssueBl: "Linked bill of lading (optional UUID)",
+  tradeCertificateIssueDeclaration: "Linked declaration (optional UUID)",
+  tradeCertificateGoodsTitle: "The goods lines — each origin declared here",
+  tradeCertificateGoodsDesc: "Description",
+  tradeCertificateGoodsOrigin: "Origin (ISO-3166)",
+  tradeCertificateGoodsHs: "HS code (optional)",
+  tradeCertificateGoodsQty: "Quantity (optional)",
+  tradeCertificateGoodsUom: "UoM (optional)",
+  tradeCertificateAddGood: "Add line",
+  tradeCertificateIssuedToast: "The certificate is issued — the frozen snapshot IS the certificate.",
+  tradeCertificateTypeOrigin: "Certificate of origin",
+  tradeCertificateTypeConformity: "Certificate of conformity",
+  tradeCertificatePrintAct: "Print preview",
+  tradeCertificatePrintTitle: "The certificate — print preview",
+  tradeCertificatePrintNow: "Print now",
+  tradeCertificatePrintExporter: "Exporter",
+  tradeCertificatePrintConsignee: "Consignee",
+  tradeCertificatePrintGood: "Goods",
+  tradeCertificatePrintOrigin: "Origin",
+  tradeCertificatePrintHs: "HS code",
+  tradeCertificatePrintQty: "Quantity",
+  tradeCertificatePrintBl: "Bill of lading",
+  tradeCertificatePrintDeclaration: "Customs declaration",
+  tradeIncotermSelectorLabel: "Incoterm",
+  tradeIncotermSelectorPlaceholder: "— pick when needed —",
+  tradeIncotermSelectorMatrixTitle: "Ownership matrix",
+  tradeIncotermSelectorHint: "Orders in a non-base currency or carrying the import/export marker require an incoterm at posting (BR-106).",
+  tradeDutySuspendedBannerTitle: "Duty-suspended stock under bond — customer issue is refused while suspended (G-66)",
+  tradeDutySuspendedChip: "Duty-suspended",
+  tradeDutySuspendedMove: "Bond move",
+  tradeDutySuspendedQty: "Qty under bond",
+  tradeDutySuspendedExecutedAt: "Executed at",
+  tradeErrInputInvalid: "An input value is invalid — check the fields and retry.",
+  tradeErrLcNotFound: "The letter of credit does not exist in this tenant.",
+  tradeErrLcDuplicate: "An LC with this number already exists in this tenant.",
+  tradeErrLcState: "The LC's state refuses this move.",
+  tradeErrLcMarginShape: "The margin shape violates G-64 — check the deposit or retirement conditions.",
+  tradeErrLcBankAccount: "The bank account is invalid for this move.",
+  tradeErrLcAmendment: "The amendment is invalid — check the amount or date pairs.",
+  tradeErrLcDocumentDuplicate: "The document type is already on this LC's checklist.",
+  tradeErrLcChecklistState: "The checklist's state refuses this move.",
+  tradeErrLcSweepThresholds: "The sweep thresholds are invalid.",
+  tradeErrCollectionNotFound: "The documentary collection does not exist.",
+  tradeErrCollectionDuplicate: "A collection with this number already exists.",
+  tradeErrCollectionState: "The collection's state refuses this move.",
+  tradeErrCollectionUsance: "The usance terms (D/A) are invalid.",
+  tradeErrCollectionSettlement: "The settlement shape is invalid — check the reference and stamps.",
+  tradeErrIncotermNotFound: "The incoterm does not exist in this tenant's registry.",
+  tradeErrIncotermDuplicate: "The code already exists in the tenant registry.",
+  tradeErrIncotermInvalid: "The incoterm shape is invalid.",
+  tradeErrIncotermCodeFrozen: "The code is the row's identity — it never rewrites.",
+  tradeErrIncotermInactive: "The incoterm is retired — select an active term.",
+  tradeErrOrderIncotermRequired: "The order is trade-flagged (currency or import/export marker) — pick an incoterm before posting (BR-106).",
+  tradeErrBlNotFound: "The bill of lading does not exist.",
+  tradeErrBlDuplicate: "A B/L with this number already exists.",
+  tradeErrPlNotFound: "The packing list does not exist.",
+  tradeErrPlDuplicate: "A packing list with this number already exists.",
+  tradeErrTransportInput: "A transport-document input is invalid — check the fields.",
+  tradeErrTrackingEvent: "The event is invalid — the ladder is monotone; the carrier's late fact appends.",
+  tradeErrDeclarationNotFound: "The declaration does not exist.",
+  tradeErrDeclarationDuplicate: "A declaration with this number already exists.",
+  tradeErrDeclarationState: "The declaration's state refuses this move.",
+  tradeErrDeclarationLine: "The declaration line is invalid — check the code and figures.",
+  tradeErrDeclarationIncomplete: "The declaration is incomplete — the completion (G-65) requires the full ladder.",
+  tradeErrDeclarationRequired: "The customs-duty allocation requires a completed declaration (INV-036).",
+  tradeErrDeclarationLink: "The link does not exist — acceptance #8's chain breaks.",
+  tradeErrDeclarationLandedCostDuplicate: "The landed cost is already linked to this declaration.",
+  tradeErrDeclarationLineTie: "The line tie is invalid — the allocated value exceeds the declaration line.",
+  tradeErrCustomsPurpose: "The purpose is not mapped onto an existing purpose account — refused until designation.",
+  tradeErrHsNotFound: "The HS code does not exist in the tenant registry.",
+  tradeErrHsDuplicate: "The HS code already exists.",
+  tradeErrHsInvalid: "The HS code shape is invalid (2…10 digits).",
+  tradeErrHsFrozen: "The code is the row's identity — it never rewrites.",
+  tradeErrBondedNotFound: "The bonded move does not exist.",
+  tradeErrBondedDuplicate: "A bonded move with this number already exists.",
+  tradeErrBondedState: "The move's state refuses this move.",
+  tradeErrBondedLine: "The bonded line is invalid — check the quantities.",
+  tradeErrBondedReleaseShape: "The release shape violates BR-107 — the recognition is exactly once.",
+  tradeErrBondedStockSuspended: "The stock is suspended under bond (G-66) — the issue is refused until release.",
+  tradeErrDrawbackNotFound: "The drawback claim does not exist.",
+  tradeErrDrawbackDuplicate: "A claim with this number already exists.",
+  tradeErrDrawbackState: "The claim's state refuses this move.",
+  tradeErrDrawbackEvidence: "No submission without linked export evidence (BR-108).",
+  tradeErrCertificateNotFound: "The certificate does not exist.",
+  tradeErrCertificateDuplicate: "A certificate with this number already exists.",
+  tradeErrCertificateInput: "The certificate input is invalid — check the fields.",
+  tradeErrCertificateLink: "The certificate's link does not exist — acceptance #8's chain breaks.",
+  tradeErrCertificateLine: "The goods line is invalid — check the description and origin.",
+  tradeDrawbackStatusDraft: "Draft",
+  tradeDrawbackStatusSubmitted: "Submitted",
+  tradeDrawbackStatusUnderReview: "Under review",
+  tradeDrawbackStatusApproved: "Approved",
+  tradeDrawbackStatusRejected: "Rejected",
+  tradeDrawbackStatusPaid: "Paid",
+  tradeBondedKindInBond: "In-bond",
+  tradeBondedKindRelease: "Release",
+  tradeBondedStatusDraft: "Draft",
+  tradeBondedStatusExecuted: "Executed",
+  tradeCollectionStatusDraft: "Draft",
+  tradeCollectionStatusPresented: "Presented",
+  tradeCollectionStatusAccepted: "Accepted",
+  tradeCollectionStatusSettled: "Settled",
+  tradeCollectionStatusCancelled: "Cancelled",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

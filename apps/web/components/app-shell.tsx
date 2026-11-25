@@ -188,6 +188,15 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "quality/spc": { group: "manufacturingNavSection", label: "qualitySpcTitle" },
   "quality/complaints": { group: "manufacturingNavSection", label: "qualityComplaintsTitle" },
   "quality/coa": { group: "manufacturingNavSection", label: "qualityCoaTitle" },
+  // -- PHASE-051 (W-39 — T-14, D-17): the foreign-trade family rides the
+  // purchasing group (the trade module composes on purchasing.landed_costs
+  // — D-04's own dependency; the NAV_ITEMS rows carry the flag-gating,
+  // these fallbacks cover nav-fetch failure).
+  "trade/lc": { group: "navPurchasing", label: "tradeLcTitle" },
+  "trade/customs": { group: "navPurchasing", label: "tradeCustomsTitle" },
+  "trade/shipments": { group: "navPurchasing", label: "tradeShipmentsTitle" },
+  "trade/incoterms": { group: "navPurchasing", label: "tradeIncotermsTitle" },
+  "trade/certificates": { group: "navPurchasing", label: "tradeCertificatesTitle" },
   // -- PHASE-021 (T2-b): the Offline Console entry — always visible
   // (DR-P21-06; browser opens the honest ONLINE-ONLY console).
   offline: { group: "offlineNavSection", label: "offlineConsoleTitle" },

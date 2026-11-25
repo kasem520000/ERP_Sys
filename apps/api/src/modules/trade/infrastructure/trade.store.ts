@@ -1640,3 +1640,81 @@ export async function stampDrawbackPaid(id: string): Promise<DrawbackClaimRow | 
     RETURNING ${DRAWBACK_COLUMNS}`);
   return rows[0];
 }
+
+// ── the certificates of origin (W-39 — T-14, the 0120 §4 plane: the frozen
+// snapshot IS the certificate — D-13's print anchor; ORIGIN + CONFORMITY
+// ride the same table as a doc type, the 050 COA one-table-two-types law) ───
+
+export interface CertificateRow {
+  id: string;
+  certificateNo: string;
+  certType: string;
+  billOfLadingId: string | null;
+  declarationId: string | null;
+  snapshot: Record<string, unknown>;
+  issuedAt: string;
+  issuedBy: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const CERTIFICATE_COLUMNS = sql`id, certificate_no AS "certificateNo", cert_type AS "certType",
+  bill_of_lading_id AS "billOfLadingId", declaration_id AS "declarationId", snapshot,
+  issued_at::text AS "issuedAt", issued_by AS "issuedBy", note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export interface InsertCertificateInput {
+  certificateNo: string;
+  certType: "ORIGIN" | "CONFORMITY";
+  billOfLadingId: string | null;
+  declarationId: string | null;
+  snapshot: Record<string, unknown>;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}
+
+export async function insertCertificate(input: InsertCertificateInput): Promise<CertificateRow> {
+  const rows = await query<CertificateRow>(sql`
+    INSERT INTO certificates_of_origin
+      (id, tenant_id, certificate_no, cert_type, bill_of_lading_id, declaration_id,
+       snapshot, issued_by, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.certificateNo}, ${input.certType},
+            ${input.billOfLadingId}, ${input.declarationId}, ${JSON.stringify(input.snapshot)}::jsonb,
+            ${input.actorId}, ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${CERTIFICATE_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findCertificateByNo(certificateNo: string): Promise<CertificateRow | undefined> {
+  const rows = await query<CertificateRow>(sql`
+    SELECT ${CERTIFICATE_COLUMNS} FROM certificates_of_origin
+    WHERE tenant_id = erp.current_tenant_id() AND certificate_no = ${certificateNo}
+    LIMIT 1`);
+  return rows[0];
+}
+
+export async function findCertificateById(id: string): Promise<CertificateRow | undefined> {
+  const rows = await query<CertificateRow>(sql`
+    SELECT ${CERTIFICATE_COLUMNS} FROM certificates_of_origin
+    WHERE tenant_id = erp.current_tenant_id() AND id = ${id}
+    LIMIT 1`);
+  return rows[0];
+}
+
+export async function listCertificates(filter: {
+  certType?: string;
+  billOfLadingId?: string;
+  limit?: number;
+}): Promise<CertificateRow[]> {
+  const certType = filter.certType ?? null;
+  const blId = filter.billOfLadingId ?? null;
+  return query<CertificateRow>(sql`
+    SELECT ${CERTIFICATE_COLUMNS} FROM certificates_of_origin
+    WHERE (${certType}::text IS NULL OR cert_type = ${certType})
+      AND (${blId}::uuid IS NULL OR bill_of_lading_id = ${blId})
+    ORDER BY issued_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}

@@ -21,9 +21,11 @@ import type {
   PartnerRow,
   PurchaseOrderRow,
   PurchaseRequestRow,
+  TradeIncotermRow,
 } from "../lib/api-types";
 import { bffFetch } from "../lib/client-api";
 import { localizedName, localizedPurchasingError, purchasingStatusLabel } from "../lib/messages";
+import { IncotermSelector } from "./incoterm-selector";
 import { Card } from "./card";
 import { CustomFieldSurface } from "./custom-field-surface";
 import { ErrorNotice, SuccessNotice } from "./notices";
@@ -45,6 +47,7 @@ export function PurchasingOrders({
   initialOrders,
   suppliers,
   items,
+  incoterms,
   canCreate,
   canApprove,
 }: {
@@ -53,6 +56,7 @@ export function PurchasingOrders({
   initialOrders: readonly PurchaseOrderRow[];
   suppliers: readonly PartnerRow[];
   items: readonly ItemRow[];
+  incoterms: readonly TradeIncotermRow[];
   canCreate: boolean;
   canApprove: boolean;
 }): JSX.Element {
@@ -70,6 +74,11 @@ export function PurchasingOrders({
   const [orderDate, setOrderDate] = useState(new Date().toISOString().slice(0, 10));
   const [expectedDate, setExpectedDate] = useState("");
   const [neededBy, setNeededBy] = useState("");
+  // PHASE-051 (W-39 — T-14, D-17): the incoterm selection rides the ORDER
+  // create form (BR-106's mandate is enforced at the order's own posting —
+  // the server-side gate; the selector renders the risk-hint matrix at
+  // selection time VERBATIM, the API's own output).
+  const [incotermCode, setIncotermCode] = useState("");
   const [lines, setLines] = useState<DraftLine[]>([{ itemId: "", qty: "", unitPrice: "" }]);
 
   // WEB-036 (PHASE-036): the purchase-order custom-field surface (session
@@ -164,6 +173,11 @@ export function PurchasingOrders({
           orderDate,
           expectedDate: expectedDate === "" ? null : expectedDate,
           currencyCode: "SAR",
+          // PHASE-051 (W-39 — T-14): the incoterm rides the create body when
+          // picked (BR-106's gate reads it at the posting — the typed
+          // ORDER_INCOTERM_REQUIRED refusal names the order when the trade
+          // flag demands it and the selection is absent).
+          ...(incotermCode !== "" ? { incotermCode } : {}),
           lines: lines.map((l) => ({ itemId: l.itemId, qty: l.qty, unitPrice: l.unitPrice })),
           ...(customPayload !== null && Object.keys(customPayload).length > 0
             ? { customFields: customPayload }
@@ -214,6 +228,14 @@ export function PurchasingOrders({
                   { value: "", label: d.purchasingSelectSupplier },
                   ...suppliersOnly.map((s) => ({ value: s.id, label: supplierNameById.get(s.id) ?? s.code })),
                 ]}
+              />
+            )}
+            {mode === "order" && (
+              <IncotermSelector
+                locale={locale}
+                incoterms={incoterms}
+                value={incotermCode}
+                onValueChange={setIncotermCode}
               />
             )}
             {mode === "request" ? (

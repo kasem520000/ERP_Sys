@@ -3450,3 +3450,206 @@ export function localizedCoaToleranceVerdict(d: Dictionary, verdict: string): st
   };
   return map[verdict] ?? verdict;
 }
+
+// ── PHASE-051 (W-39 — T-14, the trade plane's localizers) ────────────────────
+
+/** The trade family's error codes (the 55-code taxonomy — the W-34…W-38
+ * engines' own typed refusals + the W-39 certificates' four; every code
+ * the controllers can surface, localized; unknown codes fall back to the
+ * engine's own message). */
+export function localizedTradeError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "TRADE_INPUT_INVALID":
+      return d.tradeErrInputInvalid;
+    case "LC_RECORD_NOT_FOUND":
+      return d.tradeErrLcNotFound;
+    case "LC_DUPLICATE":
+      return d.tradeErrLcDuplicate;
+    case "LC_STATE":
+      return d.tradeErrLcState;
+    case "LC_MARGIN_SHAPE":
+      return d.tradeErrLcMarginShape;
+    case "LC_BANK_ACCOUNT_INVALID":
+      return d.tradeErrLcBankAccount;
+    case "LC_AMENDMENT_INVALID":
+      return d.tradeErrLcAmendment;
+    case "LC_DOCUMENT_DUPLICATE":
+      return d.tradeErrLcDocumentDuplicate;
+    case "LC_CHECKLIST_STATE":
+      return d.tradeErrLcChecklistState;
+    case "LC_SWEEP_THRESHOLDS_INVALID":
+      return d.tradeErrLcSweepThresholds;
+    case "COLLECTION_RECORD_NOT_FOUND":
+      return d.tradeErrCollectionNotFound;
+    case "COLLECTION_DUPLICATE":
+      return d.tradeErrCollectionDuplicate;
+    case "COLLECTION_STATE":
+      return d.tradeErrCollectionState;
+    case "COLLECTION_USANCE_INVALID":
+      return d.tradeErrCollectionUsance;
+    case "COLLECTION_SETTLEMENT_INVALID":
+      return d.tradeErrCollectionSettlement;
+    case "INCOTERM_RECORD_NOT_FOUND":
+      return d.tradeErrIncotermNotFound;
+    case "INCOTERM_DUPLICATE":
+      return d.tradeErrIncotermDuplicate;
+    case "INCOTERM_INVALID":
+      return d.tradeErrIncotermInvalid;
+    case "INCOTERM_CODE_FROZEN":
+      return d.tradeErrIncotermCodeFrozen;
+    case "INCOTERM_INACTIVE":
+      return d.tradeErrIncotermInactive;
+    case "ORDER_INCOTERM_REQUIRED":
+      return d.tradeErrOrderIncotermRequired;
+    case "BL_RECORD_NOT_FOUND":
+      return d.tradeErrBlNotFound;
+    case "BL_DUPLICATE":
+      return d.tradeErrBlDuplicate;
+    case "PACKING_LIST_RECORD_NOT_FOUND":
+      return d.tradeErrPlNotFound;
+    case "PACKING_LIST_DUPLICATE":
+      return d.tradeErrPlDuplicate;
+    case "TRANSPORT_INPUT_INVALID":
+      return d.tradeErrTransportInput;
+    case "TRACKING_EVENT_INVALID":
+      return d.tradeErrTrackingEvent;
+    case "DECLARATION_RECORD_NOT_FOUND":
+      return d.tradeErrDeclarationNotFound;
+    case "DECLARATION_DUPLICATE":
+      return d.tradeErrDeclarationDuplicate;
+    case "DECLARATION_STATE":
+      return d.tradeErrDeclarationState;
+    case "DECLARATION_LINE_INVALID":
+      return d.tradeErrDeclarationLine;
+    case "DECLARATION_INCOMPLETE":
+      return d.tradeErrDeclarationIncomplete;
+    case "DECLARATION_REQUIRED":
+      return d.tradeErrDeclarationRequired;
+    case "DECLARATION_LINK_NOT_FOUND":
+      return d.tradeErrDeclarationLink;
+    case "DECLARATION_LANDED_COST_DUPLICATE":
+      return d.tradeErrDeclarationLandedCostDuplicate;
+    case "DECLARATION_LINE_TIE_INVALID":
+      return d.tradeErrDeclarationLineTie;
+    case "CUSTOMS_PURPOSE_NOT_MAPPED":
+      return d.tradeErrCustomsPurpose;
+    case "HS_CODE_RECORD_NOT_FOUND":
+      return d.tradeErrHsNotFound;
+    case "HS_CODE_DUPLICATE":
+      return d.tradeErrHsDuplicate;
+    case "HS_CODE_INVALID":
+      return d.tradeErrHsInvalid;
+    case "HS_CODE_FROZEN":
+      return d.tradeErrHsFrozen;
+    case "BONDED_MOVE_RECORD_NOT_FOUND":
+      return d.tradeErrBondedNotFound;
+    case "BONDED_MOVE_DUPLICATE":
+      return d.tradeErrBondedDuplicate;
+    case "BONDED_MOVE_STATE":
+      return d.tradeErrBondedState;
+    case "BONDED_LINE_INVALID":
+      return d.tradeErrBondedLine;
+    case "BONDED_RELEASE_SHAPE":
+      return d.tradeErrBondedReleaseShape;
+    case "BONDED_STOCK_SUSPENDED":
+      return d.tradeErrBondedStockSuspended;
+    case "DRAWBACK_CLAIM_RECORD_NOT_FOUND":
+      return d.tradeErrDrawbackNotFound;
+    case "DRAWBACK_CLAIM_DUPLICATE":
+      return d.tradeErrDrawbackDuplicate;
+    case "DRAWBACK_CLAIM_STATE":
+      return d.tradeErrDrawbackState;
+    case "DRAWBACK_EVIDENCE_REQUIRED":
+      return d.tradeErrDrawbackEvidence;
+    case "CERTIFICATE_RECORD_NOT_FOUND":
+      return d.tradeErrCertificateNotFound;
+    case "CERTIFICATE_DUPLICATE":
+      return d.tradeErrCertificateDuplicate;
+    case "CERTIFICATE_INPUT_INVALID":
+      return d.tradeErrCertificateInput;
+    case "CERTIFICATE_LINK_NOT_FOUND":
+      return d.tradeErrCertificateLink;
+    case "CERTIFICATE_LINE_INVALID":
+      return d.tradeErrCertificateLine;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}
+
+/** The LC ladder's rungs (the engine's own status vocabulary). */
+export function tradeLcStatusLabel(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    DRAFT: d.tradeLcStatusDraft,
+    ISSUED: d.tradeLcStatusIssued,
+    SETTLED: d.tradeLcStatusSettled,
+    RETIRED: d.tradeLcStatusRetired,
+    CANCELLED: d.tradeLcStatusCancelled,
+    EXPIRED: d.tradeLcStatusExpired,
+  };
+  return map[status] ?? status;
+}
+
+/** The collections ladder's rungs (D/P + D/A share the fold). */
+export function tradeCollectionStatusLabel(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    DRAFT: d.tradeCollectionStatusDraft,
+    PRESENTED: d.tradeCollectionStatusPresented,
+    ACCEPTED: d.tradeCollectionStatusAccepted,
+    SETTLED: d.tradeCollectionStatusSettled,
+    CANCELLED: d.tradeCollectionStatusCancelled,
+  };
+  return map[status] ?? status;
+}
+
+/** The declarations ladder's rungs (the customs engine's own vocabulary). */
+export function tradeDeclarationStatusLabel(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    DRAFT: d.tradeDeclarationStatusDraft,
+    SUBMITTED: d.tradeDeclarationStatusSubmitted,
+    ACCEPTED: d.tradeDeclarationStatusAccepted,
+    COMPLETED: d.tradeDeclarationStatusCompleted,
+    CANCELLED: d.tradeDeclarationStatusCancelled,
+  };
+  return map[status] ?? status;
+}
+
+/** The tracking fold's monotone ladder (BOOKED → DEPARTED → ARRIVED →
+ * CLEARED → DELIVERED — the documents' driven status). */
+export function tradeShipmentStatusLabel(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    BOOKED: d.tradeShipmentStatusBooked,
+    DEPARTED: d.tradeShipmentStatusDeparted,
+    ARRIVED: d.tradeShipmentStatusArrived,
+    CLEARED: d.tradeShipmentStatusCleared,
+    DELIVERED: d.tradeShipmentStatusDelivered,
+  };
+  return map[status] ?? status;
+}
+
+/** The drawback ladder (BR-108's own vocabulary). */
+export function tradeDrawbackStatusLabel(d: Dictionary, status: string): string {
+  const map: Record<string, string> = {
+    DRAFT: d.tradeDrawbackStatusDraft,
+    SUBMITTED: d.tradeDrawbackStatusSubmitted,
+    UNDER_REVIEW: d.tradeDrawbackStatusUnderReview,
+    APPROVED: d.tradeDrawbackStatusApproved,
+    REJECTED: d.tradeDrawbackStatusRejected,
+    PAID: d.tradeDrawbackStatusPaid,
+  };
+  return map[status] ?? status;
+}
+
+/** The bonded register's move kinds + rungs (G-66/BR-107's own vocabulary). */
+export function tradeBondedStatusLabel(d: Dictionary, value: string): string {
+  const map: Record<string, string> = {
+    IN_BOND: d.tradeBondedKindInBond,
+    RELEASE: d.tradeBondedKindRelease,
+    DRAFT: d.tradeBondedStatusDraft,
+    EXECUTED: d.tradeBondedStatusExecuted,
+  };
+  return map[value] ?? value;
+}

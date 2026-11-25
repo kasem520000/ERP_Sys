@@ -8225,3 +8225,255 @@ export interface RecallRegistryRow {
   createdBy: string | null;
   createdAt: string;
 }
+
+// ── PHASE-051 (W-39 — T-14, the trade web plane's row mirrors) ───────────────
+
+/** GET /trade/lc → the LC register rows (the engine's own columns; the
+ * ladder's status + G-64's journal links ride the row VERBATIM). */
+export interface TradeLcRow {
+  id: string;
+  lcNo: string | null;
+  purchaseOrderId: string | null;
+  currency: string;
+  amount: string;
+  marginAmount: string;
+  issuingBank: string;
+  beneficiaryName: string;
+  applicantName: string;
+  issuedAt: string;
+  expiryDate: string;
+  status: string;
+  marginJournalEntryId: string | null;
+  settledAt: string | null;
+  retirementJournalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /trade/lc/:id → the amendments register (the LC find's own chain). */
+export interface TradeLcAmendmentRow {
+  id: string;
+  lcId: string;
+  amendmentNo: number;
+  changeType: string;
+  valueFrom: string | null;
+  valueTo: string | null;
+  expiryFrom: string | null;
+  expiryTo: string | null;
+  documentsNote: string | null;
+  summary: string | null;
+  effectiveAt: string;
+  note: string | null;
+  createdAt: string;
+}
+
+/** GET /trade/lc/:id → the documents checklist (the discrepancy notes ride
+ * each row — the engine's own record). */
+export interface TradeLcDocumentRow {
+  id: string;
+  lcId: string;
+  docType: string;
+  presented: boolean;
+  presentedAt: string | null;
+  verified: boolean;
+  verifiedAt: string | null;
+  discrepancyNotes: string | null;
+  note: string | null;
+}
+
+/** GET /trade/customs/declarations → the declarations register rows (the
+ * ladder + the landed-cost links ride the row VERBATIM). */
+export interface TradeDeclarationRow {
+  id: string;
+  declarationNo: string;
+  declarationType: string;
+  customsOffice: string;
+  status: string;
+  submittedAt: string | null;
+  acceptedAt: string | null;
+  completedAt: string | null;
+  receiptId: string | null;
+  purchaseOrderId: string | null;
+  billOfLadingId: string | null;
+  shipmentStatus: string;
+  currency: string;
+  landedCostId: string | null;
+  landedCostNo: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** The declaration's own line (the find's own chain — the totals render
+ * from the LINES, never a stored parallel figure). */
+export interface TradeDeclarationLineRow {
+  id: string;
+  declarationId: string;
+  lineNo: number;
+  hsCode: string;
+  originCountry: string | null;
+  itemId: string | null;
+  description: string | null;
+  quantity: string | null;
+  uom: string | null;
+  customsValue: string;
+  dutyRate: string;
+  dutyAmount: string;
+  importVat: string;
+  note: string | null;
+  noteAr: string | null;
+}
+
+/** GET /trade/customs/declarations/:id → the declaration + its lines + the
+ * fold's totals (computed at every read — D-06's own law). */
+export interface TradeDeclarationFindResult {
+  declaration: TradeDeclarationRow;
+  lines: readonly TradeDeclarationLineRow[];
+  totals: {
+    totalCustomsValue: string;
+    totalDuty: string;
+    totalImportVat: string;
+    totalLandedAmount: string;
+  };
+}
+
+/** GET /trade/customs/hs → the HS starter registry rows (tenant-extensible
+ * DATA — a missing HS code is MISSING, never invented). */
+export interface TradeHsCodeRow {
+  id: string;
+  hsCode: string;
+  name: string;
+  nameAr: string;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+}
+
+/** GET /trade/transport/bl → the bills of lading register (the B/L IS the
+ * shipment's anchor; shipment_status is the tracking fold's driven surface
+ * — never writable from the web). */
+export interface TradeBlRow {
+  id: string;
+  blNo: string;
+  docType: string;
+  carrierName: string;
+  portOfLoading: string | null;
+  portOfDischarge: string | null;
+  containerRefs: readonly string[];
+  purchaseOrderId: string | null;
+  deliveryNoteId: string | null;
+  shipmentStatus: string;
+  issuedAt: string;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /trade/transport/packing-lists → the packing lists register. */
+export interface TradePackingListRow {
+  id: string;
+  plNo: string;
+  billOfLadingId: string | null;
+  receiptId: string | null;
+  lines: readonly Record<string, unknown>[];
+  shipmentStatus: string;
+  issuedAt: string;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /trade/shipments/events → the carrier milestone log (the
+ * append-only truth; the milestone vocabulary is the fold's own ladder). */
+export interface TradeTrackingEventRow {
+  id: string;
+  billOfLadingId: string;
+  declarationId: string | null;
+  milestone: string;
+  eventAt: string;
+  carrierRef: string | null;
+  location: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+}
+
+/** GET /trade/transport/bl/:id → the B/L find's own chain (the B/L + its
+ * packing lists + its events — acceptance #8's navigable link). */
+export interface TradeBlFindResult {
+  bl: TradeBlRow;
+  packingLists: readonly TradePackingListRow[];
+  events: readonly TradeTrackingEventRow[];
+}
+
+/** The risk-hint matrix (the registry row's OWN data rendered AR/EN —
+ * zero parallel computation, the API's renderIncotermMatrix output). */
+export interface TradeIncotermMatrixHints {
+  en: readonly string[];
+  ar: readonly string[];
+}
+
+/** GET /trade/incoterms → the registry rows with the matrix hints (the
+ * selector + the reference page render the same output VERBATIM). */
+export interface TradeIncotermRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string;
+  carriageBySeller: boolean;
+  insuranceBySeller: boolean;
+  exportClearanceBySeller: boolean;
+  importClearanceBySeller: boolean;
+  importDutyBySeller: boolean;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  matrix: TradeIncotermMatrixHints;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /trade/bonded/moves → the bonded register rows (the suspended
+ * banner's own data source — the EXECUTED IN_BOND moves with their lines
+ * feed the stock surface's duty-suspended banners). */
+export interface TradeBondedMoveRow {
+  id: string;
+  moveNo: string;
+  moveKind: string;
+  fromWarehouseId: string | null;
+  toWarehouseId: string | null;
+  declarationId: string | null;
+  lines: { itemId: string; qty: string; unitCost?: string | null }[];
+  status: string;
+  executedAt: string | null;
+  dutyAmount: string | null;
+  releaseRecognizedAt: string | null;
+  releaseJournalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** GET /trade/certificates → the certificate register rows (the frozen
+ * snapshot IS the certificate — D-13's print anchor). */
+export interface TradeCertificateRow {
+  id: string;
+  certificateNo: string;
+  certType: string;
+  billOfLadingId: string | null;
+  declarationId: string | null;
+  snapshot: Record<string, unknown>;
+  issuedAt: string;
+  issuedBy: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
