@@ -6075,6 +6075,85 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/trade/customs/hs/:code",
     permission: "trade.customs.manage",
   },
+  // PHASE-051 (W-38 — T-11 + T-12, dated 2026-11-25; matrix §3.29): the
+  // keys-seed-first FIFTH trade binding wave (1,199 + 13 = 1,212 — the
+  // discipline standing: the TEN trade.* keys landed at W-33 (0122 §5),
+  // the routes bind as the service waves ship, every change dated at
+  // the block). THE BONDED FAMILY binds trade.view over the reads (the
+  // bond register's rows — the finance-read plane's own umbrella, the
+  // family carries no own view key) and trade.bonded.manage over the
+  // register acts (create · THE EXECUTE ACT — the in-bond transfer with
+  // NO duty + BR-107's exactly-once release). THE DRAWBACK FAMILY binds
+  // trade.view over the reads and trade.drawback.manage over the
+  // workflow acts (create · the evidence link · BR-108's gate at the
+  // submission · the review · the verdicts · the pay — the honest
+  // no-GL rung). The routes are feature-gated at the controller on the
+  // whole-module unit trade (D-04 — no own flag).
+  {
+    method: "GET",
+    path: "/api/v1/trade/bonded/moves",
+    permission: "trade.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/bonded/moves/:id",
+    permission: "trade.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/bonded/moves",
+    permission: "trade.bonded.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/bonded/moves/:id/execute",
+    permission: "trade.bonded.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/drawback/claims",
+    permission: "trade.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/drawback/claims/:id",
+    permission: "trade.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims",
+    permission: "trade.drawback.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims/:id/evidence",
+    permission: "trade.drawback.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims/:id/submit",
+    permission: "trade.drawback.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims/:id/review",
+    permission: "trade.drawback.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims/:id/approve",
+    permission: "trade.drawback.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims/:id/reject",
+    permission: "trade.drawback.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/drawback/claims/:id/pay",
+    permission: "trade.drawback.manage",
+  },
 ];
 
 /**

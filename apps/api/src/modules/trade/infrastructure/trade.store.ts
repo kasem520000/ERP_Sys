@@ -1346,3 +1346,297 @@ export async function updateHsCode(input: {
     RETURNING ${HS_COLUMNS}`);
   return rows[0];
 }
+
+// ── the bonded register (T-11 — the G-66 duty-suspended anchor, 0121 §4) ─────
+
+export interface BondedMoveRow {
+  id: string;
+  moveNo: string;
+  moveKind: string;
+  fromWarehouseId: string | null;
+  toWarehouseId: string | null;
+  declarationId: string | null;
+  lines: { itemId: string; qty: string; unitCost?: string | null }[];
+  status: string;
+  executedAt: string | null;
+  dutyAmount: string | null;
+  releaseRecognizedAt: string | null;
+  releaseJournalEntryId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const BONDED_MOVE_COLUMNS = sql`id, move_no AS "moveNo", move_kind AS "moveKind",
+  from_warehouse_id AS "fromWarehouseId", to_warehouse_id AS "toWarehouseId",
+  declaration_id AS "declarationId", lines, status, executed_at::text AS "executedAt",
+  duty_amount::text AS "dutyAmount", release_recognized_at::text AS "releaseRecognizedAt",
+  release_journal_entry_id AS "releaseJournalEntryId", note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export interface InsertBondedMoveInput {
+  moveNo: string;
+  moveKind: "IN_BOND" | "RELEASE";
+  fromWarehouseId: string | null;
+  toWarehouseId: string | null;
+  declarationId: string | null;
+  lines: { itemId: string; qty: string; unitCost?: string | null }[];
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}
+
+export async function insertBondedMove(input: InsertBondedMoveInput): Promise<BondedMoveRow> {
+  const rows = await query<BondedMoveRow>(sql`
+    INSERT INTO bonded_warehouse_moves
+      (id, tenant_id, move_no, move_kind, from_warehouse_id, to_warehouse_id,
+       declaration_id, lines, status, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.moveNo}, ${input.moveKind},
+            ${input.fromWarehouseId}, ${input.toWarehouseId}, ${input.declarationId},
+            ${JSON.stringify(input.lines)}::jsonb, 'DRAFT', ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${BONDED_MOVE_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findBondedMoveById(id: string): Promise<BondedMoveRow | undefined> {
+  const rows = await query<BondedMoveRow>(sql`
+    SELECT ${BONDED_MOVE_COLUMNS} FROM bonded_warehouse_moves WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function findBondedMoveByNo(moveNo: string): Promise<BondedMoveRow | undefined> {
+  const rows = await query<BondedMoveRow>(sql`
+    SELECT ${BONDED_MOVE_COLUMNS} FROM bonded_warehouse_moves WHERE move_no = ${moveNo} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listBondedMoves(filter: {
+  moveKind?: string;
+  status?: string;
+  warehouseId?: string;
+  declarationId?: string;
+  limit?: number;
+}): Promise<BondedMoveRow[]> {
+  return query<BondedMoveRow>(sql`
+    SELECT ${BONDED_MOVE_COLUMNS} FROM bonded_warehouse_moves
+    WHERE (${filter.moveKind ?? null}::text IS NULL OR move_kind = ${filter.moveKind ?? null})
+      AND (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+      AND (${filter.warehouseId ?? null}::uuid IS NULL
+           OR from_warehouse_id = ${filter.warehouseId ?? null}
+           OR to_warehouse_id = ${filter.warehouseId ?? null})
+      AND (${filter.declarationId ?? null}::uuid IS NULL OR declaration_id = ${filter.declarationId ?? null})
+    ORDER BY created_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+/**
+ * THE EXECUTION STAMP (the 0121 §4 stamp law's own CAS — the single
+ * act's all-or-nothing face): DRAFT → EXECUTED with executed_at AND,
+ * on the RELEASE kind, THE RECOGNITION PAIR ATOMIC (duty_amount +
+ * release_recognized_at + release_journal_entry_id + the declaration
+ * link land in the SAME guarded statement — ck_release_shape's own
+ * demand; the IN_BOND kind carries NO duty fields BY CONSTRUCTION —
+ * the G-66 no-duty floor, never restated here). Zero rows = the raced
+ * or repeated execution — the caller's typed replay refusal (BR-107's
+ * exactly-once).
+ */
+export async function stampBondedMoveExecuted(input: {
+  id: string;
+  dutyAmount: string | null;
+  releaseJournalEntryId: string | null;
+  declarationId: string | null;
+}): Promise<BondedMoveRow | undefined> {
+  const rows = await query<BondedMoveRow>(sql`
+    UPDATE bonded_warehouse_moves
+    SET status = 'EXECUTED',
+        executed_at = now(),
+        duty_amount = ${input.dutyAmount},
+        release_recognized_at = CASE WHEN ${input.dutyAmount}::numeric IS NULL THEN NULL ELSE now() END,
+        release_journal_entry_id = ${input.releaseJournalEntryId},
+        updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'DRAFT'
+      AND (move_kind = 'IN_BOND' AND ${input.dutyAmount}::numeric IS NULL
+           AND ${input.releaseJournalEntryId}::uuid IS NULL
+           OR move_kind = 'RELEASE')
+    RETURNING ${BONDED_MOVE_COLUMNS}`);
+  return rows[0];
+}
+
+/**
+ * THE OVER-RELEASE GUARD'S OWN READ (BR-107's arithmetic basis): the Σ
+ * EXECUTED RELEASE lines per item for a linked declaration — the bond
+ * ledger's own rows, never a parallel figure (the release fold's
+ * alreadyReleasedByItem input).
+ */
+export async function sumReleasedQtyByDeclaration(
+  declarationId: string,
+): Promise<Map<string, string>> {
+  const rows = await query<{ itemId: string; qty: string }>(sql`
+    SELECT line->>'itemId' AS "itemId", SUM((line->>'qty')::numeric(19,6))::text AS qty
+    FROM bonded_warehouse_moves m, jsonb_array_elements(m.lines) AS line
+    WHERE m.tenant_id = erp.current_tenant_id()
+      AND m.status = 'EXECUTED'
+      AND m.move_kind = 'RELEASE'
+      AND m.declaration_id = ${declarationId}
+    GROUP BY line->>'itemId'`);
+  const map = new Map<string, string>();
+  for (const row of rows) {
+    map.set(row.itemId, row.qty);
+  }
+  return map;
+}
+
+// ── the drawback register (T-12 — BR-108's gate, 0121 §5; NO GL by design) ───
+
+export interface DrawbackClaimRow {
+  id: string;
+  claimNo: string;
+  exportDeclarationId: string | null;
+  exportBillOfLadingId: string | null;
+  claimedAmount: string;
+  currency: string;
+  status: string;
+  submittedAt: string | null;
+  decidedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const DRAWBACK_COLUMNS = sql`id, claim_no AS "claimNo",
+  export_declaration_id AS "exportDeclarationId", export_bill_of_lading_id AS "exportBillOfLadingId",
+  claimed_amount::text AS "claimedAmount", currency, status,
+  submitted_at::text AS "submittedAt", decided_at::text AS "decidedAt",
+  note, note_ar AS "noteAr", created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export interface InsertDrawbackClaimInput {
+  claimNo: string;
+  exportDeclarationId: string | null;
+  exportBillOfLadingId: string | null;
+  claimedAmount: string;
+  currency: string;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}
+
+export async function insertDrawbackClaim(input: InsertDrawbackClaimInput): Promise<DrawbackClaimRow> {
+  const rows = await query<DrawbackClaimRow>(sql`
+    INSERT INTO duty_drawback_claims
+      (id, tenant_id, claim_no, export_declaration_id, export_bill_of_lading_id,
+       claimed_amount, currency, status, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.claimNo},
+            ${input.exportDeclarationId}, ${input.exportBillOfLadingId},
+            ${input.claimedAmount}, ${input.currency}, 'DRAFT', ${input.note}, ${input.noteAr},
+            ${input.actorId})
+    RETURNING ${DRAWBACK_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findDrawbackClaimById(id: string): Promise<DrawbackClaimRow | undefined> {
+  const rows = await query<DrawbackClaimRow>(sql`
+    SELECT ${DRAWBACK_COLUMNS} FROM duty_drawback_claims WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function findDrawbackClaimByNo(claimNo: string): Promise<DrawbackClaimRow | undefined> {
+  const rows = await query<DrawbackClaimRow>(sql`
+    SELECT ${DRAWBACK_COLUMNS} FROM duty_drawback_claims WHERE claim_no = ${claimNo} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listDrawbackClaims(filter: {
+  status?: string;
+  limit?: number;
+}): Promise<DrawbackClaimRow[]> {
+  return query<DrawbackClaimRow>(sql`
+    SELECT ${DRAWBACK_COLUMNS} FROM duty_drawback_claims
+    WHERE (${filter.status ?? null}::text IS NULL OR status = ${filter.status ?? null})
+    ORDER BY created_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+/**
+ * THE EVIDENCE LINK (the DRAFT-only act — the fold's own law): the
+ * claim's proof-of-export links land while the claim is DRAFT; once
+ * submitted, the evidence is the customs authority's own record. The
+ * guarded statement pins the rung (zero rows = the raced link → the
+ * caller's typed refusal).
+ */
+export async function linkDrawbackEvidence(input: {
+  id: string;
+  exportDeclarationId: string | null;
+  exportBillOfLadingId: string | null;
+}): Promise<DrawbackClaimRow | undefined> {
+  const rows = await query<DrawbackClaimRow>(sql`
+    UPDATE duty_drawback_claims
+    SET export_declaration_id = ${input.exportDeclarationId},
+        export_bill_of_lading_id = ${input.exportBillOfLadingId},
+        updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'DRAFT'
+    RETURNING ${DRAWBACK_COLUMNS}`);
+  return rows[0];
+}
+
+/** THE WORKFLOW STAMPS (the 0121 §5 stamp laws' own CAS — one guarded
+ * statement per rung: the status pins the from-state, the stamp lands
+ * in the SAME statement, zero rows = the raced/stale move). */
+export async function stampDrawbackStatus(input: {
+  id: string;
+  from: string;
+  to: string;
+  stamp: "submitted_at" | "decided_at";
+}): Promise<DrawbackClaimRow | undefined> {
+  const rows = await query<DrawbackClaimRow>(sql`
+    UPDATE duty_drawback_claims
+    SET status = ${input.to}, ${sql.raw(input.stamp)} = now(),
+        updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = ${input.from}
+    RETURNING ${DRAWBACK_COLUMNS}`);
+  return rows[0];
+}
+
+export async function stampDrawbackSubmitted(id: string): Promise<DrawbackClaimRow | undefined> {
+  return stampDrawbackStatus({ id, from: "DRAFT", to: "SUBMITTED", stamp: "submitted_at" });
+}
+
+export async function stampDrawbackUnderReview(id: string): Promise<DrawbackClaimRow | undefined> {
+  // The review rung carries NO new stamp (the 0121 XOR floors' own
+  // reading: submitted_at stands from the submission — MONOTONE
+  // evidence that never re-stamps; decided_at lands only at the
+  // verdict rungs). The guarded statement moves the rung only.
+  const rows = await query<DrawbackClaimRow>(sql`
+    UPDATE duty_drawback_claims
+    SET status = 'UNDER_REVIEW', updated_at = now(), version = version + 1
+    WHERE id = ${id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'SUBMITTED'
+    RETURNING ${DRAWBACK_COLUMNS}`);
+  return rows[0];
+}
+
+export async function stampDrawbackApproved(id: string): Promise<DrawbackClaimRow | undefined> {
+  return stampDrawbackStatus({ id, from: "UNDER_REVIEW", to: "APPROVED", stamp: "decided_at" });
+}
+
+export async function stampDrawbackRejected(id: string): Promise<DrawbackClaimRow | undefined> {
+  return stampDrawbackStatus({ id, from: "UNDER_REVIEW", to: "REJECTED", stamp: "decided_at" });
+}
+
+export async function stampDrawbackPaid(id: string): Promise<DrawbackClaimRow | undefined> {
+  // PAID keeps its decided_at stamp (the 0121 XOR floor: decided only
+  // on the decided rungs — APPROVED/REJECTED/PAID); the pay act moves
+  // the rung only (NO GL ENTRY BY DESIGN — D-12's honest no-GL shape;
+  // the refund money lands when treasury records it, 053's surface).
+  const rows = await query<DrawbackClaimRow>(sql`
+    UPDATE duty_drawback_claims
+    SET status = 'PAID', updated_at = now(), version = version + 1
+    WHERE id = ${id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'APPROVED'
+    RETURNING ${DRAWBACK_COLUMNS}`);
+  return rows[0];
+}

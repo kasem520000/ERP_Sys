@@ -146,6 +146,20 @@ import {
   HsCodeDuplicateError,
   HsCodeFrozenError,
 } from "../../modules/trade/domain/trade-errors";
+// PHASE-051 (W-38 — T-11 + T-12, dated 2026-11-25): the trade module's
+// typed refusals (the bonded + drawback planes' statuses — see
+// domainStatus).
+import {
+  BondedMoveRecordNotFoundError,
+  BondedMoveDuplicateError,
+  BondedMoveStateError,
+  BondedStockSuspendedError,
+  BondedReleaseShapeError,
+  DrawbackClaimRecordNotFoundError,
+  DrawbackClaimDuplicateError,
+  DrawbackClaimStateError,
+  DrawbackEvidenceRequiredError,
+} from "../../modules/trade/domain/trade-errors";
 import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
@@ -1555,6 +1569,36 @@ function domainStatus(error: DomainError): number {
     error instanceof DeclarationIncompleteError ||
     error instanceof HsCodeDuplicateError ||
     error instanceof HsCodeFrozenError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-051 (W-38 — T-11 + T-12, dated 2026-11-25): the trade
+  // bonded/drawback plane's statuses — registered in the SAME
+  // increment that ships the routes (the PHASE-045 T-03 lesson). The
+  // 404s: the two registers' not-founds (A7 parity). The 409s: the
+  // registers' ladder conflicts (the stamp law's raced/terminal moves,
+  // the exactly-once replay refusal) + the two natural keys ((tenant,
+  // move_no) and (tenant, claim_no)) + **G-66's own structural face —
+  // THE SHARED GATE'S TYPED REFUSAL (BONDED_STOCK_SUSPENDED — the
+  // duty-suspended stock blocked from customer issue; the conflict is
+  // the position's own state, resolved by the release)** + BR-107's
+  // release-shape laws + BR-108's export-evidence gate. The policy
+  // class — the line shapes (BONDED_LINE_INVALID) — falls through to
+  // the 422 default exactly as the family law documents it.
+  if (
+    error instanceof BondedMoveRecordNotFoundError ||
+    error instanceof DrawbackClaimRecordNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (
+    error instanceof BondedMoveDuplicateError ||
+    error instanceof BondedMoveStateError ||
+    error instanceof BondedStockSuspendedError ||
+    error instanceof BondedReleaseShapeError ||
+    error instanceof DrawbackClaimDuplicateError ||
+    error instanceof DrawbackClaimStateError ||
+    error instanceof DrawbackEvidenceRequiredError
   ) {
     return HttpStatus.CONFLICT;
   }

@@ -541,3 +541,156 @@ export class HsCodeFrozenError extends DomainError {
     );
   }
 }
+
+// ── the bonded plane (T-11 — G-66/BR-107, the 0121 §4 register) ─────────────
+
+export class BondedMoveRecordNotFoundError extends DomainError {
+  constructor(details: { moveId: string }) {
+    super(
+      "BONDED_MOVE_RECORD_NOT_FOUND",
+      `bonded warehouse move ${details.moveId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, move_no) natural key is unique (the 0121 uq) — the
+ * service refuses BY NAME before the DB floor. */
+export class BondedMoveDuplicateError extends DomainError {
+  constructor(details: { moveNo: string }) {
+    super(
+      "BONDED_MOVE_DUPLICATE",
+      `a bonded warehouse move numbered ${details.moveNo} already exists in this tenant (the (tenant, move_no) key is unique — uq_bonded_warehouse_moves_tenant_no)`,
+      details,
+    );
+  }
+}
+
+/** THE LADDER'S OWN REFUSAL (the 0121 execution stamp law — DRAFT →
+ * EXECUTED, terminal; the typed refusal names the register and the
+ * illegal move's reason: the line floors, the in-bond shape's own
+ * laws, the release's source law). */
+export class BondedMoveStateError extends DomainError {
+  constructor(details: {
+    moveId: string;
+    moveNo: string;
+    from: string;
+    to: string;
+    reason: string;
+  }) {
+    super(
+      "BONDED_MOVE_STATE",
+      `bonded move ${details.moveNo} is ${details.from} — ${details.reason} (the move to ${details.to} is refused)`,
+      details,
+    );
+  }
+}
+
+/** The bonded lines' shape floor (the 0121 CHECKs' caller-side face:
+ * the lines array's shape, the item/qty floors, the same-item pairs). */
+export class BondedLineInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super(
+      "BONDED_LINE_INVALID",
+      `the bonded move line is refused at ${details.field}: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+/**
+ * G-66's OWN STRUCTURAL FACE — THE SHARED GATE'S TYPED REFUSAL (D-08:
+ * «the duty-suspended stock is BLOCKED from customer issue while
+ * suspended»; the reservations law — NO new invariant identifier is
+ * minted for the block: the restriction is G-66's own reserved
+ * wording's structural face). The refusal names the stock + the bond
+ * (the position, the suspended quantity, the bond ledger's own
+ * figures).
+ */
+export class BondedStockSuspendedError extends DomainError {
+  constructor(details: {
+    itemId: string;
+    warehouseId: string;
+    suspendedQty: string;
+    onHand: string;
+  }) {
+    super(
+      "BONDED_STOCK_SUSPENDED",
+      `item ${details.itemId} at warehouse ${details.warehouseId} carries ${details.suspendedQty} duty-suspended units in the customs bond (G-66 — the position is blocked from issue while suspended; on-hand ${details.onHand}) — release the bond first (the release recognizes the duty, BR-107)`,
+      details,
+    );
+  }
+}
+
+/** BR-107's release-shape laws (D-08/D-11: the release-only trigger,
+ * the declaration link, the exactly-once replay, the fail-closed
+ * purpose). */
+export class BondedReleaseShapeError extends DomainError {
+  constructor(details: { moveNo: string; reason: string }) {
+    super(
+      "BONDED_RELEASE_SHAPE",
+      `the release ${details.moveNo} is refused: ${details.reason} (BR-107 — the release recognizes the duty exactly once)`,
+      details,
+    );
+  }
+}
+
+// ── the drawback plane (T-12 — BR-108, the 0121 §5 register) ────────────────
+
+export class DrawbackClaimRecordNotFoundError extends DomainError {
+  constructor(details: { claimId: string }) {
+    super(
+      "DRAWBACK_CLAIM_RECORD_NOT_FOUND",
+      `duty drawback claim ${details.claimId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, claim_no) natural key is unique (the 0121 uq) — the
+ * service refuses BY NAME before the DB floor. */
+export class DrawbackClaimDuplicateError extends DomainError {
+  constructor(details: { claimNo: string }) {
+    super(
+      "DRAWBACK_CLAIM_DUPLICATE",
+      `a drawback claim numbered ${details.claimNo} already exists in this tenant (the (tenant, claim_no) key is unique — uq_duty_drawback_claims_tenant_no)`,
+      details,
+    );
+  }
+}
+
+/** THE WORKFLOW'S OWN REFUSAL (the 0121 stamp laws' fold — DRAFT →
+ * SUBMITTED → UNDER_REVIEW → APPROVED | REJECTED, APPROVED → PAID;
+ * the typed refusal names the claim and the illegal move's reason). */
+export class DrawbackClaimStateError extends DomainError {
+  constructor(details: {
+    claimId: string;
+    claimNo: string;
+    from: string;
+    to: string;
+    reason: string;
+  }) {
+    super(
+      "DRAWBACK_CLAIM_STATE",
+      `drawback claim ${details.claimNo} is ${details.from} — ${details.reason} (the move to ${details.to} is refused)`,
+      details,
+    );
+  }
+}
+
+/**
+ * BR-108'S EXPORT-EVIDENCE GATE (D-12's own wording): the claim's
+ * submission requires the linked export evidence — the export
+ * declaration OR the export bill of lading; the typed refusal names
+ * the claim + the missing evidence (the 0121 evidence floor's
+ * caller-side face).
+ */
+export class DrawbackEvidenceRequiredError extends DomainError {
+  constructor(details: { claimNo: string }) {
+    super(
+      "DRAWBACK_EVIDENCE_REQUIRED",
+      `drawback claim ${details.claimNo} cannot submit without linked export evidence (BR-108): link the export declaration or the export bill of lading first (the claim's own proof of export)`,
+      details,
+    );
+  }
+}

@@ -2,6 +2,7 @@ import { Module, type OnModuleInit } from "@nestjs/common";
 
 import { AccountingModule } from "../accounting/accounting.module";
 import { AuditModule } from "../audit/audit.module";
+import { InventoryModule } from "../inventory/inventory.module";
 import { NotificationsModule } from "../notifications/notifications.module";
 import { PurchasingModule } from "../purchasing/purchasing.module";
 import { LcService } from "./application/lc-service";
@@ -10,6 +11,8 @@ import { IncotermsService } from "./application/incoterms-service";
 import { TransportService } from "./application/transport-service";
 import { TrackingService } from "./application/tracking-service";
 import { CustomsService } from "./application/customs-service";
+import { BondedService } from "./application/bonded-service";
+import { DrawbackService } from "./application/drawback-service";
 import { TradeExpirySweepService } from "./application/trade-expiry-sweep-service";
 import { registerTradeExpiryJob } from "./infrastructure/trade-expiry-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
@@ -23,6 +26,7 @@ import {
   TradeTransportController,
 } from "./presentation/trade-transport.controller";
 import { TradeCustomsController } from "./presentation/trade-customs.controller";
+import { TradeBondedController } from "./presentation/trade-bonded.controller";
 
 /**
  * PHASE-051 (W-34 — T-05 + T-06, 2026-11-25; W-35 — T-07 + T-08,
@@ -59,12 +63,24 @@ import { TradeCustomsController } from "./presentation/trade-customs.controller"
  * import is one-directional (purchasing consumes the trade gates
  * through PLAIN FUNCTIONS — the order gate + the customs landed-cost
  * floor; the trade module consumes the landed-cost SERVICE through
- * the module import — never a cycle)). The remaining plane
- * (bonded/drawback W-38) extends THIS module with its own services
- * and stores on the same keys.
+ * the module import — never a cycle)) + **THE BONDED ENGINE (W-38 —
+ * T-11, 2026-11-25: G-66's in-bond transfer through the REAL movement
+ * core with NO duty entry + BR-107's exactly-once release recognition
+ * through the revaluation discipline + THE SHARED GATE at the movement
+ * core's planIssue — the bonded-gate plain function, the hold-gate
+ * precedent's own shape) + THE DRAWBACK ENGINE (W-38 — T-12: BR-108's
+ * export-evidence gate + the honest no-GL workflow — the claim is a
+ * registry record, the refund lands when treasury records it, 053's
+ * surface)**. The bonded engine's revaluation ride goes through the
+ * InventoryModule import (the RevaluationService export — the
+ * purchasing module's own wiring precedent; one-directional, never a
+ * cycle: the movement core consumes the trade gate through the plain
+ * function, the bonded service consumes the movement core and the
+ * revaluation service through the module's exported surface). The
+ * remaining plane (web W-39) extends the screens on the same keys.
  */
 @Module({
-  imports: [AccountingModule, AuditModule, NotificationsModule, PurchasingModule],
+  imports: [AccountingModule, AuditModule, InventoryModule, NotificationsModule, PurchasingModule],
   controllers: [
     TradeLcController,
     TradeCollectionsController,
@@ -72,6 +88,7 @@ import { TradeCustomsController } from "./presentation/trade-customs.controller"
     TradeTransportController,
     TradeTrackingController,
     TradeCustomsController,
+    TradeBondedController,
   ],
   providers: [
     LcService,
@@ -80,6 +97,8 @@ import { TradeCustomsController } from "./presentation/trade-customs.controller"
     TransportService,
     TrackingService,
     CustomsService,
+    BondedService,
+    DrawbackService,
     TradeExpirySweepService,
   ],
   exports: [
@@ -89,6 +108,8 @@ import { TradeCustomsController } from "./presentation/trade-customs.controller"
     TransportService,
     TrackingService,
     CustomsService,
+    BondedService,
+    DrawbackService,
     TradeExpirySweepService,
   ],
 })

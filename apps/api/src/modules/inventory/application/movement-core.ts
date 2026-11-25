@@ -38,6 +38,10 @@ import { wacIssue, wacReceive } from "../domain/valuation/wac";
 // precedent's own choke-point wiring; the quality module's read of its
 // own register, no cycle — the store is a leaf).
 import { assertNoActiveBatchHolds } from "../../quality/application/hold-gate";
+// PHASE-051 (W-38 — T-11, D-08): the bonded gate — the SECOND shared
+// blocking validation (G-66's own structural face), the plain-function
+// contract (the hold-gate import shape).
+import { assertNoBondedSuspension } from "../../trade/infrastructure/bonded-gate";
 
 /**
  * Movement core (PHASE-010 T5; INV-010/INV-017/INV-018): the ONLY writer
@@ -705,6 +709,18 @@ export async function planIssue(input: {
    * gated with NO exception (the shared blocking validation service is
    * the ONLY gate; see quality/application/hold-gate.ts). */
   allowHeldBatch?: boolean;
+  /** PHASE-051 (W-38 — T-11, D-08): the trade module's own bonded paths
+   * (the in-bond transfer and the release — sourceType `bonded_move`)
+   * are the SOLE callers allowed to move duty-suspended stock: the
+   * physical in-bond transfer and the release INTO free circulation are
+   * the typed callers that legitimately move suspended stock (the
+   * beneficiary discipline, never a silent bypass — the same shape as
+   * the quality module's allowHeldBatch). Every other path — the
+   * baseline sales delivery, the manual issue, the transfer dispatch,
+   * the 044 WMS picking paths — is gated with NO exception: G-66's own
+   * structural face (the duty-suspended stock is BLOCKED from customer
+   * issue while suspended). */
+  allowBondedStock?: boolean;
   memo?: string | null;
   memoAr?: string | null;
   /** PHASE-044 (INV-029, directed picking §2.4): restrict the bin
@@ -853,6 +869,26 @@ export async function planIssue(input: {
       ),
     ];
     await assertNoActiveBatchHolds(gateBatchIds);
+  }
+
+  // PHASE-051 (W-38 — T-11, D-08): THE SECOND SHARED BLOCKING VALIDATION
+  // — G-66's own structural face, wired at the INV-035 gate's own choke
+  // point (every issue/ship path passes it BY CONSTRUCTION — the raw
+  // plan, the manual issue, the sales delivery, the transfer dispatch,
+  // the 044 WMS picking paths): a position whose bond-ledger pool is
+  // POSITIVE refuses the issue with the typed 409 BONDED_STOCK_SUSPENDED
+  // (naming the stock + the bond + the figures) BEFORE any slice is
+  // valued or applied — ZERO residue. The sole bypass: the trade
+  // module's own bonded paths (allowBondedStock — the in-bond transfer
+  // and the release are the typed callers that legitimately move
+  // suspended stock; see the input's dated comment). The flag OFF = the
+  // gate silent (the bonded-gate's own probe).
+  if (input.allowBondedStock !== true) {
+    await assertNoBondedSuspension({
+      itemId: input.itemId,
+      warehouseId: input.warehouseId,
+      onHand,
+    });
   }
 
   const slices: IssuePlan["slices"] = [];
