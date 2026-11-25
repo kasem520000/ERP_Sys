@@ -1728,6 +1728,66 @@ order.** The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا
 + the Incoterms registry with BR-106's selector mandate) under the
 owner's standing order. NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-25 (PHASE-051 W-35 DELIVERED at the engine head
+`f478170` + the spec head `e2bbfa6` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERION #6'S REGISTRY/SELECTOR ENGINE ARMS
+GREEN + THE COLLECTIONS ENGINE ARMS GREEN (the register's engine plane).**
+THE INCOTERM SELECTION IS MANDATORY ON TRADE-FLAGGED ORDERS (BR-106 —
+the owner's ruling (ج) VERBATIM): the shared order gate
+(`trade-order-gate.ts` — the documented-contract surface) probes the
+tenant's `trade` entitlement, resolves the base currency, renders the
+PURE fold's trigger verdict (the currency arm OR the marker arm, both
+NAMED), and REFUSES the order's own posting with the typed
+ORDER_INCOTERM_REQUIRED naming the order + the missing field + the
+arms — ZERO residue (the number never reserves, the row stays DRAFT/
+APPROVED, no issuance audit; proven on BOTH order families: the PO and
+the SO through its approval hop). THE RISK-HINT MATRIX RENDERS FROM THE
+REGISTRY ROW'S OWN DATA: `trade-incoterms.db.spec` proves the five AR/EN
+lines flip with the row's booleans (CIF · DDP · EXW's own 2020 shapes),
+the matrix DATA riding the registry (0120's ownership columns — never a
+parallel dictionary). THE REGISTRY LISTS THE SEEDED SET AND ACCEPTS
+TENANT ADDITIONS (the engine arms — the page renders on W-39's surface
+wave): the canonical seeds materialize through the ONBOARDING path (the
+0122 §6 note's own demand — `trade-canonical.ts`, one source both paths,
+the accuracy disclaimer on every starter row, idempotent); the tenant
+addition refuses the (tenant, code) natural key BY NAME; the frozen
+code (the identity never rewritten); the retirement's SNAPSHOT
+semantics (a retired code never rides a NEW order; an order created
+before the retirement keeps its recorded selection and posts). THE
+COLLECTIONS ENGINE (T-07 — the D/P vs D/A settlement windows over real
+PG16): both golden lifecycles (at sight and usance) with the settled
+pair landing TOGETHER, the register's own evidence telling the terms
+apart (a D/A's acceptance precedes its payment; a D/P's at-sight
+acceptance lands with the payment — declared interpretation #4, the
+0119 accepted_shape floor rendered VERBATIM), the usance floor, the
+terms gates, the stamp law's OPEN-only exit, the terminal law, and THE
+NON-LEDGER LAW (zero journal entries, zero cash movements — the money
+lands through the existing receipts discipline; the reservations law
+rides it: no posting identifier minted). THE WAVE'S HONEST CATCHES (two,
+both first-RED-proven then repaired, disclosed at the claim sites): the
+at-sight acceptance (above) + this gate's three order-dependent
+purchasing assertions (vitest's duration-based file sort reorders the
+suite across sessions — the golden G-07/G-08 GRNI-register TOTAL, the
+G-08 receipt lookup, the operations A7 count; reproduced at the FULL
+W-34 tree in this session, proving them pre-existing; the repair scopes
+every assertion to the arm's OWN rows — the per-arm-world law
+«أذرع الرفض كلٌّ على عالمه» restored; the re-run GREEN in every order).
+The battery: the six isolates standalone first, the ELEVEN-PART
+ENVELOPE 305 · 4,407 · 0 failed · 0 skipped (the coverage verified
+before the first load run), the 124-chain scratch from zero TWICE
+(check-rls OK — 354 catalog tables), the standing battery green at the
+final code state (typecheck 8/8 · lint 8/8 · depcruise 2,221 · 16,568 ·
+unit 171 · 2,072 · drift 357 = 357 · ROUTE_PERMISSIONS 1,181 · docs
+33/33 · id-ledger 0 errors + the self-test all-probes-OK ·
+history-secrets 0 violations · the shells and the boundary PASS —
+`audit-evidence/phase051-w35/`). **RISK-033: EIGHT incidents, ZERO new
+this wave — the row stays OPEN, closing only by the owner's order.**
+The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة
+خارجها. NEXT: W-36 (the transport documents + the shipment tracking —
+the pure fold FIRST per D-14) under the owner's standing order. NOT
+production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

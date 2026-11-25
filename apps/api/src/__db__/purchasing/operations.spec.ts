@@ -60,6 +60,32 @@ describe("A7 — tenant isolation (spoof parity)", () => {
   });
 
   it("the RLS policies hold on the raw plane (app role sees only tenant P's purchasing rows)", async () => {
+    // PHASE-051 (W-35 — the gate increment's HONEST CATCH, first-RED-proven
+    // then repaired): the per-arm-world law restored — the count's own row.
+    // The suite's files share tenant P and vitest's duration-based file sort
+    // reorders the family across sessions: this arm previously assumed a
+    // PRIOR spec's purchase order existed (an order-dependent absolute);
+    // the repair creates the arm's OWN order first, so the raw-plane count
+    // is > 0 BY CONSTRUCTION in every run order.
+    const own = await withTenant(TENANT_P, () =>
+      purchaseOrders.create({
+        branchId: fixture.branchId,
+        supplierId: fixture.supplierId,
+        orderDate: P_JAN,
+        expectedDate: null,
+        currencyCode: "SAR",
+        exchangeRate: null,
+        note: "A7 raw-plane own row",
+        noteAr: null,
+        requestId: null,
+        revisionOfId: null,
+        actorId: P_ACTOR,
+        lines: [
+          { itemId: fixture.items.wac, qty: "1", unitPrice: "1.000000", taxCodeId: null, requestLineId: null, note: null },
+        ],
+      }),
+    );
+    expect(own.status).toBe("DRAFT");
     const client = await purchasingAppClient();
     const result = await client.query("SELECT count(*)::int AS n FROM purchase_orders");
     expect(result.rows[0]!.n).toBeGreaterThan(0);

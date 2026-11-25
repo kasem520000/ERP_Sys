@@ -1,0 +1,9 @@
+# PHASE-051 W-35 — i18n-parity.log (the standing battery, the final code state)
+# started: 2026-11-25T03:47:55Z
+
+> erp-platform@0.1.0 check:i18n-parity /home/z/my-project/ERP_Sys_051
+> tsx scripts/check-i18n-parity.ts
+
+== i18n key parity: ar=7253 keys, en=7253 keys ==
+ar/en catalogs at 100% key parity; no empty values.
+EXIT=0

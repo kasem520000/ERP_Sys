@@ -1,0 +1,10 @@
+# PHASE-051 W-35 — mobile-tokens.log (the standing battery, the final code state)
+# started: 2026-11-25T03:47:57Z
+
+> erp-platform@0.1.0 check:mobile-tokens /home/z/my-project/ERP_Sys_051
+> tsx scripts/check-mobile-tokens.ts
+
+== mobile token parity: 130/130 ==
+== mobile token derivations: 50/50 ==
+canonical ⊆ mobile on every token family; RN adaptations derive from the canonical values.
+EXIT=0

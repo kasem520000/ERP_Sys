@@ -1,0 +1,8 @@
+# PHASE-051 W-35 — permissions-drift.log (the standing battery, the final code state)
+# started: 2026-11-25T03:47:48Z
+
+> erp-platform@0.1.0 check:permissions-drift /home/z/my-project/ERP_Sys_051
+> tsx scripts/check-permissions-drift.ts
+
+[permissions-drift] OK — matrix 357 keys, seed 357 keys
+EXIT=0

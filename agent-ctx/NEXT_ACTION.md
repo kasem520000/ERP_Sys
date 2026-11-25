@@ -1,4 +1,81 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-34 THE LC ENGINE + THE EXPIRY SWEEP DELIVERED (2026-11-25, this session — the engine `7291513` → the DB specs `3f98aa7`, every step pushed at its own commit)** — W-35 NEXT (the documentary collections API (D/P + D/A, the settlement linkage) + the Incoterms registry + the PO/SO selector with BR-106's risk-hint matrix) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-35 COLLECTIONS + INCOTERMS DELIVERED (2026-11-25, this session — the engines `f478170` → the DB specs `e2bbfa6` → the gate increment, every step pushed at its own commit)** — W-36 NEXT (the transport documents: the bills of lading (the multimodal types) + the packing lists + the shipment tracking events driving the document status — THE PURE FOLD FIRST per D-14) under the standing order — تسليم لا قبول
+
+**W-35 — COLLECTIONS + INCOTERMS (T-07 + T-08, delivered on the W-34
+gate head `0d40d2c` in two increments + this gate):** THE PURE LAYERS
+FIRST (the unit-first law): `collections-lifecycle.ts` — the D/P vs D/A
+settlement-windows fold (OPEN → PRESENTED → ACCEPTED (the usance act,
+D/A ONLY) → PAID | CANCELLED; the terms-gated settle windows; THE STAMP
+LAW'S OPEN-ONLY EXIT — the 0119 XOR floors' own reading: the presentation
+and acceptance stamps are monotone evidence that never un-stamp; the
+usance floor; the settlement pair law) with 11 property tests ·
+`incoterm-matrix.ts` — the ownership-matrix fold (five AR/EN risk-hint
+lines rendered from the registry ROW'S OWN booleans — carriage ·
+insurance · export clearance · import clearance · import duty; zero
+parallel dictionary) + **BR-106's mandate trigger fold (the owner's
+ruling (ج) VERBATIM: «currency ≠ base currency, or the order carries the
+import/export tag» — the two arms NAMED in the verdict)** with 10
+property tests → **the collections service** (T-07 — create with the
+official `COLL-{YYYY}-{SEQ:6}` reserved at create → present → accept
+(D/A only) → settle (the paid stamps + the settled pair landing
+TOGETHER; THE AT-SIGHT ACCEPTANCE — declared interpretation #4, the
+0119 accepted_shape floor rendered VERBATIM: a PAID row carries the
+full ceremony, a D/P's acceptance and payment one banking event) →
+cancel (OPEN only); **the register carries NO GL entry** — the
+non-ledger-document law's trade face, the reservations law rides it) →
+**the incoterms registry service** (T-08 — the reads render the matrix
+from the row's own data; the tenant additions with the (tenant, code)
+natural key refused BY NAME; the frozen code (the identity never
+rewritten); the retirement's snapshot semantics) → **THE SHARED ORDER
+GATE** (`trade-order-gate.ts` — the documented-contract surface consumed
+by the purchasing AND sales create/issue acts through the plain-function
+import shape, never a module coupling: the selection floor at create +
+**THE MANDATE AT THE ORDER'S OWN POSTING** — the entitlement probe → the
+base-currency resolve → the pure fold's verdict → the typed
+ORDER_INCOTERM_REQUIRED naming the order + the missing field + the arms,
+ZERO residue, the number never reserves; the flag OFF = the gate
+silent) → **THE ONBOARDING HOOK** (`trade-canonical.ts` — the
+Incoterms-2020 set + the HS chapter starter, ONE SOURCE both paths, the
+accuracy disclaimer on every starter row «البذور بإقرار الدقة», wired as
+the provisioning flow's step 1e) → **migration 0124_trade_order_incoterms**
+(the orders' incoterm_code + trade_direction additive NULLABLE column
+pairs on purchase_orders AND sales_orders — BR-106's mandate floor; NO
+FK by design (the tenant-extensible registry with a DELETE grant); the
+chain 123 → 124) → THE ELEVEN-ROUTE CONTROLLER (the collections
+register acts on trade.collections.manage · the collections + incoterms
+reads on trade.view (the matrix row's OWN wording names the
+LC/collections registers — the finance-read plane) · the incoterms
+tenant-addition MANAGEMENT on trade.collections.manage — the dated
+interpretation at the block; the routes feature-gated on the
+whole-module unit `trade`) — **ROUTE_PERMISSIONS 1,170 + 11 = 1,181**
+(the keys-seed-first SECOND trade binding wave). **THE WAVE'S HONEST
+CATCHES (two, both first-RED-proven then repaired, disclosed at the
+claim sites): (1) THE AT-SIGHT ACCEPTANCE (the 0119 accepted_shape
+floor's own demand — the first D/P at-sight settle refused by the
+floor; the repair lands the acceptance together with the payment, the
+fold's terms gate unchanged); (2) this gate's THREE ORDER-DEPENDENT
+PURCHASING ASSERTIONS (vitest's duration-based file sort reorders the
+suite across sessions — the golden G-07/G-08 GRNI-register TOTAL, the
+G-08 receipt lookup, the operations A7 count; reproduced at the FULL
+W-34 tree in this session (pre-existing, never W-35 regressions); the
+repair scopes every assertion to the arm's OWN rows — the per-arm-world
+law restored, the re-run GREEN in every order).** The evidence envelope
+`audit-evidence/phase051-w35/` (the FORTY-SEVENTH consecutive
+same-session wave): the SIX isolates standalone FIRST + the
+eleven-part envelope **305 · 4,407 · 0 failed · 0 skipped** (the
+coverage verified before the first load run) + the 124-chain scratch
+from zero TWICE (check-rls OK — 354 catalog tables) + the standing
+battery (typecheck 8/8 · lint 8/8 · depcruise 2,221/16,568 · unit
+171 · 2,072 (api 82·1,028) · drift 357 = 357 · ROUTE_PERMISSIONS 1,181
+· manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors +
+all-probes-OK · history-secrets 0 violations · capabilities agree ·
+shells PASS/PASS · boundary PASS). **W-36 (the transport documents +
+the shipment tracking) waits on the owner's dispatch under the standing
+order. RISK-033: EIGHT incidents, ZERO new — the row stays OPEN. NOT
+production approval — تسليم لا قبول.**
+
+---
+
+# The W-34 LC-engine record (the historical context below)
 
 **W-34 — THE LC ENGINE + THE EXPIRY SWEEP (T-05 + T-06, delivered on the
 W-33 gate head `4368187` in two increments + this gate):** THE TRADE MODULE

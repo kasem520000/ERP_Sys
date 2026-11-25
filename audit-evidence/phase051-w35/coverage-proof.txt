@@ -1,0 +1,14 @@
+PHASE-051 W-35 — the coverage proof (the W-15 law: verified BEFORE the
+first load run).
+
+inventory (the disk glob src/__db__/**/*.spec.ts, sorted): 305 files
+union (parts.json — the W-34 partition standing + the TWO declared
+movements: the trade-collections + trade-incoterms specs join chunk-a
+at their alphabetical positions, 115 → 117 — the W-24/W-34
+quality-schema/trade-lc precedent's own move): 305 files
+
+missing NONE · extra NONE · duplicates NONE
+305 = 305 — VERDICT: COVERED
+
+The arithmetic declared BEFORE the first load run:
+305 = 1+1+1+1+1+1+3+5+117+86+88 EXACT

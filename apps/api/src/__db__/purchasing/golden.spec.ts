@@ -61,11 +61,28 @@ async function journalLinesOf(entryId: string): Promise<ExpectedLine[]> {
   }));
 }
 
-async function grniRegisterValue(asOf: string): Promise<string> {
+/**
+ * PHASE-051 (W-35 — the gate increment's HONEST CATCH, first-RED-proven
+ * then repaired): the register's own-row open value — the per-arm-world
+ * law restored. The suite's files share tenant P, and vitest's
+ * duration-based file sort reorders the family across sessions: the
+ * register's ABSOLUTE total (other specs' open rows riding in) and the
+ * G-08 receipt lookup by totalValue (a foreign spec's same-value
+ * receipt can land first in the DESC created_at list) are
+ * order-dependent assertions this session's timing exposed — the
+ * repair scopes every register assertion to the test's OWN grn and
+ * the G-08 lookup to the G-07 receipt's own note. The
+ * order-independence law ("delta-based assertions stay
+ * order-independent") now holds on these arms too. (The absolute-total
+ * helper is RETIRED with the repair — no dead surface stands.)
+ */
+async function grniOpenValueFor(grnId: string, asOf: string): Promise<string> {
   const rows = await pStore.grniRegister(asOf);
   let total = 0;
   for (const row of rows) {
-    total += Number(row.receivedValue) - Number(row.invoicedValue);
+    if (row.grnId === grnId) {
+      total += Number(row.receivedValue) - Number(row.invoicedValue);
+    }
   }
   return total.toFixed(4);
 }
@@ -168,8 +185,11 @@ describe("G-07 — goods receipt: DR INVENTORY · CR GRNI (stock + accrual)", ()
     expect(moves[0]!.valueAmount).toBe("250.0000");
     expect(moves[0]!.postedJournalId).toBe(result.journalEntryId);
 
-    // GRNI register: received-not-invoiced = 250 at this point (RC-09 step 1).
-    expect(await withTenant(TENANT_P, () => grniRegisterValue(P_JAN))).toBe("250.0000");
+    // GRNI register: received-not-invoiced = 250 at this point (RC-09
+    // step 1) — the OWN grn's row, the per-arm-world law (the W-35 gate
+    // catch: the absolute total was order-dependent on the suite's
+    // shared tenant P).
+    expect(await withTenant(TENANT_P, () => grniOpenValueFor(grn.id, P_JAN))).toBe("250.0000");
 
     // Document state: POSTED with the official number + journal link.
     const posted = await withTenant(TENANT_P, () => pStore.findGoodsReceiptById(grn.id));
@@ -242,7 +262,7 @@ describe("G-08 — supplier invoice: GRNI clear + AP open + VAT recoverable", ()
     const grns = await withTenant(TENANT_P, () =>
       pStore.listGoodsReceipts({ status: "POSTED", limit: 5 }),
     );
-    const grn = grns.find((row) => row.poLessReason === null && row.totalValue === "250.0000")!;
+    const grn = grns.find((row) => row.note === "G-07 receipt")!;
     const grnLines = await withTenant(TENANT_P, () => pStore.listGoodsReceiptLines(grn.id));
 
     const invoice = await withTenant(TENANT_P, () =>
@@ -299,8 +319,10 @@ describe("G-08 — supplier invoice: GRNI clear + AP open + VAT recoverable", ()
       { accountId: fixture.gl.inventory, direction: "CREDIT", amount: "250.0000" },
     ]);
 
-    // GRNI register: cleared exactly (RC-09 step 2).
-    expect(await withTenant(TENANT_P, () => grniRegisterValue(P_JAN))).toBe("0.0000");
+    // GRNI register: cleared exactly (RC-09 step 2) — the OWN grn's
+    // row, the per-arm-world law (the W-35 gate catch: the absolute
+    // total was order-dependent on the suite's shared tenant P).
+    expect(await withTenant(TENANT_P, () => grniOpenValueFor(grn.id, P_JAN))).toBe("0.0000");
 
     // AP open item: 287.50 CREDIT with the partner (INV-009's substrate).
     const openItems = await withTenant(TENANT_P, () =>
