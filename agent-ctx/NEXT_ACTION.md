@@ -1,4 +1,94 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-35 COLLECTIONS + INCOTERMS DELIVERED (2026-11-25, this session — the engines `f478170` → the DB specs `e2bbfa6` → the gate increment, every step pushed at its own commit)** — W-36 NEXT (the transport documents: the bills of lading (the multimodal types) + the packing lists + the shipment tracking events driving the document status — THE PURE FOLD FIRST per D-14) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-36 TRANSPORT DOCUMENTS + SHIPMENT TRACKING DELIVERED (2026-11-25, this session — the engines `258c49a` → the DB specs `5653574` → the gate increment, every step pushed at its own commit)** — W-37 NEXT (the customs engine — T-10: the declarations + lines API, the HS registry extension, the duty computation into the landed costs (G-65 — D-06) with INV-036's completeness gate (D-07); the duty/VAT line fold a PURE module FIRST) under the standing order — تسليم لا قبول
+
+**W-36 — TRANSPORT DOCUMENTS + SHIPMENT TRACKING (T-09 + T-13, delivered
+on the W-35 gate head `0fc3d4c` in two increments + this gate):** THE PURE
+FOLD FIRST (D-14 — the unit-first law): `tracking-fold.ts` — THE TOTAL
+STATUS × EVENT MATRIX (the carrier ladder BOOKED/DEPARTED/ARRIVED/
+CLEARED/DELIVERED, ranks 0…4; every document rung × milestone carries a
+verdict: strictly above → ADVANCE (the multi-rung leap allowed — the fold
+does not demand intermediate events); the diagonal → NOOP (the idempotent
+re-assert — the event records, the status stays); strictly below →
+REFUSED as a drive (THE MONOTONE LADDER — an event never regresses a
+document's status; the event still records in the append-only log — the
+0122 comment's own law «this table is only the append-only log», the
+monotone law lives in the fold); the unknown event and the unknown
+current → the typed vocabulary refusals) with 10 property tests (the full
+5×5 product walked, the never-regress invariant asserted over the whole
+product) → **the transport documents API** (T-09 — NO journal, NO ledger
+effect anywhere: the transport documents are shipping evidence, the
+non-ledger-document law's trade face; the reservations law rides it):
+createBl (the official BL-{YYYY}-{SEQ:6} reserved AT CREATE; the
+multimodal vocabulary SEA/AIR/ROAD/RAIL/MULTIMODAL; the commercial links
+PO import leg + delivery-note export leg — acceptance #8's chain
+navigable; the container refs as JSONB data; the shipment_status NEVER
+moves by hand — THE FOLD DRIVES IT, the transport service exposes NO
+status write) → findBl (the B/L + its packing lists + its events — the
+chain's own read) → listBls → createPackingList (the official
+PL-{YYYY}-{SEQ:6}; THE ANCHOR LAW — the declared interpretation recorded
+at the claim site: the packing list is the shipment's packing document,
+the B/L link REQUIRED at the service floor (the 0120 FK nullable for the
+raw plane, the engine demands the shipment's identity); the receipt link
+optional; the pack lines validated — description/packages/gross/net AND
+THE PHYSICAL LAW: gross ≥ net, recorded at the claim site) → **the
+shipment tracking API** (T-13): appendEvent (the anchor B/L typed 404 →
+the milestone vocabulary's typed pre-check (D-14's unknown-event refusal,
+the 0122 CHECK the DB's authority of last resort) → the event shapes →
+the optional declaration link probed with the typed 404 (the read-only
+documented contract — the declarations ENGINE is W-37's own wave) → THE
+APPEND (the carrier's facts are the truth, the log append-only S/I/U NO
+DELETE) → THE DRIVE rendered VERBATIM (the fold's verdicts per document:
+the anchor B/L + the packing lists under it + the event's OWN linked
+declaration; each ADVANCE executes as the race-safe CAS with the
+from-rung pinned (a raced status never regresses); the NOOP/REFUSED never
+move the document — the event still records; the drive's own summary
+rides the response + the audit) → the event-log reads (listEvents by B/L
+or declaration) → **THE SEVEN-ROUTE CONTROLLER** (the transport family:
+trade.shipments.view over the reads + trade.shipments.manage over the
+creates — the family's OWN view key, the LC precedent's shape; the
+tracking family: trade.shipments.view over the log reads +
+trade.shipments.manage over THE APPEND) — **ROUTE_PERMISSIONS 1,181 + 7
+= 1,188** (the keys-seed-first THIRD trade binding wave, dated at the
+block) · the error filter's domainStatus chain registered the W-36 codes
+in the SAME increment that ships the routes. **NO MIGRATION THIS WAVE**
+(the 0120/0122 floors landed at W-33 and the chain stands at 124 — the
+declared slots' constants law, zero additive slot demanded by this
+wave's writers). **THE WAVE'S HONEST CATCHES (three disclosures at this
+gate, no battery red standing): (1) THE EXIT-CODE DISCOVERY (this
+session's own — the guarded wrapper hardened in response): on DB-suite
+runs the vitest process EXIT CODE IS NOT TRUSTWORTHY ON RED —
+embedded-postgres's async-exit-hook converts the natural beforeExit exit
+(vitest's pending exitCode=1 after failed tests) into an explicit
+process.exit(0); proven by a deliberate failing diagnostic (exit 0 with 1
+failed); the wrapper now verifies the vitest SUMMARY lines (zero failed
+files AND zero failed tests) in addition to the exit stamp; (2) THE SOAK
+ISOLATE'S ENVIRONMENTAL RED (run 1's end-of-window sample caught a
+5-deep tail backlog — lastDepth 5 vs baseline 1+2, the machine still
+settling after the fresh install; the RED log kept at
+`db-isolate-soak-env-RED.log`; the re-run GREEN 1·1 at 228.29s —
+environmental, never a code red: the soak path touches no trade code);
+(3) THE SCRATCH INVOCATION SLIP (the W-0/W-33 class — the first scratch
+invocation passed the repo-root-relative path; ERR_MODULE_NOT_FOUND
+before any DB work; the slip log kept; re-invoked through the filter's
+apps/api cwd, both runs green).** The evidence envelope
+`audit-evidence/phase051-w36/` (the FORTY-EIGHTH consecutive
+same-session wave): the SIX isolates standalone FIRST + the
+eleven-part envelope **307 · 4,422 · 0 failed · 0 skipped** (the coverage
+verified before the first load run; the one declared roster movement: the
+trade-tracking + trade-transport specs join chunk-a 117 → 119) + the
+124-chain scratch from zero TWICE (check-rls OK — 354 catalog tables) +
+the standing battery (typecheck 8/8 · lint 8/8 · depcruise 2,228/16,614 ·
+unit 172 · 2,072 (api 83·1,038 — the fold's property tests) · drift 357
+= 357 · ROUTE_PERMISSIONS 1,188 · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors + all-probes-OK · history-secrets 0 violations (7,091
+allowlisted hits — the window's shift) · capabilities agree · shells
+PASS/PASS · boundary PASS). **W-37 (the customs engine) waits on the
+owner's dispatch under the standing order. RISK-033: EIGHT incidents,
+ZERO new — the row stays OPEN. NOT production approval — تسليم لا
+قبول.**
+
+---
+
+# The W-35 collections + incoterms record (the historical context below)
 
 **W-35 — COLLECTIONS + INCOTERMS (T-07 + T-08, delivered on the W-34
 gate head `0d40d2c` in two increments + this gate):** THE PURE LAYERS

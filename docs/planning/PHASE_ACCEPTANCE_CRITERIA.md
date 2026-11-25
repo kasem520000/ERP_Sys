@@ -1788,6 +1788,95 @@ The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة
 the pure fold FIRST per D-14) under the owner's standing order. NOT
 production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-25 (PHASE-051 W-36 DELIVERED at the engine head
+`258c49a` + the spec head `5653574` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERION #7'S ENGINE ARMS GREEN (the
+tracking board's web arms wait on W-39's surface wave) + #8'S
+CHAIN-NAVIGABLE TRANSPORT LINK GREEN (the PO import leg through the
+REAL PO service — the chain's links navigable link-by-link as each
+lands, D-15's documented contracts).** THE TRACKING PURE FOLD (D-14 —
+the unit-first law) CAME FIRST: `tracking-fold.ts` — THE TOTAL STATUS ×
+EVENT MATRIX (the carrier ladder BOOKED/DEPARTED/ARRIVED/CLEARED/
+DELIVERED, ranks 0…4; every document rung × milestone carries a
+verdict: strictly above → ADVANCE (the multi-rung leap allowed — the
+fold does not demand intermediate events) · the diagonal → NOOP (the
+idempotent re-assert — the event records, the status stays) · strictly
+below → REFUSED as a drive (THE MONOTONE LADDER — an event NEVER
+regresses a document's status; the event still records in the
+append-only log — the 0122 comment's own law «this table is only the
+append-only log», the monotone law lives in the fold) · the unknown
+event and the unknown current → the typed vocabulary refusals) with
+its 10 property tests (the full 5×5 product walked, the never-regress
+invariant asserted over the whole product). THE DRIVE AT THE SERVICE
+(`trade-tracking.db.spec`, 9 arms, the fold's output rendered VERBATIM
+at the service floor): THE GOLDEN LADDER (every rung advances the
+anchor B/L AND both packing lists; the log carries all five events in
+order) · THE MONOTONE LAW AT THE SERVICE (a regressing event RECORDS —
+the carrier's late-arriving fact is the truth — but NEVER regresses a
+document) · THE MULTI-RUNG LEAP (a fresh world's DELIVERED event
+advances BOOKED → DELIVERED directly) · THE DECLARATION DRIVE (the
+event's OWN linked declaration advances with the shipment — the
+customs leg; the 0121 shipment_status column proven as the fold's own
+output) · the milestone vocabulary's typed refusal (ZERO residue — no
+event row) · the event shapes · the unknown-B/L typed 404 · the
+declaration link's typed 404 (the unknown declaration refuses the
+append — the event never records, the documents never moved) · the
+event-log reads (the filters by B/L and by declaration). THE TRANSPORT
+DOCUMENTS (T-09 — `trade-transport.db.spec`, 6 arms, NO journal, NO
+ledger effect anywhere — the non-ledger-document law's trade face):
+THE B/L GOLDEN CREATE (the official BL-{YYYY}-{SEQ:6} · the multimodal
+type · the commercial links — the PO import leg through the REAL PO
+service · the container refs as data · THE FOLD'S INITIAL RUNG (BOOKED
+— no manual status write exists anywhere; the transport service
+exposes NO status write) · the find's own chain: the B/L + its packing
+lists + its events) · the doc-type vocabulary's refusal · the B/L's
+own floors (the empty carrier name, the blank port, the oversized
+container ref, the >50 refs) · the unknown B/L's typed 404 · THE
+PACKING LIST'S ANCHOR + SHAPES (the B/L link REQUIRED at the service
+floor — the declared interpretation recorded at the claim site; the
+pack lines validated; THE PHYSICAL LAW — gross ≥ net, the reason
+naming the law) · the list surfaces. NO migration this wave (the
+0120/0122 floors landed at W-33; the chain stands at 124 — the
+declared slots' constants law). The battery: the six isolates
+standalone first, the ELEVEN-PART ENVELOPE **307 · 4,422 · 0 failed ·
+0 skipped** (the coverage verified before the first load run; the one
+declared roster movement: the trade-tracking + trade-transport specs
+join chunk-a 117 → 119), the 124-chain scratch from zero TWICE
+(check-rls OK — 354 catalog tables), the standing battery green at the
+final code state (typecheck 8/8 · lint 8/8 · depcruise 2,228 · 16,614
+· unit 172 · 2,082 (api 83·1,038 — the fold's property tests) · drift
+357 = 357 (zero delta — no key this wave; the routes bind the EXISTING
+0122-seeded trade.shipments.* keys) · ROUTE_PERMISSIONS 1,181 + 7 =
+**1,188** (the keys-seed-first THIRD trade binding wave, dated at the
+block) · docs 33/33 · id-ledger 0 errors + the self-test all-probes-OK
+· history-secrets 0 violations (7,091 allowlisted hits — the window's
+shift) · the shells and the boundary PASS —
+`audit-evidence/phase051-w36/`). THE WAVE'S HONEST CATCHES (three
+disclosures, no battery red standing): (1) THE EXIT-CODE DISCOVERY
+(this session's own — the guarded wrapper hardened in response): on
+DB-suite runs the vitest process EXIT CODE IS NOT TRUSTWORTHY ON RED —
+embedded-postgres's async-exit-hook converts the natural beforeExit
+exit (vitest's pending exitCode=1 after failed tests) into an explicit
+process.exit(0); proven by a deliberate failing diagnostic (exit 0
+with 1 failed); the wrapper now verifies the vitest SUMMARY lines
+(zero failed files AND zero failed tests) in addition to the exit
+stamp; (2) THE SOAK ISOLATE'S ENVIRONMENTAL RED (run 1's end-of-window
+sample caught a 5-deep tail backlog — lastDepth 5 vs baseline 1+2 —
+the machine still settling after the fresh install; the RED log kept
+at `db-isolate-soak-env-RED.log`; the re-run GREEN 1·1 at 228.29s,
+the drain restored — environmental, never a code red: the soak path
+touches no trade code); (3) THE SCRATCH INVOCATION SLIP (the W-0/W-33
+class — the first scratch invocation passed the repo-root-relative
+path; ERR_MODULE_NOT_FOUND before any DB work; the slip log kept;
+re-invoked through the filter's apps/api cwd, both runs green). The
+reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة خارجها.
+NEXT: W-37 (the customs engine — T-10: the declarations + lines API,
+the HS registry extension, the duty computation into the landed costs
+(G-65 — D-06) with INV-036's completeness gate (D-07); the duty/VAT
+line fold a PURE module FIRST) under the owner's standing order. NOT
+production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),
