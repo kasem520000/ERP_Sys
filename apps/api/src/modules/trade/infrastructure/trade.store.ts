@@ -773,3 +773,239 @@ export async function findActiveIncotermByCode(code: string): Promise<IncotermRo
     SELECT ${INCOTERM_COLUMNS} FROM incoterms WHERE code = ${code} AND is_active = true LIMIT 1`);
   return rows[0];
 }
+
+// ── the transport documents (T-09 — the bills of lading + the packing lists, 0120) ──
+
+export interface BillOfLadingRow {
+  id: string;
+  blNo: string;
+  docType: string;
+  carrierName: string;
+  portOfLoading: string | null;
+  portOfDischarge: string | null;
+  containerRefs: readonly string[];
+  purchaseOrderId: string | null;
+  deliveryNoteId: string | null;
+  shipmentStatus: string;
+  issuedAt: string;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const BL_COLUMNS = sql`id, bl_no AS "blNo", doc_type AS "docType", carrier_name AS "carrierName",
+  port_of_loading AS "portOfLoading", port_of_discharge AS "portOfDischarge", container_refs,
+  purchase_order_id AS "purchaseOrderId", delivery_note_id AS "deliveryNoteId",
+  shipment_status AS "shipmentStatus", issued_at::text AS "issuedAt", note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export async function insertBl(input: {
+  blNo: string;
+  docType: string;
+  carrierName: string;
+  portOfLoading: string | null;
+  portOfDischarge: string | null;
+  containerRefs: readonly string[];
+  purchaseOrderId: string | null;
+  deliveryNoteId: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<BillOfLadingRow> {
+  const rows = await query<BillOfLadingRow>(sql`
+    INSERT INTO bills_of_lading
+      (id, tenant_id, bl_no, doc_type, carrier_name, port_of_loading, port_of_discharge,
+       container_refs, purchase_order_id, delivery_note_id, shipment_status, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.blNo}, ${input.docType},
+            ${input.carrierName}, ${input.portOfLoading}, ${input.portOfDischarge},
+            ${JSON.stringify(input.containerRefs)}::jsonb, ${input.purchaseOrderId},
+            ${input.deliveryNoteId}, 'BOOKED', ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${BL_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findBlById(id: string): Promise<BillOfLadingRow | undefined> {
+  const rows = await query<BillOfLadingRow>(sql`
+    SELECT ${BL_COLUMNS} FROM bills_of_lading WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function findBlByNo(blNo: string): Promise<BillOfLadingRow | undefined> {
+  const rows = await query<BillOfLadingRow>(sql`
+    SELECT ${BL_COLUMNS} FROM bills_of_lading WHERE bl_no = ${blNo} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listBls(filter: { docType?: string; shipmentStatus?: string; limit?: number }): Promise<BillOfLadingRow[]> {
+  const docType = filter.docType ?? null;
+  const status = filter.shipmentStatus ?? null;
+  return query<BillOfLadingRow>(sql`
+    SELECT ${BL_COLUMNS} FROM bills_of_lading
+    WHERE (${docType}::text IS NULL OR doc_type = ${docType})
+      AND (${status}::text IS NULL OR shipment_status = ${status})
+    ORDER BY created_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+export interface PackingListRow {
+  id: string;
+  plNo: string;
+  billOfLadingId: string | null;
+  receiptId: string | null;
+  lines: readonly Record<string, unknown>[];
+  shipmentStatus: string;
+  issuedAt: string;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const PL_COLUMNS = sql`id, pl_no AS "plNo", bill_of_lading_id AS "billOfLadingId",
+  receipt_id AS "receiptId", lines, shipment_status AS "shipmentStatus",
+  issued_at::text AS "issuedAt", note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export async function insertPackingList(input: {
+  plNo: string;
+  billOfLadingId: string;
+  receiptId: string | null;
+  lines: readonly Record<string, unknown>[];
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<PackingListRow> {
+  const rows = await query<PackingListRow>(sql`
+    INSERT INTO packing_lists
+      (id, tenant_id, pl_no, bill_of_lading_id, receipt_id, lines, shipment_status, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.plNo}, ${input.billOfLadingId},
+            ${input.receiptId}, ${JSON.stringify(input.lines)}::jsonb, 'BOOKED',
+            ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${PL_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findPackingListByNo(plNo: string): Promise<PackingListRow | undefined> {
+  const rows = await query<PackingListRow>(sql`
+    SELECT ${PL_COLUMNS} FROM packing_lists WHERE pl_no = ${plNo} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listPackingLists(filter: { billOfLadingId?: string; limit?: number }): Promise<PackingListRow[]> {
+  const blId = filter.billOfLadingId ?? null;
+  return query<PackingListRow>(sql`
+    SELECT ${PL_COLUMNS} FROM packing_lists
+    WHERE (${blId}::uuid IS NULL OR bill_of_lading_id = ${blId})
+    ORDER BY created_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+// ── the shipment tracking events (T-13 — the append-only log, 0122) ─────────
+
+export interface TrackingEventRow {
+  id: string;
+  billOfLadingId: string;
+  declarationId: string | null;
+  milestone: string;
+  eventAt: string;
+  carrierRef: string | null;
+  location: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+}
+
+const EVENT_COLUMNS = sql`id, bill_of_lading_id AS "billOfLadingId", declaration_id AS "declarationId",
+  milestone, event_at::text AS "eventAt", carrier_ref AS "carrierRef", location, note, note_ar AS "noteAr",
+  created_at::text AS "createdAt"`;
+
+export async function insertTrackingEvent(input: {
+  billOfLadingId: string;
+  declarationId: string | null;
+  milestone: string;
+  eventAt: string;
+  carrierRef: string | null;
+  location: string | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<TrackingEventRow> {
+  const rows = await query<TrackingEventRow>(sql`
+    INSERT INTO shipment_tracking_events
+      (id, tenant_id, bill_of_lading_id, declaration_id, milestone, event_at, carrier_ref, location, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.billOfLadingId}, ${input.declarationId},
+            ${input.milestone}, ${input.eventAt}::timestamptz, ${input.carrierRef}, ${input.location},
+            ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${EVENT_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function listTrackingEvents(filter: { billOfLadingId?: string; declarationId?: string; limit?: number }): Promise<TrackingEventRow[]> {
+  const blId = filter.billOfLadingId ?? null;
+  const declarationId = filter.declarationId ?? null;
+  return query<TrackingEventRow>(sql`
+    SELECT ${EVENT_COLUMNS} FROM shipment_tracking_events
+    WHERE (${blId}::uuid IS NULL OR bill_of_lading_id = ${blId})
+      AND (${declarationId}::uuid IS NULL OR declaration_id = ${declarationId})
+    ORDER BY event_at, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+/**
+ * THE DRIVE'S CAS STAMPS (D-14 — the fold's ADVANCE verdicts rendered as
+ * race-free writes): each update pins the from-rung (the monotone law's
+ * own protection — a raced status never regresses, the loser's zero
+ * rows mean the fold's verdict is re-derived on the next event).
+ */
+export async function advanceBlShipmentStatus(input: {
+  id: string;
+  from: string;
+  to: string;
+}): Promise<BillOfLadingRow | undefined> {
+  const rows = await query<BillOfLadingRow>(sql`
+    UPDATE bills_of_lading
+    SET shipment_status = ${input.to}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND shipment_status = ${input.from}
+    RETURNING ${BL_COLUMNS}`);
+  return rows[0];
+}
+
+export async function advancePackingListShipmentStatus(input: {
+  id: string;
+  from: string;
+  to: string;
+}): Promise<PackingListRow | undefined> {
+  const rows = await query<PackingListRow>(sql`
+    UPDATE packing_lists
+    SET shipment_status = ${input.to}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND shipment_status = ${input.from}
+    RETURNING ${PL_COLUMNS}`);
+  return rows[0];
+}
+
+export async function advanceDeclarationShipmentStatus(input: {
+  id: string;
+  from: string;
+  to: string;
+}): Promise<{ id: string; shipmentStatus: string } | undefined> {
+  const rows = await query<{ id: string; shipmentStatus: string }>(sql`
+    UPDATE customs_declarations
+    SET shipment_status = ${input.to}, updated_at = now(), version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND shipment_status = ${input.from}
+    RETURNING id, shipment_status AS "shipmentStatus"`);
+  return rows[0];
+}
+
+/** The event's declaration-link probe (the typed 404 surface — a
+ * read-only check; the declarations ENGINE is W-37's own wave, this is
+ * the tracking event's documented-contract read). */
+export async function findDeclarationShipmentStatus(id: string): Promise<{ id: string; shipmentStatus: string } | undefined> {
+  const rows = await query<{ id: string; shipmentStatus: string }>(sql`
+    SELECT id, shipment_status AS "shipmentStatus" FROM customs_declarations
+    WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}

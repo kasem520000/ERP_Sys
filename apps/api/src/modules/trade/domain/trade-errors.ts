@@ -288,3 +288,85 @@ export class OrderIncotermRequiredError extends DomainError {
     );
   }
 }
+
+// ── the transport + tracking plane (T-09 + T-13 — 0120/0122) ───────────────
+
+export class BlRecordNotFoundError extends DomainError {
+  constructor(details: { blId: string }) {
+    super(
+      "BL_RECORD_NOT_FOUND",
+      `bill of lading ${details.blId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, bl_no) natural key is unique (the 0120 uq) — the
+ * service refuses BY NAME before the DB floor. */
+export class BlDuplicateError extends DomainError {
+  constructor(details: { blNo: string }) {
+    super(
+      "BL_DUPLICATE",
+      `a bill of lading numbered ${details.blNo} already exists in this tenant (the (tenant, bl_no) key is unique — uq_bills_of_lading_tenant_no)`,
+      details,
+    );
+  }
+}
+
+export class PackingListRecordNotFoundError extends DomainError {
+  constructor(details: { plId: string }) {
+    super(
+      "PACKING_LIST_RECORD_NOT_FOUND",
+      `packing list ${details.plId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+export class PackingListDuplicateError extends DomainError {
+  constructor(details: { plNo: string }) {
+    super(
+      "PACKING_LIST_DUPLICATE",
+      `a packing list numbered ${details.plNo} already exists in this tenant (the (tenant, pl_no) key is unique — uq_packing_lists_tenant_no)`,
+      details,
+    );
+  }
+}
+
+/** The transport documents' input floor (the 0120 CHECK shapes — the
+ * multimodal doc types, the bilingual names, the container refs, the
+ * pack lines' physical law) re-surfaced typed. */
+export class TransportInputInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super(
+      "TRANSPORT_INPUT_INVALID",
+      `the transport document write is invalid at ${details.field}: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+/** The tracking event's own floor (T-13 — the milestone vocabulary
+ * (D-14's unknown-event typed refusal) + the event shapes + the
+ * declaration link's typed 404 face). */
+export class TrackingEventInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super(
+      "TRACKING_EVENT_INVALID",
+      `the tracking event is refused at ${details.field}: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+/** The event's declaration-link probe (the typed 404 — the read-only
+ * documented contract; the declarations ENGINE is W-37's own wave). */
+export class DeclarationLinkNotFoundError extends DomainError {
+  constructor(details: { declarationId: string; blId: string }) {
+    super(
+      "DECLARATION_LINK_NOT_FOUND",
+      `customs declaration ${details.declarationId} (linked by the event on B/L ${details.blId}) does not exist in this tenant`,
+      details,
+    );
+  }
+}

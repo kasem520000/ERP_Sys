@@ -127,6 +127,11 @@ import {
   IncotermDuplicateError,
   IncotermInactiveError,
   IncotermCodeFrozenError,
+  BlRecordNotFoundError,
+  BlDuplicateError,
+  PackingListRecordNotFoundError,
+  PackingListDuplicateError,
+  DeclarationLinkNotFoundError,
 } from "../../modules/trade/domain/trade-errors";
 import {
   AttachmentNotFoundError,
@@ -1477,12 +1482,33 @@ function domainStatus(error: DomainError): number {
   ) {
     return HttpStatus.NOT_FOUND;
   }
+  // PHASE-051 (W-36 — T-09 + T-13, dated 2026-11-25): the trade
+  // transport + tracking planes' statuses — registered in the SAME
+  // increment that ships the routes (the PHASE-045 T-03 lesson). The
+  // 404s: the B/L register's, the packing lists' and the event's
+  // declaration-link not-founds (A7 parity). The 409s: the two natural
+  // keys ((tenant, bl_no) and (tenant, pl_no), refused at the service
+  // floor). The policy class — the transport documents' input shapes
+  // (TRANSPORT_INPUT_INVALID: the multimodal vocabulary, the pack
+  // lines' physical law) and the tracking event's floor
+  // (TRACKING_EVENT_INVALID: the milestone vocabulary — D-14's
+  // unknown-event refusal — and the event shapes) — falls through to
+  // the 422 default exactly as the family law documents it.
+  if (
+    error instanceof BlRecordNotFoundError ||
+    error instanceof PackingListRecordNotFoundError ||
+    error instanceof DeclarationLinkNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
   if (
     error instanceof CollectionDuplicateError ||
     error instanceof CollectionStateError ||
     error instanceof IncotermDuplicateError ||
     error instanceof IncotermInactiveError ||
-    error instanceof IncotermCodeFrozenError
+    error instanceof IncotermCodeFrozenError ||
+    error instanceof BlDuplicateError ||
+    error instanceof PackingListDuplicateError
   ) {
     return HttpStatus.CONFLICT;
   }

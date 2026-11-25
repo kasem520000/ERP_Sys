@@ -6,6 +6,8 @@ import { NotificationsModule } from "../notifications/notifications.module";
 import { LcService } from "./application/lc-service";
 import { CollectionsService } from "./application/collections-service";
 import { IncotermsService } from "./application/incoterms-service";
+import { TransportService } from "./application/transport-service";
+import { TrackingService } from "./application/tracking-service";
 import { TradeExpirySweepService } from "./application/trade-expiry-sweep-service";
 import { registerTradeExpiryJob } from "./infrastructure/trade-expiry-sweep.job";
 import { getBoss } from "../../infra/jobs/boss";
@@ -14,11 +16,17 @@ import {
   TradeCollectionsController,
   TradeIncotermsController,
 } from "./presentation/trade-collections.controller";
+import {
+  TradeTrackingController,
+  TradeTransportController,
+} from "./presentation/trade-transport.controller";
 
 /**
  * PHASE-051 (W-34 — T-05 + T-06, 2026-11-25; W-35 — T-07 + T-08,
- * 2026-11-25) THE TRADE MODULE (FTL, CR-21 — the LC engine + the
- * expiry sweep + the collections + the Incoterms registry): the LC
+ * 2026-11-25; W-36 — T-09 + T-13, 2026-11-25) THE TRADE MODULE (FTL,
+ * CR-21 — the LC engine + the expiry sweep + the collections + the
+ * Incoterms registry + the transport documents + the shipment
+ * tracking): the LC
  * lifecycle (issue → the typed amendments with the G-64 margin
  * adjustments → the documents checklist with the discrepancy notes →
  * retire) with G-64's postings through the REAL posting engine (D-05)
@@ -42,15 +50,34 @@ import {
  * asset-expiry-sweep wiring precedent); the tenant's chosen bank
  * accounts are consumed through the treasury store's own surface
  * (the documented contract — zero parallel computation). The
- * remaining planes (transport/tracking W-36 · customs W-37 ·
- * bonded/drawback W-38) extend THIS module with their own services
- * and stores on the same keys.
+ * remaining planes (customs W-37 · bonded/drawback W-38) extend
+ * THIS module with their own services and stores on the same keys.
  */
 @Module({
   imports: [AccountingModule, AuditModule, NotificationsModule],
-  controllers: [TradeLcController, TradeCollectionsController, TradeIncotermsController],
-  providers: [LcService, CollectionsService, IncotermsService, TradeExpirySweepService],
-  exports: [LcService, CollectionsService, IncotermsService, TradeExpirySweepService],
+  controllers: [
+    TradeLcController,
+    TradeCollectionsController,
+    TradeIncotermsController,
+    TradeTransportController,
+    TradeTrackingController,
+  ],
+  providers: [
+    LcService,
+    CollectionsService,
+    IncotermsService,
+    TransportService,
+    TrackingService,
+    TradeExpirySweepService,
+  ],
+  exports: [
+    LcService,
+    CollectionsService,
+    IncotermsService,
+    TransportService,
+    TrackingService,
+    TradeExpirySweepService,
+  ],
 })
 export class TradeModule implements OnModuleInit {
   constructor(private readonly expirySweep: TradeExpirySweepService) {}

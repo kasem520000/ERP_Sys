@@ -5955,6 +5955,56 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/trade/incoterms/:code",
     permission: "trade.collections.manage",
   },
+  // PHASE-051 (W-36 — T-09 + T-13, dated 2026-11-25; matrix §3.29): the
+  // keys-seed-first THIRD trade binding wave (1,181 + 7 = 1,188 — the
+  // discipline standing: the TEN trade.* keys landed at W-33 (0122 §5),
+  // the routes bind as the service waves ship, every change dated at
+  // the block — the 1,159 baseline anchor). THE TRANSPORT FAMILY binds
+  // trade.shipments.view over the reads (the B/L register + the packing
+  // lists — the family's OWN view key, the LC precedent's shape) and
+  // trade.shipments.manage over the creates; THE TRACKING FAMILY binds
+  // trade.shipments.view over the event-log reads and
+  // trade.shipments.manage over THE APPEND (the carrier milestone log
+  // + the drive on the linked B/L, the packing lists under it and the
+  // event's own declaration). The customs (W-37) · bonded/drawback
+  // (W-38) families bind on their own waves; the routes are
+  // feature-gated at the controller on the whole-module unit trade
+  // (D-04 — the transport/tracking family carries no own flag).
+  {
+    method: "GET",
+    path: "/api/v1/trade/transport/bl",
+    permission: "trade.shipments.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/transport/bl/:id",
+    permission: "trade.shipments.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/transport/bl",
+    permission: "trade.shipments.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/transport/packing-lists",
+    permission: "trade.shipments.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/transport/packing-lists",
+    permission: "trade.shipments.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/shipments/events",
+    permission: "trade.shipments.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/shipments/events",
+    permission: "trade.shipments.manage",
+  },
 ];
 
 /**
