@@ -18,12 +18,12 @@ import { withTenant } from "../../infra/db/tenant-context";
  * G-66 gate, the sweep) land with their W-34…W-38 waves.
  */
 
-export const TENANT_TRADE = "6b6b6b6b-6b6b-6b6b-6b6b-6b6b6b6b6b6b";
+export const TENANT_TRADE = "7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c";
 /** THE ISOLATED BOUNDARY TENANT (the quality fixtures' shape): the
  * tenant-boundary arms never assume a SHARED tenant — the empty-world
  * assertion answers on THIS dedicated tenant, empty BY CONSTRUCTION. */
-export const TENANT_TRADE_RLS = "6b6b6b6b-6b6b-6b6b-6b6b-6b6b6b6b6b6c";
-export const TR_ACTOR = "6b6b6b6b-0000-4000-8000-0000000006b1";
+export const TENANT_TRADE_RLS = "7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7d";
+export const TR_ACTOR = "7c7c7c7c-0000-4000-8000-0000000007c1";
 
 export interface TradeFixture {
   branchId: string;

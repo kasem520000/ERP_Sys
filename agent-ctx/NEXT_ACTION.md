@@ -1,36 +1,60 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-0 THE MASTER PLAN WAVE DELIVERED FOR REVIEW (2026-11-24, this session)** — the plan `agent-ctx/PHASE-051-MASTER-PLAN.md` PROPOSED, the implementation waves **W-33…W-42 BLOCKED until the owner's approval dispatch** (إذن إطلاق فقط — NOT production approval) — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-33 THE FOUNDATION DELIVERED (2026-11-24, this session — the plan APPROVED as the binding phase program, W-33 released by the owner's dispatch; F-051a `b67afc7` → the foundation `ff2b0df` → the schema spec `ab1fd30`, every step pushed at its own commit)** — W-34 NEXT (the LC engine + G-64's postings + the BR-105 `trade-expiry-sweep` — the SIXTH standing isolate) under the standing order — تسليم لا قبول
 
-**The launch dispatch (the owner's, recorded in full in the plan §0b):**
-PHASE-050 CLOSED AS DELIVERY at the tag `phase/050` (`01f61a7` — W-31 + W-32
-accepted, ZERO deviations — «لا تصحيحات مطلوبة», the first no-correction
-closure in the record) · PHASE-051 LAUNCHED with the master-plan-first law
-(سابقة 049-W0/050-W0) and the §5 declared base BINDING: the COA dual-print
-patterns → the trade certificates (D-13) · the planIssue unified gate → the
-bonded-warehouse movement restrictions (D-08) · the D-13/D-14
-documented-contract precedents → the 051 contracts (D-15) · **the standing
-order: «عند الانتهاء من أي خطوة ادفعها إلى المستودع»** · the open-items log
-transferred VERBATIM (§0c (6)) · the reservations **G-64…G-66 · INV-036 ·
-BR-105…BR-108 — لا كتابة خارجها**.
+**The W-0 approval dispatch (the owner's, recorded in full in the plan §0b
+and the F-051a note):** the plan ACCEPTED AS DELIVERY at `2449233` after the
+full independent verification on a clean clone — ONE non-blocking dated
+correction order (F-051a: the plan envelope's physical count 35, not 37 —
+landed FIRST at `b67afc7`, the note attached to the plan wave's gate log) ·
+**the plan ratified as the BINDING PHASE PROGRAM — إذن إطلاق فقط (a launch
+authorization, NEVER production approval)** · the rulings: (a) the wave
+numbering W-33…W-42 CONFIRMED (the global sequence, no collision; the laws
+bind from the first implementation wave) · (b) the G-64/G-65/G-66 account
+shapes ACCEPTED AS PROPOSED in D-05/D-06/D-08 (fail-closed until mapped,
+the dated-amendment right reserved) · (c) the BR-106 trigger rule AS
+PROPOSED (the currency ≠ base OR the import/export marker under the trade
+flag) · (d) the standing reservations G-64…G-66 · INV-036 · BR-105…BR-108 —
+لا كتابة خارجها, never restated narrower. **W-33 RELEASED by the dispatch:
+0119–0122 + كل المرايا + the ten keys 347→357 + the three flags + the seeds
+with the accuracy acknowledgment + the five pre-isolations FIRST + F-051a
+riding W-33.**
 
-**W-0 — THE MASTER PLAN WAVE (T-00, delivered on the closure head `01f61a7`
-in ONE docs-only increment, this session):** the plan PROPOSED for review
-before launch (W-33…W-42 over T-01…T-18 — the foundation 0119–0122 · the LC
-engine + the SIXTH isolate (the `trade-expiry-sweep`) · collections +
-Incoterms · transport + tracking · the customs engine (G-65/INV-036) ·
-bonded + drawback (G-66/BR-107/BR-108) · the web plane (the print laws) ·
-the reports (registry 122 → 126) · the proof pack · the closure + the tag
-`phase/051`) · the acceptance ledger OPENED
-(`docs/planning/PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-051 — the ten criteria
-with their ARMS and WAVES) · the IMPLEMENTATION_STATUS dated header line
-prepended · the evidence envelope `audit-evidence/phase051-plan/` (the
-FORTY-FOURTH consecutive same-session wave — the §0a fresh-clone record +
-the full battery at the 050 closure's own constants re-proven). **The
-implementation waves are BLOCKED until the owner's approval dispatch — the
-open inputs: (a) the wave numbering W-33…W-42 · (b) the G-64/G-65/G-66
-account shapes (D-05/D-06/D-08) · (c) the BR-106 trigger rule (D-10) —
-تسليم لا قبول — NOT production approval.**
+**W-33 — THE FOUNDATION (T-01…T-04, delivered on the F-051a head `b67afc7`
+in three increments + this gate):** migrations 0119–0122 + EVERY
+mirror/registry/catalog/matrix/pin in ONE increment (the 0108 W-16/0116
+W-24 pattern) — the fourteen tables with their floors (the G-64
+margin/retirement stamps · the typed-change law · the checklist floor · the
+D/A usance floor · the Incoterms ownership matrix as registry DATA · the
+B/L as THE SHIPMENT'S OWN ANCHOR (the declared interpretation) · the frozen
+certificates' snapshot · INV-036's COMPLETED floor · the tenant's own duty
+rows (no hardcoded rates) · THE G-66 NO-DUTY IN-BOND FLOOR + the BR-107
+atomic release stamps · the BR-108 evidence floor with NO GL entry · the
+milestone vocabulary) + THE DATA-ONLY GRANTS BLOCK (the TEN trade.* keys —
+matrix §3.29, the drift 347 → 357 zero-drift from the first increment; the
+ENTITLEMENTS widening applied in advance — the 050 W-24 honest catch's own
+class, admitting exactly the second whole-module `trade` key; the THREE
+flags on business+enterprise with STARTER AT THE DECLARED NEUTRAL ZERO; the
+three trade-carrying templates' manifest enablements; the TWO CoA markers
+1180 LC_MARGIN_DEPOSIT · 2145 CUSTOMS_DUTY_PAYABLE) + THE SEEDS (the
+Incoterms-2020 set + the HS starter set through the 0098 migration-plane
+gate, the accuracy disclaimer on every starter row — «البذور بإقرار
+الدقة») + the `__db__/trade/` family (the fixtures + trade-schema.db.spec —
+41 arms) + THE FULL TEN-PART ENVELOPE 301 files · 4,369 tests · 0 failed ·
+0 skipped (the five isolates standalone FIRST; the two honest catches
+RED-proven then repaired, both logs kept) + the 122-chain scratch from zero
+TWICE (check-rls OK — 354 catalog tables) + the standing battery green
+(typecheck 8/8 · lint 8/8 · depcruise 2,197/16,419 · unit 167 · 2,020
+UNCHANGED · drift 357 = 357 · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors + all-probes-OK · history-secrets 0 violations ·
+ROUTE_PERMISSIONS 1,159 UNCHANGED — keys-seed-first). **The evidence
+envelope `audit-evidence/phase051-w33/` (the FORTY-FIFTH consecutive
+same-session wave). W-34 (the LC engine + the expiry sweep) waits on the
+owner's dispatch under the standing order. RISK-033: EIGHT incidents, ZERO
+new — the row stays OPEN. NOT production approval — تسليم لا قبول.**
 
 ---
+
+# The W-0 plan wave's own record (the historical context below)
+
 
 # PHASE-050 — CLOSED AS DELIVERY 2026-11-23 (the historical record below)
 

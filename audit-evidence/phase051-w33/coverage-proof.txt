@@ -1,0 +1,8 @@
+THE COVERAGE VERIFICATION (the W-15 law — verified BEFORE the first load run):
+inventory = 301 files (the disk census: find apps/api/src/__db__ -name '*.spec.ts')
+union     = 301 files (the parts.json roster: 5 isolates + smoke 3 + perf-rest 5 + chunk-a 114 + b-rest 86 + c 88)
+missing NONE · extra NONE · duplicates NONE
+VERDICT: COVERED
+The ONE declared movement from the W-32 roster: trade-schema.db.spec joins
+chunk-a at its alphabetical position (113 → 114), exactly the W-24
+precedent's own move for the quality schema spec (97 → 98).

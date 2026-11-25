@@ -1553,6 +1553,76 @@ delivered #5's meter side, #6, #3's G-60/G-61 arms (`audit-evidence/phase049-w18
     ledger and the phase; the open-items log transferred explicitly; the
     ID_LEDGER flip — implemented G 66 · INV 36 · BR 108 — atomic with the
     canon rows).
+**[Dated 2026-11-24 (PHASE-051 W-33 DELIVERED at the foundation head
+`ff2b0df` + the spec head `ab1fd30` — THE ACCUMULATION PLACE per the
+ratified عرف 049 option (a); the owner's launch dispatch honored — the
+plan APPROVED as the binding phase program 2026-11-24, W-33 released;
+the standing order «عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored
+— F-051a `b67afc7` → the foundation `ff2b0df` → the schema spec
+`ab1fd30`, every step pushed at its own commit): CRITERION #1'S
+FOUNDATION ARMS GREEN.** The migrations 0119–0122 apply cleanly from
+zero — the 122-chain scratch from zero TWICE (both runs
+CHAIN_122_APPLIED → [check-rls] OK — **354 catalog tables** →
+SCRATCH_STOPPED, EXIT=0, both logs kept) + the re-apply no-op proven in
+every DB run's migration state. Drizzle mirror parity: schema.ts +14
+tables (348 pgTable exports). The FOURTEEN tables have their
+ENTITY_CATALOG rows (340 → 354, the section with the header chain) +
+the tables doc + the A-suite's +84 arms (the identity-isolation suite
+1,980/1,980 GREEN — the fe family's fixture rows, OWN_ROW entries and
+the FK-consistent mismatched-tenant attacks). THE SEEDS LOAD AND ARE
+TENANT-EXTENSIBLE: the Incoterms-2020 set (11 rules) + the HS starter
+set (14 chapter-level headings) seed through the 0098 §4
+migration-plane gate with THE ACCURACY DISCLAIMER ON EVERY STARTER ROW
+(«البذور بإقرار الدقة» — the owner's own order; the tenant owns the
+final classification; NO duty rates on the seeds) + the trade-schema
+spec's registry arms (the incoterm insert + the duplicate refusal; the
+HS row + its own duplicate refusal — tenant-extensible BY
+CONSTRUCTION). The structural-laws spec itself: `trade-schema.db.spec`
+— 41 arms over real PG16, every law refused BY NAME, every rejection
+arm on its own world. THE FULL TEN-PART ENVELOPE AT THE NEW COUNT:
+**301 files · 4,369 tests · 0 failed · 0 skipped** (the five isolates
+standalone FIRST per the owner's عزل مسبق order — soak 1·1 · fcm 1·8 ·
+email 1·5 · the cmms sweep 1·4 · the quality calibration sweep 1·4; the
+load parts: smoke 3·1,999 · perf-rest 5·23 · chunk-a 114·989 · b-rest
+86·625 · c 88·711; the arithmetic 301 = 1+1+1+1+1+3+5+114+86+88 EXACT ·
+4,369 = 1+8+5+4+4+1,999+23+989+625+711 EXACT; the provenance 4,369 =
+4,244 + 84 (the A-suite) + 41 (the trade schema spec); every part
+inside the 570s ceiling; the coverage verified BEFORE the first load
+run — 301 = 301, missing NONE, extra NONE, duplicates NONE, VERDICT:
+COVERED). THE HONEST CATCHES (two, both first-RED-proven then
+repaired, both logs kept verbatim — the regression-protocol law's
+exercise; no battery red stands anywhere): (1) THE TENANCY-HTTP JOURNEY
+PIN — the same two-marker delta in the HTTP journey's own mirror
+(80 → 82 accounts · 57 → 59 purposes), re-pinned with the dated note
+(the W-24 catch #3's exact class); (2) THE TRADE FIXTURE'S TENANT-ID
+COLLISION — the first chunk-a run RED-named it (the 6b6b6b6b fixture
+tenant collided with crm/time.spec's TENANT_T, the fiscal-year overlap
+refusing the journey), the repair moving the family to the free 7c
+plane, both heads re-proven (the two-head protocol: the RED log kept
+as db-chunk-a-first-red.log, the green re-run 114·989). The standing
+battery at the wave head: typecheck 8/8 (0 cached) · lint 8/8 (0
+cached) · depcruise clean 2,197 modules · 16,419 dependencies (+2/+8
+dated) · unit 8/8 — 167 files · 2,020 tests UNCHANGED (the ledger
+arithmetic 2,020 = 976+204+840 EXACT, an API-DB wave) · permissions
+drift **347 → 357 = 357** (D-03 — zero-drift from the first increment,
+seed = mirror) · i18n 7,253 standing (no delta — an API-DB wave) +
+mobile 371 · tokens 50/50 · manifests 13/13 · docs:validate 33/33 ·
+id-ledger 0 errors (implemented G 63 · INV 35 · BR 104 standing — the
+051 flip is W-42's) + the self-test all-probes-OK (probe 7 stands at
+G-64/PHASE-051) · history-secrets 0 violations · 6,920 allowlisted hits
+(the window's shift: this session's commits entering the last-200
+sample; the FIVE tag anchors walked, untouched — phase/046 `4ddb39f` ·
+phase/047 `5b73bd1` · phase/048 `ba459ff` · phase/049 `41c3701` ·
+phase/050 `01f61a7`) · ROUTE_PERMISSIONS 1,159 UNCHANGED (zero
+route-bearing files moved this wave — keys-seed-first, the 0116 §1
+precedent; the /api/v1/trade/* families bind as the W-34+ service
+waves ship) · the registry 329 tenant-owned tables · capabilities
+agree · shells PASS/PASS · boundary PASS. **RISK-033: EIGHT incidents,
+ZERO new this wave — the row stays OPEN, closing only by the owner's
+order.** The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا
+كتابة خارجها. NEXT: W-34 (the LC engine + G-64's postings + the
+BR-105 expiry sweep — the SIXTH standing isolate) under the owner's
+standing order. NOT production approval — تسليم لا قبول.]**
 
 ## Verification evidence requirements
 

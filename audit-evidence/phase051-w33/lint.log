@@ -1,0 +1,52 @@
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/desktop:lint: cache bypass, force executing b9327f5843917650
+@erp/domain-core:lint: cache bypass, force executing 1b98941ea8bfaefe
+@erp/mobile:lint: cache bypass, force executing 03c5a4356fc0ffd6
+@erp/api:lint: cache bypass, force executing 00827a14817ca80d
+@erp/ui:lint: cache bypass, force executing 510314fcbe3623a4
+@erp/web:lint: cache bypass, force executing d4c1386d58aae6dc
+@erp/sync-core:lint: cache bypass, force executing 25c64fbdd3d992ba
+@erp/contracts:lint: cache bypass, force executing 5c61b7e588d839e8
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/my-project/ERP_Sys_051/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/my-project/ERP_Sys_051/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/my-project/ERP_Sys_051/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/my-project/ERP_Sys_051/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/my-project/ERP_Sys_051/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    48.629s 
+
+EXIT=0
