@@ -303,6 +303,12 @@ export interface SalesOrderRow {
   expectedDate: string | null;
   currencyCode: string;
   exchangeRate: string | null;
+  /** PHASE-051 (W-35 — T-08, 0124, BR-106): the order's Incoterms
+   * selection (the registry code as snapshot data) + the explicit
+   * import/export marker (the mandate's second trigger arm — the export
+   * leg rides the sales side). */
+  incotermCode: string | null;
+  tradeDirection: string | null;
   status: string;
   totalNet: string;
   totalTax: string;
@@ -315,7 +321,9 @@ export interface SalesOrderRow {
 const ORDER_COLUMNS = sql`id, branch_id AS "branchId", customer_id AS "customerId",
   sales_rep_id AS "salesRepId", warehouse_id AS "warehouseId", quotation_id AS "quotationId",
   order_no AS "orderNo", order_date AS "orderDate", expected_date AS "expectedDate",
-  currency_code AS "currencyCode", exchange_rate AS "exchangeRate", status,
+  currency_code AS "currencyCode", exchange_rate AS "exchangeRate",
+  incoterm_code AS "incotermCode", trade_direction AS "tradeDirection",
+  status,
   total_net AS "totalNet", total_tax AS "totalTax", total_gross AS "totalGross",
   note, note_ar AS "noteAr", created_by AS "createdBy"`;
 
@@ -329,6 +337,9 @@ export async function insertSalesOrder(input: {
   expectedDate: string | null;
   currencyCode: string;
   exchangeRate: string | null;
+  /** PHASE-051 (W-35 — T-08, 0124, BR-106). */
+  incotermCode?: string | null;
+  tradeDirection?: string | null;
   note: string | null;
   noteAr: string | null;
   actorId: string | null;
@@ -353,11 +364,13 @@ export async function insertSalesOrder(input: {
   await tx.execute(sql`
     INSERT INTO sales_orders (id, tenant_id, branch_id, customer_id, sales_rep_id, warehouse_id,
                               quotation_id, order_date, expected_date, currency_code, exchange_rate,
-                              total_net, total_tax, total_gross, note, note_ar, created_by)
+                              total_net, total_tax, total_gross, note, note_ar, created_by,
+                              incoterm_code, trade_direction)
     VALUES (${id}, erp.current_tenant_id(), ${input.branchId}, ${input.customerId}, ${input.salesRepId},
             ${input.warehouseId}, ${input.quotationId}, ${input.orderDate}, ${input.expectedDate},
             ${input.currencyCode}, ${input.exchangeRate}, ${input.totalNet}, ${input.totalTax},
-            ${input.totalGross}, ${input.note}, ${input.noteAr}, ${input.actorId})
+            ${input.totalGross}, ${input.note}, ${input.noteAr}, ${input.actorId},
+            ${input.incotermCode ?? null}, ${input.tradeDirection ?? null})
   `);
   let lineNo = 0;
   for (const line of input.lines) {

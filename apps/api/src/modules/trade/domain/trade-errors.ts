@@ -137,3 +137,154 @@ export class LcSweepThresholdsInvalidError extends DomainError {
     );
   }
 }
+
+// ── the collections plane (T-07 — the D/P vs D/A register) ──────────────────
+
+export class CollectionRecordNotFoundError extends DomainError {
+  constructor(details: { collectionId: string }) {
+    super(
+      "COLLECTION_RECORD_NOT_FOUND",
+      `documentary collection ${details.collectionId} does not exist in this tenant`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, collection_no) natural key is unique (the 0119 uq) —
+ * the service refuses BY NAME before the DB floor. */
+export class CollectionDuplicateError extends DomainError {
+  constructor(details: { collectionNo: string }) {
+    super(
+      "COLLECTION_DUPLICATE",
+      `a collection numbered ${details.collectionNo} already exists in this tenant (the (tenant, collection_no) key is unique — uq_documentary_collections_tenant_no)`,
+      details,
+    );
+  }
+}
+
+/** THE LADDER'S OWN REFUSAL (the fold's verdict rendered VERBATIM —
+ * the typed refusal names the register and the illegal move's reason:
+ * the terms gate, the stamp law's OPEN-only exit, the terminals). */
+export class CollectionStateError extends DomainError {
+  constructor(details: {
+    collectionId: string;
+    collectionNo: string;
+    from: string;
+    to: string;
+    reason: string;
+  }) {
+    super(
+      "COLLECTION_STATE",
+      `collection ${details.collectionNo} is ${details.from} — ${details.reason} (the move to ${details.to} is refused)`,
+      details,
+    );
+  }
+}
+
+/** The usance floor's refusal at create (the 0119 constraint's own
+ * fold — the refusal names the terms and the missing maturity). */
+export class CollectionUsanceError extends DomainError {
+  constructor(details: { termsType: string; reason: string }) {
+    super(
+      "COLLECTION_USANCE_INVALID",
+      `the ${details.termsType} collection is refused: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+/** The settlement pair's refusal (the 0119 XOR floor at the act — the
+ * settlement linkage is a pair; the reference names the treasury fact). */
+export class CollectionSettlementInvalidError extends DomainError {
+  constructor(details: { collectionId: string; reason: string }) {
+    super(
+      "COLLECTION_SETTLEMENT_INVALID",
+      `the settlement on collection ${details.collectionId} is refused: ${details.reason}`,
+      details,
+    );
+  }
+}
+
+// ── the incoterms plane (T-08 — the registry + BR-106's mandate) ────────────
+
+export class IncotermRecordNotFoundError extends DomainError {
+  constructor(details: { code: string }) {
+    super(
+      "INCOTERM_RECORD_NOT_FOUND",
+      `incoterm ${details.code} does not exist in this tenant's registry`,
+      details,
+    );
+  }
+}
+
+/** The (tenant, code) natural key is unique (the 0120 uq) — the
+ * tenant-addition write refuses BY NAME before the DB floor. */
+export class IncotermDuplicateError extends DomainError {
+  constructor(details: { code: string }) {
+    super(
+      "INCOTERM_DUPLICATE",
+      `an incoterm coded ${details.code} already exists in this tenant's registry (the (tenant, code) key is unique — uq_incoterms_tenant_code)`,
+      details,
+    );
+  }
+}
+
+/** The registry write's own floor (the 0120 CHECK shapes — the code
+ * pattern and the bilingual name floors, re-surfaced typed). */
+export class IncotermInvalidError extends DomainError {
+  constructor(details: { field: string; reason: string }) {
+    super("INCOTERM_INVALID", `the incoterm write is refused at ${details.field}: ${details.reason}`, details);
+  }
+}
+
+/** The code is the row's identity — a PATCH never rewrites it (the
+ * register's audit-trail law, the 0120 uq's own reading). */
+export class IncotermCodeFrozenError extends DomainError {
+  constructor(details: { code: string; attempted: string }) {
+    super(
+      "INCOTERM_CODE_FROZEN",
+      `an incoterm's code is its identity — ${details.code} cannot become ${details.attempted} (create a new row and retire the old one)`,
+      details,
+    );
+  }
+}
+
+/** The inactive code's selection refusal (the selector's own floor —
+ * a retired code never rides a new order; existing orders keep their
+ * recorded selection, the snapshot semantics). */
+export class IncotermInactiveError extends DomainError {
+  constructor(details: { code: string }) {
+    super(
+      "INCOTERM_INACTIVE",
+      `incoterm ${details.code} is retired in this tenant's registry — select an active term (existing orders keep their recorded selection)`,
+      details,
+    );
+  }
+}
+
+/**
+ * BR-106'S MANDATE REFUSAL (the typed refusal at the order's OWN
+ * POSTING, naming the order + the missing field — D-10's own wording;
+ * the trigger arms rendered VERBATIM from the fold's verdict). The
+ * class is thrown by the shared order gate consumed by the purchasing
+ * and sales issue acts (the documented contract) — the reservation
+ * law rides the wording: BR-106 exactly, no invented identifier.
+ */
+export class OrderIncotermRequiredError extends DomainError {
+  constructor(details: {
+    docType: "purchase_order" | "sales_order";
+    orderId: string;
+    orderNo: string | null;
+    currency: string;
+    baseCurrency: string;
+    tradeDirection: "IMPORT" | "EXPORT" | null;
+    arms: readonly string[];
+  }) {
+    const number = details.orderNo ?? details.orderId;
+    super(
+      "ORDER_INCOTERM_REQUIRED",
+      `${details.docType} ${number} must post WITH an incoterm (BR-106): ${details.arms.join("; ")} — the incotermCode field is missing (the selection rides the order's create; re-create the order with its incoterm)`,
+      details,
+    );
+  }
+}

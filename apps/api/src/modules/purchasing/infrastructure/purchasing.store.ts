@@ -193,6 +193,11 @@ export interface PurchaseOrderRow {
   revisionNo: number;
   /** PHASE-038 (P-06): the linked CRM service contract (contract purchasing). */
   contractId: string | null;
+  /** PHASE-051 (W-35 — T-08, 0124, BR-106): the order's Incoterms
+   * selection (the registry code as snapshot data) + the explicit
+   * import/export marker (the mandate's second trigger arm). */
+  incotermCode: string | null;
+  tradeDirection: string | null;
   status: string;
   totalNet: string;
   totalTax: string;
@@ -232,6 +237,10 @@ export async function insertPurchaseOrder(input: {
   revisionNo: number;
   /** PHASE-038 (P-06): the optional contract linkage. */
   contractId?: string | null;
+  /** PHASE-051 (W-35 — T-08, 0124, BR-106): the order's Incoterms
+   * selection + the explicit import/export marker. */
+  incotermCode?: string | null;
+  tradeDirection?: string | null;
   note: string | null;
   noteAr: string | null;
   actorId: string | null;
@@ -257,12 +266,12 @@ export async function insertPurchaseOrder(input: {
     INSERT INTO purchase_orders (id, tenant_id, branch_id, supplier_id, order_date, expected_date,
                                  currency_code, exchange_rate, revision_of_id, revision_no,
                                  total_net, total_tax, total_gross, tax_summary, note, note_ar, created_by,
-                                 contract_id)
+                                 contract_id, incoterm_code, trade_direction)
     VALUES (${id}, erp.current_tenant_id(), ${input.branchId}, ${input.supplierId}, ${input.orderDate},
             ${input.expectedDate}, ${input.currencyCode}, ${input.exchangeRate}, ${input.revisionOfId},
             ${input.revisionNo}, ${input.totalNet}, ${input.totalTax}, ${input.totalGross},
             ${JSON.stringify(input.taxSummary)}::jsonb, ${input.note}, ${input.noteAr}, ${input.actorId},
-            ${input.contractId ?? null})
+            ${input.contractId ?? null}, ${input.incotermCode ?? null}, ${input.tradeDirection ?? null})
   `);
   let lineNo = 0;
   for (const line of input.lines) {
@@ -283,7 +292,8 @@ export async function findPurchaseOrderById(id: string): Promise<PurchaseOrderRo
     SELECT id, branch_id AS "branchId", supplier_id AS "supplierId", order_no AS "orderNo",
            order_date AS "orderDate", expected_date AS "expectedDate", currency_code AS "currencyCode",
            exchange_rate::text AS "exchangeRate", revision_of_id AS "revisionOfId",
-           revision_no AS "revisionNo", contract_id AS "contractId", status,
+           revision_no AS "revisionNo", contract_id AS "contractId",
+           incoterm_code AS "incotermCode", trade_direction AS "tradeDirection", status,
            total_net::text AS "totalNet", total_tax::text AS "totalTax", total_gross::text AS "totalGross",
            note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt",
            issued_at AS "issuedAt", closed_at AS "closedAt", cancel_reason AS "cancelReason"
@@ -315,7 +325,8 @@ export async function listPurchaseOrders(filter: {
     SELECT id, branch_id AS "branchId", supplier_id AS "supplierId", order_no AS "orderNo",
            order_date AS "orderDate", expected_date AS "expectedDate", currency_code AS "currencyCode",
            exchange_rate::text AS "exchangeRate", revision_of_id AS "revisionOfId",
-           revision_no AS "revisionNo", contract_id AS "contractId", status,
+           revision_no AS "revisionNo", contract_id AS "contractId",
+           incoterm_code AS "incotermCode", trade_direction AS "tradeDirection", status,
            total_net::text AS "totalNet", total_tax::text AS "totalTax", total_gross::text AS "totalGross",
            note, note_ar AS "noteAr", created_by AS "createdBy", created_at AS "createdAt",
            issued_at AS "issuedAt", closed_at AS "closedAt", cancel_reason AS "cancelReason"

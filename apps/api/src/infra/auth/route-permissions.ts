@@ -5873,6 +5873,88 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/trade/lc/:id/cancel",
     permission: "trade.lc.manage",
   },
+  // PHASE-051 (W-35 — T-07 + T-08, dated 2026-11-25; matrix §3.29): the
+  // keys-seed-first SECOND trade binding wave (1,170 + 11 = 1,181 —
+  // the discipline standing: the TEN trade.* keys landed at W-33 (0122
+  // §5), the routes bind as the service waves ship, every change dated
+  // at the block — the 1,159 baseline anchor). THE COLLECTIONS FAMILY
+  // binds trade.collections.manage over the register acts (create ·
+  // present · accept — the usance act, D/A only · settle — the
+  // settlement linkage · cancel — the stamp law's OPEN-only exit) and
+  // trade.view over the reads (the matrix row's OWN wording names the
+  // LC/collections registers — the finance-read plane; no family view
+  // key exists, and the W-34 LC precedent bound the family key it
+  // HAD: the family view key is preferred when it exists, the plane
+  // read key covers the families without one). THE INCOTERMS REGISTRY
+  // binds trade.view over the reads (the plane's reference register —
+  // the W-39 reference page and the selector's data source) and
+  // trade.collections.manage over the tenant-addition MANAGEMENT (the
+  // dated interpretation recorded here for the owner's review: the
+  // registry is the trade plane's shared non-ledger reference data,
+  // no registry-specific key exists among the ten, the drift is
+  // zero-drift-locked at 357 — the W-35 wave's own register-act key
+  // carries the management, the matrix's own non-ledger owner
+  // posture; never a ledger key — the registry writes must not ride
+  // G-64's or G-65's doors). The transport/tracking (W-36) · customs
+  // (W-37) · bonded/drawback (W-38) families bind on their own waves;
+  // the routes are feature-gated at the controller on the whole-
+  // module unit trade (D-04 — the collections/incoterms families
+  // carry no own flag).
+  {
+    method: "GET",
+    path: "/api/v1/trade/collections",
+    permission: "trade.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/collections/:id",
+    permission: "trade.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/collections",
+    permission: "trade.collections.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/collections/:id/present",
+    permission: "trade.collections.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/collections/:id/accept",
+    permission: "trade.collections.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/collections/:id/settle",
+    permission: "trade.collections.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/collections/:id/cancel",
+    permission: "trade.collections.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/incoterms",
+    permission: "trade.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/incoterms/:code",
+    permission: "trade.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/incoterms",
+    permission: "trade.collections.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/trade/incoterms/:code",
+    permission: "trade.collections.manage",
+  },
 ];
 
 /**

@@ -2854,6 +2854,13 @@ export const purchaseOrders = pgTable(
     // bidirectional link — acceptance criterion 3; the conversion itself
     // flows through the PHASE-038 create path, never duplicated).
     mrpSuggestionId: uuid("mrp_suggestion_id"),
+    // PHASE-051 (W-35 — T-08, 0124, D-10/BR-106): the order's Incoterms
+    // selection (the registry code as SNAPSHOT data — no FK by design,
+    // the tenant-extensible registry) + the explicit import/export
+    // marker (the mandate's second trigger arm — the owner's ruling (ج)
+    // VERBATIM: currency ≠ base currency, or the order carries the tag).
+    incotermCode: text("incoterm_code"),
+    tradeDirection: text("trade_direction"),
     status: text("status").notNull().default("DRAFT"),
     totalNet: numeric("total_net", { precision: 19, scale: 4 }).notNull().default("0"),
     totalTax: numeric("total_tax", { precision: 19, scale: 4 }).notNull().default("0"),
@@ -3432,6 +3439,13 @@ export const salesOrders = pgTable(
     expectedDate: date("expected_date"),
     currencyCode: varchar("currency_code", { length: 3 }).notNull(),
     exchangeRate: numeric("exchange_rate", { precision: 19, scale: 8 }),
+    // PHASE-051 (W-35 — T-08, 0124, D-10/BR-106): the order's Incoterms
+    // selection (the registry code as SNAPSHOT data — no FK by design,
+    // the tenant-extensible registry) + the explicit import/export
+    // marker (the mandate's second trigger arm — the export leg rides
+    // the sales side).
+    incotermCode: text("incoterm_code"),
+    tradeDirection: text("trade_direction"),
     status: text("status").notNull().default("DRAFT"),
     totalNet: numeric("total_net", { precision: 19, scale: 4 }).notNull().default("0"),
     totalTax: numeric("total_tax", { precision: 19, scale: 4 }).notNull().default("0"),

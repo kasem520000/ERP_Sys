@@ -398,7 +398,17 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // additive-slot precedent's own class under the 0099/0111 same-
     // increment law; the declared slots consumed and PUBLISHED at W-33
     // — the constants law)]
-    expect(files.at(-1)?.tag).toBe("0123_trade_notifications_category");
+    // [dated 2026-11-25 — PHASE-051 W-35: the chain grows 123 → 124 —
+    // 0124_trade_order_incoterms lands WITH this wave's writers (the
+    // additive NULLABLE incoterm_code + trade_direction column pairs on
+    // purchase_orders AND sales_orders: BR-106's mandate floor, D-10's
+    // own demand that the selection land on the order rows themselves
+    // with the typed refusal at the order's own posting reading the
+    // row's own field; NO FK by design — the registry is tenant-
+    // extensible DATA with a DELETE grant, the snapshot semantics ride
+    // the service's typed gates; the 0123 additive-slot precedent's
+    // own class under the same-increment law)]
+    expect(files.at(-1)?.tag).toBe("0124_trade_order_incoterms");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

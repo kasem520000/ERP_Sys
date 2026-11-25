@@ -92,6 +92,18 @@ const createOrderSchema = z.object({
   // insert (zero partial writes); documents are lifecycle-state machines —
   // no PATCH surface, values ride create.
   customFields: customFieldsPayloadSchema.optional(),
+  // PHASE-051 (W-35 — T-08, BR-106): the order's Incoterms selection (the
+  // registry code — validated against the tenant's registry at create, the
+  // selector's own floor) + the explicit import/export marker (the
+  // mandate's second trigger arm). No PATCH surface: the selection rides
+  // create (the 0124 additive columns; the mandate fires at the order's
+  // own posting — the issue act).
+  incotermCode: z
+    .string()
+    .regex(/^[A-Z0-9]{2,8}$/, "2…8 uppercase letters/digits (the 0120 registry floor)")
+    .nullable()
+    .optional(),
+  tradeDirection: z.enum(["IMPORT", "EXPORT"]).nullable().optional(),
 });
 
 const grnLineSchema = z.object({
@@ -329,6 +341,8 @@ export class PurchasingController {
       noteAr: input.noteAr ?? null,
       requestId: input.requestId ?? null,
       revisionOfId: input.revisionOfId ?? null,
+      incotermCode: input.incotermCode ?? null,
+      tradeDirection: input.tradeDirection ?? null,
       actorId: identity.userId,
       lines: input.lines.map((line) => ({
         itemId: line.itemId,

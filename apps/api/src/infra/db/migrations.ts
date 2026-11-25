@@ -725,6 +725,28 @@ export const MIGRATIONS: readonly string[] = [
   // first trade settings registry key trade.lc_expiry_sweep_thresholds
   // (registry-in-code, the 0111 precedent — no migration row needed).
   "0123_trade_notifications_category",
+  // PHASE-051 (W-35 — T-08, dated 2026-11-25): the orders' own incoterm
+  // columns — BR-106's mandate floor (D-10: the selection lands on the
+  // order rows themselves; the typed refusal at the order's own posting
+  // reads the row's own field). The additive NULLABLE column pairs on
+  // purchase_orders AND sales_orders: incoterm_code (the registry code
+  // as SNAPSHOT data — validated at create against the tenant's
+  // tenant-extensible registry, carried at posting; NO FK by design:
+  // the registry rows carry a DELETE grant (the 0120 grants block) and
+  // a hard FK would refuse the tenant's own registry management) +
+  // trade_direction (the explicit IMPORT/EXPORT marker — BR-106's
+  // second trigger arm, the owner's ruling (ج) VERBATIM: «currency ≠
+  // base currency, or the order carries the import/export tag»). The
+  // 0123 additive-slot precedent's own class — a service wave's
+  // structural demand lands as its own dated additive slot, ordered
+  // WITH the writers (the same-increment law). NO tables (the catalog
+  // stays 354); the drift stays 357 (the W-35 routes bind the EXISTING
+  // 0122-seeded keys); ROUTE_PERMISSIONS 1,170 + 11 = 1,181 dated at
+  // the block (the collections + incoterms families — the keys-seed-
+  // first discipline's second trade binding wave); zero seeds (the
+  // starter sets landed at 0122 §6; the new-tenant materialization is
+  // the W-35 onboarding hook — one source, both paths).
+  "0124_trade_order_incoterms",
 ];
 
 /**

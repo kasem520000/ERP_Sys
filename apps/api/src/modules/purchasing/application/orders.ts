@@ -20,6 +20,17 @@ import {
 } from "../domain/purchasing-errors";
 import { lineNetAmount, resolvePurchasePrice, enforceApprovedVendorGate } from "./pricing";
 import { findContractById } from "../../crm/infrastructure/crm.store";
+// PHASE-051 (W-35 — T-08, 2026-11-25): BR-106's shared order gate — the
+// trade module's documented-contract surface (the plain-function import
+// shape, the treasury-store/ownTenantBaseCurrency precedent; never a
+// module coupling). The create act consumes the SELECTION floor (a
+// provided code must exist and be ACTIVE in the tenant's registry); the
+// issue act consumes the MANDATE gate (the typed refusal at the order's
+// own posting — D-10's own wording, the owner's ruling (ج) VERBATIM).
+import {
+  assertIncotermSelection,
+  assertTradeIncotermMandate,
+} from "../../trade/infrastructure/trade-order-gate";
 
 /**
  * Purchase requests + orders (PHASE-011 T2; DOCUMENT_LIFECYCLE §3; BR-010/
@@ -220,6 +231,12 @@ export class PurchaseOrderService {
     revisionOfId?: string | null;
     /** PHASE-038 (P-06): the optional CRM contract linkage. */
     contractId?: string | null;
+    /** PHASE-051 (W-35 — T-08, BR-106): the order's Incoterms selection
+     * (validated against the tenant's registry at create — the selector's
+     * own floor) + the explicit import/export marker (the mandate's second
+     * trigger arm). */
+    incotermCode?: string | null;
+    tradeDirection?: "IMPORT" | "EXPORT" | null;
     lines: readonly {
       itemId: string;
       qty: string;
@@ -250,6 +267,18 @@ export class PurchaseOrderService {
         `PO in ${input.currencyCode} requires a positive exchange rate (base ${base})`,
       );
     }
+    // PHASE-051 (W-35 — T-08): THE SELECTION FLOOR (the selector's own
+    // engine arm): a provided code must exist and be ACTIVE in the
+    // tenant's registry — the typed refusals name the code (unknown /
+    // retired); a null selection passes (the mandate fires at the order's
+    // own posting, never at create — D-10's own boundary). The code rides
+    // the row as SNAPSHOT data (the create froze the choice; a later
+    // registry retirement never rewrites a posted order).
+    const incotermCode =
+      input.incotermCode === undefined || input.incotermCode === null
+        ? null
+        : input.incotermCode.trim().toUpperCase();
+    await assertIncotermSelection(incotermCode);
 
     const revisionOfId = input.revisionOfId ?? null;
     let revisionNo = 1;
@@ -332,6 +361,8 @@ export class PurchaseOrderService {
       revisionOfId,
       revisionNo,
       contractId: input.contractId ?? null,
+      incotermCode,
+      tradeDirection: input.tradeDirection ?? null,
       note: input.note,
       noteAr: input.noteAr,
       actorId: input.actorId,
@@ -434,6 +465,26 @@ export class PurchaseOrderService {
   /** Issue (the official number reserves here — BR-029). */
   async issue(id: string, actorId: string | null) {
     const order = await this.find(id);
+    // PHASE-051 (W-35 — T-08): BR-106'S MANDATE GATE at the order's OWN
+    // POSTING (the issue act is the PO's posting — the official number
+    // and the issuance land together; D-10's own wording: the typed
+    // refusal naming the order + the missing field, ZERO residue — the
+    // number never reserves on a refused act). The gate is the shared
+    // order-gate surface (the trade module's documented contract — the
+    // flag probe + the trigger fold + the typed refusal, zero parallel
+    // computation); with the trade flag OFF the gate is silent (the
+    // declared neutral zero's own reading).
+    await assertTradeIncotermMandate({
+      docType: "purchase_order",
+      orderId: order.id,
+      orderNo: order.orderNo,
+      currencyCode: order.currencyCode,
+      tradeDirection:
+        order.tradeDirection === "IMPORT" || order.tradeDirection === "EXPORT"
+          ? order.tradeDirection
+          : null,
+      incotermCode: order.incotermCode,
+    });
     if (order.status !== "APPROVED") {
       // BR-010: below-threshold orders may skip the approval hop.
       if (order.status === "DRAFT" && !(await this.requiresApproval(order))) {

@@ -18,6 +18,16 @@ import { getOwnTenant, seedMasterDataBasics } from "../infrastructure/tenancy.st
 // data basics ride the tenancy store — never an ad hoc SQL copy.
 import { materializeCanonicalStatutorySet } from "../../payroll/infrastructure/statutory-canonical";
 import { materializeCanonicalCompetencyScale } from "../../hr/infrastructure/talent-canonical";
+// PHASE-051 (W-35 — D-16): the trade plane's canonical seeds — the
+// Incoterms-2020 set + the HS chapter-level starter set with the
+// accuracy disclaimer — materialize for NEW tenants at this same
+// provisioning site (one source: trade-canonical.ts, the same rows the
+// 0122 §6 seed materialized for every EXISTING tenant; the 0098
+// competency-scale precedent's own shape — never an ad hoc SQL copy).
+import {
+  materializeCanonicalHsStarterSet,
+  materializeCanonicalIncoterms,
+} from "../../trade/infrastructure/trade-canonical";
 
 /**
  * `provisionWorkspace` onboarding backend (PHASE-004 §2.3/T5): produces
@@ -115,6 +125,20 @@ export class OnboardingService {
     // tenant (the 0098 §4 seed's existing-tenant sweep is the same
     // canonical source — talent-canonical.ts, one source, both paths).
     await materializeCanonicalCompetencyScale();
+
+    // 1e. PHASE-051 (W-35 — T-08, D-16) — the trade plane's canonical
+    // seeds: the Incoterms-2020 set (11 rules, the ICC ownership matrix
+    // as registry DATA) + the HS chapter-level starter set (14 headings),
+    // materialized idempotently for the new tenant with the accuracy
+    // disclaimer on every starter row (the 0122 §6 seed's
+    // existing-tenant sweep is the same canonical source —
+    // trade-canonical.ts, one source, both paths; «البذور بإقرار
+    // الدقة»: the tenant owns the final applicability/classification;
+    // NO duty rates anywhere on the seeds). The registry rows exist
+    // regardless of the trade flag (the flag gates the mandate and the
+    // routes, never the reference data — the 0122 §6 shape).
+    await materializeCanonicalIncoterms();
+    await materializeCanonicalHsStarterSet();
 
     // 2. CoA template instantiation (code-ordered so parents insert first).
     const template = await store.listCoaTemplate();

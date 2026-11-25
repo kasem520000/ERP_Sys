@@ -116,6 +116,18 @@ import {
   LcChecklistStateError,
   LcDocumentDuplicateError,
 } from "../../modules/trade/domain/trade-errors";
+// PHASE-051 (W-35 — T-07 + T-08, dated 2026-11-25): the trade module's
+// typed refusals (the collections + incoterms planes' statuses — see
+// domainStatus).
+import {
+  CollectionRecordNotFoundError,
+  CollectionDuplicateError,
+  CollectionStateError,
+  IncotermRecordNotFoundError,
+  IncotermDuplicateError,
+  IncotermInactiveError,
+  IncotermCodeFrozenError,
+} from "../../modules/trade/domain/trade-errors";
 import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
@@ -1436,6 +1448,41 @@ function domainStatus(error: DomainError): number {
     error instanceof LcBankAccountInvalidError ||
     error instanceof LcChecklistStateError ||
     error instanceof LcDocumentDuplicateError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-051 (W-35 — T-07 + T-08, dated 2026-11-25): the trade
+  // collections + incoterms planes' statuses — registered in the SAME
+  // increment that ships the routes (the PHASE-045 T-03 lesson: never
+  // the 422 fall-through drift for a not-found). The 404s: the
+  // collections register's and the incoterms registry's not-founds
+  // (A7 parity — unknown == foreign, never an existence disclosure).
+  // The 409s: the collections lifecycle ladder's conflicts (the
+  // single-use CAS stamps, the terms gate, the stamp law's OPEN-only
+  // exit, the terminals) + the two natural keys (the (tenant,
+  // collection_no) and (tenant, code) uqs, refused at the service
+  // floor) + the registry-state floors (the retired code's selection
+  // refusal — the bank-account precedent's own class; the code-rewrite
+  // refusal — the frozen-evidence register's own class). The policy
+  // class — the usance floor (COLLECTION_USANCE_INVALID), the
+  // settlement pair's shape (COLLECTION_SETTLEMENT_INVALID), the
+  // registry write's shapes (INCOTERM_INVALID), BR-106's mandate
+  // itself (ORDER_INCOTERM_REQUIRED — the order lacks a required
+  // field under a policy) and the input vocabulary
+  // (TRADE_INPUT_INVALID) — falls through to the 422 default exactly
+  // as the family law documents it.
+  if (
+    error instanceof CollectionRecordNotFoundError ||
+    error instanceof IncotermRecordNotFoundError
+  ) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (
+    error instanceof CollectionDuplicateError ||
+    error instanceof CollectionStateError ||
+    error instanceof IncotermDuplicateError ||
+    error instanceof IncotermInactiveError ||
+    error instanceof IncotermCodeFrozenError
   ) {
     return HttpStatus.CONFLICT;
   }

@@ -500,3 +500,263 @@ export async function lastLcSweepRun(): Promise<{
   const row = rows[0];
   return row === undefined ? undefined : { at: row.at, outcome: row.after };
 }
+
+// ── the documentary collections (T-07 — the D/P vs D/A register, 0119) ──────
+
+export interface CollectionRow {
+  id: string;
+  collectionNo: string;
+  purchaseOrderId: string | null;
+  termsType: string;
+  amount: string;
+  currency: string;
+  dueDate: string | null;
+  documents: readonly string[];
+  status: string;
+  presentedAt: string | null;
+  acceptedAt: string | null;
+  paidAt: string | null;
+  settledAt: string | null;
+  settlementRef: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const COLLECTION_COLUMNS = sql`id, collection_no AS "collectionNo",
+  purchase_order_id AS "purchaseOrderId", terms_type AS "termsType", amount::text AS "amount",
+  currency, due_date::text AS "dueDate", documents, status,
+  presented_at::text AS "presentedAt", accepted_at::text AS "acceptedAt", paid_at::text AS "paidAt",
+  settled_at::text AS "settledAt", settlement_ref AS "settlementRef", note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export async function insertCollection(input: {
+  collectionNo: string;
+  purchaseOrderId: string | null;
+  termsType: string;
+  amount: string;
+  currency: string;
+  dueDate: string | null;
+  documents: readonly string[];
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<CollectionRow> {
+  const rows = await query<CollectionRow>(sql`
+    INSERT INTO documentary_collections
+      (id, tenant_id, collection_no, purchase_order_id, terms_type, amount, currency, due_date,
+       documents, status, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.collectionNo},
+            ${input.purchaseOrderId}, ${input.termsType}, ${input.amount}, ${input.currency},
+            ${input.dueDate}, ${JSON.stringify(input.documents)}::jsonb, 'OPEN',
+            ${input.note}, ${input.noteAr}, ${input.actorId})
+    RETURNING ${COLLECTION_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findCollectionById(id: string): Promise<CollectionRow | undefined> {
+  const rows = await query<CollectionRow>(sql`
+    SELECT ${COLLECTION_COLUMNS} FROM documentary_collections WHERE id = ${id} LIMIT 1`);
+  return rows[0];
+}
+
+export async function findCollectionByNo(collectionNo: string): Promise<CollectionRow | undefined> {
+  const rows = await query<CollectionRow>(sql`
+    SELECT ${COLLECTION_COLUMNS} FROM documentary_collections WHERE collection_no = ${collectionNo} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listCollections(filter: { status?: string; limit?: number }): Promise<CollectionRow[]> {
+  const status = filter.status ?? null;
+  return query<CollectionRow>(sql`
+    SELECT ${COLLECTION_COLUMNS} FROM documentary_collections
+    WHERE (${status}::text IS NULL OR status = ${status})
+    ORDER BY created_at DESC, id
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+/**
+ * THE PRESENT STAMP (the CAS — OPEN pins the from-state; the
+ * presentation stamp lands in the SAME statement, satisfying the 0119
+ * XOR floor by the same write that consumes the stamp).
+ */
+export async function stampCollectionPresented(input: {
+  id: string;
+  actorId: string | null;
+}): Promise<CollectionRow | undefined> {
+  const rows = await query<CollectionRow>(sql`
+    UPDATE documentary_collections
+    SET status = 'PRESENTED', presented_at = now(),
+        updated_at = now(), updated_by = ${input.actorId}, version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'OPEN'
+    RETURNING ${COLLECTION_COLUMNS}`);
+  return rows[0];
+}
+
+/**
+ * THE ACCEPT STAMP (the CAS — PRESENTED pins the from-state; the
+ * acceptance stamp lands in the SAME statement; the D/A-only gate is
+ * the fold's verdict rendered at the service floor — a D/P row never
+ * reaches this write).
+ */
+export async function stampCollectionAccepted(input: {
+  id: string;
+  actorId: string | null;
+}): Promise<CollectionRow | undefined> {
+  const rows = await query<CollectionRow>(sql`
+    UPDATE documentary_collections
+    SET status = 'ACCEPTED', accepted_at = now(),
+        updated_at = now(), updated_by = ${input.actorId}, version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'PRESENTED' AND accepted_at IS NULL
+    RETURNING ${COLLECTION_COLUMNS}`);
+  return rows[0];
+}
+
+/**
+ * THE SETTLE STAMP (the CAS — the paid stamps land TOGETHER: paid_at
+ * + the settled pair in the SAME statement from the window the fold
+ * allowed (PRESENTED on D/P at sight · ACCEPTED on D/A), the 0119
+ * XOR floors satisfied by the same write that consumes the stamp).
+ */
+export async function stampCollectionSettled(input: {
+  id: string;
+  settlementRef: string;
+  actorId: string | null;
+}): Promise<CollectionRow | undefined> {
+  const rows = await query<CollectionRow>(sql`
+    UPDATE documentary_collections
+    SET status = 'PAID', paid_at = now(), settled_at = now(),
+        settlement_ref = ${input.settlementRef},
+        updated_at = now(), updated_by = ${input.actorId}, version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status IN ('PRESENTED', 'ACCEPTED')
+      AND paid_at IS NULL AND settled_at IS NULL AND settlement_ref IS NULL
+    RETURNING ${COLLECTION_COLUMNS}`);
+  return rows[0];
+}
+
+/** THE CANCEL STAMP (the CAS — OPEN pins the from-state; the stamp
+ * law's OPEN-only exit: a CANCELLED row never carries a stamp). */
+export async function stampCollectionCancelled(input: {
+  id: string;
+  actorId: string | null;
+}): Promise<CollectionRow | undefined> {
+  const rows = await query<CollectionRow>(sql`
+    UPDATE documentary_collections
+    SET status = 'CANCELLED',
+        updated_at = now(), updated_by = ${input.actorId}, version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+      AND status = 'OPEN'
+    RETURNING ${COLLECTION_COLUMNS}`);
+  return rows[0];
+}
+
+// ── the incoterms registry (T-08 — the tenant-extensible rows, 0120) ────────
+
+export interface IncotermRow {
+  id: string;
+  code: string;
+  name: string;
+  nameAr: string;
+  carriageBySeller: boolean;
+  insuranceBySeller: boolean;
+  exportClearanceBySeller: boolean;
+  importClearanceBySeller: boolean;
+  importDutyBySeller: boolean;
+  isActive: boolean;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const INCOTERM_COLUMNS = sql`id, code, name, name_ar AS "nameAr", carriage_by_seller AS "carriageBySeller",
+  insurance_by_seller AS "insuranceBySeller", export_clearance_by_seller AS "exportClearanceBySeller",
+  import_clearance_by_seller AS "importClearanceBySeller", import_duty_by_seller AS "importDutyBySeller",
+  is_active AS "isActive", note, note_ar AS "noteAr",
+  created_at::text AS "createdAt", updated_at::text AS "updatedAt"`;
+
+export async function insertIncoterm(input: {
+  code: string;
+  name: string;
+  nameAr: string;
+  carriageBySeller: boolean;
+  insuranceBySeller: boolean;
+  exportClearanceBySeller: boolean;
+  importClearanceBySeller: boolean;
+  importDutyBySeller: boolean;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<IncotermRow> {
+  const rows = await query<IncotermRow>(sql`
+    INSERT INTO incoterms
+      (id, tenant_id, code, name, name_ar, carriage_by_seller, insurance_by_seller,
+       export_clearance_by_seller, import_clearance_by_seller, import_duty_by_seller, note, note_ar, created_by)
+    VALUES (${generateUuidV7()}, erp.current_tenant_id(), ${input.code}, ${input.name}, ${input.nameAr},
+            ${input.carriageBySeller}, ${input.insuranceBySeller}, ${input.exportClearanceBySeller},
+            ${input.importClearanceBySeller}, ${input.importDutyBySeller}, ${input.note}, ${input.noteAr},
+            ${input.actorId})
+    RETURNING ${INCOTERM_COLUMNS}`);
+  return rows[0]!;
+}
+
+export async function findIncotermByCode(code: string): Promise<IncotermRow | undefined> {
+  const rows = await query<IncotermRow>(sql`
+    SELECT ${INCOTERM_COLUMNS} FROM incoterms WHERE code = ${code} LIMIT 1`);
+  return rows[0];
+}
+
+export async function listIncoterms(filter: { activeOnly?: boolean; limit?: number }): Promise<IncotermRow[]> {
+  const activeOnly = filter.activeOnly ?? true;
+  return query<IncotermRow>(sql`
+    SELECT ${INCOTERM_COLUMNS} FROM incoterms
+    WHERE (${activeOnly}::boolean IS FALSE OR is_active = true)
+    ORDER BY code
+    LIMIT ${filter.limit ?? 200}`);
+}
+
+/** The registry row's UPDATE surface (the code NEVER moves — the
+ * identity; the names, the matrix booleans and the active flag ride). */
+export async function updateIncoterm(input: {
+  id: string;
+  name: string | null;
+  nameAr: string | null;
+  carriageBySeller: boolean | null;
+  insuranceBySeller: boolean | null;
+  exportClearanceBySeller: boolean | null;
+  importClearanceBySeller: boolean | null;
+  importDutyBySeller: boolean | null;
+  isActive: boolean | null;
+  note: string | null;
+  noteAr: string | null;
+  actorId: string | null;
+}): Promise<IncotermRow | undefined> {
+  const rows = await query<IncotermRow>(sql`
+    UPDATE incoterms
+    SET name = COALESCE(${input.name}, name),
+        name_ar = COALESCE(${input.nameAr}, name_ar),
+        carriage_by_seller = COALESCE(${input.carriageBySeller}, carriage_by_seller),
+        insurance_by_seller = COALESCE(${input.insuranceBySeller}, insurance_by_seller),
+        export_clearance_by_seller = COALESCE(${input.exportClearanceBySeller}, export_clearance_by_seller),
+        import_clearance_by_seller = COALESCE(${input.importClearanceBySeller}, import_clearance_by_seller),
+        import_duty_by_seller = COALESCE(${input.importDutyBySeller}, import_duty_by_seller),
+        is_active = COALESCE(${input.isActive}, is_active),
+        note = COALESCE(${input.note}, note),
+        note_ar = COALESCE(${input.noteAr}, note_ar),
+        updated_at = now(), updated_by = ${input.actorId}, version = version + 1
+    WHERE id = ${input.id} AND tenant_id = erp.current_tenant_id()
+    RETURNING ${INCOTERM_COLUMNS}`);
+  return rows[0];
+}
+
+/** The active-code probe the order gates consume (the selector's own
+ * floor — one probe, zero parallel computation). */
+export async function findActiveIncotermByCode(code: string): Promise<IncotermRow | undefined> {
+  const rows = await query<IncotermRow>(sql`
+    SELECT ${INCOTERM_COLUMNS} FROM incoterms WHERE code = ${code} AND is_active = true LIMIT 1`);
+  return rows[0];
+}

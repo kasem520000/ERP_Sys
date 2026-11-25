@@ -102,6 +102,18 @@ const createOrderSchema = z.object({
   note: z.string().min(1).max(500).nullable().optional(),
   noteAr: z.string().min(1).max(500).nullable().optional(),
   reserve: z.boolean().optional(),
+  // PHASE-051 (W-35 — T-08, BR-106): the order's Incoterms selection (the
+  // registry code — validated against the tenant's registry at create, the
+  // selector's own floor) + the explicit import/export marker (the
+  // mandate's second trigger arm — the export leg rides the sales side).
+  // No PATCH surface: the selection rides create (the 0124 additive
+  // columns; the mandate fires at the order's own posting — the issue act).
+  incotermCode: z
+    .string()
+    .regex(/^[A-Z0-9]{2,8}$/, "2…8 uppercase letters/digits (the 0120 registry floor)")
+    .nullable()
+    .optional(),
+  tradeDirection: z.enum(["IMPORT", "EXPORT"]).nullable().optional(),
   lines: z.array(orderLineSchema).min(1).max(200),
 });
 
@@ -385,6 +397,8 @@ export class SalesController {
         quotationId: input.quotationId ?? null,
         expectedDate: input.expectedDate ?? null,
         exchangeRate: input.exchangeRate ?? null,
+        incotermCode: input.incotermCode ?? null,
+        tradeDirection: input.tradeDirection ?? null,
         note: input.note ?? null,
         noteAr: input.noteAr ?? null,
         actorId: identity.userId,

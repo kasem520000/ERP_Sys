@@ -17,6 +17,18 @@ import {
 import { requireCustomer, requireSellableItem } from "./quotations";
 import { AtpService } from "../../manufacturing/application/atp-service";
 import { resolveSalesPrice, salesLineNetAmount, PRICE_RE } from "./pricing";
+// PHASE-051 (W-35 — T-08, 2026-11-25): BR-106's shared order gate — the
+// trade module's documented-contract surface (the plain-function import
+// shape, the treasury-store/ownTenantBaseCurrency precedent; never a
+// module coupling). The create act consumes the SELECTION floor (a
+// provided code must exist and be ACTIVE in the tenant's registry); the
+// issue act consumes the MANDATE gate (the typed refusal at the order's
+// own posting — D-10's own wording, the owner's ruling (ج) VERBATIM; the
+// export leg rides the sales side).
+import {
+  assertIncotermSelection,
+  assertTradeIncotermMandate,
+} from "../../trade/infrastructure/trade-order-gate";
 
 /**
  * Sales-order service (PHASE-012 T3; §2.2): DRAFT → PENDING_APPROVAL →
@@ -244,6 +256,12 @@ export class SalesOrderService {
     expectedDate: string | null;
     currencyCode: string;
     exchangeRate: string | null;
+    /** PHASE-051 (W-35 — T-08, BR-106): the order's Incoterms selection
+     * (validated against the tenant's registry at create — the selector's
+     * own floor) + the explicit import/export marker (the mandate's second
+     * trigger arm). */
+    incotermCode?: string | null;
+    tradeDirection?: "IMPORT" | "EXPORT" | null;
     note: string | null;
     noteAr: string | null;
     actorId: string | null;
@@ -258,6 +276,18 @@ export class SalesOrderService {
         `order in ${input.currencyCode} requires a positive exchange rate (base ${base})`,
       );
     }
+    // PHASE-051 (W-35 — T-08): THE SELECTION FLOOR (the selector's own
+    // engine arm): a provided code must exist and be ACTIVE in the
+    // tenant's registry — the typed refusals name the code (unknown /
+    // retired); a null selection passes (the mandate fires at the order's
+    // own posting, never at create — D-10's own boundary). The code rides
+    // the row as SNAPSHOT data (the create froze the choice; a later
+    // registry retirement never rewrites a posted order).
+    const incotermCode =
+      input.incotermCode === undefined || input.incotermCode === null
+        ? null
+        : input.incotermCode.trim().toUpperCase();
+    await assertIncotermSelection(incotermCode);
     const { InventoryModule } = await import("../../inventory/inventory.module");
     void InventoryModule;
     const inventoryStore = await import("../../inventory/infrastructure/inventory.store");
@@ -319,6 +349,8 @@ export class SalesOrderService {
       expectedDate: input.expectedDate,
       currencyCode: input.currencyCode,
       exchangeRate: input.exchangeRate,
+      incotermCode,
+      tradeDirection: input.tradeDirection ?? null,
       note: input.note,
       noteAr: input.noteAr,
       actorId: input.actorId,
@@ -459,6 +491,26 @@ export class SalesOrderService {
   /** Issue (the official SOR- number reserves here — BR-029). */
   async issue(id: string, actorId: string | null) {
     const order = await this.find(id);
+    // PHASE-051 (W-35 — T-08): BR-106'S MANDATE GATE at the order's OWN
+    // POSTING (the issue act is the SO's posting — the official number
+    // and the issuance land together; D-10's own wording: the typed
+    // refusal naming the order + the missing field, ZERO residue — the
+    // number never reserves on a refused act). The gate is the shared
+    // order-gate surface (the trade module's documented contract — the
+    // flag probe + the trigger fold + the typed refusal, zero parallel
+    // computation); with the trade flag OFF the gate is silent (the
+    // declared neutral zero's own reading).
+    await assertTradeIncotermMandate({
+      docType: "sales_order",
+      orderId: order.id,
+      orderNo: order.orderNo,
+      currencyCode: order.currencyCode,
+      tradeDirection:
+        order.tradeDirection === "IMPORT" || order.tradeDirection === "EXPORT"
+          ? order.tradeDirection
+          : null,
+      incotermCode: order.incotermCode,
+    });
     if (order.status !== "APPROVED") {
       throw new SalesDocumentStateError(
         `sales order ${id} is ${order.status} — approval precedes issue`,
