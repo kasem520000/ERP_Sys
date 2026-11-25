@@ -125,3 +125,22 @@ implementation waves are BLOCKED until the owner's approval dispatch
 completion report §4 (transferred verbatim); the reservations G-64…G-66 ·
 INV-036 · BR-105…BR-108 carry the لا-كتابة-خارجها law into every 051
 wave.
+
+---
+
+> **[Dated 2026-11-24 (F-051a — the owner's non-blocking correction order,
+> delivered with W-33): the envelope's PHYSICAL file count is 35, not
+> 37.]** The W-0 delivery head's commit message recorded this envelope as
+> "37 physical files" — the figure was carried from the 050-plan
+> precedent's own census WITHOUT a recount. The recount this session
+> (W-33's first act, `find audit-evidence/phase051-plan -type f | wc -l`):
+> **35 files** — README.md + 29 `.log` + 3 `.txt` (the coverage
+> inventory/union/proof) + 1 `.json` (parts.json) + 1 `.ts`
+> (scratch-rls-proof.ts). The gate log itself is SOUND: every claim in
+> THIS README describes the logs by name and verdict, and the W-32
+> ten-part envelope's own arithmetic (300 files · 4,244 tests) is
+> unaffected — the miscount lived in the commit message's census phrase
+> alone, never in a gate-record claim. Recorded per the F1 literal-truth
+> law (dated corrections at the original claim site — the correction
+> order rides W-33's delivery, the owner's dispatch verbatim: «أمر تصحيح
+> مؤرّخ واحد غير حاجب»).
