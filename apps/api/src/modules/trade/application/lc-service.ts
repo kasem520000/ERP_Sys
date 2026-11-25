@@ -66,8 +66,12 @@ import {
  *   BANK_CHARGES · CR the tenant's chosen bank account** + the OUT
  *   treasury movement (INV-019), on the single-use source operation
  *   `fee_{seq}` (the INV-028 `op_<seq>` precedent — each fee act its own
- *   INV-013 key; a raced double-submit of the same sequence gets
- *   ALREADY_POSTED semantics, the engine's own law).
+ *   INV-013 key; a raced double-submit of the same sequence returns the
+ *   stored result, INV-013's own law). The movement's source identity is
+ *   the FEE EVENT itself (source `lc_fee`, its single-use journal entry
+ *   — the cash-moves discipline's one-movement-per-source-side law,
+ *   uq_cash_movements_source_side; multiple fees on one LC are multiple
+ *   events, each its own row).
  *
  *   THE DECLARED INTERPRETATIONS (four, recorded at the claim sites):
  *   (1) THE MARGIN EXIT LAW — the deposit's only exit is the retirement
@@ -857,6 +861,13 @@ export class LcService {
       lines,
     };
     const posted = await this.posting.post(spec, { postedBy: input.actorId });
+    // THE MOVEMENT'S OWN SOURCE IDENTITY (the cash-moves discipline's
+    // one-movement-per-source-side law: uq_cash_movements_source_side is
+    // (tenant, source, source_id, account, direction)): the FEE EVENT is
+    // its own money event — keyed by its single-use journal entry (the
+    // INV-013 key's concrete realization), exactly as the discipline's
+    // documents key their movements by their own rows. The linkage to
+    // the LC register rides the journal's own source key + the memo.
     await insertCashMovement({
       cashAccountId: account.id,
       direction: "OUT",
@@ -864,8 +875,8 @@ export class LcService {
       currencyCode: row.currency,
       exchangeRate: rate ?? "1",
       baseAmount: baseAmountAt(amount, rate),
-      sourceType: "letters_of_credit",
-      sourceId: row.id,
+      sourceType: "lc_fee",
+      sourceId: posted.journalEntryId,
       valueDate: entryDate,
       memo: `LC ${row.lcNo} fee (financial charge)`,
       memoAr: `رسوم الاعتماد ${row.lcNo} (مصاريف مالية)`,

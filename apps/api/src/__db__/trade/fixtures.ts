@@ -186,3 +186,135 @@ export async function freshTradeDeclaration(
   await su.end();
   return row.rows[0]!.id;
 }
+
+/**
+ * PHASE-051 (W-34, the LC engine wave) — THE LC POSTING WORLD (the
+ * quality fixtures' ensureQualityPostingWorld shape, T-05 + T-06): the
+ * trade tenant's own accounting substrate for the G-64 journeys — the
+ * CoA template instantiated (the 1180 LC_MARGIN_DEPOSIT marker + the
+ * template's own BANK_CHARGES mapping ride the same provisioning), the
+ * fiscal year FY-TR-FIX with its OPEN 2026-11 REGULAR period (the W-33
+ * schema spec's own world, ensured idempotently here so the service
+ * specs run in ANY order — the per-arm-world law), and THE TWO BANK
+ * ACCOUNTS through the treasury store's own surface (the USD bank the
+ * fixture LCs default to — the FX ride's own account — and the SAR
+ * bank for the base-currency arms). The heavy service worlds' fixtures
+ * (the G-65 allocation, the G-66 gate) extend this shape on their own
+ * waves.
+ */
+export interface TradeLcPostingWorld {
+  usdBankId: string;
+  sarBankId: string;
+  glUsdBankCode: string;
+  glSarBankCode: string;
+  marginAccountCode: string;
+  bankChargesAccountCode: string;
+}
+
+let lcPostingWorld: TradeLcPostingWorld | undefined;
+
+export async function ensureTradeLcPostingWorld(): Promise<TradeLcPostingWorld> {
+  if (lcPostingWorld !== undefined) return lcPostingWorld;
+  await setupTradeFixture();
+  await withTenant(TENANT_TRADE, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    await tenancy.seedMasterDataBasics();
+    await tenancy.provisionCoaTemplate();
+  });
+  // The fiscal year + the OPEN 2026-11 REGULAR period (the W-33 schema
+  // spec's own world, ensured idempotently — the service specs' acts
+  // post inside THIS window; the ordering-independence law).
+  const su: Client = await superuserClient();
+  await su.query(
+    `INSERT INTO fiscal_years (id, tenant_id, name, start_date, end_date, status)
+     VALUES (gen_random_uuid(), $1, 'FY-TR-FIX', '2026-01-01', '2026-12-31', 'OPEN')
+     ON CONFLICT DO NOTHING`,
+    [TENANT_TRADE],
+  );
+  await su.query(
+    `INSERT INTO fiscal_periods (id, tenant_id, fiscal_year_id, name, kind, start_date, end_date, status)
+     SELECT gen_random_uuid(), $1, fy.id, '2026-11', 'REGULAR', '2026-11-01', '2026-11-30', 'OPEN'
+     FROM fiscal_years fy
+     WHERE fy.tenant_id = $1 AND fy.name = 'FY-TR-FIX'
+       AND NOT EXISTS (
+         SELECT 1 FROM fiscal_periods fp
+         WHERE fp.tenant_id = $1 AND fp.fiscal_year_id = fy.id AND fp.name = '2026-11')`,
+    [TENANT_TRADE],
+  );
+  await su.end();
+  // The bank accounts through the treasury store's own surface — the
+  // template owns ONE bank GL (1121) and uq_cash_accounts_tenant_account
+  // is one cash account per GL account, so the FX ride's own account
+  // gets its own GL: 1122 (Bank — FX account) created through the
+  // tenant's runtime surface (the 0008 group 1120's own child, the
+  // quality fixture's second-inventory-account precedent). The SAR bank
+  // rides the template's own 1121.
+  const world = await withTenant(TENANT_TRADE, async () => {
+    const tenancy = await import("../../modules/tenancy/infrastructure/tenancy.store");
+    const treasury = await import("../../modules/treasury/infrastructure/treasury.store");
+    const marginMapping = await tenancy.findActivePurpose("LC_MARGIN_DEPOSIT");
+    const chargesMapping = await tenancy.findActivePurpose("BANK_CHARGES");
+    const glSarBank = await tenancy.findAccountByCode("1121");
+    const banksGroup = await tenancy.findAccountByCode("1120");
+    const marginAccount =
+      marginMapping === undefined ? undefined : await tenancy.findAccountByCode("1180");
+    const chargesAccount =
+      chargesMapping === undefined ? undefined : await tenancy.findAccountByCode("5240");
+    if (
+      marginMapping === undefined ||
+      chargesMapping === undefined ||
+      glSarBank === undefined ||
+      banksGroup === undefined ||
+      marginAccount === undefined ||
+      chargesAccount === undefined
+    ) {
+      throw new Error("the trade LC posting world's CoA provisioning is incomplete");
+    }
+    let glUsdBank = await tenancy.findAccountByCode("1122");
+    if (glUsdBank === undefined) {
+      glUsdBank = await tenancy.insertAccount({
+        code: "1122",
+        name: "Bank — FX account",
+        nameAr: "البنك — حساب العملات",
+        type: "ASSET",
+        parentId: banksGroup.id,
+        isPostable: true,
+      });
+    }
+    const existing = await treasury.listCashAccounts({ type: "BANK" });
+    const usd = existing.find((row) => row.currencyCode === "USD");
+    const sar = existing.find((row) => row.currencyCode === "SAR");
+    const usdBank =
+      usd ??
+      (await treasury.insertCashAccount({
+        name: "Trade Issuing Bank (USD)",
+        nameAr: "بنك الإصدار (دولار)",
+        type: "BANK",
+        accountId: glUsdBank.id,
+        branchId: null,
+        currencyCode: "USD",
+        createdBy: TR_ACTOR,
+      }));
+    const sarBank =
+      sar ??
+      (await treasury.insertCashAccount({
+        name: "Trade Issuing Bank (SAR)",
+        nameAr: "بنك الإصدار (ريال)",
+        type: "BANK",
+        accountId: glSarBank.id,
+        branchId: null,
+        currencyCode: "SAR",
+        createdBy: TR_ACTOR,
+      }));
+    return {
+      usdBankId: usdBank.id,
+      sarBankId: sarBank.id,
+      glUsdBankCode: glUsdBank.code,
+      glSarBankCode: glSarBank.code,
+      marginAccountCode: marginAccount.code,
+      bankChargesAccountCode: chargesAccount.code,
+    };
+  });
+  lcPostingWorld = world;
+  return world;
+}

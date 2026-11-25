@@ -390,11 +390,14 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // migration-plane gate with the accuracy disclaimer on every
     // starter row). FOURTEEN tenant tables; the catalog 340 → 354.
     // [dated 2026-11-25 — PHASE-051 W-34: the chain grows 122 → 123 —
-    // 0123_trade_notifications_category lands WITH the
-    // trade-expiry-sweep's inbox writer (the 'trade' member joins both
-    // closed CHECK domains, the 0099/0111/0118 same-increment law; the
-    // 050 0117/0118 additive-slot precedent's own class, the declared
-    // slots consumed and PUBLISHED at W-33 — the constants law)]
+    // 0123_trade_notifications_category lands WITH this wave's writers
+    // (the 'trade' member joins both closed notifications CHECK domains
+    // for the trade-expiry-sweep's inbox records + 'letters_of_credit'
+    // and 'lc_amendment' join ck_cash_movements_source_shape for G-64's
+    // margin movements through the REAL treasury path — the 0117/0118
+    // additive-slot precedent's own class under the 0099/0111 same-
+    // increment law; the declared slots consumed and PUBLISHED at W-33
+    // — the constants law)]
     expect(files.at(-1)?.tag).toBe("0123_trade_notifications_category");
   });
 

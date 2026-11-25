@@ -1,15 +1,32 @@
--- PHASE-051 (W-34 — T-06, dated 2026-11-25) · migration 0123 · THE
--- NOTIFICATIONS-CATEGORY WIDENING — 'trade' joins BOTH CHECK domains
--- (the 0023/0056/0099/0111/0118 pattern, D-09's own dependency).
+-- PHASE-051 (W-34 — T-06, dated 2026-11-25) · migration 0123 · THE TWO
+-- CLOSED-DOMAIN WIDENINGS this wave's writers demand (the 0117/0118
+-- additive-slot precedent's own class, ordered WITH the writers — the
+-- 0099/0111/0117/0118 same-increment law: the constraints and their
+-- writers land together, never after).
 --
---   THE CATCH IS STRUCTURAL, NOT LATENT: the trade-expiry-sweep's inbox
---     writer ships in THIS wave (the `trade-expiry-sweep` pg-boss job —
---     the 0111/calibration pattern's W-34 extension, BR-105's own
---     ladder), and its records carry category 'trade' — a member the
---     closed notifications/notification_prefs CHECK domains do not
---     carry (the eighteen-member union of 0118). The widening is
---     ordered WITH the writer, never after it (the 0099/0111/0118
---     same-increment law: the constraint and its writer land together).
+--   §1 THE NOTIFICATIONS-CATEGORY WIDENING (the 0023/0056/0099/0111/
+--     0118 pattern, D-09's own dependency): the trade-expiry-sweep's
+--     inbox writer ships in THIS wave (the `trade-expiry-sweep`
+--     pg-boss job — the 0111/calibration pattern's W-34 extension,
+--     BR-105's own ladder), and its records carry category 'trade' —
+--     a member the closed notifications/notification_prefs CHECK
+--     domains do not carry (the eighteen-member union of 0118).
+--
+--   §2 THE CASH-MOVES SOURCE WIDENING (the 0109/0110/0117 pattern
+--     VERBATIM — the 0117 class's exact shape: G-62's NCR write-off
+--     sourced its moves 'ncr_record' through the REAL WMS path and the
+--     closed ck_stock_moves_source_shape refused the first insert BY
+--     NAME; G-64's margin movements source through the REAL treasury
+--     path (insertCashMovement — the INV-019 discipline) and the same
+--     class fires here): 'letters_of_credit' (the margin deposit at
+--     issue · the release at retirement), 'lc_amendment' (the margin
+--     adjustments — one movement per amendment row) and 'lc_fee' (the
+--     fee events — each keyed by its single-use journal entry, the
+--     one-movement-per-source-side law uq_cash_movements_source_side's
+--     own demand for repeatable fee charges) join
+--     ck_cash_movements_source_shape — EXACTLY the three new sources,
+--     no wider; the standing twelve-member union of 0056 + these
+--     three = fifteen.
 --
 --   THE ADDITIVE-SLOT LAW (the 0117/0118 precedent's own class — the
 --     master plan's four declared slots 0119–0122 are consumed at W-33
@@ -37,8 +54,8 @@
 --     the permissions drift 357 unchanged (the sweep-config surface
 --     binds the EXISTING 0122-seeded trade.lc.manage key — its own
 --     description names the LC lifecycle's management; no new key) ·
---     ROUTE_PERMISSIONS 1,159 + 12 = 1,171 (the W-34 dated delta at the
---     block — the LC plane's twelve routes, the keys-seed-first FIRST
+--     ROUTE_PERMISSIONS 1,159 + 11 = 1,170 (the W-34 dated delta at
+--     the block — the LC plane's routes, the keys-seed-first FIRST
 --     trade binding wave) · the first 051 trade settings registry key
 --     trade.lc_expiry_sweep_thresholds (the CODE registry —
 --     tenant_settings carries the value; no migration row needed, the
@@ -70,6 +87,20 @@ ALTER TABLE "notification_prefs" ADD CONSTRAINT ck_notification_prefs_category_v
     'einvoicing', 'notes', 'installments', 'budgeting', 'payroll', 'purchasing', 'collections',
     'warranties', 'hr', 'assets', 'quality', 'trade'
   ));
+
+--> statement-breakpoint
+-- ---------------------------------------------------------------------------
+-- §2 THE CASH-MOVES SOURCE WIDENING (the 0117 precedent's own shape —
+--    G-64's margin movements through the REAL treasury path).
+--> statement-breakpoint
+ALTER TABLE "cash_movements" DROP CONSTRAINT IF EXISTS ck_cash_movements_source_shape;
+--> statement-breakpoint
+ALTER TABLE "cash_movements" ADD CONSTRAINT ck_cash_movements_source_shape CHECK (
+  "source_type" IN ('receipt', 'payment', 'cash_transfer', 'expense', 'shift_variance',
+                    'sales_invoice', 'rep_settlement', 'note',
+                    'payroll_payout', 'employee_loan', 'supplier_advance',
+                    'return_authorization', 'letters_of_credit', 'lc_amendment', 'lc_fee')
+);
 
 --> statement-breakpoint
 RESET ROLE;
