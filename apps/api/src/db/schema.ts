@@ -11553,3 +11553,598 @@ export const hazardRegisters = pgTable(
     index("ix_hazard_registers_tenant_active").on(table.tenantId, table.isActive),
   ],
 );
+
+/** PHASE-051 (T-01, migration 0119 — L-01, D-05): the letters of
+ * credit register — the G-64 margin/retirement anchor (the margin
+ * deposit at issuance, reversed at settlement, through the REAL engine
+ * at W-34) with the status ladder and the PO link; the expiry pair is
+ * BR-105's sweep anchor. Evidence discipline: no DELETE (the
+ * trade-finance audit trail). */
+export const lettersOfCredit = pgTable(
+  "letters_of_credit",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    lcNo: text("lc_no").notNull(),
+    purchaseOrderId: uuid("purchase_order_id"),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    amount: numeric("amount", { precision: 19, scale: 4 }).notNull(),
+    marginAmount: numeric("margin_amount", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    issuingBank: text("issuing_bank").notNull(),
+    beneficiaryName: text("beneficiary_name").notNull(),
+    applicantName: text("applicant_name").notNull(),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    expiryDate: date("expiry_date").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    marginJournalEntryId: uuid("margin_journal_entry_id"),
+    settledAt: timestamp("settled_at", { withTimezone: true, mode: "string" }),
+    retirementJournalEntryId: uuid("retirement_journal_entry_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_letters_of_credit_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_letters_of_credit_tenant_no").on(table.tenantId, table.lcNo),
+    index("ix_letters_of_credit_tenant_status").on(
+      table.tenantId,
+      table.status,
+      table.expiryDate,
+    ),
+    index("ix_letters_of_credit_tenant_po")
+      .on(table.tenantId, table.purchaseOrderId)
+      .where(sql`${table.purchaseOrderId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-01, migration 0119 — L-01, D-05): the dated typed LC
+ * amendments — each amendment exactly one typed dimension
+ * (value/validity/documents/other), the typed-change law at the SQL
+ * floor. Evidence discipline: no DELETE. */
+export const lcAmendments = pgTable(
+  "lc_amendments",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    lcId: uuid("lc_id").notNull(),
+    amendmentNo: integer("amendment_no").notNull(),
+    changeType: text("change_type").notNull(),
+    valueFrom: numeric("value_from", { precision: 19, scale: 4 }),
+    valueTo: numeric("value_to", { precision: 19, scale: 4 }),
+    expiryFrom: date("expiry_from"),
+    expiryTo: date("expiry_to"),
+    documentsNote: text("documents_note"),
+    summary: text("summary"),
+    effectiveAt: timestamp("effective_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_lc_amendments_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_lc_amendments_tenant_lc_no").on(
+      table.tenantId,
+      table.lcId,
+      table.amendmentNo,
+    ),
+    index("ix_lc_amendments_tenant_lc").on(
+      table.tenantId,
+      table.lcId,
+      table.amendmentNo,
+    ),
+  ],
+);
+
+/** PHASE-051 (T-01, migration 0119 — L-01, BR-105): the LC documents
+ * checklist — presented/verified with their own stamps and the
+ * discrepancy notes the expiry sweep reads (W-34's
+ * trade-expiry-sweep, the 0111 pattern). Evidence discipline: no
+ * DELETE. */
+export const lcDocuments = pgTable(
+  "lc_documents",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    lcId: uuid("lc_id").notNull(),
+    docType: text("doc_type").notNull(),
+    presented: boolean("presented").notNull().default(false),
+    presentedAt: timestamp("presented_at", { withTimezone: true, mode: "string" }),
+    verified: boolean("verified").notNull().default(false),
+    verifiedAt: timestamp("verified_at", { withTimezone: true, mode: "string" }),
+    discrepancyNotes: text("discrepancy_notes"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_lc_documents_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_lc_documents_tenant_lc_type").on(
+      table.tenantId,
+      table.lcId,
+      table.docType,
+    ),
+    index("ix_lc_documents_tenant_lc").on(table.tenantId, table.lcId, table.docType),
+  ],
+);
+
+/** PHASE-051 (T-01, migration 0119 — L-02, D-21): the documentary
+ * collections register — D/P and D/A terms, the documents set, the
+ * status ladder and the settlement linkage (the D/A usance floor
+ * carries its maturity). Evidence discipline: no DELETE. */
+export const documentaryCollections = pgTable(
+  "documentary_collections",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    collectionNo: text("collection_no").notNull(),
+    purchaseOrderId: uuid("purchase_order_id"),
+    termsType: text("terms_type").notNull(),
+    amount: numeric("amount", { precision: 19, scale: 4 }).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    dueDate: date("due_date"),
+    documents: jsonb("documents").notNull().default([]),
+    status: text("status").notNull().default("OPEN"),
+    presentedAt: timestamp("presented_at", { withTimezone: true, mode: "string" }),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true, mode: "string" }),
+    paidAt: timestamp("paid_at", { withTimezone: true, mode: "string" }),
+    settledAt: timestamp("settled_at", { withTimezone: true, mode: "string" }),
+    settlementRef: text("settlement_ref"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_documentary_collections_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_documentary_collections_tenant_no").on(
+      table.tenantId,
+      table.collectionNo,
+    ),
+    index("ix_documentary_collections_tenant_status").on(
+      table.tenantId,
+      table.status,
+      table.dueDate,
+    ),
+    index("ix_documentary_collections_tenant_po")
+      .on(table.tenantId, table.purchaseOrderId)
+      .where(sql`${table.purchaseOrderId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-02, migration 0120 — L-03, D-10/D-16): the
+ * tenant-extensible Incoterms registry — the ownership matrix as
+ * registry data (carriage/insurance/clearance/duty); the 2020 seed
+ * (0122 §6) carries the accuracy disclaimer on every starter row (the
+ * tenant owns the final classification). Master data: DELETE granted
+ * (the tenant's own registry). */
+export const incoterms = pgTable(
+  "incoterms",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    code: text("code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar").notNull(),
+    carriageBySeller: boolean("carriage_by_seller").notNull(),
+    insuranceBySeller: boolean("insurance_by_seller").notNull(),
+    exportClearanceBySeller: boolean("export_clearance_by_seller").notNull(),
+    importClearanceBySeller: boolean("import_clearance_by_seller").notNull(),
+    importDutyBySeller: boolean("import_duty_by_seller").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_incoterms_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_incoterms_tenant_code").on(table.tenantId, table.code),
+    index("ix_incoterms_tenant_active").on(table.tenantId, table.isActive, table.code),
+  ],
+);
+
+/** PHASE-051 (T-02, migration 0120 — L-04/L-13, D-14): the multimodal
+ * transport document — THE SHIPMENT'S OWN ANCHOR (the declared
+ * interpretation: the fourteen-table budget has no separate shipments
+ * table; the B/L's carriage contract is the shipment's identity — the
+ * tracking events link it, the commercial links keep the acceptance #8
+ * chain navigable). The shipment_status column is the tracking fold's
+ * driven surface (W-36's pure module, the monotone ladder). Evidence
+ * discipline: no DELETE. */
+export const billsOfLading = pgTable(
+  "bills_of_lading",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    blNo: text("bl_no").notNull(),
+    docType: text("doc_type").notNull(),
+    carrierName: text("carrier_name").notNull(),
+    portOfLoading: text("port_of_loading"),
+    portOfDischarge: text("port_of_discharge"),
+    containerRefs: jsonb("container_refs"),
+    purchaseOrderId: uuid("purchase_order_id"),
+    deliveryNoteId: uuid("delivery_note_id"),
+    shipmentStatus: text("shipment_status").notNull().default("BOOKED"),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_bills_of_lading_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_bills_of_lading_tenant_no").on(table.tenantId, table.blNo),
+    index("ix_bills_of_lading_tenant_status").on(
+      table.tenantId,
+      table.shipmentStatus,
+      table.issuedAt,
+    ),
+    index("ix_bills_of_lading_tenant_po")
+      .on(table.tenantId, table.purchaseOrderId)
+      .where(sql`${table.purchaseOrderId} IS NOT NULL`),
+    index("ix_bills_of_lading_tenant_dn")
+      .on(table.tenantId, table.deliveryNoteId)
+      .where(sql`${table.deliveryNoteId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-02, migration 0120 — L-05): the packing lists — the
+ * shipment/receipt link with the line-level pack shapes (a jsonb
+ * array, the 050 CAPA actions precedent: the fourteen-table budget has
+ * no child table) and the fold-driven shipment_status mirror.
+ * Evidence discipline: no DELETE. */
+export const packingLists = pgTable(
+  "packing_lists",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    plNo: text("pl_no").notNull(),
+    billOfLadingId: uuid("bill_of_lading_id"),
+    receiptId: uuid("receipt_id"),
+    lines: jsonb("lines").notNull().default([]),
+    shipmentStatus: text("shipment_status").notNull().default("BOOKED"),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_packing_lists_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_packing_lists_tenant_no").on(table.tenantId, table.plNo),
+    index("ix_packing_lists_tenant_bl")
+      .on(table.tenantId, table.billOfLadingId)
+      .where(sql`${table.billOfLadingId} IS NOT NULL`),
+    index("ix_packing_lists_tenant_receipt")
+      .on(table.tenantId, table.receiptId)
+      .where(sql`${table.receiptId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-02, migration 0120 + 0121 §6 — L-09/L-10, D-13): the
+ * chamber-format bilingual certificates — ORIGIN and CONFORMITY ride
+ * the same table as a doc type (the 050 COA one-table-two-types law);
+ * THE FROZEN SNAPSHOT: the print's own data frozen at issuance — a
+ * later declaration PATCH never moves a stored certificate (the W-39
+ * print surface renders it VERBATIM through the bi() builder
+ * EXCLUSIVELY). Evidence discipline: no DELETE (an issued certificate
+ * is immutable history). */
+export const certificatesOfOrigin = pgTable(
+  "certificates_of_origin",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    certificateNo: text("certificate_no").notNull(),
+    certType: text("cert_type").notNull(),
+    billOfLadingId: uuid("bill_of_lading_id"),
+    declarationId: uuid("declaration_id"),
+    snapshot: jsonb("snapshot").notNull(),
+    issuedAt: timestamp("issued_at", { withTimezone: true, mode: "string" })
+      .notNull()
+      .defaultNow(),
+    issuedBy: uuid("issued_by"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_certificates_of_origin_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_certificates_of_origin_tenant_no").on(
+      table.tenantId,
+      table.certificateNo,
+    ),
+    index("ix_certificates_of_origin_tenant_issued").on(
+      table.tenantId,
+      table.issuedAt,
+    ),
+    index("ix_certificates_of_origin_tenant_bl")
+      .on(table.tenantId, table.billOfLadingId)
+      .where(sql`${table.billOfLadingId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-03, migration 0121 — L-06, D-06/D-07): the customs
+ * declarations register — the status ladder whose COMPLETED rung is
+ * INV-036's own floor (a customs-duty landed-cost allocation on an
+ * import receipt REQUIRES a completed declaration reference); the
+ * duties flow into the EXISTING landed-cost allocation at W-37
+ * (G-65, through the REAL LandedCostsService VERBATIM). The
+ * shipment_status mirror is the tracking fold's driven surface.
+ * Evidence discipline: no DELETE (the customs audit trail). */
+export const customsDeclarations = pgTable(
+  "customs_declarations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    declarationNo: text("declaration_no").notNull(),
+    declarationType: text("declaration_type").notNull(),
+    customsOffice: text("customs_office").notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    acceptedAt: timestamp("accepted_at", { withTimezone: true, mode: "string" }),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+    receiptId: uuid("receipt_id"),
+    purchaseOrderId: uuid("purchase_order_id"),
+    billOfLadingId: uuid("bill_of_lading_id"),
+    shipmentStatus: text("shipment_status").notNull().default("BOOKED"),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_customs_declarations_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_customs_declarations_tenant_no").on(
+      table.tenantId,
+      table.declarationNo,
+    ),
+    index("ix_customs_declarations_tenant_status").on(
+      table.tenantId,
+      table.status,
+      table.createdAt,
+    ),
+    index("ix_customs_declarations_tenant_receipt")
+      .on(table.tenantId, table.receiptId)
+      .where(sql`${table.receiptId} IS NOT NULL`),
+    index("ix_customs_declarations_tenant_po")
+      .on(table.tenantId, table.purchaseOrderId)
+      .where(sql`${table.purchaseOrderId} IS NOT NULL`),
+    index("ix_customs_declarations_tenant_bl")
+      .on(table.tenantId, table.billOfLadingId)
+      .where(sql`${table.billOfLadingId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-03, migration 0121 — L-07/L-08, G-65): the
+ * declaration's own lines — HS code, origin, quantities, customs
+ * value, the TENANT's own duty rates (never seeded, never hardcoded —
+ * the no-hardcoded-rates law) and import VAT; every allocated duty
+ * ties to its declaration line (INV-036's own demand, the W-37
+ * line-level linkage). Evidence discipline: no DELETE. */
+export const customsDeclarationLines = pgTable(
+  "customs_declaration_lines",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    declarationId: uuid("declaration_id").notNull(),
+    lineNo: integer("line_no").notNull(),
+    hsCode: text("hs_code").notNull(),
+    originCountry: varchar("origin_country", { length: 2 }),
+    itemId: uuid("item_id"),
+    description: text("description"),
+    quantity: numeric("quantity", { precision: 19, scale: 6 }),
+    uom: text("uom"),
+    customsValue: numeric("customs_value", { precision: 19, scale: 4 }).notNull(),
+    dutyRate: numeric("duty_rate", { precision: 9, scale: 6 })
+      .notNull()
+      .default("0"),
+    dutyAmount: numeric("duty_amount", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    importVat: numeric("import_vat", { precision: 19, scale: 4 })
+      .notNull()
+      .default("0"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_customs_declaration_lines_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_customs_declaration_lines_tenant_decl_line").on(
+      table.tenantId,
+      table.declarationId,
+      table.lineNo,
+    ),
+    index("ix_customs_declaration_lines_tenant_decl").on(
+      table.tenantId,
+      table.declarationId,
+      table.lineNo,
+    ),
+    index("ix_customs_declaration_lines_tenant_hs").on(
+      table.tenantId,
+      table.hsCode,
+    ),
+    index("ix_customs_declaration_lines_tenant_item")
+      .on(table.tenantId, table.itemId)
+      .where(sql`${table.itemId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-03, migration 0121 — L-08, D-16): the
+ * tenant-extensible HS starter registry — NO duty rates on these rows
+ * (a missing HS code is MISSING, never invented; the starter rows
+ * carry the accuracy disclaimer; the tenant owns the final
+ * classification). Master data: DELETE granted (the tenant's own
+ * registry). */
+export const hsCodeRegistry = pgTable(
+  "hs_code_registry",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    hsCode: text("hs_code").notNull(),
+    name: text("name").notNull(),
+    nameAr: text("name_ar").notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+    isActive: boolean("is_active").notNull().default(true),
+  },
+  (table) => [
+    uniqueIndex("uq_hs_code_registry_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_hs_code_registry_tenant_code").on(table.tenantId, table.hsCode),
+    index("ix_hs_code_registry_tenant_active").on(
+      table.tenantId,
+      table.isActive,
+      table.hsCode,
+    ),
+  ],
+);
+
+/** PHASE-051 (T-03, migration 0121 — L-14, D-08): the bonded warehouse
+ * moves — the G-66 anchor: IN_BOND transfers carry NO duty (the
+ * floor), the RELEASE recognizes the duty EXACTLY ONCE (BR-107's
+ * atomic stamps: the duty figure + the journal stamp + the
+ * recognition time TOGETHER, requiring the declaration link — the
+ * G-65 shape's own source law); the physical transfer rides the REAL
+ * movement core at W-38. Evidence discipline: no DELETE. */
+export const bondedWarehouseMoves = pgTable(
+  "bonded_warehouse_moves",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    moveNo: text("move_no").notNull(),
+    moveKind: text("move_kind").notNull(),
+    fromWarehouseId: uuid("from_warehouse_id"),
+    toWarehouseId: uuid("to_warehouse_id"),
+    declarationId: uuid("declaration_id"),
+    lines: jsonb("lines").notNull().default([]),
+    status: text("status").notNull().default("DRAFT"),
+    executedAt: timestamp("executed_at", { withTimezone: true, mode: "string" }),
+    dutyAmount: numeric("duty_amount", { precision: 19, scale: 4 }),
+    releaseRecognizedAt: timestamp("release_recognized_at", {
+      withTimezone: true,
+      mode: "string",
+    }),
+    releaseJournalEntryId: uuid("release_journal_entry_id"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_bonded_warehouse_moves_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_bonded_warehouse_moves_tenant_no").on(
+      table.tenantId,
+      table.moveNo,
+    ),
+    index("ix_bonded_warehouse_moves_tenant_kind").on(
+      table.tenantId,
+      table.moveKind,
+      table.status,
+    ),
+    index("ix_bonded_warehouse_moves_tenant_declaration")
+      .on(table.tenantId, table.declarationId)
+      .where(sql`${table.declarationId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-03, migration 0121 — L-12, D-12): the duty drawback
+ * claims — the BR-108 export-evidence gate at the floor (submission
+ * requires the linked export evidence: the export declaration OR the
+ * export bill of lading); the claim carries NO GL entry by design
+ * (the non-ledger-document law — the refund money lands when treasury
+ * records it, 053's surface). Evidence discipline: no DELETE. */
+export const dutyDrawbackClaims = pgTable(
+  "duty_drawback_claims",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    claimNo: text("claim_no").notNull(),
+    exportDeclarationId: uuid("export_declaration_id"),
+    exportBillOfLadingId: uuid("export_bill_of_lading_id"),
+    claimedAmount: numeric("claimed_amount", { precision: 19, scale: 4 }).notNull(),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    status: text("status").notNull().default("DRAFT"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true, mode: "string" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true, mode: "string" }),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_duty_drawback_claims_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_duty_drawback_claims_tenant_no").on(
+      table.tenantId,
+      table.claimNo,
+    ),
+    index("ix_duty_drawback_claims_tenant_status").on(
+      table.tenantId,
+      table.status,
+      table.submittedAt,
+    ),
+    index("ix_duty_drawback_claims_tenant_declaration")
+      .on(table.tenantId, table.exportDeclarationId)
+      .where(sql`${table.exportDeclarationId} IS NOT NULL`),
+    index("ix_duty_drawback_claims_tenant_bl")
+      .on(table.tenantId, table.exportBillOfLadingId)
+      .where(sql`${table.exportBillOfLadingId} IS NOT NULL`),
+  ],
+);
+
+/** PHASE-051 (T-04, migration 0122 — L-11, D-14): the carrier milestone
+ * log per shipment (anchored on the bill of lading — the shipment's
+ * identity, the declared interpretation): booked → departed →
+ * arrived → cleared → delivered; the optional declaration link drives
+ * the customs leg's fold mirror. THE MONOTONE LADDER is W-36's pure
+ * module (an event never regresses a document's status); this table
+ * is the append-only log. Evidence discipline: no DELETE. */
+export const shipmentTrackingEvents = pgTable(
+  "shipment_tracking_events",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    billOfLadingId: uuid("bill_of_lading_id").notNull(),
+    declarationId: uuid("declaration_id"),
+    milestone: text("milestone").notNull(),
+    eventAt: timestamp("event_at", { withTimezone: true, mode: "string" }).notNull(),
+    carrierRef: text("carrier_ref"),
+    location: text("location"),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_shipment_tracking_events_id_tenant").on(table.id, table.tenantId),
+    index("ix_shipment_tracking_events_tenant_bl").on(
+      table.tenantId,
+      table.billOfLadingId,
+      table.eventAt,
+    ),
+    index("ix_shipment_tracking_events_tenant_declaration")
+      .on(table.tenantId, table.declarationId)
+      .where(sql`${table.declarationId} IS NOT NULL`),
+    index("ix_shipment_tracking_events_tenant_event_at").on(
+      table.tenantId,
+      table.eventAt,
+    ),
+  ],
+);

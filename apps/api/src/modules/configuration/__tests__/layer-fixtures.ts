@@ -338,6 +338,24 @@ const BUSINESS_KEYS: readonly string[] = [
   // §5a, never the plans — matrix §3.28's entitlement/authorization
   // divergence note.)
   "quality", "quality.spc",
+  // PHASE-051 (W-33, 2026-11-24) transcription of the 0122 §5b plan
+  // grants (the THREE FEATURE FLAGS → business + enterprise, the tier-4
+  // precedent; STARTER GETS NONE — the declared neutral zero: foreign
+  // trade is not a starter feature): trade (the WHOLE-MODULE composable
+  // unit — the approved master plan's D-04 binding shape, the manifest
+  // schema's dated PHASE-051 amendment admitting exactly the second
+  // whole-module key beside quality) · trade.lc (the LC plane's own
+  // unit) · trade.customs (the customs plane's own unit). The three
+  // trade-carrying templates' (0122 §5c: wholesale · distribution ·
+  // electronics carrying all three) REQUIRED chains resolve through
+  // exactly these grants — the trade manifest enablement. The
+  // dependency substrate (purchasing.landed_costs granted to business
+  // by 0008 — transcribed above at line 167 — with its full closure in
+  // every plan including starter) needs no new rows: the trade keys'
+  // BR-040 closures resolve through it. (The ten PERMISSION keys ride
+  // ROLES per 0122 §5a, never the plans — matrix §3.29's
+  // entitlement/authorization divergence note.)
+  "trade", "trade.lc", "trade.customs",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

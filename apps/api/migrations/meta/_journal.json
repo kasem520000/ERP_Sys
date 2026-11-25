@@ -826,6 +826,34 @@
       "when": 1798862400000,
       "tag": "0118_quality_notifications_category",
       "breakpoints": true
+    },
+    {
+      "idx": 118,
+      "version": "7",
+      "when": 1798948800000,
+      "tag": "0119_trade_lc_collections",
+      "breakpoints": true
+    },
+    {
+      "idx": 119,
+      "version": "7",
+      "when": 1799035200000,
+      "tag": "0120_trade_documents",
+      "breakpoints": true
+    },
+    {
+      "idx": 120,
+      "version": "7",
+      "when": 1799121600000,
+      "tag": "0121_trade_customs",
+      "breakpoints": true
+    },
+    {
+      "idx": 121,
+      "version": "7",
+      "when": 1799208000000,
+      "tag": "0122_trade_shipments",
+      "breakpoints": true
     }
   ],
   "version": "7"

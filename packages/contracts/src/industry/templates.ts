@@ -1112,6 +1112,18 @@ export const DISTRIBUTION_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFree
     "inventory.serial_ledger",
     "inventory.quarantine",
     "inventory.consignment",
+    // PHASE-051 (W-33 — D-04, the trade-plane enablement, CR-36f,
+    // 2026-11-24): the THREE FEATURE FLAGS ride the trade-carrying
+    // templates by default (0122 §5c — the stored registry's guarded
+    // append; `trade` the WHOLE-MODULE composable unit — the manifest
+    // schema's dated PHASE-051 amendment admitting the second
+    // whole-module key — + `trade.lc` the LC plane's own +
+    // `trade.customs` the customs plane's own; the ten PERMISSION keys
+    // ride ROLES, matrix §3.29; starter carries NONE of the three —
+    // the declared neutral zero).
+    "trade",
+    "trade.lc",
+    "trade.customs",
   ],
   default_modules_enabled: [
     "accounting",
@@ -2552,6 +2564,18 @@ export const WHOLESALE_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreeze(
     "inventory.serial_ledger",
     "inventory.quarantine",
     "inventory.consignment",
+    // PHASE-051 (W-33 — D-04, the trade-plane enablement, CR-36f,
+    // 2026-11-24): the THREE FEATURE FLAGS ride the trade-carrying
+    // templates by default (0122 §5c — the stored registry's guarded
+    // append; `trade` the WHOLE-MODULE composable unit — the manifest
+    // schema's dated PHASE-051 amendment admitting the second
+    // whole-module key — + `trade.lc` the LC plane's own +
+    // `trade.customs` the customs plane's own; the ten PERMISSION keys
+    // ride ROLES, matrix §3.29; starter carries NONE of the three —
+    // the declared neutral zero).
+    "trade",
+    "trade.lc",
+    "trade.customs",
   ],
   default_modules_enabled: [
     "accounting",
@@ -2877,6 +2901,18 @@ export const ELECTRONICS_TEMPLATE_MANIFEST: IndustryTemplateManifest = deepFreez
     // neutral zero).
     "quality",
     "quality.spc",
+    // PHASE-051 (W-33 — D-04, the trade-plane enablement, CR-36f,
+    // 2026-11-24): the THREE FEATURE FLAGS ride the trade-carrying
+    // templates by default (0122 §5c — the stored registry's guarded
+    // append; `trade` the WHOLE-MODULE composable unit — the manifest
+    // schema's dated PHASE-051 amendment admitting the second
+    // whole-module key — + `trade.lc` the LC plane's own +
+    // `trade.customs` the customs plane's own; the ten PERMISSION keys
+    // ride ROLES, matrix §3.29; starter carries NONE of the three —
+    // the declared neutral zero).
+    "trade",
+    "trade.lc",
+    "trade.customs",
   ],
   default_modules_enabled: [
     "accounting",

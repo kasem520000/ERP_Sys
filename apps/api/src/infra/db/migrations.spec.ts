@@ -358,7 +358,38 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // ordered WITH the quality-calibration-due sweep's inbox writer that
     // ships in the same wave (never after it — the same-increment law);
     // NO tables (the catalog stays 340). The journal 117 → 118.
-    expect(files.at(-1)?.tag).toBe("0118_quality_notifications_category");
+    // PHASE-051 (CR-21 — Foreign Trade & Logistics, the approved master
+    // plan's D-01/D-02 honest slots — the phase doc's "0091…0094" are
+    // stale blueprint slots, its own §4 note defers to the journal, the
+    // 047 D-03/048 D-02/049 D-01/050 D-01 precedent; delivered
+    // 2026-11-24 at W-33, the foundation wave, under the owner's
+    // launch authorization): 0119 the LC/collections cluster
+    // (letters_of_credit with the G-64 margin/retirement stamps ·
+    // lc_amendments the typed changes · lc_documents the checklist —
+    // BR-105's anchor · documentary_collections D/P + D/A), 0120 the
+    // trade documents cluster (incoterms the registry with the
+    // ownership matrix as DATA · bills_of_lading the multimodal
+    // transport document — the shipment's own anchor, the declared
+    // interpretation · packing_lists the shipment/receipt link ·
+    // certificates_of_origin the frozen snapshot, ORIGIN + CONFORMITY
+    // one table), 0121 the customs/bonded/drawback cluster
+    // (customs_declarations the ladder whose COMPLETED rung is
+    // INV-036's floor · customs_declaration_lines the tenant's own
+    // duty rows · hs_code_registry the starter set ·
+    // bonded_warehouse_moves the G-66 anchor — the no-duty in-bond
+    // floor + the atomic exactly-once release stamps ·
+    // duty_drawback_claims the BR-108 evidence gate), 0122 the
+    // shipments cluster (shipment_tracking_events anchored on the B/L)
+    // + THE DATA-ONLY GRANTS BLOCK (the TEN trade.* keys — matrix
+    // §3.29, 347 → 357; the THREE flags on business+enterprise with
+    // STARTER AT THE DECLARED NEUTRAL ZERO; the THREE trade-carrying
+    // templates' manifest enablements; the entitlements widening
+    // admitting the whole-module `trade` key; the TWO CoA markers
+    // 1180 LC_MARGIN_DEPOSIT · 2145 CUSTOMS_DUTY_PAYABLE; THE SEEDS:
+    // the Incoterms-2020 set + the HS starter set through the 0098
+    // migration-plane gate with the accuracy disclaimer on every
+    // starter row). FOURTEEN tenant tables; the catalog 340 → 354.
+    expect(files.at(-1)?.tag).toBe("0122_trade_shipments");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

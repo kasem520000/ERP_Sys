@@ -3796,6 +3796,147 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics, migrations 0119–0122;
+  // the W-33 foundation wave, 2026-11-24): the trade cluster's OWN rows
+  // per tenant — the fe family continues the fd sequence. FK-chained to
+  // the standing fixtures: warehouses f0f0f0f0 (WH1/WH2) · the LC chain
+  // self-contained (amendments/documents/chained rows reference the
+  // family's own LC/B-L/declaration rows).
+  await superuser.query(
+    `INSERT INTO letters_of_credit (id, tenant_id, lc_no, currency, amount, margin_amount,
+                                    issuing_bank, beneficiary_name, applicant_name, expiry_date, status)
+     VALUES
+       ('fe1e1e1e-0000-4000-8000-000000000001', $1, 'LC-ISO-1', 'SAR', 50000, 5000,
+        'Bank ISO', 'Overseas Seller SARL', 'ISO Trading Co', '2027-06-30', 'DRAFT'),
+       ('fe1e1e1e-0000-4000-8000-000000000002', $2, 'LC-ISO-1', 'USD', 50000, 5000,
+        'Bank ISO', 'Overseas Seller SARL', 'ISO Trading Co', '2027-06-30', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO lc_amendments (id, tenant_id, lc_id, amendment_no, change_type, summary)
+     VALUES
+       ('fe2e2e2e-0000-4000-8000-000000000001', $1, 'fe1e1e1e-0000-4000-8000-000000000001', 1, 'OTHER', 'Issuance terms agreed'),
+       ('fe2e2e2e-0000-4000-8000-000000000002', $2, 'fe1e1e1e-0000-4000-8000-000000000002', 1, 'OTHER', 'Issuance terms agreed')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type)
+     VALUES
+       ('fe3e3e3e-0000-4000-8000-000000000001', $1, 'fe1e1e1e-0000-4000-8000-000000000001', 'COMMERCIAL_INVOICE'),
+       ('fe3e3e3e-0000-4000-8000-000000000002', $2, 'fe1e1e1e-0000-4000-8000-000000000002', 'COMMERCIAL_INVOICE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency, status)
+     VALUES
+       ('fe4e4e4e-0000-4000-8000-000000000001', $1, 'COL-ISO-1', 'D/P', 12000, 'SAR', 'OPEN'),
+       ('fe4e4e4e-0000-4000-8000-000000000002', $2, 'COL-ISO-1', 'D/P', 12000, 'USD', 'OPEN')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO incoterms (id, tenant_id, code, name, name_ar, carriage_by_seller,
+                            insurance_by_seller, export_clearance_by_seller,
+                            import_clearance_by_seller, import_duty_by_seller, note)
+     VALUES
+       ('fe5e5e5e-0000-4000-8000-000000000001', $1, 'FOB', 'Free on Board', 'تسليم على متن السفينة',
+        false, false, true, false, false, 'Fixture row (the 2020 seed rides 0122 §6)'),
+       ('fe5e5e5e-0000-4000-8000-000000000002', $2, 'FOB', 'Free on Board', 'تسليم على متن السفينة',
+        false, false, true, false, false, 'Fixture row (the 2020 seed rides 0122 §6)')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name, port_of_loading,
+                                  port_of_discharge, shipment_status)
+     VALUES
+       ('fe6e6e6e-0000-4000-8000-000000000001', $1, 'BL-ISO-1', 'SEA', 'ISO Carrier Lines',
+        'Port Jeddah', 'Port Rotterdam', 'BOOKED'),
+       ('fe6e6e6e-0000-4000-8000-000000000002', $2, 'BL-ISO-1', 'SEA', 'ISO Carrier Lines',
+        'Port Jeddah', 'Port Rotterdam', 'BOOKED')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO packing_lists (id, tenant_id, pl_no, bill_of_lading_id, lines)
+     VALUES
+       ('fe7e7e7e-0000-4000-8000-000000000001', $1, 'PL-ISO-1', 'fe6e6e6e-0000-4000-8000-000000000001',
+        '[{"description":"Pallets of mixed goods","packages":40,"grossKg":8200,"netKg":8000}]'::jsonb),
+       ('fe7e7e7e-0000-4000-8000-000000000002', $2, 'PL-ISO-1', 'fe6e6e6e-0000-4000-8000-000000000002',
+        '[{"description":"Pallets of mixed goods","packages":40,"grossKg":8200,"netKg":8000}]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO certificates_of_origin (id, tenant_id, certificate_no, cert_type, snapshot)
+     VALUES
+       ('fe8e8e8e-0000-4000-8000-000000000001', $1, 'CRT-ISO-1', 'ORIGIN',
+        '{"exporter":"ISO Trading Co","consignee":"Overseas Buyer","originCountry":"SA","goods":[{"description":"Mixed goods"}]}'::jsonb),
+       ('fe8e8e8e-0000-4000-8000-000000000002', $2, 'CRT-ISO-1', 'ORIGIN',
+        '{"exporter":"ISO Trading Co","consignee":"Overseas Buyer","originCountry":"SA","goods":[{"description":"Mixed goods"}]}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type, customs_office,
+                                       status, currency)
+     VALUES
+       ('fe9e9e9e-0000-4000-8000-000000000001', $1, 'DEC-ISO-1', 'IMPORT', 'Jeddah Customs', 'DRAFT', 'SAR'),
+       ('fe9e9e9e-0000-4000-8000-000000000002', $2, 'DEC-ISO-1', 'IMPORT', 'Jeddah Customs', 'DRAFT', 'USD')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code, customs_value)
+     VALUES
+       ('feaeaeae-0000-4000-8000-000000000001', $1, 'fe9e9e9e-0000-4000-8000-000000000001', 1, '8471', 5000),
+       ('feaeaeae-0000-4000-8000-000000000002', $2, 'fe9e9e9e-0000-4000-8000-000000000002', 1, '8471', 5000)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO hs_code_registry (id, tenant_id, hs_code, name, name_ar, note)
+     VALUES
+       ('febebebe-0000-4000-8000-000000000001', $1, '84', 'Machinery and mechanical appliances',
+        'الآلات والأجهزة الميكانيكية', 'Fixture row (the starter set rides 0122 §6)'),
+       ('febebebe-0000-4000-8000-000000000002', $2, '84', 'Machinery and mechanical appliances',
+        'الآلات والأجهزة الميكانيكية', 'Fixture row (the starter set rides 0122 §6)')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, from_warehouse_id,
+                                         to_warehouse_id, status, lines)
+     VALUES
+       ('fececece-0000-4000-8000-000000000001', $1, 'BND-ISO-1', 'IN_BOND',
+        'f0f0f0f0-1000-4000-8000-000000000001', 'f0f0f0f0-2000-4000-8000-000000000001', 'DRAFT', '[]'::jsonb),
+       ('fececece-0000-4000-8000-000000000002', $2, 'BND-ISO-1', 'IN_BOND',
+        'f0f0f0f0-1000-4000-8000-000000000002', 'f0f0f0f0-2000-4000-8000-000000000002', 'DRAFT', '[]'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, claimed_amount, currency, status)
+     VALUES
+       ('fededede-0000-4000-8000-000000000001', $1, 'DRB-ISO-1', 1500, 'SAR', 'DRAFT'),
+       ('fededede-0000-4000-8000-000000000002', $2, 'DRB-ISO-1', 1500, 'USD', 'DRAFT')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
+     VALUES
+       ('feeeeeee-0000-4000-8000-000000000001', $1, 'fe6e6e6e-0000-4000-8000-000000000001',
+        'BOOKED', '2026-11-24T08:00:00Z'),
+       ('feeeeeee-0000-4000-8000-000000000002', $2, 'fe6e6e6e-0000-4000-8000-000000000002',
+        'BOOKED', '2026-11-24T08:00:00Z')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -4423,6 +4564,47 @@ const OWN_ROW: Record<string, [string, string]> = {
     "fdadadad-0000-4000-8000-000000000002",
   ],
   hazard_registers: ["fdbdbdbd-0000-4000-8000-000000000001", "fdbdbdbd-0000-4000-8000-000000000002"],
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics): the fe family (one
+  // OWN row per tenant per table — the default
+  // EXPECTED_ROWS_PER_TENANT of 1 each).
+  letters_of_credit: [
+    "fe1e1e1e-0000-4000-8000-000000000001",
+    "fe1e1e1e-0000-4000-8000-000000000002",
+  ],
+  lc_amendments: ["fe2e2e2e-0000-4000-8000-000000000001", "fe2e2e2e-0000-4000-8000-000000000002"],
+  lc_documents: ["fe3e3e3e-0000-4000-8000-000000000001", "fe3e3e3e-0000-4000-8000-000000000002"],
+  documentary_collections: [
+    "fe4e4e4e-0000-4000-8000-000000000001",
+    "fe4e4e4e-0000-4000-8000-000000000002",
+  ],
+  incoterms: ["fe5e5e5e-0000-4000-8000-000000000001", "fe5e5e5e-0000-4000-8000-000000000002"],
+  bills_of_lading: ["fe6e6e6e-0000-4000-8000-000000000001", "fe6e6e6e-0000-4000-8000-000000000002"],
+  packing_lists: ["fe7e7e7e-0000-4000-8000-000000000001", "fe7e7e7e-0000-4000-8000-000000000002"],
+  certificates_of_origin: [
+    "fe8e8e8e-0000-4000-8000-000000000001",
+    "fe8e8e8e-0000-4000-8000-000000000002",
+  ],
+  customs_declarations: [
+    "fe9e9e9e-0000-4000-8000-000000000001",
+    "fe9e9e9e-0000-4000-8000-000000000002",
+  ],
+  customs_declaration_lines: [
+    "feaeaeae-0000-4000-8000-000000000001",
+    "feaeaeae-0000-4000-8000-000000000002",
+  ],
+  hs_code_registry: ["febebebe-0000-4000-8000-000000000001", "febebebe-0000-4000-8000-000000000002"],
+  bonded_warehouse_moves: [
+    "fececece-0000-4000-8000-000000000001",
+    "fececece-0000-4000-8000-000000000002",
+  ],
+  duty_drawback_claims: [
+    "fededede-0000-4000-8000-000000000001",
+    "fededede-0000-4000-8000-000000000002",
+  ],
+  shipment_tracking_events: [
+    "feeeeeee-0000-4000-8000-000000000001",
+    "feeeeeee-0000-4000-8000-000000000002",
+  ],
 };
 
 /** Mismatched-tenant INSERT shapes per table (A3) — explicit columns so the
@@ -5553,6 +5735,54 @@ const MISMATCHED_INSERT: Record<string, string> = {
   hazard_registers: `INSERT INTO hazard_registers (id, tenant_id, name, hazard, category, is_ccp, critical_limit)
      VALUES ('fdbdbdbd-3000-4000-8000-000000000003', $1, 'Attack hazard', 'Attack pathogen',
       'BIOLOGICAL', false, NULL)`,
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics, migrations
+  // 0119–0122): the mismatched-tenant attack rows (FK-consistent
+  // against tenant B's own fixtures — the family's own B/L, LC,
+  // declaration and warehouse rows; the RLS WITH CHECK is what must
+  // refuse — never an FK accident).
+  letters_of_credit: `INSERT INTO letters_of_credit (id, tenant_id, lc_no, currency, amount,
+      margin_amount, issuing_bank, beneficiary_name, applicant_name, expiry_date, status)
+     VALUES ('fe1e1e1e-3000-4000-8000-000000000003', $1, 'LC-ATK', 'SAR', 9000, 900,
+      'Attack Bank', 'Attack Beneficiary', 'Attack Applicant', '2027-12-31', 'DRAFT')`,
+  lc_amendments: `INSERT INTO lc_amendments (id, tenant_id, lc_id, amendment_no, change_type, summary)
+     VALUES ('fe2e2e2e-3000-4000-8000-000000000003', $1, 'fe1e1e1e-0000-4000-8000-000000000002', 9,
+      'OTHER', 'Attack amendment')`,
+  lc_documents: `INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type)
+     VALUES ('fe3e3e3e-3000-4000-8000-000000000003', $1, 'fe1e1e1e-0000-4000-8000-000000000002',
+      'PACKING_LIST')`,
+  documentary_collections: `INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type,
+      amount, currency, status)
+     VALUES ('fe4e4e4e-3000-4000-8000-000000000003', $1, 'COL-ATK', 'D/P', 900, 'SAR', 'OPEN')`,
+  incoterms: `INSERT INTO incoterms (id, tenant_id, code, name, name_ar, carriage_by_seller,
+      insurance_by_seller, export_clearance_by_seller, import_clearance_by_seller, import_duty_by_seller)
+     VALUES ('fe5e5e5e-3000-4000-8000-000000000003', $1, 'ATK', 'Attack Term', 'شرط هجوم',
+      false, false, false, false, false)`,
+  bills_of_lading: `INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name)
+     VALUES ('fe6e6e6e-3000-4000-8000-000000000003', $1, 'BL-ATK', 'SEA', 'Attack Carrier')`,
+  packing_lists: `INSERT INTO packing_lists (id, tenant_id, pl_no, bill_of_lading_id, lines)
+     VALUES ('fe7e7e7e-3000-4000-8000-000000000003', $1, 'PL-ATK',
+      'fe6e6e6e-0000-4000-8000-000000000002', '[]'::jsonb)`,
+  certificates_of_origin: `INSERT INTO certificates_of_origin (id, tenant_id, certificate_no, cert_type, snapshot)
+     VALUES ('fe8e8e8e-3000-4000-8000-000000000003', $1, 'CRT-ATK', 'ORIGIN', '{}'::jsonb)`,
+  customs_declarations: `INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type,
+      customs_office, status, currency)
+     VALUES ('fe9e9e9e-3000-4000-8000-000000000003', $1, 'DEC-ATK', 'IMPORT', 'Attack Office', 'DRAFT', 'SAR')`,
+  customs_declaration_lines: `INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no,
+      hs_code, customs_value)
+     VALUES ('feaeaeae-3000-4000-8000-000000000003', $1, 'fe9e9e9e-0000-4000-8000-000000000002', 9,
+      '8471', 900)`,
+  hs_code_registry: `INSERT INTO hs_code_registry (id, tenant_id, hs_code, name, name_ar)
+     VALUES ('febebebe-3000-4000-8000-000000000003', $1, '99', 'Attack heading', 'بند هجوم')`,
+  bonded_warehouse_moves: `INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind,
+      from_warehouse_id, to_warehouse_id, status, lines)
+     VALUES ('fececece-3000-4000-8000-000000000003', $1, 'BND-ATK', 'IN_BOND',
+      'f0f0f0f0-1000-4000-8000-000000000002', 'f0f0f0f0-2000-4000-8000-000000000002', 'DRAFT', '[]'::jsonb)`,
+  duty_drawback_claims: `INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, claimed_amount,
+      currency, status)
+     VALUES ('fededede-3000-4000-8000-000000000003', $1, 'DRB-ATK', 900, 'SAR', 'DRAFT')`,
+  shipment_tracking_events: `INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
+     VALUES ('feeeeeee-3000-4000-8000-000000000003', $1, 'fe6e6e6e-0000-4000-8000-000000000002',
+      'BOOKED', '2026-11-24T09:00:00Z')`,
 };
 
 beforeAll(async () => {

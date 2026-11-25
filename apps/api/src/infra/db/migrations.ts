@@ -658,6 +658,52 @@ export const MIGRATIONS: readonly string[] = [
   // sweep-config surface binds the EXISTING 0116 quality.calibration
   // key); ROUTE_PERMISSIONS 1,113 + 12 = 1,125 dated at the block.
   "0118_quality_notifications_category",
+  // PHASE-051 (Blueprint v3.0 · CR-21 — Foreign Trade & Logistics; the
+  // approved master plan's D-01/D-02 honest slots — the phase doc's
+  // "0091…0094" are stale blueprint slots, its own §4 note defers to
+  // the journal, the 047 D-03/048 D-02/049 D-01/050 D-01 precedent;
+  // delivered 2026-11-24 at W-33, the foundation wave, under the
+  // owner's launch authorization — NEVER production approval): 0119
+  // the LC/collections cluster (letters_of_credit with the G-64
+  // margin/retirement stamps + the status ladder · lc_amendments the
+  // dated typed changes · lc_documents the checklist with the
+  // discrepancy notes — BR-105's anchor · documentary_collections the
+  // D/P + D/A register), 0120 the trade documents cluster (incoterms
+  // the tenant-extensible registry with the ownership matrix as DATA
+  // · bills_of_lading the multimodal transport document — the
+  // shipment's own anchor, the declared interpretation ·
+  // packing_lists the shipment/receipt link with the pack shapes ·
+  // certificates_of_origin the frozen chamber-format snapshot —
+  // ORIGIN + CONFORMITY one table), 0121 the customs/bonded/drawback
+  // cluster (customs_declarations the status ladder whose COMPLETED
+  // rung is INV-036's floor · customs_declaration_lines the tenant's
+  // own duty rows — no hardcoded rates · hs_code_registry the starter
+  // set · bonded_warehouse_moves the G-66 anchor with the no-duty
+  // in-bond floor and the atomic exactly-once release stamps ·
+  // duty_drawback_claims the BR-108 evidence gate, no GL entry by
+  // design), 0122 the shipments cluster (shipment_tracking_events the
+  // carrier milestone log anchored on the B/L) + THE DATA-ONLY
+  // GRANTS BLOCK (the 0098/0103/0108/0116 pattern): the TEN trade.*
+  // permission keys (matrix §3.29, 347 → 357 — zero-drift from the
+  // first increment), the THREE FEATURE FLAGS (trade · trade.lc ·
+  // trade.customs) on business+enterprise with STARTER AT THE
+  // DECLARED NEUTRAL ZERO, the THREE trade-carrying templates'
+  // (wholesale · distribution · electronics) manifest enablements,
+  // the ENTITLEMENTS key-shape widening admitting the one whole-module
+  // `trade` key (the 0116 §7 precedent's class applied in advance),
+  // the TWO CoA template markers (1180 LC_MARGIN_DEPOSIT — G-64's DR
+  // leg · 2145 CUSTOMS_DUTY_PAYABLE — G-65's CR leg and G-66's
+  // release leg), and THE SEEDS: the Incoterms-2020 set (11 rules)
+  // + the HS starter set (14 chapter-level headings) for every
+  // existing tenant through the 0098 migration-plane gate — with the
+  // documented accuracy disclaimer on every starter row («البذور
+  // بإقرار الدقة»: the tenant owns the final classification; no duty
+  // rates on the seeds, ever). FOURTEEN tenant tables; the catalog
+  // 340 → 354.
+  "0119_trade_lc_collections",
+  "0120_trade_documents",
+  "0121_trade_customs",
+  "0122_trade_shipments",
 ];
 
 /**

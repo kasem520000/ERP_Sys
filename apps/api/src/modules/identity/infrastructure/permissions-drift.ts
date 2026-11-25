@@ -231,6 +231,16 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // (quality.view — the G-62/G-63 GL reconciliation's read plane); the
   // operational keys stay owner-only.
   "apps/api/migrations/0116_quality_holds_recall.sql",
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics, the W-33 foundation
+  // wave, 2026-11-24): 0122 §5a seeds the TEN trade keys (matrix
+  // §3.29; 347 → 357) — trade.view · trade.lc.view/manage ·
+  // trade.collections.manage · trade.customs.view/manage ·
+  // trade.shipments.view/manage · trade.bonded.manage ·
+  // trade.drawback.manage. Role grants: the owner template holds all
+  // ten; the accountant the ONE finance-read key (trade.view — the
+  // G-64/G-65 GL reconciliation's read plane); the operational keys
+  // stay owner-only.
+  "apps/api/migrations/0122_trade_shipments.sql",
 ];
 
 export async function main(): Promise<void> {

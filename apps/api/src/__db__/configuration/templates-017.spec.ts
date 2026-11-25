@@ -60,6 +60,13 @@ import {
  *  manifest enablement, CR-36 (f)); the migration seed, the docs mirror,
  *  and the contracts verbatim copy moved together (the 039 re-pin
  *  procedure). */
+// PHASE-051 (W-33, 2026-11-24): re-pinned — the distribution
+// manifest's required_feature_keys gain the THREE TRADE FLAGS (the
+// trade-plane enablement, D-04 / 0122 §5c: `trade` the whole-module
+// composable unit + `trade.lc` + `trade.customs`; canonical + stored +
+// docs mirror + pins moved together, the 0098 §3 procedure). The
+// starter degradation chain gains the three keys (starter carries
+// NONE — the declared neutral zero).
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   // PHASE-045 (0088): the automotive pin re-pinned — required_feature_keys
   // gains the hr block (the workforce-industry enablement; canonical +
@@ -73,7 +80,7 @@ const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
   // 0108 §3; canonical + stored + docs mirror + pins moved together, the
   // 0098 §3 procedure).
   "industry.automotive": "sha256:2f847473908d59276ec5bd4338016ecb0612fb40b0fe3d66d93f5ffdc3dc4d88",
-  "industry.distribution": "sha256:89384521dea54840b9e4db5cf93b208da7dc9759f33c5360a9bb932273cf2a2d",
+  "industry.distribution": "sha256:282e406111e3bfc3370555dc8e22b3fe02f9ef6c0c0c2ccbdaef72a49740f7a7",
 });
 
 // -- tenant A: automotive apply -------------------------------------------

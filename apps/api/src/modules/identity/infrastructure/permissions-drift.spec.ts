@@ -82,6 +82,11 @@ const SEED_PATHS = [
   // 337 → 347) — the same lesson carried forward (the spec's copy
   // extends in the SAME change).
   join(process.cwd(), "migrations", "0116_quality_holds_recall.sql"), // PHASE-050 the ten quality keys (337 → 347)
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics, W-33, 2026-11-24):
+  // 0122 §5a seeds the TEN trade keys and joins both lists together
+  // (matrix §3.29, 347 → 357) — the same lesson carried forward (the
+  // spec's copy extends in the SAME change).
+  join(process.cwd(), "migrations", "0122_trade_shipments.sql"), // PHASE-051 the ten trade keys (347 → 357)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");

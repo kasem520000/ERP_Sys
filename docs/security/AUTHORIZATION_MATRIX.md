@@ -1041,6 +1041,64 @@ baseline). The alert surfaces ride the notifications' own permission plane — n
 > permission key; G-62 rides the EXISTING INVENTORY_SHRINKAGE pair and G-63's credit
 > leg the EXISTING EXTERNAL_ACCRUAL — no new markers for either.
 
+### §3.29 Foreign Trade & Logistics — trade (PHASE-051; catalog 347 → 357 at W-33)
+
+The foreign-trade & logistics cluster (CR-21, the approved master plan's D-03 — the trade document chain:
+LC, collections, Incoterms, transport documents, customs declarations, certificates, tracking, bonded,
+drawback). **The ten keys seed in migration `0122` §5a (the W-33 foundation wave, 2026-11-24 — the
+permission catalog extends 347 → 357; seed = mirror, zero drift from the first increment).** The
+entitlement/authorization divergence (the §3.25/§3.26/§3.27/§3.28 precedent, deliberate): the THREE
+FEATURE FLAGS — `trade` (the whole-module composable unit, the plan's D-04 binding shape — the manifest
+schema's dated PHASE-051 amendment admits exactly TWO whole-module keys now, quality and trade) ·
+`trade.lc` (the LC plane's own unit) · `trade.customs` (the customs plane's own unit) — are the
+ENTITLEMENT keys: business + enterprise carry them (0122 §5b) and the THREE trade-carrying industry
+templates (wholesale · distribution · electronics) compose all three by default (0122 §5c). **STARTER
+GETS NONE — the declared neutral zero (the tier-4 posture verbatim: foreign trade is not a starter
+feature; zero starter keys move).** The ten keys below are the AUTHORIZATION surface and ride ROLES
+(0122 §5a) — never the plans. **NOT ledger-free**: `trade.lc.manage` gates the G-64 margin/retirement
+postings (the deposit at issuance DR LC_MARGIN_DEPOSIT · CR the tenant's chosen bank account, reversed
+at settlement — INV-013 single-use, fail-closed until mapped) and `trade.customs.manage` gates the G-65
+duty allocation into the landed costs (DR INVENTORY/COGS · CR CUSTOMS_DUTY_PAYABLE — through the REAL
+LandedCostsService, INV-036's completeness gate); `trade.bonded.manage` gates the G-66 moves (the
+no-duty in-bond transfers and the exactly-once release recognition BR-107); `trade.drawback.manage`
+gates the BR-108 evidence-submission act. The TWO 051 CoA template markers (1180 LC_MARGIN_DEPOSIT ·
+2145 CUSTOMS_DUTY_PAYABLE) are account-template rows, never permission keys.
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `trade.view` | View the trade plane: the LC/collections registers, declarations, transport documents, certificates, tracking (the finance-read plane) / عرض مستوى التجارة: الاعتمادات والتحصيل والإقرارات والمستندات والتتبع | owner, accountant | tenant | no (read-only over the trade plane; the G-64/G-65 GL reconciliation reads these registers) |
+| `trade.lc.view` | View the letters of credit register with amendments and the documents checklist / عرض سجل الاعتمادات المستندية وتعديلاتها وقائمة مستنداتها | owner | tenant | no (read-only over the LC plane) |
+| `trade.lc.manage` | Manage the LC lifecycle: issue, amend, the documents checklist, retire — firing the G-64 margin/retirement postings / إدارة دورة الاعتماد وتشغيل قيود G-64 | owner | tenant | **yes** (the issuance posts the margin deposit (G-64) — DR LC_MARGIN_DEPOSIT · CR the tenant's chosen bank account, exactly once, fail-closed until mapped; the settlement reverses it; the amendments adjust through the same pair on their own single-use keys — the SoD surface over the posting engine) |
+| `trade.collections.manage` | Manage the documentary collections (D/P and D/A) with the settlement linkage / إدارة التحصيل المستندي وربط التسوية | owner | tenant | no (the register act — the settlement linkage records the treasury fact; the money lands through the existing receipts discipline) |
+| `trade.customs.view` | View the customs declarations register with the lines and the duty figures / عرض سجل الإقرارات الجمركية وسطورها وأرقام الرسوم | owner | tenant | no (read-only over the customs plane — the G-65 reconciliation's own feed) |
+| `trade.customs.manage` | Manage the declarations and lines — the duty computation into the landed costs (G-65, INV-036) / إدارة الإقرارات وحساب الرسوم في التكاليف الأرضية | owner | tenant | **yes** (the completed declaration's duties and import VAT flow into the EXISTING landed-cost allocation (G-65) through the REAL LandedCostsService — INV-036 refuses the allocation without the completed reference, the typed refusals with ZERO residue; the duty rates are the tenant's own lines, never hardcoded) |
+| `trade.shipments.view` | View the transport documents and the shipment tracking board / عرض مستندات النقل ولوحة تتبع الشحنات | owner | tenant | no (read-only over the transport plane) |
+| `trade.shipments.manage` | Manage the bills of lading, packing lists, certificates and the tracking events / إدارة بوالص الشحن وقوائم التعبئة والشهادات وأحداث التتبع | owner | tenant | **yes** (the certificate issuance freezes the chamber-format snapshot — a regulatory document (D-13: the frozen print, the 050 COA laws); the tracking events drive the document-status monotone ladder) |
+| `trade.bonded.manage` | Manage the bonded warehouse moves — the in-bond transfers and the releases (G-66/BR-107) / إدارة حركات المستودع الجمركي والإفراج | owner | tenant | **yes** (the in-bond transfers post NO duty (G-66's floor) riding the REAL movement core; the release recognizes the duty EXACTLY ONCE (BR-107 — the atomic stamps, INV-013 single-use); the duty-suspended stock is BLOCKED from customer issue through the shared gate inside planIssue — the INV-035 choke point, the blocking matrix is the W-38 invariant test's own surface) |
+| `trade.drawback.manage` | Manage the duty drawback claims (BR-108's export-evidence gate) / إدارة طلبات استرداد الرسوم | owner | tenant | no (the claim carries NO GL entry by design (the non-ledger-document law); the submission requires the linked export evidence (BR-108's typed refusal) — the refund money lands when treasury records it, 053's surface) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — the keys-seed-first discipline, the §3.23–§3.28 precedent):
+the `/api/v1/trade/*` families land with the W-34…W-38 service waves, each route on the exact keys
+above, and the web plane (W-39) on the same keys; the reports (W-40) ride the module's own read keys
+per the §12 module-register reuse convention. Role grants per 0122 §5a: the owner template holds all
+ten; the accountant the ONE finance-read key (trade.view — the G-64/G-65 GL reconciliation's read
+plane; the operational keys stay owner-only — trade operations are tenant-granted beyond the baseline).
+The alert surfaces ride the notifications' own permission plane — no new key.
+
+> **[Dated 2026-11-24 (PHASE-051 W-33 — T-01…T-04, the foundation wave): the ten keys seeded;
+> ROUTE_PERMISSIONS stays 1,159 = 1,159.]** Migration 0122 §5a seeds the catalog 347 → 357 with ZERO
+> route rows added — the keys land first and the `/api/v1/trade/*` families bind them as the
+> W-34…W-38 service waves ship (the §3.23–§3.28 keys-seed-first precedent; every future route-row
+> addition carries its own dated note here, the 1,159 ledger discipline). The THREE FEATURE FLAGS
+> (`trade` · `trade.lc` · `trade.customs`) grant to business + enterprise (0122 §5b — starter at the
+> DECLARED NEUTRAL ZERO) and the three trade-carrying templates compose them by default (0122 §5c —
+> wholesale · distribution · electronics carry all three) — the entitlement/authorization divergence
+> above, the §3.26/§3.27/§3.28 precedent. The entitlements key-shape widening (0122 §4, the 0116 §7
+> precedent's class applied in advance) admits the whole-module `trade` key beside `quality` — the
+> manifest schema's dated PHASE-051 amendment in packages/contracts; exactly TWO whole-module keys
+> match, no wider. The TWO CoA template markers (1180 LC_MARGIN_DEPOSIT · 2145
+> CUSTOMS_DUTY_PAYABLE) are account-template rows, never permission keys.
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

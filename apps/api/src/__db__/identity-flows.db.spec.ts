@@ -211,7 +211,12 @@ describe("seeds (acceptance 9)", () => {
     // §3.28, the W-24 foundation wave 2026-11-22 — quality.view/manage ·
     // ncr/capa/calibration/spc/complaints/coa/hold/recall; the drift CLI
     // agrees: matrix 347 = seed 347).
-    expect(result.rows[0]?.n).toBe(347);
+    // + 10 = 357 after 0122 — the TEN PHASE-051 trade keys (matrix
+    // §3.29, the W-33 foundation wave 2026-11-24 — trade.view ·
+    // lc.view/manage · collections.manage · customs.view/manage ·
+    // shipments.view/manage · bonded.manage · drawback.manage; the
+    // drift CLI agrees: matrix 357 = seed 357).
+    expect(result.rows[0]?.n).toBe(357);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

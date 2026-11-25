@@ -16,7 +16,10 @@
     "sales.invoices",
     "treasury.cashier_shifts",
     "quality",
-    "quality.spc"
+    "quality.spc",
+    "trade",
+    "trade.lc",
+    "trade.customs"
   ],
   "default_modules_enabled": [
     "accounting",

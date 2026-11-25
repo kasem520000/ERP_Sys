@@ -39,7 +39,9 @@ export const INDUSTRY_SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
  * `assets` — the PHASE-049 CMMS module's composable flags: maintenance
  * and transfer, matrix §3.27's entitlement plane + `quality` — the
  * PHASE-050 QMS module's composable flags, matrix §3.28's entitlement
- * plane).
+ * plane + `trade` — the PHASE-051 foreign-trade & logistics module's
+ * composable flags: the LC and customs planes, matrix §3.29's
+ * entitlement plane).
  *
  * PHASE-050 (W-24, 2026-11-22) — THE WHOLE-MODULE FLAG, a declared
  * interpretation: the approved master plan's D-04 binding shape gives
@@ -50,14 +52,23 @@ export const INDUSTRY_SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
  * `quality` alone (the whole-module flag). No other bare module key is
  * grantable (the alternation admits `quality` only as a two-segment
  * prefix, the dated amendment below carries the one-key exception).
+ *
+ * PHASE-051 (W-33, 2026-11-24) — THE SECOND WHOLE-MODULE FLAG, the
+ * 050 declared interpretation's own dated extension (the approved
+ * master plan's D-04 binding shape gives the trade module the bare
+ * `trade` key beside the LC and customs planes' own `trade.lc` /
+ * `trade.customs`): the pattern admits EXACTLY TWO additional bare
+ * strings now — `quality` and `trade` (the one-key exception becomes
+ * the two-key exception, dated here; no wider — no other bare module
+ * key is grantable, mirroring 0122 §4's entitlements widening).
  */
 const FEATURE_KEY_MODULE_SEGMENT =
   "platform|accounting|partners|items|inventory|sales|purchasing|treasury|tax|reporting|" +
   "crm|manufacturing|distribution|pos|offline|industry|fixed_assets|notes|installments|" +
-  "budgeting|payroll|consolidation|hr|projects|assets|quality";
+  "budgeting|payroll|consolidation|hr|projects|assets|quality|trade";
 
 export const INDUSTRY_FEATURE_KEY_PATTERN = new RegExp(
-  `^((${FEATURE_KEY_MODULE_SEGMENT})\\.[a-z0-9_]+|quality)$`,
+  `^((${FEATURE_KEY_MODULE_SEGMENT})\\.[a-z0-9_]+|quality|trade)$`,
 );
 
 /** §3 $defs.moduleName — runtime modules per MODULE_BOUNDARIES. */

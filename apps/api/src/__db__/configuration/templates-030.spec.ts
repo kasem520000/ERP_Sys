@@ -102,9 +102,17 @@ import {
  *  composes BOTH; canonical + stored + docs mirror + pins moved together,
  *  the 0108 §3 procedure). The wholesale manifest is untouched (wholesale
  *  is not a quality-carrying template). */
+// PHASE-051 (W-33, 2026-11-24): re-pinned — the manifests'
+// required_feature_keys gain the THREE TRADE FLAGS (the trade-plane
+// enablement, D-04 / 0122 §5c: `trade` the whole-module composable
+// unit + `trade.lc` + `trade.customs` — wholesale and electronics
+// compose all three; canonical + stored + docs mirror + pins moved
+// together, the 0098 §3 procedure). The starter degradation chains
+// below gain the three keys (starter carries NONE — the declared
+// neutral zero).
 const KNOWN_HASHES: Readonly<Record<string, string>> = Object.freeze({
-  "industry.wholesale": "sha256:013c35ad9626cb58e1acb4d9115eebae47880badd36f10e4da82d0abfaa28f1f",
-  "industry.electronics": "sha256:67aff4f368e04bda2650596fc3f4105d0bae43e2edf61535a0ebffa34d1637f0",
+  "industry.wholesale": "sha256:ee422f6256ca63c8a2a6ea0c5ba6b50233e4b072cc2ed122b83c5fc1c4bf6bff",
+  "industry.electronics": "sha256:682b15e97301786c94eac4880940a4a2e70bfbff7fde48c76c16ca19dfc4b28d",
 });
 
 // -- tenant A: wholesale apply ------------------------------------------------

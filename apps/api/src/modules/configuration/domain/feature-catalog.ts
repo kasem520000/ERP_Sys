@@ -353,6 +353,22 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   // parallel parameter source).
   "quality": ["items.item_master"],
   "quality.spc": ["quality"],
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics, the W-33 foundation
+  // wave, 2026-11-24): the THREE FEATURE FLAGS ride the EXISTING
+  // delivered baseline (the approved master plan's D-04 — the binding
+  // shape: `trade` the WHOLE-MODULE composable unit + `trade.lc` the
+  // LC plane's own unit + `trade.customs` the customs plane's own
+  // unit; the ten permission keys are the separate authorization
+  // surface, matrix §3.29). The trade plane stands on the purchasing
+  // module's own landed-costs discipline (the declared FX baseline —
+  // D-06/D-21: the customs duties flow into the EXISTING allocation,
+  // the LC/collection amounts ride the EXISTING FX discipline, the LC
+  // fees the EXISTING financial-charges discipline — zero new
+  // machinery); the LC and customs planes stand on the trade module
+  // itself (the module's own composable units).
+  "trade": ["purchasing.landed_costs"],
+  "trade.lc": ["trade"],
+  "trade.customs": ["trade"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

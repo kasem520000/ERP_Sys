@@ -24,7 +24,10 @@
     "inventory.abc",
     "inventory.serial_ledger",
     "inventory.quarantine",
-    "inventory.consignment"
+    "inventory.consignment",
+    "trade",
+    "trade.lc",
+    "trade.customs"
   ],
   "default_modules_enabled": [
     "accounting",

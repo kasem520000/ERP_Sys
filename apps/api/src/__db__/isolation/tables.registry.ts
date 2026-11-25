@@ -624,6 +624,34 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "recall_registry" },
   { table: "quality_management_reviews" },
   { table: "hazard_registers", deleteGranted: true },
+  // PHASE-051 (CR-21 — Foreign Trade & Logistics; migrations 0119–0122;
+  // the W-33 foundation wave, 2026-11-24): the trade cluster — FOURTEEN
+  // tables. Master data (DELETE granted — the tenant's own registries):
+  // incoterms (the ownership-matrix registry, D-10/D-16), hs_code_registry
+  // (the starter set, NO duty rates on the rows). The evidence discipline
+  // (SELECT/INSERT/UPDATE only — the audited history): letters_of_credit
+  // (the G-64 anchor), lc_amendments, lc_documents (BR-105's anchor),
+  // documentary_collections, bills_of_lading (the shipment's own anchor),
+  // packing_lists, certificates_of_origin (the frozen snapshot),
+  // customs_declarations (INV-036's COMPLETED floor),
+  // customs_declaration_lines (the tenant's own duty rows),
+  // bonded_warehouse_moves (the G-66 anchor), duty_drawback_claims
+  // (BR-108's evidence gate), shipment_tracking_events (the append-only
+  // milestone log). The auto-generated A-suite extends by +84.
+  { table: "letters_of_credit" },
+  { table: "lc_amendments" },
+  { table: "lc_documents" },
+  { table: "documentary_collections" },
+  { table: "incoterms", deleteGranted: true },
+  { table: "bills_of_lading" },
+  { table: "packing_lists" },
+  { table: "certificates_of_origin" },
+  { table: "customs_declarations" },
+  { table: "customs_declaration_lines" },
+  { table: "hs_code_registry", deleteGranted: true },
+  { table: "bonded_warehouse_moves" },
+  { table: "duty_drawback_claims" },
+  { table: "shipment_tracking_events" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(
