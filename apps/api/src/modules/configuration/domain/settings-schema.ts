@@ -763,6 +763,29 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-050 (W-26, T-08/D-08): the quality-calibration-due sweep's threshold ladder — the day-values before each instrument's calibration due date at which the sweep alerts (the documented default [30,7,0]; the dedupe is per instrument per threshold pass per due-date cycle, so an instrument descends band by band across nights and re-alerts after each re-calibration). One ladder governs every instrument asset.",
   }),
+  // PHASE-051 (W-34 — T-06, D-09): THE FIRST 051 TRADE SETTINGS KEYS —
+  // the trade-expiry-sweep's threshold ladder (the 0111/calibration
+  // pattern's 051 extension, BR-105's own dependency). The documented
+  // fail-closed default [30,14,7,1] — BR-105's own ladder (the phase
+  // doc §2's verbatim days; red line 5: tenant-configurable DATA, never
+  // hard-coded law); the pure normalize fold lives in the trade
+  // module's own domain (lc-sweep-math — this module's own home, no
+  // cross-module domain import); the dedupe is per LC per threshold
+  // pass per expiry-date cycle, so an LC descends band by band across
+  // nights AND re-alerts after each validity amendment (the day axis is
+  // the expiry date the alert names — never the current day; the
+  // convergence law holds within a cycle); the discrepancy family rides
+  // the same axes with its own marker.
+  "trade.lc_expiry_sweep_thresholds": Object.freeze({
+    key: "trade.lc_expiry_sweep_thresholds",
+    schema: z
+      .array(z.number().int().min(0))
+      .min(1)
+      .max(12),
+    default: [30, 14, 7, 1],
+    description:
+      "PHASE-051 (W-34, T-06/D-09): the trade-expiry-sweep's threshold ladder — the day-values before each letter of credit's expiry date at which the sweep alerts (BR-105's own documented default [30,14,7,1]; the dedupe is per LC per threshold pass per expiry-date cycle, so an instrument descends band by band across nights and re-alerts after each validity amendment). One ladder governs every LC; the discrepancy alerts ride the same bands.",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

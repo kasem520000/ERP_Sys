@@ -704,6 +704,22 @@ export const MIGRATIONS: readonly string[] = [
   "0120_trade_documents",
   "0121_trade_customs",
   "0122_trade_shipments",
+  // PHASE-051 (W-34 — T-06, dated 2026-11-25): the notifications-category
+  // widening — 'trade' joins BOTH closed CHECK domains, ordered WITH the
+  // trade-expiry-sweep's inbox writer that ships in the same wave (never
+  // after it — the 0099/0111/0118 same-increment law). The master
+  // plan's four declared slots 0119–0122 are consumed at W-33 and
+  // PUBLISHED (the constants law); a closed-domain widening demanded by
+  // a service wave lands as its own dated additive slot — exactly the
+  // 050 precedent's own class (0117 for G-62's stock-moves source,
+  // 0118 for the calibration sweep's 'quality' member). The union is
+  // the NINETEEN members (the shared-scope union law). NO tables (the
+  // catalog stays 354); the drift stays 357; ROUTE_PERMISSIONS
+  // 1,159 + 12 = 1,171 dated at the block (the LC plane's routes, the
+  // keys-seed-first FIRST trade binding wave); the first trade settings
+  // registry key trade.lc_expiry_sweep_thresholds (registry-in-code,
+  // the 0111 precedent — no migration row needed).
+  "0123_trade_notifications_category",
 ];
 
 /**

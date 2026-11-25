@@ -105,6 +105,17 @@ import {
   HazardRegisterDuplicateError,
   HazardRegisterStateError,
 } from "../../modules/quality/domain/quality-errors";
+// PHASE-051 (W-34 — T-05 + T-06, dated 2026-11-25): the trade module's
+// typed refusals (the LC plane's statuses — see domainStatus).
+import {
+  LcRecordNotFoundError,
+  LcDuplicateError,
+  LcStateError,
+  LcMarginShapeError,
+  LcBankAccountInvalidError,
+  LcChecklistStateError,
+  LcDocumentDuplicateError,
+} from "../../modules/trade/domain/trade-errors";
 import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
@@ -1395,6 +1406,36 @@ function domainStatus(error: DomainError): number {
     // to the 422 default exactly as the family law documents it.
     error instanceof HazardRegisterDuplicateError ||
     error instanceof HazardRegisterStateError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-051 (W-34 — T-05 + T-06, dated 2026-11-25): the trade LC
+  // plane's statuses — registered in the SAME increment that ships the
+  // routes (the PHASE-045 T-03 lesson: never the 422 fall-through drift
+  // for a not-found). The 404s: the LC register's not-found (A7 parity
+  // — unknown == foreign, never an existence disclosure). The 409s:
+  // the lifecycle ladder's conflicts (the single-use CAS stamps, the
+  // terminal register, the duplicate lc_no natural key) + G-64's own
+  // margin-shape conflicts (the margined cancellation refused — the
+  // deposit's exit is the retirement pair; the margin-free retirement
+  // refused — the reversal has nothing to reverse) + the bank-account
+  // currency/status floor (the treasury discipline's trade face) + the
+  // checklist monotone law's refusals + the checklist natural key. The
+  // policy class — the typed-change law's missing shapes
+  // (LC_AMENDMENT_INVALID), the input vocabulary (TRADE_INPUT_INVALID),
+  // the sweep thresholds' zod refusal (LC_SWEEP_THRESHOLDS_INVALID) —
+  // falls through to the 422 default exactly as the family law
+  // documents it.
+  if (error instanceof LcRecordNotFoundError) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (
+    error instanceof LcDuplicateError ||
+    error instanceof LcStateError ||
+    error instanceof LcMarginShapeError ||
+    error instanceof LcBankAccountInvalidError ||
+    error instanceof LcChecklistStateError ||
+    error instanceof LcDocumentDuplicateError
   ) {
     return HttpStatus.CONFLICT;
   }

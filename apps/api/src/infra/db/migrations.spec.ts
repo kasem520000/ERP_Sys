@@ -389,7 +389,13 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // the Incoterms-2020 set + the HS starter set through the 0098
     // migration-plane gate with the accuracy disclaimer on every
     // starter row). FOURTEEN tenant tables; the catalog 340 → 354.
-    expect(files.at(-1)?.tag).toBe("0122_trade_shipments");
+    // [dated 2026-11-25 — PHASE-051 W-34: the chain grows 122 → 123 —
+    // 0123_trade_notifications_category lands WITH the
+    // trade-expiry-sweep's inbox writer (the 'trade' member joins both
+    // closed CHECK domains, the 0099/0111/0118 same-increment law; the
+    // 050 0117/0118 additive-slot precedent's own class, the declared
+    // slots consumed and PUBLISHED at W-33 — the constants law)]
+    expect(files.at(-1)?.tag).toBe("0123_trade_notifications_category");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

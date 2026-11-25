@@ -78,7 +78,14 @@ export type NotificationCategory =
   // own dedupe axes: instrument+window+due-date). The DB domain floor
   // widened by migration 0118 (the 18-member union, the shared-scope
   // union law); this type is the writer's actual vocabulary.
-  | "quality";
+  | "quality"
+  // PHASE-051 (W-34 — T-06, 0123 category widening): the trade family —
+  // the `trade-expiry-sweep`'s deduped inbox notifications (D-09's own
+  // dedupe axes: LC+window+expiry-day, both the expiry and the
+  // discrepancy alert families). The DB domain floor widened by
+  // migration 0123 (the 19-member union, the shared-scope union law,
+  // ordered WITH this wave's writer — the 0118 same-increment law).
+  | "trade";
 
 export type NotificationSeverity = "info" | "warning" | "critical";
 

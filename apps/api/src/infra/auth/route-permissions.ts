@@ -5800,6 +5800,79 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/quality/hazards/:id",
     permission: "quality.manage",
   },
+  // PHASE-051 (W-34 — T-05 + T-06, dated 2026-11-25; matrix §3.29): the
+  // keys-seed-first FIRST trade binding wave (1,159 + 11 = 1,170 — the
+  // discipline standing: the TEN trade.* keys landed at W-33 (0122 §5),
+  // the routes bind as the service waves ship, every change dated at
+  // the block — the 1,159 baseline anchor). The LC plane binds
+  // trade.lc.view over the register reads (the list + the find with
+  // the amendments and the documents checklist) and trade.lc.manage
+  // over the lifecycle acts (the issue — G-64's margin deposit door ·
+  // the typed amendments with the G-64 margin adjustments · the
+  // checklist writes with the discrepancy notes · the fees — the
+  // financial-charges discipline's door · the retire — G-64's
+  // reversal door · the cancel) + the sweep-config surface (the cmms/
+  // quality expiry-sweep precedent: the effective ladder + the last
+  // run's seal is operational config, never a finance read). The
+  // collections (W-35) · transport/tracking (W-36) · customs (W-37) ·
+  // bonded/drawback (W-38) families bind on their own waves; the
+  // routes are feature-gated at the controller on trade.lc — the LC
+  // plane's own composable unit (D-04).
+  {
+    method: "GET",
+    path: "/api/v1/trade/lc",
+    permission: "trade.lc.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/lc/sweep-config",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/trade/lc/sweep-config",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/trade/lc/:id",
+    permission: "trade.lc.view",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc/:id/issue",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc/:id/amendments",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc/:id/documents",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc/:id/fees",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc/:id/retire",
+    permission: "trade.lc.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/trade/lc/:id/cancel",
+    permission: "trade.lc.manage",
+  },
 ];
 
 /**

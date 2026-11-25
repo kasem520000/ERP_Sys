@@ -30,6 +30,10 @@ import { FixedAssetsModule } from "./modules/fixed_assets/fixed_assets.module";
 // PHASE-050 (W-25, dated 2026-11-23): the quality module (QMS, CR-20 — the
 // specifications plane + the NCR engine with G-62's write-off).
 import { QualityModule } from "./modules/quality/quality.module";
+// PHASE-051 (W-34, dated 2026-11-25): the trade module (FTL, CR-21 — the LC
+// engine with G-64's postings + BR-105's trade-expiry-sweep, the SIXTH
+// standing isolate).
+import { TradeModule } from "./modules/trade/trade.module";
 import { NotesModule } from "./modules/notes/notes.module";
 import { InstallmentsModule } from "./modules/installments/installments.module";
 // PHASE-028/029 (restored lineage): the budgeting + payroll modules.
@@ -85,6 +89,9 @@ import { UsageLimitGuard } from "./infra/auth/usage-limit.guard";
     PurchasingModule,
     FixedAssetsModule,
     QualityModule,
+    // PHASE-051 (W-34): the trade module (the LC engine + the expiry
+    // sweep) — after the quality module, the phase's own order.
+    TradeModule,
     NotesModule,
     InstallmentsModule,
     BudgetingModule,

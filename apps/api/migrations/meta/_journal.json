@@ -854,6 +854,13 @@
       "when": 1799208000000,
       "tag": "0122_trade_shipments",
       "breakpoints": true
+    },
+    {
+      "idx": 122,
+      "version": "7",
+      "when": 1799294400000,
+      "tag": "0123_trade_notifications_category",
+      "breakpoints": true
     }
   ],
   "version": "7"

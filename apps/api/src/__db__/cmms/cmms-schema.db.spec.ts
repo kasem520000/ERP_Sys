@@ -958,7 +958,12 @@ describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-sc
     // among them; [dated 2026-11-23 — PHASE-050 W-26: the union grows
     // 17 → 18 members — `quality` joins with 0118 (the
     // quality-calibration-due sweep's inbox records, D-08's own
-    // dependency), the 0111/0112 widening pattern carried into 050]):
+    // dependency), the 0111/0112 widening pattern carried into 050];
+    // [dated 2026-11-25 — PHASE-051 W-34: the union grows 18 → 19
+    // members — `trade` joins with 0123 (the trade-expiry-sweep's inbox
+    // records, D-09's own dependency), the same widening pattern
+    // carried into 051 — this arm's own design: the new member goes RED
+    // here first, named, then the enumeration carries it]):
     expect([...union].sort()).toEqual([
       "assets",
       "budgeting",
@@ -977,6 +982,7 @@ describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-sc
       "stock",
       "subscription",
       "templates",
+      "trade",
       "warranties",
     ]);
 
