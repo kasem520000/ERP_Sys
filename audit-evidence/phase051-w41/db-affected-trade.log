@@ -1,0 +1,905 @@
+# PHASE-051 W-41 — THE AFFECTED TRADE FAMILY re-run at the delta head
+# started: 2026-11-26T03:17:56Z
+
+# ══ RUN 1: THE THREE NEW W-41 SPECS (the goldens + the RLS matrix + the OA-06 budgets) ══
+
+ RUN  v3.2.7 /home/z/ERP_live/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_live/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-26 03:17:58.124 UTC [12856] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-26 03:17:58.124 UTC [12856] LOG:  listening on IPv6 address "::1", port 34633
+2026-11-26 03:17:58.124 UTC [12856] LOG:  listening on IPv4 address "127.0.0.1", port 34633
+
+2026-11-26 03:17:58.124 UTC [12856] LOG:  listening on Unix socket "/tmp/.s.PGSQL.34633"
+
+2026-11-26 03:17:58.125 UTC [12859] LOG:  database system was shut down at 2026-11-26 03:17:58 UTC
+
+2026-11-26 03:17:58.127 UTC [12856] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/trade/trade-goldens.db.spec.ts (9 tests) 1483ms
+   ✓ PHASE-051 W-41 — T-16: THE BONDED BLOCKING-MATRIX GOLDEN + THE OFFLINE-REJECTION SHAPE (D-20) > THE BONDED BLOCKING-MATRIX GOLDEN — the suspended stock refused on EVERY baseline path IN ONE ARM (the raw plan, the manual issue, the sales-delivery post, the transfer dispatch), every payload pinned, ZERO residue per path, then the release + the GREEN re-run of the very issue that was refused  598ms
+2026-11-26 03:18:06.529 UTC [12969] ERROR:  new row violates row-level security policy for table "letters_of_credit"
+2026-11-26 03:18:06.529 UTC [12969] STATEMENT:  INSERT INTO letters_of_credit (id, tenant_id, lc_no, currency, amount, margin_amount,
+	                                        issuing_bank, beneficiary_name, applicant_name, expiry_date, status)
+	         VALUES (gen_random_uuid(), $1, 'LC-FORGE-RLS2', 'USD', 1000, 0, 'Forged Bank',
+	                 'Forged Beneficiary', 'Forged Applicant', '2027-12-31', 'DRAFT')
+
+2026-11-26 03:18:06.536 UTC [12970] ERROR:  new row violates row-level security policy for table "lc_amendments"
+2026-11-26 03:18:06.536 UTC [12970] STATEMENT:  INSERT INTO lc_amendments (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to)
+	         VALUES (gen_random_uuid(), $1, $2, 1, 'VALUE', 3000, 3600)
+
+2026-11-26 03:18:06.542 UTC [12971] ERROR:  new row violates row-level security policy for table "lc_documents"
+2026-11-26 03:18:06.542 UTC [12971] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type, presented)
+	         VALUES (gen_random_uuid(), $1, $2, 'COMMERCIAL INVOICE', false)
+
+2026-11-26 03:18:06.549 UTC [12972] ERROR:  new row violates row-level security policy for table "documentary_collections"
+2026-11-26 03:18:06.549 UTC [12972] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount,
+	                                              currency, documents, status)
+	         VALUES (gen_random_uuid(), $1, 'COLL-FORGE-RLS2', 'D/P', 500, 'USD', '[]'::jsonb, 'OPEN')
+
+2026-11-26 03:18:06.555 UTC [12973] ERROR:  new row violates row-level security policy for table "incoterms"
+2026-11-26 03:18:06.555 UTC [12973] STATEMENT:  INSERT INTO incoterms (id, tenant_id, code, name, name_ar, carriage_by_seller,
+	                                insurance_by_seller, export_clearance_by_seller,
+	                                import_clearance_by_seller, import_duty_by_seller)
+	         VALUES (gen_random_uuid(), $1, 'FGX', 'Forged term', 'شرط مزيف', false, false, true, false, false)
+
+2026-11-26 03:18:06.561 UTC [12974] ERROR:  new row violates row-level security policy for table "bills_of_lading"
+2026-11-26 03:18:06.561 UTC [12974] STATEMENT:  INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name, shipment_status)
+	         VALUES (gen_random_uuid(), $1, 'BL-FORGE-RLS2', 'SEA', 'Forged Carrier', 'BOOKED')
+
+2026-11-26 03:18:06.567 UTC [12975] ERROR:  new row violates row-level security policy for table "packing_lists"
+2026-11-26 03:18:06.567 UTC [12975] STATEMENT:  INSERT INTO packing_lists (id, tenant_id, pl_no, bill_of_lading_id, lines, shipment_status)
+	         VALUES (gen_random_uuid(), $1, 'PL-FORGE-RLS2', $2, '[]'::jsonb, 'BOOKED')
+
+2026-11-26 03:18:06.573 UTC [12976] ERROR:  new row violates row-level security policy for table "certificates_of_origin"
+2026-11-26 03:18:06.573 UTC [12976] STATEMENT:  INSERT INTO certificates_of_origin (id, tenant_id, certificate_no, cert_type,
+	                                             bill_of_lading_id, snapshot, issued_at)
+	         VALUES (gen_random_uuid(), $1, 'CERT-FORGE-RLS2', 'ORIGIN', $2, '{}'::jsonb, now())
+
+2026-11-26 03:18:06.580 UTC [12977] ERROR:  new row violates row-level security policy for table "customs_declarations"
+2026-11-26 03:18:06.580 UTC [12977] STATEMENT:  INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type,
+	                                           customs_office, status, currency)
+	         VALUES (gen_random_uuid(), $1, 'DEC-FORGE-RLS2', 'IMPORT', 'Jeddah Customs', 'DRAFT', 'SAR')
+
+2026-11-26 03:18:06.586 UTC [12978] ERROR:  new row violates row-level security policy for table "customs_declaration_lines"
+2026-11-26 03:18:06.586 UTC [12978] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code,
+	                                                customs_value, duty_rate, duty_amount, import_vat)
+	         VALUES (gen_random_uuid(), $1, $2, 1, '8471', 100, 0.05, 5, 0)
+
+2026-11-26 03:18:06.592 UTC [12979] ERROR:  new row violates row-level security policy for table "hs_code_registry"
+2026-11-26 03:18:06.592 UTC [12979] STATEMENT:  INSERT INTO hs_code_registry (id, tenant_id, hs_code, name, name_ar)
+	         VALUES (gen_random_uuid(), $1, '99', 'Forged HS', 'صنف مزيف')
+
+2026-11-26 03:18:06.598 UTC [12980] ERROR:  new row violates row-level security policy for table "bonded_warehouse_moves"
+2026-11-26 03:18:06.598 UTC [12980] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, to_warehouse_id,
+	                                             lines, status)
+	         VALUES (gen_random_uuid(), $1, 'BND-FORGE-RLS2', 'IN_BOND', $2,
+	                 '[{"itemId":"00000000-0000-4000-8000-000000000000","qty":"1"}]'::jsonb, 'DRAFT')
+
+2026-11-26 03:18:06.604 UTC [12981] ERROR:  new row violates row-level security policy for table "duty_drawback_claims"
+2026-11-26 03:18:06.604 UTC [12981] STATEMENT:  INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, export_declaration_id,
+	                                           claimed_amount, currency, status)
+	         VALUES (gen_random_uuid(), $1, 'DBK-FORGE-RLS2', $2, 100, 'SAR', 'DRAFT')
+
+2026-11-26 03:18:06.611 UTC [12982] ERROR:  new row violates row-level security policy for table "shipment_tracking_events"
+2026-11-26 03:18:06.611 UTC [12982] STATEMENT:  INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
+	         VALUES (gen_random_uuid(), $1, $2, 'DEPARTED', now())
+
+2026-11-26 03:18:06.645 UTC [12985] ERROR:  permission denied for table letters_of_credit
+2026-11-26 03:18:06.645 UTC [12985] STATEMENT:  WITH deleted AS (DELETE FROM letters_of_credit WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.652 UTC [12986] ERROR:  permission denied for table lc_amendments
+2026-11-26 03:18:06.652 UTC [12986] STATEMENT:  WITH deleted AS (DELETE FROM lc_amendments WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.658 UTC [12987] ERROR:  permission denied for table lc_documents
+2026-11-26 03:18:06.658 UTC [12987] STATEMENT:  WITH deleted AS (DELETE FROM lc_documents WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.665 UTC [12988] ERROR:  permission denied for table documentary_collections
+2026-11-26 03:18:06.665 UTC [12988] STATEMENT:  WITH deleted AS (DELETE FROM documentary_collections WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.672 UTC [12989] ERROR:  permission denied for table bills_of_lading
+2026-11-26 03:18:06.672 UTC [12989] STATEMENT:  WITH deleted AS (DELETE FROM bills_of_lading WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.679 UTC [12990] ERROR:  permission denied for table packing_lists
+2026-11-26 03:18:06.679 UTC [12990] STATEMENT:  WITH deleted AS (DELETE FROM packing_lists WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.685 UTC [12991] ERROR:  permission denied for table certificates_of_origin
+2026-11-26 03:18:06.685 UTC [12991] STATEMENT:  WITH deleted AS (DELETE FROM certificates_of_origin WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.692 UTC [12992] ERROR:  permission denied for table customs_declarations
+2026-11-26 03:18:06.692 UTC [12992] STATEMENT:  WITH deleted AS (DELETE FROM customs_declarations WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.698 UTC [12993] ERROR:  permission denied for table customs_declaration_lines
+2026-11-26 03:18:06.698 UTC [12993] STATEMENT:  WITH deleted AS (DELETE FROM customs_declaration_lines WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.706 UTC [12994] ERROR:  permission denied for table bonded_warehouse_moves
+2026-11-26 03:18:06.706 UTC [12994] STATEMENT:  WITH deleted AS (DELETE FROM bonded_warehouse_moves WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.713 UTC [12995] ERROR:  permission denied for table duty_drawback_claims
+2026-11-26 03:18:06.713 UTC [12995] STATEMENT:  WITH deleted AS (DELETE FROM duty_drawback_claims WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.719 UTC [12996] ERROR:  permission denied for table shipment_tracking_events
+2026-11-26 03:18:06.719 UTC [12996] STATEMENT:  WITH deleted AS (DELETE FROM shipment_tracking_events WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:06.764 UTC [12999] ERROR:  insert or update on table "customs_declaration_lines" violates foreign key constraint "fk_customs_declaration_lines_declaration"
+2026-11-26 03:18:06.764 UTC [12999] DETAIL:  Key (declaration_id, tenant_id)=(01a215dc-431f-7001-b873-49c8babcec48, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7e) is not present in table "customs_declarations".
+2026-11-26 03:18:06.764 UTC [12999] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code,
+	                                                customs_value, duty_rate, duty_amount, import_vat)
+	         VALUES (gen_random_uuid(), $1, $2, 1, '8471', 100, 0.05, 5, 0)
+
+ ✓ src/__db__/trade/trade-rls.db.spec.ts (10 tests) 497ms
+[trade-explain-budgets] P1 the declaration-lines read (the tenant+declaration index-driven law):
+Sort  (cost=12.69..12.77 rows=30 width=320)
+  Sort Key: line_no, id
+  ->  Bitmap Heap Scan on customs_declaration_lines  (cost=8.46..11.96 rows=30 width=320)
+        Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (declaration_id = '01a215dc-44f1-7000-b7e8-0e21fbcbd151'::uuid))
+        ->  Bitmap Index Scan on ix_customs_declaration_lines_tenant_decl  (cost=0.00..8.45 rows=30 width=0)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (declaration_id = '01a215dc-44f1-7000-b7e8-0e21fbcbd151'::uuid))
+[trade-explain-budgets] P2 the tracking-events read by the bill of lading:
+Limit  (cost=0.66..14.26 rows=30 width=257)
+  ->  Incremental Sort  (cost=0.66..14.26 rows=30 width=257)
+        Sort Key: event_at, id
+        Presorted Key: event_at
+        ->  Index Scan using ix_shipment_tracking_events_tenant_bl on shipment_tracking_events  (cost=0.15..13.05 rows=30 width=257)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (bill_of_lading_id = '01a215dc-450c-7002-8471-57c16300718d'::uuid))
+[trade-explain-budgets] P3 the tracking-events read by the declaration link (the customs leg):
+Limit  (cost=12.25..12.26 rows=3 width=257)
+  ->  Sort  (cost=12.25..12.26 rows=3 width=257)
+        Sort Key: event_at, id
+        ->  Index Scan using ix_shipment_tracking_events_tenant_declaration on shipment_tracking_events  (cost=0.14..12.23 rows=3 width=257)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (declaration_id = '01a215dc-44f1-7000-b7e8-0e21fbcbd151'::uuid))
+ ✓ src/__db__/trade/trade-explain-budgets.db.spec.ts (4 tests) 154ms
+
+ Test Files  3 passed (3)
+      Tests  23 passed (23)
+   Start at  03:17:57
+   Duration  9.62s (transform 1.35s, setup 0ms, collect 2.07s, tests 2.13s, environment 0ms, prepare 55ms)
+
+2026-11-26 03:18:06.989 UTC [12856] LOG:  received fast shutdown request
+2026-11-26 03:18:06.989 UTC [12856] LOG:  aborting any active transactions
+2026-11-26 03:18:06.989 UTC [12937] FATAL:  terminating connection due to administrator command
+
+2026-11-26 03:18:06.991 UTC [12936] FATAL:  terminating connection due to administrator command
+
+2026-11-26 03:18:06.992 UTC [12856] LOG:  background worker "logical replication launcher" (PID 12862) exited with exit code 1
+
+2026-11-26 03:18:07.010 UTC [12857] LOG:  shutting down
+2026-11-26 03:18:07.010 UTC [12857] LOG:  checkpoint starting: shutdown immediate
+
+(node:12915) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:12915) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-26 03:18:07.039 UTC [12857] LOG:  checkpoint complete: wrote 3521 buffers (21.5%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.021 s, sync=0.009 s, total=0.030 s; sync files=2907, longest=0.001 s, average=0.001 s; distance=29665 kB, estimate=29665 kB; lsn=0/31D6D98, redo lsn=0/31D6D98
+
+2026-11-26 03:18:07.047 UTC [12856] LOG:  database system is shut down
+
+
+# ══ RUN 2: THE WHOLE TRADE FAMILY (15 files) ══
+
+ RUN  v3.2.7 /home/z/ERP_live/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/ERP_live/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-26 03:18:08.588 UTC [13065] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-26 03:18:08.589 UTC [13065] LOG:  listening on IPv6 address "::1", port 44645
+2026-11-26 03:18:08.589 UTC [13065] LOG:  listening on IPv4 address "127.0.0.1", port 44645
+
+2026-11-26 03:18:08.589 UTC [13065] LOG:  listening on Unix socket "/tmp/.s.PGSQL.44645"
+
+2026-11-26 03:18:08.590 UTC [13068] LOG:  database system was shut down at 2026-11-26 03:18:08 UTC
+
+2026-11-26 03:18:08.592 UTC [13065] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/trade/trade-goldens.db.spec.ts (9 tests) 1474ms
+   ✓ PHASE-051 W-41 — T-16: THE BONDED BLOCKING-MATRIX GOLDEN + THE OFFLINE-REJECTION SHAPE (D-20) > THE BONDED BLOCKING-MATRIX GOLDEN — the suspended stock refused on EVERY baseline path IN ONE ARM (the raw plan, the manual issue, the sales-delivery post, the transfer dispatch), every payload pinned, ZERO residue per path, then the release + the GREEN re-run of the very issue that was refused  553ms
+ ✓ src/__db__/trade/trade-certificate-print-render.db.spec.ts (3 tests) 1371ms
+   ✓ PHASE-051 W-39 — the certificate print in the REAL browser (both directions, the frozen snapshot) > the REAL Chromium render: a multi-kilobyte %PDF in both locales  350ms
+   ✓ PHASE-051 W-39 — the certificate print in the REAL browser (both directions, the frozen snapshot) > DETERMINISM — two builds byte-identical; two renders byte-identical modulo the renderer's own clock stamps (AR + EN)  505ms
+ ✓ src/__db__/trade/trade-bonded.db.spec.ts (14 tests) 824ms
+ ✓ src/__db__/trade/trade-incoterms.db.spec.ts (13 tests) 1036ms
+   ✓ PHASE-051 W-35 — BR-106'S MANDATE AT THE ORDERS' OWN POSTING (the owner's ruling (ج) VERBATIM: currency ≠ base, or the import/export tag) > THE SALES LEG (the export side): a foreign-currency SO without an incoterm refuses at its own posting; with the selection it issues GREEN — the same gate, the same typed refusal  859ms
+ ✓ src/__db__/trade/trade-customs.db.spec.ts (10 tests) 658ms
+2026-11-26 03:18:21.383 UTC [13336] ERROR:  new row violates row-level security policy for table "letters_of_credit"
+2026-11-26 03:18:21.383 UTC [13336] STATEMENT:  INSERT INTO letters_of_credit (id, tenant_id, lc_no, currency, amount, margin_amount,
+	                                        issuing_bank, beneficiary_name, applicant_name, expiry_date, status)
+	         VALUES (gen_random_uuid(), $1, 'LC-FORGE-RLS2', 'USD', 1000, 0, 'Forged Bank',
+	                 'Forged Beneficiary', 'Forged Applicant', '2027-12-31', 'DRAFT')
+
+2026-11-26 03:18:21.390 UTC [13337] ERROR:  new row violates row-level security policy for table "lc_amendments"
+2026-11-26 03:18:21.390 UTC [13337] STATEMENT:  INSERT INTO lc_amendments (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to)
+	         VALUES (gen_random_uuid(), $1, $2, 1, 'VALUE', 3000, 3600)
+
+2026-11-26 03:18:21.396 UTC [13338] ERROR:  new row violates row-level security policy for table "lc_documents"
+2026-11-26 03:18:21.396 UTC [13338] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type, presented)
+	         VALUES (gen_random_uuid(), $1, $2, 'COMMERCIAL INVOICE', false)
+
+2026-11-26 03:18:21.402 UTC [13339] ERROR:  new row violates row-level security policy for table "documentary_collections"
+2026-11-26 03:18:21.402 UTC [13339] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount,
+	                                              currency, documents, status)
+	         VALUES (gen_random_uuid(), $1, 'COLL-FORGE-RLS2', 'D/P', 500, 'USD', '[]'::jsonb, 'OPEN')
+
+2026-11-26 03:18:21.407 UTC [13340] ERROR:  new row violates row-level security policy for table "incoterms"
+2026-11-26 03:18:21.407 UTC [13340] STATEMENT:  INSERT INTO incoterms (id, tenant_id, code, name, name_ar, carriage_by_seller,
+	                                insurance_by_seller, export_clearance_by_seller,
+	                                import_clearance_by_seller, import_duty_by_seller)
+	         VALUES (gen_random_uuid(), $1, 'FGX', 'Forged term', 'شرط مزيف', false, false, true, false, false)
+
+2026-11-26 03:18:21.413 UTC [13341] ERROR:  new row violates row-level security policy for table "bills_of_lading"
+2026-11-26 03:18:21.413 UTC [13341] STATEMENT:  INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name, shipment_status)
+	         VALUES (gen_random_uuid(), $1, 'BL-FORGE-RLS2', 'SEA', 'Forged Carrier', 'BOOKED')
+
+2026-11-26 03:18:21.421 UTC [13342] ERROR:  new row violates row-level security policy for table "packing_lists"
+2026-11-26 03:18:21.421 UTC [13342] STATEMENT:  INSERT INTO packing_lists (id, tenant_id, pl_no, bill_of_lading_id, lines, shipment_status)
+	         VALUES (gen_random_uuid(), $1, 'PL-FORGE-RLS2', $2, '[]'::jsonb, 'BOOKED')
+
+2026-11-26 03:18:21.427 UTC [13343] ERROR:  new row violates row-level security policy for table "certificates_of_origin"
+2026-11-26 03:18:21.427 UTC [13343] STATEMENT:  INSERT INTO certificates_of_origin (id, tenant_id, certificate_no, cert_type,
+	                                             bill_of_lading_id, snapshot, issued_at)
+	         VALUES (gen_random_uuid(), $1, 'CERT-FORGE-RLS2', 'ORIGIN', $2, '{}'::jsonb, now())
+
+2026-11-26 03:18:21.433 UTC [13344] ERROR:  new row violates row-level security policy for table "customs_declarations"
+2026-11-26 03:18:21.433 UTC [13344] STATEMENT:  INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type,
+	                                           customs_office, status, currency)
+	         VALUES (gen_random_uuid(), $1, 'DEC-FORGE-RLS2', 'IMPORT', 'Jeddah Customs', 'DRAFT', 'SAR')
+
+2026-11-26 03:18:21.439 UTC [13345] ERROR:  new row violates row-level security policy for table "customs_declaration_lines"
+2026-11-26 03:18:21.439 UTC [13345] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code,
+	                                                customs_value, duty_rate, duty_amount, import_vat)
+	         VALUES (gen_random_uuid(), $1, $2, 1, '8471', 100, 0.05, 5, 0)
+
+2026-11-26 03:18:21.445 UTC [13346] ERROR:  new row violates row-level security policy for table "hs_code_registry"
+2026-11-26 03:18:21.445 UTC [13346] STATEMENT:  INSERT INTO hs_code_registry (id, tenant_id, hs_code, name, name_ar)
+	         VALUES (gen_random_uuid(), $1, '99', 'Forged HS', 'صنف مزيف')
+
+2026-11-26 03:18:21.451 UTC [13347] ERROR:  new row violates row-level security policy for table "bonded_warehouse_moves"
+2026-11-26 03:18:21.451 UTC [13347] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, to_warehouse_id,
+	                                             lines, status)
+	         VALUES (gen_random_uuid(), $1, 'BND-FORGE-RLS2', 'IN_BOND', $2,
+	                 '[{"itemId":"00000000-0000-4000-8000-000000000000","qty":"1"}]'::jsonb, 'DRAFT')
+
+2026-11-26 03:18:21.457 UTC [13348] ERROR:  new row violates row-level security policy for table "duty_drawback_claims"
+2026-11-26 03:18:21.457 UTC [13348] STATEMENT:  INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, export_declaration_id,
+	                                           claimed_amount, currency, status)
+	         VALUES (gen_random_uuid(), $1, 'DBK-FORGE-RLS2', $2, 100, 'SAR', 'DRAFT')
+
+2026-11-26 03:18:21.464 UTC [13349] ERROR:  new row violates row-level security policy for table "shipment_tracking_events"
+2026-11-26 03:18:21.464 UTC [13349] STATEMENT:  INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
+	         VALUES (gen_random_uuid(), $1, $2, 'DEPARTED', now())
+
+2026-11-26 03:18:21.497 UTC [13352] ERROR:  permission denied for table letters_of_credit
+2026-11-26 03:18:21.497 UTC [13352] STATEMENT:  WITH deleted AS (DELETE FROM letters_of_credit WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.503 UTC [13353] ERROR:  permission denied for table lc_amendments
+2026-11-26 03:18:21.503 UTC [13353] STATEMENT:  WITH deleted AS (DELETE FROM lc_amendments WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.509 UTC [13354] ERROR:  permission denied for table lc_documents
+2026-11-26 03:18:21.509 UTC [13354] STATEMENT:  WITH deleted AS (DELETE FROM lc_documents WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.515 UTC [13355] ERROR:  permission denied for table documentary_collections
+2026-11-26 03:18:21.515 UTC [13355] STATEMENT:  WITH deleted AS (DELETE FROM documentary_collections WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.523 UTC [13356] ERROR:  permission denied for table bills_of_lading
+2026-11-26 03:18:21.523 UTC [13356] STATEMENT:  WITH deleted AS (DELETE FROM bills_of_lading WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.529 UTC [13357] ERROR:  permission denied for table packing_lists
+2026-11-26 03:18:21.529 UTC [13357] STATEMENT:  WITH deleted AS (DELETE FROM packing_lists WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.536 UTC [13358] ERROR:  permission denied for table certificates_of_origin
+2026-11-26 03:18:21.536 UTC [13358] STATEMENT:  WITH deleted AS (DELETE FROM certificates_of_origin WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.542 UTC [13359] ERROR:  permission denied for table customs_declarations
+2026-11-26 03:18:21.542 UTC [13359] STATEMENT:  WITH deleted AS (DELETE FROM customs_declarations WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.550 UTC [13360] ERROR:  permission denied for table customs_declaration_lines
+2026-11-26 03:18:21.550 UTC [13360] STATEMENT:  WITH deleted AS (DELETE FROM customs_declaration_lines WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.558 UTC [13361] ERROR:  permission denied for table bonded_warehouse_moves
+2026-11-26 03:18:21.558 UTC [13361] STATEMENT:  WITH deleted AS (DELETE FROM bonded_warehouse_moves WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.564 UTC [13362] ERROR:  permission denied for table duty_drawback_claims
+2026-11-26 03:18:21.564 UTC [13362] STATEMENT:  WITH deleted AS (DELETE FROM duty_drawback_claims WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.570 UTC [13363] ERROR:  permission denied for table shipment_tracking_events
+2026-11-26 03:18:21.570 UTC [13363] STATEMENT:  WITH deleted AS (DELETE FROM shipment_tracking_events WHERE tenant_id = $1 RETURNING 1)
+	             SELECT count(*)::int AS n FROM deleted
+
+2026-11-26 03:18:21.620 UTC [13366] ERROR:  insert or update on table "customs_declaration_lines" violates foreign key constraint "fk_customs_declaration_lines_declaration"
+2026-11-26 03:18:21.620 UTC [13366] DETAIL:  Key (declaration_id, tenant_id)=(01a215dc-7d34-7000-9cbe-5804cf3b3494, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7e) is not present in table "customs_declarations".
+2026-11-26 03:18:21.620 UTC [13366] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code,
+	                                                customs_value, duty_rate, duty_amount, import_vat)
+	         VALUES (gen_random_uuid(), $1, $2, 1, '8471', 100, 0.05, 5, 0)
+
+ ✓ src/__db__/trade/trade-rls.db.spec.ts (10 tests) 462ms
+ ✓ src/__db__/trade/trade-lc-sweep.db.spec.ts (6 tests) 334ms
+ ✓ src/__db__/trade/trade-lc.db.spec.ts (10 tests) 218ms
+2026-11-26 03:18:22.307 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_status"
+2026-11-26 03:18:22.307 UTC [13408] DETAIL:  Failing row contains (5431a23c-b335-417d-9d3a-bd730cfb0697, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.307442+00, 2026-11-26 03:18:22.307442+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-BAD-STATUS, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, LIVE, null, null, null, null, null).
+2026-11-26 03:18:22.307 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.308 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_amounts"
+2026-11-26 03:18:22.308 UTC [13408] DETAIL:  Failing row contains (4fb4e709-8ea9-4412-a254-74d257ae656b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.30815+00, 2026-11-26 03:18:22.30815+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-BAD-AMT, null, USD, 0.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, DRAFT, null, null, null, null, null).
+2026-11-26 03:18:22.308 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.308 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_amounts"
+2026-11-26 03:18:22.308 UTC [13408] DETAIL:  Failing row contains (4068a901-755b-43cf-b585-20ecc01483f0, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.308817+00, 2026-11-26 03:18:22.308817+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-BAD-MARGIN, null, USD, 50000.0000, -1.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, DRAFT, null, null, null, null, null).
+2026-11-26 03:18:22.308 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.309 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_validity"
+2026-11-26 03:18:22.309 UTC [13408] DETAIL:  Failing row contains (1a3d43d6-0e43-45d2-90ac-77bcf8baefc4, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.309376+00, 2026-11-26 03:18:22.309376+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-BAD-VAL, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2026-10-01, DRAFT, null, null, null, null, null).
+2026-11-26 03:18:22.309 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.310 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_margin_shape"
+2026-11-26 03:18:22.310 UTC [13408] DETAIL:  Failing row contains (cdf54975-dcba-430c-b151-96eaf35f8001, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.309927+00, 2026-11-26 03:18:22.309927+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-MARGIN-DRAFT, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, DRAFT, 00000000-0000-0000-0000-0000000000dd, null, null, null, null).
+2026-11-26 03:18:22.310 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.310 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_margin_shape"
+2026-11-26 03:18:22.310 UTC [13408] DETAIL:  Failing row contains (5efcb734-2ba5-43c2-894c-14133196b355, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.310431+00, 2026-11-26 03:18:22.310431+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-MARGIN-CXL, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, CANCELLED, 00000000-0000-0000-0000-0000000000dd, null, null, null, null).
+2026-11-26 03:18:22.310 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.310 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_margin_shape"
+2026-11-26 03:18:22.310 UTC [13408] DETAIL:  Failing row contains (aa5f4aad-f001-4e24-bdec-1f23811adc89, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.310867+00, 2026-11-26 03:18:22.310867+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-MARGIN-ZERO, null, USD, 50000.0000, 0.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, ISSUED, 00000000-0000-0000-0000-0000000000dd, null, null, null, null).
+2026-11-26 03:18:22.310 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.311 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_retirement_shape"
+2026-11-26 03:18:22.311 UTC [13408] DETAIL:  Failing row contains (ce04a93d-9da4-4e16-917c-e405b49cc2ec, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.311384+00, 2026-11-26 03:18:22.311384+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-RET-NOSTAMP, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, RETIRED, null, null, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-26 03:18:22.311 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.311 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_retirement_shape"
+2026-11-26 03:18:22.311 UTC [13408] DETAIL:  Failing row contains (da898a0d-221b-4ae6-9584-ee8556125c41, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.311813+00, 2026-11-26 03:18:22.311813+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-RET-NOENTRY, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, RETIRED, null, 2026-11-20 10:00:00+00, null, null, null).
+2026-11-26 03:18:22.311 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.312 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_retirement_shape"
+2026-11-26 03:18:22.312 UTC [13408] DETAIL:  Failing row contains (fec4f0eb-57b1-432e-8111-60e80f3775b7, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.312312+00, 2026-11-26 03:18:22.312312+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-LIVE-STAMP, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, ISSUED, null, 2026-11-20 10:00:00+00, null, null, null).
+2026-11-26 03:18:22.312 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.312 UTC [13408] ERROR:  new row for relation "letters_of_credit" violates check constraint "ck_letters_of_credit_retirement_shape"
+2026-11-26 03:18:22.312 UTC [13408] DETAIL:  Failing row contains (a19bcbef-6dbd-4874-bbb8-0c782cb5d0f6, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.312701+00, 2026-11-26 03:18:22.312701+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, LC-LIVE-ENTRY, null, USD, 50000.0000, 5000.0000, Bank Fixture, Overseas Seller SARL, TR Trading Co, 2026-11-01 09:00:00+00, 2027-06-30, EXPIRED, null, null, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-26 03:18:22.312 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.313 UTC [13408] ERROR:  insert or update on table "letters_of_credit" violates foreign key constraint "fk_letters_of_credit_margin_journal"
+2026-11-26 03:18:22.313 UTC [13408] DETAIL:  Key (margin_journal_entry_id, tenant_id)=(00000000-0000-0000-0000-0000000000ee, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c) is not present in table "journal_entries".
+2026-11-26 03:18:22.313 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.314 UTC [13408] ERROR:  duplicate key value violates unique constraint "uq_letters_of_credit_tenant_no"
+2026-11-26 03:18:22.314 UTC [13408] DETAIL:  Key (tenant_id, lc_no)=(7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, LC-UQ-1) already exists.
+2026-11-26 03:18:22.314 UTC [13408] STATEMENT:  INSERT INTO letters_of_credit
+	       (id, tenant_id, lc_no, purchase_order_id, currency, amount, margin_amount, issuing_bank,
+	        beneficiary_name, applicant_name, issued_at, expiry_date, status,
+	        margin_journal_entry_id, settled_at, retirement_journal_entry_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, NULL, $3, $4, $5, $6, $7, $8,
+	        '2026-11-01T09:00:00Z', $9, $10, $11, $12, $13, $14)
+
+2026-11-26 03:18:22.332 UTC [13408] ERROR:  new row for relation "lc_amendments" violates check constraint "ck_lc_amendments_typed_value"
+2026-11-26 03:18:22.332 UTC [13408] DETAIL:  Failing row contains (1058849b-be07-4184-957e-9c16aabf753c, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.331923+00, 2026-11-26 03:18:22.331923+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, 0c622381-67d8-464c-bdf3-54ceaa936471, 1, VALUE, 50000.0000, null, null, null, null, null, 2026-11-26 03:18:22.331923+00, null, null).
+2026-11-26 03:18:22.332 UTC [13408] STATEMENT:  INSERT INTO lc_amendments
+	       (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to,
+	        expiry_from, expiry_to, documents_note, summary, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+
+2026-11-26 03:18:22.332 UTC [13408] ERROR:  new row for relation "lc_amendments" violates check constraint "ck_lc_amendments_typed_value"
+2026-11-26 03:18:22.332 UTC [13408] DETAIL:  Failing row contains (83086da6-6c76-40e8-8c13-f39d29d0ba3b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.332489+00, 2026-11-26 03:18:22.332489+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, 0c622381-67d8-464c-bdf3-54ceaa936471, 1, OTHER, 1.0000, 2.0000, null, null, null, x, 2026-11-26 03:18:22.332489+00, null, null).
+2026-11-26 03:18:22.332 UTC [13408] STATEMENT:  INSERT INTO lc_amendments
+	       (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to,
+	        expiry_from, expiry_to, documents_note, summary, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+
+2026-11-26 03:18:22.340 UTC [13408] ERROR:  new row for relation "lc_amendments" violates check constraint "ck_lc_amendments_typed_validity"
+2026-11-26 03:18:22.340 UTC [13408] DETAIL:  Failing row contains (36faf319-c8db-4df6-97c7-aa85c766a251, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.339927+00, 2026-11-26 03:18:22.339927+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, 862a0b35-90d3-43aa-be5f-2f4f5f82f982, 1, VALIDITY, null, null, null, 2027-09-30, null, null, 2026-11-26 03:18:22.339927+00, null, null).
+2026-11-26 03:18:22.340 UTC [13408] STATEMENT:  INSERT INTO lc_amendments
+	       (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to,
+	        expiry_from, expiry_to, documents_note, summary, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+
+2026-11-26 03:18:22.340 UTC [13408] ERROR:  new row for relation "lc_amendments" violates check constraint "ck_lc_amendments_typed_documents"
+2026-11-26 03:18:22.340 UTC [13408] DETAIL:  Failing row contains (81635257-61a4-4dbd-98ba-9601ccf658d1, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.340519+00, 2026-11-26 03:18:22.340519+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, 862a0b35-90d3-43aa-be5f-2f4f5f82f982, 1, DOCUMENTS, null, null, null, null, null, null, 2026-11-26 03:18:22.340519+00, null, null).
+2026-11-26 03:18:22.340 UTC [13408] STATEMENT:  INSERT INTO lc_amendments
+	       (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to,
+	        expiry_from, expiry_to, documents_note, summary, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+
+2026-11-26 03:18:22.341 UTC [13408] ERROR:  new row for relation "lc_amendments" violates check constraint "ck_lc_amendments_other_summary"
+2026-11-26 03:18:22.341 UTC [13408] DETAIL:  Failing row contains (ab8c5e46-4e5a-41b2-b493-92061665078b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.34096+00, 2026-11-26 03:18:22.34096+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, 862a0b35-90d3-43aa-be5f-2f4f5f82f982, 1, OTHER, null, null, null, null, null, null, 2026-11-26 03:18:22.34096+00, null, null).
+2026-11-26 03:18:22.341 UTC [13408] STATEMENT:  INSERT INTO lc_amendments
+	       (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to,
+	        expiry_from, expiry_to, documents_note, summary, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+
+2026-11-26 03:18:22.349 UTC [13408] ERROR:  duplicate key value violates unique constraint "uq_lc_amendments_tenant_lc_no"
+2026-11-26 03:18:22.349 UTC [13408] DETAIL:  Key (tenant_id, lc_id, amendment_no)=(7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 461e0638-584a-49ba-88b5-b44feaf6f0fc, 7) already exists.
+2026-11-26 03:18:22.349 UTC [13408] STATEMENT:  INSERT INTO lc_amendments
+	       (id, tenant_id, lc_id, amendment_no, change_type, value_from, value_to,
+	        expiry_from, expiry_to, documents_note, summary, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+
+2026-11-26 03:18:22.366 UTC [13408] ERROR:  new row for relation "lc_documents" violates check constraint "ck_lc_documents_presented_shape"
+2026-11-26 03:18:22.366 UTC [13408] DETAIL:  Failing row contains (7d194fb5-713e-46cd-9979-e17ab5087585, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.366343+00, 2026-11-26 03:18:22.366343+00, 1, null, null, afa87f7c-c1cc-4534-8c6a-b945a43a1559, INVOICE, t, null, f, null, null, null, null).
+2026-11-26 03:18:22.366 UTC [13408] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type, presented)
+	           VALUES (gen_random_uuid(), $1, $2, 'INVOICE', true)
+
+2026-11-26 03:18:22.367 UTC [13408] ERROR:  new row for relation "lc_documents" violates check constraint "ck_lc_documents_presented_shape"
+2026-11-26 03:18:22.367 UTC [13408] DETAIL:  Failing row contains (e87f49ab-993a-4170-bc73-7f005ff2bb2d, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.366915+00, 2026-11-26 03:18:22.366915+00, 1, null, null, afa87f7c-c1cc-4534-8c6a-b945a43a1559, INVOICE, f, 2026-11-10 09:00:00+00, f, null, null, null, null).
+2026-11-26 03:18:22.367 UTC [13408] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type, presented, presented_at)
+	           VALUES (gen_random_uuid(), $1, $2, 'INVOICE', false, '2026-11-10T09:00:00Z')
+
+2026-11-26 03:18:22.374 UTC [13408] ERROR:  new row for relation "lc_documents" violates check constraint "ck_lc_documents_verified_shape"
+2026-11-26 03:18:22.374 UTC [13408] DETAIL:  Failing row contains (41189499-977e-49be-9a96-29ff39502c08, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.374681+00, 2026-11-26 03:18:22.374681+00, 1, null, null, 9fdcda25-77b2-46f0-90eb-e237a35e6094, INVOICE, f, null, t, null, null, null, null).
+2026-11-26 03:18:22.374 UTC [13408] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type, verified)
+	           VALUES (gen_random_uuid(), $1, $2, 'INVOICE', true)
+
+2026-11-26 03:18:22.375 UTC [13408] ERROR:  new row for relation "lc_documents" violates check constraint "ck_lc_documents_verified_shape"
+2026-11-26 03:18:22.375 UTC [13408] DETAIL:  Failing row contains (f4ebcfc3-6ae9-4f1c-8c91-00e9e5218cdd, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.37522+00, 2026-11-26 03:18:22.37522+00, 1, null, null, 9fdcda25-77b2-46f0-90eb-e237a35e6094, INVOICE, t, 2026-11-10 09:00:00+00, t, null, null, null, null).
+2026-11-26 03:18:22.375 UTC [13408] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type, presented, presented_at,
+	             verified)
+	           VALUES (gen_random_uuid(), $1, $2, 'INVOICE', true, '2026-11-10T09:00:00Z', true)
+
+2026-11-26 03:18:22.383 UTC [13408] ERROR:  duplicate key value violates unique constraint "uq_lc_documents_tenant_lc_type"
+2026-11-26 03:18:22.383 UTC [13408] DETAIL:  Key (tenant_id, lc_id, doc_type)=(7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, f34fc853-0df0-4279-a532-00791d1a1e3f, CERTIFICATE_OF_ORIGIN) already exists.
+2026-11-26 03:18:22.383 UTC [13408] STATEMENT:  INSERT INTO lc_documents (id, tenant_id, lc_id, doc_type)
+	           VALUES (gen_random_uuid(), $1, $2, 'CERTIFICATE_OF_ORIGIN')
+
+2026-11-26 03:18:22.384 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_usance"
+2026-11-26 03:18:22.384 UTC [13408] DETAIL:  Failing row contains (71360ccf-ed88-450e-b8df-b41c4794f70b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.383977+00, 2026-11-26 03:18:22.383977+00, 1, null, null, COL-DA-NODUE, null, D/A, 8000.0000, USD, null, [], OPEN, null, null, null, null, null, null, null).
+2026-11-26 03:18:22.384 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency)
+	           VALUES (gen_random_uuid(), $1, 'COL-DA-NODUE', 'D/A', 8000, 'USD')
+
+2026-11-26 03:18:22.384 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_terms"
+2026-11-26 03:18:22.384 UTC [13408] DETAIL:  Failing row contains (15ffbcd3-3aba-4cf9-97e3-e31589277c30, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.38444+00, 2026-11-26 03:18:22.38444+00, 1, null, null, COL-BAD-TERMS, null, D/X, 8000.0000, USD, null, [], OPEN, null, null, null, null, null, null, null).
+2026-11-26 03:18:22.384 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency)
+	           VALUES (gen_random_uuid(), $1, 'COL-BAD-TERMS', 'D/X', 8000, 'USD')
+
+2026-11-26 03:18:22.385 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_presented_shape"
+2026-11-26 03:18:22.385 UTC [13408] DETAIL:  Failing row contains (513faf77-cfcf-4f17-9c62-668f0d8d35a5, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.385021+00, 2026-11-26 03:18:22.385021+00, 1, null, null, COL-LAD-1, null, D/P, 100.0000, SAR, null, [], PRESENTED, null, null, null, null, null, null, null).
+2026-11-26 03:18:22.385 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency, status)
+	           VALUES (gen_random_uuid(), $1, 'COL-LAD-1', 'D/P', 100, 'SAR', 'PRESENTED')
+
+2026-11-26 03:18:22.385 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_presented_shape"
+2026-11-26 03:18:22.385 UTC [13408] DETAIL:  Failing row contains (b4f1c761-2553-4d49-ad45-9520274d77e1, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.385445+00, 2026-11-26 03:18:22.385445+00, 1, null, null, COL-LAD-2, null, D/P, 100.0000, SAR, null, [], OPEN, 2026-11-10 09:00:00+00, null, null, null, null, null, null).
+2026-11-26 03:18:22.385 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency,
+	             status, presented_at)
+	           VALUES (gen_random_uuid(), $1, 'COL-LAD-2', 'D/P', 100, 'SAR', 'OPEN', '2026-11-10T09:00:00Z')
+
+2026-11-26 03:18:22.385 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_paid_shape"
+2026-11-26 03:18:22.385 UTC [13408] DETAIL:  Failing row contains (a737d6fb-c809-4dd5-840c-cab13e7cf18b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.385865+00, 2026-11-26 03:18:22.385865+00, 1, null, null, COL-LAD-3, null, D/P, 100.0000, SAR, null, [], ACCEPTED, 2026-11-10 09:00:00+00, 2026-11-11 09:00:00+00, 2026-11-12 09:00:00+00, null, null, null, null).
+2026-11-26 03:18:22.385 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency,
+	             status, presented_at, accepted_at, paid_at)
+	           VALUES (gen_random_uuid(), $1, 'COL-LAD-3', 'D/P', 100, 'SAR', 'ACCEPTED',
+	             '2026-11-10T09:00:00Z', '2026-11-11T09:00:00Z', '2026-11-12T09:00:00Z')
+
+2026-11-26 03:18:22.386 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_settlement_pair"
+2026-11-26 03:18:22.386 UTC [13408] DETAIL:  Failing row contains (c5ebb252-a435-4fef-8df3-999c4877f2dc, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.38635+00, 2026-11-26 03:18:22.38635+00, 1, null, null, COL-SET-1, null, D/P, 100.0000, SAR, null, [], OPEN, null, null, null, 2026-11-12 09:00:00+00, null, null, null).
+2026-11-26 03:18:22.386 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency,
+	             settled_at)
+	           VALUES (gen_random_uuid(), $1, 'COL-SET-1', 'D/P', 100, 'SAR', '2026-11-12T09:00:00Z')
+
+2026-11-26 03:18:22.386 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_amount"
+2026-11-26 03:18:22.386 UTC [13408] DETAIL:  Failing row contains (50011c29-ae1a-4a58-98d6-fcc3fd8a13e3, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.386728+00, 2026-11-26 03:18:22.386728+00, 1, null, null, COL-AMT-0, null, D/P, 0.0000, SAR, null, [], OPEN, null, null, null, null, null, null, null).
+2026-11-26 03:18:22.386 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency)
+	           VALUES (gen_random_uuid(), $1, 'COL-AMT-0', 'D/P', 0, 'SAR')
+
+2026-11-26 03:18:22.387 UTC [13408] ERROR:  new row for relation "documentary_collections" violates check constraint "ck_documentary_collections_documents_shape"
+2026-11-26 03:18:22.387 UTC [13408] DETAIL:  Failing row contains (3bee4169-22d6-4abd-8163-f4d171f740b0, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.387072+00, 2026-11-26 03:18:22.387072+00, 1, null, null, COL-DOCS, null, D/P, 100.0000, SAR, null, "not-an-array", OPEN, null, null, null, null, null, null, null).
+2026-11-26 03:18:22.387 UTC [13408] STATEMENT:  INSERT INTO documentary_collections (id, tenant_id, collection_no, terms_type, amount, currency, documents)
+	           VALUES (gen_random_uuid(), $1, 'COL-DOCS', 'D/P', 100, 'SAR', '"not-an-array"'::jsonb)
+
+2026-11-26 03:18:22.397 UTC [13408] ERROR:  new row for relation "incoterms" violates check constraint "ck_incoterms_code"
+2026-11-26 03:18:22.397 UTC [13408] DETAIL:  Failing row contains (b4c754b0-4ef0-491b-bdc7-f17e2e547551, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.397468+00, 2026-11-26 03:18:22.397468+00, 1, null, null, bad code!, X, س, t, t, t, t, t, t, null, null).
+2026-11-26 03:18:22.397 UTC [13408] STATEMENT:  INSERT INTO incoterms (id, tenant_id, code, name, name_ar, carriage_by_seller,
+	             insurance_by_seller, export_clearance_by_seller, import_clearance_by_seller, import_duty_by_seller)
+	           VALUES (gen_random_uuid(), $1, 'bad code!', 'X', 'س', true, true, true, true, true)
+
+2026-11-26 03:18:22.398 UTC [13408] ERROR:  duplicate key value violates unique constraint "uq_incoterms_tenant_code"
+2026-11-26 03:18:22.398 UTC [13408] DETAIL:  Key (tenant_id, code)=(7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, CIF) already exists.
+2026-11-26 03:18:22.398 UTC [13408] STATEMENT:  INSERT INTO incoterms (id, tenant_id, code, name, name_ar, carriage_by_seller,
+	             insurance_by_seller, export_clearance_by_seller, import_clearance_by_seller, import_duty_by_seller)
+	           VALUES (gen_random_uuid(), $1, 'CIF', 'Duplicate', 'مكرر', true, true, true, true, true)
+
+2026-11-26 03:18:22.398 UTC [13408] ERROR:  new row for relation "bills_of_lading" violates check constraint "ck_bills_of_lading_doc_type"
+2026-11-26 03:18:22.398 UTC [13408] DETAIL:  Failing row contains (b9c916f1-6124-4aa0-890f-3791ef5dfd9a, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.398525+00, 2026-11-26 03:18:22.398525+00, 1, null, null, BL-BAD-TYPE, PIPE, Carrier, null, null, null, null, null, BOOKED, 2026-11-26 03:18:22.398525+00, null, null).
+2026-11-26 03:18:22.398 UTC [13408] STATEMENT:  INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name)
+	           VALUES (gen_random_uuid(), $1, 'BL-BAD-TYPE', 'PIPE', 'Carrier')
+
+2026-11-26 03:18:22.399 UTC [13408] ERROR:  new row for relation "bills_of_lading" violates check constraint "ck_bills_of_lading_shipment_status"
+2026-11-26 03:18:22.399 UTC [13408] DETAIL:  Failing row contains (7474e706-efe3-487b-8afc-7e6f5e9995e6, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.398926+00, 2026-11-26 03:18:22.398926+00, 1, null, null, BL-BAD-MILE, SEA, Carrier, null, null, null, null, null, LOST, 2026-11-26 03:18:22.398926+00, null, null).
+2026-11-26 03:18:22.399 UTC [13408] STATEMENT:  INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name, shipment_status)
+	           VALUES (gen_random_uuid(), $1, 'BL-BAD-MILE', 'SEA', 'Carrier', 'LOST')
+
+2026-11-26 03:18:22.399 UTC [13408] ERROR:  new row for relation "bills_of_lading" violates check constraint "ck_bills_of_lading_container_refs_shape"
+2026-11-26 03:18:22.399 UTC [13408] DETAIL:  Failing row contains (9ce3de23-b0dc-47eb-826b-f80da64d200a, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.399236+00, 2026-11-26 03:18:22.399236+00, 1, null, null, BL-BAD-REFS, SEA, Carrier, null, null, "MSKU123", null, null, BOOKED, 2026-11-26 03:18:22.399236+00, null, null).
+2026-11-26 03:18:22.399 UTC [13408] STATEMENT:  INSERT INTO bills_of_lading (id, tenant_id, bl_no, doc_type, carrier_name, container_refs)
+	           VALUES (gen_random_uuid(), $1, 'BL-BAD-REFS', 'SEA', 'Carrier', '"MSKU123"'::jsonb)
+
+2026-11-26 03:18:22.399 UTC [13408] ERROR:  new row for relation "packing_lists" violates check constraint "ck_packing_lists_lines_shape"
+2026-11-26 03:18:22.399 UTC [13408] DETAIL:  Failing row contains (ba5f2167-38d0-4f6e-af2d-8d5ea4e8ea25, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.399652+00, 2026-11-26 03:18:22.399652+00, 1, null, null, PL-BAD-LINES, null, null, "not-an-array", BOOKED, 2026-11-26 03:18:22.399652+00, null, null).
+2026-11-26 03:18:22.399 UTC [13408] STATEMENT:  INSERT INTO packing_lists (id, tenant_id, pl_no, lines)
+	           VALUES (gen_random_uuid(), $1, 'PL-BAD-LINES', '"not-an-array"'::jsonb)
+
+2026-11-26 03:18:22.400 UTC [13408] ERROR:  new row for relation "certificates_of_origin" violates check constraint "ck_certificates_of_origin_snapshot_shape"
+2026-11-26 03:18:22.400 UTC [13408] DETAIL:  Failing row contains (8935228f-7f44-4af7-aa96-049dc165517f, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.399966+00, 2026-11-26 03:18:22.399966+00, 1, null, null, CRT-BAD-SNAP, ORIGIN, null, [{"not": "an object"}], 2026-11-26 03:18:22.399966+00, null, null, null, null).
+2026-11-26 03:18:22.400 UTC [13408] STATEMENT:  INSERT INTO certificates_of_origin (id, tenant_id, certificate_no, cert_type, snapshot)
+	           VALUES (gen_random_uuid(), $1, 'CRT-BAD-SNAP', 'ORIGIN', '[{"not":"an object"}]'::jsonb)
+
+2026-11-26 03:18:22.400 UTC [13408] ERROR:  new row for relation "certificates_of_origin" violates check constraint "ck_certificates_of_origin_type"
+2026-11-26 03:18:22.400 UTC [13408] DETAIL:  Failing row contains (c6393b34-f05c-44d8-b5e5-7c42234a2c6a, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.400216+00, 2026-11-26 03:18:22.400216+00, 1, null, null, CRT-BAD-TYPE, ANALYSIS, null, {}, 2026-11-26 03:18:22.400216+00, null, null, null, null).
+2026-11-26 03:18:22.400 UTC [13408] STATEMENT:  INSERT INTO certificates_of_origin (id, tenant_id, certificate_no, cert_type, snapshot)
+	           VALUES (gen_random_uuid(), $1, 'CRT-BAD-TYPE', 'ANALYSIS', '{}'::jsonb)
+
+2026-11-26 03:18:22.414 UTC [13419] ERROR:  new row for relation "customs_declarations" violates check constraint "ck_customs_declarations_type"
+2026-11-26 03:18:22.414 UTC [13419] DETAIL:  Failing row contains (7f0eed50-c02f-4579-a5d3-d8909332b4c1, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.414037+00, 2026-11-26 03:18:22.414037+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, DEC-DECL-BAD-TYPE, RE_EXPORT, Jeddah Customs, DRAFT, null, null, null, null, null, null, BOOKED, SAR, null, null, null, null).
+2026-11-26 03:18:22.414 UTC [13419] STATEMENT:  INSERT INTO customs_declarations
+	       (id, tenant_id, declaration_no, declaration_type, customs_office, status, currency,
+	        created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7)
+	     RETURNING id
+
+2026-11-26 03:18:22.419 UTC [13420] ERROR:  new row for relation "customs_declarations" violates check constraint "ck_customs_declarations_status"
+2026-11-26 03:18:22.419 UTC [13420] DETAIL:  Failing row contains (6d62b06e-c55b-4916-ba84-c903a7d5b7e5, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.419087+00, 2026-11-26 03:18:22.419087+00, 1, 7c7c7c7c-0000-4000-8000-0000000007c1, null, DEC-DECL-BAD-STATUS, IMPORT, Jeddah Customs, LodGED, null, null, null, null, null, null, BOOKED, SAR, null, null, null, null).
+2026-11-26 03:18:22.419 UTC [13420] STATEMENT:  INSERT INTO customs_declarations
+	       (id, tenant_id, declaration_no, declaration_type, customs_office, status, currency,
+	        created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7)
+	     RETURNING id
+
+2026-11-26 03:18:22.420 UTC [13408] ERROR:  new row for relation "customs_declarations" violates check constraint "ck_customs_declarations_completed_shape"
+2026-11-26 03:18:22.420 UTC [13408] DETAIL:  Failing row contains (1a774d06-e677-44f2-98af-28d5fe7431d1, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.420419+00, 2026-11-26 03:18:22.420419+00, 1, null, null, DECL-COMP-NOST, IMPORT, Jeddah Customs, COMPLETED, 2026-11-10 08:00:00+00, 2026-11-10 12:00:00+00, null, null, null, null, BOOKED, SAR, null, null, null, null).
+2026-11-26 03:18:22.420 UTC [13408] STATEMENT:  INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type,
+	             customs_office, status, submitted_at, accepted_at, currency)
+	           VALUES (gen_random_uuid(), $1, 'DECL-COMP-NOST', 'IMPORT', 'Jeddah Customs', 'COMPLETED',
+	             '2026-11-10T08:00:00Z', '2026-11-10T12:00:00Z', 'SAR')
+
+2026-11-26 03:18:22.421 UTC [13408] ERROR:  new row for relation "customs_declarations" violates check constraint "ck_customs_declarations_completed_shape"
+2026-11-26 03:18:22.421 UTC [13408] DETAIL:  Failing row contains (d08613ff-9fd0-4955-aca6-7495b268d2ae, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.420964+00, 2026-11-26 03:18:22.420964+00, 1, null, null, DECL-DRAFT-STAMP, IMPORT, Jeddah, DRAFT, null, null, 2026-11-11 10:00:00+00, null, null, null, BOOKED, SAR, null, null, null, null).
+2026-11-26 03:18:22.421 UTC [13408] STATEMENT:  INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type,
+	             customs_office, status, completed_at, currency)
+	           VALUES (gen_random_uuid(), $1, 'DECL-DRAFT-STAMP', 'IMPORT', 'Jeddah', 'DRAFT',
+	             '2026-11-11T10:00:00Z', 'SAR')
+
+2026-11-26 03:18:22.421 UTC [13408] ERROR:  new row for relation "customs_declarations" violates check constraint "ck_customs_declarations_accepted_shape"
+2026-11-26 03:18:22.421 UTC [13408] DETAIL:  Failing row contains (14497383-83fd-4168-b9ad-7e20d3cf16b5, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.421342+00, 2026-11-26 03:18:22.421342+00, 1, null, null, DECL-SUB-ACC, IMPORT, Jeddah, SUBMITTED, null, 2026-11-10 12:00:00+00, null, null, null, null, BOOKED, SAR, null, null, null, null).
+2026-11-26 03:18:22.421 UTC [13408] STATEMENT:  INSERT INTO customs_declarations (id, tenant_id, declaration_no, declaration_type,
+	             customs_office, status, accepted_at, currency)
+	           VALUES (gen_random_uuid(), $1, 'DECL-SUB-ACC', 'IMPORT', 'Jeddah', 'SUBMITTED',
+	             '2026-11-10T12:00:00Z', 'SAR')
+
+2026-11-26 03:18:22.429 UTC [13408] ERROR:  new row for relation "customs_declaration_lines" violates check constraint "ck_customs_declaration_lines_hs_code"
+2026-11-26 03:18:22.429 UTC [13408] DETAIL:  Failing row contains (7ec3ac2b-6e85-484f-851e-d494c1fe8742, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.429365+00, 2026-11-26 03:18:22.429365+00, 1, null, null, ed5f45ed-ce3e-4cb7-9fc7-e8eeed834028, 1, AB12, null, null, null, null, null, 100.0000, 0.000000, 0.0000, 0.0000, null, null).
+2026-11-26 03:18:22.429 UTC [13408] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code, customs_value)
+	           VALUES (gen_random_uuid(), $1, $2, 1, 'AB12', 100)
+
+2026-11-26 03:18:22.430 UTC [13408] ERROR:  new row for relation "customs_declaration_lines" violates check constraint "ck_customs_declaration_lines_line_no"
+2026-11-26 03:18:22.430 UTC [13408] DETAIL:  Failing row contains (290e059a-8d43-4edc-bb36-446ffbf06112, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.429937+00, 2026-11-26 03:18:22.429937+00, 1, null, null, ed5f45ed-ce3e-4cb7-9fc7-e8eeed834028, 0, 8471, null, null, null, null, null, 100.0000, 0.000000, 0.0000, 0.0000, null, null).
+2026-11-26 03:18:22.430 UTC [13408] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code, customs_value)
+	           VALUES (gen_random_uuid(), $1, $2, 0, '8471', 100)
+
+2026-11-26 03:18:22.430 UTC [13408] ERROR:  new row for relation "customs_declaration_lines" violates check constraint "ck_customs_declaration_lines_amounts"
+2026-11-26 03:18:22.430 UTC [13408] DETAIL:  Failing row contains (3f6b6362-37ae-49d5-8ff7-12eb8d14e550, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.430314+00, 2026-11-26 03:18:22.430314+00, 1, null, null, ed5f45ed-ce3e-4cb7-9fc7-e8eeed834028, 1, 8471, null, null, null, null, null, -100.0000, 0.000000, 0.0000, 0.0000, null, null).
+2026-11-26 03:18:22.430 UTC [13408] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code, customs_value, duty_rate)
+	           VALUES (gen_random_uuid(), $1, $2, 1, '8471', -100, 0)
+
+2026-11-26 03:18:22.430 UTC [13408] ERROR:  insert or update on table "customs_declaration_lines" violates foreign key constraint "fk_customs_declaration_lines_item"
+2026-11-26 03:18:22.430 UTC [13408] DETAIL:  Key (item_id, tenant_id)=(11111111-1111-1111-1111-111111111111, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c) is not present in table "items".
+2026-11-26 03:18:22.430 UTC [13408] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code, item_id, customs_value)
+	           VALUES (gen_random_uuid(), $1, $2, 1, '8471', $3, 100)
+
+2026-11-26 03:18:22.439 UTC [13408] ERROR:  duplicate key value violates unique constraint "uq_customs_declaration_lines_tenant_decl_line"
+2026-11-26 03:18:22.439 UTC [13408] DETAIL:  Key (tenant_id, declaration_id, line_no)=(7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 31cb9aab-03e3-48e5-80d7-50b19fcf3339, 5) already exists.
+2026-11-26 03:18:22.439 UTC [13408] STATEMENT:  INSERT INTO customs_declaration_lines (id, tenant_id, declaration_id, line_no, hs_code, customs_value)
+	           VALUES (gen_random_uuid(), $1, $2, 5, '8471', 100)
+
+2026-11-26 03:18:22.439 UTC [13408] ERROR:  new row for relation "hs_code_registry" violates check constraint "ck_hs_code_registry_code"
+2026-11-26 03:18:22.439 UTC [13408] DETAIL:  Failing row contains (a34805f8-9768-4c40-9689-ee84d028fe6d, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.439526+00, 2026-11-26 03:18:22.439526+00, 1, null, null, 8A, Bad, سيء, null, null, t).
+2026-11-26 03:18:22.439 UTC [13408] STATEMENT:  INSERT INTO hs_code_registry (id, tenant_id, hs_code, name, name_ar)
+	           VALUES (gen_random_uuid(), $1, '8A', 'Bad', 'سيء')
+
+2026-11-26 03:18:22.440 UTC [13408] ERROR:  duplicate key value violates unique constraint "uq_hs_code_registry_tenant_code"
+2026-11-26 03:18:22.440 UTC [13408] DETAIL:  Key (tenant_id, hs_code)=(7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 90) already exists.
+2026-11-26 03:18:22.440 UTC [13408] STATEMENT:  INSERT INTO hs_code_registry (id, tenant_id, hs_code, name, name_ar)
+	           VALUES (gen_random_uuid(), $1, '90', 'Duplicate', 'مكرر')
+
+2026-11-26 03:18:22.443 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_in_bond_no_duty"
+2026-11-26 03:18:22.443 UTC [13408] DETAIL:  Failing row contains (cc738260-b213-4311-bb35-a5d997dfda9b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.443094+00, 2026-11-26 03:18:22.443094+00, 1, null, null, BND-INDUTY-1, IN_BOND, 51c99969-72a4-4ef0-9a88-6126fc635bdf, d34745fb-ea7c-4825-aa1f-950fb242cc14, null, [], DRAFT, null, 500.0000, null, null, null, null).
+2026-11-26 03:18:22.443 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, from_warehouse_id,
+	             to_warehouse_id, duty_amount, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-INDUTY-1', 'IN_BOND', $2, $3, 500, 'DRAFT')
+
+2026-11-26 03:18:22.443 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_in_bond_no_duty"
+2026-11-26 03:18:22.443 UTC [13408] DETAIL:  Failing row contains (f346fb7b-9aef-407e-b26d-9a1cc2b50e59, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.443613+00, 2026-11-26 03:18:22.443613+00, 1, null, null, BND-INSTAMP-1, IN_BOND, 51c99969-72a4-4ef0-9a88-6126fc635bdf, d34745fb-ea7c-4825-aa1f-950fb242cc14, null, [], DRAFT, null, null, 2026-11-20 10:00:00+00, null, null, null).
+2026-11-26 03:18:22.443 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, from_warehouse_id,
+	             to_warehouse_id, release_recognized_at, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-INSTAMP-1', 'IN_BOND', $2, $3,
+	             '2026-11-20T10:00:00Z', 'DRAFT')
+
+2026-11-26 03:18:22.452 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_release_shape"
+2026-11-26 03:18:22.452 UTC [13408] DETAIL:  Failing row contains (04eed57d-a685-4dde-95fc-ff27f4f45e61, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.452078+00, 2026-11-26 03:18:22.452078+00, 1, null, null, BND-REL-NOJ, RELEASE, null, null, 30a87f84-cadc-4164-8fc2-1257f3c7c0f8, [], DRAFT, null, 500.0000, 2026-11-20 10:00:00+00, null, null, null).
+2026-11-26 03:18:22.452 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, declaration_id,
+	             duty_amount, release_recognized_at, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-REL-NOJ', 'RELEASE', $2, 500,
+	             '2026-11-20T10:00:00Z', 'DRAFT')
+
+2026-11-26 03:18:22.452 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_release_shape"
+2026-11-26 03:18:22.452 UTC [13408] DETAIL:  Failing row contains (41722c04-d0da-454f-8d06-0adc84ca9a8d, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.45266+00, 2026-11-26 03:18:22.45266+00, 1, null, null, BND-REL-NODUTY, RELEASE, null, null, 30a87f84-cadc-4164-8fc2-1257f3c7c0f8, [], DRAFT, null, null, 2026-11-20 10:00:00+00, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-26 03:18:22.452 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, declaration_id,
+	             release_recognized_at, release_journal_entry_id, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-REL-NODUTY', 'RELEASE', $2,
+	             '2026-11-20T10:00:00Z', $3, 'DRAFT')
+
+2026-11-26 03:18:22.453 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_release_shape"
+2026-11-26 03:18:22.453 UTC [13408] DETAIL:  Failing row contains (82f21fa8-0ffe-4d49-bbe6-df7a978ef629, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.453091+00, 2026-11-26 03:18:22.453091+00, 1, null, null, BND-REL-NODECL, RELEASE, null, null, null, [], DRAFT, null, 500.0000, 2026-11-20 10:00:00+00, 00000000-0000-0000-0000-0000000000dd, null, null).
+2026-11-26 03:18:22.453 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, duty_amount,
+	             release_recognized_at, release_journal_entry_id, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-REL-NODECL', 'RELEASE', 500,
+	             '2026-11-20T10:00:00Z', $2, 'DRAFT')
+
+2026-11-26 03:18:22.461 UTC [13408] ERROR:  insert or update on table "bonded_warehouse_moves" violates foreign key constraint "fk_bonded_warehouse_moves_release_journal"
+2026-11-26 03:18:22.461 UTC [13408] DETAIL:  Key (release_journal_entry_id, tenant_id)=(00000000-0000-0000-0000-0000000000dd, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c) is not present in table "journal_entries".
+2026-11-26 03:18:22.461 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, declaration_id,
+	             duty_amount, release_recognized_at, release_journal_entry_id, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-REL-FK-1', 'RELEASE', $2, 500,
+	             '2026-11-20T10:00:00Z', $3, 'DRAFT')
+
+2026-11-26 03:18:22.461 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_executed_shape"
+2026-11-26 03:18:22.461 UTC [13408] DETAIL:  Failing row contains (be2e3725-b242-4d34-83cd-101b7ab4815b, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.461583+00, 2026-11-26 03:18:22.461583+00, 1, null, null, BND-EXEC-1, IN_BOND, 51c99969-72a4-4ef0-9a88-6126fc635bdf, d34745fb-ea7c-4825-aa1f-950fb242cc14, null, [], EXECUTED, null, null, null, null, null, null).
+2026-11-26 03:18:22.461 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, from_warehouse_id,
+	             to_warehouse_id, status)
+	           VALUES (gen_random_uuid(), $1, 'BND-EXEC-1', 'IN_BOND', $2, $3, 'EXECUTED')
+
+2026-11-26 03:18:22.462 UTC [13408] ERROR:  new row for relation "bonded_warehouse_moves" violates check constraint "ck_bonded_warehouse_moves_executed_shape"
+2026-11-26 03:18:22.462 UTC [13408] DETAIL:  Failing row contains (8ca1fd50-a75f-4f50-a5ba-f70bac0afd05, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.462104+00, 2026-11-26 03:18:22.462104+00, 1, null, null, BND-EXEC-2, IN_BOND, 51c99969-72a4-4ef0-9a88-6126fc635bdf, d34745fb-ea7c-4825-aa1f-950fb242cc14, null, [], DRAFT, 2026-11-20 10:00:00+00, null, null, null, null, null).
+2026-11-26 03:18:22.462 UTC [13408] STATEMENT:  INSERT INTO bonded_warehouse_moves (id, tenant_id, move_no, move_kind, from_warehouse_id,
+	             to_warehouse_id, status, executed_at)
+	           VALUES (gen_random_uuid(), $1, 'BND-EXEC-2', 'IN_BOND', $2, $3, 'DRAFT',
+	             '2026-11-20T10:00:00Z')
+
+2026-11-26 03:18:22.462 UTC [13408] ERROR:  new row for relation "duty_drawback_claims" violates check constraint "ck_duty_drawback_claims_evidence"
+2026-11-26 03:18:22.462 UTC [13408] DETAIL:  Failing row contains (242307ae-bac2-48eb-a140-193ae0250c36, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.462701+00, 2026-11-26 03:18:22.462701+00, 1, null, null, DRB-NOEV-1, null, null, 1500.0000, SAR, SUBMITTED, null, null, null, null).
+2026-11-26 03:18:22.462 UTC [13408] STATEMENT:  INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, claimed_amount, currency, status)
+	           VALUES (gen_random_uuid(), $1, 'DRB-NOEV-1', 1500, 'SAR', 'SUBMITTED')
+
+2026-11-26 03:18:22.471 UTC [13408] ERROR:  new row for relation "duty_drawback_claims" violates check constraint "ck_duty_drawback_claims_amount"
+2026-11-26 03:18:22.471 UTC [13408] DETAIL:  Failing row contains (388a6b92-f21a-4a1d-b3c0-5bf082b43914, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.471049+00, 2026-11-26 03:18:22.471049+00, 1, null, null, DRB-AMT-0, null, null, 0.0000, SAR, DRAFT, null, null, null, null).
+2026-11-26 03:18:22.471 UTC [13408] STATEMENT:  INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, claimed_amount, currency, status)
+	           VALUES (gen_random_uuid(), $1, 'DRB-AMT-0', 0, 'SAR', 'DRAFT')
+
+2026-11-26 03:18:22.471 UTC [13408] ERROR:  new row for relation "duty_drawback_claims" violates check constraint "ck_duty_drawback_claims_submitted_shape"
+2026-11-26 03:18:22.471 UTC [13408] DETAIL:  Failing row contains (7b78159b-d6ad-455c-81f2-f75273eeedd7, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.471514+00, 2026-11-26 03:18:22.471514+00, 1, null, null, DRB-DRAFT-ST, null, null, 100.0000, SAR, DRAFT, 2026-11-20 10:00:00+00, null, null, null).
+2026-11-26 03:18:22.471 UTC [13408] STATEMENT:  INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, claimed_amount, currency, status, submitted_at)
+	           VALUES (gen_random_uuid(), $1, 'DRB-DRAFT-ST', 100, 'SAR', 'DRAFT', '2026-11-20T10:00:00Z')
+
+2026-11-26 03:18:22.471 UTC [13408] ERROR:  new row for relation "duty_drawback_claims" violates check constraint "ck_duty_drawback_claims_decided_shape"
+2026-11-26 03:18:22.471 UTC [13408] DETAIL:  Failing row contains (b67528bc-ae52-4c6a-a403-b8a3a913287f, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.471883+00, 2026-11-26 03:18:22.471883+00, 1, null, null, DRB-DEC-DRAFT, null, null, 100.0000, SAR, DRAFT, null, 2026-11-20 10:00:00+00, null, null).
+2026-11-26 03:18:22.471 UTC [13408] STATEMENT:  INSERT INTO duty_drawback_claims (id, tenant_id, claim_no, claimed_amount, currency, status, decided_at)
+	           VALUES (gen_random_uuid(), $1, 'DRB-DEC-DRAFT', 100, 'SAR', 'DRAFT', '2026-11-20T10:00:00Z')
+
+2026-11-26 03:18:22.493 UTC [13408] ERROR:  new row for relation "shipment_tracking_events" violates check constraint "ck_shipment_tracking_events_milestone"
+2026-11-26 03:18:22.493 UTC [13408] DETAIL:  Failing row contains (3baa6dea-1f52-4f10-8804-4c2663155f0c, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c, 2026-11-26 03:18:22.49374+00, 2026-11-26 03:18:22.49374+00, 1, null, null, 6be56e63-4d27-43a5-950e-43827caa24ac, null, DELAYED, 2026-11-24 08:00:00+00, null, null, null, null).
+2026-11-26 03:18:22.493 UTC [13408] STATEMENT:  INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
+	           VALUES (gen_random_uuid(), $1, $2, 'DELAYED', '2026-11-24T08:00:00Z')
+
+2026-11-26 03:18:22.494 UTC [13408] ERROR:  insert or update on table "shipment_tracking_events" violates foreign key constraint "fk_shipment_tracking_events_bl"
+2026-11-26 03:18:22.494 UTC [13408] DETAIL:  Key (bill_of_lading_id, tenant_id)=(11111111-1111-1111-1111-111111111111, 7c7c7c7c-7c7c-7c7c-7c7c-7c7c7c7c7c7c) is not present in table "bills_of_lading".
+2026-11-26 03:18:22.494 UTC [13408] STATEMENT:  INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
+	           VALUES (gen_random_uuid(), $1, $2, 'BOOKED', '2026-11-24T08:00:00Z')
+
+ ✓ src/__db__/trade/trade-schema.db.spec.ts (41 tests) 226ms
+[trade-explain-budgets] P1 the declaration-lines read (the tenant+declaration index-driven law):
+Sort  (cost=8.70..8.77 rows=30 width=312)
+  Sort Key: line_no, id
+  ->  Bitmap Heap Scan on customs_declaration_lines  (cost=4.46..7.96 rows=30 width=312)
+        Recheck Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (declaration_id = '01a215dc-8240-7001-80c0-bab66febeebe'::uuid))
+        ->  Bitmap Index Scan on ix_customs_declaration_lines_tenant_decl  (cost=0.00..4.45 rows=30 width=0)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (declaration_id = '01a215dc-8240-7001-80c0-bab66febeebe'::uuid))
+[trade-explain-budgets] P2 the tracking-events read by the bill of lading:
+Limit  (cost=0.66..14.26 rows=30 width=212)
+  ->  Incremental Sort  (cost=0.66..14.26 rows=30 width=212)
+        Sort Key: event_at, id
+        Presorted Key: event_at
+        ->  Index Scan using ix_shipment_tracking_events_tenant_bl on shipment_tracking_events  (cost=0.15..13.05 rows=30 width=212)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (bill_of_lading_id = '01a215dc-8255-7002-aa68-0d6cf61af885'::uuid))
+[trade-explain-budgets] P3 the tracking-events read by the declaration link (the customs leg):
+Limit  (cost=12.25..12.26 rows=3 width=212)
+  ->  Sort  (cost=12.25..12.26 rows=3 width=212)
+        Sort Key: event_at, id
+        ->  Index Scan using ix_shipment_tracking_events_tenant_declaration on shipment_tracking_events  (cost=0.14..12.23 rows=3 width=212)
+              Index Cond: ((tenant_id = (NULLIF(current_setting('erp.tenant_id'::text, true), ''::text))::uuid) AND (declaration_id = '01a215dc-8240-7001-80c0-bab66febeebe'::uuid))
+ ✓ src/__db__/trade/trade-explain-budgets.db.spec.ts (4 tests) 125ms
+ ✓ src/__db__/trade/trade-tracking.db.spec.ts (9 tests) 163ms
+ ✓ src/__db__/trade/trade-drawback.db.spec.ts (7 tests) 127ms
+ ✓ src/__db__/trade/trade-reports.db.spec.ts (7 tests) 86ms
+ ✓ src/__db__/trade/trade-collections.db.spec.ts (9 tests) 71ms
+ ✓ src/__db__/trade/trade-transport.db.spec.ts (6 tests) 28ms
+
+ Test Files  15 passed (15)
+      Tests  158 passed (158)
+   Start at  03:18:07
+   Duration  17.03s (transform 2.90s, setup 0ms, collect 4.05s, tests 7.20s, environment 0ms, prepare 56ms)
+
+2026-11-26 03:18:24.845 UTC [13065] LOG:  received fast shutdown request
+
+2026-11-26 03:18:24.845 UTC [13065] LOG:  aborting any active transactions
+2026-11-26 03:18:24.845 UTC [13420] FATAL:  terminating connection due to administrator command
+2026-11-26 03:18:24.845 UTC [13419] FATAL:  terminating connection due to administrator command
+2026-11-26 03:18:24.845 UTC [13147] FATAL:  terminating connection due to administrator command
+2026-11-26 03:18:24.846 UTC [13408] FATAL:  terminating connection due to administrator command
+
+2026-11-26 03:18:24.849 UTC [13146] FATAL:  terminating connection due to administrator command
+
+2026-11-26 03:18:24.849 UTC [13065] LOG:  background worker "logical replication launcher" (PID 13071) exited with exit code 1
+
+2026-11-26 03:18:24.852 UTC [13066] LOG:  shutting down
+2026-11-26 03:18:24.852 UTC [13066] LOG:  checkpoint starting: shutdown immediate
+
+(node:13124) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:13124) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-26 03:18:24.884 UTC [13066] LOG:  checkpoint complete: wrote 3679 buffers (22.5%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.023 s, sync=0.009 s, total=0.032 s; sync files=2919, longest=0.001 s, average=0.001 s; distance=31201 kB, estimate=31201 kB; lsn=0/3356EF8, redo lsn=0/3356EF8
+
+2026-11-26 03:18:24.891 UTC [13065] LOG:  database system is shut down
+
