@@ -2087,6 +2087,119 @@ print surface (D-13 — the 050 print laws) + the duty-suspended
 banners (D-17) + i18n BY BOTH COUNTS from this wave) under the
 owner's standing order. NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-26 (PHASE-051 W-39 DELIVERED at the web-plane head
+`f8fee96` + the web-spec head `cf6ad9b` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERIA #6'S SURFACE ARMS + #7'S BOARD
+ARMS + #8'S PRINT ARMS GREEN — THE FIRST SURFACE WAVE'S I18N LAW
+GREEN.** THE FIVE SCREENS RENDER THE ENGINES' FIGURES VERBATIM (the
+nine web specs — the five board specs + the banner + the nav-rows
+flag-gating + the incoterm-selector + the print-builder: the register
+VERBATIM + the create acts posting the exact bodies + the detail
+chains (the amendments + the checklist with the discrepancy notes; the
+lines + the fold's totals from the LINES at every read; the B/L's own
+packing lists + events; the registry's five ownership axes; the
+certificates' frozen goods lines + parties + links) + the typed
+refusal panels with the FULL payloads + the AR locale Arabic-first on
+every board) · THE FLAG-GATING VERIFIED (the nav-rows spec's three
+arms: the five rows with the exact ids/routes/feature keys — trade.lc
++ trade.customs + the whole-module trade ×3, the PURCHASING group
+(D-04's own dependency); the permission keys mirror the
+route-permissions rows verbatim — trade.lc.view ·
+trade.customs.view · trade.shipments.view · trade.view; both label
+sides with real Arabic) · THE DECLARED I18N DELTA GREEN (7,253 + 329 =
+7,582 = 7,582 BY BOTH COUNTS — ar = en, 100% parity, the first
+surface wave's law; mobile 371 standing; the 55-code
+localizedTradeError mapper + the five status localizers) · **THE
+CERTIFICATE PRINT LAW GREEN (D-13 — the 050 COA print-render
+precedent VERBATIM)**: the print-builder spec's four arms (bi()
+EXCLUSIVELY with the no-cross-leak arms in both locales; DETERMINISM —
+two builds byte-identical in BOTH locales (docNo/docDate the
+certificate row's own strings, never a wall-clock read); the frozen
+snapshot passing through VERBATIM with the .num isolation and a real
+thead; the honest dash — absent links render no parties row) + THE
+REAL CHROMIUM CERTIFICATE PRINT ARM (trade-certificate-print-render.
+db.spec — 3 arms over real PG16 + the chromium-1248 shells: both
+locales' thead/dir/rtl-ltr/.num/woff2 assertions with the frozen goods
+lines + the frozen links' own figures; the REAL PDF render — a
+multi-kilobyte %PDF with the embedded fonts; THE DETERMINISM ARM with
+the renderer's own Skia /CreationDate + /ModDate clock stamps
+normalized — the dated 2026-11-23 finding carried VERBATIM: two builds
+byte-identical; two renders byte-identical modulo the renderer's own
+second-resolution metadata) · THE DUTY-SUSPENDED BANNER SPEC (D-17 —
+four arms: a null move renders nothing (the additive law); the
+register's own figures VERBATIM (moveNo · the line's own qty under
+bond · executedAt — never a recomputed suspended balance); role=status
+· the AR locale Arabic-first · the row-level chip) · THE INCOTERM
+SELECTOR (five arms: the matrix VERBATIM at selection time in both
+locales; no selection → no matrix + BR-106's mandate hint; the empty
+registry degrades to the bare select; the selection flows to the
+host). THE WEB SUITE 30 · 204 → 39 · 240 (+9 files, +36 tests) · the
+trade DB family 11 · 128 standing green at the spec head (the print
+arm joining) · ROUTE_PERMISSIONS 1,212 + 3 = 1,215 (the tsx recount —
+the certificate plane's three routes binding the EXISTING
+trade.shipments.manage key, the 0120 family; drift 357 = 357 — zero
+key delta, a surface wave). THE GATE BATTERY (the FIFTY-FIRST
+consecutive same-session wave; §0a first — the remote verified at
+`cf6ad9b` = the W-39 spec head, the four annotated tags' six
+identifiers + the 050 tag intact, local = remote; the TENTH
+environment reset recovered BEFORE the runs — the fresh clone from
+the GitHub remote, pnpm 9.15.9, the workspace install with the
+embedded-PG16 16.14 binaries, the chromium-1248 pair provisioned):
+the six isolates standalone FIRST (the owner's عزل مسبق order — soak
+1·1 230.23s · fcm 1·8 · email 1·5 · the cmms sweep 1·4 · the quality
+calibration sweep 1·4 · the trade expiry sweep 1·6, every stamp
+through the guarded wrapper) · THE ELEVEN-PART ENVELOPE **311 files
+· 4,456 tests · 0 failed · 0 skipped** (the coverage verified BEFORE
+the first load run — 311 = 311, missing NONE, extra NONE, duplicates
+NONE, VERDICT: COVERED; the ONE declared roster movement: the
+trade-certificate-print-render spec joins chunk-a at its alphabetical
+position 122 → 123, the roster 310 → 311; the load parts: smoke
+3·1,999 19.44s · perf-rest 5·23 90.04s · chunk-a 123·1,070 153.02s ·
+b-rest 86·625 65.45s · c 88·711 76.84s — every part inside the 570s
+ceiling; the arithmetic 311 = 1+1+1+1+1+1+3+5+123+86+88 EXACT · 4,456
+= 1+8+5+4+4+6+1,999+23+1,070+625+711 EXACT; the provenance 4,456 =
+4,453 (the W-38 envelope) + 3 (the print arm) EXACT, declared before
+the first load run and confirmed by it; the print arm ran UNSKIPPED —
+3 tests, 2,381ms, the REAL Chromium) · THE 126-CHAIN SCRATCH FROM
+ZERO TWICE (السلسلة من الصفر مرتين: both runs CHAIN_126_APPLIED →
+[check-rls] OK — 354 catalog tables → SCRATCH_STOPPED, EXIT=0, both
+logs kept — run 2 at its own SCRATCH_PORT 5498; the chain STANDS at
+126 — the wave added NO migration (the certificate surface rides the
+0120 §4 plane's own issuance; the banners read the existing bond
+ledger), verified against the tree BEFORE the claim: 126 SQL files ·
+126 journal entries; **THE «127-CHAIN» ANTICIPATION CORRECTED — the
+step-2 NEXT note's own word «the 127-chain scratch» corrected HERE at
+the original claim's follow-through site with the dated note (the F1
+literal-truth law: verified against the artifact before it is
+written; no migration invented to match an anticipation)**) · the
+standing battery green at the final code state (typecheck 8/8 (0
+cached, --force) · lint 8/8 (0 cached, --force) · depcruise clean
+2,269 · 16,922 (+25/+170 dated — the W-39 web plane's files; zero
+cycles) · unit 8/8 — **184 files · 2,161 tests** (api 86·1,081 · web
+39·240 · mobile 27·393 · desktop 16·274 · ui 3·43 · contracts 2·56 ·
+domain-core 6·38 · sync-core 5·36; the ledger arithmetic 2,161 =
+1,081+240+840 EXACT) · ROUTE_PERMISSIONS 1,215 (the tsx recount) ·
+drift 357 = 357 · i18n 7,582 = 7,582 + mobile 371 = 371 · tokens
+130/130 + derivations 50/50 · manifests 13/13 · docs 33/33 · id-ledger
+0 errors (implemented G 63 · INV 35 · BR 104 standing — the 051 flip
+is W-42's) + the self-test all-probes-OK (probe 7 stands at
+G-64/PHASE-051) · history-secrets 0 violations (7,289 allowlisted
+hits — the window's shift: this session's commits entering the
+last-200 sample; the FIVE tag anchors walked, untouched) ·
+capabilities agree · shells PASS/PASS · boundary PASS —
+`audit-evidence/phase051-w39/`). NO battery red this gate; the ONE
+honest catch is the «127-chain» anticipation correction above (the
+environment reset recovered before the runs, disclosed at §0a).
+**RISK-033: EIGHT incidents, ZERO new this wave — the row stays OPEN,
+closing only by the owner's order.** The reservations G-64…G-66 ·
+INV-036 · BR-105…BR-108 — لا كتابة خارجها. NEXT: W-40 (the reports —
+T-15: the four report contracts `trade.lc-register` ·
+`trade.customs-declaration-register` · `trade.shipment-status` ·
+`trade.duty-drawback-status`, registry 122 → 126, all pin sites
+together — D-18) under the owner's standing order. NOT production
+approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

@@ -1,0 +1,17 @@
+# PHASE-051 W-39 — BATTERY boundary-negative
+# started: 2026-11-26T01:45:34Z
+
+
+> erp-platform@0.1.0 boundary:negative-test /home/z/ERP_live
+> bash scripts/ci/negative-boundary-test.sh
+
+[negative-boundary-test] linting deliberate violation with --no-ignore...
+
+/home/z/ERP_live/apps/web/app/__boundary-violations__/violation.fixture.ts
+  10:27  error  apps-web importing apps-api violates docs/architecture/DEPENDENCY_RULES.md  boundaries/element-types
+
+✖ 1 problem (1 error, 0 warnings)
+
+PASS: ESLint exited 1 on the violating fixture (expected failure).
+      Boundary enforcement is active (DEPENDENCY_RULES.md §3).
+BATTERY_EXIT=0

@@ -1,0 +1,8 @@
+
+> erp-platform@0.1.0 lint:depcruise /home/z/ERP_live
+> dependency-cruiser apps packages --config .dependency-cruiser.cjs
+
+
+✔ no dependency violations found (2269 modules, 16922 dependencies cruised)
+
+BATTERY_EXIT=0

@@ -1,4 +1,84 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-38 THE BONDED + DRAWBACK ENGINES DELIVERED (2026-11-25, this session — the engines `e01dbab` → the DB specs `22836be` → the gate increment, every step pushed at its own commit)** — W-39 NEXT (the web plane — T-14: the three screens + the Incoterms reference page + the incoterm selector embedded in the PO/SO forms + the certificate print surface (D-13 — the 050 print laws: `bi()` EXCLUSIVELY, the frozen snapshots VERBATIM, the REAL Chromium both directions, deterministic byte-identical) + the duty-suspended banners (D-17) + i18n BY BOTH COUNTS from this wave (the declared delta 7,253+n = 7,253+n + mobile 371 standing)) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-39 THE WEB PLANE DELIVERED (2026-11-26, this session — the web plane `f8fee96` → the web specs `cf6ad9b` → the gate increment, every step pushed at its own commit)** — W-40 NEXT (the reports — T-15: the four report contracts `trade.lc-register` · `trade.customs-declaration-register` · `trade.shipment-status` · `trade.duty-drawback-status`, registry 122 → 126, all pin sites together (D-18)) under the standing order — تسليم لا قبول
+
+**W-39 — THE WEB PLANE (T-14, delivered on the W-38 gate head `78e8428`
+in two increments + this gate):** THE FIVE SCREENS (`/trade/lc` — the
+register + the create + the detail chain (the amendments + the
+documents checklist with the discrepancy notes) + the lifecycle acts
+(issue with G-64's margin door · the typed amendments · the checklist
+writes · the fees through the existing charges discipline · retire ·
+cancel); `/trade/customs` — the declarations register + the create with
+THE LINES EDITOR + the detail chain with the fold's totals rendered
+from the LINES at every read + the ladder acts (submit · accept · THE
+G-65 COMPLETION · cancel) + the DRAFT-only add-line + the HS registry
+pane with D-16's no-fabrication disclaimer; `/trade/shipments` — the
+B/L register + the packing lists + THE CARRIER EVENT LOG (the
+append-only truth; the documents' shipment_status NEVER writable
+here, D-14's own law); `/trade/incoterms` — the reference page with
+the risk-hint matrix rendered from each row's OWN data VERBATIM;
+`/trade/certificates` — the register + THE ISSUE ACT + the print
+preview (the Dialog + iframe srcDoc + Print-now, ADR-0011)) → **THE
+CERTIFICATE ENGINE (the API plane's one gap)**: `CertificateService`
+with the FROZEN SNAPSHOT (the linked B/L + declaration's own figures
+freeze at issuance ONCE — a later PATCH or tracking event NEVER moves
+a stored certificate; ledger-free by design, the 050 note-20 pattern),
+the CERT-{YYYY}-{SEQ:6} official number through the REAL
+NumberingService, the reads trade.view · the issue
+trade.shipments.manage (NO new key minted — the 357 discipline
+standing) → **THE PRINT BUILDER** (`lib/trade-certificate-print.ts` —
+the 050 COA print laws VERBATIM: `bi()` EXCLUSIVELY · DETERMINISM (no
+wall-clock reads — docNo/docDate the certificate row's own strings;
+two builds byte-identical in both locales) · the versioned
+a4-document template with the .num LTR-mono isolation) → THE SHARED
+PIECES (the IncotermSelector embedded in the PO/SO create forms —
+BR-106's mandate stays server-side, the matrix rendered VERBATIM at
+selection time; the DutySuspendedBanner + DutySuspendedChip — the 050
+hold-banner pattern, additive on the stock surface, the move's OWN
+figures VERBATIM: moveNo · the line's own qty under bond ·
+executedAt, never a recomputed suspended balance) → THE NAV (the five
+NAV_ITEMS rows riding the PURCHASING group — D-04's own dependency;
+the permission keys mirror the route-permissions rows verbatim, the
+0122 §5 ten-key seed; ⌘K inherits them through resolveNavigation,
+OA-04) + the five FALLBACK_CRUMBS → **THE I18N: 7,253 + 329 = 7,582 =
+7,582 — 100% parity BY BOTH COUNTS (the first surface wave's law)** +
+mobile 371 standing + the 55-code localizedTradeError mapper + the
+five status localizers → **THE WEB SPECS** (the nine web specs — the
+five board specs + the banner + the nav-rows flag-gating + the
+incoterm-selector + the print-builder: the web suite **30 · 204 → 39
+· 240**) + **THE REAL CHROMIUM CERTIFICATE PRINT ARM**
+(`trade-certificate-print-render.db.spec` — 3 arms, the 050 COA
+print-render precedent VERBATIM: both locales' thead/dir/rtl-ltr/.num/
+woff2 assertions · the REAL PDF render (multi-kilobyte %PDF, the
+chromium-1248 shells) · THE DETERMINISM ARM with the renderer's own
+Skia /CreationDate + /ModDate clock stamps normalized — the dated
+2026-11-23 finding carried VERBATIM) — the trade DB family **11 ·
+128** standing green. ROUTE_PERMISSIONS 1,212 + 3 = **1,215** (the tsx
+recount; drift 357 = 357, zero key delta — a surface wave). The
+battery (the FIFTY-FIRST consecutive same-session wave; §0a first —
+the remote verified at `cf6ad9b`, the five tags' anchors intact; the
+TENTH environment reset recovered BEFORE the runs — the fresh clone,
+pnpm 9.15.9, the workspace install, the chromium 1248 pair): the six
+isolates standalone first, the ELEVEN-PART ENVELOPE **311 · 4,456 · 0
+failed · 0 skipped** (the coverage verified before the first load
+run; the one declared roster movement: the print-render spec joins
+chunk-a 122 → 123, the roster 310 → 311), the 126-chain scratch from
+zero TWICE (check-rls OK — 354 catalog tables; **the step-2 NEXT
+note's «127-chain» anticipation corrected at the gate record's dated
+note — the wave added NO migration, the chain verified at 126 SQL
+files · 126 journal entries, the F1 literal-truth law**), the standing
+battery green at the final code state (typecheck 8/8 · lint 8/8 ·
+depcruise 2,269 · 16,922 · unit 184 · 2,161 (api 86·1,081 · web
+39·240) · ROUTE_PERMISSIONS 1,215 (the tsx recount) · i18n 7,582 =
+7,582 (the declared delta standing) + mobile 371 = 371 · tokens
+130/130 + derivations 50/50 · manifests 13/13 · docs 33/33 · id-ledger
+0 errors + all-probes-OK · history-secrets 0 violations (7,289
+allowlisted hits — the window's shift) · capabilities agree · shells
+PASS/PASS · boundary PASS). **W-40 (the reports) next under the
+standing order. RISK-033: EIGHT incidents, ZERO new — the row stays
+OPEN. NOT production approval — تسليم لا قبول.**
+
+---
+
+# The W-38 bonded + drawback record (the historical context below)
 
 **W-38 — THE BONDED + DRAWBACK ENGINES (T-11 + T-12, delivered on the
 W-37 gate head `33aaff5` in two increments + this gate):** THE TWO PURE

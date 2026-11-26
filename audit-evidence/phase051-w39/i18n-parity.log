@@ -1,0 +1,10 @@
+# PHASE-051 W-39 — BATTERY i18n parity (the first surface wave's declared delta standing)
+# started: 2026-11-26T01:39:54Z
+
+
+> erp-platform@0.1.0 check:i18n-parity /home/z/ERP_live
+> tsx scripts/check-i18n-parity.ts
+
+== i18n key parity: ar=7582 keys, en=7582 keys ==
+ar/en catalogs at 100% key parity; no empty values.
+BATTERY_EXIT=0

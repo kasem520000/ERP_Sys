@@ -1,0 +1,24 @@
+# PHASE-051 W-39 — BATTERY id-ledger self-test (probe 7 stands at G-64/PHASE-051 — the 051 flip is W-42's)
+# started: 2026-11-26T01:40:21Z
+
+
+> erp-platform@0.1.0 check:id-ledger /home/z/ERP_live
+> tsx scripts/check-id-ledger.ts -- --self-test
+
+[check-id-ledger] self-test (1) conflicting claim — a phase claiming another phase's reserved ids (synthetic fixture, ledger-independent): OK ✓
+[check-id-ledger] self-test (2) legitimate reference — PHASE-046 referencing the implemented G-13/G-14: OK ✓
+[check-id-ledger] self-test (3) range extraction from actual text — .., en-dash, em-dash, and … all expand: OK ✓
+[check-id-ledger] self-test (4) invalid ranges diagnosed by name — inverted / family-mismatch / too-wide (no silent drops): OK ✓
+[check-id-ledger] self-test (5) multi-line claim — the wrapped marker+ids join into one claimed unit (synthetic fixture, ledger-independent): OK ✓
+[check-id-ledger] self-test (5b) wrapped legitimate reference stays a reference (the distinction holds across lines): OK ✓
+[check-id-ledger] self-test (5c) a non-id 'gains' never claims a distant reference (the PHASE-053 shape): OK ✓
+[check-id-ledger] self-test (6) reservation-overlap produces the diagnosis (a Finding, never the TDZ crash): OK ✓
+[check-id-ledger] self-test (7) existing id referenced under a different owner — the cross-ref owner mismatch is flagged: OK ✓
+[check-id-ledger] self-test (8) implemented id re-claimed under a different meaning — the stale-claim finding (synthetic future claimant, ledger-independent): OK ✓
+[check-id-ledger] self-test (9) the REAL 043 posting-canon paragraph — the note stays references (7) while the new claims claim (7), 0 findings: OK ✓
+[check-id-ledger] self-test (9b) the G-44 claim in the claim sentence is REJECTED (stale-claim) while G-44 in the old-plan note stays a legitimate reference: OK ✓
+[check-id-ledger] self-test (9c) the REAL 045 shape (synthetic fixture, ledger-independent) — 6 claims / 0 findings clean; the mutated G-950→G-44 claim rejected while the note's references stay clean: OK ✓
+[check-id-ledger] self-test (9d) the REAL 046 shape (synthetic fixture, ledger-independent) — 7 claims / 0 findings clean (the implemented G-29 stays a reference inside the claim clause, G-951 a reference inside the note); the mutated G-952→G-44 claim rejected, G-29 never flagged: OK ✓
+[check-id-ledger] implemented: G 63 · INV 35 · BR 104 | reservations: 14 phases, 30 ids | phase docs scanned: 68 (95 claim ids, 2517 reference ids)
+[check-id-ledger] 0 errors, 0 warning(s) — OK
+BATTERY_EXIT=0
