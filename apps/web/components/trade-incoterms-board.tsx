@@ -249,7 +249,12 @@ export function TradeIncotermsBoard({
         <Card title={d.tradeIncotermMatrixTitle}>
           <div className="flex flex-col gap-3">
             {incoterms.slice(0, 12).map((row) => (
-              <div key={row.id} className="rounded-md border border-subtle bg-gray-50 px-3 py-2">
+              <div
+                key={row.id}
+                role="status"
+                lang={locale}
+                className="rounded-md border border-subtle bg-gray-50 px-3 py-2"
+              >
                 <p className="text-xs font-semibold text-gray-700">
                   {row.code} · {localizedName(row.name, row.nameAr, locale)}
                 </p>
