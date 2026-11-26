@@ -518,7 +518,7 @@ describe("PHASE-049 W-22 — T-16: the four CMMS report contracts (the engine-ve
 
   it("(h) the registry carries the four rows on the module's own keys (the §12 convention)", () => {
     const snapshot = registrySnapshot([...REPORT_CONTRACTS]);
-    expect(snapshot).toHaveLength(122); // PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
+    expect(snapshot).toHaveLength(126); // PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
     const byId = new Map(snapshot.map((row) => [row.id, row]));
     expect(byId.get("assets.maintenance-costs")?.requiredPermission).toBe("assets.maintenance.view");
     expect(byId.get("assets.maintenance-backlog")?.requiredPermission).toBe("assets.maintenance.view");

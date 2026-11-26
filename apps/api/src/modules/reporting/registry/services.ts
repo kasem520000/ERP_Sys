@@ -43,6 +43,7 @@ import { ManufacturingExecutionQueriesService } from "./manufacturing/queries";
 import { PlanningQueriesService } from "./manufacturing/planning-queries";
 import { WmsQueriesService } from "./operational/wms-queries";
 import { QualityReportQueriesService } from "./quality/quality-queries";
+import { TradeReportQueriesService } from "./trade/trade-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -143,6 +144,16 @@ export interface ReportingServices {
    * transaction, the same direct-construction graph the 049 CMMS
    * surface builds). */
   qualityQueries: QualityReportQueriesService;
+  /** PHASE-051 (W-40 — T-15, dated 2026-11-26) · the trade query
+   * surface — the trade module's own registers (the LCs · the
+   * declarations + lines · the B/Ls + events · the drawback claims)
+   * the four trade contracts read VERBATIM (zero parallel
+   * computation: the duty/VAT line fold the completion act rides +
+   * the sweep's own effective-config band fold are the engines' own
+   * reads; stateless reader over the ambient tenant transaction, the
+   * same direct-construction graph the 049 CMMS / 050 quality
+   * surfaces build). */
+  tradeQueries: TradeReportQueriesService;
 }
 
 let bundle: ReportingServices | undefined;
@@ -221,6 +232,10 @@ export function reportingServices(): ReportingServices {
       // own reader (the same direct-construction graph the __db__/quality
       // fixtures build — the sweep engine's read surfaces only).
       qualityQueries: new QualityReportQueriesService(),
+      // PHASE-051 (W-40 — T-15, dated 2026-11-26): the trade registers'
+      // own reader (the same direct-construction graph the __db__/trade
+      // fixtures build — the folds' read surfaces only, never the runs).
+      tradeQueries: new TradeReportQueriesService(),
     };
   }
   return bundle;

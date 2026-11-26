@@ -207,6 +207,14 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   // four contracts ride the module's own finance-read key the /quality
   // routes ride; the grant the fullContext actor needs to run them).
   "quality.view",
+  // PHASE-051 (0122 §5 seed, matrix §3.29 — W-40, T-15, dated
+  // 2026-11-26): the trade report keys (the same §12 convention — the
+  // four contracts ride the module's own read keys the /trade routes
+  // ride; the grants the fullContext actor needs to run them).
+  "trade.lc.view",
+  "trade.customs.view",
+  "trade.shipments.view",
+  "trade.view",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

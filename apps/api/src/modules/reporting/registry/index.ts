@@ -211,6 +211,19 @@ import { qualityNcrRegisterContract } from "./quality/ncr-register.contract";
 import { qualityCapaStatusContract } from "./quality/capa-status.contract";
 import { qualityCalibrationDueContract } from "./quality/calibration-due.contract";
 import { qualityComplaintsSummaryContract } from "./quality/complaints-summary.contract";
+// PHASE-051 (W-40 — T-15, dated 2026-11-26) · the trade set
+// (REPORT_CATALOG §9's PHASE-051 rows — the four report contracts,
+// registry 122 → 126): every contract reads the trade module's own
+// registers VERBATIM (zero parallel computation — D-18's law; the
+// duty/VAT line fold the completion act rides + the sweep's own
+// effective-config band fold are the engines' own reads) and rides
+// the module's own read keys (the §12 convention, matrix §3.29 —
+// trade.lc.view · trade.customs.view · trade.shipments.view ·
+// trade.view).
+import { tradeLcRegisterContract } from "./trade/lc-register.contract";
+import { tradeCustomsDeclarationRegisterContract } from "./trade/customs-declaration-register.contract";
+import { tradeShipmentStatusContract } from "./trade/shipment-status.contract";
+import { tradeDutyDrawbackStatusContract } from "./trade/duty-drawback-status.contract";
 
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
@@ -451,6 +464,13 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   qualityCapaStatusContract,
   qualityCalibrationDueContract,
   qualityComplaintsSummaryContract,
+  // §9 trade — PHASE-051 rows (REPORT_CATALOG §9's PHASE-051 additions;
+  // registry 122 → 126): every figure the trade module's own, zero
+  // parallel computation.
+  tradeLcRegisterContract,
+  tradeCustomsDeclarationRegisterContract,
+  tradeShipmentStatusContract,
+  tradeDutyDrawbackStatusContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

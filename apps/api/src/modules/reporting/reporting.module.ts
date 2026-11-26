@@ -130,6 +130,17 @@ const KNOWN_PERMISSION_KEYS: ReadonlySet<string> = new Set([
   // convention — the four contracts ride the module's own finance-read
   // key the /quality routes ride).
   "quality.view",
+  // PHASE-051 (0122 §5 seed, matrix §3.29 — W-40, T-15, dated
+  // 2026-11-26): the trade report keys (the same §12 module-register
+  // convention — the four contracts ride the module's own read keys
+  // the /trade routes ride: lc-register on trade.lc.view,
+  // customs-declaration-register on trade.customs.view,
+  // shipment-status on trade.shipments.view, duty-drawback-status on
+  // trade.view).
+  "trade.lc.view",
+  "trade.customs.view",
+  "trade.shipments.view",
+  "trade.view",
   // PHASE-027 (0038 seed): the notes/installments report keys
   "notes.notes.view",
   "installments.plans.view",

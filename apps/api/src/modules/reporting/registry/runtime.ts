@@ -43,6 +43,7 @@ const CATEGORIES: readonly ReportCategory[] = [
   "hr", // PHASE-045: the workforce registers (attendance / leave balances / overtime)
   "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects plane (WBS/EVM/contracting/field service)
   "quality", // PHASE-050 (W-30 — T-17, dated 2026-11-23): the QMS registers (NCR/CAPA/calibration/complaints)
+  "trade", // PHASE-051 (W-40 — T-15, dated 2026-11-26): the foreign-trade registers (LC/customs/shipments/drawback)
 ];
 
 const SOURCE_MODULES: readonly DataSourceModule[] = [
@@ -71,6 +72,7 @@ const SOURCE_MODULES: readonly DataSourceModule[] = [
   "hr", // PHASE-045: the hr query surface (attendance register / leave balances / overtime summary)
   "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects query surface (the W-9…W-12 engines the four projects contracts read verbatim — WBS rollup · budgets/actuals · EVM · change orders · contracting · field service)
   "quality", // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality query surface (the quality module's own registers the four quality contracts read verbatim — NCR · CAPA · calibration due · complaints)
+  "trade", // PHASE-051 (W-40 — T-15, dated 2026-11-26): the trade query surface (the trade module's own registers the four trade contracts read verbatim — the LCs · the declarations + lines · the B/Ls + events · the drawback claims)
 ];
 
 const dataSourceSchema = z.object({
@@ -207,9 +209,10 @@ const MODULE_DATA_PHASE: Readonly<Record<DataSourceModule, number>> = Object.fre
   hr: 45, // PHASE-045: attendance register / leave balances / overtime summary query surfaces
   projects: 48, // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects engines (WBS rollup · budgets/actuals + INV-033 · EVM · change orders · contracting registers · field service — the query surfaces the four projects contracts read)
   quality: 50, // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality module's own registers (NCR/CAPA/complaints/calibration — the query surfaces the four quality contracts read verbatim)
+  trade: 51, // PHASE-051 (W-40 — T-15, dated 2026-11-26): the trade module's own registers (the LCs · the declarations + lines · the B/Ls + events · the drawback claims — the query surfaces the four trade contracts read verbatim)
 });
 
-const REGISTERED_PHASE_WINDOW = 50; // PHASE-013 window, widened by the
+const REGISTERED_PHASE_WINDOW = 51; // PHASE-013 window, widened by the
 // delivering phases that registered contracts over real query surfaces:
 // 15 (industry reports) + 16 (the POS set) + 17 (distribution) + 18
 // (manufacturing) + 19 (CRM) + 26 (fixed assets) + 27 (notes/installments) +
@@ -221,7 +224,9 @@ const REGISTERED_PHASE_WINDOW = 50; // PHASE-013 window, widened by the
 // the PHASE-048 engine surfaces — declared, never silent) + 50 (quality
 // — see MODULE_DATA_PHASE; the W-30 widening, dated 2026-11-23: the four
 // quality contracts register over the PHASE-050 QMS registers —
-// declared, never silent).
+// declared, never silent) + 51 (trade — see MODULE_DATA_PHASE; the W-40
+// widening, dated 2026-11-26: the four trade contracts register over
+// the PHASE-051 foreign-trade registers — declared, never silent).
 
 /** Financial reports must carry the §11 minimum assertion set (§16 checklist). */
 const FINANCIAL_MINIMUM_ASSERTIONS: Readonly<Record<string, readonly string[]>> = Object.freeze({

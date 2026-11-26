@@ -23,7 +23,8 @@ export type ReportCategory =
   | "industry"
   | "hr" // PHASE-045: the workforce registers (attendance / leave balances / overtime)
   | "projects" // PHASE-048: the projects plane (WBS/EVM/contracting/field service — the four report contracts of the reports wave)
-  | "quality"; // PHASE-050 (W-30 — T-17, dated 2026-11-23): the QMS registers (the NCR register · the CAPA status · the calibration due window · the complaints summary)
+  | "quality" // PHASE-050 (W-30 — T-17, dated 2026-11-23): the QMS registers (the NCR register · the CAPA status · the calibration due window · the complaints summary)
+  | "trade"; // PHASE-051 (W-40 — T-15, dated 2026-11-26): the foreign-trade registers (the LC register · the customs declarations · the shipment statuses · the duty drawback claims)
 
 export type DataSourceModule =
   | "accounting"
@@ -50,7 +51,8 @@ export type DataSourceModule =
   | "consolidation" // PHASE-034: the consolidation query surface (consolidated TB/IS/BS + eliminations log over the completed run's immutable snapshots)
   | "hr" // PHASE-045: the hr query surface (attendance register / leave balances / overtime summary)
   | "projects" // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects query surface — the W-9…W-12 engines (WBS rollup · budgets/actuals + INV-033 · EVM · change orders · contracting registers · field service) read verbatim by the four projects contracts
-  | "quality"; // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality module's own registers (NCR/CAPA/complaints/calibration) read verbatim by the four quality contracts
+  | "quality" // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality module's own registers (NCR/CAPA/complaints/calibration) read verbatim by the four quality contracts
+  | "trade"; // PHASE-051 (W-40 — T-15, dated 2026-11-26): the trade module's own registers (the LCs · the declarations + lines · the B/Ls + events · the drawback claims) read verbatim by the four trade contracts
 
 export interface DataSourceDecl {
   readonly module: DataSourceModule;

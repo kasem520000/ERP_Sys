@@ -134,11 +134,11 @@ describe("cash flow golden (§5 + INV-019)", () => {
 });
 
 describe("registry snapshot", () => {
-  it("exposes exactly the 122 frozen contracts (50 core + 18 industry + 3 fixed assets + 5 notes/installments + 2 budgeting + 5 payroll + 4 consolidation + 1 tax.e-invoicing-log + 2 sourcing + 2 returns/collections + 1 delivery log + 4 manufacturing + 2 planning + 4 WMS intelligence + 3 hr + 4 talent + 4 projects + 4 cmms + 4 quality)", () => {
+  it("exposes exactly the 126 frozen contracts (50 core + 18 industry + 3 fixed assets + 5 notes/installments + 2 budgeting + 5 payroll + 4 consolidation + 1 tax.e-invoicing-log + 2 sourcing + 2 returns/collections + 1 delivery log + 4 manufacturing + 2 planning + 4 WMS intelligence + 3 hr + 4 talent + 4 projects + 4 cmms + 4 quality + 4 trade)", () => {
     const snapshot = registrySnapshot(newRunService().contracts());
-    expect(snapshot).toHaveLength(122); // PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
+    expect(snapshot).toHaveLength(126); // PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
     const ids = new Set(snapshot.map((row) => row.id));
-    expect(ids.size).toBe(122); // PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
+    expect(ids.size).toBe(126); // PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
   });
 });
 
