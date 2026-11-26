@@ -1,0 +1,9 @@
+# PHASE-051 W-40 — BATTERY permissions drift
+# started: 2026-11-26T02:37:38Z
+
+
+> erp-platform@0.1.0 check:permissions-drift /home/z/ERP_live
+> tsx scripts/check-permissions-drift.ts
+
+[permissions-drift] OK — matrix 357 keys, seed 357 keys
+BATTERY_EXIT=0

@@ -1,4 +1,65 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-39 THE WEB PLANE DELIVERED (2026-11-26, this session — the web plane `f8fee96` → the web specs `cf6ad9b` → the gate increment, every step pushed at its own commit)** — W-40 NEXT (the reports — T-15: the four report contracts `trade.lc-register` · `trade.customs-declaration-register` · `trade.shipment-status` · `trade.duty-drawback-status`, registry 122 → 126, all pin sites together (D-18)) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-40 THE REPORTS DELIVERED (2026-11-26, this session — the report contracts `39fe961` → the DB spec `31ed950` → the gate increment, every step pushed at its own commit)** — W-41 NEXT (the proof pack — T-16: the golden transcripts G-64/G-65/G-66 with the MANDATORY failure packs + the INV-036 completeness golden + the bonded blocking-matrix golden + the RLS attack matrix A1–A10 over the FOURTEEN tables (D-19) + the OA-06 EXPLAIN budgets (the declaration lines + the tracking events)) under the standing order — تسليم لا قبول
+
+**W-40 — THE REPORTS (T-15, delivered on the W-39 gate head `1699d7e`
+in two increments + this gate):** THE FOUR REPORT CONTRACTS (D-18 —
+**registry 122 → 126, ALL PIN SITES TOGETHER — the 048-W14 law, no
+partial anchoring**): `trade.lc-register` (the register's own rows +
+the expiry band verdict through the SWEEP'S OWN FOLD — the effective
+windows read, never the run + the days on the DB's own CURRENT_DATE +
+the checklist's own open-discrepancy count + the
+`lc-status-vocabulary` check; the amounts in each LC's own currency,
+never summed across unlike currencies — the retention-statement law
+extended to FX) · `trade.customs-declaration-register` (the
+declarations' own rows + the linked B/L/PO/landed-cost briefs + **the
+line totals THROUGH THE REAL computeDeclarationTotals fold the G-65
+completion act rides — rendered from the LINES at every read, never a
+stored parallel figure**) · `trade.shipment-status` (the B/L register
++ THE FOLD'S OWN DRIVEN shipment_status — never writable by hand,
+D-14's own law — + the append-only event log's own latest milestone +
+count) · `trade.duty-drawback-status` (the claims register + the
+export evidence's own briefs + THE HONEST NO-GL SHAPE (D-12)) → THE
+QUERY SURFACE (TradeReportQueriesService — the registry query-service
+convention, the 042/044/048/049/050 pattern verbatim; the folds' READ
+surfaces only, zero JavaScript clocks) → THE WIRING (the `trade`
+category + data-source module at phase 51 · THE WINDOW WIDENED 50 →
+51, declared · reportingServices().tradeQueries · the §9 trade
+registration) → ALL PIN SITES (the eight count pins + the cmms spec's
+own pin + the NINTH caught by the envelope — see the honest catches —
++ the known-permission catalogs + REPORT_CATALOG's header/§9/§13/
+reconciliation 122/122 → 126/126) → THE DB SPEC
+(`trade-reports.db.spec` 7 arms — the verbatim ties against the
+store's own reads + the REAL folds + the REAL TrackingService's
+driven statuses + the deny paths + the isolation floor + the
+registry's four rows; the first REDs the 0119/0121 CHECKs' own
+floors, repaired in the same session). ROUTE_PERMISSIONS 1,215
+standing (zero new routes — the contracts are registry rows on the
+engine's own run endpoint; drift 357 = 357, zero key delta — the §12
+module-register convention). The battery (the FIFTY-SECOND
+consecutive same-session wave; §0a first — the remote verified at
+`31ed950`, the five tags' anchors intact): the six isolates
+standalone first, the ELEVEN-PART ENVELOPE **312 · 4,463 · 0 failed ·
+0 skipped** (the coverage verified before the first load run; the one
+declared roster movement: the trade-reports spec joins chunk-a
+123 → 124, the roster 311 → 312; the FIRST-RED log kept — the NINTH
+count pin the envelope caught, the two-head protocol; the
+stamp-truth catch dated inside the first-red log — the NF-12 verdict
+rule exercised), the 126-chain scratch from zero TWICE (check-rls OK —
+354 catalog tables; the wave added NO migration — the window widening
+is a runtime declaration, not a schema act), the standing battery
+green at the final code state (typecheck 8/8 · lint 8/8 · depcruise
+2,275 · 16,970 · unit 184 · 2,161 standing · ROUTE_PERMISSIONS 1,215
+· i18n 7,582 standing (no delta — an API-reports wave) + mobile 371
+= 371 · tokens 130/130 + derivations 50/50 · manifests 13/13 · docs
+33/33 · id-ledger 0 errors + all-probes-OK · history-secrets 0
+violations (7,361 allowlisted hits — the window's shift) ·
+capabilities agree · shells PASS/PASS · boundary PASS). **W-41 (the
+proof pack) next under the standing order. RISK-033: EIGHT incidents,
+ZERO new — the row stays OPEN. NOT production approval — تسليم لا
+قبول.**
+
+---
+
+# The W-39 web-plane record (the historical context below)
 
 **W-39 — THE WEB PLANE (T-14, delivered on the W-38 gate head `78e8428`
 in two increments + this gate):** THE FIVE SCREENS (`/trade/lc` — the

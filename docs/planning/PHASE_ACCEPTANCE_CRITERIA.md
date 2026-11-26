@@ -2200,6 +2200,131 @@ T-15: the four report contracts `trade.lc-register` ·
 together — D-18) under the owner's standing order. NOT production
 approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-26 (PHASE-051 W-40 DELIVERED at the contracts head
+`39fe961` + the DB-spec head `31ed950` — the owner's standing order
+«عند الانتهاء من أي خطوة ادفعها إلى المستودع» honored, every step
+pushed at its own commit): CRITERION #9'S REPORT ARMS GREEN — THE
+REGISTRY 122 → 126, ALL PIN SITES TOGETHER (D-18).** THE FOUR TRADE
+REPORT CONTRACTS over the PHASE-013 engine: `trade.lc-register` (the
+register's own rows — the official number, the 0119 ladder, the
+currency, the amount, the margin deposit, the bank, the beneficiary,
+the PO brief — with THE EXPIRY BAND VERDICT THROUGH THE SWEEP'S OWN
+FOLD: the same effective-windows read (stored ∪ the documented
+[30,14,7,1] default) + lcSweepBands + lcSweepBandFor the alerting pass
+rides, NEVER running the sweep — a report is never the alerting act;
+the days-to-expiry derived on the DATABASE'S OWN CURRENT_DATE; the
+checklist's own open-discrepancy count (the store's own law:
+discrepancy_notes IS NOT NULL AND verified = false) + the amendments
+count + the `lc-status-vocabulary` block-on-fail check; the amounts
+render in each LC's own currency and are never summed across unlike
+currencies — the retention-statement law extended to FX) ·
+`trade.customs-declaration-register` (the declarations' own rows + the
+linked B/L/PO/landed-cost briefs + **THE LINE TOTALS THROUGH THE REAL
+computeDeclarationTotals FOLD THE G-65 COMPLETION ACT RIDES — rendered
+from the declaration's OWN lines at every read, never a stored
+parallel figure** (D-06's zero-parallel-computation law) + the
+`declaration-status-vocabulary` check) · `trade.shipment-status` (the
+B/L register's own rows + THE FOLD'S OWN DRIVEN shipment_status —
+never writable by hand, D-14's own law — + the append-only event
+log's own latest milestone + count + the packing-list counts + the
+`shipment-status-vocabulary` check on the fold's own milestone domain)
+· `trade.duty-drawback-status` (the claims register's own rows + the
+export evidence's own briefs with the honest dash + the
+`drawback-status-vocabulary` check + THE HONEST NO-GL SHAPE (D-12 —
+the claim is a registry record, the refund lands when treasury
+records it)). THE QUERY SURFACE: TradeReportQueriesService — the
+registry query-service convention (the 042/044/048/049/050 pattern
+verbatim), read-only over the ambient tenant transaction, the folds'
+READ surfaces only, zero JavaScript clocks (the derived-step clock
+law). THE WIRING: the `trade` category + data-source module in the
+unions · MODULE_DATA_PHASE trade: 51 · THE WINDOW WIDENED 50 → 51
+(declared, never silent) · the §9 trade registration · the §12
+module-register key reuse (trade.lc.view · trade.customs.view ·
+trade.shipments.view · trade.view — ZERO new keys minted, the 357
+discipline standing). THE PIN-SITE DISCIPLINE (the 048-W14 law — no
+partial anchoring): the eight count pins (report-pack-wiring ·
+reporting-unit ×2 · consolidation-contracts ×2 · golden ×2 ·
+industry-018 · industry-019) + the cmms spec's own pin + THE NINTH
+(the quality-reviews-hazards spec's own registry pin — missed by the
+step-1 sweep's file list, CAUGHT BY THE ENVELOPE'S OWN COVERAGE
+DISCIPLINE: the first chunk-a run RED-named it, the pin moved to 126
+with the dated note, the two-head protocol with both logs kept) + the
+known-permission catalogs (the boot list · the db fixtures · the unit
+spec's own · the consolidation spec's own) + REPORT_CATALOG's dated
+header · §9's PHASE-051 subsection (the four-row table + the notes) ·
+the §13 provenance row · THE CATALOG↔REGISTRY RECONCILIATION EXTENDED
+122/122 → 126/126 (the walk re-done at delivery: each of the four
+trade keys appears exactly once in §9 and once in the live registry).
+THE DB SPEC (trade-reports.db.spec — 7 arms, every arm on its OWN
+world): the verbatim ties against the store's own reads (the
+issuing_bank unaliased key disclosed at the claim site) + the REAL
+folds (the band fold's verdict ≤14 at 10 days; the line-fold totals
+14,000 · 1,200 · 700 · 1,900 EXACT) + the REAL TrackingService's
+driven status (ARRIVED through two REAL appendEvent acts) + the deny
+paths (one per contract — PermissionDeniedError before params bind) +
+the tenant-isolation floor (the empty boundary tenant reads zero
+rows) + the registry's four rows (the snapshot 126 + the permission
+pins + the bilingual titles). THE GATE BATTERY (the FIFTY-SECOND
+consecutive same-session wave; §0a first — the remote verified at
+`31ed950`, the four annotated tags' six identifiers + the 050 tag
+intact, local = remote): the six isolates standalone FIRST (the
+owner's عزل مسبق order — soak 1·1 228.14s · fcm 1·8 16.59s · email 1·5
+13.12s · the cmms sweep 1·4 7.26s · the quality calibration sweep 1·4
+7.86s · the trade expiry sweep 1·6 7.31s, every stamp through the
+guarded wrapper) · THE ELEVEN-PART ENVELOPE **312 files · 4,463 tests
+· 0 failed · 0 skipped** (the coverage verified BEFORE the first load
+run — 312 = 312, missing NONE, extra NONE, duplicates NONE, VERDICT:
+COVERED; the ONE declared roster movement: the trade-reports spec
+joins chunk-a at its alphabetical position 123 → 124, the roster
+311 → 312; the load parts: smoke 3·1,999 21.07s · perf-rest 5·23
+96.81s · chunk-a 124·1,077 147.97s (the green re-run — the first-red
+log kept) · b-rest 86·625 62.50s · c 88·711 74.83s — every part
+inside the 570s ceiling; the arithmetic 312 = 1+1+1+1+1+1+3+5+124+86+88
+EXACT · 4,463 = 1+8+5+4+4+6+1,999+23+1,077+625+711 EXACT; the
+provenance 4,463 = 4,456 (the W-39 envelope) + 7 (the trade-reports
+spec's arms) EXACT, declared before the first load run and confirmed
+by it) · THE 126-CHAIN SCRATCH FROM ZERO TWICE (السلسلة من الصفر
+مرتين: both runs CHAIN_126_APPLIED → [check-rls] OK — 354 catalog
+tables → SCRATCH_STOPPED, EXIT=0, both logs kept — run 2 at its own
+SCRATCH_PORT 5498; the chain STANDS at 126 — the wave added NO
+migration, the window widening 50 → 51 a RUNTIME declaration, not a
+schema act, verified against the tree: 126 SQL files · 126 journal
+entries) · the standing battery green at the final code state
+(typecheck 8/8 (0 cached, --force) · lint 8/8 (0 cached, --force) ·
+depcruise clean 2,275 · 16,970 (+6/+48 dated; zero cycles) · unit 8/8
+— **184 files · 2,161 tests** standing (2,161 = 1,081+240+840 EXACT)
+· ROUTE_PERMISSIONS 1,215 standing (the tsx recount — zero new routes)
+· drift 357 = 357 · i18n 7,582 = 7,582 standing (no delta — an
+API-reports wave) + mobile 371 = 371 · tokens 130/130 + derivations
+50/50 · manifests 13/13 · docs:validate 33/33 · id-ledger 0 errors
+(implemented G 63 · INV 35 · BR 104 standing — the 051 flip is W-42's)
++ the self-test all-probes-OK (probe 7 stands at G-64/PHASE-051) ·
+history-secrets 0 violations (7,361 allowlisted hits — the window's
+shift; the FIVE tag anchors walked, untouched) · capabilities agree ·
+shells PASS/PASS · boundary PASS — `audit-evidence/phase051-w40/`).
+THE HONEST CATCHES (all first-RED-proven then repaired, all disclosed
+at the claim sites, no battery red standing): (1) the NINTH count pin
+(the envelope's own catch — the quality-reviews-hazards spec's own
+registry pin at 122, the two-head protocol with both logs kept, the
+pin moved to 126 with the dated note); (2) THE STAMP-TRUTH CATCH (the
+NF-12 verdict rule exercised and dated inside the first-red log: the
+hand-rolled capture's stamp first read the process code 0 while the
+log's own vitest summary reported 1 failed — the exact W-6 class the
+guarded wrapper's summary guard exists for; the stamp corrected to the
+SUMMARY VERDICT, the guarded wrapper the only capture path for every
+other log); (3) the step-2 spec's first REDs (the 0119/0121 CHECKs'
+own floors: the presented-shape · the accepted-shape stamp law · the
+HS digits-only floor; the store's unaliased issuing_bank key + the
+family-run's tenant-global label — disclosed, the re-runs GREEN).
+**RISK-033: EIGHT incidents, ZERO new this wave — the row stays OPEN,
+closing only by the owner's order.** The reservations G-64…G-66 ·
+INV-036 · BR-105…BR-108 — لا كتابة خارجها. NEXT: W-41 (the proof
+pack — T-16: the golden transcripts G-64/G-65/G-66 with the MANDATORY
+failure packs + the INV-036 completeness golden + the bonded
+blocking-matrix golden + the RLS attack matrix A1–A10 over the
+FOURTEEN tables (D-19) + the OA-06 EXPLAIN budgets) under the owner's
+standing order. NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

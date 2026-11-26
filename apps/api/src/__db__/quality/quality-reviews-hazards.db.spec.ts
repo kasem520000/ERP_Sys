@@ -355,8 +355,8 @@ describe("quality management reviews + hazard registers (Q-10/Q-11 — the froze
 
   it("THE FOUR REPORT CONTRACTS: the registry carries them on the module's own key; every contract executes over the quality world", async () => {
     const snapshot = registrySnapshot([...REPORT_CONTRACTS]);
-    // PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary)
-    expect(snapshot).toHaveLength(122);
+    // PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary)
+    expect(snapshot).toHaveLength(126);
     const byId = new Map(snapshot.map((row) => [row.id, row]));
     for (const id of [
       "quality.ncr-register",
