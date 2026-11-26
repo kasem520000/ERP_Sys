@@ -177,7 +177,7 @@ export class TradeReportQueriesService {
              (l.expiry_date - CURRENT_DATE) AS "daysToExpiry",
              (SELECT count(*)::int FROM lc_documents d
                WHERE d.lc_id = l.id AND d.tenant_id = l.tenant_id
-                 AND d.status = 'DISCREPANT') AS "openDiscrepancies",
+                 AND d.discrepancy_notes IS NOT NULL AND d.verified = false) AS "openDiscrepancies",
              (SELECT count(*)::int FROM lc_amendments a
                WHERE a.lc_id = l.id AND a.tenant_id = l.tenant_id) AS amendments,
              l.settled_at::text AS "settledAt"

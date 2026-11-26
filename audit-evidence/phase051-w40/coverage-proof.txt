@@ -1,0 +1,18 @@
+PHASE-051 W-40 — the coverage proof (the W-15 law: verified BEFORE
+the first load run).
+
+inventory (the disk glob src/__db__/**/*.spec.ts, sorted): 312 files
+union (parts.json — the W-39 partition standing + the ONE declared
+roster movement: the trade-reports spec joins chunk-a at its
+alphabetical position, 123 → 124, the W-24/W-34/W-35/W-36/W-37/W-38/
+W-39 quality-schema/trade family precedent's own move): 312 files
+
+missing NONE · extra NONE · duplicates NONE
+312 = 312 — VERDICT: COVERED
+
+The arithmetic declared BEFORE the first load run:
+312 = 1+1+1+1+1+1+3+5+124+86+88 EXACT
+
+The expected provenance (declared BEFORE the first load run):
+4,463 = 4,456 (the W-39 envelope) + 7 (the trade-reports spec's arms)
+EXACT.
