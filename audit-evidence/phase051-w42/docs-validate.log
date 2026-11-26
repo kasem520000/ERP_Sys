@@ -1,5 +1,10 @@
-# PHASE-051 W-42 — THE CLOSURE DOCS + THE ID_LEDGER FLIP (T-17 step 1, 2026-11-26, this session) — docs:validate at the closure's final docs state
-# (the 33-check docs validator over the edited canon rows + the flipped ledger + the completion report + the triple flip; run: pnpm docs:validate = python3 scripts/validate_docs.py)
+# PHASE-051 W-40 — BATTERY docs:validate (the closure's final docs state)
+# started: 2026-11-26T04:20:22Z
+
+
+> erp-platform@0.1.0 docs:validate /home/z/ERP_live
+> python3 scripts/validate_docs.py
+
 PASS  1a. all relative links resolve
 PASS  1b. 13 extracted manifests parse with industry.* ids
 PASS  2. phase refs within 001-065 (v3.0) and canon client labels (desktop=021/android=022)

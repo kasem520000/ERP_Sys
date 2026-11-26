@@ -1,72 +1,106 @@
-# PHASE-051 W-42 (THE CLOSURE — STEP 1, T-17) evidence — 2026-11-26 (the closure docs + the ID_LEDGER flip, delivered on the W-41 gate head `e416bfb`)
+# PHASE-051 W-42 (THE CLOSURE — FULL SWEEP) evidence — 2026-11-26 (T-18's own share; the gate record per the ratified عرف 049 option (a))
 
-Every log below was generated THIS session against the W-41 gate head
-`e416bfb`'s tree **plus this closure step's own docs/canon edits** (the
-same-session evidence rule — the environment standing since the W-39
-gate's fresh clone). The step is the APPROVED MASTER PLAN's §3 W-42 step
-1 (T-17) under the owner's standing order «عند الانتهاء من أي خطوة ادفعها
-إلى المستودع»; **the code tree is UNCHANGED** — this increment moves
-docs and canon only (the one `.ts` delta is the checker's own self-test
-probe fixture, `scripts/check-id-ledger.ts` — outside the api tsconfig's
-include set, typechecked green anyway).
+Every log below was generated THIS session against the W-42 step-1 head
+`eafa295`'s tree (the same-session evidence rule, the **FIFTY-FOURTH**
+consecutive wave — the owner's standing record counts fifty-three through
+the W-41 gate). The wave is the APPROVED PLAN's §3 W-42 under the owner's
+launch authorization (the closure: step 1 `eafa295` the canon rows + the
+ID_LEDGER flip + the completion report + the triple flip → this step 2
+the full sweep at the final head → step 3 the archive + the tag; every
+step pushed at its own commit per «عند الانتهاء من أي خطوة ادفعها إلى
+المستودع»).
 
-## The step's acts (one docs increment)
+## §0a FIRST — the local-vs-remote verification (the wave's first act)
 
-1. **THE CANON ROWS** in the ID_LEDGER's reserved wordings (لا كتابة
-   خارجها — no identifier outside the reservations enters the canon;
-   only references to already-implemented ids): JOURNAL_RULES
-   **G-64** (the LC margin deposit & retirement) · **G-65** (the customs
-   duty + import VAT capitalization into landed cost) · **G-66** (the
-   bonded transfer & release) + **note 21** (the non-ledger-document
-   law) · ACCOUNTING_INVARIANTS **INV-036** (the declaration-completeness
-   law) · BUSINESS_RULES **BR-105…BR-108**.
-2. **THE ID_LEDGER FLIP atomic with the canon rows**: the PHASE-051 row
-   → DELIVERED 2026-11-26 · the §1 implemented-through cells
-   (G-01…G-66 · INV-001…INV-036 · BR-001…BR-108) · the coordination
-   arithmetic paragraph · **the checker's self-test probe (7) moved per
-   the W-15 precedent's seventh move** (G-64/PHASE-051 → G-67 reserved
-   for PHASE-052, claimant PHASE-053).
-3. **THE COMPLETION REPORT**
-   `docs/implementation/phases/reports/PHASE-051-COMPLETION.md` (the 050
-   report's structure): the cumulative wave table W-33…W-41 · the ledger
-   #1–#10 CLOSED · the battery scope map + the FULL unit-package table
-   (184 · 2,161 = 1,081+240+840 EXACT) + the DB roster 315 (the trade
-   family 15 · 158) + ROUTE_PERMISSIONS 1,215 (the W-33 ten-key seed +
-   the six keys-seed-first binding waves) + the honest catches' log
-   (SEVENTEEN across the phase) + the open-items log transferred
-   explicitly + the PHASE-052 handoff + **THE STAGE-13 RELEASE GATE
-   CHECKED per CR-38 (full ERP: MRP + HR + WMS + projects live —
-   recorded before Wave 3 starts)**.
-4. **THE TRIPLE FLIP**: the phase doc header → COMPLETE — DELIVERED
-   2026-11-26 · the IMPLEMENTATION_STATUS PHASE-051 row → COMPLETE +
-   the W-42 dated header line · NEXT_ACTION → PHASE-051 CLOSED AS
-   DELIVERY, PHASE-052 (Workflow & Approvals Engine) THE NEXT ELIGIBLE
-   PHASE.
+- The remote verified first: `main @ eafa295` (the closure step-1 head);
+  `phase/050` @ `01f61a7` · `phase/049` @ `41c3701` · `phase/048` @
+  `ba459ff` · `phase/047` @ `5b73bd1` · `phase/046` @ `4ddb39f` — the
+  four annotated tags' six identifiers + the 050 tag intact, local =
+  remote (the tag OBJECT ids verified pairwise: 88568da · 90fd428 ·
+  d46fa87 · 1fd74e9 · 76dda77; re-proven by the history-secrets run:
+  all FIVE anchors walked, 0 violations).
+- The working tree IS this session's own clone (the environment standing
+  since the W-39 gate) — 0 skipped on every run below.
 
-## The step's own gates (this session, this tree)
+## THE SIX ISOLATES STANDALONE FIRST (the owner's عزل مسبق order — §0c (2))
+
+soak 1 · 1 (`db-isolate-soak.log`, 227.87s) · fcm 1 · 8 (15.90s) ·
+email 1 · 5 (13.29s) · the cmms sweep 1 · 4 (7.26s) · the quality
+calibration sweep 1 · 4 (7.85s) · the trade expiry sweep 1 · 6 (7.35s)
+— every stamp through THE GUARDED WRAPPER (the vitest summary lines
+verified in addition to the exit code).
+
+## THE ELEVEN-PART ENVELOPE AT THE FINAL HEAD — 315 files · 4,486 tests · 0 failed · 0 skipped
+
+The coverage standing (the W-41 partition, zero spec movement — the
+closure is a DOCS-ONLY wave; `parts.json` from W-41 rides): 315 = 315,
+VERDICT: COVERED.
+
+| Part | Files · Tests | Time (inside the 570s ceiling) | Log |
+|---|---|---|---|
+| isolate-soak (standalone FIRST) | 1 · 1 | 227.87s | `db-isolate-soak.log` |
+| isolate-fcm (standalone FIRST) | 1 · 8 | 15.90s | `db-isolate-fcm.log` |
+| isolate-email (standalone FIRST) | 1 · 5 | 13.29s | `db-isolate-email.log` |
+| isolate-sweep (standalone FIRST) | 1 · 4 | 7.26s | `db-isolate-sweep.log` |
+| isolate-quality-sweep (standalone FIRST) | 1 · 4 | 7.85s | `db-isolate-quality-sweep.log` |
+| isolate-trade-sweep (standalone FIRST) | 1 · 6 | 7.35s | `db-isolate-trade-sweep.log` |
+| chunk-smoke | 3 · 1,999 | (log) | `db-chunk-smoke.log` |
+| chunk-perf-rest | 5 · 23 | (log) | `db-chunk-perf-rest.log` |
+| chunk-a | 127 · 1,100 | 164.00s | `db-chunk-a.log` |
+| chunk-b-rest | 86 · 625 | (log) | `db-chunk-b-rest.log` |
+| chunk-c | 88 · 711 | (log) | `db-chunk-c.log` |
+
+The arithmetic: 315 = 1+1+1+1+1+1+3+5+127+86+88 EXACT · 4,486 =
+1+8+5+4+4+6+1,999+23+1,100+625+711 EXACT — IDENTICAL to the W-41
+envelope (the closure moves docs only, the roster unmoved). Every part
+inside the amended 570s ceiling.
+
+## THE 126-CHAIN SCRATCH FROM ZERO — TWICE (السلسلة من الصفر مرتين)
+
+`check-rls-scratch-126-run1.log` · `check-rls-scratch-126-run2.log` —
+both runs CHAIN_126_APPLIED → [check-rls] OK — 354 catalog tables →
+SCRATCH_STOPPED, EXIT=0, both logs kept — run 2 at its own SCRATCH_PORT
+5498; the chain STANDS at 126 — the closure is a DOCS-ONLY wave (the
+canon rows + the flip + the report move documentation, never the
+schema; verified against the tree: 126 SQL files · 126 journal
+entries; the script: `scratch-rls-proof.ts`).
+
+## THE STANDING BATTERY AT THE FINAL HEAD (every log this session, every stamp green)
 
 | Check | Verdict | Log |
 |---|---|---|
-| check:id-ledger (the plain scan) | **0 errors — implemented G 66 · INV 36 · BR 108 · reservations 13 phases · 22 ids** | `id-ledger.log` |
-| check:id-ledger --self-test | **all probes OK — the probe (7) stands at G-67/PHASE-052, claimant PHASE-053** | `id-ledger-self-test.log` |
-| docs:validate | **33/33 checks passed** | `docs-validate.log` |
-| the api typecheck (tsc --noEmit -p tsconfig.json) | **0 errors** (the code tree unchanged) | `typecheck-api.log` |
+| typecheck | 8/8 (0 cached, --force) | `typecheck.log` |
+| lint | 8/8 (0 cached, --force) | `lint.log` |
+| depcruise | clean — 2,278 · 17,039 (standing — a docs-only wave) | `depcruise.log` |
+| unit workspace | 8/8 — **184 files · 2,161 tests** standing (2,161 = 1,081+240+840 EXACT) | `unit-workspace.log` |
+| ROUTE_PERMISSIONS | **1,215 standing** (the tsx recount — zero route-bearing files moved) | `route-permissions-recount.log` |
+| permissions drift | 357 = 357 | `permissions-drift.log` |
+| i18n parity | ar=7,582 = en=7,582 standing | `i18n-parity.log` |
+| mobile i18n / tokens | 371 standing · parity 130/130 · derivations 50/50 | `mobile-i18n.log` / `mobile-tokens.log` |
+| manifests | 13/13 | `manifests.log` |
+| docs:validate | 33/33 (the closure's final docs state) | `docs-validate.log` |
+| id-ledger | **THE FLIP PROVEN: 0 errors — implemented G 66 · INV 36 · BR 108 · reservations 13 phases · 22 ids** | `id-ledger.log` |
+| id-ledger self-test | all probes OK ✓ — **probe 7 stands at G-67/PHASE-052 (claimant PHASE-053)** — the W-15 precedent's seventh move | `id-ledger-self-test.log` |
+| history-secrets | 0 violations · 7,463 allowlisted hits (the W-41 7,411 +52 — the window's shift; the FIVE tag anchors untouched) | `history-secrets.log` |
+| capabilities | agree | `capabilities.log` |
+| desktop-shell / mobile-shell | PASS / PASS | `desktop-shell.log` / `mobile-shell.log` |
+| boundary-negative | PASS | `boundary-negative.log` |
 
-Every log carries a `BATTERY_EXIT=0` footer (the NF-12 verdict rule —
-the stamps verified against the summary verdicts).
+## The honest catches
 
-## What follows at the same closure (steps 2–3, T-18)
-
-**THE STEP-2 FULL SWEEP AT THE FINAL HEAD** (the isolates first · the
-FULL eleven-part envelope at 315 · the standing battery every check
-green · the gate logs landing in THIS folder) + **THE STEP-3 ARCHIVE
-`ERP_PLATFORM_PHASE051.zip` EXACTLY AS DECLARED (F-4/§5: FLAT, the
-commit-hash as the FIRST ENTRY, ADDITIVE-ONLY, EXCLUDING every standing
-platform zip — أرشفة الأرشيف ممنوعة; the SEVENTEEN standing zips
-verified untouched) + THE TAG `phase/051`** (DELIVERY, never acceptance
-— the §1a (a) ruling; the tag lands at the archive head).
+No new catches this step — every stamp green on the first run, the
+envelope IDENTICAL to the W-41 counts (the closure's docs-only law
+proven by the roster's own stillness). The step-1 catches (the
+SEVENTEEN→NINETEEN catches-count correction at the three claim sites;
+the W-35 middle head's verifiable form) are disclosed at the step-1
+commit.
 
 RISK-033: EIGHT incidents, ZERO new this wave — the row stays OPEN,
-closing only by the owner's order. The reservations G-67 (PHASE-052) ·
-INV-037 · the 052+ ladder — لا كتابة خارجها. NOT production approval —
-تسليم لا قبول.
+closing only by the owner's order.
+
+The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — discharged
+(implemented G 66 · INV 36 · BR 108, the ledger's own record).
+
+NEXT: the step-3 archive `ERP_PLATFORM_PHASE051.zip` EXACTLY AS
+DECLARED + the tag `phase/051` (DELIVERY, never acceptance). NOT
+production approval — تسليم لا قبول.

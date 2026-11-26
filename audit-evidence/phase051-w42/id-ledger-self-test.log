@@ -1,5 +1,10 @@
-# PHASE-051 W-42 — THE CLOSURE DOCS + THE ID_LEDGER FLIP (T-17 step 1, 2026-11-26, this session) — check:id-ledger --self-test at the closure's final docs state
-# (the self-test at the flipped ledger — the probe (7) fixture moved to G-67/PHASE-052, claimant PHASE-053, the W-15 precedent's seventh move; run: pnpm check:id-ledger -- --self-test — executed through the workspace's node_modules/.bin/tsx)
+# PHASE-051 W-40 — BATTERY id-ledger self-test (probe 7 stands at G-67/PHASE-052)
+# started: 2026-11-26T04:20:29Z
+
+
+> erp-platform@0.1.0 check:id-ledger /home/z/ERP_live
+> tsx scripts/check-id-ledger.ts -- --self-test
+
 [check-id-ledger] self-test (1) conflicting claim — a phase claiming another phase's reserved ids (synthetic fixture, ledger-independent): OK ✓
 [check-id-ledger] self-test (2) legitimate reference — PHASE-046 referencing the implemented G-13/G-14: OK ✓
 [check-id-ledger] self-test (3) range extraction from actual text — .., en-dash, em-dash, and … all expand: OK ✓

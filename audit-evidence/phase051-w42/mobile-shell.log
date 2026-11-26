@@ -1,0 +1,75 @@
+# PHASE-051 W-40 — BATTERY mobile-shell
+# started: 2026-11-26T04:25:50Z
+
+
+> erp-platform@0.1.0 check:mobile-shell /home/z/ERP_live
+> tsx scripts/check-mobile-shell.ts
+
+check:mobile-shell — PHASE-022 T-P22-4-a structural gate (source-only native glue; EAS CI compiles)
+
+== 1. native/package.json — the expo toolchain declaration
+  ✓ all 9 toolchain packages declared: expo@~52.0.0, expo-sqlite@~15.0.0, expo-secure-store@~14.0.0, expo-local-authentication@~15.0.0, expo-notifications@~0.29.0, expo-background-fetch@~13.0.0, expo-task-manager@~12.0.0, react@18.3.1, react-native@0.76.5
+  ✓ every toolchain version matches the DR-P22-01 pin table
+  ✓ react matches the workspace exactly: 18.3.1 === 18.3.1
+  ✓ react-native consistent: native pin 0.76.5 satisfies the workspace range ^0.76.5
+  ✓ packageManager pin matches the root: pnpm@9.15.9
+
+== 2. native/App.tsx — the entry point + the planned wiring
+  ✓ registerRootComponent imported from expo and invoked
+  ✓ the app entry is native/App.tsx (package.json "main") with the library surface intact on exports["."]
+  ✓ all 8 planned drivers named in the wiring TODO (sqlite, secure-store, unlock, trust, notifications, fcm, background-scheduler, barcode-scanner)
+  ✓ wiring TODO names SCREEN_REGISTRY
+  ✓ wiring TODO names I18nManager.forceRTL
+  ✓ wiring TODO names background-fetch
+
+== 3. app.config.ts + eas.json — the EAS build surface
+  ✓ app.config.ts loads (imports nothing — the DR-P22-01 rule)
+  ✓ name is "ERP Field"
+  ✓ slug is "erp-field"
+  ✓ platforms is exactly ["android"] (android-only this phase)
+  ✓ android.package is "com.erp.field"
+  ✓ version is a non-empty string
+  ✓ jsEngine is "hermes" (the RN 0.76/Expo 52 default, pinned)
+  ✓ preview profile: internal APK distribution (the QA/device-drill channel)
+  ✓ production profile: AAB + autoIncrement + EXPO_NO_TELEMETRY=1 (no secrets inline — S-15 is CI-injected)
+  ✓ cli.version floor: >= 12.0.0
+  ✓ submit.production documented (the Play Store track placeholder)
+
+== 4. src/screens/registry.ts — completeness + no orphans
+  ✓ every registered screen exists on disk (11/11)
+  ✓ no orphans: every *Screen.tsx in the dir is registered (11/11)
+  ✓ screenEntry calls 11 === registered imports 11
+  ✓ unique registry names: 11
+  ○ registry.ts carries 60 screen-reference lines — the T-P22-3-b handoff figure (60 at wave close)
+
+== 5. src/screens/** imports — the allowed-module surface
+  ✓ CollectionScreen.tsx: 10 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ CountLinesScreen.tsx: 10 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ DashboardScreen.tsx: 8 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ InvoicesScreen.tsx: 8 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ ParkedRejectionsScreen.tsx: 8 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ PersonalHomeScreen.tsx: 7 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ ReturnsScreen.tsx: 9 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ RouteVisitsScreen.tsx: 7 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ StatementScreen.tsx: 8 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ VanLoadUnloadScreen.tsx: 9 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ VanSaleCaptureScreen.tsx: 10 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ chrome.tsx: 7 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ index.ts: 12 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ registry.ts: 15 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ✓ screens-props.ts: 11 imports all allowed (react/react-native/relative/@erp workspace deps)
+  ○ 15 screen-area files checked, 139 import statements validated
+
+== 6. the workspace boundary — native/ is never installed
+  ✓ pnpm-workspace.yaml carries the explicit "!apps/mobile/native" negation
+  ✓ pnpm-lock.yaml: no apps/mobile/native importer (the native dir never enters the lockfile)
+  ✓ @erp/mobile declares no expo dependency (the toolchain lives only in native/package.json)
+
+== 7. DR-P22-02/11 spot-checks — screens (tokens + logical props)
+  ✓ no raw hex-color literals in the screens dir (tokens only — DR-P22-02)
+  ✓ no physical-direction style props (logical props only — the DR-P22-03 mirror)
+  ○ a11y labels + ≥44px targets: enforced by the render suites (screens-cpr/screens tests) + ESLint DR-P22-03 — listed for the record, never skipped
+
+check:mobile-shell: PASS — mobile shell + screen surface structurally valid
+  (honest note: the expo toolchain is compiled only by .github/workflows/mobile-release.yml)
+BATTERY_EXIT=0

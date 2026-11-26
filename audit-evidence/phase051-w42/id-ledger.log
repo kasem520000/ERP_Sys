@@ -1,5 +1,6 @@
-# PHASE-051 W-42 — THE CLOSURE DOCS + THE ID_LEDGER FLIP (T-17 step 1, 2026-11-26, this session) — check:id-ledger at the closure's final docs state
-# (the plain scan — the canon rows G-64…G-66 + INV-036 + BR-105…BR-108 landed, the ID_LEDGER flipped to DELIVERED 2026-11-26: implemented G 66 · INV 36 · BR 108; run: pnpm exec tsx scripts/check-id-ledger.ts — executed through the workspace's node_modules/.bin/tsx, pnpm 9.15.9's own runner, this shell's PATH lacking the pnpm shim)
+# PHASE-051 W-40 — BATTERY id-ledger (THE FLIP: implemented G 66 · INV 36 · BR 108)
+# started: 2026-11-26T04:20:29Z
+
 [check-id-ledger] implemented: G 66 · INV 36 · BR 108 | reservations: 13 phases, 22 ids | phase docs scanned: 68 (95 claim ids, 2517 reference ids)
 [check-id-ledger] 0 errors, 0 warning(s) — OK
 BATTERY_EXIT=0

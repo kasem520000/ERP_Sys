@@ -1,0 +1,55 @@
+# PHASE-051 W-40 — BATTERY lint (turbo 8/8, --force)
+# started: 2026-11-26T04:19:12Z
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/mobile:lint: cache bypass, force executing 01fbfab45596725e
+@erp/ui:lint: cache bypass, force executing 5b8037fe990338ab
+@erp/domain-core:lint: cache bypass, force executing e515e0d9f5404701
+@erp/contracts:lint: cache bypass, force executing 2439ec2330613729
+@erp/api:lint: cache bypass, force executing 2aceb70172383faa
+@erp/desktop:lint: cache bypass, force executing 5e54ee554fd4469f
+@erp/sync-core:lint: cache bypass, force executing 0f616df6475a154d
+@erp/web:lint: cache bypass, force executing b9b86037e4b5a4cc
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/ERP_live/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/ERP_live/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/ERP_live/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/ERP_live/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/ERP_live/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/ERP_live/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/ERP_live/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/ERP_live/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    48.822s 
+
+BATTERY_EXIT=0
