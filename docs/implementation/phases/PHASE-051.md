@@ -1,6 +1,6 @@
 # PHASE-051 — Foreign Trade & Logistics
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-21](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** **COMPLETE — DELIVERED 2026-11-26** (W-33 through W-41; the tag `phase/051` — DELIVERY, never acceptance; the [completion report](reports/PHASE-051-COMPLETION.md)) — was NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 2 / Stage 13 · **Register:** [CR-21](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 (H-08) · §14 (L-01…L-14) · [COMPLETENESS_ROADMAP.md](../../planning/COMPLETENESS_ROADMAP.md) §6.1/§6.2
 
 ## 1. Phase Overview

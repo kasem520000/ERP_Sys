@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-41 THE PROOF PACK DELIVERED (2026-11-26, this session — the proof pack `04a44f2` → the gate increment, every step pushed at its own commit) — #1…#9 ALL GREEN; ONLY #10 (THE W-42 CLOSURE) REMAINS** — W-42 NEXT (the closure — T-17 + T-18: the canon docs in the ID_LEDGER's reserved wordings (JOURNAL_RULES G-64/G-65/G-66 + note 21 · ACCOUNTING_INVARIANTS INV-036 · BUSINESS_RULES BR-105…BR-108 — لا كتابة خارجها) + THE ID_LEDGER FLIP (implemented G 66 · INV 36 · BR 108, atomic with the canon rows; the self-test probe (7) moves to G-67/PHASE-052, claimant PHASE-053) + the full sweep at the final head + the completion report + the triple flip + THE ARCHIVE ERP_PLATFORM_PHASE051.zip EXACTLY AS DECLARED (FLAT, the hash FIRST, ADDITIVE-ONLY, أرشفة الأرشيف ممنوعة) + the tag phase/051) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **CLOSED AS DELIVERY 2026-11-26** (W-33…W-41 · the tag `phase/051` — DELIVERY, never acceptance · the report `docs/implementation/phases/reports/PHASE-051-COMPLETION.md`) — **PHASE-052 (Workflow & Approvals Engine) IS THE NEXT ELIGIBLE PHASE** — the owner continues with «ابدأ تنفيذ المرحلة PHASE-052» — تسليم لا قبول — NOT production approval
 
 **W-41 — THE PROOF PACK (T-16, delivered on the W-40 gate head
 `24e439a` in one increment + this gate):** trade-goldens.db.spec — 9
@@ -62,9 +62,107 @@ standing (no delta) + mobile 371 = 371 · tokens 130/130 +
 derivations 50/50 · manifests 13/13 · docs 33/33 · id-ledger 0 errors
 + all-probes-OK · history-secrets 0 violations (7,411 allowlisted
 hits — the window's shift) · capabilities agree · shells PASS/PASS ·
-boundary PASS). **W-42 (the closure) next under the standing order —
-#1…#9 ALL GREEN. RISK-033: EIGHT incidents, ZERO new — the row stays
-OPEN. NOT production approval — تسليم لا قبول.**
+boundary PASS). #1…#9 ALL GREEN at the W-41 gate. RISK-033: EIGHT
+incidents, ZERO new — the row stays OPEN. NOT production approval —
+تسليم لا قبول.
+
+**W-42 — THE CLOSURE (T-17 + T-18, delivered 2026-11-26 on the W-41
+gate head `e416bfb` — the code tree unchanged, this closure step moves
+docs and canon only):** THE CANON ROWS in the ID_LEDGER's reserved
+wordings — JOURNAL_RULES **G-64** (the LC margin deposit & retirement:
+DR the purpose-mapped LC_MARGIN_DEPOSIT 1180 · CR the tenant's chosen
+bank at the contract rate (the FX ride, the INV-019-exact treasury
+movements), the amendment's margin adjustment through the SAME pair on
+(lc_amendment, id), the retirement's reversal of the CURRENT margin
+with the settled pair + the journal stamps landing TOGETHER in the CAS
+stamp, the fees on the `fee_{seq}` single-use keys to BANK_CHARGES, the
+margin exit law, fail-closed with zero residue) · **G-65** (the customs
+duty + import VAT capitalization: the fold's totals (Σ duty + Σ import
+VAT from the declaration's OWN lines through computeDeclarationTotals,
+never a stored parallel figure) into the landed-cost document of kind
+customs through the REAL LandedCostService — DR INVENTORY · DR COGS ·
+CR the purpose-mapped CUSTOMS_DUTY_PAYABLE 2145, the line-level tie
+riding the allocation rows, the INV-018 linkage pair in the same
+ambient transaction, the exactly-once (the 0125 partial unique
+uq_landed_costs_tenant_declaration), the zero-duty completion's
+no-document shape, the FX ride at the contract rate) · **G-66** (the
+bonded transfer: the in-bond move posts NO duty (the G-15 policy
+journal the value-neutral pair; the from-NULL deposit the custodial
+entry) · the release into free circulation recognizes the duty EXACTLY
+ONCE — the recognition pair (Dr the released stock's value · Cr the
+purpose-mapped CUSTOMS_DUTY_PAYABLE), INV-013 single-use on
+(bonded_warehouse_moves, id, release), the revaluation through the
+REAL RevaluationService, the ATOMIC recognition-pair CAS, the
+zero-duty release's EMPTY pair, the IMPORT/ACCEPTED honest
+bifurcation, the blocking face at planIssue — the ONE shared bonded
+gate) + note 21 (the non-ledger-document law: the collections,
+incoterms, B/Ls, packing lists, certificates, tracking events,
+drawbacks and HS/incoterm registers never post — the drawback a
+registry record (D-12), the refund lands when treasury records it,
+053's surface) · ACCOUNTING_INVARIANTS **INV-036** (the
+declaration-completeness law: no landed-cost allocation on an import
+receipt without a COMPLETED declaration reference, every allocated
+duty ties to a declaration line — the shared customs landed-cost floor
+wired INSIDE the purchasing LandedCostService's POST act, the typed
+DECLARATION_REQUIRED/DECLARATION_INCOMPLETE refusals with zero
+residue, the non-duty landed costs untouched, the flag OFF = the floor
+silent, the line-level tie's one-line-per-item exactness laws) ·
+BUSINESS_RULES **BR-105…BR-108** (the LC expiry ladder at 30/14/7/1
+days with the DB-clock law · the Incoterm mandate + the risk-hint
+matrix · the release's exactly-once duty recognition + the honest
+bifurcation · the drawback export-evidence gate) + **THE ID_LEDGER
+FLIP atomic with the canon rows** (implemented **G 66 · INV 36 ·
+BR 108**; reservations 13 phases · 22 ids; 0 errors + the self-test
+all-probes-OK — the probe-7 fixture moved to G-67/PHASE-052, claimant
+PHASE-053, the W-15 precedent's seventh move) + **THE COMPLETION
+REPORT** (the cumulative wave table W-33…W-41 · the ledger #1–#10
+CLOSED with every wave's evidence pointers · the battery scope map ·
+the FULL unit-package table 184 · 2,161 = 1,081+240+840 EXACT ·
+ROUTE_PERMISSIONS 1,215 (the W-33 ten-key seed + the six keys-seed-
+first binding waves) · the DB roster 315 (the trade family 15 · 158) ·
+the honest catches' log — NINETEEN across the phase, every one
+RED-proven then repaired or corrected-with-the-dated-note · the
+open-items log transferred explicitly: the 050 report §4's standing
+recalls verbatim + RISK-033 at EIGHT with ZERO new across W-33…W-41 ·
+the PHASE-052 handoff + **THE STAGE-13 RELEASE GATE CHECKED per CR-38
+(full ERP: MRP + HR + WMS + projects live — recorded before Wave 3
+starts)**) + **THE TRIPLE FLIP** (the phase doc header → COMPLETE · the
+IMPLEMENTATION_STATUS row → COMPLETE + the W-42 dated header · this
+file → PHASE-052) + **THE STEP-2 FULL SWEEP AT THE FINAL HEAD** (the
+isolates first · the FULL eleven-part envelope at 315 · the standing
+battery every check green · the gate record
+`audit-evidence/phase051-w42/`) + **THE ARCHIVE
+`ERP_PLATFORM_PHASE051.zip` EXACTLY AS DECLARED (F-4/§5 — the
+archive-form acknowledgment executed: FLAT, the commit-hash as the
+FIRST ENTRY — the physical shape of 049/050, ADDITIVE-ONLY, EXCLUDING
+every standing platform zip: أرشفة الأرشيف ممنوعة — the members
+byte-verified, the SEVENTEEN standing zips 034_FINAL…050 verified
+untouched)** + **THE TAG `phase/051`** (DELIVERY, never acceptance —
+the §1a (a) ruling; the tag lands at the archive head).
+
+**The phase's final state:** the chain **126** · ENTITY_CATALOG **354**
+· the drift **357 = 357** · the registry **329 tenant-owned tables** ·
+ROUTE_PERMISSIONS **1,215** · **the report registry 126** · i18n
+**7,582 = 7,582 + mobile 371** · the unit battery **184 · 2,161** (api
+86·1,081 · web 39·240 · mobile 27·393 · desktop 16·274 · ui 3·43 ·
+contracts 2·56 · domain-core 6·38 · sync-core 5·36) · **the DB roster
+315** (the trade family 15 · 158; the full eleven-part envelope at the
+closure's final head) · depcruise **2,278 · 17,039** · docs:validate
+33/33 · id-ledger 0 errors + self-test OK (implemented **G 66 ·
+INV 36 · BR 108**) · history-secrets 0 violations.
+
+**PHASE-052 (Workflow & Approvals Engine):** the change orders (048)
+and the duty drawback submissions are the first documents to bind
+multi-step approval chains — the workflow engine should adopt them as
+its exemplar documents; the LC fees + bank-charge postings extend
+treasury surfaces for 053; the customs jurisdiction-pack notes feed the
+tax compliance calendar for 054. **THE STAGE-13 RELEASE GATE CHECKED
+per CR-38 (recorded in the completion report, before Wave 3 starts):
+full ERP — MRP (PHASE-043) · HR (045/046/047) · WMS (044) · projects
+(048) live, and the Stage-13 program's own capstone — foreign trade &
+logistics — live with this delivery.** The owner continues with «ابدأ
+تنفيذ المرحلة PHASE-052». **Delivered as delivery — NOT production
+approval.**
 
 ---
 

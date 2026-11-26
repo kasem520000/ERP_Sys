@@ -1,0 +1,4 @@
+# PHASE-051 W-42 — THE CLOSURE DOCS + THE ID_LEDGER FLIP (T-17 step 1, 2026-11-26, this session) — the api typecheck at the closure's final code state
+# (the code tree unchanged from the W-41 gate head e416bfb — this closure step moves docs and canon only; the checker's probe-7 edit is the one .ts delta: scripts/check-id-ledger.ts, outside the api tsconfig's include set; run: pnpm exec tsc --noEmit -p tsconfig.json from apps/api — executed through the workspace's node_modules/.bin/tsc)
+TSC_EXIT=0
+BATTERY_EXIT=0
