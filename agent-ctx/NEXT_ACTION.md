@@ -1,4 +1,74 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-40 THE REPORTS DELIVERED (2026-11-26, this session — the report contracts `39fe961` → the DB spec `31ed950` → the gate increment, every step pushed at its own commit)** — W-41 NEXT (the proof pack — T-16: the golden transcripts G-64/G-65/G-66 with the MANDATORY failure packs + the INV-036 completeness golden + the bonded blocking-matrix golden + the RLS attack matrix A1–A10 over the FOURTEEN tables (D-19) + the OA-06 EXPLAIN budgets (the declaration lines + the tracking events)) under the standing order — تسليم لا قبول
+# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **W-41 THE PROOF PACK DELIVERED (2026-11-26, this session — the proof pack `04a44f2` → the gate increment, every step pushed at its own commit) — #1…#9 ALL GREEN; ONLY #10 (THE W-42 CLOSURE) REMAINS** — W-42 NEXT (the closure — T-17 + T-18: the canon docs in the ID_LEDGER's reserved wordings (JOURNAL_RULES G-64/G-65/G-66 + note 21 · ACCOUNTING_INVARIANTS INV-036 · BUSINESS_RULES BR-105…BR-108 — لا كتابة خارجها) + THE ID_LEDGER FLIP (implemented G 66 · INV 36 · BR 108, atomic with the canon rows; the self-test probe (7) moves to G-67/PHASE-052, claimant PHASE-053) + the full sweep at the final head + the completion report + the triple flip + THE ARCHIVE ERP_PLATFORM_PHASE051.zip EXACTLY AS DECLARED (FLAT, the hash FIRST, ADDITIVE-ONLY, أرشفة الأرشيف ممنوعة) + the tag phase/051) under the standing order — تسليم لا قبول
+
+**W-41 — THE PROOF PACK (T-16, delivered on the W-40 gate head
+`24e439a` in one increment + this gate):** trade-goldens.db.spec — 9
+arms (THE G-64 GOLDEN TRANSCRIPT — the issue's margin deposit DR 1180
+· CR the bank + the retirement's REVERSED pair + the settled pair
+stamped TOGETHER, the journal EXACT at the line level, the INV-013
+single-use keys, the INV-019-exact movements, the margin-net-zero
+ledger arithmetic · THE G-64 FAILURE PACK — the unmapped
+LC_MARGIN_DEPOSIT → PURPOSE_NOT_MAPPED with the FULL payload + the
+ZERO RESIDUE + the flip-and-restore and the SAME act GREEN with the
+SAME transcript · THE G-65 GOLDEN TRANSCRIPT — the fold's duty+VAT
+totals into the landed-cost document of kind customs through the REAL
+LandedCostService (DR 1140 · CR 2145, the line-level tie, the 0125
+linkage pair, the exactly-once) · THE G-65 INV-036 COMPLETENESS
+FAILURE PACK — DECLARATION_INCOMPLETE with the declaration's own state
+· DECLARATION_REQUIRED with no declaration, ZERO residue on both, the
+flip-and-restore and the SAME post GREEN · THE G-66 GOLDEN TRANSCRIPT
+— the release recognizes the duty EXACTLY ONCE (the recognition pair
+DR 1140 · CR 2145, the revaluation uplift through the REAL service,
+the ATOMIC pair, the single-use stamp with the replay refused at
+ZERO residue) · THE G-66 ZERO-DUTY RELEASE (the interpretation #6:
+the EMPTY recognition pair, the pool still releases, the gate falls
+silent) · THE G-66 FAILURE PACK (the unmapped CUSTOMS_DUTY_PAYABLE
+before the stamp, zero residue, the flip-and-restore, the SAME pair
+GREEN) · THE BONDED BLOCKING-MATRIX GOLDEN (ONE arm over the four
+canonical baseline paths — the raw planIssue · the manualIssue · the
+sales-delivery post · the transfer dispatch — the payloads pinned and
+EQUAL across the paths, ZERO residue per path, the release + the
+GREEN re-run of the very issue that was refused) · THE
+OFFLINE-REJECTION SHAPE (D-20 — OA-02 N/A-RECORDED for trade: the
+gate is SERVER-SIDE in planIssue, so the sync-reconciliation-shaped
+document's POST sees the SAME typed refusal payload for payload —
+the server-side-only law's own proof)) · trade-rls.db.spec — 10 arms
+(the A1–A10 matrix over the FOURTEEN trade tables + the census
+before/after: the no-GUC reads · the paired witnesses at both floors
+· the forged-tenant INSERTs → 42501 · the UPDATE hijacks → 0 rows ·
+the DELETE grants census (the twelve no-grant evidence tables DENIED
+· the two tenant-extensible seed registers 0 rows) · the id-probes +
+the typed finds · the composite-FK law (≥ 25 FKs, all (id, tenant_id)
+or the tenants root) + the live FK-inversion probe → 23503 · the
+FK-chain joins confined · the UNION ALL + the recursive CTE walking
+the declaration→B/L→declaration cycle) · trade-explain-budgets.db.spec
+— 4 arms (the OA-06 EXPLAIN budgets: P0 the REAL corpus · P1 the
+declaration-lines walk on ix_customs_declaration_lines_tenant_decl ·
+P2 the tracking-events walk on ix_shipment_tracking_events_tenant_bl
+· P3 the customs-leg read on the 0122 partial index — EXPLAIN not
+ANALYZE, the plans logged verbatim, SET LOCAL enable_seqscan=off,
+never a forced plan). The battery (the FIFTY-THIRD consecutive
+same-session wave; §0a first — the remote verified at `04a44f2`, the
+five tags' anchors intact): the six isolates standalone first, the
+ELEVEN-PART ENVELOPE **315 · 4,486 · 0 failed · 0 skipped** (the
+coverage verified before the first load run; the one declared roster
+movement: the three proof-pack specs join chunk-a 124 → 127, the
+roster 312 → 315; the provenance 4,463 + 9 + 10 + 4 = 4,486 EXACT),
+the 126-chain scratch from zero TWICE (check-rls OK — 354 catalog
+tables; the proof pack is a SPECS-ONLY wave — the chain STANDS), the
+standing battery green at the final code state (typecheck 8/8 · lint
+8/8 · depcruise 2,278 · 17,039 · unit 184 · 2,161 standing ·
+ROUTE_PERMISSIONS 1,215 standing · drift 357 = 357 · i18n 7,582
+standing (no delta) + mobile 371 = 371 · tokens 130/130 +
+derivations 50/50 · manifests 13/13 · docs 33/33 · id-ledger 0 errors
++ all-probes-OK · history-secrets 0 violations (7,411 allowlisted
+hits — the window's shift) · capabilities agree · shells PASS/PASS ·
+boundary PASS). **W-42 (the closure) next under the standing order —
+#1…#9 ALL GREEN. RISK-033: EIGHT incidents, ZERO new — the row stays
+OPEN. NOT production approval — تسليم لا قبول.**
+
+---
+
+# The W-40 reports record (the historical context below)
 
 **W-40 — THE REPORTS (T-15, delivered on the W-39 gate head `1699d7e`
 in two increments + this gate):** THE FOUR REPORT CONTRACTS (D-18 —

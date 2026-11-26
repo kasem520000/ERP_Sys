@@ -2325,6 +2325,131 @@ blocking-matrix golden + the RLS attack matrix A1–A10 over the
 FOURTEEN tables (D-19) + the OA-06 EXPLAIN budgets) under the owner's
 standing order. NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-26 (PHASE-051 W-41 DELIVERED at the proof-pack head
+`04a44f2` — the owner's standing order «عند الانتهاء من أي خطوة ادفعها
+إلى المستودع» honored, every step pushed at its own commit): THE
+PROOF PACK GREEN — **#1…#9 ALL GREEN; ONLY #10 (THE W-42 CLOSURE)
+REMAINS.** THE GOLDEN TRANSCRIPTS WITH THE MANDATORY FAILURE PACKS
+(the JOURNAL_RULES §7 law, the 048-W14/049-W22/050-W31 pattern): the
+G-64 golden (the issue's margin deposit DR the purpose-mapped 1180 ·
+CR the bank + the retirement's REVERSED pair + the settled pair
+stamped TOGETHER — the journal EXACT at the line level, the INV-013
+single-use keys (lc, issue)/(lc, retirement), the INV-019-exact
+treasury movements, the margin-net-zero ledger arithmetic) + the
+G-64 failure pack (the unmapped LC_MARGIN_DEPOSIT → the typed
+PURPOSE_NOT_MAPPED refusal with the FULL payload + the ZERO RESIDUE
+(the row stays DRAFT, no journal, no movement, no stamp) + the
+flip-and-restore through the tenancy runtime surface and the SAME act
+GREEN with the SAME transcript) · the G-65 golden (the fold's
+duty+VAT totals into the landed-cost document of kind customs through
+the REAL LandedCostService — DR INVENTORY 1140 · CR the purpose-mapped
+CUSTOMS_DUTY_PAYABLE 2145, the line-level tie, the 0125 linkage pair,
+the exactly-once) + the G-65 INV-036 completeness failure pack
+(DECLARATION_INCOMPLETE with the declaration's own state ·
+DECLARATION_REQUIRED with no declaration at all, ZERO residue on
+both, the flip-and-restore and the SAME post GREEN) · the G-66 golden
+(the release recognizes the duty EXACTLY ONCE — the recognition pair
+DR the released stock's value 1140 · CR 2145, the revaluation uplift
+through the REAL service, the ATOMIC recognition pair, the
+single-use stamp with the replay refused at ZERO residue) + the
+G-66 zero-duty release (the declared interpretation #6 — the EMPTY
+recognition pair, the pool still releases, the gate falls silent) +
+the G-66 failure pack (the unmapped CUSTOMS_DUTY_PAYABLE before the
+stamp, zero residue, the flip-and-restore, the SAME pair GREEN) ·
+THE BONDED BLOCKING-MATRIX GOLDEN (ONE arm over the four canonical
+baseline paths — the raw planIssue · the manualIssue · the
+sales-delivery post · the transfer dispatch — every
+BONDED_STOCK_SUSPENDED payload pinned and EQUAL across the paths,
+ZERO residue per path, the release + the GREEN re-run of the very
+issue that was refused) · THE OFFLINE-REJECTION SHAPE (D-20 — OA-02
+N/A-RECORDED for trade: the module is web-only, no synced entity; the
+gate is SERVER-SIDE in planIssue, so the sync-reconciliation-shaped
+document's POST runs the same plan and sees the SAME typed refusal,
+payload for payload — the server-side-only law's own proof). THE RLS
+ATTACK MATRIX A1–A10 OVER THE FOURTEEN TABLES (D-19): the no-GUC
+reads · the paired witnesses at both floors (victim ≥ 1 / attacker 0
+per table, the raw SQL + the store list surfaces) · the fourteen
+forged-tenant INSERTs → 42501 with the census unmoved · the fourteen
+UPDATE hijacks → 0 rows byte-identical · the DELETE grants census
+(the twelve no-grant evidence tables DENIED 42501 · the two
+tenant-extensible seed registers (incoterms · hs_code_registry) 0
+rows — their own floor honored) · the id-probes 0 rows + the typed
+finds answering the same not-found for a foreign as an absent id ·
+the composite-FK law (the catalog walk ≥ 25 FKs, all (id, tenant_id)
+or the tenants root) + the live FK-inversion probe → 23503 · the
+FK-chain joins confined with the paired witnesses · the UNION ALL
+over all fourteen (0 rows) + the recursive CTE walking the
+declaration→B/L→declaration cycle via the tracking events'
+declaration link, confined · the census before/after — every table
+covered ≥ 6 times across arms. THE OA-06 EXPLAIN BUDGETS (the W-9
+assertion law — never a forced plan, never an isolated probe
+context): P0 the REAL corpus (a 30-line probe declaration + siblings
+through the REAL customs service; a 30-event probe B/L + siblings
+through the REAL transport/tracking services) · P1 the
+declaration-lines walk (ix_customs_declaration_lines_tenant_decl —
+the INV-036 line-level tie's own leg) · P2 the tracking-events walk
+(ix_shipment_tracking_events_tenant_bl — the append-only log's own
+leg) · P3 the customs-leg read (the 0122 partial index) — EXPLAIN
+not ANALYZE, the plans logged verbatim, SET LOCAL enable_seqscan=off,
+ANALYZE before the probes. THE GATE BATTERY (the FIFTY-THIRD
+consecutive same-session wave; §0a first — the remote verified at
+`04a44f2`, the four annotated tags' six identifiers + the 050 tag
+intact, local = remote): the six isolates standalone FIRST (the
+owner's عزل مسبق order — soak 1·1 229.49s · fcm 1·8 17.01s · email
+1·5 13.47s · the cmms sweep 1·4 6.27s · the quality calibration sweep
+1·4 8.31s · the trade expiry sweep 1·6 7.32s, every stamp through
+the guarded wrapper) · THE ELEVEN-PART ENVELOPE **315 files · 4,486
+tests · 0 failed · 0 skipped** (the coverage verified BEFORE the
+first load run — 315 = 315, missing NONE, extra NONE, duplicates
+NONE, VERDICT: COVERED; the ONE declared roster movement: the three
+proof-pack specs join chunk-a at their alphabetical positions
+124 → 127, the roster 312 → 315; the load parts: smoke 3·1,999
+20.62s · perf-rest 5·23 96.76s · chunk-a 127·1,100 150.41s · b-rest
+86·625 62.45s · c 88·711 76.09s — every part inside the 570s ceiling;
+the arithmetic 315 = 1+1+1+1+1+1+3+5+127+86+88 EXACT · 4,486 =
+1+8+5+4+4+6+1,999+23+1,100+625+711 EXACT; the provenance 4,486 =
+4,463 (the W-40 envelope) + 9 + 10 + 4 EXACT, declared before the
+first load run and confirmed by it) · THE 126-CHAIN SCRATCH FROM ZERO
+TWICE (السلسلة من الصفر مرتين: both runs CHAIN_126_APPLIED →
+[check-rls] OK — 354 catalog tables → SCRATCH_STOPPED, EXIT=0, both
+logs kept — run 2 at its own SCRATCH_PORT 5498; the chain STANDS at
+126 — the proof pack is a SPECS-ONLY wave: the goldens + the RLS
+matrix + the EXPLAIN budgets PROVE the delivered schema, they never
+alter it, verified against the tree: 126 SQL files · 126 journal
+entries) · the standing battery green at the final code state
+(typecheck 8/8 (0 cached, --force) · lint 8/8 (0 cached, --force) ·
+depcruise clean 2,278 · 17,039 (+3/+69 dated; zero cycles) · unit 8/8
+— 184 files · 2,161 tests standing (2,161 = 1,081+240+840 EXACT — a
+specs-only wave) · ROUTE_PERMISSIONS 1,215 standing (the tsx
+recount) · drift 357 = 357 · i18n 7,582 standing (no delta) + mobile
+371 = 371 · tokens 130/130 + derivations 50/50 · manifests 13/13 ·
+docs:validate 33/33 · id-ledger 0 errors (implemented G 63 · INV 35 ·
+BR 104 standing — the 051 flip is W-42's) + the self-test
+all-probes-OK (probe 7 stands at G-64/PHASE-051) · history-secrets 0
+violations (7,411 allowlisted hits — the window's shift; the FIVE tag
+anchors walked, untouched) · capabilities agree · shells PASS/PASS ·
+boundary PASS — `audit-evidence/phase051-w41/`). THE HONEST CATCHES
+(the wave's own first REDs, all repaired in the same session, all
+disclosed at the claim sites — no battery red standing): (1) the
+blocking-matrix golden's post-flip ledger count (the in-place duty
+release's revaluation posts its own adjust move — the WAC uplift —
+alongside the deposit's receipt and the green issue: 2 → 3
+stock_moves expected, the product right, the spec's expectation
+corrected with the three rows named); (2) THE BOUNDARY-TENANT LAW
+(the W-31 honest-disclosure lesson applied: the shared
+TENANT_TRADE_RLS carries the sibling specs' flag-off worlds, so
+trade-rls mints its OWN dedicated never-written boundary tenant,
+recorded in the spec header). **RISK-033: EIGHT incidents, ZERO new
+this wave — the row stays OPEN, closing only by the owner's order.**
+The reservations G-64…G-66 · INV-036 · BR-105…BR-108 — لا كتابة
+خارجها. NEXT: W-42 (the closure — T-17 + T-18: the canon rows in the
+ID_LEDGER's reserved wordings + THE ID_LEDGER FLIP (implemented G 66
+· INV 36 · BR 108) + the full sweep at the final head + the
+completion report + the triple flip + THE ARCHIVE
+ERP_PLATFORM_PHASE051.zip EXACTLY AS DECLARED + the tag phase/051)
+under the owner's standing order. NOT production approval — تسليم لا
+قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),
