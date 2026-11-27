@@ -2617,6 +2617,56 @@ environment's cache carried only the 1200 pair — the first chunk-a
 attempt's four print-render skips re-run 0 skipped, the dated
 env-prep disclosure). NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-27 (PHASE-052 W-44 THE ENGINE CORE + THE EVENT BUS
+DELIVERED — **ACCEPTANCE #2 GREEN** at the W-44 gate; steps 1–3 + the
+gate increment pushed at their own commits under the standing order:
+step 1 `fc656fe` the bus + the category (0131 the declared additive
+slot WITH THE WRITER — `workflow` joins BOTH notifications CHECK
+domains, the union 19 → 20, the cmms-schema standing arm's dated
+enumeration in the same increment; the WorkflowEvent bus — D-10's
+eight topics, the config-events pattern, the 055 handoff surface) ·
+step 2 `ddae709` the engine core (the store + the engine + the
+gateway contract + the email leg on the 041 hub + the WorkflowModule)
+· step 3 `bfc798c` the four exemplar bindings (the journals'
+submit/approve/cancel · the POs' submit/approve/cancel · the change
+orders' submit/approve/reject · the drawback claims'
+submit/approve/reject — the vocabulary mapping law standing) · the
+gate increment the engine end-to-end DB spec + the exit battery. THE
+SEEDED CONDITIONAL-CHAIN SCENARIO GREEN: a PO above 50,000 opens
+manager → finance → CEO through the REAL PurchaseOrderService (the
+mid-chain approvals LAND on the chain — one atomic act, the module
+skips its transition; the final approval completes the chain AND the
+document); at or below 50,000 the branch SKIPPED stamps land at
+trigger time and the manager's single approval completes everything;
+a PHASE-036 custom field selects a different chain (the urgent PO →
+the CEO-direct chain — the 036 readers VERBATIM through the
+singular→plural entity mapping). The engine end-to-end DB spec 15
+arms ALL GREEN (the four bindings · the actor law · the snapshot law
+· the notification fire-and-advance · the cancellation mirror · the
+compatibility mode (the non-matching definition + the flag-off
+tenant) · the formula vocabulary · the unresolvable-assignee
+fail-closed with ZERO RESIDUE). THE HONEST CATCHES disclosed at the
+wave's README: the duplicate step.assigned emission · THE MID-CHAIN
+ATOMICITY DESIGN CORRECTION (the thrown refusal rolled the step
+approval back with the module's envelope — the design now RESOLVES
+the mid-chain act, the module skips its transition; the refusal class
+removed) · the trigger-entity → 036 entity-type mapping (the singular
+registry members vs the plural 036 forms — the custom-field arm
+silently read nothing; the explicit closed mapping landed) · the (k)
+world leak (the cancellation-mirror definition seeded without its
+manual_journal trigger matched every later PO — diagnosed by the dump,
+the per-arm world law re-learned). The battery: the affected folders
+9 files · 140 tests green (the workflow family + the inbox writer +
+the standing category arm + the bound modules' own specs) + the whole
+standing battery green (typecheck/lint 8/8 · unit 8/8 — 189 · 2,233 ·
+depcruise clean 2,297 · 17,118 · ROUTE_PERMISSIONS 1,215 standing
+(zero routes — the engine is service-layer, the routes land at W-47+)
+· permissions 366 = 366 · i18n standing · docs 33/33 · id-ledger 0 +
+self-test OK · history-secrets 0 with the SIX anchors · capabilities
+agree · the shells + boundary PASS); the DB roster 316 → 317 (the
+workflow-engine spec) — the full envelope at the new count is W-51's.
+NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

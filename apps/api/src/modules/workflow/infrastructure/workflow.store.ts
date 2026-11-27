@@ -53,9 +53,10 @@ export interface WorkflowStepRow {
 }
 
 /** The active definitions for a trigger, DETERMINISTICALLY ordered
- * (created_at, id) — the first whose entry conditions hold wins (the
- * documented gateway contract; a tenant controls precedence by
- * creation order, and the pick is stable across replays). */
+ * (created_at, name, id) — the first whose entry conditions hold wins
+ * (the documented gateway contract; a tenant controls precedence by
+ * creation time then name, and the pick is stable across replays —
+ * the id tiebreak keeps same-timestamp same-name rows stable too). */
 export async function findActiveDefinitionsForTrigger(
   triggerEntity: string,
   triggerEvent: string,
@@ -65,7 +66,7 @@ export async function findActiveDefinitionsForTrigger(
            trigger_event AS "triggerEvent", active, conditions, origin_policy_id AS "originPolicyId"
     FROM workflow_definitions
     WHERE trigger_entity = ${triggerEntity} AND trigger_event = ${triggerEvent} AND active
-    ORDER BY created_at, id
+    ORDER BY created_at, name, id
   `);
   return rows.rows as unknown as WorkflowDefinitionRow[];
 }
@@ -350,15 +351,17 @@ export async function userHasActiveMembership(userId: string): Promise<boolean> 
 }
 
 /** The tenant owner's user id (the FORMULA `tenant.owner` resolution —
- * the first owner-template-role membership; the ownerTarget
- * precedent's own query). */
+ * the tenant's own 'owner' role's first ACTIVE membership; the
+ * ownerTarget precedent's exact join shape: the tenant-cloned owner
+ * role carries is_system = false, the system template stays
+ * tenant_id NULL and never joins a membership). */
 export async function findTenantOwnerUserId(): Promise<string | undefined> {
   const rows = await tenantTx().execute(sql`
     SELECT m.user_id AS "userId"
     FROM memberships m
     JOIN roles r ON r.id = m.role_id AND r.tenant_id = m.tenant_id
     WHERE m.tenant_id = erp.current_tenant_id() AND m.status = 'ACTIVE'
-      AND r.is_system = true AND r.key = 'owner'
+      AND r.key = 'owner'
     ORDER BY m.created_at, m.id
     LIMIT 1
   `);

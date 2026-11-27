@@ -1,5 +1,3 @@
-import { DomainError } from "@erp/domain-core";
-
 import { requireTenantContext } from "../../../infra/db/tenant-context";
 import {
   readDocumentFacts,
@@ -48,19 +46,6 @@ import * as store from "./workflow.store";
  * verdicts; it posts nothing, stamps nothing.
  */
 
-/** The mid-chain approval refusal: the chain still has steps — the
- * document's own verdict is NOT yet due (the module rethrows; the API
- * surface renders the remaining count). */
-export class WorkflowChainStepsRemainError extends DomainError {
-  constructor(details: { instanceId: string; remaining: number; nextStepOrder: number }) {
-    super(
-      "WORKFLOW_CHAIN_STEPS_REMAIN",
-      `the approval chain still has ${details.remaining} step(s) ahead (next: step ${details.nextStepOrder}) — the document's verdict is not yet due`,
-      details,
-    );
-  }
-}
-
 /** The engine binding (the WorkflowModule's onModuleInit + the specs'
  * direct construction; unbound means NO engine — every gateway
  * function degrades to the legacy path, the compatibility mode's own
@@ -69,6 +54,13 @@ let ENGINE: WorkflowEngine | null = null;
 
 export function bindWorkflowEngine(engine: WorkflowEngine): void {
   ENGINE = engine;
+}
+
+/** The spec-isolation surface: unbind (every gateway function degrades
+ * to the legacy path — the DB suite's single-process discipline keeps
+ * the binding scoped to the specs that need it). */
+export function unbindWorkflowEngine(): void {
+  ENGINE = null;
 }
 
 /** The bound engine (the specs' access surface). */
@@ -105,14 +97,27 @@ export interface ChainVerdict {
   /** The chain reached its terminal verdict ON THIS ACT — the
    * module's own transition is due. */
   readonly completed: boolean;
+  /** THE MID-CHAIN SHAPE (chainOpened && !completed): the approval
+   * LANDED on the chain's current step (committed with this act's own
+   * envelope) and the document's own verdict is NOT yet due — the
+   * module SKIPS its own transition and returns the current row (the
+   * approval's proof is the chain's own step stamp + audit + timeline,
+   * never a silent no-op: the act's atomicity keeps the step approval
+   * and the document awaiting together, a thrown refusal here would
+   * roll the step approval back with it). */
+  readonly remaining?: number;
+  readonly nextStepOrder?: number;
 }
 
 /** THE APPROVE HOOK — at the module's approve act. With a live chain:
  * the actor must be the current step's assignee; their approval lands
- * on the step instance; `completed: false` throws the typed
- * WORKFLOW_CHAIN_STEPS_REMAIN (the module rethrows — the API surface
- * renders it); `completed: true` lets the module's own APPROVED
- * transition proceed. With NO live chain: the legacy path. */
+ * on the step instance (INSIDE this act's own envelope — the step
+ * stamp and the awaiting document commit together). The verdict tells
+ * the module which path runs next: `completed: true` → the module's
+ * own APPROVED transition proceeds; `chainOpened && !completed` → the
+ * module SKIPS its transition and returns the current row (the
+ * mid-chain shape — see ChainVerdict). With NO live chain: the legacy
+ * path. */
 export async function recordApprovalThroughChain(input: {
   triggerEntity: WorkflowTriggerEntity;
   documentId: string;
@@ -138,11 +143,12 @@ export async function recordApprovalThroughChain(input: {
     facts,
   });
   if (!outcome.completed) {
-    throw new WorkflowChainStepsRemainError({
-      instanceId: instance.id,
+    return {
+      chainOpened: true,
+      completed: false,
       remaining: outcome.remaining,
-      nextStepOrder: instance.currentStepOrder ?? 0,
-    });
+      nextStepOrder: outcome.currentStepOrder ?? 0,
+    };
   }
   return { chainOpened: true, completed: true };
 }

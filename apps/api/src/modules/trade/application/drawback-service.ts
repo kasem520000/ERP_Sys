@@ -332,16 +332,20 @@ export class DrawbackService {
     }
     // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
     // approval routes INTO the current step (the actor must be its
-    // assignee); a mid-chain approval takes the typed
-    // WORKFLOW_CHAIN_STEPS_REMAIN refusal (the approval landed on the
-    // chain; the claim's own verdict is not yet due); the legacy ladder
-    // below runs only when the chain just completed or no chain exists
-    // (the compatibility mode — byte-identical).
-    await recordApprovalThroughChain({
+    // assignee; the step stamp commits with THIS act's own envelope).
+    // The mid-chain shape (chainOpened && !completed): the approval
+    // landed on the chain and the claim's own verdict is NOT yet due —
+    // the module SKIPS its stamp and returns the current row. The
+    // legacy ladder below runs only when the chain just completed or
+    // no chain exists (the compatibility mode — byte-identical).
+    const chain = await recordApprovalThroughChain({
       triggerEntity: "duty_drawback_claim",
       documentId: row.id,
       actorId: input.actorId,
     });
+    if (chain.chainOpened && !chain.completed) {
+      return row;
+    }
     const stamped = await store.stampDrawbackApproved(row.id);
     if (stamped === undefined) {
       throw this.raced(row, "APPROVED");

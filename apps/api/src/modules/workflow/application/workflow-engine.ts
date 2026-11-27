@@ -278,6 +278,18 @@ export async function readDocumentFacts(
   }
 }
 
+/** THE TRIGGER-ENTITY → 036-ENTITY-TYPE MAPPING (the declared
+ * interpretation, W-44): the trigger registry's members are SINGULAR
+ * (manual_journal, purchase_order — D-05's own vocabulary) while the
+ * PHASE-036 entity registry keys are the table-plural forms
+ * (purchase_orders). The mapping is explicit and closed — an entity
+ * with no 036 registration reads NO custom fields (the readers are
+ * never called for unregistered types; the branch conditions on
+ * customFields.<key> see null for every key, the no-fabrication law). */
+const TRIGGER_ENTITY_TO_036: Partial<Record<WorkflowTriggerEntity, string>> = {
+  purchase_order: "purchase_orders",
+};
+
 /** The custom-field arm of the context — the PHASE-036 readers
  * VERBATIM (zero parallel computation): only the REGISTERED 036
  * entities read (purchase_orders today); the departmentId context is
@@ -288,10 +300,11 @@ async function readCustomFieldContext(
   triggerEntity: WorkflowTriggerEntity,
   documentId: string,
 ): Promise<{ customFields: Record<string, string | number | boolean | null>; departmentId: string | null }> {
-  if (!isCustomFieldEntity(triggerEntity)) {
+  const entityType = TRIGGER_ENTITY_TO_036[triggerEntity];
+  if (entityType === undefined || !isCustomFieldEntity(entityType)) {
     return { customFields: {}, departmentId: null };
   }
-  const values = await findValuesForEntity(triggerEntity, documentId);
+  const values = await findValuesForEntity(entityType, documentId);
   const customFields: Record<string, string | number | boolean | null> = {};
   for (const value of values) {
     const scalar =
@@ -651,6 +664,24 @@ export class WorkflowEngine {
       }
     }
 
+    // THE BUS FIRST (the lifecycle order: instance.started precedes
+    // every step.assigned — the emission order is the event contract's
+    // own shape, the 055 handoff surface's documented sequence).
+    await this.audit.record({
+      action: "workflow.chain_opened",
+      entityType: input.triggerEntity,
+      entityId: input.documentId,
+      actorId: input.actorId ?? undefined,
+      after: { instanceId: instance.id, definition: chosen.name, steps: steps.length },
+    });
+    const tenantId = requireTenantContext().tenantId;
+    publishWorkflowEvent({
+      type: "workflow.instance.started",
+      tenantId, instanceId: instance.id,
+      triggerEntity: input.triggerEntity, triggerEntityId: input.documentId,
+      definitionId: chosen.id,
+    });
+
     // THE FIRE-AND-ADVANCE for a NOTIFICATION first step (the declared
     // interpretation): its inbox record lands, the step takes the
     // engine's own SKIPPED stamp, the pointer moves to the next
@@ -695,30 +726,6 @@ export class WorkflowEngine {
       }
     } else if (firstAssigned !== null) {
       await this.announceAssignment(instance.id, input.triggerEntity, input.documentId, facts, snapshot, await store.findStepInstancesForInstance(instance.id));
-    }
-
-    await this.audit.record({
-      action: "workflow.chain_opened",
-      entityType: input.triggerEntity,
-      entityId: input.documentId,
-      actorId: input.actorId ?? undefined,
-      after: { instanceId: instance.id, definition: chosen.name, steps: steps.length },
-    });
-    const tenantId = requireTenantContext().tenantId;
-    publishWorkflowEvent({
-      type: "workflow.instance.started",
-      tenantId, instanceId: instance.id,
-      triggerEntity: input.triggerEntity, triggerEntityId: input.documentId,
-      definitionId: chosen.id,
-    });
-    if (firstAssigned !== null) {
-      publishWorkflowEvent({
-        type: "workflow.step.assigned",
-        tenantId, instanceId: instance.id,
-        stepInstanceId: firstAssigned.row.id,
-        stepOrder: firstAssigned.step.stepOrder,
-        assigneeUserId: firstAssigned.row.assigneeUserId,
-      });
     }
     return { chainOpened: true, instanceId: instance.id };
   }
@@ -801,7 +808,7 @@ export class WorkflowEngine {
     verdict: WorkflowStepVerdict;
     comment: string | null;
     facts: DocumentFacts;
-  }): Promise<{ completed: boolean; remaining: number }> {
+  }): Promise<{ completed: boolean; remaining: number; currentStepOrder: number | null }> {
     const instance = input.instance;
     if (instance.status !== "ACTIVE" || instance.currentStepOrder === null) {
       throw new WorkflowInstanceImmutableError({
@@ -876,7 +883,7 @@ export class WorkflowEngine {
         actorId: input.actorId ?? undefined,
         after: { instanceId: instance.id, verdict: "REJECTED" },
       });
-      return { completed: true, remaining: 0 };
+      return { completed: true, remaining: 0, currentStepOrder: null };
     }
 
     // THE POINTER WALK: advance past the acted step, firing NOTIFICATION
@@ -934,7 +941,7 @@ export class WorkflowEngine {
         actorId: input.actorId ?? undefined,
         after: { instanceId: instance.id, verdict: "APPROVED" },
       });
-      return { completed: true, remaining: 0 };
+      return { completed: true, remaining: 0, currentStepOrder: null };
     }
 
     await store.updateInstancePointer({ instanceId: instance.id, currentStepOrder: pointer });
@@ -949,7 +956,7 @@ export class WorkflowEngine {
       instance.definitionSnapshot as { steps: readonly { stepOrder: number; name: string; nameAr: string }[] },
       await store.findStepInstancesForInstance(instance.id),
     );
-    return { completed: false, remaining };
+    return { completed: false, remaining, currentStepOrder: pointer };
   }
 
   /** THE CANCELLATION MIRROR (the module's own cancellation-class

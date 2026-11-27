@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from "@nestjs/common";
 import { sql } from "drizzle-orm";
 
+import { AuditModule } from "../audit/audit.module";
 import { AuditService } from "../audit/application/audit.service";
 import { requireTenantContext } from "../../infra/db/tenant-context";
 import { childLogger } from "../../infra/observability/logger";
@@ -28,7 +29,7 @@ import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
 const log = childLogger({ module: "workflow" });
 
 @Module({
-  imports: [NotificationsModule],
+  imports: [AuditModule, NotificationsModule],
   providers: [
     {
       provide: WorkflowEngine,

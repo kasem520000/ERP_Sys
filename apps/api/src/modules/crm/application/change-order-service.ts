@@ -335,17 +335,22 @@ export class ChangeOrderService {
     }
     // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
     // approval routes INTO the current step (the actor must be its
-    // assignee); a mid-chain approval takes the typed
-    // WORKFLOW_CHAIN_STEPS_REMAIN refusal (the approval landed on the
-    // chain; the document's own verdict is not yet due — G-58's effects
-    // never fire early); the legacy BR-094 path below runs only when
-    // the chain just completed or no chain exists (the compatibility
-    // mode — byte-identical).
-    await recordApprovalThroughChain({
+    // assignee; the step stamp commits with THIS act's own envelope).
+    // The mid-chain shape (chainOpened && !completed): the approval
+    // landed on the chain and the document's own verdict is NOT yet
+    // due — the module SKIPS its transition and returns the current
+    // row (G-58's effects never fire early; the chain's step stamp +
+    // audit + timeline are the approval's proof). The legacy BR-094
+    // path below runs only when the chain just completed or no chain
+    // exists (the compatibility mode — byte-identical).
+    const chain = await recordApprovalThroughChain({
       triggerEntity: "change_order",
       documentId: orderId,
       actorId,
     });
+    if (chain.chainOpened && !chain.completed) {
+      return { order: current, journalEntryId: null, effectAppliedAt: current.effectAppliedAt ?? "" };
+    }
 
     // The verdict CAS — one guarded UPDATE (a raced move refuses).
     const approved = await store.casChangeOrderStatus({
