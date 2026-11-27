@@ -216,7 +216,14 @@ describe("seeds (acceptance 9)", () => {
     // lc.view/manage · collections.manage · customs.view/manage ·
     // shipments.view/manage · bonded.manage · drawback.manage; the
     // drift CLI agrees: matrix 357 = seed 357).
-    expect(result.rows[0]?.n).toBe(357);
+    // + 9 = 366 after 0130 — the NINE PHASE-052 workflow keys (matrix
+    // §3.30, the W-43 foundation wave 2026-11-27 — the owner's approval
+    // dispatch §1a, the ruling (ب): workflow.*, never
+    // platform.workflow.*, the 0060 law — definitions.manage · approve ·
+    // inbox.act · delegate · history.view · escalation.manage ·
+    // tasks.manage · delegations.manage · settings.admin; the drift CLI
+    // agrees: matrix 366 = seed 366).
+    expect(result.rows[0]?.n).toBe(366);
   });
 
   it("nine system templates with template grants; owner carries identity keys", async () => {

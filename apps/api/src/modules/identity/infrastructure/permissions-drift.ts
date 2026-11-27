@@ -241,6 +241,20 @@ const PERMISSION_SEED_MIGRATIONS: readonly string[] = [
   // G-64/G-65 GL reconciliation's read plane); the operational keys
   // stay owner-only.
   "apps/api/migrations/0122_trade_shipments.sql",
+  // PHASE-052 (CR-22 — Workflow & Approvals Engine, the W-43 foundation
+  // wave, 2026-11-27 — the owner's approval dispatch §1a): 0130 §2
+  // seeds the NINE workflow keys (matrix §3.30; 357 → 366 — the
+  // owner's ruling (ب): workflow.*, never platform.workflow.*, the
+  // 0060 law: platform.* is the never-tenant-assignable namespace and
+  // these are tenant-facing role keys) — workflow.definitions.manage ·
+  // workflow.approve · workflow.inbox.act · workflow.delegate ·
+  // workflow.history.view · workflow.escalation.manage ·
+  // workflow.tasks.manage · workflow.delegations.manage ·
+  // workflow.settings.admin. Role grants: the owner template holds
+  // all nine; the accountant the ONE finance-read key
+  // (workflow.history.view — the timeline read plane); the
+  // operational keys stay owner-only.
+  "apps/api/migrations/0130_approval_policies_bridge.sql",
 ];
 
 export async function main(): Promise<void> {

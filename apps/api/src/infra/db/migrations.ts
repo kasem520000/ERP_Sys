@@ -776,6 +776,34 @@ export const MIGRATIONS: readonly string[] = [
   // (the bonded/drawback families — the keys-seed-first FIFTH trade
   // binding wave).
   "0126_bonded_stock_moves_source",
+  // PHASE-052 (W-43 — T-01, dated 2026-11-27; the owner's approval
+  // dispatch §1a — the plan approved as it stood, the rulings (أ)–(د)
+  // carried): the Workflow & Approvals Engine's FOUR foundation slots
+  // (D-01/D-02 — the honest slots, no renumbering): 0127 the
+  // definitions register + the ordered steps (workflow_definitions —
+  // the FOUR exemplar trigger surfaces of D-05's registry at the
+  // closed floor, the owner's ruling (ج); workflow_steps — the
+  // APPROVAL/NOTIFICATION/TASK type, the ROLE/USER/FIELD/FORMULA
+  // assignee rule, the branch conditions, the sla_hours) · 0128 the
+  // instances + the step instances (the immutable definition snapshot;
+  // ONE ACTIVE CHAIN PER DOCUMENT — the partial unique; the ladder's
+  // stamp law; INV-037's terminal floor) · 0129 the delegation windows
+  // + the escalation events (the no-self floor; the structural dedupe
+  // uq_escalation_events_dedupe — one event per step + kind + day) ·
+  // 0130 the bridge substrate + THE DATA-ONLY GRANTS BLOCK (the
+  // origin_policy_id FK back-reference; the NINE workflow.* KEYS —
+  // the owner's ruling (ب): workflow.*, never platform.workflow.*,
+  // the 0060 law — matrix §3.30; the drift 357 → 366, zero-drift from
+  // the first increment, seed = mirror; the FIVE FEATURE FLAGS on
+  // business + enterprise at THE DECLARED NEUTRAL ZERO — starter
+  // gets none; NO manifest enablements — the engine is plan-gated,
+  // never template-gated, D-04). SIX tenant tables; the catalog 354 →
+  // 360. ROUTE_PERMISSIONS 1,215 UNCHANGED (keys-seed-first, the
+  // 0116 §1 precedent — zero routes before the W-44+ service waves).
+  "0127_workflow_definitions",
+  "0128_workflow_instances",
+  "0129_delegations_escalations",
+  "0130_approval_policies_bridge",
 ];
 
 /**

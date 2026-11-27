@@ -1099,6 +1099,64 @@ The alert surfaces ride the notifications' own permission plane — no new key.
 > match, no wider. The TWO CoA template markers (1180 LC_MARGIN_DEPOSIT · 2145
 > CUSTOMS_DUTY_PAYABLE) are account-template rows, never permission keys.
 
+### §3.30 Workflow & Approvals Engine — workflow (PHASE-052; catalog 357 → 366 at W-43)
+
+The Workflow & Approvals Engine (CR-22, the approved master plan's D-03 — the owner's 2026-11-27
+approval dispatch §1a, the ruling (ب) verbatim: the nine keys ship as **`workflow.*`, NOT
+`platform.workflow.*`** — the dated deviation from the phase doc §4's letter UPHELD under the 0060
+law: `platform.*` is the never-tenant-assignable namespace, and these are tenant-facing role keys).
+**The nine keys seed in migration `0130` §2 (the W-43 foundation wave, 2026-11-27 — the permission
+catalog extends 357 → 366; seed = mirror, zero drift from the first increment).** The
+entitlement/authorization divergence (the §3.25…§3.29 precedent, deliberate): the FIVE FEATURE
+FLAGS — `workflow.engine` (the runtime engine + the bridge, the base unit, standing on
+`platform.branches` per the payroll.employees precedent) · `workflow.definitions` (the chain editor
+plane) · `workflow.delegation` · `workflow.escalation` · `workflow.tasks` (the four planes composing
+the engine, the trade.lc-on-trade pattern) — are the ENTITLEMENT keys: business + enterprise carry
+them (0130 §3). **STARTER GETS NONE — the declared neutral zero (the tier-4 posture verbatim: the
+engine is a horizontal capability, not a starter feature). NO industry-template manifest
+enablements (D-04: plan-gated, never template-gated — no template's REQUIRED chain resolves through
+these grants; the capabilities matrix stays agreeing with zero delta).** The nine keys below are the
+AUTHORIZATION surface and ride ROLES (0130 §2) — never the plans. **Ledger-free by design (red line
+§6.3): the workflow engine GATES documents, it never posts — no workflow surface writes a journal
+entry; the chains gate the EXISTING submit/approve verdicts (the modules' own keys), the
+movements/postings stay their modules' own; zero CoA markers.**
+
+| Permission | Description EN / AR | Minimal roles | Scope | Risky |
+|------------|---------------------|---------------|-------|-------|
+| `workflow.definitions.manage` | Manage the workflow definitions — the chain editor: the ordered steps, the branch conditions, the SLA, the assignee rules / إدارة تعريفات سير العمل: محرر السلاسل والخطوات وشروط التفرع والمهل والمكلَّفين | owner | tenant | **yes** (the definitions shape every bound document's approval chain — a misconfigured chain delays or re-routes payments; the editor is the form-first shape (D-14), the free canvas OUT; in-flight instances finish on their immutable snapshots, never a live definition) |
+| `workflow.approve` | The approve/reject act on a workflow step / إجراء الموافقة أو الرفض على خطوة سير العمل | owner | tenant | **yes** (the act stamps the step's history VERBATIM (acted_at/acted_by/comment — PP-17's audit trail); G-67 blocks the self-approval through delegation chains directly and transitively; the deep-link arm is one-time (the CAS single-use) and expires by its claim's own deadline) |
+| `workflow.inbox.act` | Act on the approval inbox — the pending work with the aging indicators and the quick actions / التعامل على صندوق الموافقات: الأعمال المعلقة ومؤشرات التقادم والإجراءات السريعة | owner | tenant | no (the inbox act re-checks `workflow.approve`'s own laws at the act — the same typed refusals; the aging indicators are read-only figures) |
+| `workflow.delegate` | Create one's own delegation windows (the absence re-route) / إنشاء نوافذ التفويض الشخصية أثناء الغياب | owner | tenant | **yes** (a delegation window re-routes the creator's PENDING steps to the delegate within scope (module/entity/all); circular chains are rejected at save (the transitive-closure walk); the G-67 effective-actor check names the chain and BOTH endpoints) |
+| `workflow.history.view` | View the workflow timeline — the full step history on every bound document (PP-17) / عرض المخطط الزمني لسير العمل: التاريخ الكامل لكل خطوة على المستند | owner, accountant | tenant | no (read-only over the timeline — the terminal records render VERBATIM (INV-037's frozen history); the accountant's finance-read plane over the journal approval's own history surface) |
+| `workflow.escalation.manage` | Configure the escalation plane — the SLA actions and the reminder cadence / إعداد التصعيد: إجراءات تجاوز المهلة وإيقاع التذكيرات | owner | tenant | no (the configuration act; the sweep itself runs on the scheduler with the DB-clock law, the structural dedupe, the audit seal, and the per-tenant catch-and-continue — the escalation EVENTS are append-only evidence) |
+| `workflow.tasks.manage` | Manage the document-linked tasks (the TASK steps) / إدارة المهام المرتبطة بالمستندات | owner | tenant | no (the TASK steps ARE workflow_step_instances (D-11 — no seventh table); the completion write-back is the step's own act stamp) |
+| `workflow.delegations.manage` | Administer all delegation windows tenant-wide / إدارة نوافذ التفويض على مستوى المنشأة | owner | tenant | **yes** (the administrative plane over every user's windows — the same circularity and G-67 laws apply; the per-user `workflow.delegate` key governs one's own windows only) |
+| `workflow.settings.admin` | Administer the engine settings (the reminder cadence registry) / إدارة إعدادات محرك سير العمل | owner | tenant | no (the settings registry — `workflow.escalation_reminder_hours` the typed key, fail-closed defaults) |
+
+**Guarded routes** (ROUTE_PERMISSIONS — the keys-seed-first discipline, the §3.23–§3.29 precedent):
+the `/api/v1/workflow/*` families land with the W-44…W-47 service waves, each route on the exact keys
+above, and the web plane (W-48) on the same keys; the reports (W-49) ride the module's own read keys
+per the §12 module-register reuse convention. Role grants per 0130 §2: the owner template holds all
+nine; the accountant the ONE finance-read key (workflow.history.view — the timeline read plane on
+the documents the finance roles already read; the operational keys stay owner-only — the act keys
+are tenant-granted beyond the baseline).
+
+> **[Dated 2026-11-27 (PHASE-052 W-43 — T-01 + T-02, the foundation wave; the owner's approval
+> dispatch §1a): the nine keys seeded; ROUTE_PERMISSIONS stays 1,215 = 1,215.]** Migration 0130 §2
+> seeds the catalog 357 → 366 with ZERO route rows added — the keys land first and the
+> `/api/v1/workflow/*` families bind them as the W-44…W-47 service waves ship (the §3.23–§3.29
+> keys-seed-first precedent; every future route-row addition carries its own dated note here, the
+> 1,215 ledger discipline). The FIVE FEATURE FLAGS (`workflow.engine` · `workflow.definitions` ·
+> `workflow.delegation` · `workflow.escalation` · `workflow.tasks`) grant to business + enterprise
+> (0130 §3 — starter at the DECLARED NEUTRAL ZERO) with NO industry-template manifest enablements
+> (D-04: the engine is a horizontal capability, plan-gated never template-gated — the capabilities
+> matrix stays agreeing with zero delta) — the entitlement/authorization divergence above, the
+> §3.26…§3.29 precedent. NO entitlements key-shape widening (the 0122 §4 class): every workflow flag
+> is two-segment and matches the standing regex AND the manifest schema's module segment (the dated
+> PHASE-052 amendment in packages/contracts adds `workflow` to the alternation — no third
+> whole-module bare key; the two-key exception quality/trade stands untouched). Ledger-free by
+> design: zero CoA markers, zero account purposes — the engine gates, it never posts.
+
 ## 4. Segregation of duties & approval limits
 
 1. **Creator ≠ approver** for every approval-separated action, unless the tenant enables

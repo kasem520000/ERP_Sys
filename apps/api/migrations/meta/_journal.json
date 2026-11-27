@@ -882,6 +882,34 @@
       "when": 1799553600000,
       "tag": "0126_bonded_stock_moves_source",
       "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1799640000000,
+      "tag": "0127_workflow_definitions",
+      "breakpoints": true
+    },
+    {
+      "idx": 127,
+      "version": "7",
+      "when": 1799726400000,
+      "tag": "0128_workflow_instances",
+      "breakpoints": true
+    },
+    {
+      "idx": 128,
+      "version": "7",
+      "when": 1799812800000,
+      "tag": "0129_delegations_escalations",
+      "breakpoints": true
+    },
+    {
+      "idx": 129,
+      "version": "7",
+      "when": 1799899200000,
+      "tag": "0130_approval_policies_bridge",
+      "breakpoints": true
     }
   ],
   "version": "7"

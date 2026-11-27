@@ -369,6 +369,24 @@ export const FEATURE_DEPS: Readonly<Record<string, readonly string[]>> = Object.
   "trade": ["purchasing.landed_costs"],
   "trade.lc": ["trade"],
   "trade.customs": ["trade"],
+  // PHASE-052 (CR-22 — Workflow & Approvals Engine, the W-43 foundation
+  // wave, 2026-11-27 — the owner's approval dispatch §1a): the FIVE
+  // FEATURE FLAGS ride the EXISTING delivered baseline (the approved
+  // master plan's D-04 — the owner's ruling (ب): the tenant namespace,
+  // workflow.*, never platform.workflow.* — the 0060 law; the nine
+  // permission keys are the separate authorization surface, matrix
+  // §3.30). workflow.engine (the runtime engine + the bridge — the
+  // base unit) stands on platform.branches (the payroll.employees
+  // precedent verbatim: the assignee resolution and the delegation
+  // windows ride the branch/user substrate, never a new substrate);
+  // the four planes compose the engine (the trade.lc-on-trade
+  // pattern). NO industry-template enablements — the engine is a
+  // HORIZONTAL capability, plan-gated never template-gated (D-04).
+  "workflow.engine": ["platform.branches"],
+  "workflow.definitions": ["workflow.engine"],
+  "workflow.delegation": ["workflow.engine"],
+  "workflow.escalation": ["workflow.engine"],
+  "workflow.tasks": ["workflow.engine"],
   // consolidation
   "consolidation.groups": ["accounting.multi_currency", "accounting.fiscal_calendar"],
   "consolidation.eliminations": ["consolidation.groups"],

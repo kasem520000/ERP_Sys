@@ -3937,6 +3937,79 @@ async function seedFixtures(superuser: {
     [TENANT_A, TENANT_B],
   );
 
+  // PHASE-052 (W-43, 2026-11-27): the workflow cluster — SIX tables, one
+  // FK-consistent fixture row per registered table per tenant (the
+  // purchase_order exemplar surface; the instance/step ladder at its
+  // PENDING floor; the delegation window ALL-scope; the escalation
+  // REMINDER on the day axis).
+  await superuser.query(
+    `INSERT INTO workflow_definitions (id, tenant_id, name, name_ar, trigger_entity,
+                                       trigger_event, active, conditions)
+     VALUES
+       ('ff1e1e1e-0000-4000-8000-000000000001', $1, 'PO approvals', 'موافقات أوامر الشراء',
+        'purchase_order', 'PENDING_APPROVAL', true, '{"all":[]}'::jsonb),
+       ('ff1e1e1e-0000-4000-8000-000000000002', $2, 'PO approvals', 'موافقات أوامر الشراء',
+        'purchase_order', 'PENDING_APPROVAL', true, '{"all":[]}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO workflow_steps (id, tenant_id, definition_id, step_order, step_type,
+                                 assignee_rule, assignee_value, name, name_ar)
+     VALUES
+       ('ff2e2e2e-0000-4000-8000-000000000001', $1, 'ff1e1e1e-0000-4000-8000-000000000001',
+        1, 'APPROVAL', 'ROLE', 'owner', 'Manager approval', 'موافقة المدير'),
+       ('ff2e2e2e-0000-4000-8000-000000000002', $2, 'ff1e1e1e-0000-4000-8000-000000000002',
+        1, 'APPROVAL', 'ROLE', 'owner', 'Manager approval', 'موافقة المدير')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO workflow_instances (id, tenant_id, definition_id, trigger_entity,
+                                     trigger_entity_id, definition_snapshot, current_step_order, status)
+     VALUES
+       ('ff3e3e3e-0000-4000-8000-000000000001', $1, 'ff1e1e1e-0000-4000-8000-000000000001',
+        'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d01', '{}'::jsonb, 1, 'ACTIVE'),
+       ('ff3e3e3e-0000-4000-8000-000000000002', $2, 'ff1e1e1e-0000-4000-8000-000000000002',
+        'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d02', '{}'::jsonb, 1, 'ACTIVE')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO workflow_step_instances (id, tenant_id, instance_id, step_order, step_type,
+                                           assignee_user_id, status)
+     VALUES
+       ('ff4e4e4e-0000-4000-8000-000000000001', $1, 'ff3e3e3e-0000-4000-8000-000000000001',
+        1, 'APPROVAL', 'eeeeeeee-0000-4000-8000-000000000001', 'PENDING'),
+       ('ff4e4e4e-0000-4000-8000-000000000002', $2, 'ff3e3e3e-0000-4000-8000-000000000002',
+        1, 'APPROVAL', 'eeeeeeee-0000-4000-8000-000000000002', 'PENDING')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO delegations (id, tenant_id, from_user_id, to_user_id, scope_kind,
+                              starts_at, ends_at)
+     VALUES
+       ('ff5e5e5e-0000-4000-8000-000000000001', $1,
+        'eeeeeeee-0000-4000-8000-000000000001', 'eeeeeeee-0000-4000-8000-000000000002',
+        'ALL', '2026-11-27T08:00:00Z', '2026-11-28T08:00:00Z'),
+       ('ff5e5e5e-0000-4000-8000-000000000002', $2,
+        'eeeeeeee-0000-4000-8000-000000000002', 'eeeeeeee-0000-4000-8000-000000000001',
+        'ALL', '2026-11-27T08:00:00Z', '2026-11-28T08:00:00Z')
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+  await superuser.query(
+    `INSERT INTO escalation_events (id, tenant_id, step_instance_id, kind, due_date, payload)
+     VALUES
+       ('ff6e6e6e-0000-4000-8000-000000000001', $1, 'ff4e4e4e-0000-4000-8000-000000000001',
+        'REMINDER', '2026-11-27', '{}'::jsonb),
+       ('ff6e6e6e-0000-4000-8000-000000000002', $2, 'ff4e4e4e-0000-4000-8000-000000000002',
+        'REMINDER', '2026-11-27', '{}'::jsonb)
+     ON CONFLICT (id) DO NOTHING`,
+    [TENANT_A, TENANT_B],
+  );
+
   // -- seedFixtures end --
 
 }
@@ -4604,6 +4677,30 @@ const OWN_ROW: Record<string, [string, string]> = {
   shipment_tracking_events: [
     "feeeeeee-0000-4000-8000-000000000001",
     "feeeeeee-0000-4000-8000-000000000002",
+  ],
+  workflow_definitions: [
+    "ff1e1e1e-0000-4000-8000-000000000001",
+    "ff1e1e1e-0000-4000-8000-000000000002",
+  ],
+  workflow_steps: [
+    "ff2e2e2e-0000-4000-8000-000000000001",
+    "ff2e2e2e-0000-4000-8000-000000000002",
+  ],
+  workflow_instances: [
+    "ff3e3e3e-0000-4000-8000-000000000001",
+    "ff3e3e3e-0000-4000-8000-000000000002",
+  ],
+  workflow_step_instances: [
+    "ff4e4e4e-0000-4000-8000-000000000001",
+    "ff4e4e4e-0000-4000-8000-000000000002",
+  ],
+  delegations: [
+    "ff5e5e5e-0000-4000-8000-000000000001",
+    "ff5e5e5e-0000-4000-8000-000000000002",
+  ],
+  escalation_events: [
+    "ff6e6e6e-0000-4000-8000-000000000001",
+    "ff6e6e6e-0000-4000-8000-000000000002",
   ],
 };
 
@@ -5783,6 +5880,30 @@ const MISMATCHED_INSERT: Record<string, string> = {
   shipment_tracking_events: `INSERT INTO shipment_tracking_events (id, tenant_id, bill_of_lading_id, milestone, event_at)
      VALUES ('feeeeeee-3000-4000-8000-000000000003', $1, 'fe6e6e6e-0000-4000-8000-000000000002',
       'BOOKED', '2026-11-24T09:00:00Z')`,
+  workflow_definitions: `INSERT INTO workflow_definitions (id, tenant_id, name, name_ar, trigger_entity,
+      trigger_event, active, conditions)
+     VALUES ('ff1e1e1e-3000-4000-8000-000000000003', $1, 'Attack chain', 'سلسلة هجوم',
+      'purchase_order', 'PENDING_APPROVAL', false, '{"all":[]}'::jsonb)`,
+  workflow_steps: `INSERT INTO workflow_steps (id, tenant_id, definition_id, step_order, step_type,
+      assignee_rule, assignee_value, name, name_ar)
+     VALUES ('ff2e2e2e-3000-4000-8000-000000000003', $1, 'ff1e1e1e-0000-4000-8000-000000000002',
+      9, 'APPROVAL', 'ROLE', 'owner', 'Attack step', 'خطوة هجوم')`,
+  workflow_instances: `INSERT INTO workflow_instances (id, tenant_id, definition_id, trigger_entity,
+      trigger_entity_id, definition_snapshot, current_step_order, status)
+     VALUES ('ff3e3e3e-3000-4000-8000-000000000003', $1, 'ff1e1e1e-0000-4000-8000-000000000002',
+      'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d03', '{}'::jsonb, 1, 'ACTIVE')`,
+  workflow_step_instances: `INSERT INTO workflow_step_instances (id, tenant_id, instance_id, step_order,
+      step_type, assignee_user_id, status)
+     VALUES ('ff4e4e4e-3000-4000-8000-000000000003', $1, 'ff3e3e3e-0000-4000-8000-000000000002',
+      9, 'APPROVAL', 'eeeeeeee-0000-4000-8000-000000000002', 'PENDING')`,
+  delegations: `INSERT INTO delegations (id, tenant_id, from_user_id, to_user_id, scope_kind,
+      starts_at, ends_at)
+     VALUES ('ff5e5e5e-3000-4000-8000-000000000003', $1,
+      'eeeeeeee-0000-4000-8000-000000000001', 'eeeeeeee-0000-4000-8000-000000000002',
+      'ALL', '2026-11-27T08:00:00Z', '2026-11-28T08:00:00Z')`,
+  escalation_events: `INSERT INTO escalation_events (id, tenant_id, step_instance_id, kind, due_date, payload)
+     VALUES ('ff6e6e6e-3000-4000-8000-000000000003', $1, 'ff4e4e4e-0000-4000-8000-000000000002',
+      'NOTIFY', '2026-11-27', '{}'::jsonb)`,
 };
 
 beforeAll(async () => {

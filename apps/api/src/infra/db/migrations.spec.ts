@@ -429,7 +429,25 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // the same-increment law; the union 24 + 1 = 25, no wider; the DB
     // spec's first RED disclosed at the claim sites — the honest
     // catch, the step-1 «NO migration» declaration corrected here)]
-    expect(files.at(-1)?.tag).toBe("0126_bonded_stock_moves_source");
+    // [dated 2026-11-27 — PHASE-052 W-43 (the owner's approval
+    // dispatch §1a, the rulings (أ)–(د) carried): the chain grows
+    // 126 → 130 — the Workflow & Approvals Engine's FOUR foundation
+    // slots in ONE increment (D-01/D-02): 0127 workflow_definitions +
+    // workflow_steps (the four exemplar trigger surfaces at the closed
+    // floor, D-05/the ruling (ج)) · 0128 workflow_instances +
+    // workflow_step_instances (the immutable snapshot; ONE ACTIVE
+    // CHAIN PER DOCUMENT — the partial unique; the ladder's stamp law;
+    // INV-037's terminal floor) · 0129 delegations + escalation_events
+    // (the no-self floor; the structural dedupe uq_escalation_events_
+    // dedupe) · 0130 the approval-policies bridge substrate + THE
+    // DATA-ONLY GRANTS BLOCK (the NINE workflow.* keys, the ruling
+    // (ب) — workflow.*, never platform.workflow.*, the 0060 law; the
+    // drift 357 → 366 zero-drift from the first increment; the FIVE
+    // FEATURE FLAGS on business+enterprise at the declared neutral
+    // zero; NO manifest enablements — plan-gated, never template-
+    // gated, D-04). SIX tenant tables; the catalog 354 → 360;
+    // ROUTE_PERMISSIONS 1,215 UNCHANGED (keys-seed-first).]
+    expect(files.at(-1)?.tag).toBe("0130_approval_policies_bridge");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

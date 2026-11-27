@@ -12162,3 +12162,220 @@ export const shipmentTrackingEvents = pgTable(
     ),
   ],
 );
+
+/** PHASE-052 (T-01, migration 0127 — W-01/W-02, D-02/D-05): the tenant
+ * workflow definition register — bound to a trigger entity + event (the
+ * FOUR exemplar surfaces of D-05's registry, the owner's ruling (ج):
+ * manual_journals · purchase_orders · the 048 change orders · the 051
+ * duty drawback claims; the mapping law binds each doc type's OWN
+ * submit-transition status), the active flag, the entry conditions jsonb
+ * (D-06's group shape), the bilingual name, and the origin_policy_id
+ * column from birth (the bridge's back-reference; the FK lands at 0130).
+ * Evidence discipline: no DELETE (deactivation via the active flag). */
+export const workflowDefinitions = pgTable(
+  "workflow_definitions",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    name: text("name").notNull(),
+    nameAr: text("name_ar").notNull(),
+    triggerEntity: text("trigger_entity").notNull(),
+    triggerEvent: text("trigger_event").notNull(),
+    active: boolean("active").notNull().default(true),
+    conditions: jsonb("conditions").notNull().default(sql`'{"all":[]}'::jsonb`),
+    originPolicyId: uuid("origin_policy_id"),
+  },
+  (table) => [
+    uniqueIndex("uq_workflow_definitions_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_workflow_definitions_tenant_name").on(table.tenantId, table.name),
+    index("ix_workflow_definitions_tenant_trigger").on(
+      table.tenantId,
+      table.triggerEntity,
+      table.triggerEvent,
+      table.active,
+    ),
+  ],
+);
+
+/** PHASE-052 (T-01, migration 0127 — W-02/W-05, D-02): the ordered
+ * workflow steps — the APPROVAL/NOTIFICATION/TASK type (the W-10 scope:
+ * the three ONLY), the ROLE/USER/FIELD/FORMULA assignee rule, the branch
+ * conditions jsonb (D-06's operands: amount thresholds / department /
+ * the PHASE-036 custom fields), the per-step sla_hours, the bilingual
+ * label. The (tenant, definition, order) uniqueness is the form-first
+ * editor's own floor (D-14). Evidence discipline: no DELETE. */
+export const workflowSteps = pgTable(
+  "workflow_steps",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    definitionId: uuid("definition_id").notNull(),
+    stepOrder: integer("step_order").notNull(),
+    stepType: text("step_type").notNull(),
+    assigneeRule: text("assignee_rule").notNull(),
+    assigneeValue: text("assignee_value").notNull(),
+    conditions: jsonb("conditions").notNull().default(sql`'{"all":[]}'::jsonb`),
+    slaHours: integer("sla_hours"),
+    name: text("name").notNull(),
+    nameAr: text("name_ar").notNull(),
+  },
+  (table) => [
+    uniqueIndex("uq_workflow_steps_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_workflow_steps_tenant_definition_order").on(
+      table.tenantId,
+      table.definitionId,
+      table.stepOrder,
+    ),
+    index("ix_workflow_steps_tenant_definition").on(
+      table.tenantId,
+      table.definitionId,
+      table.stepOrder,
+    ),
+  ],
+);
+
+/** PHASE-052 (T-01, migration 0128 — W-07, D-02/D-13): the workflow
+ * instances — one per triggered document: the entity reference (the same
+ * closed four-member registry), the immutable definition SNAPSHOT jsonb
+ * captured at trigger time (a definition edited after trigger never
+ * rewrites a live instance), the current-step pointer, the terminal
+ * state + stamp (INV-037's floor). ONE ACTIVE CHAIN PER DOCUMENT — the
+ * partial unique; terminal instances stand as the frozen history.
+ * Evidence discipline: no DELETE. */
+export const workflowInstances = pgTable(
+  "workflow_instances",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    definitionId: uuid("definition_id").notNull(),
+    triggerEntity: text("trigger_entity").notNull(),
+    triggerEntityId: uuid("trigger_entity_id").notNull(),
+    definitionSnapshot: jsonb("definition_snapshot").notNull(),
+    currentStepOrder: integer("current_step_order"),
+    status: text("status").notNull().default("ACTIVE"),
+    completedAt: timestamp("completed_at", { withTimezone: true, mode: "string" }),
+  },
+  (table) => [
+    uniqueIndex("uq_workflow_instances_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_workflow_instances_live_doc")
+      .on(table.tenantId, table.triggerEntity, table.triggerEntityId)
+      .where(sql`${table.status} = 'ACTIVE'`),
+    index("ix_workflow_instances_tenant_definition").on(table.tenantId, table.definitionId),
+    index("ix_workflow_instances_tenant_doc").on(
+      table.tenantId,
+      table.triggerEntity,
+      table.triggerEntityId,
+    ),
+  ],
+);
+
+/** PHASE-052 (T-01, migration 0128 — W-07/W-08, D-11/D-13, PP-17): the
+ * per-step instances — the PENDING/APPROVED/REJECTED/SKIPPED/DELEGATED
+ * ladder with the resolved assignee, the delegated_to provenance, the
+ * acted_at/acted_by pair, the comment, and the SLA due floor: the
+ * complete step-history record the timeline renders. The TASK steps ARE
+ * these rows (no seventh table). Evidence discipline: no DELETE. */
+export const workflowStepInstances = pgTable(
+  "workflow_step_instances",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    instanceId: uuid("instance_id").notNull(),
+    stepOrder: integer("step_order").notNull(),
+    stepType: text("step_type").notNull(),
+    assigneeUserId: uuid("assignee_user_id").notNull(),
+    status: text("status").notNull().default("PENDING"),
+    delegatedTo: uuid("delegated_to"),
+    actedAt: timestamp("acted_at", { withTimezone: true, mode: "string" }),
+    actedBy: uuid("acted_by"),
+    comment: text("comment"),
+    dueAt: timestamp("due_at", { withTimezone: true, mode: "string" }),
+  },
+  (table) => [
+    uniqueIndex("uq_workflow_step_instances_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_workflow_step_instances_tenant_instance_order").on(
+      table.tenantId,
+      table.instanceId,
+      table.stepOrder,
+    ),
+    index("ix_workflow_step_instances_tenant_assignee").on(
+      table.tenantId,
+      table.assigneeUserId,
+      table.status,
+    ),
+    index("ix_workflow_step_instances_tenant_due")
+      .on(table.tenantId, table.status, table.dueAt)
+      .where(sql`${table.status} IN ('PENDING', 'DELEGATED')`),
+  ],
+);
+
+/** PHASE-052 (T-01, migration 0129 — W-03, D-07): the absence delegation
+ * windows — from→to users, the module/entity/all scope pair, the window
+ * bounds; the active windows re-route PENDING steps at act time. The
+ * windows are tenant DATA (the BR-055 family — the engine never invents
+ * an assignee). Evidence discipline: no DELETE. */
+export const delegations = pgTable(
+  "delegations",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    fromUserId: uuid("from_user_id").notNull(),
+    toUserId: uuid("to_user_id").notNull(),
+    scopeKind: text("scope_kind").notNull(),
+    scopeValue: text("scope_value"),
+    startsAt: timestamp("starts_at", { withTimezone: true, mode: "string" }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true, mode: "string" }).notNull(),
+    note: text("note"),
+    noteAr: text("note_ar"),
+  },
+  (table) => [
+    uniqueIndex("uq_delegations_id_tenant").on(table.id, table.tenantId),
+    index("ix_delegations_tenant_from").on(
+      table.tenantId,
+      table.fromUserId,
+      table.startsAt,
+      table.endsAt,
+    ),
+  ],
+);
+
+/** PHASE-052 (T-01, migration 0129 — W-05/W-06, D-08): the SLA-breach
+ * escalation events — the reassign/add-level/notification actions and
+ * the recurring reminders, ONE per step + kind + day (the structural
+ * dedupe at the floor, the 0111/0123 axes law). The sweep itself is
+ * W-45's engine; this table is its append-only evidence. Evidence
+ * discipline: no DELETE. */
+export const escalationEvents = pgTable(
+  "escalation_events",
+  {
+    ...standardColumns,
+    tenantId: uuid("tenant_id").notNull(),
+    createdBy: uuid("created_by"),
+    updatedBy: uuid("updated_by"),
+    stepInstanceId: uuid("step_instance_id").notNull(),
+    kind: text("kind").notNull(),
+    dueDate: date("due_date").notNull(),
+    payload: jsonb("payload").notNull().default(sql`'{}'::jsonb`),
+    note: text("note"),
+  },
+  (table) => [
+    uniqueIndex("uq_escalation_events_id_tenant").on(table.id, table.tenantId),
+    uniqueIndex("uq_escalation_events_dedupe").on(
+      table.tenantId,
+      table.stepInstanceId,
+      table.kind,
+      table.dueDate,
+    ),
+    index("ix_escalation_events_tenant_step").on(table.tenantId, table.stepInstanceId),
+  ],
+);

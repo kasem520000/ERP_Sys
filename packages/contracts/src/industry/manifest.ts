@@ -61,11 +61,24 @@ export const INDUSTRY_SEMVER_PATTERN = /^\d+\.\d+\.\d+$/;
  * strings now — `quality` and `trade` (the one-key exception becomes
  * the two-key exception, dated here; no wider — no other bare module
  * key is grantable, mirroring 0122 §4's entitlements widening).
+ *
+ * PHASE-052 (W-43, 2026-11-27 — the owner's approval dispatch §1a):
+ * `workflow` joins the module segment — the Workflow & Approvals
+ * Engine's five two-segment flags (`workflow.engine` ·
+ * `workflow.definitions` · `workflow.delegation` ·
+ * `workflow.escalation` · `workflow.tasks`, matrix §3.30's
+ * entitlement plane — the ruling (ب): the tenant namespace, never
+ * platform.workflow.*). NO third bare-string exception: the engine is
+ * a HORIZONTAL capability with NO whole-module unit (D-04 — plan-
+ * gated, never template-gated); the two-key exception (quality,
+ * trade) stands untouched, and the DB-side
+ * ck_entitlements_feature_key_shape needs NO widening (every
+ * workflow flag is two-segment and matches the standing regex).
  */
 const FEATURE_KEY_MODULE_SEGMENT =
   "platform|accounting|partners|items|inventory|sales|purchasing|treasury|tax|reporting|" +
   "crm|manufacturing|distribution|pos|offline|industry|fixed_assets|notes|installments|" +
-  "budgeting|payroll|consolidation|hr|projects|assets|quality|trade";
+  "budgeting|payroll|consolidation|hr|projects|assets|quality|trade|workflow";
 
 export const INDUSTRY_FEATURE_KEY_PATTERN = new RegExp(
   `^((${FEATURE_KEY_MODULE_SEGMENT})\\.[a-z0-9_]+|quality|trade)$`,

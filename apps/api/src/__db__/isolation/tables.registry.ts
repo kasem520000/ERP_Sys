@@ -652,6 +652,24 @@ export const TENANT_TABLES_REGISTRY: readonly RegisteredTenantTable[] = [
   { table: "bonded_warehouse_moves" },
   { table: "duty_drawback_claims" },
   { table: "shipment_tracking_events" },
+  // PHASE-052 (CR-22 — Workflow & Approvals Engine; migrations
+  // 0127–0130; the W-43 foundation wave, 2026-11-27 — the owner's
+  // approval dispatch §1a): the workflow cluster — SIX tables, ALL
+  // under the evidence discipline (SELECT/INSERT/UPDATE only — no
+  // DELETE): workflow_definitions (the definition register —
+  // deactivation via the active flag, the immutable snapshots' source),
+  // workflow_steps (the ordered chain), workflow_instances (INV-037's
+  // terminal floor — the frozen history), workflow_step_instances
+  // (the timeline's own step history, PP-17), delegations (the absence
+  // windows — tenant DATA, editable, never deleted),
+  // escalation_events (the sweep's append-only evidence, the
+  // structural dedupe). The auto-generated A-suite extends by +36.
+  { table: "workflow_definitions" },
+  { table: "workflow_steps" },
+  { table: "workflow_instances" },
+  { table: "workflow_step_instances" },
+  { table: "delegations" },
+  { table: "escalation_events" },
 ];
 
 export const TENANT_TABLE_NAMES: readonly string[] = TENANT_TABLES_REGISTRY.map(

@@ -356,6 +356,26 @@ const BUSINESS_KEYS: readonly string[] = [
   // ROLES per 0122 §5a, never the plans — matrix §3.29's
   // entitlement/authorization divergence note.)
   "trade", "trade.lc", "trade.customs",
+  // PHASE-052 (W-43, 2026-11-27 — the owner's approval dispatch §1a)
+  // transcription of the 0130 §3 plan grants (the FIVE FEATURE FLAGS →
+  // business + enterprise, the 050 tier-4 precedent; STARTER GETS NONE
+  // — the declared neutral zero: the workflow engine is a HORIZONTAL
+  // capability, not a starter feature): workflow.engine (the runtime
+  // engine + the bridge — the base unit, standing on platform.branches
+  // — the payroll.employees precedent) · workflow.definitions (the
+  // chain editor plane) · workflow.delegation · workflow.escalation ·
+  // workflow.tasks (the four planes composing the engine — the
+  // trade.lc-on-trade pattern). NO industry-template manifest
+  // enablements (D-04: the engine is plan-gated, never template-gated
+  // — no template's REQUIRED chain resolves through these grants). The
+  // dependency substrate (platform.branches granted to every plan by
+  // the base seed — transcribed above) needs no new rows: the
+  // workflow keys' BR-040 closures resolve through it. (The nine
+  // PERMISSION keys ride ROLES per 0130 §2, never the plans — matrix
+  // §3.30's entitlement/authorization divergence note; the ruling (ب):
+  // workflow.*, never platform.workflow.* — the 0060 law.)
+  "workflow.engine", "workflow.definitions", "workflow.delegation",
+  "workflow.escalation", "workflow.tasks",
 ];
 
 const ENTERPRISE_KEYS: readonly string[] = [

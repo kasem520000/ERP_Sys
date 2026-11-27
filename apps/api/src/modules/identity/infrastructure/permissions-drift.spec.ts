@@ -87,6 +87,13 @@ const SEED_PATHS = [
   // (matrix §3.29, 347 → 357) — the same lesson carried forward (the
   // spec's copy extends in the SAME change).
   join(process.cwd(), "migrations", "0122_trade_shipments.sql"), // PHASE-051 the ten trade keys (347 → 357)
+  // PHASE-052 (CR-22 — Workflow & Approvals Engine, W-43, 2026-11-27 —
+  // the owner's approval dispatch §1a): 0130 §2 seeds the NINE workflow
+  // keys and joins both lists together (matrix §3.30, 357 → 366 — the
+  // ruling (ب): workflow.*, never platform.workflow.*, the 0060 law) —
+  // the same lesson carried forward (the spec's copy extends in the
+  // SAME change).
+  join(process.cwd(), "migrations", "0130_approval_policies_bridge.sql"), // PHASE-052 the nine workflow keys (357 → 366)
 ] as const;
 
 const matrixMarkdown = readFileSync(MATRIX_PATH, "utf8");
