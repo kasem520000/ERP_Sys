@@ -85,7 +85,16 @@ export type NotificationCategory =
   // discrepancy alert families). The DB domain floor widened by
   // migration 0123 (the 19-member union, the shared-scope union law,
   // ordered WITH this wave's writer — the 0118 same-increment law).
-  | "trade";
+  | "trade"
+  // PHASE-052 (W-44 — T-03, 0131 category widening — the declared
+  // additive slot ordered WITH THE WRITER, the 0118/0123 same-increment
+  // law): the workflow family — the engine's step-assignment inbox
+  // records (the chain's current-step assignee notifications, D-10's
+  // own notification surface: the approval request lands in the
+  // assignee's inbox with the document's number and amount; the
+  // escalation reminders join at W-45). The DB domain floor widened by
+  // migration 0131 (the 20-member union, the shared-scope union law).
+  | "workflow";
 
 export type NotificationSeverity = "info" | "warning" | "critical";
 

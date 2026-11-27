@@ -447,7 +447,17 @@ describe("migration manifest (MIGRATION_STRATEGY §1)", () => {
     // zero; NO manifest enablements — plan-gated, never template-
     // gated, D-04). SIX tenant tables; the catalog 354 → 360;
     // ROUTE_PERMISSIONS 1,215 UNCHANGED (keys-seed-first).]
-    expect(files.at(-1)?.tag).toBe("0130_approval_policies_bridge");
+    // [dated 2026-11-27 — PHASE-052 W-44: the chain grows 130 → 131 —
+    // the DECLARED ADDITIVE SLOT lands WITH THE WRITER (the master
+    // plan §2's own 0131 row; the 0117/0118/0123 same-increment law):
+    // 'workflow' joins BOTH notifications CHECK domains, the
+    // shared-scope union 19 → 20 (every member every migration ever
+    // defined re-declared, ordered — the cmms-schema standing arm's
+    // dated enumeration updates in the SAME increment); ZERO table
+    // delta (the catalog stays 360) · the drift 366 unchanged ·
+    // ROUTE_PERMISSIONS 1,215 standing (the engine core is
+    // service-layer, the routes land at W-47+).]
+    expect(files.at(-1)?.tag).toBe("0131_workflow_notifications_category");
   });
 
   it("journal entries mirror the manifest order (drizzle-kit manifest)", () => {

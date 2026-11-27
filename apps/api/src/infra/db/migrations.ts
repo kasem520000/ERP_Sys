@@ -800,10 +800,21 @@ export const MIGRATIONS: readonly string[] = [
   // never template-gated, D-04). SIX tenant tables; the catalog 354 →
   // 360. ROUTE_PERMISSIONS 1,215 UNCHANGED (keys-seed-first, the
   // 0116 §1 precedent — zero routes before the W-44+ service waves).
+  //
+  // [PHASE-052 W-44 (dated 2026-11-27): 0131 the DECLARED ADDITIVE
+  // SLOT — the notifications-category widening WITH THE WRITER (the
+  // 0117/0118/0123 same-increment law): 'workflow' joins BOTH closed
+  // CHECK domains, the shared-scope union 19 → 20 (every member
+  // every migration ever defined re-declared, ordered); ZERO table
+  // delta (the catalog stays 360) · the drift 366 unchanged (the
+  // writer binds the EXISTING 0130 keys) · ROUTE_PERMISSIONS 1,215
+  // standing (the engine core is service-layer, the routes land with
+  // their own controllers at W-47+).]
   "0127_workflow_definitions",
   "0128_workflow_instances",
   "0129_delegations_escalations",
   "0130_approval_policies_bridge",
+  "0131_workflow_notifications_category",
 ];
 
 /**

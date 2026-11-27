@@ -910,6 +910,13 @@
       "when": 1799899200000,
       "tag": "0130_approval_policies_bridge",
       "breakpoints": true
+    },
+    {
+      "idx": 130,
+      "version": "7",
+      "when": 1799985600000,
+      "tag": "0131_workflow_notifications_category",
+      "breakpoints": true
     }
   ],
   "version": "7"

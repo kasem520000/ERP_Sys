@@ -969,7 +969,12 @@ describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-sc
     // members — `trade` joins with 0123 (the trade-expiry-sweep's inbox
     // records, D-09's own dependency), the same widening pattern
     // carried into 051 — this arm's own design: the new member goes RED
-    // here first, named, then the enumeration carries it]):
+    // here first, named, then the enumeration carries it];
+    // [dated 2026-11-27 — PHASE-052 W-44: the union grows 19 → 20
+    // members — `workflow` joins with 0131 (the engine's
+    // step-assignment inbox records, D-10's own dependency — the
+    // declared additive slot ordered WITH THE WRITER, the 0118/0123
+    // same-increment law), the same widening pattern carried into 052]):
     expect([...union].sort()).toEqual([
       "assets",
       "budgeting",
@@ -990,6 +995,7 @@ describe("PHASE-049 W-19 — THE NOTIFICATIONS-CATEGORY UNION ARM (the shared-sc
       "templates",
       "trade",
       "warranties",
+      "workflow",
     ]);
 
     // The LIVE constraints, from the catalog itself — BOTH domains.
