@@ -786,6 +786,27 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-051 (W-34, T-06/D-09): the trade-expiry-sweep's threshold ladder — the day-values before each letter of credit's expiry date at which the sweep alerts (BR-105's own documented default [30,14,7,1]; the dedupe is per LC per threshold pass per expiry-date cycle, so an instrument descends band by band across nights and re-alerts after each validity amendment). One ladder governs every LC; the discrepancy alerts ride the same bands.",
   }),
+  // PHASE-052 (W-45 — T-04, D-08): THE FIRST 052 WORKFLOW SETTINGS KEY —
+  // the escalation sweep's recurring-reminder cadence (the 0111/
+  // calibration/trade pattern's 052 extension, acceptance #5's own
+  // dependency). The documented fail-closed default [24] — ONE reminder
+  // per breached step, one day (24h) after the due instant (the
+  // DEFAULT_ESCALATION_REMINDER_HOURS constant's own declaration, the
+  // 0099 precedent's one-source law); the pure normalize fold lives in
+  // the workflow module's own domain (sla-fold — this module's own
+  // home, no cross-module domain import); the garbage never disables
+  // (an empty or garbage residue reads as the documented default —
+  // the fail-closed direction, the lc-sweep-math precedent verbatim).
+  "workflow.escalation_reminder_hours": Object.freeze({
+    key: "workflow.escalation_reminder_hours",
+    schema: z
+      .array(z.number().int().min(1))
+      .min(1)
+      .max(12),
+    default: [24],
+    description:
+      "PHASE-052 (W-45, T-04/D-08): the workflow-escalation-sweep's recurring-reminder cadence — the hour-values after a breached step's due instant at which the sweep reminds the assignee (the documented fail-closed default [24]: one reminder per breached step, one day after the due instant; the escalation event's structural dedupe is per step per kind per due-date cycle, so re-runs, the nightly cron, and a raced concurrent pass all converge within a cycle).",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

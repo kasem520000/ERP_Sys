@@ -374,6 +374,87 @@ export async function findTenantOwnerUserId(): Promise<string | undefined> {
   return (rows.rows as unknown as { userId: string }[])[0]?.userId;
 }
 
+// ── the escalation plane (0129 — D-08's sweep substrate) ─────────────
+
+/** One breached awaiting step, with the instance's own rendering facts
+ * (the sweep's per-step world — the notification payload's own
+ * material, joined ONCE per scan; the DB's OWN CLOCK decides the
+ * breach inside the SQL, never a JS wall clock). */
+export interface BreachedStepRow {
+  readonly stepInstanceId: string;
+  readonly instanceId: string;
+  readonly stepOrder: number;
+  readonly stepType: "APPROVAL" | "NOTIFICATION" | "TASK";
+  readonly assigneeUserId: string;
+  readonly dueAt: string;
+  readonly triggerEntity: string;
+  readonly triggerEntityId: string;
+  readonly definitionSnapshot: unknown;
+  /** The DB's own now() at the scan — the sweep's clock, read ONCE per
+   * row by the same statement that decides the breach (the derived
+   * step rides the same statement; the reminder thresholds derive
+   * from THIS value + the row's due_at, never from Date.now()). */
+  readonly dbNow: string;
+}
+
+/** THE BREACH SCAN (D-08 — the clock law verbatim): the awaiting
+ * PENDING/DELEGATED step instances with a due_at the DATABASE'S OWN
+ * CLOCK has passed, on ACTIVE chains only (a terminal instance's
+ * frozen history never escalates — INV-037's own reading), bounded
+ * per pass (the cmms precedent's 500), riding the 0128 partial index
+ * ix_workflow_step_instances_tenant_due. */
+export async function scanBreachedSteps(
+  bound: number,
+): Promise<readonly BreachedStepRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT si.id AS "stepInstanceId", si.instance_id AS "instanceId",
+           si.step_order AS "stepOrder", si.step_type AS "stepType",
+           si.assignee_user_id AS "assigneeUserId",
+           si.due_at::text AS "dueAt",
+           wi.trigger_entity AS "triggerEntity", wi.trigger_entity_id AS "triggerEntityId",
+           wi.definition_snapshot AS "definitionSnapshot",
+           now()::text AS "dbNow"
+    FROM workflow_step_instances si
+    JOIN workflow_instances wi
+      ON wi.id = si.instance_id AND wi.tenant_id = si.tenant_id
+    WHERE si.status IN ('PENDING', 'DELEGATED')
+      AND si.due_at IS NOT NULL
+      AND si.due_at < now()
+      AND wi.status = 'ACTIVE'
+    ORDER BY si.due_at, si.id
+    LIMIT ${bound}
+  `);
+  return rows.rows as unknown as BreachedStepRow[];
+}
+
+/** One escalation_events row (the append-only sweep evidence — 0129 §2).
+ * THE STRUCTURAL DEDUPE IS THE INDEX (the 0111/0123 axes law —
+ * uq_escalation_events_dedupe on (tenant_id, step_instance_id, kind,
+ * due_date)): the insert rides ON CONFLICT DO NOTHING, so re-runs, the
+ * nightly cron, and a raced concurrent pass all CONVERGE — the second
+ * pass inserts NOTHING and returns undefined (never a read-check
+ * race). The caller hands the dedupe axis's own members; the row's
+ * payload carries the action's own record. */
+export async function insertEscalationEvent(input: {
+  stepInstanceId: string;
+  kind: "REASSIGN" | "ADD_LEVEL" | "NOTIFY" | "REMINDER";
+  dueDate: string;
+  payload: Record<string, unknown>;
+}): Promise<{ id: string } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    INSERT INTO escalation_events (
+      id, tenant_id, step_instance_id, kind, due_date, payload
+    ) VALUES (
+      ${generateUuidV7()}, erp.current_tenant_id(), ${input.stepInstanceId},
+      ${input.kind}, ${input.dueDate}::date,
+      ${JSON.stringify(input.payload)}::jsonb
+    )
+    ON CONFLICT (tenant_id, step_instance_id, kind, due_date) DO NOTHING
+    RETURNING id
+  `);
+  return (rows.rows as unknown as { id: string }[])[0];
+}
+
 // ── the audit-first law ──────────────────────────────────────────────
 
 /** Append one audit_events row through the ambient tenant transaction
