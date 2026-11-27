@@ -5,11 +5,14 @@ import { AuditModule } from "../audit/audit.module";
 import { AuditService } from "../audit/application/audit.service";
 import { requireTenantContext } from "../../infra/db/tenant-context";
 import { childLogger } from "../../infra/observability/logger";
+import { getBoss } from "../../infra/jobs/boss";
 import { EMAIL_SERVICE, NotificationsModule } from "../notifications/notifications.module";
 import type { EmailService } from "../notifications/application/email-service";
 import { InboxService } from "../notifications/application/inbox-service";
 import { WorkflowEngine, type WorkflowEmailLeg } from "./application/workflow-engine";
+import { EscalationService } from "./application/escalation-service";
 import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
+import { registerWorkflowEscalationJob } from "./infrastructure/workflow-escalation-sweep.job";
 
 /**
  * PHASE-052 (W-44 — T-03, dated 2026-11-27) THE WORKFLOW MODULE: binds
@@ -20,6 +23,13 @@ import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
  * the workflow.step.assigned consumer enqueues the 041-hub template
  * mail when the assignee's prefs carry email on — the consumer acts
  * inside the emitting request's envelope, the config-events law).
+ *
+ * PHASE-052 (W-45 — T-04, D-08): THE ESCALATION SWEEP registers its
+ * daily queue on boot (the `workflow-escalation-sweep` at 05:45 UTC —
+ * the SEVENTH standing isolate, the trade-expiry-sweep registration
+ * shape: the named schedule is idempotent, the structural dedupe
+ * makes raced passes converge, the per-tenant catch-and-continue
+ * degrades the feature never the platform).
  *
  * No controllers yet — the engine core is service-layer (the W-44
  * scope); the routes land with their own controllers at W-47+ (the
@@ -37,16 +47,33 @@ const log = childLogger({ module: "workflow" });
         new WorkflowEngine(audit, inbox, moduleEmailLeg(email)),
       inject: [AuditService, InboxService, EMAIL_SERVICE],
     },
+    {
+      provide: EscalationService,
+      useFactory: (audit: AuditService, inbox: InboxService) =>
+        new EscalationService(audit, inbox),
+      inject: [AuditService, InboxService],
+    },
   ],
-  exports: [WorkflowEngine],
+  exports: [WorkflowEngine, EscalationService],
 })
 export class WorkflowModule implements OnModuleInit {
-  constructor(private readonly engine: WorkflowEngine) {}
+  constructor(
+    private readonly engine: WorkflowEngine,
+    private readonly escalation: EscalationService,
+  ) {}
 
   async onModuleInit(): Promise<void> {
     // THE GATEWAY BINDING — the documented contract goes live (unbound
     // means the legacy path; every gateway function degrades safely).
     bindWorkflowEngine(this.engine);
+    // THE ESCALATION SWEEP'S DAILY QUEUE (W-45, D-08): registers on
+    // boot — the named schedule is idempotent (NO DOUBLE LAUNCH); the
+    // registration failure is the catch-and-continue (the platform
+    // boots regardless — the sweep joins the standing isolate set
+    // from this wave, the SEVENTH).
+    await registerWorkflowEscalationJob(getBoss(), this.escalation).catch((error) => {
+      log.warn({ err: error }, "workflow escalation sweep registration failed");
+    });
   }
 }
 
