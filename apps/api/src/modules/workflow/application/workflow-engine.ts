@@ -29,6 +29,8 @@ import {
   WorkflowStepAlreadyActedError,
 } from "../domain/workflow-errors";
 import { publishWorkflowEvent } from "./workflow-events";
+import { assertNotSelfApproval } from "../domain/delegation-graph";
+import { resolveEffectiveActor } from "../infrastructure/delegation-service";
 
 /**
  * PHASE-052 (W-44 — T-03, dated 2026-11-27) THE WORKFLOW ENGINE CORE
@@ -823,12 +825,41 @@ export class WorkflowEngine {
         reason: `instance ${instance.id} points at step ${instance.currentStepOrder} which has no row (the frozen history is inconsistent)`,
       });
     }
-    // THE ACTOR LAW (this wave's own floor; G-67's delegation closure is
-    // W-45's): the actor must be the current step's assignee.
-    if (current.assigneeUserId !== input.actorId) {
+    // THE DELEGATION RESOLUTION (W-45, D-07 — the act-time law): the
+    // assignee's ACTIVE in-scope windows at the moment of the act
+    // re-route the step — the effective actor is the resolution chain's
+    // terminal (the DB's own clock bounds the windows; the expired ones
+    // never enter the edge set, so they stop routing by construction).
+    const delegation = await resolveEffectiveActor({
+      triggerEntity: instance.triggerEntity,
+      assigneeUserId: current.assigneeUserId,
+    });
+    // G-67 (THE GOLDEN — the reserved wording): an actor cannot approve
+    // their OWN document through a delegation chain — directly or
+    // transitively. The EFFECTIVE actor (the resolution chain's
+    // terminal) is checked against the document's creator; the typed
+    // block names the chain and BOTH endpoints. The BR-034 default-OFF
+    // discipline stands: allowSelfApproval never flips without an
+    // explicit tenant decision record (the bridge's own surface, W-46 —
+    // the engine reads NO policy, the standing default is OFF).
+    if (input.facts.createdBy !== null) {
+      assertNotSelfApproval({
+        documentCreatorId: input.facts.createdBy,
+        stepAssigneeId: current.assigneeUserId,
+        edges: delegation.edges,
+        allowSelfApproval: false,
+      });
+    }
+    // THE ACTOR LAW (the W-44 floor, widened by the delegation plane):
+    // the acting user is the assignee himself OR the resolution chain's
+    // terminal (the delegate exercising the absent user's authority);
+    // every other user is refused (the typed refusal names the assignee).
+    const actedThroughDelegate =
+      input.actorId !== current.assigneeUserId ? input.actorId : null;
+    if (input.actorId !== current.assigneeUserId && input.actorId !== delegation.effectiveActorId) {
       throw new WorkflowStepAlreadyActedError({
         stepInstanceId: current.id,
-        status: `assigned to ${current.assigneeUserId} (not the acting user)`,
+        status: `assigned to ${current.assigneeUserId} (routed to ${delegation.effectiveActorId}; not the acting user)`,
       });
     }
     const now = new Date();
@@ -844,6 +875,7 @@ export class WorkflowEngine {
       actedAt: now.toISOString(),
       actedBy: input.actorId,
       comment: acted.comment,
+      actedThroughDelegate: actedThroughDelegate,
     });
     if (stamped === undefined) {
       throw new WorkflowStepAlreadyActedError({ stepInstanceId: current.id, status: current.status });

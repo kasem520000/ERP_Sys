@@ -245,11 +245,17 @@ export async function stampStepActed(input: {
   actedAt: string;
   actedBy: string;
   comment: string | null;
+  /** THE DELEGATION PROVENANCE (D-07): the delegate's user id when the
+   *  act came through an active window (the APPROVED/REJECTED rung
+   *  retains the route's own history; null when the assignee acted
+   *  directly — the stamp law's own shape). */
+  actedThroughDelegate?: string | null;
 }): Promise<WorkflowStepInstanceRow | undefined> {
   const rows = await tenantTx().execute(sql`
     UPDATE workflow_step_instances
     SET status = ${input.status}, acted_at = ${input.actedAt}::timestamptz,
-        acted_by = ${input.actedBy}, comment = ${input.comment}, updated_at = now()
+        acted_by = ${input.actedBy}, comment = ${input.comment},
+        delegated_to = ${input.actedThroughDelegate ?? null}, updated_at = now()
     WHERE id = ${input.stepInstanceId} AND status IN ('PENDING', 'DELEGATED')
     RETURNING id, instance_id AS "instanceId", step_order AS "stepOrder", step_type AS "stepType",
       assignee_user_id AS "assigneeUserId", status, delegated_to AS "delegatedTo",
