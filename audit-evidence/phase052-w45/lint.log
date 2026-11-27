@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 lint /home/z/my-project/ERP_Sys_clone
+> turbo run lint
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running lint in 9 packages
+   • Remote caching disabled
+
+@erp/mobile:lint: cache hit, replaying logs 5b058768ae33fa8f
+@erp/mobile:lint: 
+@erp/mobile:lint: > @erp/mobile@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/mobile
+@erp/mobile:lint: > eslint .
+@erp/mobile:lint: 
+@erp/desktop:lint: cache hit, replaying logs 6a43f3977b841659
+@erp/desktop:lint: 
+@erp/desktop:lint: > @erp/desktop@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/desktop
+@erp/desktop:lint: > eslint .
+@erp/desktop:lint: 
+@erp/api:lint: cache miss, executing 61afdf83520c6ef9
+@erp/domain-core:lint: cache hit, replaying logs e1682a67e937b97e
+@erp/domain-core:lint: 
+@erp/domain-core:lint: > @erp/domain-core@0.1.0 lint /home/z/my-project/ERP_Sys_clone/packages/domain-core
+@erp/domain-core:lint: > eslint .
+@erp/domain-core:lint: 
+@erp/web:lint: cache hit, replaying logs b61fff4b376fae33
+@erp/web:lint: 
+@erp/web:lint: > @erp/web@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/web
+@erp/web:lint: > eslint .
+@erp/web:lint: 
+@erp/sync-core:lint: cache hit, replaying logs 4174fa54884438f2
+@erp/sync-core:lint: 
+@erp/sync-core:lint: > @erp/sync-core@0.1.0 lint /home/z/my-project/ERP_Sys_clone/packages/sync-core
+@erp/sync-core:lint: > eslint .
+@erp/sync-core:lint: 
+@erp/contracts:lint: cache hit, replaying logs dbcba598076bd6ee
+@erp/contracts:lint: 
+@erp/contracts:lint: > @erp/contracts@0.1.0 lint /home/z/my-project/ERP_Sys_clone/packages/contracts
+@erp/contracts:lint: > eslint .
+@erp/contracts:lint: 
+@erp/ui:lint: cache hit, replaying logs 58b2f62d0afab021
+@erp/ui:lint: 
+@erp/ui:lint: > @erp/ui@1.0.0 lint /home/z/my-project/ERP_Sys_clone/packages/ui
+@erp/ui:lint: > eslint .
+@erp/ui:lint: 
+@erp/api:lint: 
+@erp/api:lint: > @erp/api@0.1.0 lint /home/z/my-project/ERP_Sys_clone/apps/api
+@erp/api:lint: > eslint .
+@erp/api:lint: 
+
+ Tasks:    8 successful, 8 total
+Cached:    7 cached, 8 total
+  Time:    23.507s 
+
+EXIT=0

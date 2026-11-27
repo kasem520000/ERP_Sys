@@ -2667,6 +2667,83 @@ agree · the shells + boundary PASS); the DB roster 316 → 317 (the
 workflow-engine spec) — the full envelope at the new count is W-51's.
 NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-27 (PHASE-052 W-45 DELEGATION + ESCALATION DELIVERED
+— **ACCEPTANCE #3 GREEN + #4's ENFORCEMENT ARMS GREEN + #5 GREEN** at
+the W-45 gate; steps 1–3 + the gate increment pushed at their own
+commits under the standing order: step 1 `c88dba2` the delegation law
++ G-67's enforcement (the delegation service — the save-time
+circularity over the DB's own clock, the scope pair law, the act-time
+resolution; the engine's act path — assertNotSelfApproval with the
+chain and BOTH endpoints, the actor law widened to the resolution
+chain's terminal, the delegated_to provenance stamp) · step 2
+`6831f12` the escalation engine (the settings key
+`workflow.escalation_reminder_hours` — the typed registry row with the
+fail-closed default [24]; the store's escalation plane — the breach
+scan with the DB's own now() inside the SQL + the structurally-deduped
+escalation_events insert; the EscalationService — the entitlement
+gate, the cadence read, the NOTIFY row + the owner-target breach
+notification + the bus emission, the REMINDER plane, the audit seal) ·
+step 3 `c8c51f6` the sweep job (the `workflow-escalation-sweep` queue
+at 05:45 UTC — the SEVENTH standing isolate; the per-tenant
+catch-and-continue; the WorkflowModule registration) · the gate
+increment the two DB specs + the exit battery. THE DELEGATION SPEC
+(workflow-delegation-escalation.db.spec — 8 arms ALL GREEN, acceptance
+#3's own proof + #4's enforcement arms): the act-time re-route (the
+delegate's approval lands with acted_by + delegated_to = the delegate,
+the assignee frozen) · the scope law (ALL covers everything · MODULE
+accounting covers the journal · ENTITY purchase_order never re-routes
+the journal step — the typed actor-law refusal with ZERO residue, the
+assignee's own act still landing) · the expiry (the past-bounded
+window stops routing by construction) · the save-time circularity (the
+typed refusal naming the FULL closed chain finance → manager →
+delegate → finance + the no-self floor + the scope pair law defended
+typed) · G-67 DIRECT (the creator-assignee's own approval — the chain
+of length one, BOTH endpoints himself, ZERO residue) · G-67 TRANSITIVE
+(the routed-back chain manager → delegate → creator: EVERY act on the
+step blocked — the creator's AND the manager's — the chain names BOTH
+endpoints, ZERO residue) · the windows' own register (the early end
+narrows the bounds, the row never deleted, the resolution stops). THE
+SWEEP ISOLATE SPEC (workflow-escalation-sweep.db.spec — 9 arms ALL
+GREEN, acceptance #5's own proof, THE SEVENTH standing isolate): the
+empty pass (the seal lands even when nothing breached) · the breach →
+the events (the NOTIFY row + the owner's warning notification + the
+bus workflow.step.escalated emission; the reminder NOT yet at 2h vs
+the 24h cadence) · the reminder cadence (the 25h breach: the REMINDER
+row + the assignee's reminder at the per-member key) · the structural
+dedupe convergence (the re-run inserts NOTHING — events and inbox
+unchanged) · the clock law (the future due never breaches) · the
+custom cadence [1, 2] (TWO per-member reminders — the recurring
+surface) · the fail-closed garbage (the garbage row reads the
+documented [24]) · the prefs gate (the owner's in-app off skips the
+record, the rows still land, the run still seals) · the entitlement
+gate (the escalation-flag-off tenant: NOTHING, NO SEAL). THE DECLARED
+INTERPRETATIONS recorded at the claim sites: the action vocabulary's
+honest boundary (the 0129 floor carries all four kinds; the sweep
+emits NOTIFY + REMINDER only — REASSIGN/ADD_LEVEL need an
+escalation-target/level configuration the 0127 step shape does not
+carry; the engine never invents an assignee — widenings dated
+additive) · the audiences (the NOTIFY breach → the tenant owner, the
+escalation audience; the REMINDER family → the breached step's
+assignee, the aging nudge) · the recurring surface (ONE REMINDER row
+per step EVER — the due-date axis is fixed; the per-member inbox
+family carries the cadence). The battery: the workflow family 4 · 73
+ALL GREEN + the affected folders (the inbox writer + the cmms standing
+category arm 2 · 40) + the whole standing battery green (typecheck/lint
+8/8 · unit 8/8 — 189 · 2,233 · depcruise clean 2,302 · 17,165 ·
+ROUTE_PERMISSIONS 1,215 standing (zero routes — the wave is
+service-layer, the routes land at W-47+) · permissions 366 = 366 ·
+i18n standing · docs 33/33 · id-ledger 0 + self-test OK (probe 7
+stands at G-67/PHASE-052, claimant PHASE-053) · history-secrets 0 ·
+7,889 allowlisted (the SIX tag anchors walked) · capabilities agree ·
+the shells + boundary PASS); the DB roster 317 → 319 (the
+delegation-escalation spec + the sweep isolate join the family) — the
+full envelope at the new count is W-51's. The spec's own first REDs
+disclosed at the wave's README: the identity plane's own floors
+surfacing at the seeds (the users email lowercase CHECK · the roles
+key shape ^[a-z][a-z0-9_]*$) + the (h) arm's raw instance seed needing
+its own definition row (the composite FK's own floor). NOT production
+approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),
