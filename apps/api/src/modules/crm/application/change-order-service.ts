@@ -12,6 +12,15 @@ import {
   ProjectPlaneNotFoundError,
 } from "../domain/projects-errors";
 import * as store from "../infrastructure/change-order.store";
+// PHASE-052 (W-44, dated 2026-11-27): the workflow gateway — the
+// documented plain-function contract (the trade-order-gate pattern:
+// zero module coupling; the engine binds at boot, unbound = the legacy
+// path byte-identical).
+import {
+  onDocumentSubmitted,
+  recordApprovalThroughChain,
+  recordRejectionThroughChain,
+} from "../../workflow/infrastructure/workflow-gateway";
 import type { ChangeOrderRow } from "../infrastructure/change-order.store";
 import {
   findProjectPlane,
@@ -235,6 +244,12 @@ export class ChangeOrderService {
       before: { status: "DRAFT" },
       after: { status: "SUBMITTED" },
     });
+    // PHASE-052 (W-44): the workflow chain opens AFTER the module's own
+    // submit transition (the vocabulary mapping law — SUBMITTED is the
+    // change order's own submit-transition status); an unresolvable
+    // chain (a typed refusal) surfaces — a chain that cannot open NEVER
+    // silently ungates the document.
+    await onDocumentSubmitted({ triggerEntity: "change_order", documentId: orderId, actorId });
     return moved;
   }
 
@@ -252,6 +267,17 @@ export class ChangeOrderService {
         { changeOrderId: orderId, status: current.status },
       );
     }
+    // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
+    // rejection routes INTO the current step (the actor must be its
+    // assignee), the chain COMPLETES (a rejection is a terminal
+    // verdict), and the module's own rejection proceeds; no chain = the
+    // legacy path byte-identical.
+    await recordRejectionThroughChain({
+      triggerEntity: "change_order",
+      documentId: orderId,
+      actorId,
+      comment: reason,
+    });
     const moved = await store.casChangeOrderStatus({
       id: orderId,
       from: "SUBMITTED",
@@ -307,6 +333,19 @@ export class ChangeOrderService {
         { changeOrderId: orderId, effectAppliedAt: current.effectAppliedAt },
       );
     }
+    // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
+    // approval routes INTO the current step (the actor must be its
+    // assignee); a mid-chain approval takes the typed
+    // WORKFLOW_CHAIN_STEPS_REMAIN refusal (the approval landed on the
+    // chain; the document's own verdict is not yet due — G-58's effects
+    // never fire early); the legacy BR-094 path below runs only when
+    // the chain just completed or no chain exists (the compatibility
+    // mode — byte-identical).
+    await recordApprovalThroughChain({
+      triggerEntity: "change_order",
+      documentId: orderId,
+      actorId,
+    });
 
     // The verdict CAS — one guarded UPDATE (a raced move refuses).
     const approved = await store.casChangeOrderStatus({

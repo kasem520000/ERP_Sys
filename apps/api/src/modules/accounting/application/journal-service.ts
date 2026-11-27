@@ -17,6 +17,15 @@ import {
 } from "../domain/accounting-errors";
 import { PostingService } from "./posting-service";
 import { addExact, compareExact, multiplyExact } from "./decimal-strings";
+// PHASE-052 (W-44, dated 2026-11-27): the workflow gateway — the
+// documented plain-function contract (the trade-order-gate pattern:
+// zero module coupling; the engine binds at boot, unbound = the legacy
+// path byte-identical).
+import {
+  onDocumentCancelled,
+  onDocumentSubmitted,
+  recordApprovalThroughChain,
+} from "../../workflow/infrastructure/workflow-gateway";
 import type { JournalSpec, JournalLineSpec } from "../domain/posting-engine/journal-spec";
 
 /**
@@ -232,6 +241,12 @@ export class JournalService {
       actorId,
       after: { policy: policy.mode },
     });
+    // PHASE-052 (W-44): the workflow chain opens AFTER the module's own
+    // submit transition (the vocabulary mapping law — PENDING_APPROVAL
+    // is the journal's own submit-transition status); an unresolvable
+    // chain (a typed refusal) surfaces — a chain that cannot open NEVER
+    // silently ungates the document.
+    await onDocumentSubmitted({ triggerEntity: "manual_journal", documentId: id, actorId });
     return updated!;
   }
 
@@ -247,6 +262,19 @@ export class JournalService {
     if (draft.status !== "PENDING_APPROVAL") {
       throw new JournalStateError(`draft is ${draft.status} — approve requires PENDING_APPROVAL`);
     }
+    // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
+    // approval routes INTO the current step (the actor must be its
+    // assignee); a mid-chain approval takes the typed
+    // WORKFLOW_CHAIN_STEPS_REMAIN refusal (the approval landed on the
+    // chain; the document's own verdict is not yet due); the legacy
+    // BR-034 path below runs only when the chain just completed or no
+    // chain exists (the compatibility mode — byte-identical).
+    await recordApprovalThroughChain({
+      triggerEntity: "manual_journal",
+      documentId: id,
+      actorId,
+      comment: note ?? null,
+    });
     const policy = await this.policyFor("journal_entry", draft.entryDate);
     if (draft.createdBy === actorId && policy.allowSelfApproval !== true) {
       throw new SelfApprovalBlockedError();
@@ -307,6 +335,15 @@ export class JournalService {
       actorId,
       before: { status: draft.status },
       after: { status: "CANCELLED", reason },
+    });
+    // PHASE-052 (W-44): the cancellation mirror — the ACTIVE chain (if
+    // any) cancels with the document; the engine mirrors the module's
+    // verdict, never invents one.
+    await onDocumentCancelled({
+      triggerEntity: "manual_journal",
+      documentId: id,
+      actorId,
+      reason,
     });
     return updated!;
   }

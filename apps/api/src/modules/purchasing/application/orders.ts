@@ -19,6 +19,15 @@ import {
   SupplierNotFoundError,
 } from "../domain/purchasing-errors";
 import { lineNetAmount, resolvePurchasePrice, enforceApprovedVendorGate } from "./pricing";
+// PHASE-052 (W-44, dated 2026-11-27): the workflow gateway — the
+// documented plain-function contract (the trade-order-gate pattern:
+// zero module coupling; the engine binds at boot, unbound = the legacy
+// path byte-identical).
+import {
+  onDocumentCancelled,
+  onDocumentSubmitted,
+  recordApprovalThroughChain,
+} from "../../workflow/infrastructure/workflow-gateway";
 import { findContractById } from "../../crm/infrastructure/crm.store";
 // PHASE-051 (W-35 — T-08, 2026-11-25): BR-106's shared order gate — the
 // trade module's documented-contract surface (the plain-function import
@@ -438,6 +447,12 @@ export class PurchaseOrderService {
       );
     }
     await store.updatePurchaseOrderStatus({ id, status: "PENDING_APPROVAL", actorId });
+    // PHASE-052 (W-44): the workflow chain opens AFTER the module's own
+    // submit transition (the vocabulary mapping law — PENDING_APPROVAL
+    // is the PO's own submit-transition status); an unresolvable chain
+    // (a typed refusal) surfaces — a chain that cannot open NEVER
+    // silently ungates the document.
+    await onDocumentSubmitted({ triggerEntity: "purchase_order", documentId: id, actorId });
     return this.find(id);
   }
 
@@ -448,6 +463,19 @@ export class PurchaseOrderService {
         `purchase order ${id} is ${order.status} — only PENDING_APPROVAL orders can approve`,
       );
     }
+    // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
+    // approval routes INTO the current step (the actor must be its
+    // assignee); a mid-chain approval takes the typed
+    // WORKFLOW_CHAIN_STEPS_REMAIN refusal (the approval landed on the
+    // chain; the document's own verdict is not yet due); the legacy
+    // BR-010 path below (the SoD floor included) runs only when the
+    // chain just completed or no chain exists (the compatibility mode —
+    // byte-identical; the chain never weakens the standing floors).
+    await recordApprovalThroughChain({
+      triggerEntity: "purchase_order",
+      documentId: id,
+      actorId,
+    });
     if (order.createdBy !== null && order.createdBy === actorId) {
       throw new SelfApprovalBlockedError();
     }
@@ -549,6 +577,16 @@ export class PurchaseOrderService {
       entityId: id,
       actorId: actorId ?? undefined,
       after: { reason },
+    });
+    // PHASE-052 (W-44): the cancellation mirror — the ACTIVE chain (if
+    // any) cancels with the document; the engine mirrors the module's
+    // verdict, never invents one. The PO's cancellation is the PO's own
+    // rejection-class verdict (the class carries no reject act).
+    await onDocumentCancelled({
+      triggerEntity: "purchase_order",
+      documentId: id,
+      actorId,
+      reason,
     });
     return this.find(id);
   }

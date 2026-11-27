@@ -5,6 +5,15 @@ import { AuditService } from "../../audit/api/audit";
 import { NumberingService } from "../../accounting/application/numbering-service";
 
 import * as store from "../infrastructure/trade.store";
+// PHASE-052 (W-44, dated 2026-11-27): the workflow gateway — the
+// documented plain-function contract (the trade-order-gate pattern:
+// zero module coupling; the engine binds at boot, unbound = the legacy
+// path byte-identical).
+import {
+  onDocumentSubmitted,
+  recordApprovalThroughChain,
+  recordRejectionThroughChain,
+} from "../../workflow/infrastructure/workflow-gateway";
 import {
   drawbackEvidenceSatisfied,
   isExportDeclarationType,
@@ -269,6 +278,17 @@ export class DrawbackService {
       actorId: input.actorId ?? undefined,
       after: { claimNo: row.claimNo, status: "SUBMITTED" },
     });
+    // PHASE-052 (W-44): the workflow chain opens AFTER the module's own
+    // submit transition (the vocabulary mapping law — SUBMITTED is the
+    // drawback claim's own submit-transition status, the register's own
+    // ready-made ladder); an unresolvable chain (a typed refusal)
+    // surfaces — a chain that cannot open NEVER silently ungates the
+    // document.
+    await onDocumentSubmitted({
+      triggerEntity: "duty_drawback_claim",
+      documentId: row.id,
+      actorId: input.actorId,
+    });
     return stamped;
   }
 
@@ -310,6 +330,18 @@ export class DrawbackService {
         reason: verdict.reason!,
       });
     }
+    // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
+    // approval routes INTO the current step (the actor must be its
+    // assignee); a mid-chain approval takes the typed
+    // WORKFLOW_CHAIN_STEPS_REMAIN refusal (the approval landed on the
+    // chain; the claim's own verdict is not yet due); the legacy ladder
+    // below runs only when the chain just completed or no chain exists
+    // (the compatibility mode — byte-identical).
+    await recordApprovalThroughChain({
+      triggerEntity: "duty_drawback_claim",
+      documentId: row.id,
+      actorId: input.actorId,
+    });
     const stamped = await store.stampDrawbackApproved(row.id);
     if (stamped === undefined) {
       throw this.raced(row, "APPROVED");
@@ -336,6 +368,16 @@ export class DrawbackService {
         reason: verdict.reason!,
       });
     }
+    // PHASE-052 (W-44): THE CHAIN GATE FIRST — with a live chain the
+    // rejection routes INTO the current step (the actor must be its
+    // assignee), the chain COMPLETES (a rejection is a terminal
+    // verdict), and the module's own rejection proceeds; no chain =
+    // the legacy path byte-identical.
+    await recordRejectionThroughChain({
+      triggerEntity: "duty_drawback_claim",
+      documentId: row.id,
+      actorId: input.actorId,
+    });
     const stamped = await store.stampDrawbackRejected(row.id);
     if (stamped === undefined) {
       throw this.raced(row, "REJECTED");
