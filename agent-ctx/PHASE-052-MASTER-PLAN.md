@@ -18,7 +18,8 @@ RLS isolation substrate · the AR/EN i18n discipline · the ⌘K palette · the
 reservations (**G-67 · INV-037 — NO BR reservation for this phase**, re-coordinated
 2026-11-13 per the ledger's own note) → this plan.
 
-**Status: PROPOSED (2026-11-27, this session — per the owner's PHASE-052 launch
+**Status: APPROVED (2026-11-27 — the owner's approval dispatch, recorded at
+§1a; first proposed for review 2026-11-27 per the owner's PHASE-052 launch
 dispatch «طيب ابدأ تنفيذ المرحلة PHASE-052 وعند الانتهاء من أي خطوة ادفعها إلى
 المستودع»: the master plan is the FIRST deliverable, sent FOR REVIEW BEFORE
 LAUNCH — سابقة 049-W0/050-W0/051-W0 — and NO CODE WAVE opens before the owner's
@@ -157,9 +158,22 @@ the declared base — binding on this plan:**
    052 row carries no BR reservation — the phase's business laws are the
    phase doc's own conditions, never new canon identifiers); the ID_LEDGER's
    reserved wordings are the canon the closure wave writes; the checker's
-   probe-7 fixture stands at G-64/PHASE-051 (claimant PHASE-052 at the flip —
-   the W-15 precedent's eighth move, to G-67/PHASE-052 with claimant
-   PHASE-053).
+   probe-7 fixture stands at G-67/PHASE-052 (claimant PHASE-053 — the W-42
+   closure's seventh move, verified against the tool this session; the
+   eighth move at the W-51 flip takes it to G-68/PHASE-053 with claimant
+   PHASE-054).
+   *(Dated correction 2026-11-27, the F1 literal-truth law, per the owner's
+   audit note at the approval dispatch — §1a: this item originally read
+   «stands at G-64/PHASE-051 (claimant PHASE-052 at the flip — the W-15
+   precedent's eighth move, to G-67/PHASE-052 with claimant PHASE-053)»,
+   which was STALE BY ONE MOVE: the W-42 closure (2026-11-26, before this
+   plan was written) had already executed the SEVENTH move. Verified against
+   the tool itself before W-43's first line — `pnpm check:id-ledger
+   -- --self-test` all probes OK, the fixture pins G-67 reserved for
+   PHASE-052, claimant PHASE-053 (`scripts/check-id-ledger.ts`, the drift
+   note's last line). The 051 closure record (W-42) is CORRECT; this plan's
+   wording was drafted from the 051 plan's pre-closure text with the move
+   number incremented, never re-checked against the tool.)*
 
 ## 0. Inputs consumed (the plan-first reads — one focused pass over the `c5175ff` head, 2026-11-27, this session)
 
@@ -420,6 +434,65 @@ the declared base — binding on this plan:**
   scope note: the three step types ONLY, the free-form custom actions
   OUT — the platform note the phase doc itself records).
 
+## 1a. THE OWNER'S APPROVAL DISPATCH (2026-11-27 — the plan APPROVED as it stood; the launch authorization recorded)
+
+The owner reviewed the master plan and approved it as delivered («راجعت
+الخطة الرئيسية PHASE-052 وأعتمدها كما وُضعت»), ruling the four open inputs of
+§7 (the ruling verbatim in Arabic, the binding form below):
+
+- **(أ) THE WAVE NUMBERING RULED: W-43…W-51 CONFIRMED** («أثبّت ترقيم الأمواج
+  W-43…W-51») — the global no-collision sequence stands; the nine
+  implementation waves open exactly as §3 divides them, the laws binding from
+  the first wave.
+- **(ب) THE KEY/FIELD NAMESPACE RULED: `workflow.*` ADOPTED — the nine keys
+  + the five flags as proposed** («أعتمد المفاتيح التسعة بصيغة workflow.* وليس
+  platform.workflow.* — انحرافك المؤرخ عن حرف وثيقة المرحلة صحيح وفق قانون 0060
+  — مع الأعلام الخمسة كما اقترحت (drift 357 → 366)»): the dated deviation
+  from the phase doc §4's letter UPHELD under the 0060 law; D-03's nine keys
+  and D-04's five flags stand verbatim; **the drift 357 → 366, zero-drift
+  from the first increment (W-43)**.
+- **(ج) THE TRIGGER BINDING SET RULED: THE FOUR EXEMPLARS** («أعتمد مجموعة
+  الرباط الأربعة كما اقترحت: manual_journals · purchase_orders · أوامر
+  التغيير (048) · طالبات استرداد الرسوم (051)»): D-05's registry stands —
+  every doc type outside the set keeps its existing behavior byte-identical.
+- **(د) THE CARRIED ITEMS + THE RESERVATIONS STAND** («البنود المنقولة
+  والتحفظات G-67 · INV-037 (بلا BR هذه المرحلة) قائمة كما هي — لا كتابة
+  خارجها»): §0c(6)'s standing recalls and red line §6.16 verbatim — no
+  identifier outside G-67 · INV-037, no BR at all this phase.
+
+**The boundary — the owner's own words: «هذا إذن إطلاق فقط وليس موافقة إنتاج —
+تسليم لا قبول»** (a launch authorization ONLY, NEVER production approval —
+delivery, never acceptance). **The order: «ابدأ بالموجة W-43 وسلّم كل خطوة عند
+اكتمالها وفق أمرك القائم»** — start at W-43; every completed step delivered
++ pushed at its own commit under the standing order «عند الانتهاء من أي
+خطوة ادفعها إلى المستودع».
+
+**The owner's audit note — EXECUTED BEFORE W-43 (the F1 literal-truth law):**
+the owner found a wording contradiction between two records: the 051 closure
+(W-42) says probe-7 moved in the SEVENTH move to G-67/PHASE-052, while this
+plan's §0c(7) said it still stood at G-64/PHASE-051 with the eighth move at
+W-51. **Verified against the tool itself this session (2026-11-27, before
+W-43's first line): `pnpm check:id-ledger -- --self-test` — all probes OK;
+the probe-7 fixture pins G-67, reserved for PHASE-052, claimant PHASE-053**
+(`scripts/check-id-ledger.ts`, the fixture-drift note's last line: the W-42
+closure's seventh move, G-64/PHASE-051 → G-67/PHASE-052). **The W-42 closure
+record is CORRECT; this plan's §0c(7) and §3 W-51 wordings were STALE by one
+move** (drafted from the 051 plan's pre-closure wording with the move number
+incremented, never re-checked against the tool — the exact class the F1 law
+exists for). **Dated corrections landed at BOTH original claim sites**
+(§0c(7) and §3 W-51): the probe STANDS at G-67/PHASE-052 (claimant PHASE-053)
+since the W-42 closure; the EIGHTH move — at the W-51 flip — takes it to
+**G-68/PHASE-053 with claimant PHASE-054** (the ledger's §2 row: PHASE-053 =
+G-68…G-70). The historical records that say «probe 7 stands at
+G-64/PHASE-051» (IMPLEMENTATION_STATUS's pre-closure dated lines, the
+acceptance ledger's W-33…W-41 notes, the 050 completion report) were TRUE
+when written and stand untouched — F1 corrects the live claim, never the
+history.
+
+The approval head baselined: the dispatch arrived in-channel with no new
+head; **the approved base is this plan's own delivery head `8e07400`** (the
+W-0 commit, remote-verified this session). W-43 opens on it.
+
 ## 2. Migration inventory (the honest slots — journal ends at `0126`, idx 125; the fingerprint declared by design)
 
 | Slot | File | Contents |
@@ -572,8 +645,8 @@ identifier outside the reservations enters the canon; NO BR section — the
 (docs:validate 33 → 34, the extended count declared) + FEATURE_CATALOG +
 NAVIGATION_MODEL + the two decision records (DR-052-01/DR-052-02) + **THE
 ID_LEDGER FLIP** (atomic with the canon rows — implemented G 67 · INV 37;
-the checker's self-test probe (7) moves to G-67/PHASE-052, claimant
-PHASE-053 — the W-15 precedent's eighth move) + the full sweep at the
+the checker's self-test probe (7) moves to G-68/PHASE-053, claimant
+PHASE-054 — the W-15 precedent's eighth move) + the full sweep at the
 final head (the isolates first — the SEVENTH standing; the amended
 ceiling law) + the completion report (the cumulative ledger walked and
 closed + the battery scope map + the FULL unit-package table + the bridge
@@ -762,9 +835,14 @@ figures re-proven).
   reservations law §6.16 — **NOT production approval: the approval dispatch
   is a launch authorization only.**
 
-**The implementation waves are BLOCKED until the owner's approval dispatch**
-(the dispatch's own boundary: الخطة أولاً للمراجعة قبل الإطلاق — وليست
-موافقة إنتاج). PHASE-051 stands COMPLETE at `phase/051` (W-33…W-42
-delivered; the closure with the archive + the tag + the full sweep 315 ·
-4,486); PHASE-052's plan is this document, its evidence envelope beside it,
-its acceptance ledger OPENED, its archive form declared and acknowledged.
+**RULED 2026-11-27 — the owner's approval dispatch (recorded at §1a): (أ)
+W-43…W-51 confirmed · (ب) the nine `workflow.*` keys + the five flags,
+drift 357 → 366 · (ج) the four exemplar binding set · (د) the carried items
++ the reservations G-67 · INV-037 stand — لا كتابة خارجها — إذن إطلاق فقط
+وليست موافقة إنتاج — تسليم لا قبول. The implementation waves are OPEN
+from W-43** (the four open inputs above are each marked RULED at §1a; the
+blocking condition discharged). PHASE-051 stands COMPLETE at `phase/051`
+(W-33…W-42 delivered; the closure with the archive + the tag + the full
+sweep 315 · 4,486); PHASE-052's plan is this document — **APPROVED**, its
+evidence envelope beside it, its acceptance ledger OPENED, its archive form
+declared and acknowledged.

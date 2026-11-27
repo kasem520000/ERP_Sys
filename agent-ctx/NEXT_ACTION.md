@@ -1,4 +1,4 @@
-# NEXT ACTION — PHASE-052 (Workflow & Approvals Engine) — **W-0 THE MASTER PLAN WAVE DELIVERED 2026-11-27** (the plan `agent-ctx/PHASE-052-MASTER-PLAN.md` PROPOSED for review before launch — سابقة 049-W0/050-W0/051-W0; the ledger `docs/planning/PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-052 OPENED; the evidence `audit-evidence/phase052-plan/` — the FIFTY-FOURTH consecutive same-session wave at the 051 closure head `c5175ff`) — **THE IMPLEMENTATION WAVES W-43…W-51 ARE BLOCKED UNTIL THE OWNER'S APPROVAL DISPATCH** (إذن إطلاق فقط، وليست موافقة إنتاج) — the open inputs at the plan's §7: (a) the wave numbering W-43…W-51 · (ب) the key/flag namespace ruling (`workflow.*` per the 0060 law — the doc's `platform.workflow.*` letter stale) · (ج) the trigger binding set (the four exemplar surfaces) · (د) the standing carried items — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-052 (Workflow & Approvals Engine) — **THE MASTER PLAN APPROVED 2026-11-27 (the owner's dispatch, recorded at the plan's §1a — إذن إطلاق فقط، وليست موافقة إنتاج — تسليم لا قبول)** — **W-43 THE FOUNDATION IN PROGRESS** (on the approved W-0 plan head `8e07400`: the §7 rulings — (أ) W-43…W-51 confirmed · (ب) the nine `workflow.*` keys + the five flags, drift 357 → 366 · (ج) the four exemplar binding set · (د) the carried items + G-67 · INV-037 standing — لا كتابة خارجها; the owner's audit note EXECUTED before W-43: probe-7 verified against the tool — the fixture pins **G-67/PHASE-052, claimant PHASE-053** (the W-42 record CORRECT; the plan's §0c(7)/§3-W-51 wordings were STALE by one move — dated F1 corrections landed at both claim sites; the eighth move at W-51 → G-68/PHASE-053, claimant PHASE-054)) — under the standing order «عند الانتهاء من أي خطوة ادفعها إلى المستودع» — NOT production approval — تسليم لا قبول
 
 **W-0 — THE MASTER PLAN WAVE (T-00, delivered 2026-11-27 at the 051
 closure head `c5175ff` in one increment):** §0a FIRST (the remote
@@ -25,10 +25,14 @@ compatibility mode) · THE LEDGER OPENED (§PHASE-052 — the ten criteria
 with their ARMS and WAVES) · the status header + this NEXT_ACTION
 updated. The battery: the closure head's own constants re-proven
 (a docs-only wave) — every log in `audit-evidence/phase052-plan/`.
-NEXT: the owner's approval dispatch (the §7 open inputs), then W-43
-THE FOUNDATION (migrations 0127–0130 + every mirror + the nine keys +
-the five flags + the pure folds + the `__db__/workflow/` family opens)
-under the standing order «عند الانتهاء من أي خطوة ادفعها إلى
+**W-0's exit condition discharged 2026-11-27: the plan APPROVED with the
+four §7 rulings (recorded at §1a on the 046–051 pattern); the approval head
+baselined at `8e07400` (the dispatch arrived in-channel, no new head); the
+owner's audit note executed — the probe-7 F1 corrections landed at §0c(7)
+and §3 W-51.**
+NEXT: **W-43 THE FOUNDATION** (migrations 0127–0130 + every mirror + the
+nine keys + the five flags + the pure folds + the `__db__/workflow/` family
+opens) under the standing order «عند الانتهاء من أي خطوة ادفعها إلى
 المستودع». The standing recalls carried verbatim (the 051 completion
 report §4): the 043 hard review OPEN · RISK-031/032 OPEN · the §7(b)
 remarks · the register's exactly-two narrowed items · the 045 Tabs
