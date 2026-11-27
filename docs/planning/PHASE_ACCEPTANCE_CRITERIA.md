@@ -2450,6 +2450,131 @@ ERP_PLATFORM_PHASE051.zip EXACTLY AS DECLARED + the tag phase/051)
 under the owner's standing order. NOT production approval — تسليم لا
 قبول.]**
 
+### PHASE-052 — Workflow & Approvals Engine (OPENED AT PLAN 2026-11-27 — the owner's review-framework law: the ledger opens with the plan and closes with the closure; every criterion carries its ARMS and its WAVES; the master plan `agent-ctx/PHASE-052-MASTER-PLAN.md` §3/§4 is the binding division; the launch dispatch's standing orders carried verbatim — «عند الانتهاء من أي خطوة ادفعها إلى المستودع» · «تسليم لا قبول»; the 051 completion report §5 handoff is the declared base — the change orders (048) and the duty drawback claims (051) the FIRST documents to bind multi-step chains; the reservations G-67 · INV-037 — NO BR reservation this phase — لا كتابة خارجها)
+
+1. **Migrations 0127–0130 (the honest slots — the phase doc's 0090…0093
+   stale by its own note, the 048/049/050/051 D-02 precedent) apply
+   cleanly from zero (re-apply no-op); Drizzle mirror parity; the SIX new
+   tables (`workflow_definitions` · `workflow_steps` ·
+   `workflow_instances` · `workflow_step_instances` · `delegations` ·
+   `escalation_events`) have ENTITY_CATALOG rows (354 → 360) + the RLS
+   registry rows; the nine `workflow.*` keys seed with the matrix §3.30
+   section (drift 357 → 366, zero-drift from the first increment) + the
+   five feature flags on business+enterprise at the declared neutral
+   zero.** — *Arms:* the chain spec extended to 130 · the from-zero boot
+   in every run (السلسلة من الصفر مرتين at W-43) · the A-suite's arms
+   over the six tables · the grants block's bilingual descriptions (the
+   0122 §5 pattern). *Waves:* W-43 (opens) · W-51 (the final sweep
+   closes).
+2. **The engine runs the seeded conditional-chain scenario: a PO above
+   50,000 routes manager → finance → CEO; at or below 50,000 it stops at
+   the manager; a branch on a PHASE-036 custom field selects a different
+   chain (the integration test) — over the FOUR exemplar bindings
+   (`manual_journals` · `purchase_orders` · the 048 change orders · the
+   051 drawback claims) through the documented WorkflowGateway contract,
+   the vocabulary mapping law standing (each doc type's OWN
+   submit-transition status, never a parallel vocabulary).** — *Arms:*
+   `workflow-engine.db.spec` (the entry-condition evaluation · the
+   definition snapshot capture at trigger time · the step ladder · the
+   custom-field branch through the 036 readers VERBATIM — zero parallel
+   computation) · the condition-evaluator pure fold FIRST (property
+   tests, the typed refusals naming the condition BY PATH). *Waves:*
+   W-44 (opens) · W-50 (the golden closes).
+3. **Delegation: an active absence window re-routes PENDING steps to the
+   delegate within scope only; expired windows stop routing; circular
+   delegations are rejected at save.** — *Arms:*
+   `workflow-delegation-escalation.db.spec` (the act-time resolution ·
+   the scope boundaries · the circularity walk's typed refusal naming
+   the chain · the delegation-graph pure fold first). *Waves:* W-45
+   (opens).
+4. **G-67 (the golden): an actor cannot approve their own document
+   through a delegation chain (directly or transitively) — the
+   effective-actor transitive closure checked against the document's
+   creator, `allowSelfApproval` never flipping without an explicit
+   tenant decision record.** — *Arms:* the enforcement at the act
+   (W-45) + **the golden transcript with the MANDATORY failure pack at
+   W-50** (the block naming the chain and BOTH endpoints · the zero
+   residue · the flip-and-restore through a clean chain with the SAME
+   act GREEN — the 048-W14/049-W22/050-W31/051-W41 pattern) + the
+   JOURNAL_RULES canon row at the closure. *Waves:* W-45 (the
+   enforcement opens) · W-50 (the golden closes) · W-51 (the canon).
+5. **Escalation: a step left past its SLA hours produces an
+   `escalation_events` row and fires the configured
+   escalation/notification plus reminders via the scheduler.** —
+   *Arms:* `workflow-escalation-sweep` (**the SEVENTH standing isolate**
+   — the 05:45 cron · the clock law with the DB's own CURRENT_DATE · the
+   structural dedupe `workflow:sla:{stepInstanceId}:{kind}:{dueDate}` ·
+   the audit seal in the same ambient transaction · the entitlement gate
+   · the per-tenant catch-and-continue) + the settings registry's typed
+   key (`workflow.escalation_reminder_hours`, fail-closed defaults).
+   *Waves:* W-45 (opens).
+6. **Email deep-link approve and reject: the action is one-time, records
+   the actor, `acted_at`, and comment, updates the timeline; replayed or
+   expired links are rejected with a clear error.** — *Arms:* the
+   stateless HMAC token (the identity secret's FOURTH derivation, the
+   `workflow-action:` domain prefix — never the raw session) + the
+   step-instance CAS single-use (the `acted_at` stamp) + the typed
+   refusals (ALREADY_ACTED / EXPIRED / ACTOR_MISMATCH) + the email leg
+   on the 041 templates. *Waves:* W-47 (opens).
+7. **The timeline component renders the full step history (state,
+   assignee, `delegated_to`, `acted_at`, comment) on the bound documents
+   across modules, and the approval inbox lists PENDING work with aging —
+   PP-17 satisfied with AR/EN parity and RTL.** — *Arms:* the data-slot
+   shape (never the Tabs primitive — the 045 recall, every 052 board
+   immune by construction) · the inbox's aging figures the engine's own
+   reads VERBATIM · NAV_ITEMS +3 + the ⌘K registration · **i18n ~180
+   keys BY BOTH COUNTS (7,582 + n = 7,582 + n, mobile 371 standing)**.
+   *Waves:* W-48 (opens).
+8. **INV-037: terminal workflow instances are immutable — any mutation
+   attempt after completion is rejected by the service layer and covered
+   by an invariant test.** — *Arms:* the typed
+   `WORKFLOW_INSTANCE_IMMUTABLE` refusal (the state machine's fold + the
+   store's guard) + the RED/GREEN invariant pair at W-50 + the
+   ACCOUNTING_INVARIANTS canon row at the closure. *Waves:* W-44 (the
+   floor) · W-50 (the golden) · W-51 (the canon).
+9. **The `approval_policies` bridge converts seeded policies without
+   behavior change (parity test on documents gated before/after), and
+   in-flight documents complete under compatibility semantics.** —
+   *Arms:* `workflow-bridge.db.spec` (the four-mode mapping — none → the
+   honest no-chain row · single-approver → the one-step chain ·
+   two-step → the two-step chain · amount-threshold → the branch pair ·
+   the `origin_policy_id` back-reference) + the compatibility mode (the
+   unregistered doc types byte-identical · the in-flight boundary
+   recorded) + the mapping table in the completion report. *Waves:*
+   W-46 (opens) · W-51 (the mapping record).
+10. **All CR-36 discipline gates green (SQL+Drizzle+catalog parity,
+    permissions zero-drift 366 = 366, AR/EN parity, `docs:validate`
+    33 → 34 with the BUSINESS_WORKFLOWS intake declared, RLS tests,
+    feature flags, the sync-surface assessment recorded — the
+    inbox/timeline read surfaces assessed for the sync clients, the
+    approve actions online-only by design); the report contracts
+    `workflow.pending-approvals` + `workflow.sla-aging` (registry 126 →
+    128, all pin sites together); completion report
+    `reports/PHASE-052-COMPLETION.md` appended with evidence (the
+    bridge mapping table + the event-bus topic list handed to
+    PHASE-055); `IMPLEMENTATION_STATUS.md` row flipped; archive
+    delivered as `ERP_PLATFORM_PHASE052.zip` (OA-07 — FLAT, the
+    commit-hash first entry, additive-only, excluding the EIGHTEEN
+    standing zips); the tag `phase/052` — DELIVERY, never acceptance.**
+    — *Arms:* the closure wave's full sweep (the SEVEN isolates
+    standalone first) + the ID_LEDGER flip (implemented G 67 · INV 37 ·
+    probe-7's eighth move, claimant PHASE-053) + the two decision
+    records (DR-052-01 the bridge policy · DR-052-02 the W-10 scope
+    note). *Waves:* W-49 (the reports) · W-50 (the RLS matrix + the
+    EXPLAIN budgets) · W-51 (closes).
+
+**[Dated 2026-11-27 (PHASE-052 W-0 THE MASTER PLAN WAVE DELIVERED at the
+051 closure head `c5175ff` — the plan PROPOSED for review before launch,
+the implementation waves W-43…W-51 BLOCKED until the owner's approval
+dispatch; the ledger OPENED with this plan per the owner's framework law;
+the plan wave's own envelope `audit-evidence/phase052-plan/` — the
+FIFTY-FOURTH consecutive same-session wave: the §0a record (remote @
+c5175ff = the tag phase/051 · the six tags' identifiers intact · the
+zero-diff reconciliation · the evidence census 1,699 files across 74
+directories) + the full battery at the closure head's own constants
+re-proven — a docs-only wave, the CODE tree byte-identical at `c5175ff`.
+NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

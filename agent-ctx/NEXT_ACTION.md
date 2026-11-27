@@ -1,4 +1,44 @@
-# NEXT ACTION — PHASE-051 (Foreign Trade & Logistics) — **CLOSED AS DELIVERY 2026-11-26** (W-33…W-41 · the tag `phase/051` — DELIVERY, never acceptance · the report `docs/implementation/phases/reports/PHASE-051-COMPLETION.md`) — **PHASE-052 (Workflow & Approvals Engine) IS THE NEXT ELIGIBLE PHASE** — the owner continues with «ابدأ تنفيذ المرحلة PHASE-052» — تسليم لا قبول — NOT production approval
+# NEXT ACTION — PHASE-052 (Workflow & Approvals Engine) — **W-0 THE MASTER PLAN WAVE DELIVERED 2026-11-27** (the plan `agent-ctx/PHASE-052-MASTER-PLAN.md` PROPOSED for review before launch — سابقة 049-W0/050-W0/051-W0; the ledger `docs/planning/PHASE_ACCEPTANCE_CRITERIA.md` §PHASE-052 OPENED; the evidence `audit-evidence/phase052-plan/` — the FIFTY-FOURTH consecutive same-session wave at the 051 closure head `c5175ff`) — **THE IMPLEMENTATION WAVES W-43…W-51 ARE BLOCKED UNTIL THE OWNER'S APPROVAL DISPATCH** (إذن إطلاق فقط، وليست موافقة إنتاج) — the open inputs at the plan's §7: (a) the wave numbering W-43…W-51 · (ب) the key/flag namespace ruling (`workflow.*` per the 0060 law — the doc's `platform.workflow.*` letter stale) · (ج) the trigger binding set (the four exemplar surfaces) · (د) the standing carried items — تسليم لا قبول — NOT production approval
+
+**W-0 — THE MASTER PLAN WAVE (T-00, delivered 2026-11-27 at the 051
+closure head `c5175ff` in one increment):** §0a FIRST (the remote
+verified at `c5175ff` = the tag `phase/051` — annotated `38b444e`
+peeling to the W-42 archive head; the FIVE annotated predecessors'
+six identifiers + the 051 tag intact; the working tree reconciled to
+the remote — the ninth environment reset recovered: git init + fetch +
+reset --hard, ZERO content differences, ZERO missing files, the
+evidence census 1,699 tracked files across 74 directories; pnpm 9.15.9
+via npm -g — corepack's /usr/bin symlink refused EACCES, disclosed; the
+workspace install store-cached 24.3s; the embedded-PG16 smoke green
+3 · 1,999 VITEST_EXIT=0; the chromium 1248 pair provisioned BEFORE the
+runs — the same dated disclosure as the 051-plan wave) · THE MASTER
+PLAN (the nine waves W-43…W-51 over T-01…T-16; the sixteen settled
+design decisions D-01…D-16 — the honest slots 0127–0130 + the declared
+additive 0131 WITH the writer; the nine `workflow.*` keys 357 → 366
+(the 0060 law); the five flags on business+enterprise at the neutral
+zero; the FOUR exemplar bindings through the WorkflowGateway contract;
+the G-67 effective-actor closure; the INV-037 terminal floor; the
+stateless-HMAC deep links with the CAS single-use; the WorkflowEvent
+bus family — the 055 handoff surface; the TASK steps ARE the step
+instances — no seventh table; the bridge's four-mode mapping + the
+compatibility mode) · THE LEDGER OPENED (§PHASE-052 — the ten criteria
+with their ARMS and WAVES) · the status header + this NEXT_ACTION
+updated. The battery: the closure head's own constants re-proven
+(a docs-only wave) — every log in `audit-evidence/phase052-plan/`.
+NEXT: the owner's approval dispatch (the §7 open inputs), then W-43
+THE FOUNDATION (migrations 0127–0130 + every mirror + the nine keys +
+the five flags + the pure folds + the `__db__/workflow/` family opens)
+under the standing order «عند الانتهاء من أي خطوة ادفعها إلى
+المستودع». The standing recalls carried verbatim (the 051 completion
+report §4): the 043 hard review OPEN · RISK-031/032 OPEN · the §7(b)
+remarks · the register's exactly-two narrowed items · the 045 Tabs
+defect (every 052 board immune — the data-slot shape) · RISK-033 at
+EIGHT incidents. The reservations G-67 · INV-037 — NO BR this phase —
+لا كتابة خارجها. NOT production approval — تسليم لا قبول.
+
+---
+
+# PHASE-051 (Foreign Trade & Logistics) — **CLOSED AS DELIVERY 2026-11-26** (W-33…W-41 · the tag `phase/051` — DELIVERY, never acceptance · the report `docs/implementation/phases/reports/PHASE-051-COMPLETION.md`) — the historical record below
 
 **W-41 — THE PROOF PACK (T-16, delivered on the W-40 gate head
 `24e439a` in one increment + this gate):** trade-goldens.db.spec — 9

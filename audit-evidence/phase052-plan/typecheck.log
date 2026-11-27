@@ -1,0 +1,63 @@
+
+> erp-platform@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone
+> turbo run typecheck
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running typecheck in 9 packages
+   • Remote caching disabled
+
+@erp/domain-core:typecheck: cache miss, executing 11cfc5eec92df032
+@erp/mobile:typecheck: cache miss, executing 4f752b1beb6fe360
+@erp/desktop:typecheck: cache miss, executing 5bd752855703fec8
+@erp/sync-core:typecheck: cache miss, executing 2aca721c2479ead1
+@erp/ui:typecheck: cache miss, executing 7ca35c958ed599eb
+@erp/web:typecheck: cache miss, executing 3da28123c64c222d
+@erp/contracts:typecheck: cache miss, executing 69261b524d45b248
+@erp/api:typecheck: cache miss, executing 9616c022c0547eca
+@erp/ui:typecheck: 
+@erp/ui:typecheck: > @erp/ui@1.0.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/ui
+@erp/ui:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/ui:typecheck: 
+@erp/sync-core:typecheck: 
+@erp/sync-core:typecheck: > @erp/sync-core@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/sync-core
+@erp/sync-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/sync-core:typecheck: 
+@erp/mobile:typecheck: 
+@erp/mobile:typecheck: > @erp/mobile@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/mobile
+@erp/mobile:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/mobile:typecheck: 
+@erp/contracts:typecheck: 
+@erp/contracts:typecheck: > @erp/contracts@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/contracts
+@erp/contracts:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/contracts:typecheck: 
+@erp/web:typecheck: 
+@erp/web:typecheck: > @erp/web@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/web
+@erp/web:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/web:typecheck: 
+@erp/desktop:typecheck: 
+@erp/desktop:typecheck: > @erp/desktop@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/desktop
+@erp/desktop:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/desktop:typecheck: 
+@erp/domain-core:typecheck: 
+@erp/domain-core:typecheck: > @erp/domain-core@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/domain-core
+@erp/domain-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/domain-core:typecheck: 
+@erp/api:typecheck: 
+@erp/api:typecheck: > @erp/api@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/api
+@erp/api:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/api:typecheck: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    1m6.431s 
+
+EXIT=0

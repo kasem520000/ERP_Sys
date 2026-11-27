@@ -1,0 +1,10 @@
+PHASE-052 W-0 (plan wave) — the coverage proof (the W-15 law: verified BEFORE the first load run).
+
+inventory (the disk glob src/__db__/**/*.spec.ts, sorted): 315 files
+union (parts.json — the W-41 partition STANDING, zero spec movement — a docs-only wave): 315 files
+
+missing NONE · extra NONE · duplicates NONE
+315 = 315 — VERDICT: COVERED
+
+The arithmetic declared BEFORE the first load run:
+315 = 3+1+1+1+1+1+1+5+127+86+88 EXACT

@@ -1,6 +1,6 @@
 # PHASE-052 — Workflow & Approvals Engine
 
-> **Status:** NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 3 / Stage 14 · **Register:** [CR-22](../../planning/COMPLETENESS_REGISTER.md)
+> **Status:** **IN_PROGRESS — W-0 the master plan wave delivered 2026-11-27** (the plan `agent-ctx/PHASE-052-MASTER-PLAN.md` PROPOSED for review before launch — سابقة 049-W0/050-W0/051-W0; the implementation waves W-43…W-51 BLOCKED until the owner's approval dispatch; the ledger [§PHASE-052](../../planning/PHASE_ACCEPTANCE_CRITERIA.md) OPENED) — was NOT_STARTED — PLANNED (Blueprint v3.0) · **Wave:** 3 / Stage 14 · **Register:** [CR-22](../../planning/COMPLETENESS_REGISTER.md)
 > **Evidence base:** [gap-analysis/ERP_FULL_GAP_ANALYSIS.md](../../planning/gap-analysis/ERP_FULL_GAP_ANALYSIS.md) §2 H-14 · §16 W-01…W-12 · §20 UX-13 · §28 PP-17 · [gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md](../../planning/gap-analysis/ERP_COMPLETENESS_GAP_REPORT.md) §3 row 12
 
 ## 1. Phase Overview
