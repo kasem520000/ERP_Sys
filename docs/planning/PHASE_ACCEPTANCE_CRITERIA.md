@@ -2575,6 +2575,48 @@ directories) + the full battery at the closure head's own constants
 re-proven — a docs-only wave, the CODE tree byte-identical at `c5175ff`.
 NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-27 (PHASE-052 W-43 THE FOUNDATION DELIVERED —
+**ACCEPTANCE #1 GREEN** at the W-43 gate; steps 1–3 + the gate increment
+pushed at their own commits under the standing order «عند الانتهاء من أي
+خطوة ادفعها إلى المستودع»: step 1 `7246506` the migrations 0127–0130 +
+every mirror/registry/catalog/matrix/pin in ONE increment (the drift 357
+→ 366 zero-drift from the first increment · the five flags ·
+ENTITY_CATALOG 354 → 360 · the ROUTE_PERMISSIONS 1,215 standing
+keys-seed-first) · step 2 `f026f2a` the pure folds (the condition
+evaluator · the instance/step state machine · the delegation graph · the
+SLA fold · the token fold — unit-first, 5 files · 72 tests) · step 3
+`b8c834f` the __db__/workflow/ family opens (the schema spec 41 arms,
+every law refused BY NAME) · the gate increment this evidence envelope.
+The wave's exit evidence `audit-evidence/phase052-w43/`: THE SIX STANDING
+ISOLATES standalone first (soak 1 · 1 @ 230.23s · fcm 1 · 8 · email 1 ·
+5 · the cmms sweep 1 · 4 · the quality sweep 1 · 4 · the trade sweep 1 ·
+6) + THE FULL DB SUITE at the new count — **316 files · 4,563 tests · 0
+failed · 0 skipped** (smoke 3 · 2,035 — the A-suite 1,999 → 2,035 over
+the six new tables · perf-rest 5 · 23 · chunk-a 128 · 1,141 · chunk-b
+86 · 625 · chunk-c 88 · 711; 4,563 = 4,486 + 36 + 41 EXACT, the
+coverage verified before the first load run) + **THE 130-CHAIN FROM
+ZERO TWICE** (both CHAIN_130_APPLIED → [check-rls] OK — 360 catalog
+tables, both logs kept) + the full battery (typecheck 8/8 · lint 8/8 ·
+unit 8/8 — 189 files · 2,233 tests · depcruise clean 2,291 · 17,067 ·
+docs 33/33 · i18n 7,582 = 7,582 + mobile 371 standing · permissions
+366 = 366 · manifests 13/13 · id-ledger 0 errors + self-test OK ·
+history-secrets 0 with the SIX anchors walked · capabilities agree ·
+the shells PASS · boundary-negative PASS). THE HONEST CATCHES
+disclosed: (1) THE A-SUITE UUID PARSE FIX — step 1's committed
+A-suite extension carried three invalid uuid literals (11-char last
+groups `…d01/d02/d03`), the pre-fix RED captured (`invalid input
+syntax for type uuid` 22P02 at the seed boot — the RED log kept,
+VITEST_EXIT=1, 2,016 arms skipped) and the fix re-verified GREEN
+standalone (1 · 2,016) AND inside the smoke chunk (3 · 2,035); (2) THE
+COVERAGE-PROOF F1 ARITHMETIC CORRECTION — the first draft declared
+«4,527 = 4,486 + 41» while itself stating the A-suite grows 1,999 →
+2,035 (the +36 never added); corrected BEFORE the first load run with
+the dated F1 note at the proof, 4,563 confirmed EXACT by the run; (3)
+the chromium-1248 pair provisioned BEFORE the chunk runs (the fresh
+environment's cache carried only the 1200 pair — the first chunk-a
+attempt's four print-render skips re-run 0 skipped, the dated
+env-prep disclosure). NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

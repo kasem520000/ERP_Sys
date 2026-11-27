@@ -3969,9 +3969,9 @@ async function seedFixtures(superuser: {
                                      trigger_entity_id, definition_snapshot, current_step_order, status)
      VALUES
        ('ff3e3e3e-0000-4000-8000-000000000001', $1, 'ff1e1e1e-0000-4000-8000-000000000001',
-        'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d01', '{}'::jsonb, 1, 'ACTIVE'),
+        'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d001', '{}'::jsonb, 1, 'ACTIVE'),
        ('ff3e3e3e-0000-4000-8000-000000000002', $2, 'ff1e1e1e-0000-4000-8000-000000000002',
-        'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d02', '{}'::jsonb, 1, 'ACTIVE')
+        'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d002', '{}'::jsonb, 1, 'ACTIVE')
      ON CONFLICT (id) DO NOTHING`,
     [TENANT_A, TENANT_B],
   );
@@ -5891,7 +5891,7 @@ const MISMATCHED_INSERT: Record<string, string> = {
   workflow_instances: `INSERT INTO workflow_instances (id, tenant_id, definition_id, trigger_entity,
       trigger_entity_id, definition_snapshot, current_step_order, status)
      VALUES ('ff3e3e3e-3000-4000-8000-000000000003', $1, 'ff1e1e1e-0000-4000-8000-000000000002',
-      'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d03', '{}'::jsonb, 1, 'ACTIVE')`,
+      'purchase_order', 'ff3e3e3e-0000-4000-8000-00000000d003', '{}'::jsonb, 1, 'ACTIVE')`,
   workflow_step_instances: `INSERT INTO workflow_step_instances (id, tenant_id, instance_id, step_order,
       step_type, assignee_user_id, status)
      VALUES ('ff4e4e4e-3000-4000-8000-000000000003', $1, 'ff3e3e3e-0000-4000-8000-000000000002',
