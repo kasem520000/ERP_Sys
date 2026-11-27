@@ -803,14 +803,16 @@ export class WorkflowEngine {
    * machine fold renders the move; the pointer advances (firing
    * NOTIFICATION steps along the way); the chain COMPLETES on the
    * final approval or any rejection; the next assignee is notified.
-   * Returns the chain's live state for the gateway's contract. */
+   * Returns the chain's live state for the gateway's contract
+   * (completedSteps — the APPROVED step count at the terminal verdict,
+   * the bridge's approval_step parity figure, W-46). */
   async actOnCurrentStep(input: {
     instance: store.WorkflowInstanceRow;
     actorId: string;
     verdict: WorkflowStepVerdict;
     comment: string | null;
     facts: DocumentFacts;
-  }): Promise<{ completed: boolean; remaining: number; currentStepOrder: number | null }> {
+  }): Promise<{ completed: boolean; remaining: number; currentStepOrder: number | null; completedSteps: number }> {
     const instance = input.instance;
     if (instance.status !== "ACTIVE" || instance.currentStepOrder === null) {
       throw new WorkflowInstanceImmutableError({
@@ -915,7 +917,12 @@ export class WorkflowEngine {
         actorId: input.actorId ?? undefined,
         after: { instanceId: instance.id, verdict: "REJECTED" },
       });
-      return { completed: true, remaining: 0, currentStepOrder: null };
+      return {
+        completed: true,
+        remaining: 0,
+        currentStepOrder: null,
+        completedSteps: await countApprovedSteps(instance.id),
+      };
     }
 
     // THE POINTER WALK: advance past the acted step, firing NOTIFICATION
@@ -973,7 +980,12 @@ export class WorkflowEngine {
         actorId: input.actorId ?? undefined,
         after: { instanceId: instance.id, verdict: "APPROVED" },
       });
-      return { completed: true, remaining: 0, currentStepOrder: null };
+      return {
+        completed: true,
+        remaining: 0,
+        currentStepOrder: null,
+        completedSteps: await countApprovedSteps(instance.id),
+      };
     }
 
     await store.updateInstancePointer({ instanceId: instance.id, currentStepOrder: pointer });
@@ -988,7 +1000,7 @@ export class WorkflowEngine {
       instance.definitionSnapshot as { steps: readonly { stepOrder: number; name: string; nameAr: string }[] },
       await store.findStepInstancesForInstance(instance.id),
     );
-    return { completed: false, remaining, currentStepOrder: pointer };
+    return { completed: false, remaining, currentStepOrder: pointer, completedSteps: 0 };
   }
 
   /** THE CANCELLATION MIRROR (the module's own cancellation-class
@@ -1042,6 +1054,15 @@ function toStepShape(row: WorkflowStepInstanceRow): StepInstanceShape {
     actedBy: row.actedBy,
     comment: row.comment,
   };
+}
+
+/** The chain's APPROVED step count at a terminal verdict (the bridge's
+ * approval_step parity figure, W-46 — the actionable steps that were
+ * acted with an approval; the SKIPPED branch stamps never count, the
+ * frozen PENDING tail of a rejection never counts). */
+async function countApprovedSteps(instanceId: string): Promise<number> {
+  const rows = await store.findStepInstancesForInstance(instanceId);
+  return rows.filter((row) => row.status === "APPROVED").length;
 }
 
 /** The instance row → the fold's own shape (the completion fold's

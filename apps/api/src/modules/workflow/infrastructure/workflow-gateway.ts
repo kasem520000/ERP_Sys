@@ -107,6 +107,13 @@ export interface ChainVerdict {
    * roll the step approval back with it). */
   readonly remaining?: number;
   readonly nextStepOrder?: number;
+  /** THE COMPLETION'S OWN STEP ACCOUNTING (W-46 — the bridge's
+   * approval_step parity figure): the chain's APPROVED step count at
+   * the terminal verdict (the actionable steps that were acted; the
+   * SKIPPED branch stamps never count). The bound module's own
+   * transition may carry it where its legacy plane kept an approval
+   * counter (the journal's approval_step — the parity figure). */
+  readonly completedSteps?: number;
 }
 
 /** THE APPROVE HOOK — at the module's approve act. With a live chain:
@@ -150,7 +157,7 @@ export async function recordApprovalThroughChain(input: {
       nextStepOrder: outcome.currentStepOrder ?? 0,
     };
   }
-  return { chainOpened: true, completed: true };
+  return { chainOpened: true, completed: true, completedSteps: outcome.completedSteps };
 }
 
 /** THE REJECT HOOK — at the module's reject act. With a live chain:

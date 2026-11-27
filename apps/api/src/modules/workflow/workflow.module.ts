@@ -11,6 +11,7 @@ import type { EmailService } from "../notifications/application/email-service";
 import { InboxService } from "../notifications/application/inbox-service";
 import { WorkflowEngine, type WorkflowEmailLeg } from "./application/workflow-engine";
 import { EscalationService } from "./application/escalation-service";
+import { PolicyBridgeService } from "./application/policy-bridge-service";
 import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
 import { registerWorkflowEscalationJob } from "./infrastructure/workflow-escalation-sweep.job";
 
@@ -30,6 +31,12 @@ import { registerWorkflowEscalationJob } from "./infrastructure/workflow-escalat
  * shape: the named schedule is idempotent, the structural dedupe
  * makes raced passes converge, the per-tenant catch-and-continue
  * degrades the feature never the platform).
+ *
+ * PHASE-052 (W-46 — T-05, D-12): THE POLICY BRIDGE joins the module's
+ * providers (the one-time launch-boundary conversion tool — the
+ * approval_policies → workflow_definitions mapping with the
+ * origin_policy_id back-reference; the specs drive it directly, the
+ * admin surface is a later wave's own).
  *
  * No controllers yet — the engine core is service-layer (the W-44
  * scope); the routes land with their own controllers at W-47+ (the
@@ -53,8 +60,13 @@ const log = childLogger({ module: "workflow" });
         new EscalationService(audit, inbox),
       inject: [AuditService, InboxService],
     },
+    {
+      provide: PolicyBridgeService,
+      useFactory: (audit: AuditService) => new PolicyBridgeService(audit),
+      inject: [AuditService],
+    },
   ],
-  exports: [WorkflowEngine, EscalationService],
+  exports: [WorkflowEngine, EscalationService, PolicyBridgeService],
 })
 export class WorkflowModule implements OnModuleInit {
   constructor(

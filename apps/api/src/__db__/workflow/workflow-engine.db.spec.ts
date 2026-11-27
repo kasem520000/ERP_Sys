@@ -648,7 +648,7 @@ describe("PHASE-052 W-44 — the engine end-to-end over the four bindings", () =
         triggerEntity: "manual_journal", documentId: journalId, actorId: WFE_FINANCE,
       }),
     );
-    expect(verdict).toEqual({ chainOpened: true, completed: true });
+    expect(verdict).toEqual({ chainOpened: true, completed: true, completedSteps: 2 });
     const state = await instanceRows("manual_journal", journalId);
     expect(state.instance.status).toBe("COMPLETED");
     expect(state.steps.map((step) => step.status)).toEqual(["APPROVED", "APPROVED"]);
@@ -681,6 +681,9 @@ describe("PHASE-052 W-44 — the engine end-to-end over the four bindings", () =
       }),
     );
     stopBus();
+    // THE REJECTION VERDICT carries no completedSteps (the approve
+    // hook's own parity figure — the rejection is terminal, its frozen
+    // history is the timeline's record).
     expect(verdict).toEqual({ chainOpened: true, completed: true });
     const state = await instanceRows("change_order", coId);
     expect(state.instance.status).toBe("COMPLETED");

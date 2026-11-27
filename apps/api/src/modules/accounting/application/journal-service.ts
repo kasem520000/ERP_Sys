@@ -270,8 +270,7 @@ export class JournalService {
     // due — the module SKIPS its transition and returns the current
     // row (the chain's step stamp + audit + timeline are the
     // approval's proof). The legacy BR-034 path below runs only when
-    // the chain just completed or no chain exists (the compatibility
-    // mode — byte-identical).
+    // NO chain exists (the compatibility mode — byte-identical).
     const chain = await recordApprovalThroughChain({
       triggerEntity: "manual_journal",
       documentId: id,
@@ -280,6 +279,36 @@ export class JournalService {
     });
     if (chain.chainOpened && !chain.completed) {
       return this.requireDraft(id);
+    }
+    if (chain.chainOpened && chain.completed) {
+      // PHASE-052 (W-46 — THE BRIDGE'S COMPLETION LAW): the chain's
+      // completion IS the approval — the chain carried the gating (the
+      // converted policy's semantics rode its steps: the two-step
+      // ladder rendered as the chain's own two acts, the
+      // amount-threshold branch pair as its conditional second step);
+      // the module's own APPROVED transition lands DIRECTLY, never
+      // through the legacy policy engine (the W-44 fall-through's
+      // latent double-gate — a two-step policy's ladder demanding its
+      // own acts AFTER the chain completed, an amount-threshold policy
+      // REFUSING the very approval its branch pair just granted —
+      // caught and corrected at the bridge, disclosed at the W-46
+      // gate). The chain never weakens the standing floors: G-67's
+      // block ran at every step (the document's creator never reaches
+      // this line through a clean chain); approval_step carries the
+      // chain's APPROVED step count (the parity figure).
+      const updated = await journal.setManualJournalState(id, {
+        status: "APPROVED",
+        approvalStep: chain.completedSteps ?? 1,
+        approvedBy: actorId,
+      });
+      await this.audit.record({
+        action: "accounting.journal_approved",
+        entityType: "manual_journal",
+        entityId: id,
+        actorId,
+        after: { step: chain.completedSteps ?? 1, note: note ?? null, via: "workflow_chain" },
+      });
+      return updated!;
     }
     const policy = await this.policyFor("journal_entry", draft.entryDate);
     if (draft.createdBy === actorId && policy.allowSelfApproval !== true) {

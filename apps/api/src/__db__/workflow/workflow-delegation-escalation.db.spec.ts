@@ -273,7 +273,7 @@ describe("PHASE-052 W-45 — the delegation law + G-67's enforcement (acceptance
     const verdict = await withTenant(TENANT_WFD, () =>
       recordApprovalThroughChain({ triggerEntity: "manual_journal", documentId: w.journalId, actorId: w.delegateId }),
     );
-    expect(verdict).toEqual({ chainOpened: true, completed: true });
+    expect(verdict).toEqual({ chainOpened: true, completed: true, completedSteps: 1 });
     const state = await chainState(w.journalId);
     expect(state.instanceStatus).toBe("COMPLETED");
     expect(state.step).toMatchObject({
@@ -322,7 +322,7 @@ describe("PHASE-052 W-45 — the delegation law + G-67's enforcement (acceptance
     const verdict = await withTenant(TENANT_WFD, () =>
       recordApprovalThroughChain({ triggerEntity: "manual_journal", documentId: w.journalId, actorId: w.managerId }),
     );
-    expect(verdict).toEqual({ chainOpened: true, completed: true });
+    expect(verdict).toEqual({ chainOpened: true, completed: true, completedSteps: 1 });
     state = await chainState(w.journalId);
     expect(state.step).toMatchObject({ status: "APPROVED", actedBy: w.managerId, delegatedTo: null });
   });
@@ -347,7 +347,7 @@ describe("PHASE-052 W-45 — the delegation law + G-67's enforcement (acceptance
     const verdict = await withTenant(TENANT_WFD, () =>
       recordApprovalThroughChain({ triggerEntity: "manual_journal", documentId: w.journalId, actorId: w.delegateId }),
     );
-    expect(verdict).toEqual({ chainOpened: true, completed: true });
+    expect(verdict).toEqual({ chainOpened: true, completed: true, completedSteps: 1 });
     const state = await chainState(w.journalId);
     expect(state.step).toMatchObject({ status: "APPROVED", actedBy: w.delegateId, delegatedTo: w.delegateId });
   });
@@ -386,7 +386,7 @@ describe("PHASE-052 W-45 — the delegation law + G-67's enforcement (acceptance
     const verdict = await withTenant(TENANT_WFD, () =>
       recordApprovalThroughChain({ triggerEntity: "manual_journal", documentId: w.journalId, actorId: w.managerId }),
     );
-    expect(verdict).toEqual({ chainOpened: true, completed: true });
+    expect(verdict).toEqual({ chainOpened: true, completed: true, completedSteps: 1 });
     const after = await chainState(w.journalId);
     expect(after.step).toMatchObject({ status: "APPROVED", actedBy: w.managerId, delegatedTo: null });
   });
