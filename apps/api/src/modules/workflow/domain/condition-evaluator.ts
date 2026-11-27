@@ -45,8 +45,16 @@ import { WorkflowConditionInvalidError } from "./workflow-errors";
  */
 
 /** The closed trigger registry (D-05 — the owner's ruling (ج)): the
- * FOUR exemplar surfaces; widenings are dated additive migrations. */
-export const WORKFLOW_TRIGGER_ENTITIES: readonly string[] = Object.freeze([
+ * FOUR exemplar surfaces; widenings are dated additive migrations
+ * (the 0127/0128 CHECK floors are this vocabulary's own structural
+ * faces — the schema spec pins them member by member). */
+export type WorkflowTriggerEntity =
+  | "manual_journal"
+  | "purchase_order"
+  | "change_order"
+  | "duty_drawback_claim";
+
+export const WORKFLOW_TRIGGER_ENTITIES: readonly WorkflowTriggerEntity[] = Object.freeze([
   "manual_journal",
   "purchase_order",
   "change_order",

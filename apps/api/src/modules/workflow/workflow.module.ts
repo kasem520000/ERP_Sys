@@ -1,0 +1,111 @@
+import { Module, OnModuleInit } from "@nestjs/common";
+import { sql } from "drizzle-orm";
+
+import { AuditService } from "../audit/application/audit.service";
+import { requireTenantContext } from "../../infra/db/tenant-context";
+import { childLogger } from "../../infra/observability/logger";
+import { EMAIL_SERVICE, NotificationsModule } from "../notifications/notifications.module";
+import type { EmailService } from "../notifications/application/email-service";
+import { InboxService } from "../notifications/application/inbox-service";
+import { WorkflowEngine, type WorkflowEmailLeg } from "./application/workflow-engine";
+import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
+
+/**
+ * PHASE-052 (W-44 — T-03, dated 2026-11-27) THE WORKFLOW MODULE: binds
+ * the engine into the gateway (the documented plain-function contract
+ * the four exemplar surfaces consume — accounting/purchasing/crm/trade
+ * import the gateway functions, never this module) + wires THE EMAIL
+ * LEG of the assignee notifications (D-10's own bus-consumer shape:
+ * the workflow.step.assigned consumer enqueues the 041-hub template
+ * mail when the assignee's prefs carry email on — the consumer acts
+ * inside the emitting request's envelope, the config-events law).
+ *
+ * No controllers yet — the engine core is service-layer (the W-44
+ * scope); the routes land with their own controllers at W-47+ (the
+ * deep links, the inbox act).
+ */
+
+const log = childLogger({ module: "workflow" });
+
+@Module({
+  imports: [NotificationsModule],
+  providers: [
+    {
+      provide: WorkflowEngine,
+      useFactory: (audit: AuditService, inbox: InboxService, email: EmailService) =>
+        new WorkflowEngine(audit, inbox, moduleEmailLeg(email)),
+      inject: [AuditService, InboxService, EMAIL_SERVICE],
+    },
+  ],
+  exports: [WorkflowEngine],
+})
+export class WorkflowModule implements OnModuleInit {
+  constructor(private readonly engine: WorkflowEngine) {}
+
+  async onModuleInit(): Promise<void> {
+    // THE GATEWAY BINDING — the documented contract goes live (unbound
+    // means the legacy path; every gateway function degrades safely).
+    bindWorkflowEngine(this.engine);
+  }
+}
+
+/** THE EMAIL LEG (the 041 hub's template mail — the engine's own
+ * notification surface): on every step assignment, when the assignee's
+ * prefs carry email on (absent prefs mean email on — the 014 law),
+ * enqueue the workflow_step_assigned template mail through the REAL
+ * EmailService (the pg-boss jobId fingerprint's own dedupe makes a
+ * re-assignment idempotent on the wire). The leg runs INSIDE the
+ * emitting request's envelope (the config-events law); a failed
+ * enqueue NEVER blocks the chain (the catch-and-continue — the inbox
+ * leg already landed inside the emitting transaction). */
+function moduleEmailLeg(email: EmailService): WorkflowEmailLeg {
+  return {
+    async enqueueStepAssignedMail(input): Promise<void> {
+      try {
+        const context = requireTenantContext();
+        if (context.tx === undefined) {
+          return;
+        }
+        const rows = await context.tx.execute(sql`
+          SELECT u.email, COALESCE(u.locale, 'ar') AS locale
+          FROM users u
+          WHERE u.id = ${input.assigneeUserId}
+          LIMIT 1
+        `);
+        const target = (rows.rows as unknown as { email: string; locale: string }[])[0];
+        if (target === undefined) {
+          return;
+        }
+        const prefRows = await context.tx.execute(sql`
+          SELECT COALESCE(email, true) AS email
+          FROM notification_prefs
+          WHERE tenant_id = erp.current_tenant_id()
+            AND user_id = ${input.assigneeUserId} AND category = 'workflow'
+          LIMIT 1
+        `);
+        const pref = (prefRows.rows as unknown as { email: boolean }[])[0];
+        if (pref !== undefined && !pref.email) {
+          return;
+        }
+        await email.enqueue(context.tenantId, {
+          template: "workflow_step_assigned",
+          locale: target.locale === "en" ? "en" : "ar",
+          recipient: target.email,
+          variables: {
+            docLabel: target.locale === "en" ? input.docLabelEn : input.docLabelAr,
+            docNo: input.docNo,
+            amount: input.amountBase,
+            currency: input.currency,
+            stepName: target.locale === "en" ? input.stepName : input.stepNameAr,
+            docUrl: input.docUrl,
+          },
+        });
+      } catch (error) {
+        log.warn(
+          { err: error, step: input.stepInstanceId },
+          "workflow email leg failed (dropped — the inbox leg already landed)",
+        );
+      }
+    },
+  };
+}

@@ -27,7 +27,12 @@ export type EmailTemplate =
   | "subscription_state"
   /** PHASE-019 §3 (crm): the daily task-reminder sweep's email leg — one
    * mail per remindable task (dedupe key crm-task-reminder:<taskId>:<remindAt>). */
-  | "task_reminder";
+  | "task_reminder"
+  /** PHASE-052 (W-44 — the workflow engine's assignee-notification email
+   * leg on the 041 hub): one mail per step assignment (the approval
+   * request — the document's label + number + amount + the step's name;
+   * the dedupe is the bus consumer's own per-step axis). */
+  | "workflow_step_assigned";
 
 export interface EmailPayload {
   template: EmailTemplate;
@@ -158,6 +163,22 @@ const AR = {
       `— فريق المنصة`,
     ].join("\r\n"),
   }),
+  workflow_step_assigned: (v: Record<string, string>) => ({
+    subject: `مستند بانتظار موافقتكم: ${v.docLabel} — ${v.docNo}`,
+    body: [
+      `مرحبًا،`,
+      ``,
+      `وصل إلى خطوة الموافقة المكلَّفة إليكم:`,
+      `المستند: ${v.docLabel} ${v.docNo}`,
+      `القيمة: ${v.amount} ${v.currency}`,
+      `الخطوة: ${v.stepName}`,
+      ``,
+      `يمكنكم مراجعة المستند من:`,
+      v.docUrl,
+      ``,
+      `— فريق المنصة`,
+    ].join("\r\n"),
+  }),
 } as const;
 
 const EN = {
@@ -272,6 +293,22 @@ const EN = {
       ``,
       `Review it from:`,
       v.tasksUrl,
+      ``,
+      `— The platform team`,
+    ].join("\r\n"),
+  }),
+  workflow_step_assigned: (v: Record<string, string>) => ({
+    subject: `Document awaiting your approval: ${v.docLabel} — ${v.docNo}`,
+    body: [
+      `Hello,`,
+      ``,
+      `A document reached the approval step assigned to you:`,
+      `Document: ${v.docLabel} ${v.docNo}`,
+      `Amount: ${v.amount} ${v.currency}`,
+      `Step: ${v.stepName}`,
+      ``,
+      `Review it from:`,
+      v.docUrl,
       ``,
       `— The platform team`,
     ].join("\r\n"),

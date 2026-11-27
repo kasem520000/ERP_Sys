@@ -34,6 +34,10 @@ import { QualityModule } from "./modules/quality/quality.module";
 // engine with G-64's postings + BR-105's trade-expiry-sweep, the SIXTH
 // standing isolate).
 import { TradeModule } from "./modules/trade/trade.module";
+// PHASE-052 (W-44, dated 2026-11-27): the workflow module (CR-22 — the
+// engine core: the gateway binding + the assignee-notification email
+// leg; no controllers yet — the routes land at W-47+).
+import { WorkflowModule } from "./modules/workflow/workflow.module";
 import { NotesModule } from "./modules/notes/notes.module";
 import { InstallmentsModule } from "./modules/installments/installments.module";
 // PHASE-028/029 (restored lineage): the budgeting + payroll modules.
@@ -92,6 +96,9 @@ import { UsageLimitGuard } from "./infra/auth/usage-limit.guard";
     // PHASE-051 (W-34): the trade module (the LC engine + the expiry
     // sweep) — after the quality module, the phase's own order.
     TradeModule,
+    // PHASE-052 (W-44): the workflow module (the engine core + the
+    // gateway binding) — after the trade module, the phase's own order.
+    WorkflowModule,
     NotesModule,
     InstallmentsModule,
     BudgetingModule,
