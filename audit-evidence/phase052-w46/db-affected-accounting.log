@@ -1,0 +1,125 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys_clone/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-27 23:30:33.634 UTC [23749] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-27 23:30:33.634 UTC [23749] LOG:  listening on IPv6 address "::1", port 34255
+2026-11-27 23:30:33.634 UTC [23749] LOG:  listening on IPv4 address "127.0.0.1", port 34255
+
+2026-11-27 23:30:33.635 UTC [23749] LOG:  listening on Unix socket "/tmp/.s.PGSQL.34255"
+
+2026-11-27 23:30:33.636 UTC [23752] LOG:  database system was shut down at 2026-11-27 23:30:33 UTC
+
+2026-11-27 23:30:33.637 UTC [23749] LOG:  database system is ready to accept connections
+
+{"level":30,"time":1795822247963,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795822248035,"service":"erp-api","module":"notifications","channel":"fcm","disabled":true,"msg":"fcm channel DISABLED (FCM_CREDENTIALS unset) — pushes are logged + dropped as ok:false"}
+{"level":30,"time":1795822248477,"service":"erp-api","module":"http","correlation_id":"01a21f58-e176-7000-86ab-bc05e5d66d84","action":"request","method":"POST","path":"/api/v1/identity/sessions","status":200,"duration_ms":167,"msg":"request completed"}
+{"level":30,"time":1795822248506,"service":"erp-api","module":"http","correlation_id":"01a21f58-e226-7000-9c91-29d705acf820","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":200,"duration_ms":20,"msg":"request completed"}
+{"level":30,"time":1795822248523,"service":"erp-api","module":"http","correlation_id":"01a21f58-e23f-7000-96c5-1207fb11f172","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":200,"duration_ms":12,"msg":"request completed"}
+{"level":30,"time":1795822248533,"service":"erp-api","module":"http","correlation_id":"01a21f58-e24d-7000-9e82-19035b1d068d","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":200,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795822248541,"service":"erp-api","module":"http","correlation_id":"01a21f58-e257-7000-b8c6-1ed10c2bb695","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":422,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795822248549,"service":"erp-api","module":"http","correlation_id":"01a21f58-e25f-7000-9321-8e12cfd036c0","action":"request","method":"GET","path":"/api/v1/accounting/projects","status":200,"duration_ms":6,"msg":"request completed"}
+2026-11-27 23:30:48.558 UTC [23834] ERROR:  duplicate key value violates unique constraint "uq_projects_tenant_code"
+2026-11-27 23:30:48.558 UTC [23834] STATEMENT:  
+	    INSERT INTO projects (id, tenant_id, code, name, name_ar, parent_id)
+	    VALUES ($1, erp.current_tenant_id(), $2, $3, $4, $5)
+	    RETURNING id, code, name, name_ar AS "nameAr", parent_id AS "parentId", status
+	  
+
+{"level":30,"time":1795822248561,"service":"erp-api","module":"http","correlation_id":"01a21f58-e268-7000-8d34-3ca1b067a0b5","action":"request","method":"POST","path":"/api/v1/accounting/projects","status":409,"duration_ms":9,"msg":"request completed"}
+{"level":30,"time":1795822248571,"service":"erp-api","module":"http","correlation_id":"01a21f58-e273-7000-b061-2ba58d362299","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/11111111-2222-4333-8444-555555555555","status":404,"duration_ms":8,"msg":"request completed"}
+{"level":30,"time":1795822248589,"service":"erp-api","module":"http","correlation_id":"01a21f58-e27d-7000-bd62-eda6af862f6f","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a21f58-df27-7000-b8c2-24130b20c51e","status":404,"duration_ms":16,"msg":"request completed"}
+{"level":30,"time":1795822248598,"service":"erp-api","module":"http","correlation_id":"01a21f58-e290-7000-b108-35b6d742f516","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a21f58-e248-7000-ae07-be8d394e0acd","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795822248606,"service":"erp-api","module":"http","correlation_id":"01a21f58-e298-7000-b43f-671a411923b2","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a21f58-e248-7000-ae07-be8d394e0acd","status":200,"duration_ms":6,"msg":"request completed"}
+{"level":30,"time":1795822248615,"service":"erp-api","module":"http","correlation_id":"01a21f58-e2a0-7000-b390-ad8c8c373543","action":"request","method":"PATCH","path":"/api/v1/accounting/projects/01a21f58-e248-7000-ae07-be8d394e0acd","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795822248748,"service":"erp-api","module":"http","correlation_id":"01a21f58-e325-7000-aefd-0eab8ae7799a","action":"request","method":"GET","path":"/api/v1/accounting/gl/accounts?projectId=01a21f58-e236-7000-9f2a-ecb9e8a95b17","status":200,"duration_ms":7,"msg":"request completed"}
+{"level":30,"time":1795822248755,"service":"erp-api","module":"http","correlation_id":"01a21f58-e32e-7000-bfde-5c19ba95325a","action":"request","method":"GET","path":"/api/v1/accounting/gl/accounts/01a21f58-ddf3-7001-996e-d9a5f4b45c81/movements?projectId=01a21f58-e236-7000-9f2a-ecb9e8a95b17","status":200,"duration_ms":5,"msg":"request completed"}
+{"level":30,"time":1795822248760,"service":"erp-api","module":"http","correlation_id":"01a21f58-e334-7000-a4fc-412e0de36807","action":"request","method":"GET","path":"/api/v1/accounting/gl/journal-register?projectId=01a21f58-e236-7000-9f2a-ecb9e8a95b17","status":200,"duration_ms":4,"msg":"request completed"}
+{"level":30,"time":1795822248849,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/accounting/projects.spec.ts (7 tests) 1649ms
+{"level":60,"time":1795822249401,"service":"erp-api","module":"posting-service","metric":"erp_posting_invariant_failures_total","code":"ENTRY_NOT_BALANCED","spec":{"docType":"journal_entry","docId":"01a21f58-e5b6-7000-8191-d97efffc3ac5","operation":"post"},"msg":"POSTING INVARIANT FAILURE: the engine rejected an unbalanced entry (INV-001/002, RISK-009 — zero tolerance, auto-SEV-1) — investigate immediately"}
+ ✓ src/__db__/accounting/golden/golden.spec.ts (8 tests) 508ms
+ ✓ src/__db__/accounting/periods/periods.spec.ts (5 tests) 220ms
+2026-11-27 23:30:49.732 UTC [23853] ERROR:  PERIOD_LOCKED: entry date falls in a LOCKED fiscal period
+2026-11-27 23:30:49.732 UTC [23853] CONTEXT:  PL/pgSQL function erp.journal_entry_period_check() line 9 at RAISE
+2026-11-27 23:30:49.732 UTC [23853] STATEMENT:  COMMIT
+
+2026-11-27 23:30:49.849 UTC [23855] ERROR:  duplicate key value violates unique constraint "uq_number_assignments_scope_number"
+2026-11-27 23:30:49.849 UTC [23855] DETAIL:  Key (tenant_id, doc_type, COALESCE(branch_id, '00000000-0000-0000-0000-000000000000'::uuid), number)=(33333333-3333-3333-3333-333333333333, probe_doc, 00000000-0000-0000-0000-000000000000, PRB-2026-000001) already exists.
+2026-11-27 23:30:49.849 UTC [23855] STATEMENT:  INSERT INTO number_assignments (id, tenant_id, doc_type, period_key, number, value)
+	         VALUES ($1, $2, 'probe_doc', '2026', $3, 999)
+
+ ✓ src/__db__/accounting/invariants/INV-011-022.spec.ts (8 tests) 215ms
+
+ Test Files  4 passed (4)
+      Tests  28 passed (28)
+   Start at  23:30:32
+   Duration  17.37s (transform 5.26s, setup 0ms, collect 9.25s, tests 2.59s, environment 0ms, prepare 53ms)
+
+2026-11-27 23:30:49.905 UTC [23749] LOG:  received fast shutdown request
+
+2026-11-27 23:30:49.905 UTC [23749] LOG:  aborting any active transactions
+2026-11-27 23:30:49.905 UTC [23845] FATAL:  terminating connection due to administrator command
+
+2026-11-27 23:30:49.906 UTC [23749] LOG:  background worker "logical replication launcher" (PID 23755) exited with exit code 1
+
+2026-11-27 23:30:49.908 UTC [23844] FATAL:  terminating connection due to administrator command
+
+2026-11-27 23:30:49.910 UTC [23750] LOG:  shutting down
+
+2026-11-27 23:30:49.910 UTC [23750] LOG:  checkpoint starting: shutdown immediate
+
+(node:23808) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:23808) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-27 23:30:49.941 UTC [23750] LOG:  checkpoint complete: wrote 3726 buffers (22.7%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.021 s, sync=0.011 s, total=0.031 s; sync files=3314, longest=0.001 s, average=0.001 s; distance=33327 kB, estimate=33327 kB; lsn=0/356A5B0, redo lsn=0/356A5B0
+
+2026-11-27 23:30:49.950 UTC [23749] LOG:  database system is shut down
+
+VITEST_EXIT=0

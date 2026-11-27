@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from "@nestjs/common";
+import { Inject, Module, OnModuleInit } from "@nestjs/common";
 import { sql } from "drizzle-orm";
 
 import { AuditModule } from "../audit/audit.module";
@@ -69,9 +69,20 @@ const log = childLogger({ module: "workflow" });
   exports: [WorkflowEngine, EscalationService, PolicyBridgeService],
 })
 export class WorkflowModule implements OnModuleInit {
+  // THE EXPLICIT @Inject LAW (the platform's own convention — the
+  // controllers' shape): vitest's esbuild transform does NOT emit
+  // constructor design:paramtypes (tsc's emitDecoratorMetadata never
+  // runs there), so a plain typed constructor resolves to undefined
+  // under the app-booting specs — the W-46 honest catch (the W-44
+  // latent wiring bug, never exercised until the bridge's affected-
+  // folder run paired the projects spec's AppModule boot with the
+  // golden spec's journal submits: bindWorkflowEngine(undefined) —
+  // the gateway's null check passes (undefined !== null) and every
+  // submit crashes on ENGINE.openChain). The explicit tokens are
+  // metadata-free by construction — immune in BOTH worlds.
   constructor(
-    private readonly engine: WorkflowEngine,
-    private readonly escalation: EscalationService,
+    @Inject(WorkflowEngine) private readonly engine: WorkflowEngine,
+    @Inject(EscalationService) private readonly escalation: EscalationService,
   ) {}
 
   async onModuleInit(): Promise<void> {

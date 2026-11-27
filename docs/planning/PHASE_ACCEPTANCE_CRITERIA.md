@@ -2744,6 +2744,82 @@ key shape ^[a-z][a-z0-9_]*$) + the (h) arm's raw instance seed needing
 its own definition row (the composite FK's own floor). NOT production
 approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-27 (PHASE-052 W-46 THE BRIDGE DELIVERED —
+**ACCEPTANCE #9 GREEN** at the W-46 gate; step 1 + the gate increment
+pushed at their own commits under the standing order: step 1 `545e1ca`
+THE CONVERSION TOOL + THE COMPLETION-LAW FIX (the PolicyBridgeService —
+D-12's four-mode mapping with the origin_policy_id back-reference, the
+idempotence, the SUPERSEDED handling, the doc-type mapping, the
+threshold canonicalization, the entitlement gate, the audit seal; the
+engine's completedSteps — the bridge's approval_step parity figure;
+the ChainVerdict widened; THE JOURNAL'S COMPLETION LAW — the W-44
+fall-through's latent double-gate caught and corrected: the legacy
+policy engine ran AFTER the chain completed — a two-step policy's
+ladder demanding its own acts after the chain's two, an
+amount-threshold policy REFUSING the very approval its branch pair
+just granted; the corrected law: on the chain's completion the
+module's own APPROVED transition lands DIRECTLY, approval_step carries
+the chain's APPROVED step count, the legacy path runs only when NO
+chain exists) · the gate increment THE BRIDGE DB SPEC + THE EXIT
+BATTERY. THE BRIDGE SPEC (workflow-bridge.db.spec — 7 arms ALL GREEN
+over real embedded PG16, the mode-per-tenant design, the REAL
+JournalService's own acts on both sides): (a) THE SINGLE-APPROVER
+PARITY (the same verdicts and stamps before/after — one act by the
+owner, approval_step 1; the SoD parity — the owner's own journal
+blocked both sides (the legacy SelfApprovalBlocked / the chain's
+G-67); THE APPROVER-CLASS NARROWING disclosed — a third user the
+legacy allowed, the converted chain refuses (the actor law — D-12's
+owner-role mapping); the origin back-reference + the ROLE owner step
+asserted) · (b) THE TWO-STEP PARITY (two acts before, two acts after —
+NEVER four; approval_step 2 both sides — the completion law's own
+proof) · (c) THE AMOUNT-THRESHOLD BRANCH PAIR (≤ threshold the
+one-step chain with the branch's SKIPPED stamp · THE AT-LIMIT LAW (the
+total exactly at the threshold → the one-step chain — the BR-034
+boundary) · > threshold THE DECLARED MAPPING: the second approval
+level instead of the legacy refusal (the BEFORE side's
+ApprovalLimitExceeded disclosed as the honest delta) · the step-2
+condition asserted verbatim) · (d) THE NONE MODE + THE SUPERSEDED +
+THE UNMAPPED (the honest rows: NO_CHAIN_NEEDED · SUPERSEDED ·
+UNMAPPED_DOC_TYPE; no definition lands; the none auto-approval
+byte-identical) · (e) THE IN-FLIGHT COMPLETION (a document submitted
+BEFORE the conversion finishes under the OLD semantics — zero
+instances for it, the legacy two-step ladder carries it; a document
+submitted AFTER gates under the chain — the launch-time boundary
+recorded) · (f) THE ENTITLEMENT GATE (the engine-off tenant: the
+bridge silent, the legacy path permanent) · (g) THE IDEMPOTENCE (the
+re-run converts NOTHING — ALREADY_CONVERTED, no new definitions).
+THE HONEST CATCHES disclosed at the wave's README: (1) THE W-44
+FALL-THROUGH'S LATENT DOUBLE-GATE (above — caught at the bridge's own
+design, corrected at step 1); (2) THE W-44 MODULE WIRING'S LATENT DI
+BUG — THE EXPLICIT @Inject LAW: vitest's esbuild transform does NOT
+emit constructor design:paramtypes, so the WorkflowModule's plain
+typed constructor resolved `engine` and `escalation` to UNDEFINED
+under the app-booting specs — bindWorkflowEngine(undefined) — the
+gateway's null check passed (undefined !== null) and every journal
+submit crashed on ENGINE.openChain; never exercised until the bridge's
+affected-folder run paired the projects spec's AppModule boot with the
+golden spec's journal submits; THE FIX: the explicit @Inject tokens
+(the platform's own controller convention — metadata-free by
+construction, immune in both worlds); the platform-wide latent class
+DISCLOSED (the other sweep-registering modules with plain constructors
+— fixed_assets · hr · trade — degrade silently under the same
+transform: their registrations ride the catch-and-continue; a
+candidate follow-up recorded, NOT this wave's scope); (3) the
+journal's amount law re-learned at the spec (totalBaseAmount sums
+EVERY line — DEBIT + CREDIT — the W-44 facts law verbatim; the
+balanced pair at X per line reads 2X). The battery: the workflow
+family 5 · 80 ALL GREEN (the bridge spec joins) + the accounting
+affected specs 4 · 28 + the inbox writer + the standing category arm 2
+· 40 + the whole standing battery green (typecheck/lint 8/8 · unit 8/8
+— 189 · 2,233 · depcruise clean 2,304 · 17,187 (+2/+22 dated — the
+bridge service + the spec; zero cycles) · ROUTE_PERMISSIONS 1,215
+standing (the bridge is service-layer, the routes land at W-47+) ·
+permissions 366 = 366 · i18n standing · docs 33/33 · id-ledger 0 +
+self-test OK · history-secrets 0 with the SIX anchors · capabilities
+agree · the shells + boundary PASS); the DB roster 319 → 320 (the
+bridge spec joins the family) — the full envelope at the new count is
+W-51's. NOT production approval — تسليم لا قبول.]**
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),
