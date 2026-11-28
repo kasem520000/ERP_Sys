@@ -139,6 +139,26 @@ export async function recordApprovalThroughChain(input: {
     input.documentId,
   );
   if (instance === undefined) {
+    // PHASE-052 (W-47 — T-06's completion half): THE POST-COMPLETION
+    // RE-ENTRY. A chain that completed OUTSIDE the module's own act (the
+    // deep-link act — the email/mobile link's step stamp completed the
+    // chain; the W-46 completion law's own verdict) leaves the document
+    // in its awaiting status. The module's next approve act reads THIS
+    // branch: the chain-approved document's transition is DUE — the
+    // verdict { chainOpened: true, completed: true } routes the module
+    // into its DIRECT landing (the W-46 path), and the legacy policy
+    // engine NEVER re-gates a chain-approved document (the double-gate
+    // the bridge caught, closed here for the beyond-module act
+    // surfaces). The idempotence is structural: a document already
+    // transitioned is refused by the module's own state floors BEFORE
+    // this read (the re-entry never double-fires).
+    const completed = await store.findCompletedApprovedInstanceForDocument(
+      input.triggerEntity,
+      input.documentId,
+    );
+    if (completed !== undefined) {
+      return { chainOpened: true, completed: true, completedSteps: completed.completedSteps };
+    }
     return { chainOpened: false, completed: false };
   }
   const facts = await readDocumentFacts(input.triggerEntity, input.documentId);

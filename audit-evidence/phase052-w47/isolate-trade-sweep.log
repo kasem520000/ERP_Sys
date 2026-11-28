@@ -1,0 +1,83 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+
+creating directory /tmp/erp-api-testdb ... 
+ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys_clone/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-28 00:28:31.795 UTC [4103] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-28 00:28:31.795 UTC [4103] LOG:  listening on IPv6 address "::1", port 45591
+2026-11-28 00:28:31.795 UTC [4103] LOG:  listening on IPv4 address "127.0.0.1", port 45591
+
+2026-11-28 00:28:31.795 UTC [4103] LOG:  listening on Unix socket "/tmp/.s.PGSQL.45591"
+
+2026-11-28 00:28:31.797 UTC [4106] LOG:  database system was shut down at 2026-11-28 00:28:31 UTC
+
+2026-11-28 00:28:31.798 UTC [4103] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/trade/trade-lc-sweep.db.spec.ts (6 tests) 454ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  00:28:30
+   Duration  7.59s (transform 792ms, setup 0ms, collect 1.61s, tests 454ms, environment 0ms, prepare 57ms)
+
+2026-11-28 00:28:38.196 UTC [4103] LOG:  received fast shutdown request
+2026-11-28 00:28:38.196 UTC [4103] LOG:  aborting any active transactions
+2026-11-28 00:28:38.196 UTC [4184] FATAL:  terminating connection due to administrator command
+2026-11-28 00:28:38.198 UTC [4103] LOG:  background worker "logical replication launcher" (PID 4109) exited with exit code 1
+
+2026-11-28 00:28:38.200 UTC [4104] LOG:  shutting down
+2026-11-28 00:28:38.200 UTC [4104] LOG:  checkpoint starting: shutdown immediate
+
+(node:4162) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:4162) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-28 00:28:38.224 UTC [4104] LOG:  checkpoint complete: wrote 3145 buffers (19.2%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.016 s, sync=0.009 s, total=0.025 s; sync files=2947, longest=0.001 s, average=0.001 s; distance=29632 kB, estimate=29632 kB; lsn=0/31CEC60, redo lsn=0/31CEC60
+
+2026-11-28 00:28:38.232 UTC [4103] LOG:  database system is shut down
+
+VITEST_EXIT=0

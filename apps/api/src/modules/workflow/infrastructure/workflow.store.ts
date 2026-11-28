@@ -131,6 +131,44 @@ export async function findActiveInstanceForDocument(
   return (rows.rows as unknown as WorkflowInstanceRow[])[0];
 }
 
+/** PHASE-052 (W-47 — T-06's completion half, dated 2026-11-27) THE
+ * POST-COMPLETION RE-ENTRY'S OWN READ: the latest COMPLETED chain for
+ * a document whose verdict was APPROVED (no REJECTED step instance on
+ * the chain — the rejection's terminal verdict is the REJECTED step
+ * itself; the frozen PENDING tail of a rejection never reads as an
+ * approval), carrying the chain's APPROVED step count (the bridge's
+ * approval_step parity figure — the same countApprovedSteps law). This
+ * is the DEEP-LINK COMPLETION'S landing: a chain completed outside the
+ * module's own act (the email/mobile link's act) leaves the document
+ * awaiting; the module's next approve act reads THIS row and lands its
+ * own transition DIRECTLY (the W-46 completion law extended to the
+ * act surfaces beyond the module's own — the legacy policy path never
+ * re-gates a chain-approved document). */
+export async function findCompletedApprovedInstanceForDocument(
+  triggerEntity: string,
+  triggerEntityId: string,
+): Promise<{ instanceId: string; completedSteps: number } | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT wi.id AS "instanceId",
+           (SELECT COUNT(*) FROM workflow_step_instances si
+             WHERE si.instance_id = wi.id AND si.tenant_id = wi.tenant_id
+               AND si.status = 'APPROVED')::int AS "completedSteps",
+           (SELECT COUNT(*) FROM workflow_step_instances si
+             WHERE si.instance_id = wi.id AND si.tenant_id = wi.tenant_id
+               AND si.status = 'REJECTED')::int AS "rejectedSteps"
+    FROM workflow_instances wi
+    WHERE wi.trigger_entity = ${triggerEntity} AND wi.trigger_entity_id = ${triggerEntityId}
+      AND wi.status = 'COMPLETED'
+    ORDER BY wi.completed_at DESC, wi.created_at DESC
+    LIMIT 1
+  `);
+  const row = (rows.rows as unknown as { instanceId: string; completedSteps: number; rejectedSteps: number }[])[0];
+  if (row === undefined || row.rejectedSteps > 0) {
+    return undefined;
+  }
+  return { instanceId: row.instanceId, completedSteps: row.completedSteps };
+}
+
 export async function findInstanceById(
   instanceId: string,
 ): Promise<WorkflowInstanceRow | undefined> {

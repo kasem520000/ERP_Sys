@@ -2820,6 +2820,130 @@ agree · the shells + boundary PASS); the DB roster 319 → 320 (the
 bridge spec joins the family) — the full envelope at the new count is
 W-51's. NOT production approval — تسليم لا قبول.]**
 
+**[Dated 2026-11-28 (PHASE-052 W-47 THE DEEP LINKS + THE TASKS + THE
+RULES ALERTS DELIVERED — **ACCEPTANCE #6 GREEN** at the W-47 gate;
+steps 1–2 + the gate increment pushed at their own commits under the
+standing order «عند الانتهاء من أي خطوة ادفعها إلى المستودع»: step 1
+`14dee97` THE DEEP-LINK LAW END-TO-END (T-06 — the deadline law at the
+token fold's own home (the step's own due_at when the SLA set one,
+else the 72-hour default window from the assignment — the invitation
+precedent's span; the stateless law, never a stored TTL, never a token
+table) · the routes' own 404 class (WorkflowStepInstanceNotFoundError
+— the A7 parity, registered in the SAME increment as the routes) ·
+the WorkflowDeepLinkService (the decode with ANY tamper/shape failure
+the typed WORKFLOW_INPUT_INVALID · the claims' instance/step
+consistency · the claims asserted USABLE against the DB'S OWN CLOCK
+(readDbNow — the clock law) with the typed EXPIRED + ACTOR_MISMATCH
+(the link authorizes, the session authenticates — never an
+unauthenticated action surface) · the CAS PRE-CHECK (a stale token
+never acts on a step the pointer has moved past) · the engine's own
+act path VERBATIM) + THE LINK PREVIEW (the act page's own read) + the
+email leg's tokens (the engine builds them at assignment; the leg
+renders the locale-bound URLs) + the module's FIRST CONTROLLER (POST
+/api/v1/workflow/act on workflow.approve + the SESSION_ROUTES preview)
++ ROUTE_PERMISSIONS 1,215 → 1,216 + the workflow error statuses in
+error.filter.ts's domainStatus chain (404/403/409s — the CAS replay,
+the EXPIRED deadline, the ladder, INV-037, G-67, the circularity; the
+policy class the 422 fall-through) + the 041 template's deep links
+(AR/EN, byte-stable)) · step 2 `5d35b4e` THE TASKS LANE + THE RULES
+ALERTS (T-08 + T-07's rules half — the tasks ARE the step instances
+(no seventh table, no crm coupling): the store's lane query (due-first
+aging) + the TaskLaneService (the typed list through the ENGINE'S OWN
+facts reader per row, bounded; the graceful tasks-plane gate; the
+completion write-back = the step's own ACTED stamp through the
+engine's act path with the TASK floors (the wrong-surface refusal, the
+ladder law, the single-use completion) + the completion receipt) + the
+tasks routes (SESSION_ROUTES +2, @RequireFeature(workflow.tasks)) ·
+THE ALERT-RULES FOLD (the pure fail-closed normalizer — the envelope's
+typed members normalized, the conditions passed VERBATIM (the D-06
+fold the conditions' ONE validator), the garbage dropped one by one) +
+the settings key workflow.alert_rules (the typed registry row, the
+documented OPT-IN default []) + THE ADAPTER (the
+workflow.instance.started BUS CONSUMER: the envelope law, the rules
+read through the effective-setting reader, THE ENGINE'S OWN
+assembleDocumentContext (exported this increment — never a parallel
+evaluation path), the D-06 fold VERBATIM, the audiences owner|creator,
+the per-rule-per-instance dedupe, the catch-and-continue — a failed
+alert never blocks the chain; the drain() spec surface) + the module
+wiring (the providers + the adapter's subscribe() at boot)) · the gate
+increment THE DB SPEC + THE EXIT BATTERY. THE DEEPLINK-TASKS SPEC
+(workflow-deeplink-tasks.db.spec — 17 arms ALL GREEN over real embedded
+PG16, TENANT_WFX (engine + tasks + the alert-rules settings + the
+owner user) + TENANT_WFX_GATE (engine only — the graceful-gate +
+no-rules worlds), every arm its own world, the CAPTURING EMAIL LEG
+carrying the exact tokens the 041 mail renders — the end-to-end: the
+link the assignee receives is the link that works): (a) THE ONE-TIME
+ACT + THE COMPLETION LANDING (the email's own approve token acts once
+— the step APPROVED with acted_at/acted_by/comment, the chain
+COMPLETED, the instance.completed bus emission; THE POST-COMPLETION
+RE-ENTRY: the module's approve act after the deep-link completion (the
+REAL JournalService) reads the completed-approved chain and lands the
+document's APPROVED transition DIRECTLY — approval_step the chain's
+count, the W-46 completion law extended to the beyond-module act
+surfaces, the legacy policy path never re-gates a chain-approved
+document) · (b) THE REPLAY REFUSAL (the same link again — the typed
+WORKFLOW_STEP_ALREADY_ACTED, the CAS single-use, the acted_at stamp
+the ledger) · (c) THE EXPIRY REFUSAL (a token past its claim's own
+deadline — the typed WORKFLOW_TOKEN_EXPIRED, the DB's own clock) ·
+(d) THE ACTOR MISMATCH (another user's session — the typed
+WORKFLOW_TOKEN_ACTOR_MISMATCH, ZERO residue) · (e) THE TAMPER (a
+forged signature — the typed input class, no partial parse) · (f) THE
+REJECT LINK (the terminal REJECTED verdict + the frozen history) ·
+(g) THE PREVIEW (the act page's own read — the rendering facts, the
+awaiting flag, the claim's own deadline) · (h) THE TYPED LIST (the
+caller's own PENDING TASK steps due-first; the other user's tasks
+never in my lane; the doc facts per row) · (i) THE COMPLETION
+WRITE-BACK (the step's own ACTED stamp, the chain completes, the lane
+empties, the receipt lands) · (j) THE NON-TASK REFUSAL (an APPROVAL
+step through the task surface — the typed wrong-surface refusal, ZERO
+residue) · (k) THE ACTOR LAW (another user completing my task — the
+engine's typed actor refusal, ZERO residue) · (l) THE GRACEFUL GATE
+(the tasks-flag-off tenant's lane EMPTY — the chain itself lives) ·
+(m) THE THRESHOLD ALERT (the configured amount rule above its
+threshold raises the owner's inbox alert — the engine's own context
+figure) · (n) THE BELOW-THRESHOLD SILENCE (no alert; the chain's own
+assignment notification only) · (o) THE GARBAGE RULE SKIPPED (the
+malformed rule never alerts, never crashes the chain open — exactly
+one alert for the good rule) · (p) THE NO-RULES DEFAULT (the
+settings-less tenant's chains raise NO alerts — the opt-in default [])
+· (q) THE CREATOR AUDIENCE (the creator-audience rule alerts the
+document's creator). THE HONEST CATCH caught at the spec's own design
+and corrected IN THIS INCREMENT: THE STRANDED-ACT GAP — the deep-link
+act completes the chain OUTSIDE the module's own act, leaving the
+document awaiting with the legacy policy path as its only next step
+(the W-46 double-gate resurfaced through the beyond-module act
+surfaces); THE FIX: THE POST-COMPLETION RE-ENTRY at the gateway
+(findCompletedApprovedInstanceForDocument — the latest COMPLETED
+chain with no REJECTED step carries the verdict {chainOpened: true,
+completed: true, completedSteps}; the module's next approve act lands
+its transition DIRECTLY; the idempotence structural — a document
+already transitioned is refused by the module's own state floors
+before this read). The battery: THE SEVEN STANDING ISOLATES standalone
+first (soak 1 · 1 · fcm 1 · 8 · email 1 · 5 · the cmms sweep 1 · 4 ·
+the quality sweep 1 · 4 · the trade sweep 1 · 6 · the workflow
+escalation sweep 1 · 9) + the workflow family 6 · 97 ALL GREEN (the
+deeplink-tasks spec joins — 80 + 17) + the accounting affected specs 4
+· 28 + the inbox writer + the standing category arm 2 · 40 + the whole
+standing battery green (typecheck/lint 8/8 · unit 8/8 — 189 · 2,243
+standing (+10: the deadline law's 3 + the template links' 2 + the
+alert-rules fold's 5) · depcruise clean 2,311 · 17,243 (+5/+18 dated —
+the deep-link service + the task-lane service + the alert adapter +
+the alert-rules fold + the spec; zero cycles) · ROUTE_PERMISSIONS
+1,215 → 1,216 (the act route) + SESSION_ROUTES +3 (the preview + the
+tasks pair) · permissions 366 = 366 (zero new keys — the act binds
+the existing workflow.approve, the tasks ride the self plane) · i18n
+7,582 = 7,582 standing (no delta — the W-48 web plane's ~180 keys are
+that wave's own) + mobile parity standing · manifests 13/13 · docs
+33/33 · id-ledger 0 errors · history-secrets 0 violations (8,034
+allowlisted hits — the window's shift) · capabilities agree · the
+shells PASS · boundary-negative PASS); the DB roster 320 → 321 (the
+deeplink-tasks spec joins chunk-a 132 → 133) — the full envelope at
+the new count is W-51's. The mobile companion affordance stays
+ONLINE-ONLY (the OFFLINE_CAPABILITIES_MATRIX row 16 law — the approve
+act never queued, never faked offline). NOT production approval —
+تسليم لا قبول.]**
+
+
 ## Verification evidence requirements
 
 Every acceptance item must be evidenced by at least one of: CI test names (linked),

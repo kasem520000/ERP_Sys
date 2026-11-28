@@ -1,0 +1,412 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys_clone/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-28 00:22:50.678 UTC [2378] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-28 00:22:50.678 UTC [2378] LOG:  listening on IPv6 address "::1", port 40295
+2026-11-28 00:22:50.678 UTC [2378] LOG:  listening on IPv4 address "127.0.0.1", port 40295
+
+2026-11-28 00:22:50.679 UTC [2378] LOG:  listening on Unix socket "/tmp/.s.PGSQL.40295"
+
+2026-11-28 00:22:50.680 UTC [2381] LOG:  database system was shut down at 2026-11-28 00:22:50 UTC
+
+2026-11-28 00:22:50.681 UTC [2378] LOG:  database system is ready to accept connections
+
+ ✓ src/__db__/workflow/workflow-engine.db.spec.ts (15 tests) 944ms
+ ✓ src/__db__/workflow/workflow-deeplink-tasks.db.spec.ts (17 tests) 653ms
+2026-11-28 00:22:58.221 UTC [2609] ERROR:  new row for relation "workflow_definitions" violates check constraint "ck_workflow_definitions_trigger_entity"
+2026-11-28 00:22:58.221 UTC [2609] DETAIL:  Failing row contains (99f27b6b-679d-41b8-b14f-864fd569a143, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.221281+00, 2026-11-28 00:22:58.221281+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, WF-BAD-ENTITY, تعريف, sales_invoice, PENDING_APPROVAL, t, {"all": []}, null).
+2026-11-28 00:22:58.221 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+2026-11-28 00:22:58.222 UTC [2609] ERROR:  new row for relation "workflow_definitions" violates check constraint "ck_workflow_definitions_trigger_event"
+2026-11-28 00:22:58.222 UTC [2609] DETAIL:  Failing row contains (e7e7b2c0-ba40-4259-8bd4-e04f2ab4006c, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.222103+00, 2026-11-28 00:22:58.222103+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, WF-BAD-EVENT, تعريف, purchase_order, APPROVED, t, {"all": []}, null).
+2026-11-28 00:22:58.222 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+2026-11-28 00:22:58.223 UTC [2609] ERROR:  new row for relation "workflow_definitions" violates check constraint "ck_workflow_definitions_name_shape"
+2026-11-28 00:22:58.223 UTC [2609] DETAIL:  Failing row contains (84c64926-ae8a-4d7a-b03d-cd188c76e45f, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.222971+00, 2026-11-28 00:22:58.222971+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, WF-NAME-BAD
+	SECOND-LINE, تعريف, purchase_order, PENDING_APPROVAL, t, {"all": []}, null).
+2026-11-28 00:22:58.223 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+2026-11-28 00:22:58.223 UTC [2609] ERROR:  duplicate key value violates unique constraint "uq_workflow_definitions_tenant_name"
+2026-11-28 00:22:58.223 UTC [2609] DETAIL:  Key (tenant_id, name)=(8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, WF-NAME-1) already exists.
+2026-11-28 00:22:58.223 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+2026-11-28 00:22:58.224 UTC [2609] ERROR:  new row for relation "workflow_definitions" violates check constraint "ck_workflow_definitions_conditions_shape"
+2026-11-28 00:22:58.224 UTC [2609] DETAIL:  Failing row contains (97472c72-9bc9-4ed4-ad38-1ba9147b33cf, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.224446+00, 2026-11-28 00:22:58.224446+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, WF-BAD-COND, تعريف, purchase_order, PENDING_APPROVAL, t, ["not", "an", "object"], null).
+2026-11-28 00:22:58.224 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+2026-11-28 00:22:58.225 UTC [2609] ERROR:  new row for relation "workflow_definitions" violates check constraint "ck_workflow_definitions_conditions_shape"
+2026-11-28 00:22:58.225 UTC [2609] DETAIL:  Failing row contains (8a584407-e217-4660-9233-7dfcdf67d118, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.225097+00, 2026-11-28 00:22:58.225097+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, WF-BAD-COND-2, تعريف, purchase_order, PENDING_APPROVAL, t, "all", null).
+2026-11-28 00:22:58.225 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+2026-11-28 00:22:58.244 UTC [2609] ERROR:  new row for relation "workflow_steps" violates check constraint "ck_workflow_steps_type"
+2026-11-28 00:22:58.244 UTC [2609] DETAIL:  Failing row contains (fc5f839b-b890-4629-a1aa-8db94d45c996, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.243819+00, 2026-11-28 00:22:58.243819+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, a2790f44-6373-4872-937a-a01e676196ca, 1, CUSTOM_ACTION, ROLE, owner, {"all": []}, null, S-CUSTOM, خطوة).
+2026-11-28 00:22:58.244 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.251 UTC [2609] ERROR:  new row for relation "workflow_steps" violates check constraint "ck_workflow_steps_assignee_rule"
+2026-11-28 00:22:58.251 UTC [2609] DETAIL:  Failing row contains (dace8b97-efef-4a92-941e-1d7deece9571, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.251717+00, 2026-11-28 00:22:58.251717+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 1127df19-34dd-4a7f-b642-209355d838d8, 1, APPROVAL, TEAM, owner, {"all": []}, null, S-TEAM, خطوة).
+2026-11-28 00:22:58.251 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.260 UTC [2609] ERROR:  new row for relation "workflow_steps" violates check constraint "ck_workflow_steps_order"
+2026-11-28 00:22:58.260 UTC [2609] DETAIL:  Failing row contains (336465d6-5248-4b73-9814-da5c4c46436a, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.259826+00, 2026-11-28 00:22:58.259826+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, bed1678d-3404-42b3-88c1-fcb60ad23dc7, 0, APPROVAL, ROLE, owner, {"all": []}, null, S-ZERO, خطوة).
+2026-11-28 00:22:58.260 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.267 UTC [2609] ERROR:  new row for relation "workflow_steps" violates check constraint "ck_workflow_steps_sla_hours"
+2026-11-28 00:22:58.267 UTC [2609] DETAIL:  Failing row contains (09da9878-4b4a-4959-9c60-6a94965a1527, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.267535+00, 2026-11-28 00:22:58.267535+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, f6e56ddf-b590-402e-8ac0-f79a6354524c, 1, APPROVAL, ROLE, owner, {"all": []}, 0, S-SLA-0, خطوة).
+2026-11-28 00:22:58.267 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.275 UTC [2609] ERROR:  duplicate key value violates unique constraint "uq_workflow_steps_tenant_definition_order"
+2026-11-28 00:22:58.275 UTC [2609] DETAIL:  Key (tenant_id, definition_id, step_order)=(8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 25bda327-18a6-4654-afb0-3dcb282d40ef, 1) already exists.
+2026-11-28 00:22:58.275 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.277 UTC [2609] ERROR:  insert or update on table "workflow_steps" violates foreign key constraint "fk_workflow_steps_definition"
+2026-11-28 00:22:58.277 UTC [2609] DETAIL:  Key (definition_id, tenant_id)=(35a8a791-51f3-438a-a4a7-78fe24980479, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f) is not present in table "workflow_definitions".
+2026-11-28 00:22:58.277 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.285 UTC [2609] ERROR:  new row for relation "workflow_steps" violates check constraint "ck_workflow_steps_assignee_value_shape"
+2026-11-28 00:22:58.285 UTC [2609] DETAIL:  Failing row contains (ad53561f-98e9-49aa-bd8d-bc70ede5cfd5, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.284955+00, 2026-11-28 00:22:58.284955+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, e8e9d395-ef62-4e31-a0ab-8dde25ace5d1, 1, APPROVAL, ROLE, owner'; DROP TABLE users; --, {"all": []}, null, S-BAD-VAL, خطوة).
+2026-11-28 00:22:58.285 UTC [2609] STATEMENT:  INSERT INTO workflow_steps
+	       (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+	        conditions, sla_hours, name, name_ar, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10, $11)
+
+2026-11-28 00:22:58.316 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_pointer_shape"
+2026-11-28 00:22:58.316 UTC [2609] DETAIL:  Failing row contains (30879710-50f6-414f-bfaa-3249dc7f4d13, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.316676+00, 2026-11-28 00:22:58.316676+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 2467ccf8-ec73-4c73-a4b6-4cf7de573f58, purchase_order, dc2391a6-37bd-4fd7-aa08-0199402c3177, {"steps": []}, 1, PENDING, null).
+2026-11-28 00:22:58.316 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.324 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_trigger_entity"
+2026-11-28 00:22:58.324 UTC [2609] DETAIL:  Failing row contains (1ce2bdd7-7d7a-4533-b638-613d76fed7bf, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.324638+00, 2026-11-28 00:22:58.324638+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, fd0af82c-3ce7-4b46-a4a6-0f0977649cc6, goods_receipt, e4ad2ce2-e0ad-481f-ad09-2d596ee9ce66, {"steps": []}, 1, ACTIVE, null).
+2026-11-28 00:22:58.324 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.332 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_pointer_shape"
+2026-11-28 00:22:58.332 UTC [2609] DETAIL:  Failing row contains (bf7e617e-a33c-47cd-967d-711e13eeed8a, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.332798+00, 2026-11-28 00:22:58.332798+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, ce26e8b8-a06b-43cc-88cd-7560063a3739, purchase_order, a5daf6af-93a5-4947-81ab-4e4641079595, {"steps": []}, null, ACTIVE, null).
+2026-11-28 00:22:58.332 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.340 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_pointer_shape"
+2026-11-28 00:22:58.340 UTC [2609] DETAIL:  Failing row contains (c5221a7b-a810-441d-ac7b-6ed86c082c3b, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.340368+00, 2026-11-28 00:22:58.340368+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 0e261c87-0f60-4caa-b595-a7b04cf9ea1b, purchase_order, b1893402-f814-40d4-a239-d3a874c12a6a, {"steps": []}, 2, COMPLETED, 2026-11-27 12:00:00+00).
+2026-11-28 00:22:58.340 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.348 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_terminal_shape"
+2026-11-28 00:22:58.348 UTC [2609] DETAIL:  Failing row contains (e854f140-0d1b-418c-aed1-7f315ed0cf45, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.348694+00, 2026-11-28 00:22:58.348694+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 623d9cde-feb8-4f02-b806-67d8d650c30f, purchase_order, e8f486bf-d522-4005-91c0-5f9d96834ca6, {"steps": []}, null, COMPLETED, null).
+2026-11-28 00:22:58.348 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.356 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_terminal_shape"
+2026-11-28 00:22:58.356 UTC [2609] DETAIL:  Failing row contains (f65889d1-55d9-4be1-ac02-12af04e63706, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.356324+00, 2026-11-28 00:22:58.356324+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 92281944-6169-4af5-bbc4-449669fe3c44, purchase_order, 352c9a3f-b692-4fee-9542-ca6855c055b9, {"steps": []}, 1, ACTIVE, 2026-11-27 12:00:00+00).
+2026-11-28 00:22:58.356 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.364 UTC [2609] ERROR:  new row for relation "workflow_instances" violates check constraint "ck_workflow_instances_snapshot_shape"
+2026-11-28 00:22:58.364 UTC [2609] DETAIL:  Failing row contains (44664c1b-0fab-4f6a-ac68-cc83596f19ce, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.36432+00, 2026-11-28 00:22:58.36432+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 9e19cf7b-3b09-407b-97f5-6771bc492ed1, purchase_order, 74cc1c6f-e949-4b41-abdd-22fa30b4002c, ["not", "an", "object"], 1, ACTIVE, null).
+2026-11-28 00:22:58.364 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.373 UTC [2609] ERROR:  duplicate key value violates unique constraint "uq_workflow_instances_live_doc"
+2026-11-28 00:22:58.373 UTC [2609] DETAIL:  Key (tenant_id, trigger_entity, trigger_entity_id)=(8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, purchase_order, 8f75a14a-a155-4e32-a334-193e77fc5174) already exists.
+2026-11-28 00:22:58.373 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.384 UTC [2609] ERROR:  insert or update on table "workflow_instances" violates foreign key constraint "fk_workflow_instances_definition"
+2026-11-28 00:22:58.384 UTC [2609] DETAIL:  Key (definition_id, tenant_id)=(edebc7bb-670f-4e4e-bd25-6fa4f31d0e40, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f) is not present in table "workflow_definitions".
+2026-11-28 00:22:58.384 UTC [2609] STATEMENT:  INSERT INTO workflow_instances
+	       (id, tenant_id, definition_id, trigger_entity, trigger_entity_id, definition_snapshot,
+	        current_step_order, status, completed_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4::uuid, $5::jsonb, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.490 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.490 UTC [2609] DETAIL:  Failing row contains (cd64d9ff-ac7a-4eb4-84d4-d66c23b09f9b, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.490174+00, 2026-11-28 00:22:58.490174+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, fe4f3cb3-5655-45ed-b12c-279a04781987, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, PENDING, null, 2026-11-27 09:00:00+00, null, null, null).
+2026-11-28 00:22:58.490 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.508 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.508 UTC [2609] DETAIL:  Failing row contains (eaa1baea-cdff-4a23-b57a-a52b50a009be, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.508127+00, 2026-11-28 00:22:58.508127+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 1429f39f-9e8e-4e3a-b62e-e06aa2e576ae, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, PENDING, null, null, 8f8f8f8f-0000-4000-8000-0000000001a1, null, null).
+2026-11-28 00:22:58.508 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.533 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.533 UTC [2609] DETAIL:  Failing row contains (b4bc9f9f-a844-4ea9-921e-7f4d19665edc, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.533087+00, 2026-11-28 00:22:58.533087+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, c8676875-b1d3-489f-9440-3c4f01b4929c, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, PENDING, 8f8f8f8f-0000-4000-8000-0000000001a2, null, null, null, null).
+2026-11-28 00:22:58.533 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.549 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.549 UTC [2609] DETAIL:  Failing row contains (9cb904c5-a77c-4872-977a-3f557de7325c, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.549678+00, 2026-11-28 00:22:58.549678+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, a3624627-9259-4cc1-86c4-8a2c03c03c12, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, DELEGATED, null, null, null, null, null).
+2026-11-28 00:22:58.549 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.565 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.565 UTC [2609] DETAIL:  Failing row contains (f3265f30-2770-4769-bf05-5f40d5ca9f6a, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.565563+00, 2026-11-28 00:22:58.565563+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 34dcc890-59ea-4518-ac98-653c2e0d314a, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, DELEGATED, 8f8f8f8f-0000-4000-8000-0000000001a2, 2026-11-27 09:00:00+00, 8f8f8f8f-0000-4000-8000-0000000001a2, null, null).
+2026-11-28 00:22:58.565 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.582 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.582 UTC [2609] DETAIL:  Failing row contains (ef7dbc68-b75c-42d4-b666-9a3c8c15efb2, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.58192+00, 2026-11-28 00:22:58.58192+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 017242ef-a427-48f9-b78b-73d18780061a, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, APPROVED, null, 2026-11-27 09:00:00+00, null, null, null).
+2026-11-28 00:22:58.582 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.598 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.598 UTC [2609] DETAIL:  Failing row contains (e2aaa65c-901a-4774-bd21-0bf09a0b09c6, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.597797+00, 2026-11-28 00:22:58.597797+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, db0c703e-108c-4788-8e9f-c9c7787b35ba, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, REJECTED, null, null, 8f8f8f8f-0000-4000-8000-0000000001a1, null, null).
+2026-11-28 00:22:58.598 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.614 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.614 UTC [2609] DETAIL:  Failing row contains (c1a921bf-3f3e-40df-b46d-f6e3b7294e47, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.614267+00, 2026-11-28 00:22:58.614267+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, d9f38d16-4383-4b75-b756-8827d7c6e6df, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, SKIPPED, null, 2026-11-27 09:00:00+00, 8f8f8f8f-0000-4000-8000-0000000001a1, null, null).
+2026-11-28 00:22:58.614 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.630 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.630 UTC [2609] DETAIL:  Failing row contains (e4a25f7b-4560-4deb-9998-47b5c71f0b7b, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.630249+00, 2026-11-28 00:22:58.630249+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 7206b962-a5f9-4848-9345-7516ba483731, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, SKIPPED, 8f8f8f8f-0000-4000-8000-0000000001a2, 2026-11-27 09:00:00+00, null, null, null).
+2026-11-28 00:22:58.630 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.646 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.646 UTC [2609] DETAIL:  Failing row contains (bb12b1f5-6b45-465c-8a22-ccca352d1e2b, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.646577+00, 2026-11-28 00:22:58.646577+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, b8429f23-a5b8-4f9c-8ead-2b5255742c4d, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, SKIPPED, null, null, null, null, null).
+2026-11-28 00:22:58.646 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.662 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_act_shape"
+2026-11-28 00:22:58.662 UTC [2609] DETAIL:  Failing row contains (9e94ff9d-923b-496c-91d8-a58603686547, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.662484+00, 2026-11-28 00:22:58.662484+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, dd1d662f-f4f9-43bf-9fdb-a48491ceab47, 1, APPROVAL, 8f8f8f8f-0000-4000-8000-0000000001a1, DONE, null, null, null, null, null).
+2026-11-28 00:22:58.662 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.678 UTC [2609] ERROR:  new row for relation "workflow_step_instances" violates check constraint "ck_workflow_step_instances_type"
+2026-11-28 00:22:58.678 UTC [2609] DETAIL:  Failing row contains (8cb2804f-42a0-4a49-8025-e453fa1c0cf8, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.678125+00, 2026-11-28 00:22:58.678125+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, d2573e53-f2b7-4676-8346-abe21092fa9b, 1, ESCALATION, 8f8f8f8f-0000-4000-8000-0000000001a1, PENDING, null, null, null, null, null).
+2026-11-28 00:22:58.678 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.694 UTC [2609] ERROR:  duplicate key value violates unique constraint "uq_workflow_step_instances_tenant_instance_order"
+2026-11-28 00:22:58.694 UTC [2609] DETAIL:  Key (tenant_id, instance_id, step_order)=(8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, eef3ca18-e618-441a-ae17-c354fd5b8f4b, 1) already exists.
+2026-11-28 00:22:58.694 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.695 UTC [2609] ERROR:  insert or update on table "workflow_step_instances" violates foreign key constraint "fk_workflow_step_instances_instance"
+2026-11-28 00:22:58.695 UTC [2609] DETAIL:  Key (instance_id, tenant_id)=(8f8f8f8f-0000-4000-8000-0000000000ff, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f) is not present in table "workflow_instances".
+2026-11-28 00:22:58.695 UTC [2609] STATEMENT:  INSERT INTO workflow_step_instances
+	       (id, tenant_id, instance_id, step_order, step_type, assignee_user_id, status,
+	        delegated_to, acted_at, acted_by, comment, due_at, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::uuid, $8, $9::uuid, $10, $11, $12)
+
+2026-11-28 00:22:58.697 UTC [2609] ERROR:  new row for relation "delegations" violates check constraint "ck_delegations_no_self"
+2026-11-28 00:22:58.697 UTC [2609] DETAIL:  Failing row contains (9cbfdbc1-fcb2-4e80-a459-3221c5712a87, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.69747+00, 2026-11-28 00:22:58.69747+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 8f8f8f8f-0000-4000-8000-0000000001a1, 8f8f8f8f-0000-4000-8000-0000000001a1, ALL, null, 2026-11-27 08:00:00+00, 2026-11-28 08:00:00+00, null, null).
+2026-11-28 00:22:58.697 UTC [2609] STATEMENT:  INSERT INTO delegations
+	       (id, tenant_id, from_user_id, to_user_id, scope_kind, scope_value, starts_at, ends_at,
+	        note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3::uuid, $4, $5, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.698 UTC [2609] ERROR:  new row for relation "delegations" violates check constraint "ck_delegations_scope_shape"
+2026-11-28 00:22:58.698 UTC [2609] DETAIL:  Failing row contains (0152061d-b1f2-4a9f-b3a3-92caeeeb820a, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.698679+00, 2026-11-28 00:22:58.698679+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 8f8f8f8f-0000-4000-8000-0000000001a1, 8f8f8f8f-0000-4000-8000-0000000001a2, ALL, purchasing, 2026-11-27 08:00:00+00, 2026-11-28 08:00:00+00, null, null).
+2026-11-28 00:22:58.698 UTC [2609] STATEMENT:  INSERT INTO delegations
+	       (id, tenant_id, from_user_id, to_user_id, scope_kind, scope_value, starts_at, ends_at,
+	        note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3::uuid, $4, $5, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.699 UTC [2609] ERROR:  new row for relation "delegations" violates check constraint "ck_delegations_scope_shape"
+2026-11-28 00:22:58.699 UTC [2609] DETAIL:  Failing row contains (a6844cc2-bc53-425e-875c-684f5eb09b2b, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.699394+00, 2026-11-28 00:22:58.699394+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 8f8f8f8f-0000-4000-8000-0000000001a1, 8f8f8f8f-0000-4000-8000-0000000001a2, MODULE, null, 2026-11-27 08:00:00+00, 2026-11-28 08:00:00+00, null, null).
+2026-11-28 00:22:58.699 UTC [2609] STATEMENT:  INSERT INTO delegations
+	       (id, tenant_id, from_user_id, to_user_id, scope_kind, scope_value, starts_at, ends_at,
+	        note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3::uuid, $4, $5, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.700 UTC [2609] ERROR:  new row for relation "delegations" violates check constraint "ck_delegations_scope_kind"
+2026-11-28 00:22:58.700 UTC [2609] DETAIL:  Failing row contains (03b0150b-b93d-4024-a4fe-d976da73e702, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.700013+00, 2026-11-28 00:22:58.700013+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 8f8f8f8f-0000-4000-8000-0000000001a1, 8f8f8f8f-0000-4000-8000-0000000001a2, DEPARTMENT, null, 2026-11-27 08:00:00+00, 2026-11-28 08:00:00+00, null, null).
+2026-11-28 00:22:58.700 UTC [2609] STATEMENT:  INSERT INTO delegations
+	       (id, tenant_id, from_user_id, to_user_id, scope_kind, scope_value, starts_at, ends_at,
+	        note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3::uuid, $4, $5, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.700 UTC [2609] ERROR:  new row for relation "delegations" violates check constraint "ck_delegations_window"
+2026-11-28 00:22:58.700 UTC [2609] DETAIL:  Failing row contains (001da66e-c91a-4088-87dc-72fbad594030, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.700567+00, 2026-11-28 00:22:58.700567+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 8f8f8f8f-0000-4000-8000-0000000001a1, 8f8f8f8f-0000-4000-8000-0000000001a2, ALL, null, 2026-11-28 08:00:00+00, 2026-11-27 08:00:00+00, null, null).
+2026-11-28 00:22:58.700 UTC [2609] STATEMENT:  INSERT INTO delegations
+	       (id, tenant_id, from_user_id, to_user_id, scope_kind, scope_value, starts_at, ends_at,
+	        note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3::uuid, $4, $5, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.701 UTC [2609] ERROR:  new row for relation "delegations" violates check constraint "ck_delegations_window"
+2026-11-28 00:22:58.701 UTC [2609] DETAIL:  Failing row contains (874c6f40-b3e8-4dc2-aa81-4a48feab7931, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.700981+00, 2026-11-28 00:22:58.700981+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 8f8f8f8f-0000-4000-8000-0000000001a1, 8f8f8f8f-0000-4000-8000-0000000001a2, ALL, null, 2026-11-27 08:00:00+00, 2026-11-27 08:00:00+00, null, null).
+2026-11-28 00:22:58.701 UTC [2609] STATEMENT:  INSERT INTO delegations
+	       (id, tenant_id, from_user_id, to_user_id, scope_kind, scope_value, starts_at, ends_at,
+	        note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3::uuid, $4, $5, $6, $7, $8, $9)
+
+2026-11-28 00:22:58.754 UTC [2609] ERROR:  new row for relation "escalation_events" violates check constraint "ck_escalation_events_kind"
+2026-11-28 00:22:58.754 UTC [2609] DETAIL:  Failing row contains (9dbb6588-fe1c-4f70-977f-2ef476d37651, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.754523+00, 2026-11-28 00:22:58.754523+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 564bbbcc-361a-4168-ae98-43c259e71c6b, ESCALATE, 2026-11-27, {}, null).
+2026-11-28 00:22:58.754 UTC [2609] STATEMENT:  INSERT INTO escalation_events
+	       (id, tenant_id, step_instance_id, kind, due_date, payload, note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3, $4::date, $5::jsonb, $6, $7)
+
+2026-11-28 00:22:58.778 UTC [2609] ERROR:  duplicate key value violates unique constraint "uq_escalation_events_dedupe"
+2026-11-28 00:22:58.778 UTC [2609] DETAIL:  Key (tenant_id, step_instance_id, kind, due_date)=(8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 4a8e9bb5-8321-4d09-938a-ae184fa66ee0, REMINDER, 2026-11-27) already exists.
+2026-11-28 00:22:58.778 UTC [2609] STATEMENT:  INSERT INTO escalation_events
+	       (id, tenant_id, step_instance_id, kind, due_date, payload, note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3, $4::date, $5::jsonb, $6, $7)
+
+2026-11-28 00:22:58.802 UTC [2609] ERROR:  new row for relation "escalation_events" violates check constraint "ck_escalation_events_payload_shape"
+2026-11-28 00:22:58.802 UTC [2609] DETAIL:  Failing row contains (92c60a29-d462-439b-b5e6-8831689a4b77, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f, 2026-11-28 00:22:58.801958+00, 2026-11-28 00:22:58.801958+00, 1, 8f8f8f8f-0000-4000-8000-0000000008f1, null, 1d150a16-aa16-4a76-b55e-3eb2c211df98, REMINDER, 2026-11-27, ["not", "an", "object"], null).
+2026-11-28 00:22:58.802 UTC [2609] STATEMENT:  INSERT INTO escalation_events
+	       (id, tenant_id, step_instance_id, kind, due_date, payload, note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3, $4::date, $5::jsonb, $6, $7)
+
+2026-11-28 00:22:58.802 UTC [2609] ERROR:  insert or update on table "escalation_events" violates foreign key constraint "fk_escalation_events_step_instance"
+2026-11-28 00:22:58.802 UTC [2609] DETAIL:  Key (step_instance_id, tenant_id)=(8f8f8f8f-0000-4000-8000-0000000000fe, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f) is not present in table "workflow_step_instances".
+2026-11-28 00:22:58.802 UTC [2609] STATEMENT:  INSERT INTO escalation_events
+	       (id, tenant_id, step_instance_id, kind, due_date, payload, note, created_by)
+	     VALUES (gen_random_uuid(), $1, $2::uuid, $3, $4::date, $5::jsonb, $6, $7)
+
+2026-11-28 00:22:58.804 UTC [2609] ERROR:  insert or update on table "workflow_definitions" violates foreign key constraint "fk_workflow_definitions_origin_policy"
+2026-11-28 00:22:58.804 UTC [2609] DETAIL:  Key (origin_policy_id, tenant_id)=(8f8f8f8f-0000-4000-8000-0000000000fd, 8f8f8f8f-8f8f-8f8f-8f8f-8f8f8f8f8f8f) is not present in table "approval_policies".
+2026-11-28 00:22:58.804 UTC [2609] STATEMENT:  INSERT INTO workflow_definitions
+	       (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions,
+	        origin_policy_id, created_by)
+	     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9)
+
+ ✓ src/__db__/workflow/workflow-schema.db.spec.ts (41 tests) 605ms
+ ✓ src/__db__/workflow/workflow-bridge.db.spec.ts (7 tests) 559ms
+ ✓ src/__db__/workflow/workflow-escalation-sweep.db.spec.ts (9 tests) 302ms
+ ✓ src/__db__/workflow/workflow-delegation-escalation.db.spec.ts (8 tests) 274ms
+
+ Test Files  6 passed (6)
+      Tests  97 passed (97)
+   Start at  00:22:49
+   Duration  10.45s (transform 861ms, setup 0ms, collect 1.69s, tests 3.34s, environment 0ms, prepare 55ms)
+
+2026-11-28 00:23:00.028 UTC [2378] LOG:  received fast shutdown request
+2026-11-28 00:23:00.028 UTC [2378] LOG:  aborting any active transactions
+2026-11-28 00:23:00.028 UTC [2609] FATAL:  terminating connection due to administrator command
+2026-11-28 00:23:00.030 UTC [2464] FATAL:  terminating connection due to administrator command
+2026-11-28 00:23:00.031 UTC [2378] LOG:  background worker "logical replication launcher" (PID 2384) exited with exit code 1
+2026-11-28 00:23:00.032 UTC [2379] LOG:  shutting down
+2026-11-28 00:23:00.032 UTC [2379] LOG:  checkpoint starting: shutdown immediate
+
+(node:2437) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:2437) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+2026-11-28 00:23:00.061 UTC [2379] LOG:  checkpoint complete: wrote 3304 buffers (20.2%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.020 s, sync=0.009 s, total=0.029 s; sync files=2956, longest=0.001 s, average=0.001 s; distance=30345 kB, estimate=30345 kB; lsn=0/3280E00, redo lsn=0/3280E00
+
+2026-11-28 00:23:00.069 UTC [2378] LOG:  database system is shut down
+
+VITEST_EXIT=0
