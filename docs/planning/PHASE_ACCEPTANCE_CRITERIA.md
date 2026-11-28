@@ -2943,6 +2943,88 @@ ONLINE-ONLY (the OFFLINE_CAPABILITIES_MATRIX row 16 law — the approve
 act never queued, never faked offline). NOT production approval —
 تسليم لا قبول.]**
 
+**[Dated 2026-11-28 (PHASE-052 W-48 THE WEB PLANE DELIVERED —
+**ACCEPTANCE #7 GREEN** at the W-48 gate; steps 1–4 + the gate
+increment pushed at their own commits under the standing order «عند
+الانتهاء من أي خطوة ادفعها إلى المستودع»: step 1 `3555bfc` THE API
+SURFACE (the definition-input pure fold FIRST — the unit-first law,
+18 spec arms: the mapping law (the event DERIVED, never sent), the
+D-06 tree's save-time structural face naming every malformed node BY
+PATH, the step ladder's floors (the three types ONLY · the four
+assignee rules · the SLA whole-hours law · the 1..20 contiguous
+ladder) + the store's editor reads/writes (the definitions + steps
+REPLACED in one ambient transaction — an edit never touches a live
+instance, the snapshots frozen; deactivation the path, never delete)
++ the inbox's pointer-step APPROVAL query with THE AGING FIGURES THE
+DB'S OWN CLOCK COMPUTES (ageHours + overdue inside the SQL) + THE
+DELEGATION LANE (the absent assignees' steps resolved through the
+SAME resolveEffectiveActor the act path runs — the listed set IS the
+actable set) + the WorkflowDefinitionsService (the fold first + the
+audit seal + the duplicate-name typed wrap + the binding immutability)
++ the WorkflowApprovalInboxService (listMyApprovals · actOnStep — the
+engine's own actOnCurrentStep VERBATIM · readTimeline — the ACTIVE
+chain or the latest terminal one, the no-chain document the honest
+instance-null read) + THE CONTROLLER +6 (ROUTE_PERMISSIONS 1,216 →
+1,222, every key the 0130-seeded matrix §3.30 row: GET approvals on
+workflow.inbox.act · POST approvals/:id/act on workflow.approve · GET
+timeline on workflow.history.view · the definitions CRUD pair on
+workflow.definitions.manage; the flags workflow.engine/
+workflow.definitions per D-04)) · step 2 `6187fa9` THE WORKFLOW
+SURFACES (the timeline component — PP-17's full step history VERBATIM
+with the snapshot's own bilingual names + the actors' display names;
+the approvals inbox board — the DATA-SLOT pane switch (never the Tabs
+primitive, the 045 recall), the aging VERBATIM, the routed rows'
+delegation marker, the quick actions through the engine's own act
+path; the tasks lane pane (the completion write-back); the deep-link
+act landing (the link authorizes, the session authenticates — the
+dead link previews as the typed refusal, never a stale form) + the
+three pages + the FALLBACK_CRUMBS + **i18n BY BOTH COUNTS 7,582 + 166
+= 7,748 = 7,748** (the wave's whole declared delta) + the messages
+helpers) · step 3 `65e7384` THE CHAIN EDITOR + THE NAV (the form-first
+editor: the visual ordering (the up/down buttons rewrite the array —
+the order is DATA, never a canvas), the conditions editor (the D-06
+tree's structured face — the fold the ONE validator), the mapping law
+(no triggerEvent key ever leaves the editor), the deactivation dialog;
+NAV_ITEMS **+3** (workflow.approvals · workflow.tasks — the HOME
+group, NAVIGATION_MODEL §1's own approvals-queue member ·
+settings.workflows) + **THE HONEST +1** (trade.drawbacks — the fourth
+bound surface's register, disclosed: the 051 web plane delivered the
+drawback claims engine-only; the engine's own docDetailPath law points
+the assignee at /trade/drawbacks?doc=…, so the row makes the workflow
+plane's contract honest) + the ⌘K registration (OA-04 — the registry
+IS the registration)) · step 4 `7d62c0b` THE TIMELINE EMBEDS + THE
+FOURTH BOUND SURFACE (the journal detail embed — server-gated on
+workflow.history.view, the section never renders without it; the PO
+chain view (the rowAction + the ?doc= landing); the contracting CO
+chain view (the rowAction + the ?doc= landing, independent of the
+project selection); THE DRAWBACK CLAIMS BOARD — the 051 engine's own
+register with the ladder chips + the create act (the honest nulls) +
+the lifecycle acts (evidence · submit · review · approve · reject ·
+pay) + the chain view). The gate increment: THE SEVEN STANDING
+ISOLATES standalone FIRST (soak 1·1 · fcm 1·8 · email 1·5 · the cmms
+sweep 1·4 · the quality sweep 1·4 · the trade sweep 1·6 · the workflow
+escalation sweep 1·9) + the affected folders (the workflow family
+6 · 97 · the accounting 4 · 28 · the inbox/cmms 2 · 40 · the
+identity-flows 1 · 21 — the ROUTE_PERMISSIONS registry's own consumer)
++ the wave's own web suite (46 files · 269 tests ALL GREEN — the six
+W-48 spec files' 31 arms among them) + the whole standing battery
+(typecheck 8/8 · lint 8/8 · unit workspace 8/8 — 2,290 tests standing
+(+47: the definition-input fold's 18 + the web plane's 29) ·
+depcruise clean 2,332 · 17,413 (+21/+170 dated; zero cycles) ·
+ROUTE_PERMISSIONS 1,216 → 1,222 + SESSION_ROUTES standing 32 ·
+permissions drift 366 = 366 (zero new keys — all six routes bind the
+0130-seeded rows) · **i18n 7,582 + 166 = 7,748 = 7,748 BY BOTH
+COUNTS** + mobile 371 = 371 standing · manifests 13/13 · docs 33/33
+(the ledger edits ride this increment) · id-ledger 0 errors + the
+self-test all-probes OK (probe 7 stands at G-67/PHASE-052, claimant
+PHASE-053) · history-secrets 0 violations (8,179 allowlisted hits —
+the SIX tag anchors walked, all untouched) · capabilities agree · the
+shells PASS · boundary-negative PASS); the DB roster standing at 321
+(no new DB spec — the wave's specs are the web component specs + the
+pure fold's unit spec) — the full envelope is W-51's. The mobile
+companion affordance stays ONLINE-ONLY (the OFFLINE_CAPABILITIES_
+MATRIX row 16 law). NOT production approval — تسليم لا قبول.]**
+
 
 ## Verification evidence requirements
 

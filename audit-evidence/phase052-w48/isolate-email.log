@@ -1,0 +1,86 @@
+
+ RUN  v3.2.7 /home/z/my-project/ERP_Sys_clone/apps/api
+
+The files belonging to this database system will be owned by user "z".
+This user must also own the server process.
+
+
+The database cluster will be initialized with this locale configuration:
+  provider:    libc
+  LC_COLLATE:  C
+  LC_CTYPE:    C.UTF-8
+  LC_MESSAGES: C
+  LC_MONETARY: C
+  LC_NUMERIC:  C
+  LC_TIME:     C
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory /tmp/erp-api-testdb ... ok
+
+creating subdirectories ... 
+ok
+
+selecting dynamic shared memory implementation ... 
+posix
+selecting default max_connections ... 
+100
+selecting default shared_buffers ... 
+128MB
+selecting default time zone ... 
+Etc/UTC
+creating configuration files ... 
+ok
+running bootstrap script ... 
+ok
+
+performing post-bootstrap initialization ... 
+ok
+syncing data to disk ... 
+ok
+
+Success. You can now start the database server using:
+
+    '/home/z/my-project/ERP_Sys_clone/node_modules/.pnpm/@embedded-postgres+linux-x64@16.14.0-beta.17/node_modules/@embedded-postgres/linux-x64/native/bin/pg_ctl' -D /tmp/erp-api-testdb -l logfile start
+
+
+2026-11-28 01:40:40.004 UTC [21594] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0, 64-bit
+
+2026-11-28 01:40:40.004 UTC [21594] LOG:  listening on IPv6 address "::1", port 34213
+2026-11-28 01:40:40.004 UTC [21594] LOG:  listening on IPv4 address "127.0.0.1", port 34213
+
+2026-11-28 01:40:40.004 UTC [21594] LOG:  listening on Unix socket "/tmp/.s.PGSQL.34213"
+
+2026-11-28 01:40:40.006 UTC [21597] LOG:  database system was shut down at 2026-11-28 01:40:39 UTC
+
+2026-11-28 01:40:40.007 UTC [21594] LOG:  database system is ready to accept connections
+
+{"level":30,"time":1795830045786,"service":"erp-api","module":"jobs","action":"boss-started","msg":"pg-boss queue client started"}
+{"level":30,"time":1795830047797,"service":"erp-api","module":"notifications","template":"invitation","msg":"email delivered"}
+{"level":30,"time":1795830049794,"service":"erp-api","module":"notifications","template":"password_reset","msg":"email delivered"}
+{"level":30,"time":1795830051793,"service":"erp-api","module":"notifications","template":"login_notification","msg":"email delivered"}
+{"level":30,"time":1795830052658,"service":"erp-api","module":"jobs","action":"boss-stopped","msg":"pg-boss queue client stopped"}
+ ✓ src/__db__/notifications-email.db.spec.ts (5 tests) 6912ms
+   ✓ email adapter (real SMTP session + pg-boss idempotency) > renders + delivers the AR invitation with the accept link through the queue  2031ms
+   ✓ email adapter (real SMTP session + pg-boss idempotency) > delivers the EN password reset (30-minute wording + link)  2009ms
+   ✓ email adapter (real SMTP session + pg-boss idempotency) > duplicate enqueue of the same logical email sends exactly once (idempotent handler)  2813ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  01:40:38
+   Duration  13.84s (transform 549ms, setup 0ms, collect 1.22s, tests 6.91s, environment 0ms, prepare 56ms)
+
+2026-11-28 01:40:52.668 UTC [21594] LOG:  received fast shutdown request
+
+2026-11-28 01:40:52.668 UTC [21594] LOG:  aborting any active transactions
+2026-11-28 01:40:52.670 UTC [21594] LOG:  background worker "logical replication launcher" (PID 21600) exited with exit code 1
+2026-11-28 01:40:52.670 UTC [21595] LOG:  shutting down
+2026-11-28 01:40:52.670 UTC [21595] LOG:  checkpoint starting: shutdown immediate
+
+2026-11-28 01:40:52.695 UTC [21595] LOG:  checkpoint complete: wrote 3041 buffers (18.6%); 0 WAL file(s) added, 0 removed, 2 recycled; write=0.015 s, sync=0.010 s, total=0.025 s; sync files=2983, longest=0.001 s, average=0.001 s; distance=29708 kB, estimate=29708 kB; lsn=0/31E19C0, redo lsn=0/31E19C0
+
+2026-11-28 01:40:52.703 UTC [21594] LOG:  database system is shut down
+
+VITEST_EXIT=0

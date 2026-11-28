@@ -1,0 +1,56 @@
+
+> erp-platform@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone
+> turbo run typecheck
+
+
+   • turbo 2.11.10
+   • Packages in scope: @erp/api, @erp/config, @erp/contracts, @erp/desktop, @erp/domain-core, @erp/mobile, @erp/sync-core, @erp/ui, @erp/web
+   • Running typecheck in 9 packages
+   • Remote caching disabled
+
+@erp/domain-core:typecheck: cache miss, executing ee834efef98b0504
+@erp/mobile:typecheck: cache miss, executing 7dbb4232ffa52e77
+@erp/api:typecheck: cache miss, executing 20f72f4e2558ec3d
+@erp/contracts:typecheck: cache miss, executing 2fd7deb1ad99dab5
+@erp/web:typecheck: cache miss, executing c94ff6f3a791e88a
+@erp/desktop:typecheck: cache miss, executing e06fc81855e80c22
+@erp/sync-core:typecheck: cache miss, executing 47f1c5f5c688e59a
+@erp/ui:typecheck: cache miss, executing 3830d0d6b5375313
+@erp/domain-core:typecheck: 
+@erp/domain-core:typecheck: > @erp/domain-core@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/domain-core
+@erp/domain-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/domain-core:typecheck: 
+@erp/contracts:typecheck: 
+@erp/contracts:typecheck: > @erp/contracts@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/contracts
+@erp/contracts:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/contracts:typecheck: 
+@erp/ui:typecheck: 
+@erp/ui:typecheck: > @erp/ui@1.0.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/ui
+@erp/ui:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/ui:typecheck: 
+@erp/web:typecheck: 
+@erp/web:typecheck: > @erp/web@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/web
+@erp/web:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/web:typecheck: 
+@erp/api:typecheck: 
+@erp/api:typecheck: > @erp/api@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/api
+@erp/api:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/api:typecheck: 
+@erp/sync-core:typecheck: 
+@erp/sync-core:typecheck: > @erp/sync-core@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/packages/sync-core
+@erp/sync-core:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/sync-core:typecheck: 
+@erp/desktop:typecheck: 
+@erp/desktop:typecheck: > @erp/desktop@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/desktop
+@erp/desktop:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/desktop:typecheck: 
+@erp/mobile:typecheck: 
+@erp/mobile:typecheck: > @erp/mobile@0.1.0 typecheck /home/z/my-project/ERP_Sys_clone/apps/mobile
+@erp/mobile:typecheck: > tsc --noEmit -p tsconfig.json
+@erp/mobile:typecheck: 
+
+ Tasks:    8 successful, 8 total
+Cached:    0 cached, 8 total
+  Time:    1m9.243s 
+
+EXIT=0
