@@ -44,6 +44,7 @@ import { PlanningQueriesService } from "./manufacturing/planning-queries";
 import { WmsQueriesService } from "./operational/wms-queries";
 import { QualityReportQueriesService } from "./quality/quality-queries";
 import { TradeReportQueriesService } from "./trade/trade-queries";
+import { WorkflowReportQueriesService } from "./workflow/workflow-queries";
 import { PartnerQueriesService } from "../../partners/application/partner-queries";
 import { TaxQueriesService } from "../../tax/application/tax-queries";
 import { UserQueriesService } from "../../identity/application/user-queries";
@@ -154,6 +155,13 @@ export interface ReportingServices {
    * same direct-construction graph the 049 CMMS / 050 quality
    * surfaces build). */
   tradeQueries: TradeReportQueriesService;
+  /** PHASE-052 (W-49 — T-14, dated 2026-11-28) · the workflow query
+   * surface — the inbox's pointer-step APPROVAL read at the tenant's
+   * breadth with the aging figures the DB's own clock computes, and
+   * the escalation plane's awaiting-steps read + the sweep's own
+   * escalation_events counts (the registry query-service convention,
+   * the 051 trade pattern verbatim). */
+  workflowQueries: WorkflowReportQueriesService;
 }
 
 let bundle: ReportingServices | undefined;
@@ -236,6 +244,9 @@ export function reportingServices(): ReportingServices {
       // own reader (the same direct-construction graph the __db__/trade
       // fixtures build — the folds' read surfaces only, never the runs).
       tradeQueries: new TradeReportQueriesService(),
+      // PHASE-052 (W-49 — T-14): the workflow reads' own reader (the same
+      // direct-construction graph the __db__/workflow fixtures build).
+      workflowQueries: new WorkflowReportQueriesService(),
     };
   }
   return bundle;

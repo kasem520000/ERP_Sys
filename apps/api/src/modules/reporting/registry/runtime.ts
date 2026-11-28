@@ -44,6 +44,7 @@ const CATEGORIES: readonly ReportCategory[] = [
   "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects plane (WBS/EVM/contracting/field service)
   "quality", // PHASE-050 (W-30 — T-17, dated 2026-11-23): the QMS registers (NCR/CAPA/calibration/complaints)
   "trade", // PHASE-051 (W-40 — T-15, dated 2026-11-26): the foreign-trade registers (LC/customs/shipments/drawback)
+  "workflow", // PHASE-052 (W-49 — T-14, dated 2026-11-28): the workflow registers (the pending approvals at the tenant's breadth · the SLA aging + the escalation events)
 ];
 
 const SOURCE_MODULES: readonly DataSourceModule[] = [
@@ -73,6 +74,7 @@ const SOURCE_MODULES: readonly DataSourceModule[] = [
   "projects", // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects query surface (the W-9…W-12 engines the four projects contracts read verbatim — WBS rollup · budgets/actuals · EVM · change orders · contracting · field service)
   "quality", // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality query surface (the quality module's own registers the four quality contracts read verbatim — NCR · CAPA · calibration due · complaints)
   "trade", // PHASE-051 (W-40 — T-15, dated 2026-11-26): the trade query surface (the trade module's own registers the four trade contracts read verbatim — the LCs · the declarations + lines · the B/Ls + events · the drawback claims)
+  "workflow", // PHASE-052 (W-49 — T-14, dated 2026-11-28): the workflow query surface (the workflow module's own reads the two workflow contracts read verbatim — the inbox's pointer-step APPROVAL query · the escalation plane's awaiting-steps + events)
 ];
 
 const dataSourceSchema = z.object({
@@ -210,9 +212,10 @@ const MODULE_DATA_PHASE: Readonly<Record<DataSourceModule, number>> = Object.fre
   projects: 48, // PHASE-048 (W-14 — T-17, dated 2026-11-22): the projects engines (WBS rollup · budgets/actuals + INV-033 · EVM · change orders · contracting registers · field service — the query surfaces the four projects contracts read)
   quality: 50, // PHASE-050 (W-30 — T-17, dated 2026-11-23): the quality module's own registers (NCR/CAPA/complaints/calibration — the query surfaces the four quality contracts read verbatim)
   trade: 51, // PHASE-051 (W-40 — T-15, dated 2026-11-26): the trade module's own registers (the LCs · the declarations + lines · the B/Ls + events · the drawback claims — the query surfaces the four trade contracts read verbatim)
+  workflow: 52, // PHASE-052 (W-49 — T-14, dated 2026-11-28): the workflow module's own reads (the inbox's pointer-step APPROVAL query · the escalation plane's awaiting-steps + events — the query surfaces the two workflow contracts read verbatim)
 });
 
-const REGISTERED_PHASE_WINDOW = 51; // PHASE-013 window, widened by the
+const REGISTERED_PHASE_WINDOW = 52; // PHASE-013 window, widened by the
 // delivering phases that registered contracts over real query surfaces:
 // 15 (industry reports) + 16 (the POS set) + 17 (distribution) + 18
 // (manufacturing) + 19 (CRM) + 26 (fixed assets) + 27 (notes/installments) +

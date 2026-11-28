@@ -225,6 +225,18 @@ import { tradeCustomsDeclarationRegisterContract } from "./trade/customs-declara
 import { tradeShipmentStatusContract } from "./trade/shipment-status.contract";
 import { tradeDutyDrawbackStatusContract } from "./trade/duty-drawback-status.contract";
 
+// PHASE-052 (W-49 — T-14, dated 2026-11-28) · the workflow set
+// (REPORT_CATALOG's PHASE-052 rows — the two report contracts, registry
+// 126 → 128, ALL PIN SITES TOGETHER per D-15/D-18): every contract reads
+// the workflow module's own reads VERBATIM (zero parallel computation —
+// the inbox's pointer-step APPROVAL query with the aging figures the
+// DB's own clock computes; the escalation plane's awaiting-steps read +
+// the sweep's own escalation_events counts) and rides the module's own
+// keys (the §12 convention, matrix §3.30 — workflow.inbox.act ·
+// workflow.escalation.manage).
+import { workflowPendingApprovalsContract } from "./workflow/pending-approvals.contract";
+import { workflowSlaAgingContract } from "./workflow/sla-aging.contract";
+
 export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   // §1 financial statements
   trialBalanceContract,
@@ -471,6 +483,9 @@ export const REPORT_CONTRACTS: readonly ReportContract[] = Object.freeze([
   tradeCustomsDeclarationRegisterContract,
   tradeShipmentStatusContract,
   tradeDutyDrawbackStatusContract,
+  // PHASE-052 (W-49 — T-15's canon numbering, dated 2026-11-28): the workflow pair
+  workflowPendingApprovalsContract,
+  workflowSlaAgingContract,
 ]);
 
 export { validateRegistry, registrySnapshot } from "./runtime";

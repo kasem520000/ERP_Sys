@@ -215,6 +215,12 @@ export const ALL_KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "trade.customs.view",
   "trade.shipments.view",
   "trade.view",
+  // PHASE-052 (0130 §5 seed, matrix §3.30 — W-49, T-14, dated
+  // 2026-11-28): the workflow report keys (the same §12 convention —
+  // the two contracts ride the module's own keys the workflow routes
+  // ride; the grants the fullContext actor needs to run them).
+  "workflow.inbox.act",
+  "workflow.escalation.manage",
 ]);
 
 /** A full-grants RunContext (override permissions for the deny paths). */

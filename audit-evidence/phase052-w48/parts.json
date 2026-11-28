@@ -159,6 +159,7 @@
   "src/__db__/trade/trade-transport.db.spec.ts",
   "src/__db__/workflow/workflow-bridge.db.spec.ts",
   "src/__db__/workflow/workflow-deeplink-tasks.db.spec.ts",
+  "src/__db__/workflow/workflow-reports.db.spec.ts",
   "src/__db__/workflow/workflow-delegation-escalation.db.spec.ts",
   "src/__db__/workflow/workflow-engine.db.spec.ts",
   "src/__db__/workflow/workflow-escalation-sweep.db.spec.ts",

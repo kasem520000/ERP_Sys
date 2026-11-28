@@ -170,6 +170,12 @@ const KNOWN_PERMISSIONS: ReadonlySet<string> = new Set([
   "projects.evm.view",
   "projects.contracting.view",
   "projects.fieldservice.view",
+  // PHASE-052 (0130 §5 seed, matrix §3.30 — W-49, T-14, dated
+  // 2026-11-28): the workflow report keys (the same §12 convention —
+  // the two contracts ride the module's own keys the workflow routes
+  // ride).
+  "workflow.inbox.act",
+  "workflow.escalation.manage",
 ]);
 
 /** A minimal but type-complete stored envelope for cache/CSV/XLSX tests. */
@@ -217,16 +223,16 @@ function fakeResult(overrides: Partial<ReportResult> = {}): ReportResult {
 }
 
 describe("registry meta-tests (boot validation, §2)", () => {
-  it("the 126 frozen contracts validate against the known-permission catalog", () => { // PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects)
+  it("the 128 frozen contracts validate against the known-permission catalog", () => { // PHASE-052 (W-49, T-14, dated 2026-11-28): 126 → 128 (+2 workflow: pending-approvals, sla-aging); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register); PHASE-048 (W-14, T-17, dated 2026-11-22): 110 → 114 (+4 projects)
     const result = validateRegistry([...REPORT_CONTRACTS], { knownPermissions: KNOWN_PERMISSIONS });
     expect(result.ok).toBe(true);
     expect(result.errors).toEqual([]);
-    expect(result.count).toBe(126); // PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
+    expect(result.count).toBe(128); // PHASE-052 (W-49, T-14, dated 2026-11-28): 126 → 128 (+2 workflow: pending-approvals, sla-aging); PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
   });
 
   it("snapshot exposes id + permission for navigation and includes the trial balance", () => {
     const snapshot = registrySnapshot(REPORT_CONTRACTS);
-    expect(snapshot).toHaveLength(126); // PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
+    expect(snapshot).toHaveLength(128); // PHASE-052 (W-49, T-14, dated 2026-11-28): 126 → 128 (+2 workflow: pending-approvals, sla-aging); PHASE-051 (W-40, T-15, dated 2026-11-26): 122 → 126 (+4 trade: lc-register, customs-declaration-register, shipment-status, duty-drawback-status); PHASE-050 (W-30, T-17, dated 2026-11-23): 118 → 122 (+4 quality: ncr-register, capa-status, calibration-due, complaints-summary); PHASE-049 (W-22, T-16, dated 2026-11-22): 114 → 118 (+4 cmms: maintenance-costs, maintenance-backlog, meter-readings, expiry-register)
     const tb = snapshot.find((row) => row.id === "financial.trial-balance");
     expect(tb).toBeDefined();
     expect(tb!.requiredPermission).toBe("reports.financial.tb.read");
