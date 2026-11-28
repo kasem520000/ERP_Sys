@@ -8499,6 +8499,7 @@ export interface WorkflowApprovalView {
   amountBase: string;
   currency: string;
   routedFromUserId: string | null;
+  routedFromUserName: string | null;
 }
 
 /** PHASE-052 (W-48 — T-11): POST /workflow/approvals/:id/act → the
@@ -8521,12 +8522,17 @@ export interface WorkflowApprovalActOutcome {
 export interface WorkflowTimelineStepRow {
   id: string;
   stepOrder: number;
+  stepName: string;
+  stepNameAr: string;
   stepType: "APPROVAL" | "NOTIFICATION" | "TASK";
   assigneeUserId: string;
+  assigneeName: string | null;
   status: "PENDING" | "APPROVED" | "REJECTED" | "SKIPPED" | "DELEGATED";
   delegatedTo: string | null;
+  delegatedToName: string | null;
   actedAt: string | null;
   actedBy: string | null;
+  actedByName: string | null;
   comment: string | null;
   dueAt: string | null;
 }
@@ -8594,4 +8600,42 @@ export interface TradeDrawbackClaimRow {
   noteAr: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+/** PHASE-052 (W-48 — T-06's web half): GET /workflow/act?token=… → the
+ * deep-link preview (the act page's own read — the same
+ * decode/expire/actor floors as the act; the awaiting flag is the
+ * pointer's own state at read time). */
+export interface DeepLinkPreview {
+  action: "approve" | "reject";
+  stepInstanceId: string;
+  stepOrder: number;
+  stepName: string;
+  stepNameAr: string;
+  instanceId: string;
+  triggerEntity: "manual_journal" | "purchase_order" | "change_order" | "duty_drawback_claim";
+  documentId: string;
+  documentNo: string | null;
+  amountBase: string;
+  currency: string;
+  deadline: string;
+  awaiting: boolean;
+}
+
+/** PHASE-052 (W-47 — T-08, D-11): GET /workflow/tasks → the tasks lane
+ * rows (the tasks ARE the step instances — no seventh table): the
+ * caller's own PENDING TASK steps on ACTIVE chains, due-first. */
+export interface WorkflowTaskView {
+  taskStepId: string;
+  instanceId: string;
+  triggerEntity: "manual_journal" | "purchase_order" | "change_order" | "duty_drawback_claim";
+  documentId: string;
+  stepOrder: number;
+  stepName: string;
+  stepNameAr: string;
+  dueAt: string | null;
+  assignedAt: string;
+  documentNo: string | null;
+  amountBase: string;
+  currency: string;
 }

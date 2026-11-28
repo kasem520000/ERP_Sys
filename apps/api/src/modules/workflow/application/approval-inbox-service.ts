@@ -68,6 +68,7 @@ export interface WorkflowApprovalView {
   readonly amountBase: string;
   readonly currency: string;
   readonly routedFromUserId: string | null;
+  readonly routedFromUserName: string | null;
 }
 
 /** The quick action's outcome (the act path's own shape — the same
@@ -102,12 +103,17 @@ export interface WorkflowTimelineView {
   readonly steps: readonly {
     readonly id: string;
     readonly stepOrder: number;
+    readonly stepName: string;
+    readonly stepNameAr: string;
     readonly stepType: "APPROVAL" | "NOTIFICATION" | "TASK";
     readonly assigneeUserId: string;
+    readonly assigneeName: string | null;
     readonly status: "PENDING" | "APPROVED" | "REJECTED" | "SKIPPED" | "DELEGATED";
     readonly delegatedTo: string | null;
+    readonly delegatedToName: string | null;
     readonly actedAt: string | null;
     readonly actedBy: string | null;
+    readonly actedByName: string | null;
     readonly comment: string | null;
     readonly dueAt: string | null;
   }[];
@@ -139,8 +145,15 @@ export class WorkflowApprovalInboxService {
     // the candidates resolve through the SAME act-path resolution, so
     // the lane lists exactly the rows the caller can act on.
     const candidates = await this.delegationCandidates(input.userId, limit);
+    const routedNames = await this.userNames(
+      candidates.map((row) => row.assigneeUserId).filter((id) => id !== input.userId),
+    );
     for (const row of candidates) {
-      const view = await this.toView(row, row.assigneeUserId);
+      const view = await this.toView(
+        row,
+        row.assigneeUserId,
+        routedNames.get(row.assigneeUserId) ?? null,
+      );
       if (view !== null) {
         views.push(view);
       }
@@ -244,8 +257,23 @@ export class WorkflowApprovalInboxService {
     }
     const snapshot = instance.definitionSnapshot as {
       definition?: { name?: string; nameAr?: string };
+      steps?: readonly { stepOrder: number; name: string; nameAr: string }[];
     };
     const steps = await store.findStepInstancesForInstance(instance.id);
+    // The user names resolve in ONE bounded query (the distinct ids of
+    // the steps' own actor columns — the frozen history's actors render
+    // by name, the ids stay the record's own identifiers).
+    const userIds = new Set<string>();
+    for (const step of steps) {
+      userIds.add(step.assigneeUserId);
+      if (step.delegatedTo !== null) {
+        userIds.add(step.delegatedTo);
+      }
+      if (step.actedBy !== null) {
+        userIds.add(step.actedBy);
+      }
+    }
+    const names = await this.userNames([...userIds]);
     return {
       document: facts,
       instance: {
@@ -256,19 +284,52 @@ export class WorkflowApprovalInboxService {
         definitionName: snapshot?.definition?.name ?? "—",
         definitionNameAr: snapshot?.definition?.nameAr ?? "—",
       },
-      steps: steps.map((step) => ({
-        id: step.id,
-        stepOrder: step.stepOrder,
-        stepType: step.stepType,
-        assigneeUserId: step.assigneeUserId,
-        status: step.status,
-        delegatedTo: step.delegatedTo,
-        actedAt: step.actedAt,
-        actedBy: step.actedBy,
-        comment: step.comment,
-        dueAt: step.dueAt,
-      })),
+      steps: steps.map((step) => {
+        const meta = snapshot?.steps?.find((s) => s.stepOrder === step.stepOrder);
+        return {
+          id: step.id,
+          stepOrder: step.stepOrder,
+          stepName: meta?.name ?? `Step ${step.stepOrder}`,
+          stepNameAr: meta?.nameAr ?? `خطوة ${step.stepOrder}`,
+          stepType: step.stepType,
+          assigneeUserId: step.assigneeUserId,
+          assigneeName: names.get(step.assigneeUserId) ?? null,
+          status: step.status,
+          delegatedTo: step.delegatedTo,
+          delegatedToName: step.delegatedTo !== null ? (names.get(step.delegatedTo) ?? null) : null,
+          actedAt: step.actedAt,
+          actedBy: step.actedBy,
+          actedByName: step.actedBy !== null ? (names.get(step.actedBy) ?? null) : null,
+          comment: step.comment,
+          dueAt: step.dueAt,
+        };
+      }),
     };
+  }
+
+  /** The bounded users-name resolution (ONE query over the distinct
+   * ids — the engine's own read; unresolvable ids render null and the
+   * board falls back to the mono id). */
+  private async userNames(userIds: readonly string[]): Promise<Map<string, string>> {
+    if (userIds.length === 0) {
+      return new Map();
+    }
+    const context = requireTenantContext();
+    if (context.tx === undefined) {
+      throw new Error("the approvals inbox requires an ambient tenant scope");
+    }
+    const rows = await context.tx.execute(sql`
+      SELECT id, full_name AS "fullName" FROM users
+      WHERE id IN (${sql.join(
+        userIds.map((id) => sql`${id}`),
+        sql`, `,
+      )})
+    `);
+    const map = new Map<string, string>();
+    for (const row of rows.rows as unknown as { id: string; fullName: string }[]) {
+      map.set(row.id, row.fullName);
+    }
+    return map;
   }
 
   /** The delegation lane's candidates: the users whose ACTIVE windows
@@ -323,6 +384,7 @@ export class WorkflowApprovalInboxService {
   private async toView(
     row: store.PendingApprovalRow,
     routedFromUserId: string | null,
+    routedFromUserName: string | null = null,
   ): Promise<WorkflowApprovalView | null> {
     const instance = await store.findInstanceById(row.instanceId);
     if (instance === undefined) {
@@ -362,6 +424,7 @@ export class WorkflowApprovalInboxService {
       amountBase,
       currency,
       routedFromUserId,
+      routedFromUserName,
     };
   }
 }

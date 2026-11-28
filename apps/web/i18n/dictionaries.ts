@@ -8046,6 +8046,177 @@ export interface Dictionary {
   tradeCollectionStatusAccepted: string;
   tradeCollectionStatusSettled: string;
   tradeCollectionStatusCancelled: string;
+
+// ── PHASE-052 (W-48 — T-10/T-11/T-12/T-13, the workflow web plane's
+// keys: i18n BY BOTH COUNTS — the first-surface-wave law standing; ar +n
+// = en +n on this block; the aging figures' and the ladder's own
+// vocabularies ride the boards' VERBATIM renders) ────────
+  navWorkflowApprovals: string;
+  navWorkflowTasks: string;
+  navWorkflowSettings: string;
+  navTradeDrawbacks: string;
+  workflowTitle: string;
+  workflowSubtitle: string;
+  workflowRefresh: string;
+  workflowEmpty: string;
+  workflowRefusalTitle: string;
+  workflowRefusalDetails: string;
+  workflowColStep: string;
+  workflowColDoc: string;
+  workflowColDocType: string;
+  workflowColAmount: string;
+  workflowColDue: string;
+  workflowColAge: string;
+  workflowColStatus: string;
+  workflowColAssignee: string;
+  workflowColActedAt: string;
+  workflowColComment: string;
+  workflowDocManualJournal: string;
+  workflowDocPurchaseOrder: string;
+  workflowDocChangeOrder: string;
+  workflowDocDrawbackClaim: string;
+  workflowStatePending: string;
+  workflowStateApproved: string;
+  workflowStateRejected: string;
+  workflowStateSkipped: string;
+  workflowStateDelegated: string;
+  workflowTypeApproval: string;
+  workflowTypeNotification: string;
+  workflowTypeTask: string;
+  workflowInstanceActive: string;
+  workflowInstanceCompleted: string;
+  workflowInstanceCancelled: string;
+  workflowOverdueChip: string;
+  workflowAgeHoursValue: string;
+  workflowNoDue: string;
+  workflowPendingChip: string;
+  workflowRoutedChip: string;
+  workflowActApprove: string;
+  workflowActReject: string;
+  workflowActApproveTitle: string;
+  workflowActRejectTitle: string;
+  workflowActComment: string;
+  workflowActApproveDone: string;
+  workflowActRejectDone: string;
+  workflowActChainCompleted: string;
+  workflowActRemaining: string;
+  workflowActCancel: string;
+  workflowTasksTitle: string;
+  workflowTasksSubtitle: string;
+  workflowTasksEmpty: string;
+  workflowTaskCompleteAct: string;
+  workflowTaskCompleteTitle: string;
+  workflowTaskDone: string;
+  workflowPaneApprovals: string;
+  workflowPaneTasks: string;
+  workflowTimelineTitle: string;
+  workflowTimelineSubtitle: string;
+  workflowTimelineNoChain: string;
+  workflowTimelineCurrentChip: string;
+  workflowTimelineCompletedAt: string;
+  workflowTimelineOpenDoc: string;
+  workflowTimelineLoading: string;
+  workflowTimelineDelegatedTo: string;
+  workflowTimelineActedBy: string;
+  workflowTimelineChain: string;
+  workflowActPageTitle: string;
+  workflowActPageSubtitle: string;
+  workflowActPreviewRefusal: string;
+  workflowActAwaiting: string;
+  workflowActNotAwaiting: string;
+  workflowActDocNo: string;
+  workflowActStepLabel: string;
+  workflowActDocLabel: string;
+  workflowActOpenDoc: string;
+  workflowSettingsTitle: string;
+  workflowSettingsSubtitle: string;
+  workflowEditorPaneRegister: string;
+  workflowEditorPaneCreate: string;
+  workflowEditorColName: string;
+  workflowEditorColTrigger: string;
+  workflowEditorColActive: string;
+  workflowEditorColSteps: string;
+  workflowEditorColOrigin: string;
+  workflowEditorOriginBridge: string;
+  workflowEditorOriginManual: string;
+  workflowEditorOpenAct: string;
+  workflowEditorEmpty: string;
+  workflowEditorEditingTitle: string;
+  workflowEditorNameEn: string;
+  workflowEditorNameAr: string;
+  workflowEditorTrigger: string;
+  workflowEditorActive: string;
+  workflowEditorEntryConditions: string;
+  workflowEditorConditionsHint: string;
+  workflowEditorSteps: string;
+  workflowEditorAddStep: string;
+  workflowEditorRemoveStep: string;
+  workflowEditorMoveUp: string;
+  workflowEditorMoveDown: string;
+  workflowEditorStepType: string;
+  workflowEditorAssigneeRule: string;
+  workflowEditorAssigneeValue: string;
+  workflowEditorAssigneeHint: string;
+  workflowEditorSlaHours: string;
+  workflowEditorBranchConditions: string;
+  workflowEditorStepNameEn: string;
+  workflowEditorStepNameAr: string;
+  workflowEditorSubmitCreate: string;
+  workflowEditorSubmitUpdate: string;
+  workflowEditorCreatedToast: string;
+  workflowEditorUpdatedToast: string;
+  workflowCondGroupHint: string;
+  workflowCondCombiner: string;
+  workflowCondAll: string;
+  workflowCondAny: string;
+  workflowCondAdd: string;
+  workflowCondRemove: string;
+  workflowCondField: string;
+  workflowCondOp: string;
+  workflowCondValue: string;
+  workflowCondOpGt: string;
+  workflowCondOpGte: string;
+  workflowCondOpLt: string;
+  workflowCondOpLte: string;
+  workflowCondOpEq: string;
+  workflowCondOpNeq: string;
+  workflowCondOpIn: string;
+  workflowCondOpBetween: string;
+  workflowErrInputInvalid: string;
+  workflowErrConditionInvalid: string;
+  workflowErrStepNotFound: string;
+  workflowErrAlreadyActed: string;
+  workflowErrTokenExpired: string;
+  workflowErrActorMismatch: string;
+  workflowErrStepState: string;
+  workflowErrInstanceImmutable: string;
+  workflowErrSelfApproval: string;
+  workflowErrDelegationCircular: string;
+  workflowErrAssigneeUnresolvable: string;
+  tradeDrawbackTitle: string;
+  tradeDrawbackSubtitle: string;
+  tradeDrawbackColNo: string;
+  tradeDrawbackColAmount: string;
+  tradeDrawbackColCurrency: string;
+  tradeDrawbackColStatus: string;
+  tradeDrawbackColSubmittedAt: string;
+  tradeDrawbackColDecidedAt: string;
+  tradeDrawbackCreateTitle: string;
+  tradeDrawbackClaimedAmount: string;
+  tradeDrawbackCurrency: string;
+  tradeDrawbackExportDeclaration: string;
+  tradeDrawbackExportBl: string;
+  tradeDrawbackNote: string;
+  tradeDrawbackCreatedToast: string;
+  tradeDrawbackActSubmit: string;
+  tradeDrawbackActReview: string;
+  tradeDrawbackActApprove: string;
+  tradeDrawbackActReject: string;
+  tradeDrawbackActPay: string;
+  tradeDrawbackActEvidence: string;
+  tradeDrawbackDoneToast: string;
+  tradeDrawbackDetailTitle: string;
+  tradeDrawbackNoAccess: string;
 }
 
 const ar: Dictionary = {
@@ -16073,6 +16244,177 @@ const ar: Dictionary = {
   tradeCollectionStatusAccepted: "مقبول",
   tradeCollectionStatusSettled: "مُسوّى",
   tradeCollectionStatusCancelled: "ملغى",
+
+// ── PHASE-052 (W-48 — T-10/T-11/T-12/T-13, the workflow web plane's
+// keys: i18n BY BOTH COUNTS — the first-surface-wave law standing; ar +n
+// = en +n on this block; the aging figures' and the ladder's own
+// vocabularies ride the boards' VERBATIM renders) ────────
+  navWorkflowApprovals: "صندوق الموافقات",
+  navWorkflowTasks: "مهامي",
+  navWorkflowSettings: "سير العمل والموافقات",
+  navTradeDrawbacks: "طلبات استرداد الرسوم",
+  workflowTitle: "صندوق الموافقات",
+  workflowSubtitle: "العمل بانتظار إجراءك — مع مؤشرات التقادم والإجراءات السريعة",
+  workflowRefresh: "تحديث",
+  workflowEmpty: "لا عمل بانتظار إجرائك الآن.",
+  workflowRefusalTitle: "رفض محرك سير العمل",
+  workflowRefusalDetails: "تفاصيل الرفض",
+  workflowColStep: "الخطوة",
+  workflowColDoc: "المستند",
+  workflowColDocType: "النوع",
+  workflowColAmount: "المبلغ",
+  workflowColDue: "الاستحقاق",
+  workflowColAge: "العمر",
+  workflowColStatus: "الحالة",
+  workflowColAssignee: "المكلَّف",
+  workflowColActedAt: "تاريخ الإجراء",
+  workflowColComment: "التعليق",
+  workflowDocManualJournal: "قيد يومية",
+  workflowDocPurchaseOrder: "أمر شراء",
+  workflowDocChangeOrder: "أمر تغيير",
+  workflowDocDrawbackClaim: "طلب استرداد رسوم",
+  workflowStatePending: "بانتظار",
+  workflowStateApproved: "معتمدة",
+  workflowStateRejected: "مرفوضة",
+  workflowStateSkipped: "مستبعدة",
+  workflowStateDelegated: "محوَّلة",
+  workflowTypeApproval: "موافقة",
+  workflowTypeNotification: "إشعار",
+  workflowTypeTask: "مهمة",
+  workflowInstanceActive: "سلسلة جارية",
+  workflowInstanceCompleted: "سلسلة مكتملة",
+  workflowInstanceCancelled: "سلسلة ملغاة",
+  workflowOverdueChip: "متأخر",
+  workflowAgeHoursValue: "{hours} ساعة",
+  workflowNoDue: "بلا مهلة",
+  workflowPendingChip: "بانتظار إجرائك",
+  workflowRoutedChip: "عبر تفويض {name}",
+  workflowActApprove: "موافقة",
+  workflowActReject: "رفض",
+  workflowActApproveTitle: "الموافقة على الخطوة",
+  workflowActRejectTitle: "رفض الخطوة",
+  workflowActComment: "تعليق (اختياري)",
+  workflowActApproveDone: "تمت الموافقة على الخطوة.",
+  workflowActRejectDone: "تم رفض الخطوة.",
+  workflowActChainCompleted: "اكتملت السلسلة بهذا الإجراء.",
+  workflowActRemaining: "تبقّى {count} من الخطوات.",
+  workflowActCancel: "إلغاء",
+  workflowTasksTitle: "مهامي",
+  workflowTasksSubtitle: "مهام المستندات المكلَّفة إليك — الأقرب استحقاقًا أولًا",
+  workflowTasksEmpty: "لا مهام مكلَّفة إليك الآن.",
+  workflowTaskCompleteAct: "إكمال المهمة",
+  workflowTaskCompleteTitle: "إكمال المهمة",
+  workflowTaskDone: "أُكملت المهمة.",
+  workflowPaneApprovals: "الموافقات",
+  workflowPaneTasks: "المهام",
+  workflowTimelineTitle: "مسار الموافقات",
+  workflowTimelineSubtitle: "التاريخ الكامل لخطوات السلسلة كما حدث — مجمَّدًا",
+  workflowTimelineNoChain: "لا سلسلة موافقات على هذا المستند.",
+  workflowTimelineCurrentChip: "الخطوة الحالية",
+  workflowTimelineCompletedAt: "تاريخ الاكتمال",
+  workflowTimelineOpenDoc: "فتح المستند",
+  workflowTimelineLoading: "يُحمَّل المسار…",
+  workflowTimelineDelegatedTo: "مفوَّض إلى",
+  workflowTimelineActedBy: "أجراها",
+  workflowTimelineChain: "السلسلة",
+  workflowActPageTitle: "الإجراء عبر الرابط",
+  workflowActPageSubtitle: "رابط موقَّع أحادي الاستخدام من بريد الإحالة",
+  workflowActPreviewRefusal: "الرابط غير صالح أو منتهٍ",
+  workflowActAwaiting: "بانتظار إجرائك حتى {deadline}",
+  workflowActNotAwaiting: "لم تعد هذه الخطوة بانتظارك.",
+  workflowActDocNo: "رقم المستند",
+  workflowActStepLabel: "الخطوة",
+  workflowActDocLabel: "المستند",
+  workflowActOpenDoc: "فتح المستند",
+  workflowSettingsTitle: "محرر سلاسل سير العمل",
+  workflowSettingsSubtitle: "سلاسل الموافقة الشرطية على مستنداتك — محرر نصي بترتيب مرئي، لا لوحة حرة",
+  workflowEditorPaneRegister: "التعريفات",
+  workflowEditorPaneCreate: "تعريف جديد",
+  workflowEditorColName: "الاسم",
+  workflowEditorColTrigger: "المستند والحدث",
+  workflowEditorColActive: "نشط",
+  workflowEditorColSteps: "الخطوات",
+  workflowEditorColOrigin: "المصدر",
+  workflowEditorOriginBridge: "جسر السياسات",
+  workflowEditorOriginManual: "يدوي",
+  workflowEditorOpenAct: "تحرير",
+  workflowEditorEmpty: "لا تعريفات بعد — أنشئ أول سلسلة.",
+  workflowEditorEditingTitle: "تحرير التعريف",
+  workflowEditorNameEn: "الاسم (إنجليزي)",
+  workflowEditorNameAr: "الاسم (عربي)",
+  workflowEditorTrigger: "نوع المستند",
+  workflowEditorActive: "التعريف نشط",
+  workflowEditorEntryConditions: "شروط الدخول (اختياري)",
+  workflowEditorConditionsHint: "تُقيَّم الشروط عند إطلاق السلسلة؛ المجموعة الفارغة تمر دائمًا.",
+  workflowEditorSteps: "الخطوات المرتبة",
+  workflowEditorAddStep: "إضافة خطوة",
+  workflowEditorRemoveStep: "إزالة",
+  workflowEditorMoveUp: "أعلى",
+  workflowEditorMoveDown: "أسفل",
+  workflowEditorStepType: "نوع الخطوة",
+  workflowEditorAssigneeRule: "قاعدة التكليف",
+  workflowEditorAssigneeValue: "قيمة التكليف",
+  workflowEditorAssigneeHint: "مفتاح الدور لقاعدة ROLE، أو معرّف المستخدم لقاعدة USER",
+  workflowEditorSlaHours: "مهلة الخدمة (ساعات، اختياري)",
+  workflowEditorBranchConditions: "شروط التفرع (اختياري)",
+  workflowEditorStepNameEn: "اسم الخطوة (إنجليزي)",
+  workflowEditorStepNameAr: "اسم الخطوة (عربي)",
+  workflowEditorSubmitCreate: "إنشاء التعريف",
+  workflowEditorSubmitUpdate: "حفظ التعريف",
+  workflowEditorCreatedToast: "أُنشئ التعريف.",
+  workflowEditorUpdatedToast: "حُفظ التعريف.",
+  workflowCondGroupHint: "مجموعة شروط واحدة برابط واحد",
+  workflowCondCombiner: "الرابط",
+  workflowCondAll: "كل الشروط (و)",
+  workflowCondAny: "أي شرط (أو)",
+  workflowCondAdd: "إضافة شرط",
+  workflowCondRemove: "إزالة",
+  workflowCondField: "الحقل",
+  workflowCondOp: "العملية",
+  workflowCondValue: "القيمة",
+  workflowCondOpGt: "أكبر من",
+  workflowCondOpGte: "أكبر من أو يساوي",
+  workflowCondOpLt: "أصغر من",
+  workflowCondOpLte: "أصغر من أو يساوي",
+  workflowCondOpEq: "يساوي",
+  workflowCondOpNeq: "لا يساوي",
+  workflowCondOpIn: "ضمن (قائمة بفواصل)",
+  workflowCondOpBetween: "بين (قيمتان بفاصلة)",
+  workflowErrInputInvalid: "مدخل غير صالح في سير العمل.",
+  workflowErrConditionInvalid: "شرط غير صالح في السلسلة.",
+  workflowErrStepNotFound: "الخطوة غير موجودة.",
+  workflowErrAlreadyActed: "سبق الإجراء على هذه الخطوة.",
+  workflowErrTokenExpired: "انتهت صلاحية الرابط.",
+  workflowErrActorMismatch: "الرابط ليس مخصصًا لك.",
+  workflowErrStepState: "حالة الخطوة لا تسمح بهذا الإجراء.",
+  workflowErrInstanceImmutable: "السلسلة مكتملة ولا تقبل التعديل.",
+  workflowErrSelfApproval: "لا يجوز الموافقة على مستندك عبر سلسلة تفويض (G-67).",
+  workflowErrDelegationCircular: "سلسلة التفويض دائرية.",
+  workflowErrAssigneeUnresolvable: "تعذَّر تحديد المكلَّف لهذه الخطوة.",
+  tradeDrawbackTitle: "طلبات استرداد الرسوم",
+  tradeDrawbackSubtitle: "سجل طلبات الاسترداد وسلّم حالتها — بوابة الأدلة BR-108",
+  tradeDrawbackColNo: "رقم الطلب",
+  tradeDrawbackColAmount: "المبلغ المطالب",
+  tradeDrawbackColCurrency: "العملة",
+  tradeDrawbackColStatus: "الحالة",
+  tradeDrawbackColSubmittedAt: "تاريخ التقديم",
+  tradeDrawbackColDecidedAt: "تاريخ القرار",
+  tradeDrawbackCreateTitle: "طلب استرداد جديد",
+  tradeDrawbackClaimedAmount: "المبلغ المطالب",
+  tradeDrawbackCurrency: "العملة (رمز ISO)",
+  tradeDrawbackExportDeclaration: "إقرار التصدير (معرّف، اختياري)",
+  tradeDrawbackExportBl: "بوليصة الشحن (معرّف، اختياري)",
+  tradeDrawbackNote: "ملاحظة",
+  tradeDrawbackCreatedToast: "أُنشئ طلب الاسترداد.",
+  tradeDrawbackActSubmit: "تقديم",
+  tradeDrawbackActReview: "مراجعة",
+  tradeDrawbackActApprove: "اعتماد",
+  tradeDrawbackActReject: "رفض",
+  tradeDrawbackActPay: "صرف",
+  tradeDrawbackActEvidence: "ربط دليل التصدير",
+  tradeDrawbackDoneToast: "نُفِّذ الإجراء.",
+  tradeDrawbackDetailTitle: "تفاصيل الطلب",
+  tradeDrawbackNoAccess: "لا تملك صلاحية عرض طلبات استرداد الرسوم.",
 };
 
 const en: Dictionary = {
@@ -24116,6 +24458,177 @@ const en: Dictionary = {
   tradeCollectionStatusAccepted: "Accepted",
   tradeCollectionStatusSettled: "Settled",
   tradeCollectionStatusCancelled: "Cancelled",
+
+// ── PHASE-052 (W-48 — T-10/T-11/T-12/T-13, the workflow web plane's
+// keys: i18n BY BOTH COUNTS — the first-surface-wave law standing; ar +n
+// = en +n on this block; the aging figures' and the ladder's own
+// vocabularies ride the boards' VERBATIM renders) ────────
+  navWorkflowApprovals: "Approvals inbox",
+  navWorkflowTasks: "My tasks",
+  navWorkflowSettings: "Workflows",
+  navTradeDrawbacks: "Duty drawback claims",
+  workflowTitle: "Approvals inbox",
+  workflowSubtitle: "The work awaiting your action — with aging indicators and quick actions",
+  workflowRefresh: "Refresh",
+  workflowEmpty: "Nothing awaits your action right now.",
+  workflowRefusalTitle: "Workflow engine refusal",
+  workflowRefusalDetails: "Refusal details",
+  workflowColStep: "Step",
+  workflowColDoc: "Document",
+  workflowColDocType: "Type",
+  workflowColAmount: "Amount",
+  workflowColDue: "Due",
+  workflowColAge: "Age",
+  workflowColStatus: "Status",
+  workflowColAssignee: "Assignee",
+  workflowColActedAt: "Acted at",
+  workflowColComment: "Comment",
+  workflowDocManualJournal: "Manual journal",
+  workflowDocPurchaseOrder: "Purchase order",
+  workflowDocChangeOrder: "Change order",
+  workflowDocDrawbackClaim: "Duty drawback claim",
+  workflowStatePending: "Pending",
+  workflowStateApproved: "Approved",
+  workflowStateRejected: "Rejected",
+  workflowStateSkipped: "Skipped",
+  workflowStateDelegated: "Delegated",
+  workflowTypeApproval: "Approval",
+  workflowTypeNotification: "Notification",
+  workflowTypeTask: "Task",
+  workflowInstanceActive: "Chain active",
+  workflowInstanceCompleted: "Chain completed",
+  workflowInstanceCancelled: "Chain cancelled",
+  workflowOverdueChip: "Overdue",
+  workflowAgeHoursValue: "{hours}h",
+  workflowNoDue: "No SLA",
+  workflowPendingChip: "Awaiting you",
+  workflowRoutedChip: "Via {name}'s delegation",
+  workflowActApprove: "Approve",
+  workflowActReject: "Reject",
+  workflowActApproveTitle: "Approve the step",
+  workflowActRejectTitle: "Reject the step",
+  workflowActComment: "Comment (optional)",
+  workflowActApproveDone: "The step is approved.",
+  workflowActRejectDone: "The step is rejected.",
+  workflowActChainCompleted: "The chain completed with this act.",
+  workflowActRemaining: "{count} steps remain.",
+  workflowActCancel: "Cancel",
+  workflowTasksTitle: "My tasks",
+  workflowTasksSubtitle: "The document tasks assigned to you — due-first",
+  workflowTasksEmpty: "No tasks assigned to you right now.",
+  workflowTaskCompleteAct: "Complete task",
+  workflowTaskCompleteTitle: "Complete the task",
+  workflowTaskDone: "The task is completed.",
+  workflowPaneApprovals: "Approvals",
+  workflowPaneTasks: "Tasks",
+  workflowTimelineTitle: "Approval timeline",
+  workflowTimelineSubtitle: "The chain's full step history, frozen as it happened",
+  workflowTimelineNoChain: "No approval chain on this document.",
+  workflowTimelineCurrentChip: "Current step",
+  workflowTimelineCompletedAt: "Completed at",
+  workflowTimelineOpenDoc: "Open document",
+  workflowTimelineLoading: "Loading the timeline…",
+  workflowTimelineDelegatedTo: "Delegated to",
+  workflowTimelineActedBy: "Acted by",
+  workflowTimelineChain: "Chain",
+  workflowActPageTitle: "Act through the link",
+  workflowActPageSubtitle: "A signed one-time link from the assignment email",
+  workflowActPreviewRefusal: "The link is invalid or expired",
+  workflowActAwaiting: "Awaiting your action until {deadline}",
+  workflowActNotAwaiting: "This step no longer awaits you.",
+  workflowActDocNo: "Document no.",
+  workflowActStepLabel: "Step",
+  workflowActDocLabel: "Document",
+  workflowActOpenDoc: "Open the document",
+  workflowSettingsTitle: "Workflow chain editor",
+  workflowSettingsSubtitle: "The conditional approval chains on your documents — a form-first editor with visual ordering, never a free canvas",
+  workflowEditorPaneRegister: "Definitions",
+  workflowEditorPaneCreate: "New definition",
+  workflowEditorColName: "Name",
+  workflowEditorColTrigger: "Document & event",
+  workflowEditorColActive: "Active",
+  workflowEditorColSteps: "Steps",
+  workflowEditorColOrigin: "Origin",
+  workflowEditorOriginBridge: "Policy bridge",
+  workflowEditorOriginManual: "Manual",
+  workflowEditorOpenAct: "Edit",
+  workflowEditorEmpty: "No definitions yet — create the first chain.",
+  workflowEditorEditingTitle: "Edit definition",
+  workflowEditorNameEn: "Name (English)",
+  workflowEditorNameAr: "Name (Arabic)",
+  workflowEditorTrigger: "Document type",
+  workflowEditorActive: "Definition active",
+  workflowEditorEntryConditions: "Entry conditions (optional)",
+  workflowEditorConditionsHint: "The conditions are evaluated when the chain triggers; the empty group always passes.",
+  workflowEditorSteps: "Ordered steps",
+  workflowEditorAddStep: "Add step",
+  workflowEditorRemoveStep: "Remove",
+  workflowEditorMoveUp: "Up",
+  workflowEditorMoveDown: "Down",
+  workflowEditorStepType: "Step type",
+  workflowEditorAssigneeRule: "Assignee rule",
+  workflowEditorAssigneeValue: "Assignee value",
+  workflowEditorAssigneeHint: "The role key for the ROLE rule, or the user id for the USER rule",
+  workflowEditorSlaHours: "SLA hours (optional)",
+  workflowEditorBranchConditions: "Branch conditions (optional)",
+  workflowEditorStepNameEn: "Step name (English)",
+  workflowEditorStepNameAr: "Step name (Arabic)",
+  workflowEditorSubmitCreate: "Create definition",
+  workflowEditorSubmitUpdate: "Save definition",
+  workflowEditorCreatedToast: "The definition is created.",
+  workflowEditorUpdatedToast: "The definition is saved.",
+  workflowCondGroupHint: "One condition group, one combiner",
+  workflowCondCombiner: "Combiner",
+  workflowCondAll: "All conditions (AND)",
+  workflowCondAny: "Any condition (OR)",
+  workflowCondAdd: "Add condition",
+  workflowCondRemove: "Remove",
+  workflowCondField: "Field",
+  workflowCondOp: "Operator",
+  workflowCondValue: "Value",
+  workflowCondOpGt: "Greater than",
+  workflowCondOpGte: "Greater or equal",
+  workflowCondOpLt: "Less than",
+  workflowCondOpLte: "Less or equal",
+  workflowCondOpEq: "Equals",
+  workflowCondOpNeq: "Not equals",
+  workflowCondOpIn: "In (comma-separated list)",
+  workflowCondOpBetween: "Between (two values, comma)",
+  workflowErrInputInvalid: "Invalid workflow input.",
+  workflowErrConditionInvalid: "An invalid condition in the chain.",
+  workflowErrStepNotFound: "The step was not found.",
+  workflowErrAlreadyActed: "The step was already acted on.",
+  workflowErrTokenExpired: "The link has expired.",
+  workflowErrActorMismatch: "The link is not yours.",
+  workflowErrStepState: "The step's state refuses this act.",
+  workflowErrInstanceImmutable: "The chain is terminal and immutable.",
+  workflowErrSelfApproval: "You cannot approve your own document through a delegation chain (G-67).",
+  workflowErrDelegationCircular: "The delegation chain is circular.",
+  workflowErrAssigneeUnresolvable: "The assignee could not be resolved for this step.",
+  tradeDrawbackTitle: "Duty drawback claims",
+  tradeDrawbackSubtitle: "The drawback claims register with its status ladder — the BR-108 evidence gate",
+  tradeDrawbackColNo: "Claim no.",
+  tradeDrawbackColAmount: "Claimed amount",
+  tradeDrawbackColCurrency: "Currency",
+  tradeDrawbackColStatus: "Status",
+  tradeDrawbackColSubmittedAt: "Submitted at",
+  tradeDrawbackColDecidedAt: "Decided at",
+  tradeDrawbackCreateTitle: "New drawback claim",
+  tradeDrawbackClaimedAmount: "Claimed amount",
+  tradeDrawbackCurrency: "Currency (ISO code)",
+  tradeDrawbackExportDeclaration: "Export declaration (id, optional)",
+  tradeDrawbackExportBl: "Bill of lading (id, optional)",
+  tradeDrawbackNote: "Note",
+  tradeDrawbackCreatedToast: "The drawback claim is created.",
+  tradeDrawbackActSubmit: "Submit",
+  tradeDrawbackActReview: "Review",
+  tradeDrawbackActApprove: "Approve",
+  tradeDrawbackActReject: "Reject",
+  tradeDrawbackActPay: "Pay",
+  tradeDrawbackActEvidence: "Link export evidence",
+  tradeDrawbackDoneToast: "The act landed.",
+  tradeDrawbackDetailTitle: "Claim detail",
+  tradeDrawbackNoAccess: "You lack the permission to view the drawback claims.",
 };
 
 const dictionaries: Record<Locale, Dictionary> = { ar, en };

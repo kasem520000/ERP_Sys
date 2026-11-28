@@ -197,6 +197,15 @@ const FALLBACK_CRUMBS: Record<string, { group?: keyof Dictionary; label: keyof D
   "trade/shipments": { group: "navPurchasing", label: "tradeShipmentsTitle" },
   "trade/incoterms": { group: "navPurchasing", label: "tradeIncotermsTitle" },
   "trade/certificates": { group: "navPurchasing", label: "tradeCertificatesTitle" },
+  // -- PHASE-052 (W-48 — T-13): the workflow family's surfaces — the
+  // approvals inbox + the tasks lane ride the HOME group (the
+  // NAVIGATION_MODEL §1's own "approvals queue" member; the registry
+  // rows carry the flag/permission gating, these fallbacks cover
+  // nav-fetch failure — the support-sessions rule, crumbs only).
+  "workflow/approvals": { group: "navHome", label: "workflowTitle" },
+  "workflow/tasks": { group: "navHome", label: "workflowTasksTitle" },
+  "settings/workflows": { group: "navSettings", label: "workflowSettingsTitle" },
+  "trade/drawbacks": { group: "navPurchasing", label: "tradeDrawbackTitle" },
   // -- PHASE-021 (T2-b): the Offline Console entry — always visible
   // (DR-P21-06; browser opens the honest ONLINE-ONLY console).
   offline: { group: "offlineNavSection", label: "offlineConsoleTitle" },

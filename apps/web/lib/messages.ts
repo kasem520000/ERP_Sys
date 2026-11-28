@@ -3653,3 +3653,111 @@ export function tradeBondedStatusLabel(d: Dictionary, value: string): string {
   };
   return map[value] ?? value;
 }
+
+// ── PHASE-052 (W-48 — the workflow web plane) ──────────────────────────────
+
+/** The doc-type label (the closed trigger registry, D-05's ruling (ج) —
+ * the four bound surfaces; every doc type outside the set keeps its
+ * existing behavior byte-identical). */
+export function workflowDocLabel(
+  d: Dictionary,
+  triggerEntity: string,
+): string {
+  switch (triggerEntity) {
+    case "manual_journal":
+      return d.workflowDocManualJournal;
+    case "purchase_order":
+      return d.workflowDocPurchaseOrder;
+    case "change_order":
+      return d.workflowDocChangeOrder;
+    case "duty_drawback_claim":
+      return d.workflowDocDrawbackClaim;
+    default:
+      return triggerEntity;
+  }
+}
+
+/** The step-state ladder (PP-17's own vocabulary — the frozen history
+ * renders the state by its own word). */
+export function workflowStepStateLabel(d: Dictionary, status: string): string {
+  switch (status) {
+    case "PENDING":
+      return d.workflowStatePending;
+    case "APPROVED":
+      return d.workflowStateApproved;
+    case "REJECTED":
+      return d.workflowStateRejected;
+    case "SKIPPED":
+      return d.workflowStateSkipped;
+    case "DELEGATED":
+      return d.workflowStateDelegated;
+    default:
+      return status;
+  }
+}
+
+/** The step type (the W-10 scope note's three — APPROVAL / NOTIFICATION /
+ * TASK; free-form custom actions are OUT). */
+export function workflowStepTypeLabel(d: Dictionary, stepType: string): string {
+  switch (stepType) {
+    case "APPROVAL":
+      return d.workflowTypeApproval;
+    case "NOTIFICATION":
+      return d.workflowTypeNotification;
+    case "TASK":
+      return d.workflowTypeTask;
+    default:
+      return stepType;
+  }
+}
+
+/** The instance (chain) state. */
+export function workflowInstanceStatusLabel(d: Dictionary, status: string): string {
+  switch (status) {
+    case "ACTIVE":
+      return d.workflowInstanceActive;
+    case "COMPLETED":
+      return d.workflowInstanceCompleted;
+    case "CANCELLED":
+      return d.workflowInstanceCancelled;
+    default:
+      return status;
+  }
+}
+
+/** The typed workflow refusals (the error.filter family's own codes —
+ * W-47's registration + W-48's surfaces render them localized; the
+ * refusal PANELS still render the full payloads, never this summary). */
+export function localizedWorkflowError(
+  d: Dictionary,
+  error: ApiErrorBody,
+  retryAfterSeconds?: number,
+): string {
+  switch (error.code) {
+    case "WORKFLOW_INPUT_INVALID":
+    case "VALIDATION_ERROR":
+      return d.workflowErrInputInvalid;
+    case "WORKFLOW_CONDITION_INVALID":
+      return d.workflowErrConditionInvalid;
+    case "WORKFLOW_STEP_INSTANCE_NOT_FOUND":
+      return d.workflowErrStepNotFound;
+    case "WORKFLOW_STEP_ALREADY_ACTED":
+      return d.workflowErrAlreadyActed;
+    case "WORKFLOW_TOKEN_EXPIRED":
+      return d.workflowErrTokenExpired;
+    case "WORKFLOW_TOKEN_ACTOR_MISMATCH":
+      return d.workflowErrActorMismatch;
+    case "WORKFLOW_STEP_STATE":
+      return d.workflowErrStepState;
+    case "WORKFLOW_INSTANCE_IMMUTABLE":
+      return d.workflowErrInstanceImmutable;
+    case "WORKFLOW_SELF_APPROVAL_BLOCKED":
+      return d.workflowErrSelfApproval;
+    case "WORKFLOW_DELEGATION_CIRCULAR":
+      return d.workflowErrDelegationCircular;
+    case "WORKFLOW_ASSIGNEE_UNRESOLVABLE":
+      return d.workflowErrAssigneeUnresolvable;
+    default:
+      return localizedApiError(d, error, retryAfterSeconds);
+  }
+}
