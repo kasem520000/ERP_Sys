@@ -30,6 +30,7 @@ import { Card } from "./card";
 import { CustomFieldSurface } from "./custom-field-surface";
 import { ErrorNotice, SuccessNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
+import { WorkflowTimeline } from "./workflow-timeline";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const QTY_RE = /^\d+(\.\d{1,6})?$/;
@@ -50,6 +51,7 @@ export function PurchasingOrders({
   incoterms,
   canCreate,
   canApprove,
+  initialChainDocId,
 }: {
   locale: Locale;
   initialRequests: readonly PurchaseRequestRow[];
@@ -59,6 +61,10 @@ export function PurchasingOrders({
   incoterms: readonly TradeIncotermRow[];
   canCreate: boolean;
   canApprove: boolean;
+  /** PHASE-052 (W-48 — T-12): the ?doc= landing's own chain view (the
+   * engine's docDetailPath law points the assignee here — the timeline
+   * Card renders for the linked document when the param carries it). */
+  initialChainDocId?: string | null;
 }): JSX.Element {
   const d = getDictionary(locale);
   const router = useRouter();
@@ -68,6 +74,10 @@ export function PurchasingOrders({
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [mode, setMode] = useState<"request" | "order">("order");
+  // PHASE-052 (W-48 — T-12, PP-17): the PO chain view — the ?doc= landing
+  // or the register's own rowAction opens the timeline Card (the engine's
+  // docDetailPath law lands the assignee here).
+  const [chainDocId, setChainDocId] = useState<string | null>(initialChainDocId ?? null);
 
   // Shared form state.
   const [supplierId, setSupplierId] = useState("");
@@ -406,12 +416,35 @@ export function PurchasingOrders({
                       void orderAction(row.id, "close");
                     },
                   },
+                  {
+                    id: "chain",
+                    label: d.workflowTimelineTitle,
+                    onSelect: (row: PurchaseOrderRow) => {
+                      setChainDocId(row.id);
+                    },
+                  },
                 ]
-              : []
+              : [
+                  {
+                    id: "chain",
+                    label: d.workflowTimelineTitle,
+                    onSelect: (row: PurchaseOrderRow) => {
+                      setChainDocId(row.id);
+                    },
+                  },
+                ]
           }
           empty={{ title: d.purchasingEmpty }}
         />
       </Card>
+
+      {/* PHASE-052 (W-48 — T-12, PP-17): the PO chain view — the timeline
+       * Card (the read gates on workflow.history.view at the API; the
+       * unentitled reader takes the typed refusal, the unbound document
+       * its honest no-chain notice). */}
+      {chainDocId !== null ? (
+        <WorkflowTimeline locale={locale} triggerEntity="purchase_order" documentId={chainDocId} />
+      ) : null}
 
       <Card title={d.purchasingRequestsSection}>
         <DataTable

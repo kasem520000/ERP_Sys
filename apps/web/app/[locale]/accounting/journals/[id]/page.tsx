@@ -12,6 +12,7 @@ import { ErrorState } from "../../../../../components/client-ui";
 import { AppShell } from "../../../../../components/app-shell";
 import { JournalDetailPanel } from "../../../../../components/journal-detail-panel";
 import { RetryButton } from "../../../../../components/retry-button";
+import { WorkflowTimeline } from "../../../../../components/workflow-timeline";
 import { getDictionary, isLocale, type Locale } from "../../../../../i18n/dictionaries";
 import type {
   AccountRow,
@@ -70,17 +71,27 @@ export default async function JournalDetailPage({
   } else {
     const permissions = session.ok ? session.data.permissions : [];
     content = (
-      <JournalDetailPanel
-        locale={localeValue}
-        journalId={id}
-        draft={draft.data.draft}
-        draftLines={draft.data.lines}
-        posted={entry.ok ? entry.data : null}
-        accounts={accounts.ok ? accounts.data : []}
-        canApprove={permissions.includes("accounting.journal_entries.approve")}
-        canPost={permissions.includes("accounting.journal_entries.post")}
-        canReverse={permissions.includes("accounting.journal_entries.reverse")}
-      />
+      <div className="flex flex-col gap-4">
+        <JournalDetailPanel
+          locale={localeValue}
+          journalId={id}
+          draft={draft.data.draft}
+          draftLines={draft.data.lines}
+          posted={entry.ok ? entry.data : null}
+          accounts={accounts.ok ? accounts.data : []}
+          canApprove={permissions.includes("accounting.journal_entries.approve")}
+          canPost={permissions.includes("accounting.journal_entries.post")}
+          canReverse={permissions.includes("accounting.journal_entries.reverse")}
+        />
+        {/* PHASE-052 (W-48 — T-12, PP-17): the workflow timeline embedded
+         * on the FIRST bound detail surface (the manual journals — the
+         * bridge's parity target); the read gates on workflow.history.view
+         * (the 0130-seeded matrix §3.30 key — the section never renders for
+         * a reader without it; the flag floor rides the API's own gate). */}
+        {permissions.includes("workflow.history.view") ? (
+          <WorkflowTimeline locale={localeValue} triggerEntity="manual_journal" documentId={id} />
+        ) : null}
+      </div>
     );
   }
 

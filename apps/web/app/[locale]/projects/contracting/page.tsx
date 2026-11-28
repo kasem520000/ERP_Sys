@@ -38,10 +38,13 @@ import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
 
 export default async function ProjectsContractingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ doc?: string }>;
 }): Promise<JSX.Element> {
   const { locale } = await params;
+  const { doc } = await searchParams;
   if (!isLocale(locale)) {
     notFound();
   }
@@ -129,6 +132,7 @@ export default async function ProjectsContractingPage({
         initialProjectId={first?.id ?? null}
         initialSurfaces={surfaces}
         tenantName={tenantName}
+        initialChainDocId={doc ?? null}
       />
     );
   }

@@ -76,6 +76,7 @@ import { DefList } from "./def-list";
 import { ErrorNotice } from "./notices";
 import { activeLocaleHeader } from "./table-header";
 import { TypedRefusalPanel } from "./typed-refusal-panel";
+import { WorkflowTimeline } from "./workflow-timeline";
 
 /** A canonical decimal/ISO/code cell (display: the exact server string, LTR). */
 function monoCell(value: string, title?: string): JSX.Element {
@@ -150,6 +151,7 @@ export function ProjectsContractingBoard({
   initialProjectId,
   initialSurfaces,
   tenantName,
+  initialChainDocId,
 }: {
   locale: Locale;
   initialProjects: readonly ProjectPoolRow[];
@@ -158,9 +160,17 @@ export function ProjectsContractingBoard({
   /** The active tenant's own name (the print letterhead — the page's
    * session read, engine data; never a client-side constant). */
   tenantName: string;
+  /** PHASE-052 (W-48 — T-12): the ?doc= landing's own chain view (the
+   * engine's docDetailPath law points the assignee at the change
+   * order's chain — the timeline Card renders when the param carries
+   * it, independent of the project selection). */
+  initialChainDocId?: string | null;
 }): JSX.Element {
   const d = getDictionary(locale);
   const [tab, setTab] = useState("certificates");
+  // PHASE-052 (W-48 — T-12, PP-17): the change-order chain view — the
+  // ?doc= landing or the register's own rowAction opens the timeline.
+  const [chainDocId, setChainDocId] = useState<string | null>(initialChainDocId ?? null);
   const [state, setState] = useState<BoardState>({
     ...initialSurfaces,
     projectId: initialProjectId ?? "",
@@ -784,9 +794,25 @@ export function ProjectsContractingBoard({
                   columns={coColumns}
                   rows={[...state.changeOrders!]}
                   rowKey={(row) => row.id}
+                  rowActions={[
+                    {
+                      id: "chain",
+                      label: d.workflowTimelineTitle,
+                      onSelect: (row) => {
+                        setChainDocId(row.id);
+                      },
+                    },
+                  ]}
                 />
               ),
             )}
+            {/* PHASE-052 (W-48 — T-12, PP-17): the change-order chain view
+             * (the read gates on workflow.history.view at the API; the
+             * unentitled reader takes the typed refusal, the unbound
+             * document its honest no-chain notice). */}
+            {chainDocId !== null ? (
+              <WorkflowTimeline locale={locale} triggerEntity="change_order" documentId={chainDocId} />
+            ) : null}
           </div>
 
           <div data-slot="subcontracts" className="flex flex-col gap-4">

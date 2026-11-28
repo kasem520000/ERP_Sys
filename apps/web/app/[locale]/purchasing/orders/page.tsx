@@ -25,10 +25,13 @@ import { fetchApi, requireSessionToken } from "../../../../lib/server-api";
 
 export default async function PurchasingOrdersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ doc?: string }>;
 }): Promise<JSX.Element> {
   const { locale } = await params;
+  const { doc } = await searchParams;
   if (!isLocale(locale)) {
     notFound();
   }
@@ -77,6 +80,7 @@ export default async function PurchasingOrdersPage({
         incoterms={incoterms.ok ? incoterms.data : []}
         canCreate={permissions.includes("purchasing.purchase_orders.create")}
         canApprove={permissions.includes("purchasing.purchase_orders.approve")}
+        initialChainDocId={doc ?? null}
       />
     );
   }
