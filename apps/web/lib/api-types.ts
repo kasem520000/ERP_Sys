@@ -8477,3 +8477,121 @@ export interface TradeCertificateRow {
   createdAt: string;
   updatedAt: string;
 }
+
+/** PHASE-052 (W-48 — T-11): GET /workflow/approvals → the approvals
+ * inbox rows — the caller's PENDING work (the current APPROVAL steps
+ * assigned to them + the delegation lane's routed rows). The aging
+ * figures (`ageHours` · `overdue`) are the DB's own clock's, rendered
+ * VERBATIM (zero client-side recomputation — the engine-output law). */
+export interface WorkflowApprovalView {
+  stepInstanceId: string;
+  instanceId: string;
+  triggerEntity: "manual_journal" | "purchase_order" | "change_order" | "duty_drawback_claim";
+  documentId: string;
+  stepOrder: number;
+  stepName: string;
+  stepNameAr: string;
+  dueAt: string | null;
+  assignedAt: string;
+  overdue: boolean;
+  ageHours: number;
+  documentNo: string | null;
+  amountBase: string;
+  currency: string;
+  routedFromUserId: string | null;
+}
+
+/** PHASE-052 (W-48 — T-11): POST /workflow/approvals/:id/act → the
+ * quick action's outcome (the act path's own figures — completed ·
+ * remaining · completedSteps). */
+export interface WorkflowApprovalActOutcome {
+  action: "approve" | "reject";
+  stepInstanceId: string;
+  completed: boolean;
+  remaining: number;
+  currentStepOrder: number | null;
+  completedSteps: number;
+}
+
+/** PHASE-052 (W-48 — T-12 — PP-17): GET /workflow/timeline → the
+ * document's chain with the FULL step history (state, assignee,
+ * delegated_to, acted_at, comment — the frozen history VERBATIM) + the
+ * document's own rendering facts. A document with no chain carries
+ * instance: null (the detail page's own honest "no chain" state). */
+export interface WorkflowTimelineStepRow {
+  id: string;
+  stepOrder: number;
+  stepType: "APPROVAL" | "NOTIFICATION" | "TASK";
+  assigneeUserId: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "SKIPPED" | "DELEGATED";
+  delegatedTo: string | null;
+  actedAt: string | null;
+  actedBy: string | null;
+  comment: string | null;
+  dueAt: string | null;
+}
+
+export interface WorkflowTimelineView {
+  document: {
+    docNo: string | null;
+    amountBase: string;
+    currency: string;
+    status: string;
+  };
+  instance: {
+    id: string;
+    status: "ACTIVE" | "COMPLETED" | "CANCELLED";
+    currentStepOrder: number | null;
+    completedAt: string | null;
+    definitionName: string;
+    definitionNameAr: string;
+  } | null;
+  steps: readonly WorkflowTimelineStepRow[];
+}
+
+/** PHASE-052 (W-48 — T-10): GET /workflow/definitions → the chain
+ * editor's register — every definition with its ordered steps (the
+ * form-first editor's own data). */
+export interface WorkflowDefinitionStepRow {
+  id: string;
+  stepOrder: number;
+  stepType: "APPROVAL" | "NOTIFICATION" | "TASK";
+  assigneeRule: "ROLE" | "USER" | "FIELD" | "FORMULA";
+  assigneeValue: string;
+  conditions: unknown;
+  slaHours: number | null;
+  name: string;
+  nameAr: string;
+}
+
+export interface WorkflowDefinitionView {
+  id: string;
+  name: string;
+  nameAr: string;
+  triggerEntity: "manual_journal" | "purchase_order" | "change_order" | "duty_drawback_claim";
+  triggerEvent: string;
+  active: boolean;
+  conditions: unknown;
+  originPolicyId: string | null;
+  steps: readonly WorkflowDefinitionStepRow[];
+}
+
+/** PHASE-052 (W-48 — T-12): the drawback claims register rows (the
+ * /trade/drawbacks board — the fourth bound detail surface's own
+ * register; the claims engine shipped at W-38 (051), the board lands
+ * with the web plane so the docDetailPath contract holds). */
+export interface TradeDrawbackClaimRow {
+  id: string;
+  claimNo: string;
+  exportDeclarationId: string | null;
+  exportBillOfLadingId: string | null;
+  claimedAmount: string;
+  currency: string;
+  status: string;
+  submittedAt: string | null;
+  decidedAt: string | null;
+  note: string | null;
+  noteAr: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

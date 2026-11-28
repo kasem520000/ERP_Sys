@@ -6200,6 +6200,50 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/workflow/act",
     permission: "workflow.approve",
   },
+  // PHASE-052 (W-48 — T-10/T-11/T-12, dated 2026-11-28; matrix §3.30):
+  // the web plane's own backend — the keys-seed-first discipline standing
+  // (the nine workflow.* keys landed at W-43 (0130 §5), the routes bind
+  // as the service waves ship, every change dated at the block; 1,216 →
+  // 1,222). THE APPROVALS INBOX binds `workflow.inbox.act` (the inbox's
+  // own read key — the PENDING work with the aging figures); THE QUICK
+  // ACTION binds `workflow.approve` (the act key — the same key the
+  // deep-link act carries, the engine's own act path both); THE TIMELINE
+  // binds `workflow.history.view` (PP-17's full step history read); THE
+  // DEFINITIONS CRUD binds `workflow.definitions.manage` (the chain
+  // editor's list/create/update — deactivation the path, never delete).
+  // All six feature-gated at the controller (the inbox + the timeline +
+  // the act on `workflow.engine` — D-04's base unit; the definitions on
+  // `workflow.definitions` — the composable editor plane).
+  {
+    method: "GET",
+    path: "/api/v1/workflow/approvals",
+    permission: "workflow.inbox.act",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/workflow/approvals/:id/act",
+    permission: "workflow.approve",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/workflow/timeline",
+    permission: "workflow.history.view",
+  },
+  {
+    method: "GET",
+    path: "/api/v1/workflow/definitions",
+    permission: "workflow.definitions.manage",
+  },
+  {
+    method: "POST",
+    path: "/api/v1/workflow/definitions",
+    permission: "workflow.definitions.manage",
+  },
+  {
+    method: "PUT",
+    path: "/api/v1/workflow/definitions/:id",
+    permission: "workflow.definitions.manage",
+  },
 ];
 
 /**

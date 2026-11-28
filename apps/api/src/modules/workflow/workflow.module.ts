@@ -13,6 +13,8 @@ import { InboxService } from "../notifications/application/inbox-service";
 import { WorkflowEngine, type WorkflowEmailLeg } from "./application/workflow-engine";
 import { WorkflowDeepLinkService } from "./application/deep-link-service";
 import { WorkflowTaskLaneService } from "./application/task-lane-service";
+import { WorkflowApprovalInboxService } from "./application/approval-inbox-service";
+import { WorkflowDefinitionsService } from "./application/definitions-service";
 import { WorkflowAlertAdapter } from "./application/rules-alerts";
 import { EscalationService } from "./application/escalation-service";
 import { PolicyBridgeService } from "./application/policy-bridge-service";
@@ -61,6 +63,14 @@ import { WorkflowController } from "./presentation/workflow.controller";
  * raised into the notifications inbox — never a parallel evaluation
  * path; the catch-and-continue: a failed alert never blocks the
  * chain).
+ *
+ * PHASE-052 (W-48 — T-10/T-11/T-12, dated 2026-11-28): THE WEB PLANE'S
+ * OWN BACKEND SERVICES join the providers — the APPROVALS INBOX
+ * (the PENDING work + the aging figures the DB's own clock computes +
+ * the quick actions through the engine's own act path + the timeline
+ * read PP-17 renders) and the DEFINITIONS SERVICE (the chain editor's
+ * list/create/update — the validation fold first, the audit seal at
+ * every write).
  */
 
 const log = childLogger({ module: "workflow" });
@@ -85,6 +95,16 @@ const log = childLogger({ module: "workflow" });
       useFactory: (engine: WorkflowEngine, inbox: InboxService) =>
         new WorkflowTaskLaneService(engine, inbox),
       inject: [WorkflowEngine, InboxService],
+    },
+    {
+      provide: WorkflowApprovalInboxService,
+      useFactory: (engine: WorkflowEngine) => new WorkflowApprovalInboxService(engine),
+      inject: [WorkflowEngine],
+    },
+    {
+      provide: WorkflowDefinitionsService,
+      useFactory: (audit: AuditService) => new WorkflowDefinitionsService(audit),
+      inject: [AuditService],
     },
     {
       provide: WorkflowAlertAdapter,

@@ -113,6 +113,140 @@ export interface WorkflowStepInstanceRow {
   readonly dueAt: string | null;
 }
 
+/** PHASE-052 (W-48 — T-10, dated 2026-11-28) THE EDITOR'S OWN LIST:
+ * every definition of the tenant (active AND inactive — the register
+ * the chain editor renders), DETERMINISTICALLY ordered, with its
+ * steps assembled in ONE pass (the two queries composed in the
+ * service — the same rows the snapshot captures at trigger time). */
+export async function listWorkflowDefinitions(): Promise<readonly WorkflowDefinitionRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, name, name_ar AS "nameAr", trigger_entity AS "triggerEntity",
+           trigger_event AS "triggerEvent", active, conditions, origin_policy_id AS "originPolicyId"
+    FROM workflow_definitions
+    ORDER BY trigger_entity, created_at, name, id
+  `);
+  return rows.rows as unknown as WorkflowDefinitionRow[];
+}
+
+/** The editor's list WITH the steps (the composed read — the steps
+ * ordered per definition; the definitions carry their steps by id). */
+export async function listWorkflowSteps(): Promise<readonly WorkflowStepRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, definition_id AS "definitionId", step_order AS "stepOrder", step_type AS "stepType",
+           assignee_rule AS "assigneeRule", assignee_value AS "assigneeValue", conditions,
+           sla_hours AS "slaHours", name, name_ar AS "nameAr"
+    FROM workflow_steps
+    ORDER BY definition_id, step_order
+  `);
+  return rows.rows as unknown as WorkflowStepRow[];
+}
+
+export interface WriteDefinitionInput {
+  readonly name: string;
+  readonly nameAr: string;
+  readonly triggerEntity: string;
+  readonly triggerEvent: string;
+  readonly active: boolean;
+  readonly conditions: unknown;
+  readonly actorId: string;
+  readonly steps: readonly {
+    stepOrder: number;
+    stepType: string;
+    assigneeRule: string;
+    assigneeValue: string;
+    conditions: unknown;
+    slaHours: number | null;
+    name: string;
+    nameAr: string;
+  }[];
+}
+
+/** The editor's CREATE (the validated fold's write shape — the steps
+ * inserted in the SAME ambient transaction; the definition is the
+ * immutable per-instance snapshot's SOURCE, never a live template:
+ * an edit after trigger never rewrites a live instance). */
+export async function insertWorkflowDefinition(
+  input: WriteDefinitionInput,
+): Promise<WorkflowDefinitionRow> {
+  const definitionId = generateUuidV7();
+  await tenantTx().execute(sql`
+    INSERT INTO workflow_definitions
+      (id, tenant_id, name, name_ar, trigger_entity, trigger_event, active, conditions, created_by)
+    VALUES (
+      ${definitionId}, erp.current_tenant_id(), ${input.name}, ${input.nameAr},
+      ${input.triggerEntity}, ${input.triggerEvent}, ${input.active},
+      ${JSON.stringify(input.conditions)}::jsonb, ${input.actorId}
+    )
+  `);
+  await insertWorkflowSteps(definitionId, input.steps, input.actorId);
+  const row = await findDefinitionById(definitionId);
+  if (row === undefined) {
+    throw new Error("workflow definition insert did not land (the ambient transaction rolled back)");
+  }
+  return row;
+}
+
+/** The editor's UPDATE: the definition row + the steps REPLACED in
+ * the same ambient transaction (the (tenant, definition, step_order)
+ * uniqueness is the replace's own floor — delete-then-insert keeps the
+ * order contiguous; an edit NEVER touches a live instance — the
+ * snapshots are frozen, D-02's own law). Deactivation is the path:
+ * definitions are NEVER deleted (the evidence discipline, 0127 §3). */
+export async function updateWorkflowDefinition(
+  definitionId: string,
+  input: Omit<WriteDefinitionInput, "triggerEntity" | "triggerEvent">,
+): Promise<WorkflowDefinitionRow | undefined> {
+  const updated = await tenantTx().execute(sql`
+    UPDATE workflow_definitions SET
+      name = ${input.name}, name_ar = ${input.nameAr}, active = ${input.active},
+      conditions = ${JSON.stringify(input.conditions)}::jsonb,
+      updated_by = ${input.actorId}, updated_at = now(), version = version + 1
+    WHERE id = ${definitionId}
+    RETURNING id, name, name_ar AS "nameAr", trigger_entity AS "triggerEntity",
+              trigger_event AS "triggerEvent", active, conditions, origin_policy_id AS "originPolicyId"
+  `);
+  const row = (updated.rows as unknown as WorkflowDefinitionRow[])[0];
+  if (row === undefined) {
+    return undefined;
+  }
+  await tenantTx().execute(sql`
+    DELETE FROM workflow_steps WHERE definition_id = ${definitionId}
+  `);
+  await insertWorkflowSteps(definitionId, input.steps, input.actorId);
+  return row;
+}
+
+async function insertWorkflowSteps(
+  definitionId: string,
+  steps: WriteDefinitionInput["steps"],
+  actorId: string,
+): Promise<void> {
+  for (const step of steps) {
+    await tenantTx().execute(sql`
+      INSERT INTO workflow_steps
+        (id, tenant_id, definition_id, step_order, step_type, assignee_rule, assignee_value,
+         conditions, sla_hours, name, name_ar, created_by)
+      VALUES (
+        ${generateUuidV7()}, erp.current_tenant_id(), ${definitionId}, ${step.stepOrder},
+        ${step.stepType}, ${step.assigneeRule}, ${step.assigneeValue},
+        ${JSON.stringify(step.conditions)}::jsonb, ${step.slaHours},
+        ${step.name}, ${step.nameAr}, ${actorId}
+      )
+    `);
+  }
+}
+
+async function findDefinitionById(definitionId: string): Promise<WorkflowDefinitionRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, name, name_ar AS "nameAr", trigger_entity AS "triggerEntity",
+           trigger_event AS "triggerEvent", active, conditions, origin_policy_id AS "originPolicyId"
+    FROM workflow_definitions
+    WHERE id = ${definitionId}
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as WorkflowDefinitionRow[])[0];
+}
+
 /** The ACTIVE instance for a document, if any (the ONE-ACTIVE-CHAIN
  * law's partial unique guarantees at most one). */
 export async function findActiveInstanceForDocument(
@@ -167,6 +301,28 @@ export async function findCompletedApprovedInstanceForDocument(
     return undefined;
   }
   return { instanceId: row.instanceId, completedSteps: row.completedSteps };
+}
+
+/** PHASE-052 (W-48 — T-12, dated 2026-11-28) THE TIMELINE'S OWN READ:
+ * the document's chain — the ACTIVE instance if one lives, else the
+ * latest terminal one (the frozen history renders VERBATIM — PP-17:
+ * the terminal record is the timeline's own immutable source, INV-
+ * 037's floor; a document with no chain returns undefined and the
+ * timeline renders its honest no-chain state). */
+export async function findLatestInstanceForDocument(
+  triggerEntity: string,
+  triggerEntityId: string,
+): Promise<WorkflowInstanceRow | undefined> {
+  const rows = await tenantTx().execute(sql`
+    SELECT id, definition_id AS "definitionId", trigger_entity AS "triggerEntity",
+           trigger_entity_id AS "triggerEntityId", definition_snapshot AS "definitionSnapshot",
+           current_step_order AS "currentStepOrder", status, completed_at AS "completedAt"
+    FROM workflow_instances
+    WHERE trigger_entity = ${triggerEntity} AND trigger_entity_id = ${triggerEntityId}
+    ORDER BY (status = 'ACTIVE') DESC, completed_at DESC NULLS LAST, created_at DESC
+    LIMIT 1
+  `);
+  return (rows.rows as unknown as WorkflowInstanceRow[])[0];
 }
 
 export async function findInstanceById(
@@ -461,6 +617,97 @@ export async function findPendingTasksForUser(
     LIMIT ${limit}
   `);
   return rows.rows as unknown as PendingTaskRow[];
+}
+
+/** PHASE-052 (W-48 — T-11, dated 2026-11-28) THE APPROVALS INBOX'S OWN
+ * QUERY: the CURRENT (the pointer's own) PENDING APPROVAL steps on
+ * ACTIVE chains — the inbox's PENDING work with THE AGING FIGURES THE
+ * DB'S OWN CLOCK COMPUTES (the engine-output law: `ageHours` and
+ * `overdue` are computed inside the SQL at now(), rendered VERBATIM by
+ * the board — zero client-side recomputation, zero JS wall clocks).
+ * The pointer floor is the act path's own shape (only the current step
+ * is actable — a future step never lists); the aging-first order is
+ * the tasks lane's own law. */
+export interface PendingApprovalRow {
+  readonly stepInstanceId: string;
+  readonly instanceId: string;
+  readonly stepOrder: number;
+  readonly triggerEntity: string;
+  readonly triggerEntityId: string;
+  readonly assigneeUserId: string;
+  readonly dueAt: string | null;
+  readonly assignedAt: string;
+  readonly overdue: boolean;
+  readonly ageHours: number;
+}
+
+export async function findPendingApprovalsForUser(
+  userId: string,
+  limit: number,
+): Promise<readonly PendingApprovalRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT si.id AS "stepInstanceId", si.instance_id AS "instanceId",
+           si.step_order AS "stepOrder",
+           wi.trigger_entity AS "triggerEntity", wi.trigger_entity_id AS "triggerEntityId",
+           si.assignee_user_id AS "assigneeUserId",
+           si.due_at::text AS "dueAt",
+           wi.created_at::text AS "assignedAt",
+           (si.due_at IS NOT NULL AND si.due_at < now()) AS "overdue",
+           (EXTRACT(EPOCH FROM (now() - wi.created_at)) / 3600)::int AS "ageHours"
+    FROM workflow_step_instances si
+    JOIN workflow_instances wi
+      ON wi.id = si.instance_id AND wi.tenant_id = si.tenant_id
+    WHERE si.tenant_id = erp.current_tenant_id()
+      AND si.assignee_user_id = ${userId}
+      AND si.step_type = 'APPROVAL'
+      AND si.status = 'PENDING'
+      AND wi.status = 'ACTIVE'
+      AND wi.current_step_order = si.step_order
+    ORDER BY si.due_at ASC NULLS LAST, wi.created_at ASC, si.step_order ASC
+    LIMIT ${limit}
+  `);
+  return rows.rows as unknown as PendingApprovalRow[];
+}
+
+/** The DELEGATION LANE'S CANDIDATES (W-48 — D-07's own read side): the
+ * CURRENT PENDING APPROVAL steps assigned to the given users (the
+ * absent assignees whose active windows may route to the caller) —
+ * the SERVICE resolves each candidate through the delegation chain
+ * and keeps only the rows whose EFFECTIVE ACTOR is the caller (the
+ * actor law's terminal — the inbox never lists a step its reader
+ * cannot act on). */
+export async function findPendingApprovalsForUsers(
+  userIds: readonly string[],
+  limit: number,
+): Promise<readonly PendingApprovalRow[]> {
+  if (userIds.length === 0) {
+    return [];
+  }
+  const rows = await tenantTx().execute(sql`
+    SELECT si.id AS "stepInstanceId", si.instance_id AS "instanceId",
+           si.step_order AS "stepOrder",
+           wi.trigger_entity AS "triggerEntity", wi.trigger_entity_id AS "triggerEntityId",
+           si.assignee_user_id AS "assigneeUserId",
+           si.due_at::text AS "dueAt",
+           wi.created_at::text AS "assignedAt",
+           (si.due_at IS NOT NULL AND si.due_at < now()) AS "overdue",
+           (EXTRACT(EPOCH FROM (now() - wi.created_at)) / 3600)::int AS "ageHours"
+    FROM workflow_step_instances si
+    JOIN workflow_instances wi
+      ON wi.id = si.instance_id AND wi.tenant_id = si.tenant_id
+    WHERE si.tenant_id = erp.current_tenant_id()
+      AND si.assignee_user_id IN (${sql.join(
+        userIds.map((id) => sql`${id}`),
+        sql`, `,
+      )})
+      AND si.step_type = 'APPROVAL'
+      AND si.status = 'PENDING'
+      AND wi.status = 'ACTIVE'
+      AND wi.current_step_order = si.step_order
+    ORDER BY si.due_at ASC NULLS LAST, wi.created_at ASC, si.step_order ASC
+    LIMIT ${limit}
+  `);
+  return rows.rows as unknown as PendingApprovalRow[];
 }
 
 /** One breached awaiting step, with the instance's own rendering facts
