@@ -6264,6 +6264,16 @@ export const SESSION_ROUTES: readonly { method: string; path: string }[] = [
   // form). The act itself is permission-guarded in ROUTE_PERMISSIONS
   // above (workflow.approve).
   { method: "GET", path: "/api/v1/workflow/act" },
+  // PHASE-052 (W-47 — T-08, D-11): the tasks lane's self plane — the
+  // document-linked tasks ARE the workflow_step_instances (type TASK —
+  // no seventh table); the list is the caller's own PENDING TASK steps
+  // and the completion write-back is the step's own ACTED stamp (the
+  // actor law is the engine's own floor — the assignee or their active
+  // delegate — never a role key; every authenticated user works their
+  // own lane, the notifications self-plane pattern). Feature-gated at
+  // the controller on `workflow.tasks` (D-04).
+  { method: "GET", path: "/api/v1/workflow/tasks" },
+  { method: "POST", path: "/api/v1/workflow/tasks/:id/complete" },
 ];
 
 /**

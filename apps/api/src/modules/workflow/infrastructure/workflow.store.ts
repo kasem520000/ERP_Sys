@@ -384,6 +384,47 @@ export async function findTenantOwnerUserId(): Promise<string | undefined> {
 
 // ── the escalation plane (0129 — D-08's sweep substrate) ─────────────
 
+/** PHASE-052 (W-47 — T-08, D-11) THE TASKS LANE'S OWN QUERY: the
+ * PENDING TASK step instances on ACTIVE chains assigned to the user —
+ * the tasks ARE the step instances (no seventh table), the list is a
+ * query over them (the typed list the API carries; the W-48 inbox's
+ * tasks lane renders). Ordered by the due instant then the instance's
+ * own creation (the aging-first law — the most urgent work first; the
+ * undated tasks after the dated ones, then the oldest chains first). */
+export interface PendingTaskRow {
+  readonly stepInstanceId: string;
+  readonly instanceId: string;
+  readonly stepOrder: number;
+  readonly triggerEntity: string;
+  readonly triggerEntityId: string;
+  readonly dueAt: string | null;
+  readonly assignedAt: string;
+}
+
+export async function findPendingTasksForUser(
+  userId: string,
+  limit: number,
+): Promise<readonly PendingTaskRow[]> {
+  const rows = await tenantTx().execute(sql`
+    SELECT si.id AS "stepInstanceId", si.instance_id AS "instanceId",
+           si.step_order AS "stepOrder",
+           wi.trigger_entity AS "triggerEntity", wi.trigger_entity_id AS "triggerEntityId",
+           si.due_at::text AS "dueAt",
+           wi.created_at::text AS "assignedAt"
+    FROM workflow_step_instances si
+    JOIN workflow_instances wi
+      ON wi.id = si.instance_id AND wi.tenant_id = si.tenant_id
+    WHERE si.tenant_id = erp.current_tenant_id()
+      AND si.assignee_user_id = ${userId}
+      AND si.step_type = 'TASK'
+      AND si.status = 'PENDING'
+      AND wi.status = 'ACTIVE'
+    ORDER BY si.due_at ASC NULLS LAST, wi.created_at ASC, si.step_order ASC
+    LIMIT ${limit}
+  `);
+  return rows.rows as unknown as PendingTaskRow[];
+}
+
 /** One breached awaiting step, with the instance's own rendering facts
  * (the sweep's per-step world — the notification payload's own
  * material, joined ONCE per scan; the DB's OWN CLOCK decides the

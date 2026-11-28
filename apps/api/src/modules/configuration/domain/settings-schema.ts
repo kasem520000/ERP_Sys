@@ -807,6 +807,34 @@ export const SETTINGS_REGISTRY: Readonly<Record<string, SettingDefinition>> = Ob
     description:
       "PHASE-052 (W-45, T-04/D-08): the workflow-escalation-sweep's recurring-reminder cadence — the hour-values after a breached step's due instant at which the sweep reminds the assignee (the documented fail-closed default [24]: one reminder per breached step, one day after the due instant; the escalation event's structural dedupe is per step per kind per due-date cycle, so re-runs, the nightly cron, and a raced concurrent pass all converge within a cycle).",
   }),
+  // PHASE-052 (W-47 — T-07's rules half, UX-13): THE RULES-ENGINE ALERT
+  // RULES — the configurable threshold/condition rules the bus consumer
+  // evaluates at every chain open (raising the matching alerts into the
+  // notifications inbox — never a parallel evaluation path: the D-06
+  // fold is the conditions' one validator, the engine's own context
+  // assembly the one reader). The ENVELOPE's shape is this schema's own
+  // law (the name, the audience, the severity, and that the conditions
+  // field is a present object); the CONDITIONS' shape is the workflow
+  // domain's own (the alert-rules fold normalizes fail-closed — a
+  // malformed rule is dropped, never an alert, never a crash of the
+  // emitting request). The documented default [] — the plane is OPT-IN
+  // by configuration: a tenant who configures nothing gets no alerts.
+  "workflow.alert_rules": Object.freeze({
+    key: "workflow.alert_rules",
+    schema: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(200),
+          conditions: z.record(z.string(), z.unknown()),
+          audience: z.enum(["owner", "creator"]).default("owner"),
+          severity: z.enum(["info", "warning"]).default("warning"),
+        }),
+      )
+      .max(20),
+    default: [],
+    description:
+      "PHASE-052 (W-47, T-07's rules half — UX-13): the rules-engine alert rules — the configurable threshold/condition rules evaluated at every workflow chain open (the D-06 condition shape on amountBase/departmentId/customFields/native, the same context the chain's own entry conditions saw); a matching rule raises one inbox alert to its audience (the tenant owner or the document's creator) with the rule's severity. The default [] is the documented opt-in: no rules configured, no alerts.",
+  }),
 });
 
 export const SETTING_KEYS: readonly string[] = Object.keys(SETTINGS_REGISTRY);

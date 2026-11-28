@@ -12,6 +12,8 @@ import type { EmailService } from "../notifications/application/email-service";
 import { InboxService } from "../notifications/application/inbox-service";
 import { WorkflowEngine, type WorkflowEmailLeg } from "./application/workflow-engine";
 import { WorkflowDeepLinkService } from "./application/deep-link-service";
+import { WorkflowTaskLaneService } from "./application/task-lane-service";
+import { WorkflowAlertAdapter } from "./application/rules-alerts";
 import { EscalationService } from "./application/escalation-service";
 import { PolicyBridgeService } from "./application/policy-bridge-service";
 import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
@@ -47,6 +49,18 @@ import { WorkflowController } from "./presentation/workflow.controller";
  * links' own service (the decode/expire/actor floors + the engine's own
  * act path), and the email leg's tokens ride the step-assignment mail
  * (the approve/reject URLs rendered in the recipient's locale).
+ *
+ * PHASE-052 (W-47 — T-08 + T-07's rules half, D-11/UX-13): THE TASKS
+ * LANE + THE RULES-ALERT CONSUMER — the tasks ARE the step instances
+ * (no seventh table): the typed list (the caller's own PENDING TASK
+ * steps) + the completion write-back (the step's own ACTED stamp
+ * through the engine's act path); the RULES-ALERT ADAPTER subscribes
+ * to the event bus at boot (the workflow.instance.started consumer —
+ * the configurable threshold/condition rules evaluated against the
+ * ENGINE'S OWN context assembly, the D-06 fold VERBATIM, the alerts
+ * raised into the notifications inbox — never a parallel evaluation
+ * path; the catch-and-continue: a failed alert never blocks the
+ * chain).
  */
 
 const log = childLogger({ module: "workflow" });
@@ -67,6 +81,17 @@ const log = childLogger({ module: "workflow" });
       inject: [WorkflowEngine],
     },
     {
+      provide: WorkflowTaskLaneService,
+      useFactory: (engine: WorkflowEngine, inbox: InboxService) =>
+        new WorkflowTaskLaneService(engine, inbox),
+      inject: [WorkflowEngine, InboxService],
+    },
+    {
+      provide: WorkflowAlertAdapter,
+      useFactory: (inbox: InboxService) => new WorkflowAlertAdapter(inbox),
+      inject: [InboxService],
+    },
+    {
       provide: EscalationService,
       useFactory: (audit: AuditService, inbox: InboxService) =>
         new EscalationService(audit, inbox),
@@ -78,7 +103,7 @@ const log = childLogger({ module: "workflow" });
       inject: [AuditService],
     },
   ],
-  exports: [WorkflowEngine, WorkflowDeepLinkService, EscalationService, PolicyBridgeService],
+  exports: [WorkflowEngine, WorkflowDeepLinkService, WorkflowTaskLaneService, EscalationService, PolicyBridgeService],
 })
 export class WorkflowModule implements OnModuleInit {
   // THE EXPLICIT @Inject LAW (the platform's own convention — the
@@ -95,6 +120,7 @@ export class WorkflowModule implements OnModuleInit {
   constructor(
     @Inject(WorkflowEngine) private readonly engine: WorkflowEngine,
     @Inject(EscalationService) private readonly escalation: EscalationService,
+    @Inject(WorkflowAlertAdapter) private readonly alertAdapter: WorkflowAlertAdapter,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -109,6 +135,15 @@ export class WorkflowModule implements OnModuleInit {
     await registerWorkflowEscalationJob(getBoss(), this.escalation).catch((error) => {
       log.warn({ err: error }, "workflow escalation sweep registration failed");
     });
+    // THE RULES-ALERT CONSUMER (W-47 — UX-13, D-10's bus-consumer law):
+    // the adapter subscribes to the event bus at boot — the
+    // workflow.instance.started consumer evaluating the configured
+    // threshold/condition rules (the settings key workflow.alert_rules)
+    // against the engine's own context assembly and raising the alerts
+    // into the notifications inbox. The consumer acts INSIDE the
+    // emitting request's envelope (the config-events law); its own
+    // catch-and-continue degrades the alerts never the chain.
+    this.alertAdapter.subscribe();
   }
 }
 

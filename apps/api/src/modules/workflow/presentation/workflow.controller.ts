@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Post, Query, Req } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Inject, Param, Post, Query, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { z } from "zod";
 
@@ -8,6 +8,7 @@ import { UnauthenticatedError } from "../../identity/api/identity";
 import { RequirePermissions } from "../../../infra/auth/require-permissions.decorator";
 import { RequireFeature } from "../../../infra/auth/require-feature.decorator";
 import { WorkflowDeepLinkService } from "../application/deep-link-service";
+import { WorkflowTaskLaneService } from "../application/task-lane-service";
 
 /**
  * PHASE-052 (W-47 — T-06, dated 2026-11-27) THE WORKFLOW ACT SURFACE —
@@ -53,10 +54,17 @@ const actSchema = z.object({
   comment: z.string().max(2_000).nullable().optional(),
 });
 
+const taskCompleteSchema = z.object({
+  comment: z.string().max(2_000).nullable().optional(),
+});
+
+const UUID = z.string().uuid();
+
 @Controller("api/v1/workflow")
 export class WorkflowController {
   constructor(
     @Inject(WorkflowDeepLinkService) private readonly deepLinks: WorkflowDeepLinkService,
+    @Inject(WorkflowTaskLaneService) private readonly taskLane: WorkflowTaskLaneService,
   ) {}
 
   /** The link preview — the act page's own read (SESSION_ROUTES: the
@@ -86,6 +94,51 @@ export class WorkflowController {
     return envelope(
       await this.deepLinks.actThroughToken({
         token: parsed.token,
+        actorId: identity.userId,
+        comment: parsed.comment ?? null,
+      }),
+    );
+  }
+
+  // ── PHASE-052 (W-47 — T-08, D-11): THE TASKS LANE — the document-
+  // linked tasks' own self plane (SESSION_ROUTES: every authenticated
+  // user works their own lane — the notifications self-plane pattern;
+  // the actor law is the engine's own floor, not a role key). The
+  // tasks ARE the workflow_step_instances (type TASK — no seventh
+  // table); the list is the PENDING TASK steps on ACTIVE chains
+  // assigned to the caller; the completion write-back is the step's
+  // own ACTED stamp (the engine's act path VERBATIM). Feature-gated on
+  // `workflow.tasks` (D-04 — the composable unit).
+
+  /** The caller's own task lane (the typed list — the W-48 inbox's
+   * tasks lane renders this shape). */
+  @Get("tasks")
+  @RequireFeature("workflow.tasks")
+  async tasks(@Req() request: Request, @Query("limit") rawLimit?: string): Promise<unknown> {
+    const identity = requireIdentity(request);
+    const parsedLimit = rawLimit !== undefined ? Number(rawLimit) : NaN;
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 200) : 100;
+    return envelope(await this.taskLane.listMyTasks({ userId: identity.userId, limit }));
+  }
+
+  /** THE COMPLETION WRITE-BACK: the task's completion is the step's
+   * own ACTED stamp (single-use — the acted_at stamp is the ledger);
+   * the pointer advances, the chain completes when the task was the
+   * last step. The comment captures with the act. */
+  @Post("tasks/:id/complete")
+  @HttpCode(HttpStatus.OK)
+  @RequireFeature("workflow.tasks")
+  async completeTask(
+    @Req() request: Request,
+    @Param("id") id: string,
+    @Body() body: unknown,
+  ): Promise<unknown> {
+    const identity = requireIdentity(request);
+    const taskId = UUID.parse(id);
+    const parsed = taskCompleteSchema.parse(body ?? {});
+    return envelope(
+      await this.taskLane.completeTask({
+        taskStepId: taskId,
         actorId: identity.userId,
         comment: parsed.comment ?? null,
       }),

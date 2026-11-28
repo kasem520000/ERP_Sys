@@ -321,8 +321,11 @@ async function readCustomFieldContext(
 }
 
 /** Assemble the D-06 document context ONCE per trigger (the evaluator
- * never re-reads anything). */
-async function assembleDocumentContext(
+ * never re-reads anything). PHASE-052 (W-47 — UX-13): exported for the
+ * rules-alert adapter — THE SAME assembly the chain's entry conditions
+ * saw (the engine's own readers, zero parallel computation: never a
+ * second context path for the alert rules to diverge on). */
+export async function assembleDocumentContext(
   triggerEntity: WorkflowTriggerEntity,
   documentId: string,
 ): Promise<{ context: WorkflowDocumentContext; facts: DocumentFacts }> {
