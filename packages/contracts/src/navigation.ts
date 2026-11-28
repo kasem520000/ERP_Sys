@@ -180,6 +180,38 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 20,
   },
+  // home group — PHASE-052 (W-48 — T-13, OA-04): the workflow family's
+  // two home surfaces. The approvals inbox is NAVIGATION_MODEL §1's own
+  // "approvals queue (if approver)" member — the PENDING work with the
+  // aging indicators and the quick actions (the permission key is the
+  // 0130-seeded matrix §3.30 inbox key; the flag the D-04 base unit —
+  // an unentitled tenant never sees the surface). The tasks lane is the
+  // self plane's own landing (the tasks routes are SESSION_ROUTES — the
+  // actor law is the engine's own floor, so no permission key; the
+  // composable `workflow.tasks` unit gates it).
+  {
+    id: "workflow.approvals",
+    parentGroup: "home",
+    label: { ar: "صندوق الموافقات", en: "Approvals inbox" },
+    icon: "circle-check",
+    route: "/workflow/approvals",
+    featureKey: "workflow.engine",
+    permission: "workflow.inbox.act",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 35,
+  },
+  {
+    id: "workflow.tasks",
+    parentGroup: "home",
+    label: { ar: "مهامي", en: "My tasks" },
+    icon: "calendar-check",
+    route: "/workflow/tasks",
+    featureKey: "workflow.tasks",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 40,
+  },
   // sales group — PHASE-012 (T13-UI): the quote-to-cash chain. Quotes and
   // orders share ONE workspace (/sales/quotes); deliveries, invoices and
   // credit notes are separate transaction-entry screens; /sales/ar carries
@@ -1321,6 +1353,26 @@ export const NAV_ITEMS: readonly NavItem[] = [
     archetype: "list-search",
     order: 25,
   },
+  // PHASE-052 (W-48 — the honest +1 over the declared NAV +3, disclosed
+  // at the wave's README): the drawback claims board — the FOURTH bound
+  // detail surface (the engine's own docDetailPath law points the
+  // assignee at /trade/drawbacks?doc=…; the 051 web plane (W-39)
+  // delivered the LC/customs/shipments screens engine-only for the
+  // drawback claims, so this row makes the workflow plane's contract
+  // honest). The whole-module `trade` flag + the register read key
+  // (trade.view) — the W-39 precedent verbatim.
+  {
+    id: "trade.drawbacks",
+    parentGroup: "purchasing",
+    label: { ar: "طلبات استرداد الرسوم", en: "Duty drawback claims" },
+    icon: "banknote",
+    route: "/trade/drawbacks",
+    featureKey: "trade",
+    permission: "trade.view",
+    branchScoped: false,
+    archetype: "list-search",
+    order: 26,
+  },
   // PHASE-039 supplier returns (matrix §3.3; the seeded 0059 keys): the RTV
   // authorizations REQUESTED → approve → ship → credit (G-38).
   {
@@ -1522,6 +1574,23 @@ export const NAV_ITEMS: readonly NavItem[] = [
     branchScoped: false,
     archetype: "settings",
     order: 125,
+  },
+  // settings group — PHASE-052 (W-48 — T-13, OA-04): the workflow chain
+  // editor (D-14's form-first shape — the ordered steps, the branch
+  // conditions, the SLA, the assignee rules; the visual ordering, never
+  // the free canvas). The manage key is the 0130-seeded matrix §3.30 row;
+  // the flag the D-04 composable editor plane `workflow.definitions`.
+  {
+    id: "settings.workflows",
+    parentGroup: "settings",
+    label: { ar: "سير العمل والموافقات", en: "Workflows" },
+    icon: "list-ordered",
+    route: "/settings/workflows",
+    featureKey: "workflow.definitions",
+    permission: "workflow.definitions.manage",
+    branchScoped: false,
+    archetype: "settings",
+    order: 127,
   },
   // settings group — T19-WEB (PHASE-014): the owner billing home (plan card,
   // usage meters, billing history, trial countdown). NAVIGATION_MODEL §1 lists
