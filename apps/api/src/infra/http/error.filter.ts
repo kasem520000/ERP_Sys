@@ -161,6 +161,16 @@ import {
   DrawbackEvidenceRequiredError,
 } from "../../modules/trade/domain/trade-errors";
 import {
+  WorkflowDelegationCircularError,
+  WorkflowInstanceImmutableError,
+  WorkflowSelfApprovalBlockedError,
+  WorkflowStepAlreadyActedError,
+  WorkflowStepInstanceNotFoundError,
+  WorkflowStepStateError,
+  WorkflowTokenActorMismatchError,
+  WorkflowTokenExpiredError,
+} from "../../modules/workflow/domain/workflow-errors";
+import {
   AttachmentNotFoundError,
   AttachmentOwnerNotFoundError,
   CreditTermsCodeTakenError,
@@ -1599,6 +1609,44 @@ function domainStatus(error: DomainError): number {
     error instanceof DrawbackClaimDuplicateError ||
     error instanceof DrawbackClaimStateError ||
     error instanceof DrawbackEvidenceRequiredError
+  ) {
+    return HttpStatus.CONFLICT;
+  }
+  // PHASE-052 (W-47 — T-06, dated 2026-11-27): the workflow plane's
+  // statuses — registered in the SAME increment that ships the module's
+  // FIRST routes (the PHASE-045 T-03 lesson: never the 422 fall-through
+  // drift). The 404s: the step-instance lookup floor (A7 parity —
+  // identical shape for unknown-vs-foreign ids, no existence
+  // disclosure). The 403s: the deep-link ACTOR MISMATCH (the link's
+  // bound user vs the session's own — an authorization refusal, never
+  // an input shape). The 409s: the D-09 family's own state conflicts
+  // — the CAS single-use replay (WORKFLOW_STEP_ALREADY_ACTED — the
+  // acted_at stamp is the ledger), the claim's own deadline
+  // (WORKFLOW_TOKEN_EXPIRED — the link's lifecycle state, the
+  // BudgetStateError family; the identity plane's merged-class
+  // InvalidResetTokenError 422 is the single-class precedent, not the
+  // split-class one), the ladder's illegal moves
+  // (WORKFLOW_STEP_STATE), INV-037's terminal immutability
+  // (WORKFLOW_INSTANCE_IMMUTABLE), G-67's self-approval block
+  // (WORKFLOW_SELF_APPROVAL_BLOCKED — the BudgetSelfApprovalError
+  // precedent verbatim), and the delegation circularity. The policy
+  // class — the input/condition/assignee families
+  // (WORKFLOW_INPUT_INVALID · WORKFLOW_CONDITION_INVALID ·
+  // WORKFLOW_ASSIGNEE_UNRESOLVABLE) — falls through to the 422 default
+  // exactly as the family law documents it.
+  if (error instanceof WorkflowStepInstanceNotFoundError) {
+    return HttpStatus.NOT_FOUND;
+  }
+  if (error instanceof WorkflowTokenActorMismatchError) {
+    return HttpStatus.FORBIDDEN;
+  }
+  if (
+    error instanceof WorkflowStepAlreadyActedError ||
+    error instanceof WorkflowTokenExpiredError ||
+    error instanceof WorkflowStepStateError ||
+    error instanceof WorkflowInstanceImmutableError ||
+    error instanceof WorkflowSelfApprovalBlockedError ||
+    error instanceof WorkflowDelegationCircularError
   ) {
     return HttpStatus.CONFLICT;
   }

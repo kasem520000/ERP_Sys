@@ -158,3 +158,20 @@ export class WorkflowTokenActorMismatchError extends DomainError {
     );
   }
 }
+
+// ── the lookup floor (W-47 — the routes' own 404 class; the PHASE-045
+//    T-03 lesson: the not-found classes register in error.filter.ts's
+//    domainStatus chain in the SAME increment that ships the routes) ──
+
+/** The step instance the act/task surface targets does not exist (or
+ * belongs to another tenant — the A7 parity: identical shape for
+ * unknown-vs-foreign ids, no existence disclosure). */
+export class WorkflowStepInstanceNotFoundError extends DomainError {
+  constructor(details: { stepInstanceId: string }) {
+    super(
+      "WORKFLOW_STEP_INSTANCE_NOT_FOUND",
+      `workflow step instance ${details.stepInstanceId} not found`,
+      details,
+    );
+  }
+}

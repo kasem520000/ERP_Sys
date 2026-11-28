@@ -31,7 +31,12 @@ export type EmailTemplate =
   /** PHASE-052 (W-44 — the workflow engine's assignee-notification email
    * leg on the 041 hub): one mail per step assignment (the approval
    * request — the document's label + number + amount + the step's name;
-   * the dedupe is the bus consumer's own per-step axis). */
+   * the dedupe is the bus consumer's own per-step axis).
+   * PHASE-052 (W-47 — T-06, D-09): the mail carries THE SIGNED ONE-TIME
+   * DEEP LINKS — the approve and reject URLs (the stateless HMAC
+   * tokens rendered into the recipient's locale; the links expire at
+   * the claim's own deadline and are single-use by the step's own
+   * CAS stamp). */
   | "workflow_step_assigned";
 
 export interface EmailPayload {
@@ -173,7 +178,11 @@ const AR = {
       `القيمة: ${v.amount} ${v.currency}`,
       `الخطوة: ${v.stepName}`,
       ``,
-      `يمكنكم مراجعة المستند من:`,
+      `يمكنكم الموافقة أو الرفض مباشرة من الرابطين التاليين (صالحان لمرة واحدة حتى ${v.deadline}):`,
+      `الموافقة: ${v.approveUrl}`,
+      `الرفض: ${v.rejectUrl}`,
+      ``,
+      `أو مراجعة المستند من:`,
       v.docUrl,
       ``,
       `— فريق المنصة`,
@@ -307,7 +316,11 @@ const EN = {
       `Amount: ${v.amount} ${v.currency}`,
       `Step: ${v.stepName}`,
       ``,
-      `Review it from:`,
+      `You can approve or reject directly from the links below (single-use, valid until ${v.deadline}):`,
+      `Approve: ${v.approveUrl}`,
+      `Reject: ${v.rejectUrl}`,
+      ``,
+      `Or review the document from:`,
       v.docUrl,
       ``,
       `— The platform team`,

@@ -6,14 +6,17 @@ import { AuditService } from "../audit/application/audit.service";
 import { requireTenantContext } from "../../infra/db/tenant-context";
 import { childLogger } from "../../infra/observability/logger";
 import { getBoss } from "../../infra/jobs/boss";
+import { env } from "../../config/env";
 import { EMAIL_SERVICE, NotificationsModule } from "../notifications/notifications.module";
 import type { EmailService } from "../notifications/application/email-service";
 import { InboxService } from "../notifications/application/inbox-service";
 import { WorkflowEngine, type WorkflowEmailLeg } from "./application/workflow-engine";
+import { WorkflowDeepLinkService } from "./application/deep-link-service";
 import { EscalationService } from "./application/escalation-service";
 import { PolicyBridgeService } from "./application/policy-bridge-service";
 import { bindWorkflowEngine } from "./infrastructure/workflow-gateway";
 import { registerWorkflowEscalationJob } from "./infrastructure/workflow-escalation-sweep.job";
+import { WorkflowController } from "./presentation/workflow.controller";
 
 /**
  * PHASE-052 (W-44 — T-03, dated 2026-11-27) THE WORKFLOW MODULE: binds
@@ -38,21 +41,30 @@ import { registerWorkflowEscalationJob } from "./infrastructure/workflow-escalat
  * origin_policy_id back-reference; the specs drive it directly, the
  * admin surface is a later wave's own).
  *
- * No controllers yet — the engine core is service-layer (the W-44
- * scope); the routes land with their own controllers at W-47+ (the
- * deep links, the inbox act).
+ * PHASE-052 (W-47 — T-06, D-09): THE DEEP-LINK SERVICE + THE MODULE'S
+ * FIRST CONTROLLER — the act surface (`POST /api/v1/workflow/act` on
+ * `workflow.approve` + the SESSION_ROUTES preview): the signed one-time
+ * links' own service (the decode/expire/actor floors + the engine's own
+ * act path), and the email leg's tokens ride the step-assignment mail
+ * (the approve/reject URLs rendered in the recipient's locale).
  */
 
 const log = childLogger({ module: "workflow" });
 
 @Module({
   imports: [AuditModule, NotificationsModule],
+  controllers: [WorkflowController],
   providers: [
     {
       provide: WorkflowEngine,
       useFactory: (audit: AuditService, inbox: InboxService, email: EmailService) =>
         new WorkflowEngine(audit, inbox, moduleEmailLeg(email)),
       inject: [AuditService, InboxService, EMAIL_SERVICE],
+    },
+    {
+      provide: WorkflowDeepLinkService,
+      useFactory: (engine: WorkflowEngine) => new WorkflowDeepLinkService(engine),
+      inject: [WorkflowEngine],
     },
     {
       provide: EscalationService,
@@ -66,7 +78,7 @@ const log = childLogger({ module: "workflow" });
       inject: [AuditService],
     },
   ],
-  exports: [WorkflowEngine, EscalationService, PolicyBridgeService],
+  exports: [WorkflowEngine, WorkflowDeepLinkService, EscalationService, PolicyBridgeService],
 })
 export class WorkflowModule implements OnModuleInit {
   // THE EXPLICIT @Inject LAW (the platform's own convention — the
@@ -148,7 +160,15 @@ function moduleEmailLeg(email: EmailService): WorkflowEmailLeg {
             amount: input.amountBase,
             currency: input.currency,
             stepName: target.locale === "en" ? input.stepName : input.stepNameAr,
-            docUrl: input.docUrl,
+            docUrl: `${env.WEB_BASE_URL.replace(/\/$/, "")}${input.docUrl}`,
+            // PHASE-052 (W-47 — D-09): THE DEEP-LINK URLS — the stateless
+            // tokens rendered into the recipient's locale (the link shape
+            // `${WEB_BASE_URL}/{locale}/workflow/act?token=…`; the single-use
+            // + the deadline are the token's own claims — the mail renders
+            // the deadline so the reader knows the window).
+            approveUrl: `${env.WEB_BASE_URL.replace(/\/$/, "")}/${target.locale === "en" ? "en" : "ar"}/workflow/act?token=${input.approveToken}`,
+            rejectUrl: `${env.WEB_BASE_URL.replace(/\/$/, "")}/${target.locale === "en" ? "en" : "ar"}/workflow/act?token=${input.rejectToken}`,
+            deadline: input.tokenDeadline,
           },
         });
       } catch (error) {

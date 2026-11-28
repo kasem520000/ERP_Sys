@@ -31,6 +31,10 @@ import {
 import { publishWorkflowEvent } from "./workflow-events";
 import { assertNotSelfApproval } from "../domain/delegation-graph";
 import { resolveEffectiveActor } from "../infrastructure/delegation-service";
+import {
+  actionTokenDeadline,
+  encodeWorkflowActionToken,
+} from "../domain/action-token";
 
 /**
  * PHASE-052 (W-44 — T-03, dated 2026-11-27) THE WORKFLOW ENGINE CORE
@@ -462,7 +466,10 @@ function docDetailPath(triggerEntity: WorkflowTriggerEntity, documentId: string)
 
 /** One inbox record for the current step's assignee (the approval
  * request — the document's number + amount + the step's bilingual
- * name; the dedupe key the per-step-per-assignment axis). */
+ * name; the dedupe key the per-step-per-assignment axis). The email
+ * leg carries the DEEP-LINK TOKENS (W-47, D-09 — built here with the
+ * deadline law: the step's own due_at when the SLA set one, else the
+ * 72-hour default window; the leg renders the locale-bound URLs). */
 async function notifyAssignee(input: {
   inbox: InboxService;
   emailLeg: WorkflowEmailLeg | null | undefined;
@@ -475,6 +482,8 @@ async function notifyAssignee(input: {
   assigneeUserId: string;
   stepInstanceId: string;
   instanceId: string;
+  stepDueAt: string | null;
+  assignedAt: string;
 }): Promise<void> {
   const label = DOC_LABELS[input.triggerEntity];
   const docRef = input.facts.docNo ?? input.documentId.slice(0, 8);
@@ -495,6 +504,13 @@ async function notifyAssignee(input: {
     userId: input.assigneeUserId,
   });
   if (input.emailLeg !== null && input.emailLeg !== undefined) {
+    // THE TOKENS (D-09 — the stateless HMAC fourth derivation): bound
+    // to the assignee + the instance + the step + the action, with the
+    // deadline law (the step's own SLA due, else the default window).
+    const deadline = actionTokenDeadline({
+      stepDueAt: input.stepDueAt,
+      now: input.assignedAt,
+    });
     await input.emailLeg.enqueueStepAssignedMail({
       assigneeUserId: input.assigneeUserId,
       docLabelEn: label.en,
@@ -506,6 +522,21 @@ async function notifyAssignee(input: {
       stepNameAr: input.stepNameAr,
       stepInstanceId: input.stepInstanceId,
       docUrl: docDetailPath(input.triggerEntity, input.documentId),
+      approveToken: encodeWorkflowActionToken({
+        userId: input.assigneeUserId,
+        instanceId: input.instanceId,
+        stepInstanceId: input.stepInstanceId,
+        action: "approve",
+        deadline,
+      }),
+      rejectToken: encodeWorkflowActionToken({
+        userId: input.assigneeUserId,
+        instanceId: input.instanceId,
+        stepInstanceId: input.stepInstanceId,
+        action: "reject",
+        deadline,
+      }),
+      tokenDeadline: deadline,
     });
   }
 }
@@ -539,7 +570,11 @@ export interface WorkflowAuditRecorder {
 /** The email-leg contract (the 041 hub's template mail — the module
  * wires this to the EmailService; the specs may omit it: the inbox
  * leg alone is the engine's own floor, the email leg rides the
- * module's envelope). */
+ * module's envelope). PHASE-052 (W-47 — T-06): the leg carries the
+ * DEEP-LINK TOKENS (D-09 — the engine builds them at assignment with
+ * the deadline law; the leg renders the locale-bound URLs in the
+ * recipient's own locale — `${WEB_BASE_URL}/{locale}/workflow/act?
+ * token=…`, the module wiring's own resolution). */
 export interface WorkflowEmailLeg {
   enqueueStepAssignedMail(input: {
     assigneeUserId: string;
@@ -552,6 +587,9 @@ export interface WorkflowEmailLeg {
     stepNameAr: string;
     stepInstanceId: string;
     docUrl: string;
+    approveToken: string;
+    rejectToken: string;
+    tokenDeadline: string;
   }): Promise<void>;
 }
 
@@ -702,6 +740,8 @@ export class WorkflowEngine {
         assigneeUserId: firstAssigned.row.assigneeUserId,
         stepInstanceId: firstAssigned.row.id,
         instanceId: instance.id,
+        stepDueAt: firstAssigned.row.dueAt,
+        assignedAt: now.toISOString(),
       });
       await store.stampNotificationStepFired({
         stepInstanceId: firstAssigned.row.id,
@@ -724,10 +764,10 @@ export class WorkflowEngine {
         });
       } else {
         await store.updateInstancePointer({ instanceId: instance.id, currentStepOrder });
-        await this.announceAssignment(instance.id, input.triggerEntity, input.documentId, facts, snapshot, stepRows);
+        await this.announceAssignment(instance.id, input.triggerEntity, input.documentId, facts, snapshot, stepRows, now);
       }
     } else if (firstAssigned !== null) {
-      await this.announceAssignment(instance.id, input.triggerEntity, input.documentId, facts, snapshot, await store.findStepInstancesForInstance(instance.id));
+      await this.announceAssignment(instance.id, input.triggerEntity, input.documentId, facts, snapshot, await store.findStepInstancesForInstance(instance.id), now);
     }
     return { chainOpened: true, instanceId: instance.id };
   }
@@ -760,7 +800,9 @@ export class WorkflowEngine {
   }
 
   /** The current step's assignment announcement — the inbox record +
-  * the bus event (the pointer just reached this step). */
+  * the bus event (the pointer just reached this step). The `now` is
+  * the caller's own act/open instant (the same clock the due stamps
+  * ride — the token deadline's base, W-47). */
   private async announceAssignment(
     instanceId: string,
     triggerEntity: WorkflowTriggerEntity,
@@ -768,6 +810,7 @@ export class WorkflowEngine {
     facts: DocumentFacts,
     snapshot: { steps: readonly { stepOrder: number; name: string; nameAr: string }[] },
     stepRows: readonly WorkflowStepInstanceRow[],
+    now: Date,
   ): Promise<void> {
     const instance = await store.findInstanceById(instanceId);
     if (instance === undefined || instance.status !== "ACTIVE" || instance.currentStepOrder === null) {
@@ -788,6 +831,8 @@ export class WorkflowEngine {
       assigneeUserId: current.assigneeUserId,
       stepInstanceId: current.id,
       instanceId,
+      stepDueAt: current.dueAt,
+      assignedAt: now.toISOString(),
     });
     const tenantId = requireTenantContext().tenantId;
     publishWorkflowEvent({
@@ -952,6 +997,8 @@ export class WorkflowEngine {
           assigneeUserId: row.assigneeUserId,
           stepInstanceId: row.id,
           instanceId: instance.id,
+          stepDueAt: row.dueAt,
+          assignedAt: now.toISOString(),
         });
         await store.stampNotificationStepFired({
           stepInstanceId: row.id,
@@ -999,6 +1046,7 @@ export class WorkflowEngine {
       input.facts,
       instance.definitionSnapshot as { steps: readonly { stepOrder: number; name: string; nameAr: string }[] },
       await store.findStepInstancesForInstance(instance.id),
+      now,
     );
     return { completed: false, remaining, currentStepOrder: pointer, completedSteps: 0 };
   }

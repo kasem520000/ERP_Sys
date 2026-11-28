@@ -45,6 +45,72 @@ describe("email templates (AR/EN, plain-text-first)", () => {
     expect(rendered.body).toContain("5.10.20.30");
     expect(rendered.body).toContain("2026-10-28T10:00:00Z");
   });
+
+  // PHASE-052 (W-47 — T-06, D-09): the step-assignment mail carries THE
+  // SIGNED ONE-TIME DEEP LINKS — the approve/reject URLs + the claim's
+  // own deadline, in both locales (the byte-stable law stands).
+  it("renders the step-assignment mail with the approve/reject deep links (AR)", () => {
+    const rendered = renderEmail({
+      template: "workflow_step_assigned",
+      locale: "ar",
+      recipient: "approver@corp.example",
+      variables: {
+        docLabel: "أمر شراء",
+        docNo: "PO-2026-001",
+        amount: "75,000.0000",
+        currency: "SAR",
+        stepName: "موافقة المدير المالي",
+        docUrl: "https://erp/ar/purchasing/orders?doc=po-1",
+        approveUrl: "https://erp/ar/workflow/act?token=APPROVE-TOKEN",
+        rejectUrl: "https://erp/ar/workflow/act?token=REJECT-TOKEN",
+        deadline: "2026-12-01T09:00:00.000Z",
+      },
+    });
+    expect(rendered.subject).toContain("PO-2026-001");
+    expect(rendered.body).toContain("https://erp/ar/workflow/act?token=APPROVE-TOKEN");
+    expect(rendered.body).toContain("https://erp/ar/workflow/act?token=REJECT-TOKEN");
+    expect(rendered.body).toContain("2026-12-01T09:00:00.000Z");
+    expect(rendered.body).toContain("لمرة واحدة");
+    expect(renderEmail({
+      template: "workflow_step_assigned",
+      locale: "ar",
+      recipient: "approver@corp.example",
+      variables: {
+        docLabel: "أمر شراء",
+        docNo: "PO-2026-001",
+        amount: "75,000.0000",
+        currency: "SAR",
+        stepName: "موافقة المدير المالي",
+        docUrl: "https://erp/ar/purchasing/orders?doc=po-1",
+        approveUrl: "https://erp/ar/workflow/act?token=APPROVE-TOKEN",
+        rejectUrl: "https://erp/ar/workflow/act?token=REJECT-TOKEN",
+        deadline: "2026-12-01T09:00:00.000Z",
+      },
+    })).toEqual(rendered);
+  });
+
+  it("renders the step-assignment mail with the approve/reject deep links (EN)", () => {
+    const rendered = renderEmail({
+      template: "workflow_step_assigned",
+      locale: "en",
+      recipient: "approver@corp.example",
+      variables: {
+        docLabel: "Purchase order",
+        docNo: "PO-2026-001",
+        amount: "75,000.0000",
+        currency: "SAR",
+        stepName: "Finance manager approval",
+        docUrl: "https://erp/en/purchasing/orders?doc=po-1",
+        approveUrl: "https://erp/en/workflow/act?token=APPROVE-TOKEN",
+        rejectUrl: "https://erp/en/workflow/act?token=REJECT-TOKEN",
+        deadline: "2026-12-01T09:00:00.000Z",
+      },
+    });
+    expect(rendered.subject).toContain("PO-2026-001");
+    expect(rendered.body).toContain("Approve: https://erp/en/workflow/act?token=APPROVE-TOKEN");
+    expect(rendered.body).toContain("Reject: https://erp/en/workflow/act?token=REJECT-TOKEN");
+    expect(rendered.body).toContain("single-use, valid until 2026-12-01T09:00:00.000Z");
+  });
 });
 
 describe("rate limiter (R-03/R-08 shape)", () => {

@@ -6182,6 +6182,24 @@ export const ROUTE_PERMISSIONS: readonly RoutePermissionRule[] = [
     path: "/api/v1/trade/certificates",
     permission: "trade.shipments.manage",
   },
+  // PHASE-052 (W-47 — T-06, dated 2026-11-27; matrix §3.30): the
+  // workflow plane's FIRST route — the keys-seed-first discipline
+  // standing (the nine workflow.* keys landed at W-43 (0130 §5), the
+  // routes bind as the service waves ship, every change dated at the
+  // block; 1,215 → 1,216). THE DEEP-LINK ACT binds `workflow.approve`
+  // (D-03 — the approve/reject act key): session-authenticated (never
+  // an unauthenticated action surface — risk §7), the signed one-time
+  // token the act's own authorization, the step's CAS stamp the
+  // single-use floor. The link PREVIEW rides SESSION_ROUTES below (the
+  // notifications self-plane pattern — the link's own user reads their
+  // own act surface; the actor-mismatch floor still compares the
+  // session). The route is feature-gated at the controller on
+  // `workflow.engine` (D-04 — the base unit).
+  {
+    method: "POST",
+    path: "/api/v1/workflow/act",
+    permission: "workflow.approve",
+  },
 ];
 
 /**
@@ -6235,9 +6253,17 @@ export const SESSION_ROUTES: readonly { method: string; path: string }[] = [
   // sessions; the 020 device-token path resolves the same plane).
   { method: "GET", path: "/api/v1/sync/status" },
   { method: "GET", path: "/api/v1/sync/pull" },
+  { method: "POST", path: "/api/v1/sync/pull" },
   { method: "POST", path: "/api/v1/sync/push" },
   { method: "POST", path: "/api/v1/sync/pull/ack" },
   { method: "POST", path: "/api/v1/sync/push/ack" },
+  // PHASE-052 (W-47 — T-06): the deep-link PREVIEW self plane — the link's
+  // own user reads their own act surface (the notifications self-plane
+  // pattern; the token's actor-mismatch floor still compares the session
+  // against the link's bound user — the typed refusal, never a stale
+  // form). The act itself is permission-guarded in ROUTE_PERMISSIONS
+  // above (workflow.approve).
+  { method: "GET", path: "/api/v1/workflow/act" },
 ];
 
 /**

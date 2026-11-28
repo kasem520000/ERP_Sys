@@ -324,6 +324,14 @@ export async function stampInstanceTerminal(input: {
 
 // ── the assignee resolution reads ────────────────────────────────────
 
+/** PHASE-052 (W-47 — T-06, the clock law): the DATABASE'S OWN now() —
+ * the deep-link expiry check's clock (never a JS wall clock; the same
+ * law the breach scan carries inside its SQL). */
+export async function readDbNow(): Promise<string> {
+  const rows = await tenantTx().execute(sql`SELECT now()::text AS "dbNow"`);
+  return (rows.rows as unknown as { dbNow: string }[])[0]!.dbNow;
+}
+
 /** The FIRST ACTIVE membership holder of a role key — the
  * DETERMINISTIC pick (created_at, id), captured at trigger time (the
  * snapshot law: a later membership change never rewrites a live

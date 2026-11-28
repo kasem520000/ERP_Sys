@@ -126,3 +126,28 @@ export function assertWorkflowTokenUsable(
     });
   }
 }
+
+/** PHASE-052 (W-47 — T-06, dated 2026-11-27) THE DEADLINE LAW (the
+ * declared interpretation, D-09's own reading): the link's expiry is
+ * the CLAIM'S OWN deadline, derived at encoding time from the step's
+ * own substrate — the step's `due_at` when the SLA set one (the link
+ * dies with the step's own SLA window), else a DEFAULT WINDOW of 72
+ * hours from the assignment (the invitation precedent's own span —
+ * the approval link's documented default; widenings are dated
+ * additive). The deadline rides the claims (the stateless law — never
+ * a stored TTL, never a token table). */
+export const WORKFLOW_ACTION_DEFAULT_WINDOW_HOURS = 72;
+
+/** Derive the token's own deadline from the step's due instant (the
+ * SLA window) or the default window from the assignment instant. */
+export function actionTokenDeadline(input: {
+  readonly stepDueAt: string | null;
+  readonly now: string;
+}): string {
+  if (input.stepDueAt !== null) {
+    return input.stepDueAt;
+  }
+  return new Date(
+    new Date(input.now).getTime() + WORKFLOW_ACTION_DEFAULT_WINDOW_HOURS * 3_600_000,
+  ).toISOString();
+}

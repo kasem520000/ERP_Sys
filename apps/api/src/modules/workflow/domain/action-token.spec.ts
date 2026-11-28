@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  actionTokenDeadline,
   assertWorkflowTokenUsable,
   decodeWorkflowActionToken,
   encodeWorkflowActionToken,
+  WORKFLOW_ACTION_DEFAULT_WINDOW_HOURS,
   type WorkflowActionClaims,
 } from "./action-token";
 import {
@@ -132,5 +134,32 @@ describe("THE TYPED REFUSALS (the claim's own deadline + the actor binding)", ()
     expect(() =>
       assertWorkflowTokenUsable(claims(), { now: "2026-11-27T09:00:00Z", actorId: "user-1" }),
     ).not.toThrow();
+  });
+});
+
+// PHASE-052 (W-47 — T-06, dated 2026-11-27) THE DEADLINE LAW (the
+// declared interpretation, D-09's own reading): the link's expiry is
+// the CLAIM'S OWN deadline, derived at encoding time from the step's
+// own substrate — the step's due_at when the SLA set one (the link
+// dies with the step's own SLA window), else the 72-hour default
+// window from the assignment (the invitation precedent's own span).
+describe("the deadline law (actionTokenDeadline — W-47)", () => {
+  it("a step with an SLA due: the token's deadline IS the step's own due instant", () => {
+    expect(
+      actionTokenDeadline({ stepDueAt: "2026-12-01T09:00:00.000Z", now: "2026-11-28T09:00:00.000Z" }),
+    ).toBe("2026-12-01T09:00:00.000Z");
+  });
+
+  it("a step with NO SLA due: the 72-hour default window from the assignment", () => {
+    expect(actionTokenDeadline({ stepDueAt: null, now: "2026-11-28T09:00:00.000Z" })).toBe(
+      "2026-12-01T09:00:00.000Z",
+    );
+    expect(WORKFLOW_ACTION_DEFAULT_WINDOW_HOURS).toBe(72);
+  });
+
+  it("the derived deadline round-trips through the token (the claims carry it verbatim)", () => {
+    const deadline = actionTokenDeadline({ stepDueAt: null, now: "2026-11-28T09:00:00.000Z" });
+    const token = encodeWorkflowActionToken(claims({ deadline }));
+    expect(decodeWorkflowActionToken(token)?.deadline).toBe("2026-12-01T09:00:00.000Z");
   });
 });
